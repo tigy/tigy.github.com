@@ -1,0 +1,32 @@
+
+
+
+
+.libs-category, .res-category {
+	width: 80px;	
+}
+
+.libs-summary, .res-summary {
+    width: 116px;   
+}
+
+
+tr.alt {
+	background-color: #F6F6F6;	
+}
+
+.x-table td{
+	word-break: break-all;
+}
+
+.removed {
+	text-decoration: line-through;	
+}
+
+.italic {
+	font-style: italic;
+}
+
+.strong {
+	font-weight: bold;
+}

@@ -1,0 +1,51 @@
+
+
+var configs = require('../config'),
+	DplBuilder = require('./buildfiles');
+
+var callback = urlInfo.query["callback"],
+	data,
+	namespace = urlInfo.query["namespace"],
+	isStyle = urlInfo.query["isStyle"] === "true";
+
+
+
+var buildFile = new DplBuilder.BuildFile('');
+
+function getRelative(path){
+	return path.replace(configs.root, "");
+}
+
+switch(urlInfo.query["type"]){
+	case "source":
+		var data = [getRelative(buildFile.getPath(namespace, isStyle))];
+		
+		if(!isStyle){
+			data.push(getRelative(buildFile.getPath(namespace, true)));
+		}
+	
+		break;
+	case "refs":
+		var data = buildFile.getRefs(namespace, isStyle);
+	
+		break;
+	case "preview":
+		var data = DplBuilder.getBuildFile(urlInfo.query["name"]).getFinalFiles();
+	
+		break;
+
+}
+
+
+
+
+
+
+
+data = JSON.stringify(data);
+		
+
+if(callback) {
+	data = callback + "(" + data + ")";
+}
+response.end(data);

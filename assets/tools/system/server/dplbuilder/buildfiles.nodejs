@@ -1,0 +1,56 @@
+
+
+var DplBuilder = require('./buildfiles');
+
+function redrect(url, response){
+	response.writeHead(302, {
+		'Content-Type' : 'text/html',
+		'Location': url
+	});
+	response.end('Object Moved');
+}
+
+if(request.method != "POST"){
+	response.writeHead(403, {
+		'Content-Type' : 'text/html'
+	});
+	response.end("403 - Method Not Allowed");
+}
+
+var data = JSON.parse(content["data"]),
+		action = data.action,
+		url = data.url || "",
+		build = data.build,
+		data = data.data;
+
+switch(action){
+	case 'save':
+		DplBuilder.BuildFiles = data;
+		DplBuilder.saveFile(DplBuilder.BuildFiles);
+		if(!build){
+			redrect(url, response);
+			break;
+		}
+	case 'build':
+		DplBuilder.buildAndLog(build, response, url || "javascript:history.back()");
+		break;
+	case 'rebuild':
+		url = url || "javascript:history.back()";
+		
+		
+		response.writeHead(200, {
+			'Content-Type': 'text/html'
+		});
+		
+		for(var item in DplBuilder.BuildFiles){
+			DplBuilder.buildAndLogInternal(item, response);
+		}
+
+		response.write('<a href="' + url + '">返回</a>');
+		
+		response.end();
+		break;
+	default:
+		response.end('');
+}
+
