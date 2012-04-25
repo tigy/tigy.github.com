@@ -561,7 +561,7 @@ var NamespaceAutoComplete = AutoComplete.extend({
 			name = name.toLowerCase();
 			
 			for(var i in c){
-				if(i.toLowerCase().indexOf(name) !== -1) {
+				if(c[i].attribute != '$' && i.toLowerCase().indexOf(name) !== -1) {
 					r.push(n + i);
 				}
 			}

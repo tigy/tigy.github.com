@@ -1,0 +1,1 @@
+/** * @author  */using("Controls.Core.ListControl");var Tabbable = ListControl.extend({		xType: 'tabbable',		init: function(){		this.base('init');				this.bindSelector('click');	}});
