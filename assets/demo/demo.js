@@ -4098,6 +4098,21 @@ Demo.showPage = function () {
 		     }
 			
 			
+			
+        	if(tda.attribute === '~') {
+        		if(currentUrl === src){
+        			Demo.category = category;
+					Demo.name = name;
+					currentInfo = isLib ? [tda.summary || name, module + '.' +category + '.' + name, category] : [name, category, category];
+        		}
+        		
+        		
+        		continue;	
+        	}
+        	
+        	
+        	
+        	
 			 // 处理 clazz
 			
 			 switch (tda.status) {
@@ -4124,17 +4139,6 @@ Demo.showPage = function () {
 	                total++;
 	                break;
 	        }
-			
-        	if(tda.attribute === '~') {
-        		if(currentUrl === src){
-        			Demo.category = category;
-					Demo.name = name;
-					currentInfo = isLib ? [tda.summary || name, module + '.' +category + '.' + name, category] : [name, category, category];
-        		}
-        		
-        		
-        		continue;	
-        	}
         	
 			if(currentUrl === src){
 				Demo.category = category;
