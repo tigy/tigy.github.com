@@ -93,7 +93,9 @@ var DplBuilder = {
 		Dom.get('tabbable').query('[data-name="' + buildFileName + '"]').addClass('x-tabbable-actived');
 		
 		DplBuilder.currentBuildFileName = buildFileName;
-		DplBuilder.currentBuildFile = BuildFiles[buildFileName] || DplBuilder.addFile || ( DplBuilder.addFile = {});
+		DplBuilder.currentBuildFile = BuildFiles[buildFileName] || DplBuilder.addFile || ( DplBuilder.addFile = {
+			top: ['System.Core.System', 'Controls.Core.Base']
+		});
 		
 		var html = Tpl.parse('<div class="x-formfield">\
                 <label class="x-formfield-label">\
@@ -180,24 +182,34 @@ var DplBuilder = {
             <h3>组件列表</h3>\
             \
             <div id="namespaces">\
+            	{for c in $data.top}\
+            	<div class="namespace">\
+	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[置顶]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'top\')">删除</a>\
+	           	</div>\
+	           	{end}\
             	{for c in $data.using}\
             	<div class="namespace">\
-	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', false)">删除</a>\
+	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'js\')">删除</a>\
 	           	</div>\
 	           	{end}\
             	{for c in $data.imports}\
             	<div class="namespace">\
-	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[样式]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', true)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', true)">删除</a>\
+	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[样式]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', true)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'css\')">删除</a>\
 	           	</div>\
 	           	{end}\
             	{for c in $data.excludeJs}\
             	<div class="namespace">\
-	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank"><del>[排除]{c}</del></a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', true)">删除</a>\
+	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank"><del>[排除]{c}</del></a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'excludeJs\')">删除</a>\
 	           	</div>\
 	           	{end}\
             	{for c in $data.excludeCss}\
             	<div class="namespace">\
-	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank"><del>[无样式]{c}</del></a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', true)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', true)">删除</a>\
+	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank"><del>[无样式]{c}</del></a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', true)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'excludeCss\')">删除</a>\
+	           	</div>\
+	           	{end}\
+            	{for c in $data.bottom}\
+            	<div class="namespace">\
+	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[置底]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'bottom\')">删除</a>\
 	           	</div>\
 	           	{end}\
 	           	\
@@ -207,6 +219,8 @@ var DplBuilder = {
 	                        <option value="imports" title="仅引入一个组件的样式及其依赖样式">仅样式</option>\
 	                        <option value="excludeJs" title="仅引入一个组件的样式及其依赖样式">排除</option>\
 	                        <option value="excludeCss" title="仅引入一个组件的样式及其依赖样式">无样式</option>\
+	                        <option value="top" title="置顶一个组件">置顶</option>\
+	                        <option value="bottom" title="置底一个组件">置底</option>\
 	                    </select>\
 	                  \
 	                      <input type="text" class="x-textbox control-namespace" placeholder="输入组件的名字空间" />\
@@ -349,13 +363,13 @@ var DplBuilder = {
 		 
 	},
 	
-	deleteControl: function(name, isStyle){
+	deleteControl: function(name, type){
 		
 		if(!confirm("确定删除组件 " + name + "?")){
 			return;	
 		}
 		
-		var arr = DplBuilder.currentBuildFile[  isStyle ? 'imports' : 'using' ];
+		var arr = DplBuilder.currentBuildFile[  type ];
 		
 		arr.remove(name);
 		   DplBuilder.showView(DplBuilder.currentBuildFileName);
@@ -452,7 +466,7 @@ var DplBuilder = {
 				</th>\
 				</tr>\
     			{for c in data.css}\
-	    		<tr>\
+	    		<tr class="alt">\
 					<td>\
 						{author(c)}\
 		           	</td>\
@@ -476,7 +490,7 @@ var DplBuilder = {
 				</tr>\
     			{end}\
     			{for c in data.excludeCss}\
-	    		<tr>\
+	    		<tr class="alt">\
 					<td>\
 						<del>{author(c)}</del>\
 		           	</td>\

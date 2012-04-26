@@ -12,7 +12,7 @@
 
 
 tr.alt {
-	background-color: #F6F6F6;	
+	background-color: #f0f0f0;	
 }
 
 .x-table td{
@@ -29,4 +29,11 @@ tr.alt {
 
 .strong {
 	font-weight: bold;
+}
+
+
+.goto {
+	border: 1px solid #dddddd;
+	border-radius: 4px;
+	padding: 4px;
 }

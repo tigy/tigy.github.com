@@ -58,6 +58,18 @@ var BuildFile = function(name, options) {
 		
 	}
 	
+	if(this.top){
+		var pp =   this.top.reverse();
+		this.js = this.js.concat(pp);
+		this.css = this.css.concat(pp);
+	}
+	
+	if(this.bottom){
+		this.js = this.bottom.concat(this.js);
+		this.css = this.bottom.concat(this.css);
+	}
+	
+	
 	this.compile();
 
 };
@@ -150,10 +162,12 @@ BuildFile.prototype = {
 	    var stack = [];
 	    var resultCss = [];
 	    var resultJs = [];
+	    var result = [];
 	    var child;;
 	    var p;
 	    while(true) {
 	        var bo = 2;
+	        var ins = p ? result.indexOf(p) : 0;
 	        while(bo--) {
 	            var bool = bo == 0;
 	            tempArray = bool ? tempObj.css : tempObj.js;
@@ -167,6 +181,7 @@ BuildFile.prototype = {
 	                        parent: []
 	                    };
 	                    stack.push(child);
+	                    result.splice(ins, 0, child);
 	                }
 	                if(p) {
 	                	child.parent.push(p);
@@ -174,14 +189,14 @@ BuildFile.prototype = {
 	            }
 	        }
 	        if (!(p = stack.pop())) break;
-	        /*if (p.isStyle)
-	        	resultCss.push(p);
-	       	else
-	       		resultJs.push(p);*/
 	        tempObj = this.getRefs(p.name, p.isStyle);
 	    }
-	    resultCss = resultCss.reverse();
-	    resultJs = resultJs.reverse();
+        for (i = 0; i < result.length; i++) {
+			if (result[i].isStyle)
+        		resultCss.push(result[i]);
+       		else
+       			resultJs.push(result[i]);
+        }
 	    return {js:resultJs, css:resultCss};
 	},
 	
