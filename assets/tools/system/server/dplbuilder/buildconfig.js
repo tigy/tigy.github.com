@@ -85,7 +85,7 @@ var BuildConfig = {
 		if(isStyle) {
 				
 			
-			content.replace(/(^\s*|#)(using|imports)\b(.+)\*\/\s*$/m, function(m, c1, type, c3){
+			content.replace(/(^\s*|#)(using|imports)\b(.+)\*\/\s*$/mg, function(m, c1, type, c3){
 				var value = c3.replace(/^[\s\("']+|[\s\)'";]+$/g, "");
 				
 				r.css.push(value);
@@ -97,7 +97,7 @@ var BuildConfig = {
 			
 		} else {
 			
-			content.replace(/(^\s*|#)(using|imports)\b(.+)$/m, function(m, c1, type, c3){
+			content.replace(/(^\s*|#)(using|imports)\b(.+)$/mg, function(m, c1, type, c3){
 				var value = c3.replace(/^[\s\("']+|[\s\)'";]+$/g, "");
 				
 				r.css.push(value);
@@ -109,7 +109,6 @@ var BuildConfig = {
 			
 			
 		}
-		
 		
 		return r;
 		
@@ -232,23 +231,23 @@ var BuildConfig = {
 		}
 		
 		if(this.removeUsing){
-			content = content.replace(/^\s*using\s*\(.*?$/m, "");
+			content = content.replace(/^\s*using\s*\(.*?$/mg, "");
 		}
 		
 		if(this.removeImports){
-			content = content.replace(/^\s*imports\s*\(.*?$/m, "");
+			content = content.replace(/^\s*imports\s*\(.*?$/mg, "");
 		}
 		
 		if(this.removeTrace){
-			content = content.replace(/^\s*trace\s*[\(\.].*?$/m, "");
+			content = content.replace(/^\s*trace\s*[\(\.].*?$/mg, "");
 		}
 		
 		if(this.removeAssert){
-			content = content.replace(/^\s*assert\s*[\(\.].*?$/m, "");
+			content = content.replace(/^\s*assert\s*[\(\.].*?$/mg, "");
 		}
 		
 		if(this.removeConsole){
-			content = content.replace(/^\s*console\s*\..*?$/m, "");
+			content = content.replace(/^\s*console\s*\..*?$/mg, "");
 		}
 		
 		return content;
@@ -285,10 +284,6 @@ var BuildConfig = {
 			var targetImages = Path.join(this.targetImages, getParentName(name));
 			var p = Path.join(Path.dirname(this.targetCss), targetImages);
 			var me = this;
-			if(!me.exist(p)){
-				require("../lib/io").createDirectory(p);
-			}
-			
 			
 			content = content.replace(/url\s*\((['""]?)(.*)\1\)/ig, function(all, c1, c2, c3){
 				if(c2.indexOf(':') >= 0)
@@ -304,7 +299,11 @@ var BuildConfig = {
                     	
                     	return  all;
                     }
-                    
+		                    
+					if(!me.exist(p)){
+						require("../lib/io").createDirectory(p);
+					}
+					
                     require("../lib/io").copyFile(src, Path.join(p, destName));
                 }
                 return "url(" + Path.join(targetImages, destName).replace(/\\/g, "/") + ")";

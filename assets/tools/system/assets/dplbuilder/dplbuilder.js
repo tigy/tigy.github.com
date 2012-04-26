@@ -470,7 +470,31 @@ var DplBuilder = {
 		           	</td>\
 					<td>\
 						{for p in c.parent}\
-							{author(p)}\
+							{author(p)}<br>\
+						{end}\
+					</td>\
+				</tr>\
+    			{end}\
+    			{for c in data.excludeCss}\
+	    		<tr>\
+					<td>\
+						<del>{author(c)}</del>\
+		           	</td>\
+					<td>\
+						{for p in c.parent}\
+							{author(p)}<br>\
+						{end}\
+					</td>\
+				</tr>\
+    			{end}\
+    			{for c in data.excludeJs}\
+	    		<tr>\
+					<td>\
+		            	<del>{author(c)}</del>\
+		           	</td>\
+					<td>\
+						{for p in c.parent}\
+							{author(p)}<br>\
 						{end}\
 					</td>\
 				</tr>\

@@ -190,7 +190,7 @@
             nodes = parentNode.getElementsByTagName('SCRIPT');
             for (var i = 0, len = nodes.length; i < len; i++) {
                 var script = nodes[i];
-                if (script.className === 'demo' && !script.processed) {
+                if (script.className.indexOf('demo') !== -1 && !script.processed) {
                     script.parentNode.insertBefore(Demo.getCode(script.innerHTML, script.type), script.nextSibling);
                 }
             }
@@ -1030,7 +1030,11 @@
                 if (typeof tempToken !== 'string') {
                     return tempToken;
                 }
-                token = js_beautify(tempToken, this.indentSize, this.indentCharacter, this.indent_level);
+                token = js_beautify(tempToken, {
+                	indent_size: this.indentSize,
+                	indent_char: this.indentCharacter,
+                	indent_level: this.indent_level
+                });
                 //call the JS Beautifier
                 return [token, 'TK_CONTENT'];
             }
@@ -1106,42 +1110,56 @@
         parse: function (htmlSource, indentCharacter, indentSize) {
             var me = this;
             me.printer(htmlSource, indentCharacter, indentSize); //initialize starting values
+            
+            var hasContent = true;
+            
             while (true) {
                 var t = me.getToken();
                 me.tokenText = t[0];
                 me.tokenType = t[1];
-
                 if (me.tokenType === 'TK_EOF') {
                     break;
                 }
 
                 switch (me.tokenType) {
-                case 'TK_TAG_START':
-                case 'TK_TAG_SCRIPT':
-                case 'TK_TAG_STYLE':
-                    me.printNewline(false, me.output);
-                    me.printToken(me.tokenText);
-                    me.indent();
-                    me.currentMode = 'CONTENT';
-                    break;
-                case 'TK_TAG_END':
-                    me.printNewline(true, me.output);
-                    me.printToken(me.tokenText);
-                    me.currentMode = 'CONTENT';
-                    break;
-                case 'TK_TAG_SINGLE':
-                    me.printNewline(false, me.output);
-                    me.printToken(me.tokenText);
-                    me.currentMode = 'CONTENT';
-                    break;
-                case 'TK_CONTENT':
-                    if (me.tokenText !== '') {
-                        me.printNewline(false, me.output);
-                        me.printToken(me.tokenText);
-                    }
-                    me.currentMode = 'TAG';
-                    break;
-                }
+	                case 'TK_TAG_START':
+	                case 'TK_TAG_SCRIPT':
+	                case 'TK_TAG_STYLE':
+	                    me.printNewline(false, me.output);
+	                    me.printToken(me.tokenText);
+	                    me.indent();
+	                    me.currentMode = 'CONTENT';
+	                    break;
+	                case 'TK_TAG_END':
+	                	if(hasContent) {
+	                  		me.printNewline(true, me.output);
+		                } else {
+	                    	hasContent = true;	
+		                }
+	                    me.printToken(me.tokenText);
+	                    me.currentMode = 'CONTENT';
+	                    break;
+	                case 'TK_TAG_SINGLE':
+	                    me.printNewline(false, me.output);
+	                    me.printToken(me.tokenText);
+	                    me.currentMode = 'CONTENT';
+	                    hasContent = true;
+	                    break;
+	                case 'TK_CONTENT':
+	                    hasContent = true;
+	                    if (me.tokenText !== '') {
+	                    	if(/^\<(title|textarea|p|a|span|button|li)\b/.test(me.lastText)){
+	                    		hasContent = false;
+	                    	} else {
+		                        me.printNewline(false, me.output);
+	                       }
+		                   me.printToken(me.tokenText);
+	                    } else if(/^TK_TAG_S/.test(me.lastToken)){
+	                    	hasContent = false;
+	                    }
+	                    me.currentMode = 'TAG';
+	                    break;
+	            }
                 me.lastToken = me.tokenType;
                 me.lastText = me.tokenText;
             }
@@ -1238,6 +1256,7 @@
         var opt_keep_array_indentation = typeof options.keep_array_indentation === 'undefined' ? false : options.keep_array_indentation;
         var opt_space_before_conditional = typeof options.space_before_conditional === 'undefined' ? true : options.space_before_conditional;
         var opt_indent_case = typeof options.indent_case === 'undefined' ? false : options.indent_case;
+		var indentation_level_start = options.indent_level || 0;
 
         just_added_newline = false;
 
@@ -1352,7 +1371,7 @@
                 case_body: false,
                 eat_next_space: false,
                 indentation_baseline: -1,
-                indentation_level: (flags ? flags.indentation_level + (flags.case_body ? 1 : 0) + ((flags.var_line && flags.var_line_reindented) ? 1 : 0) : 0),
+                indentation_level: (flags ? flags.indentation_level + (flags.case_body ? 1 : 0) + ((flags.var_line && flags.var_line_reindented) ? 1 : 0) : indentation_level_start),
                 ternary_depth: 0
             };
         }
@@ -3959,10 +3978,10 @@ Demo.initPage = function(project){
     }
     
 	// 初始化控件。
-	Demo.onLoad(Demo.showPage);
+	Demo.onLoad(Demo.initControls);
     
 	// 初始化控件。
-	Demo.onLoad(Demo.initControls);
+	Demo.onLoad(Demo.showPage);
 };
 
 Demo.showPage = function () {
@@ -3989,7 +4008,7 @@ Demo.showPage = function () {
     	var navl = nav.toLowerCase(), clazz = '';
     	if(navl === modulePath){
     		var type = Dpl.projects[nav].type;
-			isLib = type === 'libs';
+			isLib = Demo.isLib = type === 'libs';
 			data = Dpl[type][nav];
 			clazz = ' demo-page-current';
 			module = Demo.module = nav;
@@ -4175,6 +4194,10 @@ Demo.showPage = function () {
 
     sidebar.innerHTML = t.join('\r\n');
     
+    if(!isLib || !currentInfo){
+   		Demo.initViewSource(document);
+    }
+    
     if(currentInfo) {
         
         document.title = currentInfo[0] + ' - ' + currentInfo[2] + ' - ' + document.title;
@@ -4187,11 +4210,12 @@ Demo.showPage = function () {
     	
     	if(isLib) {
 		
-			t = ['♦ 隐藏源码', '❒ 全屏视图'];
+			t = ['♢ 显示源码', '❒ 全屏视图'];
 			
-			if(Demo.getData('demo_source') === 'false') {
-				main.className = 'demo-page-clean';
-				t[0] = '♢ 显示源码';
+			if(Demo.getData('demo_source') !== 'false') {
+				t[0] = '♦ 隐藏源码';
+    			Demo.initViewSource(document);
+                Demo.viewSourceState = true;
 			}
 		
 			if(Demo.getData('demo_view') === 'true') {

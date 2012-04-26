@@ -2,6 +2,8 @@
  * @fileOverview 提供最底层的 DOM 辅助函数。
  */
 
+using("System.Core.System");
+
 // Core - 核心部分
 // Parse - 节点解析部分
 // Traversing - 节点转移部分

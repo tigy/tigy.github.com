@@ -1897,7 +1897,7 @@ function assert(bValue, msg) {
 
         }
 
-        trace.error(msg);
+        window.trace.error(msg);
 
     }
 
@@ -2478,7 +2478,7 @@ function assert(bValue, msg) {
                     r.push('无法对 ' + (obj === null ? "null" : "undefined") + ' 分析');
                 }
 
-                trace(r.join('\r\n'));
+                window.trace(r.join('\r\n'));
 
             };
 
@@ -2561,7 +2561,7 @@ function assert(bValue, msg) {
         error: function(msg) {
             if (p.debug) {
                 if (window.console && console.error)
-                    console.error(msg); // 如果错误在此行产生，说明这是预知错误。
+                    window.console.error(msg); // 如果错误在此行产生，说明这是预知错误。
                 else
                     throw msg;
             }
@@ -2574,9 +2574,9 @@ function assert(bValue, msg) {
         warn: function(msg) {
             if (p.debug) {
                 if (window.console && console.warn)
-                    console.warn(msg);
+                    window.console.warn(msg);
                 else
-                    trace.write("[警告]" + msg);
+                    window.trace.write("[警告]" + msg);
             }
         },
 
@@ -2587,9 +2587,9 @@ function assert(bValue, msg) {
         info: function(msg) {
             if (p.debug) {
                 if (window.console && console.info)
-                    console.info(msg);
+                    window.console.info(msg);
                 else
-                    trace.write("[信息]" + msg);
+                    window.trace.write("[信息]" + msg);
             }
         },
 
@@ -2605,7 +2605,7 @@ function assert(bValue, msg) {
                     var r = "", i;
                     for (i in obj)
                         r += i + " = " + trace.inspect(obj[i], 1) + "\r\n";
-                    trace(r);
+                    window.trace(r);
                 }
             }
         },
@@ -2615,7 +2615,7 @@ function assert(bValue, msg) {
          */
         clear: function() {
             if (window.console && console.clear)
-                console.clear();
+                window.console.clear();
         },
 
         /**
@@ -2638,7 +2638,7 @@ function assert(bValue, msg) {
          * 空函数，用于证明函数已经执行过。
          */
         count: function() {
-            trace('[调试]' + p.id++);
+            window.trace('[调试]' + p.id++);
         },
 
         /**
@@ -2652,7 +2652,7 @@ function assert(bValue, msg) {
             while (times-- > 0)
                 fn();
             times = Date.now() - d;
-            trace("[时间] " + times);
+            window.trace("[时间] " + times);
         }
 
     });

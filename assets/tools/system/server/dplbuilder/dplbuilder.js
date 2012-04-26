@@ -174,10 +174,10 @@ BuildFile.prototype = {
 	            }
 	        }
 	        if (!(p = stack.pop())) break;
-	        if (p.isStyle)
+	        /*if (p.isStyle)
 	        	resultCss.push(p);
 	       	else
-	       		resultJs.push(p);
+	       		resultJs.push(p);*/
 	        tempObj = this.getRefs(p.name, p.isStyle);
 	    }
 	    resultCss = resultCss.reverse();
@@ -274,7 +274,6 @@ BuildFile.prototype = {
 		
 		if(this.header)
 			this.writeGlobalHeader(writer);
-		
 		files.forEach(function(file){
 			var name = file.name;
 			
@@ -331,6 +330,12 @@ BuildFile.prototype = {
 	
 	exist: IO.exist,
 	
+	checkNamespace: function(namespace, isStyle){
+		var path = this.getPath(namespace, isStyle);
+		
+		return this.exist(path);
+	},
+	
 	getPath: function(namespace, isStyle){
 
 		var cache = isStyle ? this.cssFiles: this.jsFiles;
@@ -354,10 +359,24 @@ BuildFile.prototype = {
 			cache[namespace] = this.resolveRefs(namespace, isStyle);
 			
 			// 如果是样式文件，还需要从js文件入手搜索引用项。
+			var r = cache[namespace].css;
 			
 			if(isStyle) {
-				[].push.apply(cache[namespace].css, this.getRefs(namespace, false).css);	
+				
+				[].push.apply(r, this.getRefs(namespace, false).css);	
+				
+				var i = r.indexOf(namespace);
+				
+				
+				if(i >= 0)  {
+					r.splice(i, 1);
+				}
+				
 			}
+			
+			cache[namespace].css = r.filter(function(value){
+				return this.checkNamespace(value, true);
+			}, this);
 		}
 
 		return cache[namespace];
