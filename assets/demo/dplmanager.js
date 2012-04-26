@@ -1,5 +1,5 @@
 
-var rootPath = Demo.rootPath + '/assets/tools/system/assets/';
+var rootPath = Demo.rootPath + 'assets/tools/system/assets/';
 
 document.write('<link href="' + rootPath + 'lib/base.css" rel="stylesheet" type="text/css">');
 document.write('<link href="' + rootPath + 'dplmanager/dplmanager.css" rel="stylesheet" type="text/css">');

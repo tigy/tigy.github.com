@@ -425,11 +425,14 @@ var DplManager = {
 				
 				var a = new AutoComplete(node);
 				
-				a.getSuggestItems = function(){
+				a.getSuggestItems = function(text){
 					var tr = this.getParent(1), info = DplManager.ViewData.getInfo(tr), r= [];
 					
+					text = text.toLowerCase();
+					
 					for(var cat in (Dpl.libs[info[0]] || {})[tr.find('.libs-category').getText()]){
-						r.push(cat);
+						if(cat.toLowerCase().indexOf(text) !== -1)
+							r.push(cat);
 					}
 					
 					return r;
@@ -645,11 +648,14 @@ var DplManager = {
 				
 				var a = new AutoComplete(node);
 				
-				a.getSuggestItems = function(){
+				a.getSuggestItems = function(text){
 					var tr = this.getParent(1), info = DplManager.ViewData.getInfo(tr), r= [];
 					
+					text = text.toLowerCase();
+					
 					for(var cat in (Dpl.res[info[0]] || {})[tr.find('.res-category').getText()]){
-						r.push(cat);
+						if(cat.toLowerCase().indexOf(text) !== -1)
+							r.push(cat);
 					}
 					
 					return r;

@@ -96,14 +96,15 @@ if(typeof module === \'object\') {\
 	},
 	
 	updateList: function(type, module, category, name, summary, status, attribute, bDelete){
+			
 		if(bDelete) {
 			var data = Dpl[type][module];
 			var cat = data && data[category];
 			cat && delete cat[name];
 			for(var item in cat){
+								DplManager.saveDplManager(Dpl);
 				return;	
 			}
-			
 			data && delete data[category];
 			
 		} else {
@@ -123,7 +124,8 @@ if(typeof module === \'object\') {\
 			data.attribute = attribute;
 		}
 		
-		DplManager.saveDplManager(Dpl);
+		
+			DplManager.saveDplManager(Dpl);
 	},
 	
 	getControls: function (){
