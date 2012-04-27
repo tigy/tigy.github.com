@@ -117,8 +117,8 @@ var Dpl = {
 					"status" : "+",
 					"attribute" : ""
 				},
-				"J+ 教程" : {
-					"summary" : "",
+				"使用 J+" : {
+					"summary" : "docs/jplus/usage.html",
 					"status" : "",
 					"attribute" : ""
 				}
