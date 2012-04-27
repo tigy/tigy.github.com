@@ -517,6 +517,22 @@ pre.demo ol.linenums li {
 }
 
 
+
+/*********************************** 文档 *******************************************/
+
+
+.demo-doc p.demo, .demo-doc li.demo, .demo-doc table.demo, .demo-doc dd.demo, .demo-doc code.demo{
+	font-size: 14px;
+	line-height: 20px;
+	color: #555555;
+}
+
+.demo-doc #demo-body a.demo {
+	font-size: 14px;
+	line-height: 20px;
+	text-decoration: underline;
+}
+
 /*********************************** 风格 *******************************************/
 
 a.demo {

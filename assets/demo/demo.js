@@ -220,7 +220,7 @@
             if (type === 'text/html') {
                 sourceCode = Demo.formatHTML(sourceCode);
                 type = 'html';
-            } else if (!type || type === 'text/javascript') {
+            } else if (!type || type === 'text/javascript' || type === 'text/js') {
                 sourceCode = Demo.formatJS(sourceCode);
                 type = 'js';
             } else if (type === 'text/css') {

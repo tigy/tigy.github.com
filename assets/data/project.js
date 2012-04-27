@@ -58,11 +58,6 @@ var Dpl = {
 					"status" : "+",
 					"attribute" : ""
 				},
-				"Hello World - 如何开发组件" : {
-					"summary" : "docs/library/helloworld.html",
-					"status" : "+",
-					"attribute" : ""
-				},
 				"系统构架" : {
 					"summary" : "docs/library/architecture.html",
 					"status" : "+",
@@ -70,6 +65,16 @@ var Dpl = {
 				},
 				"组件管理系统" : {
 					"summary" : "docs/library/dplsystem.html",
+					"status" : "",
+					"attribute" : ""
+				},
+				"Hello World - 如何开发组件" : {
+					"summary" : "docs/library/helloworld.html",
+					"status" : "+",
+					"attribute" : ""
+				},
+				"组件开发细则" : {
+					"summary" : "docs/library/develop.html",
 					"status" : "",
 					"attribute" : ""
 				}
@@ -111,6 +116,11 @@ var Dpl = {
 					"summary" : "docs/jplus/features.html",
 					"status" : "+",
 					"attribute" : ""
+				},
+				"J+ 教程" : {
+					"summary" : "",
+					"status" : "",
+					"attribute" : ""
 				}
 			},
 			"Javascript 学习" : {
@@ -148,10 +158,8 @@ var Dpl = {
 					"summary" : "docs/javascript/ECMA-262, 3rd edition, December 1999[1].pdf",
 					"status" : "+",
 					"attribute" : ""
-				}
-			},
-			"自测" : {
-				"Javascript 中级" : {
+				},
+				"Javascript 中级自测" : {
 					"summary" : "docs/quiz/javascript-b.html",
 					"status" : "+",
 					"attribute" : ""
@@ -210,17 +218,17 @@ var Dpl = {
 			},
 			"洗洗睡": {
 				"怎么样才算喜欢编程" : {
-					"summary" : "docs/night/canibeacoder.html",
+					"summary" : "docs/night/can-i-be-a-coder.html",
 					"status" : "+",
 					"attribute" : ""
 				},
 				"有没有这样一个人" : {
-					"summary" : "docs/night/isthereaperson.html",
+					"summary" : "docs/night/is-there-a-person.html",
 					"status" : "+",
 					"attribute" : ""
 				},
 				"有互联网的今天" : {
-					"summary" : "docs/night/whenigrowup.html",
+					"summary" : "docs/night/when-i-grow-up.html",
 					"status" : "+",
 					"attribute" : ""
 				}
