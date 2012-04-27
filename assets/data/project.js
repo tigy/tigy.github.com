@@ -35,7 +35,7 @@ var Dpl = {
 	},
 	"res" : {
 		"Docs" : {
-			"常用手册": {
+			"常用手册" : {
 				"J+ 核心 API" : {
 					"summary" : "docs/api/jplus-core-api.xml",
 					"status" : "+",
@@ -79,24 +79,34 @@ var Dpl = {
 					"attribute" : ""
 				}
 			},
-			"开发": {
+			"开发" : {
 				"首页" : {
 					"summary" : "index.html",
 					"status" : "+",
 					"attribute" : ""
 				},
-				"Javascript 编码规范": {
+				"Javascript 编码规范" : {
 					"summary" : "docs/coder/javascript-specification.html",
 					"status" : "+",
 					"attribute" : ""
 				},
-				"组件编码规范": {
+				"组件编码规范" : {
 					"summary" : "docs/coder/control-specification.html",
+					"status" : "+",
+					"attribute" : ""
+				},
+				"文档注释规范" : {
+					"summary" : "docs/coder/doccomment.html",
 					"status" : "+",
 					"attribute" : ""
 				}
 			},
 			"J+" : {
+				"概述" : {
+					"summary" : "docs/jplus/introduction.html",
+					"status" : "+",
+					"attribute" : ""
+				},
 				"运行坏境需求" : {
 					"summary" : "docs/jplus/environment.html",
 					"status" : "+",
@@ -120,6 +130,11 @@ var Dpl = {
 				"使用 J+" : {
 					"summary" : "docs/jplus/usage.html",
 					"status" : "",
+					"attribute" : ""
+				},
+				"[word]J+ 用户向导" : {
+					"summary" : "docs/jplus/JPlusUI guider.docx",
+					"status" : "+",
 					"attribute" : ""
 				}
 			},
@@ -187,7 +202,7 @@ var Dpl = {
 					"attribute" : ""
 				}
 			},
-			"专题研究": {
+			"专题研究" : {
 				"Attribute" : {
 					"summary" : "docs/issues/attribute.html",
 					"status" : "+",
@@ -209,14 +224,19 @@ var Dpl = {
 					"attribute" : ""
 				}
 			},
-			"实验室": {
+			"实验室" : {
 				"IE6 无 expression 实现FIXED" : {
 					"summary" : "docs/labs/fixed.html",
 					"status" : "+",
 					"attribute" : ""
 				},
+				"前端构架探索" : {
+					"summary" : "docs/labs/front-end.pptx",
+					"status" : "+",
+					"attribute" : ""
+				}
 			},
-			"洗洗睡": {
+			"洗洗睡" : {
 				"怎么样才算喜欢编程" : {
 					"summary" : "docs/night/can-i-be-a-coder.html",
 					"status" : "+",
