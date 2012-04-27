@@ -157,48 +157,56 @@ BuildFile.prototype = {
 	},
 	
 	createAst: function(tempObj){
-	    var map = {};
-	    var tempArray;
-	    var stack = [];
-	    var resultCss = [];
-	    var resultJs = [];
-	    var result = [];
-	    var child;;
-	    var p;
-	    while(true) {
-	        var bo = 2;
-	        var ins = p ? result.indexOf(p) : 0;
-	        while(bo--) {
-	            var bool = bo == 0;
-	            tempArray = bool ? tempObj.css : tempObj.js;
-	            for (var i = 0; i < tempArray.length; i++) {
-	                var cname = tempArray[i] + '.' + bool;
-	                child = map[cname];
-	                if (!child) {
-	                    child = map[cname] = {
-	                        isStyle: bool,
-	                        name: tempArray[i],
-	                        parent: []
-	                    };
-	                    stack.push(child);
-	                    result.splice(ins, 0, child);
-	                }
-	                if(p) {
-	                	child.parent.push(p);
-					}
-	            }
-	        }
-	        if (!(p = stack.pop())) break;
-	        tempObj = this.getRefs(p.name, p.isStyle);
-	    }
-        for (i = 0; i < result.length; i++) {
-			if (result[i].isStyle)
-        		resultCss.push(result[i]);
-       		else
-       			resultJs.push(result[i]);
+	       var map = {};
+        var stack = [];
+        var result = [];
+        var resultCss = [];
+       var resultJs = [];
+        map['.'] = {
+            isStyle: false,
+            name: '.',
+            parent: [],
+            children:[tempObj.js, tempObj.css]
         }
-	    return {js:resultJs, css:resultCss};
-	},
+        stack.push(map['.']);
+        while(stack.length) {
+            var tempArray = stack[stack.length - 1].children;
+            var bool = tempArray.length - 1;
+            if (bool == -1) {
+                result.push(stack.pop());
+                if (result[result.length - 1].name === '.') result.pop();
+                continue;
+            }
+            if (!tempArray[bool].length) {
+                tempArray.pop();
+                continue;
+            }
+            tempArray = tempArray[bool];
+            bool = bool == 1;
+            var cname = tempArray.pop();
+            var cbname = cname + '.' + bool;
+            var has = map[cbname];
+            if (!has) {
+                tempObj = this.getRefs(cname, bool);
+                has = map[cbname] = {
+                    isStyle: bool,
+                    name: cname,
+                    parent: [stack[stack.length - 1].name === '.' ? null : stack[stack.length - 1]],
+                    children:[tempObj.js, tempObj.css]
+                };
+                stack.push(has);
+            } else {
+                has.parent.push(stack[stack.length - 1].name === '.' ? null : stack[stack.length - 1]);
+            }
+        }
+        for (i = 0; i < result.length; i++) {
+         if (result[i].isStyle)
+              resultCss.push(result[i]);
+             else
+                resultJs.push(result[i]);
+        }
+        return {js:resultJs, css:resultCss};
+    },
 	
 	// BUILD
 	
@@ -230,6 +238,10 @@ BuildFile.prototype = {
 	},
 	
 	getFinalFiles: function(){
+		
+		if(this.resolveUsing === false){
+			return     this;
+		}
 		
 		var finalJsFiles = [];
 		var finalCssFiles = [];

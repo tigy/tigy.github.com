@@ -346,11 +346,12 @@ var DplManager = {
 			
 			if(this.validate(arg, isAdd) === false) return;
 			
-			DplManager.ViewData.updateList(this.name, arg.module, arg.category, arg.name, arg.summary, arg.status, arg.attribute);
+			System.getJSONP(this.server, arg, function(){
+				DplManager.ViewData.updateList(this.name, arg.module, arg.category, arg.name, arg.summary, arg.status, arg.attribute);
+				DplManager.reload();
+				DplManager.ViewData.currentTr = 0;
+			});
 			
-			System.getJSONP(this.server, arg, DplManager.reload);
-			
-			DplManager.ViewData.currentTr = 0;
 			
 		},
 		

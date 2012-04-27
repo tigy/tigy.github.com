@@ -165,6 +165,7 @@ var DplBuilder = {
                     <label><input type="checkbox" class="x-checkbox" name="removeConsole" {if removeConsole}checked="checked"{end}>删除 console</label>\
                     <br>\
                     <label><input type="checkbox" class="x-checkbox" name="header" {if $data.header!== false}checked="checked"{end}>添加注释信息</label>\
+                    <label><input type="checkbox" class="x-checkbox" name="resolveUsing" {if $data.resolveUsing!== false}checked="checked"{end}>智能解析依赖</label>\
                 </div>\
             </div>\
             \
@@ -312,6 +313,7 @@ var DplBuilder = {
 		currentFile.resolveLess = content.find('[name=resolveLess]').getAttr('checked');
 		currentFile.header = content.find('[name=header]').getAttr('checked');
 		currentFile.macro = content.find('[name=macro]').getAttr('checked');
+		currentFile.resolveUsing = content.find('[name=resolveUsing]').getAttr('checked');
 		
 	},
 	

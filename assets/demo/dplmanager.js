@@ -11,6 +11,7 @@ Demo.onLoad(function(){
     
 	var module = Demo.module;
 	var body = document.getElementById('demo-body');
+	var isLibs = Dpl.projects[module].type === 'libs';
 	
 	document.title = Dpl.projects[module].summary + ' - ' +  document.title;
 
@@ -23,59 +24,64 @@ Demo.onLoad(function(){
     h1.innerHTML = Dpl.projects[module].summary + ' <small>(' + module + ')</small>';
     body.insertBefore(h1, hr);
 
-    var div = document.createElement('div');
-    div.className = 'demo-control-toolbar';
-    div.innerHTML = '<input type="text" class="goto" placeholder="按空格输入组件名转到" id="control-searchbox">';
-    body.insertBefore(div, body.firstChild);
+	if(isLibs){
+	    var div = document.createElement('div');
+	    div.className = 'demo-control-toolbar';
+	    div.innerHTML = '<input type="text" class="goto" placeholder="按空格输入组件名转到" id="control-searchbox">';
+	    body.insertBefore(div, body.firstChild);
+	}
 	    
 	var div = document.createElement('div');
 	div.id = 'demo-list-' + module;
 	body.appendChild(div);
-	DplManager[Dpl.projects[module].type === 'libs' ? 'showLib' : 'showRes'](module, 'demo-list-' + module);
+	DplManager[isLibs ? 'showLib' : 'showRes'](module, 'demo-list-' + module);
 	
-	var NamespaceAutoComplete = AutoComplete.extend({
-		
-		dropDownMenuWidth: -1,
-		
-		getSuggestItems: function(text){
+	if(isLibs){
+		var NamespaceAutoComplete = AutoComplete.extend({
 			
-			text = text.toLowerCase();
+			dropDownMenuWidth: -1,
 			
-			var r = [];
-			
-			var module = Demo.module;
-			for(var  categegory in Dpl.libs[module]){
-				for(var  name in Dpl.libs[module][categegory]){
-					if(name.toLowerCase().indexOf(text) !== -1){
-						r.push(module + '.' + categegory + '.' + name);	
+			getSuggestItems: function(text){
+				
+				text = text.toLowerCase();
+				
+				var r = [];
+				
+				var module = Demo.module;
+				for(var  categegory in Dpl.libs[module]){
+					for(var  name in Dpl.libs[module][categegory]){
+						if(name.toLowerCase().indexOf(text) !== -1){
+							r.push(module + '.' + categegory + '.' + name);	
+						}
 					}
 				}
+				return r;
+			},
+			
+			go: function(){
+				location.href = Demo.rootPath + this.getText().toLowerCase().replace(/\./g, "/") + ".html";
+			},
+			
+			onSelectItem: function(item){
+				this.setText(item.getText());
+				this.go();
+				return false;
 			}
-			return r;
-		},
-		
-		go: function(){
-			location.href = Demo.rootPath + this.getText().toLowerCase().replace(/\./g, "/") + ".html";
-		},
-		
-		onSelectItem: function(item){
-			this.setText(item.getText());
-			this.go();
-			return false;
-		}
-		
-	});
+			
+		});
 
-	var a = new NamespaceAutoComplete('control-searchbox');
-	
-	a.on('keyup', function (e) {
-	  if(e.which === 13){
-	  	a.go();
-	  }
-	});
-	
-	document.on('keyup', function(e){
-		if(e.which === 32)
-			a.focus();
-	});
+
+		var a = new NamespaceAutoComplete('control-searchbox');
+		
+		a.on('keyup', function (e) {
+		  if(e.which === 13){
+		  	a.go();
+		  }
+		});
+		
+		document.on('keypress', function(e){
+			if(e.which === 32)
+				a.focus();
+		});
+	}
 });

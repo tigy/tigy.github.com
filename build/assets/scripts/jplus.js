@@ -1,5 +1,5 @@
 /**********************************************
- * This file is created by a tool at 2012/4/26 20:3
+ * This file is created by a tool at 2012/4/27 15:32
  **********************************************/
 
 
@@ -2849,405 +2849,6 @@ JPlus.resolveNamespace = function(ns, isStyle){
 
 
 /**********************************************
- * Controls.Button.CloseButton
- **********************************************/
-/** * @author  *//**********************************************
- * System.Data.Collection
- **********************************************/
-/**
- * @fileOverview 集合的基类。
- * @author xuld
- */	
-	
-/**
- * 集合。
- * @class Collection
- */
-var Collection = Class({
-	
-	/**
-	 * 获取当前的项数目。
-	 */
-	length: 0,
-	
-	/**
-	 * 对项初始化。
-	 * @protected
-	 * @virtual
-	 */
-	initItem: function (item) {
-		return item;
-	},
-	
-	onAdd: function(item){
-		this.onInsert(item, this.length);
-	},
-
-	onInsert: Function.empty,
-	
-	onRemove: Function.empty,
-	
-	onBeforeSet: Function.empty,
-	
-	onAfterSet: Function.empty,
-	
-	add: function(item){
-		assert.notNull(item, "Collection.prototype.add(item): 参数 {item} ~。");
-		Array.prototype.push.call(this, item = this.initItem(item));
-		this.onAdd(item);
-		return item;
-	},
-	
-	addRange: function(args){
-		return Array.prototype.forEach.call(args && typeof args.length === 'number' ? args : arguments, this.add, this);
-	},
-	
-	insert: function(index, item){
-		assert.notNull(item, "Collection.prototype.insert(item): 参数 {item} ~。");
-		index = Array.prototype.insert.call(this, index, item = this.initItem(item));
-		this.onInsert(item, index + 1);
-		return item;
-	},
-	
-	clear: function(){
-		var me = this;
-		me.onBeforeSet();
-		while (me.length) {
-			var item = me[--me.length];
-			delete me[me.length];
-			me.onRemove(item, me.length);
-		}
-		me.onAfterSet();
-		return me;
-	},
-	
-	remove: function(item){
-		assert.notNull(item, "Collection.prototype.remove(item): 参数 {item} ~。");
-		var index = this.indexOf(item);
-		this.removeAt(index);
-		return index;
-	},
-	
-	removeAt: function(index){
-		var item = this[index];
-		if(item){
-			Array.prototype.splice.call(this, index, 1);
-			delete this[this.length];
-			this.onRemove(item, index);
-		}
-			
-		return item;
-	},
-		
-	set: function(index, item){
-		var me = this;
-		me.onBeforeSet();
-		
-		if(typeof index === 'number'){
-			item = this.initItem(item);
-			assert.notNull(item, "Collection.prototype.set(item): 参数 {item} ~。");
-			assert(index >= 0 && index < me.length, 'Collection.prototype.set(index, item): 设置的 {index} 超出范围。请确保  0 <= index < ' + this.length, index);
-			item = me.onInsert(item, index);
-			me.onRemove(me[index], index);
-			me[index] = item;
-		} else{
-			if(me.length)
-				me.clear();
-			index.forEach(me.add, me);
-		}
-		
-		me.onAfterSet();
-		return me;
-	}
-	
-});
-
-String.map("indexOf forEach each invoke lastIndexOf item filter", Array.prototype, Collection.prototype);
-
-/**********************************************
- * Controls.Core.ScrollableControl
- **********************************************/
-/** * @author  xuld *//** * 表示一个含有滚动区域的控件。 * @class ScrollableControl * @extends Control * @abstract * @see ScrollableControl.ControlCollection * @see ListControl * @see ContainerControl * <p> * {@link ScrollableControl} 提供了完整的子控件管理功能。 * {@link ScrollableControl} 通过 {@link ScrollableControl.ControlCollection} 来管理子控件。 * 通过 {@link#controls} 属性可以获取其实例对象。 * </p> *  * <p> * 通过 {@link ScrollableControl.ControlCollection#add}  * 来增加一个子控件，该方法间接调用 {@link ScrollableControl.ControlCollection#onControlAdded}，以 * 让 {@link ScrollableControl} 有能力自定义组件的添加方式。 * </p> *  * <p> * 如果需要创建一个含子控件的控件，则可以 继承 {@link ScrollableControl} 类创建。 * 子类需要重写 {@link #initChildControl} 方法用于对子控件初始化。 * 重写 {@link #onControlAdded}实现子控件的添加方式（默认使用 appendChild 到跟节点）。 * 重写 {@link #onControlRemoved}实现子控件的删除方式。 * 重写 {@link #createChildCollection} 实现创建自定义的容器对象。 * </p> *  * <p> * 最典型的 {@link ScrollableControl} 的子类为 {@link ListControl} 和 {@link ContainerControl} 提供抽象基类。 * </p> */var ScrollableControl = Control.extend({	/**	 * 当新控件被添加时执行。	 * @param {Object} childControl 新添加的元素。	 * @param {Number} index 元素被添加的位置。	 * @protected virtual	 */	onControlAdded: function(childControl, index){		index = this.controls[index];		assert(childControl && childControl.attach, "Control.prototype.onControlAdded(childControl, index): {childControl} \u5FC5\u987B\u662F\u63A7\u4EF6\u3002", childControl);		childControl.attach(this.container.dom, index ? index.dom : null);	},		/**	 * 当新控件被移除时执行。	 * @param {Object} childControl 新添加的元素。	 * @param {Number} index 元素被添加的位置。	 * @protected virtual	 */	onControlRemoved: function(childControl, index){		assert(childControl && childControl.detach, "Control.prototype.onControlRemoved(childControl, index): {childControl} \u5FC5\u987B\u662F\u63A7\u4EF6\u3002", childControl);		childControl.detach(this.container.dom);	},	/**	 * 当被子类重新时，实现创建一个子控件列表。	 * @return {ScrollableControl.ControlCollection} 子控件列表。	 * @protected virtual	 */	createControlsInstance: function(){		return new ScrollableControl.ControlCollection(this);	},		// /**
-	 // * 获取当前控件用于存放子节点的容器控件。
-	 // * @protected virtual
-	 // */
-	// getContainer: function(){
-		// return this;
-	// },		/**	 * 从 DOM 树更新 controls 属性。	 * @protected virtual
-	 */	init: function(){		this.container = Dom.get(this.container.dom);		this.controls.addRange(this.container.getChildren(true));	},		/**	 * 根据用户的输入创建一个新的子控件。	 * @param {Object} item 新添加的元素。	 * @return {Control} 一个控件，根据用户的输入决定。	 * @protected virtual	 * 默认地，如果输入字符串和DOM节点，将转为对应的控件。	 */	initChild: Dom.parse,		removeChild: function (childControl) {		return this.controls.remove(childControl);	},		insertBefore: function (newControl, childControl) {		return childControl === null ? this.controls.add(newControl) : this.controls.insert(this.controls.indexOf(childControl), newControl);	},		/**	 * 获取目前所有子控件。	 * @type {Control.ControlCollection}	 * @name controls	 */	constructor: function(){		this.container = this;		this.controls = this.createControlsInstance();		//   this.loadControls();		Control.prototype.constructor.apply(this, arguments);	},		empty: function(){		this.controls.clear();		return this;	}});/** * 存储控件的集合。 * @class * @extends Collection */ScrollableControl.ControlCollection = Collection.extend({		/**	 * 初始化 Control.ControlCollection 的新实例。	 * @constructor	 * @param {ScrollableControl} owner 当前集合的所属控件。	 */	constructor: function(owner){		this.owner = owner;	},		/**	 * 当被子类重写时，初始化子元素。	 * @param {Object} item 添加的元素。	 * @return {Object} 初始化完成后的元素。	 */	initItem: function(item){		return this.owner.initChild(item);	},		/**	 * 通知子类一个新的元素被添加。	 * @param {Object} childControl 新添加的元素。	 * @param {Number} index 元素被添加的位置。	 */	onInsert: function(childControl, index){				// 如果控件已经有父控件。		if(childControl.parentControl) {			childControl.parentControl.controls.remove(childControl);		}		childControl.parentControl = this.owner;				// 执行控件添加函数。		this.owner.onControlAdded(childControl, index);	},		/**	 * 通知子类一个元素被移除。	 * @param {Object} childControl 新添加的元素。	 * @param {Number} index 元素被添加的位置。	 */	onRemove: function(childControl, index){		this.owner.onControlRemoved(childControl, index);		childControl.parentControl = null;	}	});/**********************************************
- * Controls.Core.ListControl
- **********************************************/
-/**
- * @author  xuld
- */
-
-
-
-/**
- * 表示所有管理多个有序列的子控件的控件基类。
- * @class ListControl
- * @extends ScrollableControl
- * ListControl 封装了使用  &lt;ul&gt; 创建列表控件一系列方法。
- */
-var ListControl = ScrollableControl.extend({
-	
-	xType: 'listcontrol',
-	
-	tpl: '<div></div>',
-	
-	onControlAdded: function(childControl, index){
-		var t = childControl;
-		if(childControl.dom.tagName !== 'LI') {
-			childControl = Dom.create('li', 'x-' + this.xType + '-content');
-			childControl.append(t);
-		}
-		
-		index = this.controls[index];
-		this.container.insertBefore(childControl, index && index.getParent());
-		
-		// 更新选中项。
-		if(this.baseGetSelected(childControl)){
-			this.setSelectedItem(t);
-		}
-		
-	},
-	
-	onControlRemoved: function(childControl, index){
-		var t = childControl;
-		if(childControl.dom.tagName !== 'LI'){
-			childControl = childControl.getParent();
-			childControl.removeChild(t);
-		}
-		
-		this.container.removeChild(childControl);
-		
-		// 更新选中项。
-		if(this.getSelectedItem() == t){
-			this.selectedItem = null;
-			this.setSelectedIndex(index);
-		}
-	},
-	
-	/**
-	 * 获取指定子控件的最外层 <li>元素。
-	 */
-	getContainerOf: function(childControl){
-		return childControl.dom.tagName === 'LI' ? childControl : childControl.getParent('li');
-	},
-	
-	/**
-	 * 获取包含指定节点的子控件。
-	 */
-	getItemOf: function(node){
-		var me = this.controls, ul = this.container.dom;
-		while(node){
-			if(node.parentNode === ul){
-				for(var i = me.length; i--;){
-					if((ul = me[i].dom) && (ul === node || ul.parentNode === node)){
-						return me[i];
-					}
-				}
-				break;
-			}
-			node = node.parentNode;
-		}
-		
-		return null;
-	},
-	
-	init: function(options){
-		this.items = this.controls;
-		var classNamePreFix = 'x-' + this.xType;
-		this.addClass(classNamePreFix);
-		
-		// 获取容器。
-		var container = this.container = this.getFirst('ul');
-		if(container) {
-			// 已经存在了一个 UL 标签，转换为 items 属性。
-			this.controls.addRange(container.query('>li').addClass(classNamePreFix + '-content'));
-		} else {
-			container = this.container = Dom.create('ul', '');
-			this.dom.appendChild(container.dom);
-		}
-		container.addClass(classNamePreFix + '-container');
-	},
-	
-	// 选择功能
-	
-	/**
-	 * 当前的选中项。
-	 */
-	selectedItem: null,
-	
-	/**
-	 * 底层获取某项的选中状态。该函数仅仅检查元素的 class。
-	 */
-	baseGetSelected: function (itemContainerLi) {
-		return itemContainerLi.hasClass('x-' + this.xType + '-selected');
-	},
-	
-	/**
-	 * 底层设置某项的选中状态。该函数仅仅设置元素的 class。
-	 */
-	baseSetSelected: function (itemContainerLi, value) {
-		itemContainerLi.toggleClass('x-' + this.xType + '-selected', value);
-	},
-	
-	onOverFlowY: function(max){
-		this.setHeight(max);
-	},
-	
-	/**
-	 * 当选中的项被更新后触发。
-	 */
-	onChange: function (old, item){
-		return this.trigger('change', old);
-	},
-	
-	/**
-	 * 当某项被选择时触发。如果返回 false， 则事件会被阻止。
-	 */
-	onSelect: function (item){
-		return this.trigger('select', item);
-	},
-	
-	/**
-	 * 获取当前选中项的索引。如果没有向被选中，则返回 -1 。
-	 */
-	getSelectedIndex: function () {
-		return this.controls.indexOf(this.getSelectedItem());
-	},
-	
-	/**
-	 * 设置当前选中项的索引。
-	 */
-	setSelectedIndex: function (value) {
-		return this.setSelectedItem(this.controls[value]);
-	},
-	
-	/**
-	 * 获取当前选中的项。如果不存在选中的项，则返回 null 。
-	 */
-	getSelectedItem: function () {
-		return this.selectedItem;
-	},
-	
-	/**
-	 * 设置某一项为选中状态。对于单选框，该函数会同时清除已有的选择项。
-	 */
-	setSelectedItem: function(item){
-		
-		// 先反选当前选择项。
-		var old = this.getSelectedItem();
-		if(old && (old = this.getContainerOf(old)))
-			this.baseSetSelected(old, false);
-	
-		if(this.onSelect(item)){
-		
-			// 更新选择项。
-			this.selectedItem = item;
-			
-			if(item != null){
-				item = this.getContainerOf(item);
-			//	if(!navigator.isQuirks)
-			//		item.scrollIntoView();
-				this.baseSetSelected(item, true);
-				
-			}
-			
-		}
-			
-		if(old !== item)
-			this.onChange(old, item);
-			
-		return this;
-	},
-	
-	/**
-	 * 获取选中项的文本内容。
-	 */
-	getText: function () {
-		var selectedItem = this.getSelectedItem();
-		return selectedItem ? selectedItem.getText() : '';
-	},
-	
-	/**
-	 * 查找并选中指定文本内容的项。如果没有项的文本和当前项相同，则清空选择状态。
-	 */
-	setText: function (value) {
-		var t = null;
-		this.controls.each(function(item){
-			if(item.getText() === value){
-				t = item;
-				return false;
-			}
-		}, this);
-		
-		return this.setSelectedItem(t);
-	},
-	
-	/**
-	 * 切换某一项的选择状态。
-	 */
-	toggleItem: function(item){
-		
-		// 如果当前项已选中，则表示反选当前的项。
-		return  this.setSelectedItem(item === this.getSelectedItem() ? null : item);
-	},
-	
-	/**
-	 * 确保当前有至少一项被选择。
-	 */
-	select: function () {
-		if(!this.selectedItem) {
-			this.setSelectedIndex(0);
-		}
-		
-		return this;
-	},
-	
-	/**
-	 * 选择当前选择项的下一项。
-	 */
-	selectNext: function(up){
-		var oldIndex = this.getSelectedIndex(), newIndex, maxIndex = this.controls.length - 1;
-		if(oldIndex != -1) {
-			newIndex = oldIndex + ( up !== false ? 1 : -1);
-			if(newIndex < 0) newIndex = maxIndex;
-			else if(newIndex > maxIndex) newIndex = 0;
-		} else {
-			newIndex = up !== false ? 0 : maxIndex;
-		}
-		return this.setSelectedIndex(newIndex);
-	},
-	
-	/**
-	 * 选择当前选择项的上一项。
-	 */
-	selectPrevious: function(){
-		return this.selectNext(false);
-	},
-	
-	/**
-	 * 设置某个事件发生之后，自动选择元素。
-	 */
-	bindSelector: function(eventName){
-		this.on(eventName, function(e){
-			var item = this.getItemOf(e.target);
-			if(item){
-				this.setSelectedItem(item);
-			}
-		}, this);
-		return this;
-	}
-	
-}).addEvents({select:{}, change:{}});
-
-
-/**********************************************
- * Controls.Core.ContentControl
- **********************************************/
-/** * @fileOverview 表示一个包含文本内容的控件。 * @author xuld *//** * 表示一个有内置呈现的控件。 * @abstract * @class ContentControl * @extends Control * <p> * ContentControl 控件把 content 属性作为自己的内容主体。 * ContentControl 控件的大小将由 content 决定。 * 当执行 appendChild/setWidth/setHtml 等操作时，都转到对 content 的操作。  * 这个类的应用如: dom 是用于显示视觉效果的辅助层， content 是实际内容的控件。 * 默认 content 和  dom 相同。子类应该重写 init ，并重新赋值  content 。 * </p> *  * <p> * 这个控件同时允许在子控件上显示一个图标。 * </p> *  * <p> * ContentControl 的外元素是一个根据内容自动改变大小的元素。它自身没有设置大小，全部的大小依赖子元素而自动决定。 * 因此，外元素必须满足下列条件的任何一个: *  <ul> * 		<li>外元素的 position 是 absolute<li> * 		<li>外元素的 float 是 left或 right <li> * 		<li>外元素的 display 是  inline-block (在 IE6 下，使用 inline + zoom模拟) <li> *  </ul> * </p> */var ContentControl = Control.extend({		/**	 * 当前正文。	 * @type Element/Control	 * @property container	 * @proected	 */		/**	 * 当被子类改写时，实现创建添加和返回一个图标节点。	 * @protected	 * @virtual	 */	createIcon: function(){		return  Dom.create('span', 'x-icon');	},		insertIcon: function(icon){		if(icon)			this.container.insert('afterBegin', icon);	},		init: function(){		this.container = new Dom(this.dom);	},		/**	 * 获取当前显示的图标。	 * @name icon	 * @type {Element}	 */		/**	 * 设置图标。	 * @param {String} icon 图标。	 * @return {Panel} this	 */	setIcon: function(icon) {				if(icon === null){			if(this.icon) {				this.icon.remove();				this.icon = null;			}						return this;						}				if(!this.icon || !this.icon.getParent()) {						this.insertIcon(this.icon = this.createIcon());		}				this.icon.dom.className = "x-icon x-icon-" + icon;				return this;	},		setText: function(value){		this.container.setText(value);		this.insertIcon(this.icon);				return this;	},		setHtml: function(value){		this.container.setHtml(value);		this.insertIcon(this.icon);				return this;	}	});Control.delegate(ContentControl, 'container', 'setWidth setHeight empty', 'insertBefore removeChild contains append getHtml getText getWidth getHeight');/**********************************************
  * System.Dom.Element
  **********************************************/
 ﻿﻿/**
@@ -6691,6 +6292,408 @@ var ListControl = ScrollableControl.extend({
 	
 })(this);
 /**********************************************
+ * Controls.Core.Base
+ **********************************************/
+/** * @author  */// 重写 JPlus.loadStyle 支持 less 文件。JPlus.loadStyle = function (url) {	var urlLowerCase = url.toLowerCase();	var lessUrl = urlLowerCase.replace(/\.css$/i, ".less");	if(!Object.each(document.getElementsByTagName('link'), function(dom){		var href = ((navigator.isQuirks ? dom.getAttribute('href', 4) : dom.href) || '').toLowerCase();		return !href || (href.indexOf(urlLowerCase) === -1 && href.indexOf(lessUrl) === -1);	}))		return;    // 在顶部插入一个css，但这样肯能导致css没加载就执行 js 。所以，要保证样式加载后才能继续执行计算。    document.getElementsByTagName("HEAD")[0].appendChild(Object.extend(document.createElement('link'), {        href: lessUrl,        rel: 'stylesheet/less',        type: 'text/css'    }));};/**********************************************
+ * Controls.Button.CloseButton
+ **********************************************/
+/** * @author  *//**********************************************
+ * System.Data.Collection
+ **********************************************/
+/**
+ * @fileOverview 集合的基类。
+ * @author xuld
+ */	
+	
+/**
+ * 集合。
+ * @class Collection
+ */
+var Collection = Class({
+	
+	/**
+	 * 获取当前的项数目。
+	 */
+	length: 0,
+	
+	/**
+	 * 对项初始化。
+	 * @protected
+	 * @virtual
+	 */
+	initItem: function (item) {
+		return item;
+	},
+	
+	onAdd: function(item){
+		this.onInsert(item, this.length);
+	},
+
+	onInsert: Function.empty,
+	
+	onRemove: Function.empty,
+	
+	onBeforeSet: Function.empty,
+	
+	onAfterSet: Function.empty,
+	
+	add: function(item){
+		assert.notNull(item, "Collection.prototype.add(item): 参数 {item} ~。");
+		Array.prototype.push.call(this, item = this.initItem(item));
+		this.onAdd(item);
+		return item;
+	},
+	
+	addRange: function(args){
+		return Array.prototype.forEach.call(args && typeof args.length === 'number' ? args : arguments, this.add, this);
+	},
+	
+	insert: function(index, item){
+		assert.notNull(item, "Collection.prototype.insert(item): 参数 {item} ~。");
+		index = Array.prototype.insert.call(this, index, item = this.initItem(item));
+		this.onInsert(item, index + 1);
+		return item;
+	},
+	
+	clear: function(){
+		var me = this;
+		me.onBeforeSet();
+		while (me.length) {
+			var item = me[--me.length];
+			delete me[me.length];
+			me.onRemove(item, me.length);
+		}
+		me.onAfterSet();
+		return me;
+	},
+	
+	remove: function(item){
+		assert.notNull(item, "Collection.prototype.remove(item): 参数 {item} ~。");
+		var index = this.indexOf(item);
+		this.removeAt(index);
+		return index;
+	},
+	
+	removeAt: function(index){
+		var item = this[index];
+		if(item){
+			Array.prototype.splice.call(this, index, 1);
+			delete this[this.length];
+			this.onRemove(item, index);
+		}
+			
+		return item;
+	},
+		
+	set: function(index, item){
+		var me = this;
+		me.onBeforeSet();
+		
+		if(typeof index === 'number'){
+			item = this.initItem(item);
+			assert.notNull(item, "Collection.prototype.set(item): 参数 {item} ~。");
+			assert(index >= 0 && index < me.length, 'Collection.prototype.set(index, item): 设置的 {index} 超出范围。请确保  0 <= index < ' + this.length, index);
+			item = me.onInsert(item, index);
+			me.onRemove(me[index], index);
+			me[index] = item;
+		} else{
+			if(me.length)
+				me.clear();
+			index.forEach(me.add, me);
+		}
+		
+		me.onAfterSet();
+		return me;
+	}
+	
+});
+
+String.map("indexOf forEach each invoke lastIndexOf item filter", Array.prototype, Collection.prototype);
+
+/**********************************************
+ * Controls.Core.ScrollableControl
+ **********************************************/
+/** * @author  xuld *//** * 表示一个含有滚动区域的控件。 * @class ScrollableControl * @extends Control * @abstract * @see ScrollableControl.ControlCollection * @see ListControl * @see ContainerControl * <p> * {@link ScrollableControl} 提供了完整的子控件管理功能。 * {@link ScrollableControl} 通过 {@link ScrollableControl.ControlCollection} 来管理子控件。 * 通过 {@link#controls} 属性可以获取其实例对象。 * </p> *  * <p> * 通过 {@link ScrollableControl.ControlCollection#add}  * 来增加一个子控件，该方法间接调用 {@link ScrollableControl.ControlCollection#onControlAdded}，以 * 让 {@link ScrollableControl} 有能力自定义组件的添加方式。 * </p> *  * <p> * 如果需要创建一个含子控件的控件，则可以 继承 {@link ScrollableControl} 类创建。 * 子类需要重写 {@link #initChildControl} 方法用于对子控件初始化。 * 重写 {@link #onControlAdded}实现子控件的添加方式（默认使用 appendChild 到跟节点）。 * 重写 {@link #onControlRemoved}实现子控件的删除方式。 * 重写 {@link #createChildCollection} 实现创建自定义的容器对象。 * </p> *  * <p> * 最典型的 {@link ScrollableControl} 的子类为 {@link ListControl} 和 {@link ContainerControl} 提供抽象基类。 * </p> */var ScrollableControl = Control.extend({	/**	 * 当新控件被添加时执行。	 * @param {Object} childControl 新添加的元素。	 * @param {Number} index 元素被添加的位置。	 * @protected virtual	 */	onControlAdded: function(childControl, index){		index = this.controls[index];		assert(childControl && childControl.attach, "Control.prototype.onControlAdded(childControl, index): {childControl} \u5FC5\u987B\u662F\u63A7\u4EF6\u3002", childControl);		childControl.attach(this.container.dom, index ? index.dom : null);	},		/**	 * 当新控件被移除时执行。	 * @param {Object} childControl 新添加的元素。	 * @param {Number} index 元素被添加的位置。	 * @protected virtual	 */	onControlRemoved: function(childControl, index){		assert(childControl && childControl.detach, "Control.prototype.onControlRemoved(childControl, index): {childControl} \u5FC5\u987B\u662F\u63A7\u4EF6\u3002", childControl);		childControl.detach(this.container.dom);	},	/**	 * 当被子类重新时，实现创建一个子控件列表。	 * @return {ScrollableControl.ControlCollection} 子控件列表。	 * @protected virtual	 */	createControlsInstance: function(){		return new ScrollableControl.ControlCollection(this);	},		// /**
+	 // * 获取当前控件用于存放子节点的容器控件。
+	 // * @protected virtual
+	 // */
+	// getContainer: function(){
+		// return this;
+	// },		/**	 * 从 DOM 树更新 controls 属性。	 * @protected virtual
+	 */	init: function(){		this.container = Dom.get(this.container.dom);		this.controls.addRange(this.container.getChildren(true));	},		/**	 * 根据用户的输入创建一个新的子控件。	 * @param {Object} item 新添加的元素。	 * @return {Control} 一个控件，根据用户的输入决定。	 * @protected virtual	 * 默认地，如果输入字符串和DOM节点，将转为对应的控件。	 */	initChild: Dom.parse,		removeChild: function (childControl) {		return this.controls.remove(childControl);	},		insertBefore: function (newControl, childControl) {		return childControl === null ? this.controls.add(newControl) : this.controls.insert(this.controls.indexOf(childControl), newControl);	},		/**	 * 获取目前所有子控件。	 * @type {Control.ControlCollection}	 * @name controls	 */	constructor: function(){		this.container = this;		this.controls = this.createControlsInstance();		//   this.loadControls();		Control.prototype.constructor.apply(this, arguments);	},		empty: function(){		this.controls.clear();		return this;	}});/** * 存储控件的集合。 * @class * @extends Collection */ScrollableControl.ControlCollection = Collection.extend({		/**	 * 初始化 Control.ControlCollection 的新实例。	 * @constructor	 * @param {ScrollableControl} owner 当前集合的所属控件。	 */	constructor: function(owner){		this.owner = owner;	},		/**	 * 当被子类重写时，初始化子元素。	 * @param {Object} item 添加的元素。	 * @return {Object} 初始化完成后的元素。	 */	initItem: function(item){		return this.owner.initChild(item);	},		/**	 * 通知子类一个新的元素被添加。	 * @param {Object} childControl 新添加的元素。	 * @param {Number} index 元素被添加的位置。	 */	onInsert: function(childControl, index){				// 如果控件已经有父控件。		if(childControl.parentControl) {			childControl.parentControl.controls.remove(childControl);		}		childControl.parentControl = this.owner;				// 执行控件添加函数。		this.owner.onControlAdded(childControl, index);	},		/**	 * 通知子类一个元素被移除。	 * @param {Object} childControl 新添加的元素。	 * @param {Number} index 元素被添加的位置。	 */	onRemove: function(childControl, index){		this.owner.onControlRemoved(childControl, index);		childControl.parentControl = null;	}	});/**********************************************
+ * Controls.Core.ListControl
+ **********************************************/
+/**
+ * @author  xuld
+ */
+
+
+
+/**
+ * 表示所有管理多个有序列的子控件的控件基类。
+ * @class ListControl
+ * @extends ScrollableControl
+ * ListControl 封装了使用  &lt;ul&gt; 创建列表控件一系列方法。
+ */
+var ListControl = ScrollableControl.extend({
+	
+	xType: 'listcontrol',
+	
+	tpl: '<div></div>',
+	
+	onControlAdded: function(childControl, index){
+		var t = childControl;
+		if(childControl.dom.tagName !== 'LI') {
+			childControl = Dom.create('li', 'x-' + this.xType + '-content');
+			childControl.append(t);
+		}
+		
+		index = this.controls[index];
+		this.container.insertBefore(childControl, index && index.getParent());
+		
+		// 更新选中项。
+		if(this.baseGetSelected(childControl)){
+			this.setSelectedItem(t);
+		}
+		
+	},
+	
+	onControlRemoved: function(childControl, index){
+		var t = childControl;
+		if(childControl.dom.tagName !== 'LI'){
+			childControl = childControl.getParent();
+			childControl.removeChild(t);
+		}
+		
+		this.container.removeChild(childControl);
+		
+		// 更新选中项。
+		if(this.getSelectedItem() == t){
+			this.selectedItem = null;
+			this.setSelectedIndex(index);
+		}
+	},
+	
+	/**
+	 * 获取指定子控件的最外层 <li>元素。
+	 */
+	getContainerOf: function(childControl){
+		return childControl.dom.tagName === 'LI' ? childControl : childControl.getParent('li');
+	},
+	
+	/**
+	 * 获取包含指定节点的子控件。
+	 */
+	getItemOf: function(node){
+		var me = this.controls, ul = this.container.dom;
+		while(node){
+			if(node.parentNode === ul){
+				for(var i = me.length; i--;){
+					if((ul = me[i].dom) && (ul === node || ul.parentNode === node)){
+						return me[i];
+					}
+				}
+				break;
+			}
+			node = node.parentNode;
+		}
+		
+		return null;
+	},
+	
+	init: function(options){
+		this.items = this.controls;
+		var classNamePreFix = 'x-' + this.xType;
+		this.addClass(classNamePreFix);
+		
+		// 获取容器。
+		var container = this.container = this.getFirst('ul');
+		if(container) {
+			// 已经存在了一个 UL 标签，转换为 items 属性。
+			this.controls.addRange(container.query('>li').addClass(classNamePreFix + '-content'));
+		} else {
+			container = this.container = Dom.create('ul', '');
+			this.dom.appendChild(container.dom);
+		}
+		container.addClass(classNamePreFix + '-container');
+	},
+	
+	// 选择功能
+	
+	/**
+	 * 当前的选中项。
+	 */
+	selectedItem: null,
+	
+	/**
+	 * 底层获取某项的选中状态。该函数仅仅检查元素的 class。
+	 */
+	baseGetSelected: function (itemContainerLi) {
+		return itemContainerLi.hasClass('x-' + this.xType + '-selected');
+	},
+	
+	/**
+	 * 底层设置某项的选中状态。该函数仅仅设置元素的 class。
+	 */
+	baseSetSelected: function (itemContainerLi, value) {
+		itemContainerLi.toggleClass('x-' + this.xType + '-selected', value);
+	},
+	
+	onOverFlowY: function(max){
+		this.setHeight(max);
+	},
+	
+	/**
+	 * 当选中的项被更新后触发。
+	 */
+	onChange: function (old, item){
+		return this.trigger('change', old);
+	},
+	
+	/**
+	 * 当某项被选择时触发。如果返回 false， 则事件会被阻止。
+	 */
+	onSelect: function (item){
+		return this.trigger('select', item);
+	},
+	
+	/**
+	 * 获取当前选中项的索引。如果没有向被选中，则返回 -1 。
+	 */
+	getSelectedIndex: function () {
+		return this.controls.indexOf(this.getSelectedItem());
+	},
+	
+	/**
+	 * 设置当前选中项的索引。
+	 */
+	setSelectedIndex: function (value) {
+		return this.setSelectedItem(this.controls[value]);
+	},
+	
+	/**
+	 * 获取当前选中的项。如果不存在选中的项，则返回 null 。
+	 */
+	getSelectedItem: function () {
+		return this.selectedItem;
+	},
+	
+	/**
+	 * 设置某一项为选中状态。对于单选框，该函数会同时清除已有的选择项。
+	 */
+	setSelectedItem: function(item){
+		
+		// 先反选当前选择项。
+		var old = this.getSelectedItem();
+		if(old && (old = this.getContainerOf(old)))
+			this.baseSetSelected(old, false);
+	
+		if(this.onSelect(item)){
+		
+			// 更新选择项。
+			this.selectedItem = item;
+			
+			if(item != null){
+				item = this.getContainerOf(item);
+			//	if(!navigator.isQuirks)
+			//		item.scrollIntoView();
+				this.baseSetSelected(item, true);
+				
+			}
+			
+		}
+			
+		if(old !== item)
+			this.onChange(old, item);
+			
+		return this;
+	},
+	
+	/**
+	 * 获取选中项的文本内容。
+	 */
+	getText: function () {
+		var selectedItem = this.getSelectedItem();
+		return selectedItem ? selectedItem.getText() : '';
+	},
+	
+	/**
+	 * 查找并选中指定文本内容的项。如果没有项的文本和当前项相同，则清空选择状态。
+	 */
+	setText: function (value) {
+		var t = null;
+		this.controls.each(function(item){
+			if(item.getText() === value){
+				t = item;
+				return false;
+			}
+		}, this);
+		
+		return this.setSelectedItem(t);
+	},
+	
+	/**
+	 * 切换某一项的选择状态。
+	 */
+	toggleItem: function(item){
+		
+		// 如果当前项已选中，则表示反选当前的项。
+		return  this.setSelectedItem(item === this.getSelectedItem() ? null : item);
+	},
+	
+	/**
+	 * 确保当前有至少一项被选择。
+	 */
+	select: function () {
+		if(!this.selectedItem) {
+			this.setSelectedIndex(0);
+		}
+		
+		return this;
+	},
+	
+	/**
+	 * 选择当前选择项的下一项。
+	 */
+	selectNext: function(up){
+		var oldIndex = this.getSelectedIndex(), newIndex, maxIndex = this.controls.length - 1;
+		if(oldIndex != -1) {
+			newIndex = oldIndex + ( up !== false ? 1 : -1);
+			if(newIndex < 0) newIndex = maxIndex;
+			else if(newIndex > maxIndex) newIndex = 0;
+		} else {
+			newIndex = up !== false ? 0 : maxIndex;
+		}
+		return this.setSelectedIndex(newIndex);
+	},
+	
+	/**
+	 * 选择当前选择项的上一项。
+	 */
+	selectPrevious: function(){
+		return this.selectNext(false);
+	},
+	
+	/**
+	 * 设置某个事件发生之后，自动选择元素。
+	 */
+	bindSelector: function(eventName){
+		this.on(eventName, function(e){
+			var item = this.getItemOf(e.target);
+			if(item){
+				this.setSelectedItem(item);
+			}
+		}, this);
+		return this;
+	}
+	
+}).addEvents({select:{}, change:{}});
+
+
+/**********************************************
+ * Controls.Core.ContentControl
+ **********************************************/
+/** * @fileOverview 表示一个包含文本内容的控件。 * @author xuld *//** * 表示一个有内置呈现的控件。 * @abstract * @class ContentControl * @extends Control * <p> * ContentControl 控件把 content 属性作为自己的内容主体。 * ContentControl 控件的大小将由 content 决定。 * 当执行 appendChild/setWidth/setHtml 等操作时，都转到对 content 的操作。  * 这个类的应用如: dom 是用于显示视觉效果的辅助层， content 是实际内容的控件。 * 默认 content 和  dom 相同。子类应该重写 init ，并重新赋值  content 。 * </p> *  * <p> * 这个控件同时允许在子控件上显示一个图标。 * </p> *  * <p> * ContentControl 的外元素是一个根据内容自动改变大小的元素。它自身没有设置大小，全部的大小依赖子元素而自动决定。 * 因此，外元素必须满足下列条件的任何一个: *  <ul> * 		<li>外元素的 position 是 absolute<li> * 		<li>外元素的 float 是 left或 right <li> * 		<li>外元素的 display 是  inline-block (在 IE6 下，使用 inline + zoom模拟) <li> *  </ul> * </p> */var ContentControl = Control.extend({		/**	 * 当前正文。	 * @type Element/Control	 * @property container	 * @proected	 */		/**	 * 当被子类改写时，实现创建添加和返回一个图标节点。	 * @protected	 * @virtual	 */	createIcon: function(){		return  Dom.create('span', 'x-icon');	},		insertIcon: function(icon){		if(icon)			this.container.insert('afterBegin', icon);	},		init: function(){		this.container = new Dom(this.dom);	},		/**	 * 获取当前显示的图标。	 * @name icon	 * @type {Element}	 */		/**	 * 设置图标。	 * @param {String} icon 图标。	 * @return {Panel} this	 */	setIcon: function(icon) {				if(icon === null){			if(this.icon) {				this.icon.remove();				this.icon = null;			}						return this;						}				if(!this.icon || !this.icon.getParent()) {						this.insertIcon(this.icon = this.createIcon());		}				this.icon.dom.className = "x-icon x-icon-" + icon;				return this;	},		setText: function(value){		this.container.setText(value);		this.insertIcon(this.icon);				return this;	},		setHtml: function(value){		this.container.setHtml(value);		this.insertIcon(this.icon);				return this;	}	});Control.delegate(ContentControl, 'container', 'setWidth setHeight empty', 'insertBefore removeChild contains append getHtml getText getWidth getHeight');/**********************************************
  * System.Dom.Align
  **********************************************/
 /**
@@ -6927,7 +6930,4 @@ Control.implement((function(){
 /** * @author  *//**********************************************
  * Controls.Core.Common
  **********************************************/
-/** * @author  *//**********************************************
- * Controls.Core.Base
- **********************************************/
-/** * @author  */// 重写 JPlus.loadStyle 支持 less 文件。JPlus.loadStyle = function (url) {	var urlLowerCase = url.toLowerCase();	var lessUrl = urlLowerCase.replace(/\.css$/i, ".less");	if(!Object.each(document.getElementsByTagName('link'), function(dom){		var href = ((navigator.isQuirks ? dom.getAttribute('href', 4) : dom.href) || '').toLowerCase();		return !href || (href.indexOf(urlLowerCase) === -1 && href.indexOf(lessUrl) === -1);	}))		return;    // 在顶部插入一个css，但这样肯能导致css没加载就执行 js 。所以，要保证样式加载后才能继续执行计算。    document.getElementsByTagName("HEAD")[0].appendChild(Object.extend(document.createElement('link'), {        href: lessUrl,        rel: 'stylesheet/less',        type: 'text/css'    }));};
+/** * @author  */
