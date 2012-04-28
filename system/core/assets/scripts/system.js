@@ -60,7 +60,7 @@
 		 * System 全局静态对象。包含系统有关的函数。
 		 * @type Object
 		 */
-		System = getOrCreate(window, "System");
+		System = window.System || (window.System = {});
 		
 	/// #endregion
 
@@ -294,7 +294,7 @@
 		            "Class.addEvents(events): {event} 必须是一个包含事件的对象。 如 {click: { add: ..., remove: ..., initEvent: ..., trigger: ... } ", events);
 
 			// 更新事件对象。
-		    apply(getOrCreate(this, "$event"), events);
+		    apply(this.$event || (this.$event = {}), events);
 
 		    return this;
 	    },
@@ -1162,7 +1162,7 @@
 		 * @param {Object} bind=this listener 执行时的作用域。
 		 * @return  Base this
 		 * @example <code>
-         * elem.one('click', function (e) {
+         * elem.once('click', function (e) {
          * 		trace('a');  
          * });
          * 
@@ -1170,7 +1170,7 @@
          * elem.trigger('click');   //  没有输出 
          * </code>
 		 */
-        one: function(type, listener, bind) {
+        once: function(type, listener, bind) {
 
 	        assert.isFunction(listener, 'System.Object.prototype.one(type, listener): {listener} ~');
 			
@@ -1571,42 +1571,64 @@
 		return t[type];
 	}
 
-    /**
-     * 获取对象里的一个属性，如果此属性不存在，则创建新属性。
-     */
-	function getOrCreate(base, propertyName) {
-		return base[propertyName] || (base[propertyName] = {});
-	}
-
 	/// #endregion
 
 })(this);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /// #if !Release
 
-/// #region Trace
+/**
+ * Debug Tools
+ */
 
 /**
  * 调试输出指定的信息。
  * @param {Object} ... 要输出的变量。
  */
 function trace() {
-    if (System.debug) {
-
-        var hasLog = window.console && console.log;
-
-        // 如果存在控制台，则优先使用控制台。
-        if (hasLog && console.log.apply) {
-            console.log.apply(console, arguments);
-        } else if (hasLog && arguments.length === 1) {
-            console.log(arguments[0]);
-        } else {
-            (hasLog ? console : trace).log(Object.update(arguments, trace.inspect, []).join(" "));
+    if (trace.enable) {
+        
+        if(window.console && console.debug && console.debug.apply) {
+        	return console.debug.apply(console, arguments);
         }
+
+        var hasConsole = window.console && console.debug, data;
+        
+        if(arguments.length === 0) {
+        	data = '(traced)';
+        // 如果存在控制台，则优先使用控制台。
+        } else if (hasConsole && console.log.apply) {
+        	return console.log.apply(console, arguments);
+        } else {
+        	data = trace.inspect(arguments);
+        }
+    	
+    	return hasConsole ? console.log(data) : alert(data);
     }
 }
-
-/// #region Assert
 
 /**
  * 确认一个值正确。
@@ -1635,7 +1657,7 @@ function assert(bValue, msg) {
         // 错误源
         val = arguments.callee.caller;
 
-        if (System.stackTrace) {
+        if (assert.stackTrace) {
 
             while (val.debugStepThrough)
                 val = val.caller;
@@ -1649,16 +1671,12 @@ function assert(bValue, msg) {
 
         }
 
-        window.trace.error(msg);
+        trace.error(msg);
 
     }
 
     return !!bValue;
 }
-
-
-
-/// #region Using
 
 /**
  * 使用一个名空间。
@@ -1670,34 +1688,53 @@ function assert(bValue, msg) {
 function using(ns, isStyle) {
 
     assert.isString(ns, "using(ns): {ns} 不是合法的名字空间。");
+    
+    var cache = using[isStyle ? 'styles' : 'scripts'];
 
     // 已经载入。
-    if (System[isStyle ? 'styles' : 'scripts'].include(ns))
+    if (cache.indexOf(ns) >= 0)
         return;
+        
+    cache.push(ns);
 
-    if (ns.indexOf('/') === -1)
-        ns = System.resolveNamespace(ns.toLowerCase(), isStyle);
+    ns = using.resolve(ns.toLowerCase(), isStyle);
 
-    var doms, callback, path = ns.replace(/^[\.\/\\]+/, "");
+    var tagName, 
+    	type,
+    	exts,
+    	callback;
+    	
     if (isStyle) {
-        callback = System.loadStyle;
-        doms = document.styleSheets;
-        src = 'href';
+    	tagName = "LINK";
+    	type = "href";
+    	exts = [".less", ".css"];
+        callback = using.loadStyle;
+    	
+    	if(!using.useLess){
+    		exts.shift(); 	
+    	}
     } else {
-        callback = System.loadScript;
-        doms = document.getElementsByTagName("SCRIPT");
-        src = 'src';
+    	tagName = "SCRIPT";
+    	type = "src";
+    	exts = [".js"];
+        callback = using.loadScript;
     }
-
+    
     // 如果在节点找到符合的就返回，找不到，调用 callback 进行真正的 加载处理。
-    Object.each(doms, function(dom) {
-    	var url = navigator.isQuirks ? (
-    		isStyle ? 
-    			dom.owningElement ? dom.owningElement.getAttribute(src, 4) : dom.href :
-    			dom.getAttribute(src, 4)
-    	) :  dom[src];
-        return !url || url.toLowerCase().indexOf(path) === -1;
-    }) && callback(System.rootPath + ns);
+    
+	var doms = 	document.getElementsByTagName(tagName),
+		path = ns.replace(/^[\.\/\\]+/, "");
+	
+	for(var i = 0; doms[i]; i++){
+		var url = ((document.constructor ? doms[i][type] : doms[i].getAttribute(type, 4)) || '').toLowerCase();
+		for(var j = 0; j < exts.length; j++){
+			if(url.indexOf(path + exts[j]) >= 0){
+				return ;
+			}
+		}
+	}
+    
+    callback(using.rootPath + ns + exts[0]);
 };
 
 /**
@@ -1708,169 +1745,20 @@ function imports(ns){
     return using(ns, true);
 };
 
-/// #endregion
-
-/// #endregion
-
-/// #endregion
-
-(function(System, apply){
-
-    /// #region Using
-
-    apply(System, {
-
-        /**
-         * 同步载入代码。
-         * @param {String} uri 地址。
-         * @example <code>
-         * System.loadScript('./v.js');
-         * </code>
-         */
-        loadScript: function(url) {
-            return System.loadText(url, execScript);
-        },
-
-        /**
-         * 异步载入样式。
-         * @param {String} uri 地址。
-         * @example <code>
-         * System.loadStyle('./v.css');
-         * </code>
-         */
-        loadStyle: function(url) {
-
-            // 在顶部插入一个css，但这样肯能导致css没加载就执行 js 。所以，要保证样式加载后才能继续执行计算。
-            return document.getElementsByTagName("HEAD")[0].appendChild(apply(document.createElement('link'), {
-                href: url,
-                rel: 'stylesheet',
-                type: 'text/css'
-            }));
-        },
-
-        /**
-         * 同步载入文本。
-         * @param {String} uri 地址。
-         * @param {Function} [callback] 对返回值的处理函数。
-         * @return {String} 载入的值。 因为同步，所以无法跨站。
-         * @example <code>
-         * trace(  System.loadText('./v.html')  );
-         * </code>
-         */
-        loadText: function(url, callback) {
-
-            assert.notNull(url, "System.loadText(url, callback): {url} ~");
-
-            // assert(window.location.protocol != "file:",
-            // "System.loadText(uri, callback): 当前正使用 file 协议，请使用 http
-            // 协议。 \r\n请求地址: {0}", uri);
-
-            // 新建请求。
-            // 下文对 XMLHttpRequest 对象进行兼容处理。
-            var xmlHttp = new XMLHttpRequest();
-
-            try {
-
-                // 打开请求。
-                xmlHttp.open("GET", url, false);
-
-                // 发送请求。
-                xmlHttp.send(null);
-
-                // 检查当前的 XMLHttp 是否正常回复。
-                if (!System.checkStatusCode(xmlHttp.status)) {
-                    // 载入失败的处理。
-                    throw String.format("请求失败:  \r\n   地址: {0} \r\n   状态: {1}   {2}  {3}", url, xmlHttp.status, xmlHttp.statusText,
-                        window.location.protocol == "file:" ? '\r\n原因: 当前正使用 file 协议打开文件，请使用 http 协议。' : '');
-                }
-
-                url = xmlHttp.responseText;
-
-                // 运行处理函数。
-                return callback ? callback(url) : url;
-
-            } catch (e) {
-
-                // 调试输出。
-                trace.error(e);
-            } finally {
-
-                // 释放资源。
-                xmlHttp = null;
-            }
-
-        },
-
-        /**
-         * System 安装的根目录, 可以为相对目录。
-         * @config {String}
-         */
-        rootPath: (function(){
-            try {
-                var scripts = document.getElementsByTagName("script");
-
-                // 当前脚本在 <script> 引用。最后一个脚本即当前执行的文件。
-                scripts = scripts[scripts.length - 1];
-
-                // IE6/7 使用 getAttribute
-                scripts = navigator.isQuirks ? scripts.getAttribute('src', 5) : scripts.src;
-
-                // 设置路径。
-                return (scripts.match(/[\S\s]*\//) || [""])[0];
-
-            } catch (e) {
-
-                // 出错后，设置当前位置.
-                return "";
-            }
-
-        })(),
-
-        /**
-         * 全部已载入的样式。
-         * @type Array
-         * @private
-         */
-        styles: [],
-
-        /**
-         * 全部已载入的名字空间。
-         * @type Array
-         * @private
-         */
-        scripts: [],
-
-        /**
-         * 将指定的名字空间转为路径。
-         * @param {String} ns 名字空间。
-         * @param {Boolean} isStyle=false 是否为样式表。
-         */
-        resolveNamespace: function(ns, isStyle) {
-            // 如果名字空间本来就是一个地址，则不需要转换，否则，将 . 替换为 / ,并在末尾加上 文件后缀。
-            return ns.replace(/\./g, '/') + (isStyle ? '.css' : '.js');
-        }
-
-    });
-
-    /// #endregion
-
+(function(){
+	
     /// #region Trace
 
     /**
-     * @namespace String
+     * @namespace trace
      */
-    apply(String, {
+    apply(trace, {
 
-        /**
-         * 将字符串转为 utf-8 字符串。
-         * @param {String} s 字符串。
-         * @return {String} 返回的字符串。
-         */
-        encodeUTF8: function(s) {
-            return s.replace(/[^\x00-\xff]/g, function(a, b) {
-                return '\\u' + ((b = a.charCodeAt()) < 16 ? '000' : b < 256 ? '00' : b < 4096 ? '0' : '') + b.toString(16);
-            });
-        },
+		/**
+		 * 是否打开调试输出。
+		 * @config {Boolean}
+		 */
+		enable: true,
 
         /**
          * 将字符串从 utf-8 字符串转义。
@@ -1881,21 +1769,6 @@ function imports(ns){
             return s.replace(/\\u([0-9a-f]{3})([0-9a-f])/gi, function(a, b, c) {
                 return String.fromCharCode((parseInt(b, 16) * 16 + parseInt(c, 16)))
             })
-        }
-
-    });
-
-    /**
-     * @namespace trace
-     */
-    apply(trace, {
-
-        /**
-         * 输出方式。 {@param {String} message 信息。}
-         * @type Function
-         */
-        log: function(message) {
-            alert(message);
         },
 
         /**
@@ -1932,81 +1805,7 @@ function imports(ns){
                     'Date': 'now parse UTC'
                 },
 
-                APIInfo = Class({
-
-                    memberName: '',
-
-                    title: 'API 信息:',
-
-                    prefix: '',
-
-                    getPrefix: function(obj) {
-                        if (!obj)
-                            return "";
-                        for ( var i = 0; i < definedClazz.length; i++) {
-                            if (window[definedClazz[i]] === obj) {
-                                return this.memberName = definedClazz[i];
-                            }
-                        }
-
-                        return this.getTypeName(obj, window, "", 3);
-                    },
-
-                    getTypeName: function(obj, base, baseName, deep) {
-
-                        for ( var memberName in base) {
-                            if (base[memberName] === obj) {
-                                this.memberName = memberName;
-                                return baseName + memberName;
-                            }
-                        }
-
-                        if (deep-- > 0) {
-                            for ( var memberName in base) {
-                                try {
-                                    if (base[memberName] && isUpper(memberName, 0)) {
-                                        memberName = this.getTypeName(obj, base[memberName], baseName + memberName + ".", deep);
-                                        if (memberName)
-                                            return memberName;
-                                    }
-                                } catch (e) {
-                                }
-                            }
-                        }
-
-                        return '';
-                    },
-
-                    getBaseClassDescription: function(obj) {
-                        if (obj && obj.base && obj.base !== System.Object) {
-                            var extObj = this.getTypeName(obj.base, window, "", 3);
-                            return " 类" + (extObj && extObj != "System.Object" ? "(继承于 " + extObj + " 类)" : "");
-                        }
-
-                        return " 类";
-                    },
-
-                    /**
-                     * 获取类的继承关系。
-                     */
-                    getExtInfo: function(clazz) {
-                        if (!this.baseClasses) {
-                            this.baseClassNames = [];
-                            this.baseClasses = [];
-                            while (clazz && clazz.prototype) {
-                                var name = this.getPrefix(clazz);
-                                if (name) {
-                                    this.baseClasses.push(clazz);
-                                    this.baseClassNames.push(name);
-                                }
-
-                                clazz = clazz.base;
-                            }
-                        }
-
-                    },
-
-                    constructor: function(obj, showPredefinedMembers) {
+                APIInfo = function(obj, showPredefinedMembers) {
                         this.members = {};
                         this.sortInfo = {};
 
@@ -2077,118 +1876,192 @@ function imports(ns){
                             }
 
                         }
-                    },
+                    };
+                
+           	APIInfo.prototype = {
 
-                    addStaticMembers: function(obj, nonStatic) {
-                        for ( var memberName in obj) {
-							this.addMember(obj, memberName, 1, nonStatic);
+                memberName: '',
+
+                title: 'API 信息:',
+
+                prefix: '',
+
+                getPrefix: function(obj) {
+                    if (!obj)
+                        return "";
+                    for ( var i = 0; i < definedClazz.length; i++) {
+                        if (window[definedClazz[i]] === obj) {
+                            return this.memberName = definedClazz[i];
                         }
+                    }
 
-                    },
+                    return this.getTypeName(obj, window, "", 3);
+                },
 
-                    addPredefinedMembers: function(clazz, obj, staticOrNonStatic, nonStatic) {
-                        for ( var type in staticOrNonStatic) {
-                            if (clazz === window[type]) {
-                                staticOrNonStatic[type].forEach(function(memberName) {
-                                    this.addMember(obj, memberName, 5, nonStatic);
-                                }, this);
+                getTypeName: function(obj, base, baseName, deep) {
+
+                    for ( var memberName in base) {
+                        if (base[memberName] === obj) {
+                            this.memberName = memberName;
+                            return baseName + memberName;
+                        }
+                    }
+
+                    if (deep-- > 0) {
+                        for ( var memberName in base) {
+                            try {
+                                if (base[memberName] && isUpper(memberName, 0)) {
+                                    memberName = this.getTypeName(obj, base[memberName], baseName + memberName + ".", deep);
+                                    if (memberName)
+                                        return memberName;
+                                }
+                            } catch (e) {
                             }
                         }
-                    },
+                    }
 
-                    addPredefinedNonStaticMembers: function(clazz, obj, nonStatic) {
+                    return '';
+                },
 
-                        if (clazz !==  Object) {
+                getBaseClassDescription: function(obj) {
+                    if (obj && obj.base && obj.base !== System.Object) {
+                        var extObj = this.getTypeName(obj.base, window, "", 3);
+                        return " 类" + (extObj && extObj != "System.Object" ? "(继承于 " + extObj + " 类)" : "");
+                    }
 
-                            predefinedNonStatic.Object.forEach(function(memberName) {
-                                if (clazz.prototype[memberName] !==  Object.prototype[memberName]) {
-                                    this.addMember(obj, memberName, 5, nonStatic);
-                                }
+                    return " 类";
+                },
+
+                /**
+                 * 获取类的继承关系。
+                 */
+                getExtInfo: function(clazz) {
+                    if (!this.baseClasses) {
+                        this.baseClassNames = [];
+                        this.baseClasses = [];
+                        while (clazz && clazz.prototype) {
+                            var name = this.getPrefix(clazz);
+                            if (name) {
+                                this.baseClasses.push(clazz);
+                                this.baseClassNames.push(name);
+                            }
+
+                            clazz = clazz.base;
+                        }
+                    }
+
+                },
+
+                addStaticMembers: function(obj, nonStatic) {
+                    for ( var memberName in obj) {
+						this.addMember(obj, memberName, 1, nonStatic);
+                    }
+
+                },
+
+                addPredefinedMembers: function(clazz, obj, staticOrNonStatic, nonStatic) {
+                    for ( var type in staticOrNonStatic) {
+                        if (clazz === window[type]) {
+                            staticOrNonStatic[type].forEach(function(memberName) {
+                                this.addMember(obj, memberName, 5, nonStatic);
                             }, this);
-
                         }
+                    }
+                },
 
-                        if (clazz ===  Object && !this.isClass) {
-                            return;
-                        }
+                addPredefinedNonStaticMembers: function(clazz, obj, nonStatic) {
 
-                        this.addPredefinedMembers(clazz, obj, predefinedNonStatic, nonStatic);
+                    if (clazz !==  Object) {
 
-                    },
-
-					addEvents: function(obj, extInfo){
-						var evtInfo = obj.prototype && System.Events[obj.prototype.xtype];
-						
-						if(evtInfo){
-						
-							for(var evt in evtInfo){
-								this.sortInfo[this.members[evt] = obj.prototype.xtype + '.' + evt + ' 事件' + extInfo] = 4 + evt;
-							}
-							
-							if(obj.base){
-								this.addEvents(obj.base, '(继承的)');
-							}
-						}
-					},
-					
-                    addMember: function(base, memberName, type, nonStatic) {
-						try {
-
-							var hasOwnProperty =  Object.prototype.hasOwnProperty, owner = hasOwnProperty.call(base, memberName), prefix, extInfo = '';
-
-							nonStatic = nonStatic ? 'prototype.' : '';
-
-							// 如果 base 不存在 memberName 的成员，则尝试在父类查找。
-							if (owner) {
-								prefix = this.orignalPrefix || (this.prefix + nonStatic);
-								type--; // 自己的成员置顶。
-							} else {
-
-								// 搜索包含当前成员的父类。
-								this.baseClasses.each(function(baseClass, i) {
-									if (baseClass.prototype[memberName] === base[memberName] && hasOwnProperty.call(baseClass.prototype, memberName)) {
-										prefix = this.baseClassNames[i] + ".prototype.";
-
-										if (nonStatic)
-											extInfo = '(继承的)';
-
-										return false;
-									}
-								}, this);
-
-								// 如果没找到正确的父类，使用当前类替代，并指明它是继承的成员。
-								if (!prefix) {
-									prefix = this.prefix + nonStatic;
-									extInfo = '(继承的)';
-								}
-
-							}
-
-							this.sortInfo[this.members[memberName] = (type >= 4 ? '[内置]' : '') + prefix + getDescription(base, memberName) + extInfo] = type
-								+ memberName;
-
-						} catch (e) {
-						}
-                    },
-
-                    copyTo: function(value) {
-                        for ( var member in this.members) {
-                            value.push(this.members[member]);
-                        }
-
-                        if (value.length) {
-                            var sortInfo = this.sortInfo;
-                            value.sort(function(a, b) {
-                                return sortInfo[a] < sortInfo[b] ? -1 : 1;
-                            });
-                            value.unshift(this.title);
-                        } else {
-                            value.push(this.title + '没有可用的子成员信息。');
-                        }
+                        predefinedNonStatic.Object.forEach(function(memberName) {
+                            if (clazz.prototype[memberName] !==  Object.prototype[memberName]) {
+                                this.addMember(obj, memberName, 5, nonStatic);
+                            }
+                        }, this);
 
                     }
 
-                });
+                    if (clazz ===  Object && !this.isClass) {
+                        return;
+                    }
+
+                    this.addPredefinedMembers(clazz, obj, predefinedNonStatic, nonStatic);
+
+                },
+
+				addEvents: function(obj, extInfo){
+					var evtInfo = obj.$event;
+					
+					if(evtInfo){
+					
+						for(var evt in evtInfo){
+							this.sortInfo[this.members[evt] = evt + ' 事件' + extInfo] = 4 + evt;
+						}
+						
+						if(obj.base){
+							this.addEvents(obj.base, '(继承的)');
+						}
+					}
+				},
+				
+                addMember: function(base, memberName, type, nonStatic) {
+					try {
+
+						var hasOwnProperty =  Object.prototype.hasOwnProperty, owner = hasOwnProperty.call(base, memberName), prefix, extInfo = '';
+
+						nonStatic = nonStatic ? 'prototype.' : '';
+
+						// 如果 base 不存在 memberName 的成员，则尝试在父类查找。
+						if (owner) {
+							prefix = this.orignalPrefix || (this.prefix + nonStatic);
+							type--; // 自己的成员置顶。
+						} else {
+
+							// 搜索包含当前成员的父类。
+							this.baseClasses.each(function(baseClass, i) {
+								if (baseClass.prototype[memberName] === base[memberName] && hasOwnProperty.call(baseClass.prototype, memberName)) {
+									prefix = this.baseClassNames[i] + ".prototype.";
+
+									if (nonStatic)
+										extInfo = '(继承的)';
+
+									return false;
+								}
+							}, this);
+
+							// 如果没找到正确的父类，使用当前类替代，并指明它是继承的成员。
+							if (!prefix) {
+								prefix = this.prefix + nonStatic;
+								extInfo = '(继承的)';
+							}
+
+						}
+
+						this.sortInfo[this.members[memberName] = (type >= 4 ? '[内置]' : '') + prefix + getDescription(base, memberName) + extInfo] = type
+							+ memberName;
+
+					} catch (e) {
+					}
+                },
+
+                copyTo: function(value) {
+                    for ( var member in this.members) {
+                        value.push(this.members[member]);
+                    }
+
+                    if (value.length) {
+                        var sortInfo = this.sortInfo;
+                        value.sort(function(a, b) {
+                            return sortInfo[a] < sortInfo[b] ? -1 : 1;
+                        });
+                        value.unshift(this.title);
+                    } else {
+                        value.push(this.title + '没有可用的子成员信息。');
+                    }
+
+                }
+
+            };
 
             initPredefined(predefinedNonStatic);
             initPredefined(predefinedStatic);
@@ -2249,22 +2122,8 @@ function imports(ns){
                         r.push(getDescription(window, definedClazz[i]));
                     }
 					
-					if(window.using){
-						r.push("using 函数");
-					}
+					r.push("trace 函数", "assert 函数", "using 函数", "imports 函数");
 					
-					if(window.imports){
-						r.push("imports 函数");
-					}
-					
-					if(window.trace){
-						r.push("trace 函数");
-					}
-					
-					if(window.assert){
-						r.push("assert 函数");
-					}
-
                     for ( var name in window) {
 					
 						try{
@@ -2284,7 +2143,7 @@ function imports(ns){
                     r.push('无法对 ' + (obj === null ? "null" : "undefined") + ' 分析');
                 }
 
-                window.trace(r.join('\r\n'));
+                trace(r.join('\r\n'));
 
             };
 
@@ -2296,33 +2155,30 @@ function imports(ns){
          * @param {Number/undefined} deep=0 递归的层数。
          * @return String 成员。
          */
-        inspect: function(obj, deep) {
+        inspect: function(obj, deep, showArrayPlain) {
 
             if (deep == null)
-                deep = 0;
+                deep = 3;
             switch (typeof obj) {
                 case "function":
-                    if (deep == 0 && obj.prototype && obj.prototype.xtype) {
-                        // 类
-                        return String.format("class {0} : {1} {2}", obj.prototype.xtype,
-                            (obj.prototype.base && obj.prototype.base.xtype || "Basee"), trace.inspect(obj.prototype, deep + 1));
-                    }
-
                     // 函数
-                    return deep == 0 ? String.decodeUTF8(obj.toString()) : "function ()";
+                    return deep >= 3 ? trace.decodeUTF8(obj.toString()) : "function ()";
 
                 case "object":
                     if (obj == null)
                         return "null";
-                    if (deep >= 3)
+                    if (deep < 0)
                         return obj.toString();
 
-                    if (Array.isArray(obj)) {
-                        return "[" +  Object.update(obj, trace.inspect, []).join(", ") + "]";
-
+                    if (typeof obj.length === "number") {
+                    	var r = [];
+                    	for(var i = 0; i < obj.length; i++){
+                    		r.push(trace.inspect(obj[i], ++deep));
+                    	}
+                        return showArrayPlain ? r.join("   ") : ("[" +  r.join(", ") + "]");
                     } else {
                         if (obj.setInterval && obj.resizeTo)
-                            return "window" + obj.document.URL;
+                            return "window#" + obj.document.URL;
                         if (obj.nodeType) {
                             if (obj.nodeType == 9)
                                 return 'document ' + obj.URL;
@@ -2347,12 +2203,12 @@ function imports(ns){
                         }
                         var r = "{\r\n", i;
                         for (i in obj)
-                            r += "\t" + i + " = " + trace.inspect(obj[i], deep + 1) + "\r\n";
+                            r += "\t" + i + " = " + trace.inspect(obj[i], deep - 1) + "\r\n";
                         r += "}";
                         return r;
                     }
                 case "string":
-                    return deep == 0 ? obj : '"' + obj + '"';
+                    return deep >= 3 ? obj : '"' + obj + '"';
                 case "undefined":
                     return "undefined";
                 default:
@@ -2361,15 +2217,25 @@ function imports(ns){
         },
 
         /**
+         * 输出方式。 {@param {String} message 信息。}
+         * @type Function
+         */
+        log: function(message) {
+           if (trace.enable && window.console && console.log) {
+           	console.log(message);
+           }
+        },
+        
+        /**
          * 输出一个错误信息。
          * @param {Object} msg 内容。
          */
         error: function(msg) {
-            if (System.debug) {
+            if (trace.enable) {
                 if (window.console && console.error)
-                    window.console.error(msg); // 如果错误在此行产生，说明这是预知错误。
+                    console.error(msg); // 如果错误在此行产生，说明这是预知错误。
                 else
-                    throw msg;
+                    throw msg; // 如果错误在此行产生，说明这是预知错误。
             }
         },
 
@@ -2378,11 +2244,11 @@ function imports(ns){
          * @param {Object} msg 内容。
          */
         warn: function(msg) {
-            if (System.debug) {
+            if (trace.enable) {
                 if (window.console && console.warn)
-                    window.console.warn(msg);
+                    console.warn(msg);
                 else
-                    window.trace.write("[警告]" + msg);
+                    trace("[警告]" + msg);
             }
         },
 
@@ -2391,11 +2257,11 @@ function imports(ns){
          * @param {Object} msg 内容。
          */
         info: function(msg) {
-            if (System.debug) {
+            if (trace.enable) {
                 if (window.console && console.info)
-                    window.console.info(msg);
+                    console.info(msg);
                 else
-                    window.trace.write("[信息]" + msg);
+                    trace.write("[信息]" + msg);
             }
         },
 
@@ -2404,14 +2270,14 @@ function imports(ns){
          * @param {Object} obj 对象。
          */
         dir: function(obj) {
-            if (System.debug) {
+            if (trace.enable) {
                 if (window.console && console.dir)
                     console.dir(obj);
                 else if (obj) {
                     var r = "", i;
                     for (i in obj)
                         r += i + " = " + trace.inspect(obj[i], 1) + "\r\n";
-                    window.trace(r);
+                    trace(r);
                 }
             }
         },
@@ -2421,30 +2287,23 @@ function imports(ns){
          */
         clear: function() {
             if (window.console && console.clear)
-                window.console.clear();
+                console.clear();
         },
 
         /**
          * 如果是调试模式就运行。
-         * @param {Function} func 函数。
+         * @param {String/Function} code 代码。
          * @return String 返回运行的错误。如无错, 返回空字符。
          */
-        execute: function(func) {
-            if (System.debug) {
+        eval: function(code) {
+            if (trace.enable) {
                 try {
-                    func();
+                    typeof code === 'function' ? code() : eval(code);
                 } catch (e) {
                     return e;
                 }
             }
             return "";
-        },
-
-        /**
-         * 空函数，用于证明函数已经执行过。
-         */
-        count: function() {
-            window.trace('[调试]' + System.id++);
         },
 
         /**
@@ -2458,7 +2317,7 @@ function imports(ns){
             while (times-- > 0)
                 fn();
             times = Date.now() - d;
-            window.trace("[时间] " + times);
+            trace("[时间] " + times);
         }
 
     });
@@ -2469,6 +2328,12 @@ function imports(ns){
      * @namespace assert
      */
     apply(assert, {
+    	
+		/**
+		 * 是否在 assert 失败时显示函数调用堆栈。
+		 * @config {Boolean} stackTrace
+		 */
+    	stackTrace: true,
 
         /**
          * 确认一个值为函数变量。
@@ -2479,8 +2344,8 @@ function imports(ns){
          * assert.isFunction(a, "a ~");
          * </code>
          */
-        isFunction: function() {
-            return assertInternal2(Function.isFunction, "必须是函数。", arguments);
+        isFunction: function(value, msg) {
+            return assertInternal(typeof value == 'function', msg, value, "必须是函数。");
         },
 
         /**
@@ -2489,8 +2354,8 @@ function imports(ns){
          * @param {String} msg="断言失败" 错误后的提示。
          * @return {Boolean} 返回 bValue 。
          */
-        isArray: function() {
-            return assertInternal2(Array.isArray, "必须是数组。", arguments);
+        isArray: function(value, msg) {
+            return assertInternal(typeof value.length == 'number', msg, value, "必须是数组。");
         },
 
         /**
@@ -2500,7 +2365,7 @@ function imports(ns){
          * @return {Boolean} 返回 bValue 。
          */
         isObject: function(value, msg) {
-            return assertInternal( Object.isObject(value) || Function.isFunction(value) || value.nodeType, msg, value, "必须是引用的对象。", arguments);
+            return assertInternal( value && (typeof value === "object" || typeof value === "function" || value.nodeType), msg, value, "必须是引用的对象。", arguments);
         },
 
         /**
@@ -2550,7 +2415,7 @@ function imports(ns){
          * @return {Boolean} 返回 bValue 。
          */
         isDate: function(value, msg) {
-            return assertInternal( Object.type(value) == 'date' || value instanceof Date, msg, value, "必须是日期。");
+            return assertInternal( value instanceof Date, msg, value, "必须是日期。");
         },
 
         /**
@@ -2560,7 +2425,7 @@ function imports(ns){
          * @return {Boolean} 返回 bValue 。
          */
         isRegExp: function(value, msg) {
-            return assertInternal( Object.type(value) == 'regexp' || value instanceof RegExp, msg, value, "必须是正则表达式。");
+            return assertInternal( value instanceof RegExp, msg, value, "必须是正则表达式。");
         },
 
         /**
@@ -2601,13 +2466,9 @@ function imports(ns){
         return assert(asserts, msg ? msg.replace('~', dftMsg) : dftMsg, value);
     }
 
-    function assertInternal2(fn, dftMsg, args) {
-        return assertInternal(fn(args[0]), args[1], args[0], dftMsg);
-    }
-
 	// 追加 debugStepThrough 防止被认为是 assert 错误源堆栈。
 
-    assertInternal.debugStepThrough = assertInternal2.debugStepThrough = assert.debugStepThrough = true;
+    assertInternal.debugStepThrough = assert.debugStepThrough = true;
 
     for ( var fn in assert) {
         assert[fn].debugStepThrough = true;
@@ -2615,34 +2476,200 @@ function imports(ns){
 
     /// #endregion
 
+    /// #region Using
+
+    apply(using, {
+    	
+    	/**
+    	 * 是否使用 lesscss
+    	 * @config 
+    	 */
+    	useLess: true,
+
+        /**
+         * 同步载入代码。
+         * @param {String} uri 地址。
+         * @example <code>
+         * System.loadScript('./v.js');
+         * </code>
+         */
+        loadScript: function(url) {
+            return using.loadText(url, window.execScript || function(statements){
+	            	
+				// 如果正常浏览器，使用 window.eval 。
+				window["eval"].call( window, statements );
+
+            });
+        },
+
+        /**
+         * 异步载入样式。
+         * @param {String} uri 地址。
+         * @example <code>
+         * System.loadStyle('./v.css');
+         * </code>
+         */
+        loadStyle: function(url) {
+
+            // 在顶部插入一个css，但这样肯能导致css没加载就执行 js 。所以，要保证样式加载后才能继续执行计算。
+            return document.getElementsByTagName("HEAD")[0].appendChild(apply(document.createElement('link'), {
+                href: url,
+                rel: trace.useLess ? 'stylesheet/less' : 'stylesheet',
+                type: 'text/css'
+            }));
+        },
+
+        /**
+         * 判断一个 HTTP 状态码是否表示正常响应。
+         * @param {Number} statusCode 要判断的状态码。
+         * @return {Boolean} 如果正常则返回true, 否则返回 false 。
+		 * 一般地， 200、304、1223 被认为是正常的状态吗。
+         */
+        checkStatusCode: function(statusCode) {
+
+            // 获取状态。
+            if (!statusCode) {
+
+                // 获取协议。
+                var protocol = window.location.protocol;
+
+                // 对谷歌浏览器, 在有些协议， statusCode 不存在。
+                return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");
+            }
+
+            // 检查， 各浏览器支持不同。
+            return (statusCode >= 200 && statusCode < 300) || statusCode == 304 || statusCode == 1223;
+        },
+
+        /**
+         * 同步载入文本。
+         * @param {String} uri 地址。
+         * @param {Function} [callback] 对返回值的处理函数。
+         * @return {String} 载入的值。 因为同步，所以无法跨站。
+         * @example <code>
+         * trace(  System.loadText('./v.html')  );
+         * </code>
+         */
+        loadText: function(url, callback) {
+
+            assert.notNull(url, "System.loadText(url, callback): {url} ~");
+
+            // assert(window.location.protocol != "file:",
+            // "System.loadText(uri, callback): 当前正使用 file 协议，请使用 http
+            // 协议。 \r\n请求地址: {0}", uri);
+
+            // 新建请求。
+            // 下文对 XMLHttpRequest 对象进行兼容处理。
+            var xmlHttp;
+            
+            if(window.XMLHttpRequest) {
+            	xmlHttp = new XMLHttpRequest();
+            } else {
+            	xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+
+            try {
+
+                // 打开请求。
+                xmlHttp.open("GET", url, false);
+
+                // 发送请求。
+                xmlHttp.send(null);
+
+                // 检查当前的 XMLHttp 是否正常回复。
+                if (!using.checkStatusCode(xmlHttp.status)) {
+                    // 载入失败的处理。
+                    throw "请求失败:  \r\n   地址: " + url + " \r\n   状态: " + xmlHttp.status + "   " + xmlHttp.statusText + "  " + ( window.location.protocol == "file:" ? '\r\n原因: 当前正使用 file 协议打开文件，请使用 http 协议。' : '');
+                }
+
+                url = xmlHttp.responseText;
+
+                // 运行处理函数。
+                return callback ? callback(url) : url;
+
+            } catch (e) {
+
+                // 调试输出。
+                trace.error(e);
+            } finally {
+
+                // 释放资源。
+                xmlHttp = null;
+            }
+
+        },
+
+        /**
+         * 全部已载入的样式。
+         * @type Array
+         * @private
+         */
+        styles: [],
+
+        /**
+         * 全部已载入的名字空间。
+         * @type Array
+         * @private
+         */
+        scripts: [],
+
+        /**
+         * System 安装的根目录, 可以为相对目录。
+         * @config {String}
+         */
+        rootPath: (function(){
+            try {
+                var scripts = document.getElementsByTagName("script");
+
+                // 当前脚本在 <script> 引用。最后一个脚本即当前执行的文件。
+                scripts = scripts[scripts.length - 1];
+
+                // IE6/7 使用 getAttribute
+                scripts = !document.constructor ? scripts.getAttribute('src', 4) : scripts.src;
+
+                // 设置路径。
+                return (scripts.match(/[\S\s]*\//) || [""])[0];
+
+            } catch (e) {
+
+                // 出错后，设置当前位置.
+                return "";
+            }
+
+        })().replace("system/core/assets/scripts/", ""),
+
+        /**
+         * 将指定的名字空间转为路径。
+         * @param {String} ns 名字空间。
+         * @param {Boolean} isStyle=false 是否为样式表。
+         */
+        resolve: function(ns, isStyle){
+			return ns.replace(/^([^.]+\.[^.]+)\./, isStyle ? '$1.assets.styles.' : '$1.assets.scripts.').replace(/\./g, '/');
+		}
+
+    });
+
     /// #endregion
 
+    /// #endregion
 
-})(System, Object.extend);
+	/**
+	 * 复制所有属性到任何对象。
+	 * @param {Object} dest 复制目标。
+	 * @param {Object} src 要复制的内容。
+	 * @return {Object} 复制后的对象。
+	 */
+	function apply(dest, src) {
 
+		assert(dest != null, "Object.extend(dest, src): {dest} 不可为空。", dest);
 
-/// #if !Publish
+		// 直接遍历，不判断是否为真实成员还是原型的成员。
+		for ( var b in src)
+			dest[b] = src[b];
+		return dest;
+	}
 
-/**
- * 是否打开调试。启用调试后，将支持assert检查。
- * @config {Boolean}
- */
-System.debug = true;
-
-/**
- * 是否在 assert 失败时显示函数调用堆栈。
- * @config {Boolean} stackTrace
- */
-System.stackTrace = true;
-
-System.rootPath = System.rootPath.substr(0, System.rootPath.length - "system/core/assets/scripts/".length);
-
-System.resolveNamespace = function(ns, isStyle){
-	return ns.replace(/^([^.]+\.[^.]+)\./, isStyle ? '$1.assets.styles.' : '$1.assets.scripts.').replace(/\./g, '/') + (isStyle ? '.css' : '.js');
-};
-
+})();
 
 /// #endif
 
-
-/// #endif

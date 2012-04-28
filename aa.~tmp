@@ -61,3 +61,13 @@
 		    if (obj.$data)
 		        obj.$data = null;
 		},
+		
+		
+		
+                'JPlus.namespace': {
+                    '~("MyName.MyClass")': function (value, assert) {
+                      assert(window.MyName);
+                      assert(window.MyName.MyClass);
+                      assert(window.MyName.MyClass === value);
+                    }
+                },
