@@ -1,0 +1,1 @@
+/** * @author  */Fx.TouchScroll = Class({		constructor: function(dom, options){					}});Control.implement({		touchScroll: function(options){		return new 	Fx.TouchScroll(this,   options);		}});

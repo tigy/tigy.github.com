@@ -346,8 +346,10 @@ var DplManager = {
 			
 			if(this.validate(arg, isAdd) === false) return;
 			
+			var me = this;
+			
 			System.getJSONP(this.server, arg, function(){
-				DplManager.ViewData.updateList(this.name, arg.module, arg.category, arg.name, arg.summary, arg.status, arg.attribute);
+				DplManager.ViewData.updateList(me.name, arg.module, arg.category, arg.name, arg.summary, arg.status, arg.attribute);
 				DplManager.reload();
 				DplManager.ViewData.currentTr = 0;
 			});
