@@ -1,0 +1,1 @@
+/** * @author  */Control.implement({		scrollSpy: function(){							}});
