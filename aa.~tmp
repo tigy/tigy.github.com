@@ -1,0 +1,63 @@
+
+
+		/**
+		 * 判断一个 HTTP 状态码是否表示正常响应。
+		 * @param {Number} statusCode 要判断的状态码。
+		 * @return {Boolean} 如果正常则返回true, 否则返回 false 。
+		 * 一般地， 200、304、1223 被认为是正常的状态吗。
+		 */
+		checkStatusCode: function(statusCode) {
+
+			// 获取状态。
+			if (!statusCode) {
+
+				// 获取协议。
+				var protocol = window.location.protocol;
+
+				// 对谷歌浏览器, 在有些协议， statusCode 不存在。
+				return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");
+			}
+
+			// 检查， 各浏览器支持不同。
+			return (statusCode >= 200 && statusCode < 300) || statusCode == 304 || statusCode == 1223;
+		},
+		
+		
+		
+		
+
+		/// #if CompactMode
+		
+		/**
+		 * 初始化一个 XMLHttpRequest 对象。
+		 * @constructor
+		 * @class XMLHttpRequest
+		 * @return {XMLHttpRequest} 请求的对象。
+		 */
+		XMLHttpRequest: function() {
+			return new ActiveXObject("Microsoft.XMLHTTP");
+		},
+
+		/// #endif
+
+
+		
+		
+		/**
+		 * 删除属于一个对象指定字段的全部数据。
+		 * @param {Object} obj 任何对象。
+		 * @example <code>
+		 * var obj = {};
+		 * System.removeData(obj);
+		 * </code>
+		 */
+		removeData: function (obj) {
+
+		    assert.isObject(obj, "System.removeData(obj, dataType): {obj} ~");
+
+		    // 内部支持 dom 属性。
+		    obj = obj.dom || obj;
+
+		    if (obj.$data)
+		        obj.$data = null;
+		},

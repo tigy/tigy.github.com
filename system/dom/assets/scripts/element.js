@@ -3110,7 +3110,7 @@ using("System.Core.System");
 		if(cloneEvent !== false) {
 			
 		    // event 作为系统内部对象。事件的拷贝必须重新进行 on 绑定。
-		    var event = p.getData(srcElem, 'event'), dest;
+		    var event = p.getData(srcElem, '$event'), dest;
 
 		    if (event) {
 		    	dest = new Dom(destElem);

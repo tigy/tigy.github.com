@@ -7,15 +7,17 @@
 		
 		<script type="text/javascript" src="../../assets/demo/demo.js" ></script>
 	</head>
-	<body>
+	<body
+
+        <p class="demo">底层提供，常用底层函数。</p>
 		
 		<script>
 
 			var testcases = {
 				'Object': '-',
-				'Object.type': {
-					"~(1)": "number"
-				},
+				//'Object.type': {
+				//	"~(1)": "number"
+				//},
 				//'Object.clone': {
 				//	params: '',
 				//	tests: '[5] => [5]'
@@ -133,16 +135,16 @@
 					'~(new Function())':  true,
 					'~()':  false,
 				},
-				'Function.bind': {
-					'~(function(){assert.log(this)}, 2)':  function(value, assert){
-						value();
-						assert.logged("2");
-					}
-				},
 				'Function.from': {
 					'~(1)':  function(value, assert){
 						assert.areEqual(value(), 1);
 					}
+                },
+				'Function.prototype.bind': {
+				    '(function(){assert.log(this)}).bind(2)': function (value, assert) {
+				        value();
+				        assert.logged("2");
+				    }
 				},
 				'String': '-',
 				'String.ellipsis': {
@@ -169,13 +171,15 @@
 					'~()': function(value){
 						return value > 0;
 					}
-				},
-				'XMLHttpRequest': '-',
-				'new XMLHttpRequest': {
-					'~()':  function(value, assert){
-						return !!value.open;
-					}	
-				}
+                },
+				'System & Global': '-',
+				'System.getData': '~({}, "a")',
+				'System.setData': '~({}, "a", 5)',
+				'window.execScript': {
+				        '~("Demo.assert.log(false)")': function (value, assert) {
+			            assert.logged("false")
+			        }
+			    }
 			};
 			
 			Demo.writeTestCases(testcases);

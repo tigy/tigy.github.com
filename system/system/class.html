@@ -8,118 +8,189 @@
 	</head>
 	<body>
 		
-		<p>面向对象的实现是类库的重要组成部分。</p>
+		<p class="demo">面向对象的机制实现是底层的重要组成部分。</p>
+
+        <h3 class="demo">创建一个类</h3>
 		
-		<script>
+		<script class="demo">
+
+		    // 创建一个类。
+		    var MyClass1 = new Class({
+		        xtype: "MyClass1",
+
+		        // 构造函数。
+		        constructor: function MyClass1Ctr(args) {
+		            console.log("MyClass1->" + args);
+		            Demo.assert.log("1");
+		        }
+            });
+
+		</script>
+
+        <h3 class="demo">创建类实例</h3>
 		
-			// 创建一个类。
-			var MyClass1 = new Class({
-				xType: "MyClass1",
-				
-				// 构造函数。
-				constructor: function MyClass1Ctr(args){
-					console.log("MyClass1->" + args);
-					assert.log("1");
-				}
-			});
+		<script class="demo">
+
+		    // 创建类的实例
+		    var myObj1 = new MyClass1('构造函数参数 A');
+		    var myObj2 = new MyClass1('构造函数参数 B');
+
+		</script>
+
+        <h3 class="demo">继承一个类</h3>
+		
+		<script class="demo">
 			
 			// 继承创建一个类。
 			var MyClass2 = MyClass1.extend({
-				xType: "MyClass2",
-				constructor: function MyClass2Ctr(args){
+				xtype: "MyClass2",
+				constructor: function MyClass2Ctr(args) {
+
+                    // 使用当前函数的参数调用父类的构造函数。
 					this.base('constructor');
 					console.log("MyClass2->" + args);
-					assert.log("2");
+					Demo.assert.log("2");
 				}
 			});
 			
 			var MyClass3 = MyClass2.extend({
-				xType: "MyClass3",
-				constructor: function MyClass3Ctr(args){
+				xtype: "MyClass3",
+				constructor: function MyClass3Ctr(args) {
+
+				    // 使用当前函数的参数调用父类的构造函数。
 					this.base('constructor');
 					console.log("MyClass3->" + args);
-					assert.log("3");
+					Demo.assert.log("3");
 				}
 			});
 			
 			var MyClass4 = MyClass3.extend({
 				
-				xType: "MyClass4",
+				xtype: "MyClass4",
 				
 				a: function(a){
 					console.log("MyClass4.a->", a);
-					assert.log("4");
+					Demo.assert.log("4");
 				}
 			});
 			
 			var MyClass5 = MyClass4.extend({
 				
-				xType: "MyClass5",
+				xtype: "MyClass5",
 				
-				a: function(a){
+				a: function (a) {
+
+				    // 使用当前函数的参数调用父类的 a 函数。
 					this.base('a', a);
 					console.log("MyClass5.a->", a);
-					assert.log("5");
+					Demo.assert.log("5");
 				}
 				
 			});
 			
 			var MyClass6 = MyClass5.extend({
 				
-				xType: "MyClass6",
+				xtype: "MyClass6",
 				
 				a: function(a){
 					this.base('a');
 					console.log("MyClass6.a->", a);
-					assert.log("6");
+					Demo.assert.log("6");
 				}
-			});
-			
-			MyClass5.addEvents({
-				"click": {
-					add: function(){
-						console.log("绑定");
-						assert.log("bind");
-					},
-					remove: function(){
-						console.log("删除绑定");
-						assert.log("unbind");
-					}
-				}
-			});
+            });
+
+		</script>
+
+        <h3 class="demo">为类添加事件</h3>
 		
-			// 从一个 Javascript 函数创建一个类。
-			var SimpleClass = JPlus.Native(function(){
-				console.log("Simple");
+		<script class="demo">
+
+		    // 为 MyClass5 类添加一个事件。
+			MyClass5.addEvents({
+			    "click": {
+			        add: function () {
+			            console.log("绑定");
+			            Demo.assert.log("bind");
+			        },
+			        remove: function () {
+			            console.log("删除绑定");
+			            Demo.assert.log("unbind");
+			        }
+			    }
+            });
+
+			// 创建类的实例
+			var myObj5 = new MyClass5('构造函数参数 myObj5');
+
+			// 绑定 click 事件。
+			myObj5.on('click', function (e) {
+			    console.log("click 事件触发了", e);
 			});
-			
-			
-			var testcases = {
-				'类': '-',
-				'new MyClass1': {
-					name: '创建一个类',
-					tests: '"" => assert.logged("1")'
-				},
-				'new MyClass6': {
-					name: '继承',
-					tests: '"" => assert.logged("123333")'
-				},
-				'MyClass6.prototype.a': {
-					name: '重载',
-					tests: '@obj = new MyClass6(""); "" => assert.logged("456")'
-				},
-				'MyClass5.prototype.on': {
-					name: '事件',
-					tests: '@obj = new MyClass6(""); "click", function(){} => assert.logged("bind")'
-				},
-				'Data': '-',
-				'JPlus.data': '{}, "a"',
-				'JPlus.getData': '{}, "a"',
-				'JPlus.setData': '{}, "a", 5'
-			};
-			
-			Demo.writeTestCases(testcases);
+
+			// 触发 click 事件。
+			myObj5.trigger('click', ": 这是参数");
 			
 		</script>
+
+        <p class="demo">类的事件是可以继承的。子类也可以用使用父类事件。</p>
+
+        <script>
+
+            var testcases = {
+                '类': function () {
+
+                    Demo.assert.clearLog();
+                    var obj = new MyClass1("p1");
+                    Demo.assert.logged("1");
+
+                    return obj;
+                },
+                '继承': function () {
+                    Demo.assert.clearLog();
+                    var obj = new MyClass6("p6");
+                    Demo.assert.logged("123333");
+
+                    return obj;
+                },
+                '重载': function () {
+                    var obj = new MyClass6("p6");
+
+                    Demo.assert.clearLog();
+                    obj.a();
+                    Demo.assert.logged("456");
+
+                    return obj;
+                },
+                '事件': function () {
+
+                    var obj = new MyClass6("p6");
+
+                    Demo.assert.clearLog();
+                    obj.on("click", function () { });
+                    Demo.assert.logged("bind");
+
+                    Demo.assert.clearLog();
+
+                    obj.un("click");
+                    Demo.assert.logged("unbind");
+
+                    return obj;
+                },
+                'Native 类': function () {
+
+
+                    // 从一个 Javascript 函数创建一个类。
+                    var SimpleClass = System.Native(function () {
+                        console.log("Simple");
+                    });
+
+
+                    return SimpleClass;
+                }
+            };
+
+            Demo.writeTestCases(testcases);
+
+        </script>
 	</body>
 </html>
