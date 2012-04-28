@@ -1,5 +1,5 @@
 
-/// #if !Release
+/// #if !Debug
 
 /**
  * Debug Tools
