@@ -177,7 +177,7 @@ var cases = {
 		jQuery: '$.noop()'
 	},
 	'Function - 作用域绑定':{
-		jplus: 'Function.bind(fn, this)',
+		jplus: 'fn.bind(this)',
 		mootools: '$empty.bind(this)',
 		jQuery: '$.proxy(fn, this)'
 	},

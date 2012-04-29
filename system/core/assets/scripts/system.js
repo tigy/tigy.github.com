@@ -54,7 +54,7 @@
 		 * 空对象。
 		 * @type Object
 		 */
-		emptyObj,
+		emptyObj = {},
 	
 		/**
 		 * System 全局静态对象。包含系统有关的函数。
@@ -1667,7 +1667,7 @@ function assert(bValue, msg) {
             }
 
             if (val)
-                msg += "\r\n--------------------------------------------------------------------\r\n" + String.ellipsis(String.decodeUTF8(val.toString()), 600);
+                msg += "\r\n--------------------------------------------------------------------\r\n" + String.ellipsis(trace.decodeUTF8(val.toString()), 600);
 
         }
 

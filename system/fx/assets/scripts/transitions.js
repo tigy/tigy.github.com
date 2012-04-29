@@ -3,7 +3,7 @@
 //   A: xuld
 //===========================================
 
-var Transitions = JPlus.namespace("Fx.Transitions", {
+var Transitions = {
 	
 	linear: function(p){
 		return p;
@@ -63,4 +63,4 @@ var Transitions = JPlus.namespace("Fx.Transitions", {
 		};
 	}
 	
-});
+};

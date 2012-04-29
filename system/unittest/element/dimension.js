@@ -1,6 +1,6 @@
 module("Dimensions");
 
-test("Control.prototype.getWidth", function() {
+test("Dom.prototype.getWidth", function() {
 	expect(6);
 
 	var $div = Dom.get("nothiddendiv");
@@ -24,10 +24,10 @@ test("Control.prototype.getWidth", function() {
 	Dom.setStyles(Dom.get("nothiddendiv").dom, { border: "", padding: "", width: "" });
 	Dom.setStyles(Dom.get("nothiddendivchild").dom, { border: "", padding: "", width: "" });
 	
-	JPlus.setData($div, "display", null);
+	System.setData($div, "display", null);
 });
 
-test("Control.prototype.getHeight", function() {
+test("Dom.prototype.getHeight", function() {
 	expect(6);
 
 	var $div = Dom.get("nothiddendiv");
@@ -52,7 +52,7 @@ test("Control.prototype.getHeight", function() {
 	Dom.setStyles(Dom.get("nothiddendiv").dom, { border: "", padding: "", height: "" });
 	Dom.setStyles(Dom.get("nothiddendivchild").dom, { border: "", padding: "", height: "" });
 
-	JPlus.setData($div, "display", null);
+	System.setData($div, "display", null);
 });
 
 test("child of a hidden elem has accurate getWidth()/getHeight()  see #9441 #9300", function() {
@@ -73,7 +73,7 @@ test("child of a hidden elem has accurate getWidth()/getHeight()  see #9441 #930
 	$divNormal.remove();
 });
 
-test("Control.prototype.getSize", function() {
+test("Dom.prototype.getSize", function() {
 
 	equal( document.getSize().y > 0, true, "Test on document without margin option" );
 	

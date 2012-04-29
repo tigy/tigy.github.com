@@ -1,6 +1,6 @@
 module("Styles");
 
-test("Control.prototype.getStyle", function() {
+test("Dom.prototype.getStyle", function() {
 
 	equal( Dom.get("qunit-fixture").getStyle("display"), "block", "Check for css property \"display\"");
 
@@ -104,7 +104,7 @@ test("Control.prototype.getStyle", function() {
 	equal( child.dom.style.fontSize, old, "Make sure font-size isn't changed on null." );
 });
 
-test("Control.prototype.setStyle", function() {
+test("Dom.prototype.setStyle", function() {
 
 	ok( !Dom.isHidden(Dom.get("nothiddendiv").dom), "Modifying CSS display: Assert element is visible");
 	Dom.get("nothiddendiv").setStyle("display", "none");

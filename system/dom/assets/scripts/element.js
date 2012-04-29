@@ -65,20 +65,20 @@
 		div = document.createElement('DIV'),
 	
 		/**
-		 * 所有控件基类。
-		 * @class Control
+		 * 所有Dom 对象基类。
+		 * @class Dom
 		 * @abstract
-		 * 控件的周期： 
-		 * constructor - 创建控件对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。 
+		 * Dom 对象的周期： 
+		 * constructor - 创建Dom 对象对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。 
 		 * create - 创建本身的 dom 节点。 可重写 - 默认使用 this.tpl 创建。
-		 * init - 初始化控件本身。 可重写 - 默认为无操作。 
-		 * attach - 渲染控件到文档。不建议重写，如果你希望额外操作渲染事件，则重写。 
-		 * detach - 删除控件。不建议重写，如果一个控件用到多个 dom 内容需重写。
+		 * init - 初始化Dom 对象本身。 可重写 - 默认为无操作。 
+		 * attach - 渲染Dom 对象到文档。不建议重写，如果你希望额外操作渲染事件，则重写。 
+		 * detach - 删除Dom 对象。不建议重写，如果一个Dom 对象用到多个 dom 内容需重写。
 		 */
-		Control = Class({
+		Dom = Class({
 	
 			/**
-			 * 当前控件实际对应的 HTMLNode 实例。
+			 * 当前Dom 对象实际对应的 HTMLNode 实例。
 			 * @type Node
 			 * @protected
 			 */
@@ -88,31 +88,39 @@
 			 * xType 。
 			 * @virtual
 			 */
-			xtype: "control",
+			xtype: "dom",
 	
 			/**
-			 * 存储当前控件的默认配置。
+			 * 存储当前Dom 对象的默认配置。
 			 * @getter {Object} options
 			 * @protected
 			 * @virtual
 			 */
 	
 			/**
-			 * 存储当前控件的默认模板字符串。
+			 * 存储当前Dom 对象的默认模板字符串。
 			 * @getter {String} tpl
 			 * @protected
 			 * @virtual
 			 */
 		
 			/**
-			 * 将当前控件插入到指定父节点，并显示在指定节点之前。
+			 * Dom 对象的封装。
+			 * @param {Node} dom 封装的元素。
+			 */
+			constructor: function (dom) {
+				this.dom = dom;
+			},
+		
+			/**
+			 * 将当前Dom 对象插入到指定父节点，并显示在指定节点之前。
 			 * @param {Node} parentNode 渲染的目标。
 			 * @param {Node} refNode=null 渲染的位置。
 			 * @protected virtual
 			 */
 			attach: function(parentNode, refNode) {
-				assert(parentNode && parentNode.nodeType, 'Control.prototype.attach(parentNode, refNode): {parentNode} 必须是 DOM 节点。', parentNode);
-				assert(refNode === null || refNode.nodeType, 'Control.prototype.attach(parentNode, refNode): {refNode} 必须是 null 或 DOM 节点 。', refNode);
+				assert(parentNode && parentNode.nodeType, 'Dom.prototype.attach(parentNode, refNode): {parentNode} 必须是 DOM 节点。', parentNode);
+				assert(refNode === null || refNode.nodeType, 'Dom.prototype.attach(parentNode, refNode): {refNode} 必须是 null 或 DOM 节点 。', refNode);
 				parentNode.insertBefore(this.dom, refNode);
 			},
 		
@@ -122,28 +130,28 @@
 			 * @protected virtual
 			 */
 			detach: function(parentNode) {
-				assert(parentNode && parentNode.removeChild, 'Control.prototype.detach(parentNode): {parentNode} 必须是 DOM 节点或控件。', parent);
+				assert(parentNode && parentNode.removeChild, 'Dom.prototype.detach(parentNode): {parentNode} 必须是 DOM 节点或Dom 对象。', parent);
 				parentNode.removeChild(this.dom);
 			},
 		
 			/**
-			 * 在当前控件下插入一个子控件，并插入到指定位置。
-			 * @param {Control} childControl 要插入的控件。
-			 * @param {Control} refControl=null 渲染的位置。
+			 * 在当前Dom 对象下插入一个子Dom 对象，并插入到指定位置。
+			 * @param {Dom} childControl 要插入的Dom 对象。
+			 * @param {Dom} refControl=null 渲染的位置。
 			 * @protected
 			 */
 			insertBefore: function(childControl, refControl) {
-				assert(childControl && childControl.attach, 'Control.prototype.insertBefore(childControl, refControl): {childControl} 必须是控件。', childControl);
+				assert(childControl && childControl.attach, 'Dom.prototype.insertBefore(childControl, refControl): {childControl} 必须是Dom 对象。', childControl);
 				childControl.attach(this.dom, refControl && refControl.dom || null);
 			},
 		
 			/**
-			 * 删除当前控件的指定子控件。
-			 * @param {Control} childControl 要插入的控件。
+			 * 删除当前Dom 对象的指定子Dom 对象。
+			 * @param {Dom} childControl 要插入的Dom 对象。
 			 * @protected
 			 */
 			removeChild: function(childControl) {
-				assert(childControl && childControl.detach, 'Control.prototype.removeChild(childControl): {childControl} 必须是控件。', childControl);
+				assert(childControl && childControl.detach, 'Dom.prototype.removeChild(childControl): {childControl} 必须是Dom 对象。', childControl);
 				childControl.detach(this.dom);
 			},
 			
@@ -193,7 +201,7 @@
 			invoke: function(func, args) {
 				assert(args && typeof args.length === 'number', "DomList.prototype.invoke(func, args): {args} 必须是数组, 无法省略。", args);
 				var r = [];
-				assert(Dom.prototype[func] && Dom.prototype[func].apply, "DomList.prototype.invoke(func, args): Control 不包含方法 {func}。", func);
+				assert(Dom.prototype[func] && Dom.prototype[func].apply, "DomList.prototype.invoke(func, args): Dom 不包含方法 {func}。", func);
 				ap.forEach.call(this, function(value) {
 					value = new Dom(value);
 					r.push(value[func].apply(value, args));
@@ -243,7 +251,7 @@
 			/**
 			 * xType
 			 */
-			xType: "nodelist"
+			xtype: "domlist"
 	
 		}),
 	
@@ -465,8 +473,8 @@
 		
 		/**
 		 * 根据一个 id 获取元素。如果传入的id不是字符串，则直接返回参数。
-		 * @param {String/Node/Control/DomList} id 要获取元素的 id 或元素本身。
-	 	 * @return {Control} 元素。
+		 * @param {String/Node/Dom/DomList} id 要获取元素的 id 或元素本身。
+	 	 * @return {Dom} 元素。
 		 */
 		get: function(id) {
 			
@@ -507,7 +515,7 @@
 		 * 判断一个元素是否符合一个选择器。
 		 */
 		match: function (elem, selector) {
-			assert.isString(selector, "Control.prototype.find(selector): selector ~。");
+			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
 			
 			if(elem.nodeType !== 1)
 				return false;
@@ -525,11 +533,11 @@
 		},
 
 		/**
-		 * 解析一个 html 字符串，返回相应的控件。
+		 * 解析一个 html 字符串，返回相应的Dom 对象。
 		 * @param {String/Element} html 字符。
 		 * @param {Element} context=document 生成节点使用的文档中的任何节点。
 		 * @param {Boolean} cachable=true 指示是否缓存节点。
-		 * @return {Control} 控件。
+		 * @return {Dom} Dom 对象。
 		 */
 		parse: function(html, context, cachable) {
 
@@ -561,7 +569,7 @@
 		
 		/**
 		 * 根据一个 id 获取元素。如果传入的id不是字符串，则直接返回参数。
-		 * @param {String/Node/Control} id 要获取元素的 id 或元素本身。
+		 * @param {String/Node/Dom} id 要获取元素的 id 或元素本身。
 	 	 * @return {Node} 元素。
 		 */
 		getNode: function (id) {
@@ -1070,83 +1078,9 @@
 		 * @return {Document} 文档。
 		 */
 		getDocument: getDocument,
-
-		/**
-		 * 表示事件的参数。
-		 * @class JPlus.Event
-		 */
-		Event: Class({
-
-			/**
-			 * 构造函数。
-			 * @param {Object} target 事件对象的目标。
-			 * @param {String} type 事件对象的类型。
-			 * @param {Object} [e] 事件对象的属性。
-			 * @constructor
-			 */
-			constructor: function(target, type, e) {
-				assert.notNull(target, "Dom.Event.prototype.constructor(target, type, e): {target} ~");
-
-				var me = this;
-				me.target = target;
-				me.type = type;
-				apply(me, e);
-			},
-			
-			/**
-			 * 阻止事件的冒泡。
-			 * @remark 默认情况下，事件会向父元素冒泡。使用此函数阻止事件冒泡。
-			 */
-			stopPropagation: function() {
-				this.cancelBubble = true;
-			},
-			
-			/**
-			 * 取消默认事件发生。
-			 * @remark 有些事件会有默认行为，如点击链接之后执行跳转，使用此函数阻止这些默认行为。
-			 */
-			preventDefault: function() {
-				this.returnValue = false;
-			},
-			
-			/**
-			 * 停止默认事件和冒泡。
-			 * @remark 此函数可以完全撤销事件。 事件处理函数中 return false 和调用 stop() 是不同的， return
-			 *         false 只会阻止当前事件其它函数执行， 而 stop() 只阻止事件冒泡和默认事件，不阻止当前事件其它函数。
-			 */
-			stop: function() {
-				this.stopPropagation();
-				this.preventDefault();
-			},
-			
-			/**
-			 * 获取当前发生事件的控件。
-			 * @return {Control} 发生事件的控件。
-			 */
-			getTarget: function() {
-				assert(this.target, "Dom.Event.prototype.getTarget(): 当前事件不支持 getTarget 操作");
-				return new Dom(this.target.nodeType === 3 ? this.target.parentNode: this.target);
-			}
-		}),
-
-		/**
-		 * 文档对象。
-		 * @class Document 因为 IE6/7 不存在这些对象, 文档对象是对原生 HTMLDocument 对象的补充。 扩展
-		 *        Document 也会扩展 HTMLDocument。
-		 */
-		Document: p.Native(document.constructor || {
-			prototype: document
-		})
-
-	});
-
-	/**
-	 * @class Control
-	 */
-	apply(Control, {
 	
 		/**
-		 * 将一个成员附加到 Control 对象和相关类。
+		 * 将一个成员附加到 Dom 对象和相关类。
 		 * @param {Object} obj 要附加的对象。
 		 * @param {Number} listType = 1 说明如何复制到 DomList 实例。
 		 * @return {Element} this
@@ -1159,7 +1093,7 @@
 		 *         只要有一个返回等于 true 的值， 就返回这个值。 参数 copyIf 仅内部使用。
 		 */
 		implement: function(members, listType, copyIf) {
-			assert.notNull(members, "Control.implement" + ( copyIf ? 'If' : '') + "(members, listType): {members} ~");
+			assert.notNull(members, "Dom.implement" + ( copyIf ? 'If' : '') + "(members, listType): {members} ~");
 		
 			Object.each(members, function(value, func) {
 		
@@ -1212,7 +1146,7 @@
 					}
 				}
 		
-			}, [DomList, Dom.Document, Control]);
+			}, [DomList, Dom.Document, Dom]);
 		
 			return this;
 
@@ -1237,7 +1171,7 @@
 		 * @param {Function} initEvent 触发器。
 		 * @return {Function} 函数本身。
 		 * @static
-		 * @memberOf Element 原则 Control.addEvents 可以解决问题。 但由于 DOM
+		 * @memberOf Element 原则 Dom.addEvents 可以解决问题。 但由于 DOM
 		 *           的特殊性，额外提供 defineEvents 方便定义适合 DOM 的事件。 defineEvents
 		 *           主要解决 3 个问题:
 		 *           <ol>
@@ -1276,17 +1210,17 @@
 		 */
 		addEvents: function(events, baseEvent, initEvent) {
 	
-			var ee = p.Events.control;
-	
 			if( typeof events !== 'string') {
-				p.Object.addEvents.call(this, events);
+				p.Base.addEvents.call(this, events);
 				return this;
 			}
+	
+			var ee = Dom.$event;
 		
 			// 删除已经创建的事件。
 			delete ee[events];
 		
-			assert(!initEvent || ee[baseEvent], "Control.addEvents(events, baseEvent, initEvent): 不存在基础事件 {baseEvent}。");
+			assert(!initEvent || ee[baseEvent], "Dom.addEvents(events, baseEvent, initEvent): 不存在基础事件 {baseEvent}。");
 		
 			// 对每个事件执行定义。
 			map(events, Function.from(Function.isFunction(baseEvent) ? o.extendIf({
@@ -1309,23 +1243,23 @@
 			}), ee);
 	
 		
-			return Control.addEvents;
+			return Dom.addEvents;
 	
 		},
 	
 		/**
 		 * 将指定名字的方法委托到当前对象指定的成员。
-		 * @param {Object} control 类。
+		 * @param {Object} Dom 类。
 		 * @param {String} delegate 委托变量。
 		 * @param {String} methods 所有成员名。
 		 *            因此经常需要将一个函数转换为对节点的调用。
 		 * @static
 		 */
-		delegate: function(control, target, setters, getters) {
-			assert(control && control.prototype, "Control.delegate(control, target, setters, getters): {control} 必须是一个类", control);
+		define: function(Dom, target, setters, getters) {
+			assert(Dom && Dom.prototype, "Dom.define(Dom, target, setters, getters): {Dom} 必须是一个类", Dom);
 			
 			if(typeof getters === 'string'){
-				Control.delegate(control, target, getters, true);
+				Dom.define(Dom, target, getters, true);
 				getters = false;
 			}
 			
@@ -1336,16 +1270,89 @@
 					this[target][func](args1, args2);
 					return this;
 				};
-			}, control.prototype);
-			return Control.delegate;
-		}
-	})
+			}, Dom.prototype);
+			return Dom.define;
+		},
+
+		/**
+		 * 表示事件的参数。
+		 * @class JPlus.Event
+		 */
+		Event: Class({
+
+			/**
+			 * 构造函数。
+			 * @param {Object} target 事件对象的目标。
+			 * @param {String} type 事件对象的类型。
+			 * @param {Object} [e] 事件对象的属性。
+			 * @constructor
+			 */
+			constructor: function(target, type, e) {
+				assert.notNull(target, "Dom.Event.prototype.constructor(target, type, e): {target} ~");
+
+				var me = this;
+				me.target = target;
+				me.type = type;
+				apply(me, e);
+			},
+			
+			/**
+			 * 阻止事件的冒泡。
+			 * @remark 默认情况下，事件会向父元素冒泡。使用此函数阻止事件冒泡。
+			 */
+			stopPropagation: function() {
+				this.cancelBubble = true;
+			},
+			
+			/**
+			 * 取消默认事件发生。
+			 * @remark 有些事件会有默认行为，如点击链接之后执行跳转，使用此函数阻止这些默认行为。
+			 */
+			preventDefault: function() {
+				this.returnValue = false;
+			},
+			
+			/**
+			 * 停止默认事件和冒泡。
+			 * @remark 此函数可以完全撤销事件。 事件处理函数中 return false 和调用 stop() 是不同的， return
+			 *         false 只会阻止当前事件其它函数执行， 而 stop() 只阻止事件冒泡和默认事件，不阻止当前事件其它函数。
+			 */
+			stop: function() {
+				this.stopPropagation();
+				this.preventDefault();
+			},
+			
+			/**
+			 * 获取当前发生事件的Dom 对象。
+			 * @return {Dom} 发生事件的Dom 对象。
+			 */
+			getTarget: function() {
+				assert(this.target, "Dom.Event.prototype.getTarget(): 当前事件不支持 getTarget 操作");
+				return new Dom(this.target.nodeType === 3 ? this.target.parentNode: this.target);
+			}
+		}),
+
+		/**
+		 * 文档对象。
+		 * @class Document 因为 IE6/7 不存在这些对象, 文档对象是对原生 HTMLDocument 对象的补充。 扩展
+		 *        Document 也会扩展 HTMLDocument。
+		 */
+		Document: p.Native(document.constructor || {
+			prototype: document
+		})
+
+	});
+
+	/**
+	 * @class Dom
+	 */
+	Dom
 
 	.implement({
 	
 		/**
 		 * 将当前节点添加到其它节点。
-		 * @param {Element/String} elem=document.body 节点、控件或节点的 id 字符串。
+		 * @param {Element/String} elem=document.body 节点、Dom 对象或节点的 id 字符串。
 		 * @return this 
 		 * this.appendTo(parent) 相当于 parent.append(this) 。 
 		 */
@@ -1360,13 +1367,13 @@
 	
 		/**
 		 * 删除元素子节点或本身。
-		 * @param {Control} childControl 子控件。
-		 * @return {Control} this
+		 * @param {Dom} childControl 子Dom 对象。
+		 * @return {Dom} this
 		 */
 		remove: function(childControl) {
 	
 			if (arguments.length) {
-				assert(childControl && this.hasChild(childControl), 'Control.prototype.remove(childControl): {childControl} 不是当前节点的子节点', childControl);
+				assert(childControl && this.hasChild(childControl), 'Dom.prototype.remove(childControl): {childControl} 不是当前节点的子节点', childControl);
 				this.removeChild(childControl);
 			} else if (childControl = this.parentControl || this.getParent()){
 				childControl.removeChild(this);
@@ -1411,8 +1418,8 @@
 			// 获取样式
 			var me = this;
 			
-			assert.isString(name, "Control.prototype.setStyle(name, value): {name} ~");
-			assert.isElement(me.dom, "Control.prototype.setStyle(name, value): 当前 dom 不支持样式");
+			assert.isString(name, "Dom.prototype.setStyle(name, value): {name} ~");
+			assert.isElement(me.dom, "Dom.prototype.setStyle(name, value): 当前 dom 不支持样式");
 		
 			// 设置通用的属性。
 			if(arguments.length == 1){
@@ -1427,7 +1434,7 @@
 			} else {
 				name = name.replace(rStyle, formatStyle);
 		
-				assert(value || !isNaN(value), "Control.prototype.setStyle(name, value): {value} 不是正确的属性值。", value);
+				assert(value || !isNaN(value), "Dom.prototype.setStyle(name, value): {value} 不是正确的属性值。", value);
 		
 				// 如果值是函数，运行。
 				if( typeof value === "number" && !( name in Dom.styleNumbers))
@@ -1449,8 +1456,8 @@
 		 */
 		setOpacity: 'opacity' in div.style ? function(value) {
 		
-			assert(value <= 1 && value >= 0, 'Control.prototype.setOpacity(value): {value} 必须在 0~1 间。', value);
-			assert.isElement(this.dom, "Control.prototype.setStyle(name, value): 当前 dom 不支持样式");
+			assert(value <= 1 && value >= 0, 'Dom.prototype.setOpacity(value): {value} 必须在 0~1 间。', value);
+			assert.isElement(this.dom, "Dom.prototype.setStyle(name, value): 当前 dom 不支持样式");
 		
 			// 标准浏览器使用 opacity
 			this.dom.style.opacity = value;
@@ -1459,8 +1466,8 @@
 		}: function(value) {
 			var elem = this.dom, style = elem.style;
 		
-			assert(!+value || (value <= 1 && value >= 0), 'Control.prototype.setOpacity(value): {value} 必须在 0~1 间。', value);
-			assert.isElement(elem, "Control.prototype.setStyle(name, value): 当前 dom 不支持样式");
+			assert(!+value || (value <= 1 && value >= 0), 'Dom.prototype.setOpacity(value): {value} 必须在 0~1 间。', value);
+			assert.isElement(elem, "Dom.prototype.setStyle(name, value): 当前 dom 不支持样式");
 		
 			if(value)
 				value *= 100;
@@ -1469,7 +1476,7 @@
 			// 获取真实的滤镜。
 			elem = styleString(elem, 'filter');
 		
-			assert(!/alpha\([^)]*\)/i.test(elem) || rOpacity.test(elem), 'Control.prototype.setOpacity(value): 当前元素的 {filter} CSS属性存在不属于 alpha 的 opacity， 将导致 setOpacity 不能正常工作。', elem);
+			assert(!/alpha\([^)]*\)/i.test(elem) || rOpacity.test(elem), 'Dom.prototype.setOpacity(value): 当前元素的 {filter} CSS属性存在不属于 alpha 的 opacity， 将导致 setOpacity 不能正常工作。', elem);
 		
 			// 当元素未布局，IE会设置失败，强制使生效。
 			style.zoom = 1;
@@ -1486,7 +1493,7 @@
 		/// setOpacity: function (value) {
 		///
 		/// 	assert(value <= 1 && value >= 0,
-		//   'Control.prototype.setOpacity(value): {value} 必须在 0~1 间。',
+		//   'Dom.prototype.setOpacity(value): {value} 必须在 0~1 间。',
 		//    value);
 		///
 		/// 	// 标准浏览器使用 opacity
@@ -1540,27 +1547,27 @@
 		 * @param {Boolean} value 是否可选。
 		 * @return this
 		 */
-		setUnselectable: 'unselectable' in div ? function(value) {
-			assert.isElement(this.dom, "Control.prototype.setUnselectable(value): 当前 dom 不支持此操作");
+		unselectable: 'unselectable' in div ? function(value) {
+			assert.isElement(this.dom, "Dom.prototype.unselectable(value): 当前 dom 不支持此操作");
 			this.dom.unselectable = value !== false ? 'on': '';
 			return this;
 		}: 'onselectstart' in div ? function(value) {
-			assert.isElement(this.dom, "Control.prototype.setUnselectable(value): 当前 dom 不支持此操作");
+			assert.isElement(this.dom, "Dom.prototype.unselectable(value): 当前 dom 不支持此操作");
 			this.dom.onselectstart = value !== false ? Function.returnFalse: null;
 			return this;
 		}: function(value) {
-			assert.isElement(this.dom, "Control.prototype.setUnselectable(value): 当前 dom 不支持此操作");
+			assert.isElement(this.dom, "Dom.prototype.unselectable(value): 当前 dom 不支持此操作");
 			this.dom.style.MozUserSelect = value !== false ? 'none': '';
 			return this;
 		},
 	
 		/**
 		 * 将元素引到最前。
-		 * @param {Control} [targetControl] 如果指定了参考控件，则控件将位于指定的控件之上。
+		 * @param {Dom} [targetControl] 如果指定了参考Dom 对象，则Dom 对象将位于指定的Dom 对象之上。
 		 * @return this
 		 */
 		bringToFront: function(targetControl) {
-			assert(!targetControl || (targetControl.dom && targetControl.dom.style), "Control.prototype.bringToFront(elem): {elem} 必须为 空或允许使用样式的控件。", targetControl);
+			assert(!targetControl || (targetControl.dom && targetControl.dom.style), "Dom.prototype.bringToFront(elem): {elem} 必须为 空或允许使用样式的Dom 对象。", targetControl);
 		
 			var thisElem = this.dom, targetZIndex = targetControl&& (parseInt(styleString(targetControl.dom, 'zIndex')) + 1) || Dom.zIndex++;
 		
@@ -1583,7 +1590,7 @@
 		
 			/// #if CompactMode
 			
-			assert(name !== 'type' || elem.tagName !== "INPUT" || !elem.parentNode, "Control.prototype.setAttr(name, type): 无法修改INPUT元素的 type 属性。");
+			assert(name !== 'type' || elem.tagName !== "INPUT" || !elem.parentNode, "Dom.prototype.setAttr(name, type): 无法修改INPUT元素的 type 属性。");
 		
 			/// #endif
 			// 如果是节点具有的属性。
@@ -1593,7 +1600,7 @@
 					attributes[name].set(elem, name, value);
 				else {
 		
-					assert(elem.tagName !== 'FORM' || name !== 'className' || typeof elem.className === 'string', "Control.prototype.setAttr(name, type): 表单内不能存在 name='className' 的节点。");
+					assert(elem.tagName !== 'FORM' || name !== 'className' || typeof elem.className === 'string', "Dom.prototype.setAttr(name, type): 表单内不能存在 name='className' 的节点。");
 		
 					elem[attributes[name]] = value;
 		
@@ -1601,7 +1608,7 @@
 		
 			} else if(value === null) {
 		
-				assert(elem.removeAttributeNode, "Control.prototype.setAttr(name, type): 当前元素不存在 removeAttributeNode 方法");
+				assert(elem.removeAttributeNode, "Dom.prototype.setAttr(name, type): 当前元素不存在 removeAttributeNode 方法");
 		
 				if( value = elem.getAttributeNode(name)) {
 					value.nodeValue = '';
@@ -1610,7 +1617,7 @@
 		
 			} else {
 		
-				assert(elem.getAttributeNode, "Control.prototype.setAttr(name, type): 当前元素不存在 getAttributeNode 方法");
+				assert(elem.getAttributeNode, "Dom.prototype.setAttr(name, type): 当前元素不存在 getAttributeNode 方法");
 		
 				var node = elem.getAttributeNode(name);
 		
@@ -1667,7 +1674,7 @@
 		 * @return {Element} this
 		 */
 		addClass: function(className) {
-			assert.isString(className, "Control.prototype.addClass(className): {className} ~");
+			assert.isString(className, "Dom.prototype.addClass(className): {className} ~");
 		
 			var elem = this.dom, classList = className.split(/\s+/), newClass, i;
 		
@@ -1694,7 +1701,7 @@
 		 * @param {String} [className] 类名。
 		 */
 		removeClass: function(className) {
-			assert(!className || className.split, "Control.prototype.removeClass(className): {className} ~");
+			assert(!className || className.split, "Dom.prototype.removeClass(className): {className} ~");
 		
 			var elem = this.dom, classList, newClass = "", i;
 		
@@ -1725,7 +1732,7 @@
 		},
 	
 		/**
-		 * 设置控件对应的文本值。
+		 * 设置Dom 对象对应的文本值。
 		 * @param {String/Boolean} 值。
 		 * @return {Element} this
 		 */
@@ -1736,7 +1743,7 @@
 		},
 	
 		/**
-		 * 设置当前控件的内部 HTML 字符串。
+		 * 设置当前Dom 对象的内部 HTML 字符串。
 		 * @param {String} value 设置的新值。
 		 * @return {Element} this
 		 */
@@ -1744,10 +1751,12 @@
 			var elem = this.dom,
 				map = wrapMap.$default;
 			
-			assert(elem.nodeType === 1, "Control.prototype.setHtml(value): 仅当 dom.nodeType === 1 时才能使用此函数。"); 
+			assert(elem.nodeType === 1, "Dom.prototype.setHtml(value): 仅当 dom.nodeType === 1 时才能使用此函数。"); 
 			
 			value = (map[1] + value + map[2]).replace(rXhtmlTag, "<$1></$2>");
-			o.each(elem.getElementsByTagName("*"), p.removeData);
+			// o.each(elem.getElementsByTagName("*"), function(node){
+			// 	node.$data = null;
+			// });
 			
 			try {
 				elem.innerHTML = value;
@@ -1814,7 +1823,7 @@
 		 */
 		setOffset: function(p) {
 		
-			assert(o.isObject(p), "Control.prototype.setOffset(p): {p} 必须有 'x' 和 'y' 属性。", p);
+			assert(o.isObject(p), "Dom.prototype.setOffset(p): {p} 必须有 'x' 和 'y' 属性。", p);
 			var s = this.dom.style;
 			
 			if(p.y != null)
@@ -1866,7 +1875,7 @@
 		
 		delegate: function(selector, eventName, handler){
 			
-			assert.isFunction(handler, "Control.prototype.delegate(selector, eventName, handler): {handler}  ~");
+			assert.isFunction(handler, "Dom.prototype.delegate(selector, eventName, handler): {handler}  ~");
 			
 			this.on(eventName, function(e){
 				var target = e.getTarget();
@@ -1890,8 +1899,8 @@
 		
 			var elem = this.dom;
 		
-			assert.isString(name, "Control.prototype.getStyle(name): {name} ~");
-			assert(elem.style, "Control.prototype.getStyle(name): 当前控件对应的节点不是元素，无法使用样式。");
+			assert.isString(name, "Dom.prototype.getStyle(name): {name} ~");
+			assert(elem.style, "Dom.prototype.getStyle(name): 当前Dom 对象对应的节点不是元素，无法使用样式。");
 		
 			return elem.style[name = name.replace(rStyle, formatStyle)] || getStyle(elem, name);
 		
@@ -1947,11 +1956,11 @@
 		},
 	
 		/**
-		 * 获取当前控件的内部 HTML 字符串。
+		 * 获取当前Dom 对象的内部 HTML 字符串。
 		 * @return {String} HTML 字符串。
 		 */
 		getHtml: function() {
-			assert(this.dom.nodeType === 1, "Control.prototype.getHtml(): 仅当 dom.nodeType === 1 时才能使用此函数。"); 
+			assert(this.dom.nodeType === 1, "Dom.prototype.getHtml(): 仅当 dom.nodeType === 1 时才能使用此函数。"); 
 			return this.dom.innerHTML;
 		},
 	
@@ -2160,7 +2169,7 @@
 		 * @return {Element/undefined} 节点。
 		 */
 		find: function(selector){
-			assert.isString(selector, "Control.prototype.find(selector): selector ~。");
+			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
 			var elem = this.dom, result;
 			if(elem.nodeType !== 1) {
 				return document.find.call(this, selector)
@@ -2191,8 +2200,8 @@
 		 * @return {Element/undefined} 节点。
 		 */
 		query: function(selector){
-			assert.isString(selector, "Control.prototype.find(selector): selector ~。");
-			assert(selector, "Control.prototype.find(selector): {selector} 不能为空。", selector);
+			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
+			assert(selector, "Dom.prototype.find(selector): {selector} 不能为空。", selector);
 			var elem = this.dom, result;
 			
 			if(elem.nodeType !== 1) {
@@ -2235,7 +2244,7 @@
 		 */
 		insert: function(where, html) {
 		
-			assert(' afterEnd beforeBegin afterBegin beforeEnd '.indexOf(' ' + where + ' ') >= 0, "Control.prototype.insert(where, html): {where} 必须是 beforeBegin、beforeEnd、afterBegin 或 afterEnd 。", where);
+			assert(' afterEnd beforeBegin afterBegin beforeEnd '.indexOf(' ' + where + ' ') >= 0, "Dom.prototype.insert(where, html): {where} 必须是 beforeBegin、beforeEnd、afterBegin 或 afterEnd 。", where);
 		
 			var me = this,
 				parentControl = me,
@@ -2250,7 +2259,7 @@
 					// 继续。
 				case "beforeBegin":
 					parentControl = me.getParent();
-					assert(parentControl, "Control.prototype.insert(where, html): 节点无父节点时无法执行 insert({where})。", where);
+					assert(parentControl, "Dom.prototype.insert(where, html): 节点无父节点时无法执行 insert({where})。", where);
 					break;
 				case "afterBegin":
 					refChild = me.getFirst(true);
@@ -2292,11 +2301,11 @@
 		},
 	
 		/**
-		 * 创建并返回控件的副本。
+		 * 创建并返回Dom 对象的副本。
 		 * @param {Boolean} cloneEvent=false 是否复制事件。
 		 * @param {Boolean} contents=true 是否复制子元素。
 		 * @param {Boolean} keepId=false 是否复制 id 。
-		 * @return {Control} 新的控件。
+		 * @return {Dom} 新的Dom 对象。
 		 */
 		clone: function(cloneEvent, contents, keepId) {
 		
@@ -2311,7 +2320,7 @@
 				cleanClone(elem, clone, cloneEvent, keepId);
 			}
 		
-			return this.constructor === Control ? new Dom(clone) : new this.constructor(clone);
+			return this.constructor === Dom ? new Dom(clone) : new this.constructor(clone);
 		}
 	 
 	}, 3)
@@ -2328,23 +2337,23 @@
 		
 		/**
 		 * 判断一个节点是否包含一个节点。 一个节点包含自身。
-		 * @param {Element} control 子节点。
+		 * @param {Element} Dom 子节点。
 		 * @return {Boolean} 有返回true 。
 		 */
-		contains: function(control) {
+		contains: function(dom) {
 			var elem = this.dom;
-			control = Dom.getNode(control);
-			assert.notNull(control, "Control.prototype.contains(control):{control} ~");
-			return control == elem || Dom.hasChild(elem, control);
+			dom = Dom.getNode(dom);
+			assert.notNull(dom, "Dom.prototype.contains(Dom):{Dom} ~");
+			return dom == elem || Dom.hasChild(elem, dom);
 		},
 		
 		/**
 		 * 判断一个节点是否有子节点。
-		 * @param {Element} [control] 子节点。
+		 * @param {Element} [Dom] 子节点。
 		 * @return {Boolean} 有返回true 。
 		 */
-		hasChild: function(control) {
-			return control ? Dom.hasChild(this.dom, Dom.getNode(control)): !Dom.isEmpty(this.dom);
+		hasChild: function(dom) {
+			return dom ? Dom.hasChild(this.dom, Dom.getNode(dom)): !Dom.isEmpty(this.dom);
 		}
 		
 	}, 4);
@@ -2356,7 +2365,7 @@
 		
 		/**
 		 * 插入一个HTML 。
-		 * @param {String/Control} html 内容。
+		 * @param {String/Dom} html 内容。
 		 * @return {Element} 元素。
 		 */
 		append: function(html) {
@@ -2365,7 +2374,7 @@
 		
 		/**
 		 * 插入一个HTML 。
-		 * @param {String/Control} html 内容。
+		 * @param {String/Dom} html 内容。
 		 * @return {Element} 元素。
 		 */
 		insert: function(where, html) {
@@ -2374,7 +2383,7 @@
 		
 		/**
 		 * 插入一个HTML 。
-		 * @param {String/Control} html 内容。
+		 * @param {String/Dom} html 内容。
 		 * @return {Element} 元素。
 		 */
 		remove: function() {
@@ -2384,7 +2393,7 @@
 		},
 		
 		find: function(selector){
-			assert.isString(selector, "Control.prototype.find(selector): selector ~。");
+			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
 			var result;
 			try{
 				result = this.querySelector(selector);
@@ -2401,7 +2410,7 @@
 		 * @return {Element/undefined} 节点。
 		 */
 		query: function(selector){
-			assert.isString(selector, "Control.prototype.find(selector): selector ~。");
+			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
 			var result;
 			try{
 				result = this.querySelectorAll(selector);
@@ -2421,7 +2430,7 @@
 		// },
 // 		
 		// /**
-		 // * 根据元素返回封装后的控件。
+		 // * 根据元素返回封装后的Dom 对象。
 		 // * @param {String} ... 对象的 id 或对象。
 		 // * @return {DomList} 如果只有1个参数，返回元素，否则返回元素集合。
 		 // */
@@ -2462,7 +2471,7 @@
 		 */
 		getScroll: getWindowScroll,
 		
-		xType: 'control',
+		xType: 'Dom',
 
 		/**
 		 * 滚到。
@@ -2486,7 +2495,7 @@
 
 	// 变量初始化。
 
-	Control.delegate(Control, 'dom', 'scrollIntoView focus blur select click submit reset');
+	Dom.define(Dom, 'dom', 'scrollIntoView focus blur select click submit reset');
 
 	map("push shift unshift pop include indexOf each forEach", ap, DomList.prototype);
 	DomList.prototype.insertItem = ap.insert;
@@ -2498,7 +2507,7 @@
 		};
 	}, DomList.prototype);
 	
-	Dom.prototype = Control.prototype;
+	Dom.prototype = Dom.prototype;
 
 	Dom.window = new Dom(window);
 	
@@ -2542,11 +2551,11 @@
 		 * @type Object
 		 * @hide
 		 */
-		eventObj = p.namespace("JPlus.Events.control.$default", {
+		eventObj = {
 			
 			/**
 			 * 创建当前事件可用的参数。
-			 * @param {Control} ctrl 事件所有者。
+			 * @param {Dom} ctrl 事件所有者。
 			 * @param {Event} e 事件参数。
 			 * @param {Object} target 事件目标。
 			 * @return {Event} e 事件参数。
@@ -2567,7 +2576,7 @@
 			
 			/**
 			 * 添加绑定事件。
-			 * @param {Control} ctrl 事件所有者。
+			 * @param {Dom} ctrl 事件所有者。
 			 * @param {String} type 类型。
 			 * @param {Function} fn 函数。
 			 */
@@ -2589,13 +2598,17 @@
 				ctrl.dom.detachEvent('on' + type, fn);
 			}
 			
-		}),
+		},
 		
 		/**
 		 * 浏览器使用的真实的 DOMContentLoaded 事件名字。
 		 * @type String
 		 */
 		domReady;
+		
+	Dom.addEvents({
+		'$default': eventObj
+	});
 
 	/// #if CompactMode
 
@@ -2667,7 +2680,7 @@
 			attributes.value = {
 
 				node: function(elem, name) {
-					assert(elem.getAttributeNode, "Control.prototype.getAttr(name, type): 当前元素不存在 getAttributeNode 方法");
+					assert(elem.getAttributeNode, "Dom.prototype.getAttr(name, type): 当前元素不存在 getAttributeNode 方法");
 					return elem.tagName === 'BUTTON' ? elem.getAttributeNode(name) || {
 						value: ''
 					}: elem;
@@ -2705,25 +2718,26 @@
 
 	}
 	
+	eventObj.initEvent = initUIEvent;
+	
 	/// #endif
 
-	Control.addEvents
-		("mousewheel blur focus focusin focusout scroll change select submit resize error load unload touchstart touchmove touchend hashchange", initUIEvent)
+	Dom.addEvents
 		("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", initMouseEvent)
 		("keydown keypress keyup", initKeyboardEvent);
 
 	if(navigator.isFirefox)
-		Control.addEvents
+		Dom.addEvents
 			('mousewheel', 'DOMMouseScroll')
 			('focusin', 'DOMFocusIn')
 			('focusout', 'DOMFocusOut');
 
 	if(!navigator.isIE)
-		Control.addEvents
+		Dom.addEvents
 			('mouseenter', 'mouseover', checkMouseEnter)
 			('mouseleave', 'mouseout', checkMouseEnter);
 	
-	Control.implement(String.map('on un one trigger', Dom.prototype, {}));
+	Dom.implement(String.map('on un one trigger', Dom.prototype, {}));
 
 	map('on un trigger', function (name) {
 		Dom.Document.prototype[name] = function(){
@@ -2866,7 +2880,7 @@
 
 		Dom: Dom,
 
-		Control: Control,
+		Dom: Dom,
 
 		Point: Point,
 		
@@ -2882,14 +2896,6 @@
 	/**
 	 * @class
 	 */
-
-	/**
-	 * Dom 对象的封装。
-	 * @param {Node} dom 封装的元素。
-	 */
-	function Dom(dom) {
-		this.dom = dom;
-	}
 
 	/**
 	 * 获取元素的文档。
@@ -2977,7 +2983,7 @@
 				
 			}
 	
-			assert.isFunction(args, "Control.prototype.getXXX(args): {args} 必须是一个函数、空、数字或字符串。", args);
+			assert.isFunction(args, "Dom.prototype.getXXX(args): {args} 必须是一个函数、空、数字或字符串。", args);
 			
 		} else {
 			
@@ -3023,7 +3029,7 @@
 			// IE 会复制 自定义事件， 清楚它。
 			destElem.clearAttributes();
 			destElem.mergeAttributes(srcElem);
-			p.removeData(destElem);
+			destElem.$data = null;
 
 			if(srcElem.options)
 				o.update(srcElem.options, 'selected', destElem.options, true);
@@ -3069,7 +3075,7 @@
 		new Dom(elem).un();
 
 		// 删除句柄，以删除双重的引用。
-		p.removeData(elem);
+		elem.$data = null;
 
 	}
 
@@ -3158,7 +3164,7 @@
 	/**
 	 * 使用指定的选择器代码对指定的结果集进行一次查找。
 	 * @param {String} selector 选择器表达式。
-	 * @param {DomList/Control} result 上级结果集，将对此结果集进行查找。
+	 * @param {DomList/Dom} result 上级结果集，将对此结果集进行查找。
 	 * @return {DomList} 返回新的结果集。
 	 */
 	function query(selector, result) {

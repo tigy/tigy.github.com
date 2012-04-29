@@ -35,15 +35,25 @@
 		<script>
 			
 			
-			var a = $$('a'), b = $$('b'), c = $$('c'), d = $$('d'), o = $$('o');
+			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o');
 			
 			
 			var testcases = {
-				'Control.prototype.on': '@a; "click", function(){console.log("clicked") }',
-				'Control.prototype.un': '@a; "click"',
-				'Control.prototype.trigger': '@a; "click"',
-				'Control.prototype.one': '@a; "click", function(){console.log("clicked - once") }',
-				'Control.prototype.delegate': '@a; "#c", "click", function(){console.log("clicked") }'
+				'Dom.prototype.on': {
+                    'a.on("click", function(){console.log("clicked") })': '-'
+                },
+				'Dom.prototype.un': {
+                    'a.un("click")': '-'
+                },
+				'Dom.prototype.trigger': {
+                    'a.trigger("click")': '-'
+                },
+				'Dom.prototype.once': {
+                    'a.once("click", function(){console.log("clicked - once") })': '-'
+                },
+				'Dom.prototype.delegate': {
+                    'a.delegate("#c", "click", function(){console.log("delegate clicked") })': '-'
+                }
 			};
 			
 			Demo.writeTestCases(testcases);

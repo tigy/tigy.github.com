@@ -3,13 +3,13 @@ module("Manipulation");
 var bareObj = function(value) { return value; };
 var functionReturningObj = function(value) { return (function() { return value; }); };
 
-test("Control.prototype.getText", function() {
+test("Dom.prototype.getText", function() {
 	
 	var expected = "This link has class=\"blog\": Simon Willison's Weblog";
 	equal( Dom.get("sap").getText().replace(/[\r\n]/g, "").replace("hasclass", "has class"), expected, "Check for merged text of more then one element." );
 
 	// Check serialization of text values
-	equal( new Control(document.createTextNode("foo")).getText(), "foo", "Text node was retreived from .getText()." );
+	equal( new Dom(document.createTextNode("foo")).getText(), "foo", "Text node was retreived from .getText()." );
 
 	var val = "<div><b>Hello</b> cruel world!</div>";
 	equal( Dom.get("foo").setText(val).dom.innerHTML.replace(/>/g, "&gt;"), "&lt;div&gt;&lt;b&gt;Hello&lt;/b&gt; cruel world!&lt;/div&gt;", "Check escaped text" );
@@ -84,7 +84,7 @@ test("Control.prototype.getText", function() {
 /*  
 
 
-test("Control.prototype.wrap", function() {
+test("Dom.prototype.wrap", function() {
 	var defaultText = "Try them out:"
 	var result = Dom.get("first").wrap( "<div class='red'><span></span></div>").getText();
 	equal( defaultText, result, "Check for wrapping of on-the-fly html" );
@@ -225,7 +225,7 @@ test("unwrap()", function() {
 
 */
 
-test("Control.prototype.append", function() {
+test("Dom.prototype.append", function() {
 	var defaultText = "Try them out:"
 	equal( Dom.get("first").getText(), defaultText, "Check defaultText" );
 	var result = Dom.get("first");
@@ -288,7 +288,7 @@ test("Control.prototype.append", function() {
 	
 		if(body !== null) {
 			pass = false;
-			new Control( body ).append( "<div>test</div>"   );
+			new Dom( body ).append( "<div>test</div>"   );
 		}
 		
 		
@@ -392,7 +392,7 @@ test("append the same fragment with events (Bug #6997, 5566)", function () {
 
 /*
 
-test("Control.prototype.append(xml)", function() {
+test("Dom.prototype.append(xml)", function() {
 	expect( 1 );
 
 	function createXMLDoc() {
@@ -422,14 +422,14 @@ test("Control.prototype.append(xml)", function() {
 		xml1 = xmlDoc.createElement("head"),
 		xml2 = xmlDoc.createElement("test");
 
-	ok( new Control( xml1 ).append( xml2 ), "Append an xml element to another without raising an exception." );
+	ok( new Dom( xml1 ).append( xml2 ), "Append an xml element to another without raising an exception." );
 
 });
 
 
 */
 
-test("Control.prototype.appendTo", function() {
+test("Dom.prototype.appendTo", function() {
 
 	var defaultText = "Try them out:";
 	Dom.parse("<b>buga</b>").appendTo("first");
@@ -498,7 +498,7 @@ test("Control.prototype.appendTo", function() {
 	QUnit.reset();
 });
 
-test("Control.prototype.insert('afterBegin', html)", function() {
+test("Dom.prototype.insert('afterBegin', html)", function() {
 	var defaultText = "Try them out:"
 	var result = Dom.get("first");
 	result.insert( 'afterBegin', "<b>buga</b>");
@@ -516,7 +516,7 @@ test("Control.prototype.insert('afterBegin', html)", function() {
 	equal( Dom.get("sap").getText().replace(/[\r\n]/g, "").replace("hasclass", "has class"), expected, "Check for prepending of Dom.parse object" );
 });
 
-test("Control.prototype.insert('beforeBegin', html)", function() {
+test("Dom.prototype.insert('beforeBegin', html)", function() {
 	var expected = "This is a normal link: bugaYahoo";
 	Dom.get("yahoo").insert('beforeBegin', "<b>buga</b>");
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, ""), expected, "Insert String before" );
@@ -537,7 +537,7 @@ test("Control.prototype.insert('beforeBegin', html)", function() {
 	// equal( set.nodeName.toLowerCase(), "span", "Insert the element before the disconnected node." );
 });
 
-test("Control.prototype.insert('afterEnd', html)", function() {
+test("Dom.prototype.insert('afterEnd', html)", function() {
 	var expected = "This is a normal link: Yahoobuga";
 	Dom.get("yahoo").insert( 'afterEnd',  "<b>buga</b>" );
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, ""), expected, "Insert String after" );
@@ -556,7 +556,7 @@ test("Control.prototype.insert('afterEnd', html)", function() {
 	// equal( set.nodeName.toLowerCase(), "span", "Insert the element after the disconnected node." );
 });
 
-test("Control.prototype.insert('beforeEnd', html)", function() {
+test("Dom.prototype.insert('beforeEnd', html)", function() {
 	var expected = "This is a normal link: Yahoobuga";
 	Dom.get("yahoo").insert( 'beforeEnd', "<b>buga</b>" );
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, ""), expected, "Insert String after" );
@@ -575,7 +575,7 @@ test("Control.prototype.insert('beforeEnd', html)", function() {
 	equal( set.dom.nodeName.toLowerCase(), "span", "Insert the element after the disconnected node." );
 });
 
-test("Control.prototype.replaceWith", function() {
+test("Dom.prototype.replaceWith", function() {
 
 	Dom.get("yahoo").replaceWith( "<b id='replace'>buga</b>" );
 	ok( Dom.get("replace"), "Replace element with string" );
@@ -651,7 +651,7 @@ test("Control.prototype.replaceWith", function() {
 	equal( Dom.get("qunit-fixture").query("div[id=replaceWith]").length, 1, "Make sure only one div exists." );
 });
 
-test("Control.prototype.replaceWith(string) for more than one element", function(){
+test("Dom.prototype.replaceWith(string) for more than one element", function(){
 	expect(3);
 
 	equal(document.query("#foo p").length, 3, "ensuring that test data has not changed");
@@ -681,7 +681,7 @@ test("Dom.parse.clone() (#8017)", function() {
 	
 });
 
-test("Control.prototype.clone", function() {
+test("Dom.prototype.clone", function() {
 	equal( "This is a normal link: Yahoo", Dom.get("en").getText(), "Assert text for #en" );
 	var clone = Dom.get("yahoo").clone();
 	Dom.get("first").append(clone);
@@ -806,7 +806,7 @@ test("clone(multiple selected options)", function() {
 
 });
 
-test("Control.prototype.setHtml", function() {
+test("Dom.prototype.setHtml", function() {
 
 	Dom.parse.scriptorder = 0;
 
@@ -872,7 +872,7 @@ test("Control.prototype.setHtml", function() {
 	Dom.get("qunit-fixture").setHtml("<script>equal(Dom.parse.scriptorder++, 0, 'Script is executed in order');equal(Dom.parse('#scriptorder').length, 1,'Execute after html (even though appears before)')<\/script><span id='scriptorder'><script>equal(Dom.parse.scriptorder++, 1, 'Script (nested) is executed in order');equal(Dom.parse('#scriptorder').length, 1,'Execute after html')<\/script></span><script>equal(Dom.parse.scriptorder++, 2, 'Script (unnested) is executed in order');equal(Dom.parse('#scriptorder').length, 1,'Execute after html')<\/script>");
 });
 
-test("Control.prototype.remove", function() {
+test("Dom.prototype.remove", function() {
 
 	var first = Dom.get("ap");
 
@@ -890,7 +890,7 @@ test("Control.prototype.remove", function() {
 	cleanUp.remove();
 });
 
-test("Control.prototype.empty", function() {
+test("Dom.prototype.empty", function() {
 	equal( Dom.get("ap").getChildren().empty().getText().join('').length, 0, "Check text is removed" );
 	equal( Dom.get("ap").getChildren().length, 4, "Check elements are not removed" );
 

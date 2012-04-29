@@ -51,16 +51,26 @@
 		<div id="rule"></div>
 		<script>
 		
-			var a = $$('a'), b = $$('b'), c = $$('c'), d = $$('d'), o = $$('o');
+			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o');
 			
 			
 			var testcases = {
 				'Offset': '-',
-				'Control.prototype.getOffset': '@a;',
-				'Control.prototype.setOffset': '@a; {x:2, y:5}',
-				'Control.prototype.getPosition': '@a;',
-				'Control.prototype.setPosition': '@a;',
-				'Control.prototype.getScroll': '@a;'
+				'Dom.prototype.getOffset': {
+                    'a.getOffset()': '-'
+                },
+				'Dom.prototype.setOffset': {
+                    'a.setOffset({x:2, y:5})': '-'
+                },
+				'Dom.prototype.getPosition': {
+                    'a.getPosition()': '-'
+                },
+				'Dom.prototype.setPosition': {
+                    'a.setPosition()': '-'
+                },
+				'Dom.prototype.getScroll': {
+                    'a.getScroll()': '-'
+                }
 			};
 			
 			Demo.writeTestCases(testcases);

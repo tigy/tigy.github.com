@@ -39,7 +39,7 @@
 			</div>
 		</span>
 		<script>
-			var a = $$('a'), b = $$('b'), c = $$('c'), d = $$('d'), o = $$('o'), abcd = new DomList($$('all').dom.getElementsByTagName("div"));
+			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o'), abcd = new DomList($('all').dom.getElementsByTagName("div"));
 			
 			var testcases = {
 				'Animate': '-',
@@ -53,24 +53,24 @@
 					})
 					
 				 },
-				'animateHeight': function(){d.animate({height: 500}).animate({height: 100}).animate({height: 30});},
-				'animateOpacity': function(){a.animate({opacity: 0}).animate({opacity: 1}).animate({opacity: 0}).animate({opacity: 1});},
-				'animateScrollTop': function(){document.animate({scrollTop: 400});},
-				'animateBackgroundColor': function(){ a.animate({'background-color': '#efefef'});},
+				'animateHeight': 'd.animate({height: 500}).animate({height: 100}).animate({height: 30})',
+				'animateOpacity': 'a.animate({opacity: 0}).animate({opacity: 1}).animate({opacity: 0}).animate({opacity: 1})',
+				'animateScrollTop': 'document.animate({scrollTop: 400})',
+				'animateBackgroundColor': 'a.animate({"background-color": "#efefef"})',
 				'Toggle': '-',
-				'Control.prototype.toggle': function(){ a.toggle(1000); },
-				'toggleHeight': function(){ a.toggle(1000, null, 'height'); },
-				'toggleWidth': function(){ a.toggle(1000, null, 'width'); },
-				'toggleOpacity': function(){ a.toggle(1000, null, 'opacity'); },
-				'toggleLeft': function(){ a.toggle(1000, null, 'left'); },
-				'toggleTop': function(){ a.toggle(1000, null, 'top'); },
-				'toggleRight': function(){ a.toggle(1000, null, 'right'); },
-				'toggleBottom': function(){ a.toggle(1000, null, 'bottom'); },
-				'Control.prototype.hide(1000)': function(){ a.hide(1000); },
-				'Control.prototype.hide': function(){ a.hide(0); },
+				'Dom.prototype.toggle': 'a.toggle(1000)',
+				'toggleHeight': 'a.toggle(1000, null, "height")',
+				'toggleWidth': 'a.toggle(1000, null, "width")',
+				'toggleOpacity': 'a.toggle(1000, null, "opacity")',
+				'toggleLeft': 'a.toggle(1000, null, "left")',
+				'toggleTop': 'a.toggle(1000, null, "top")',
+				'toggleRight': 'a.toggle(1000, null, "right")',
+				'toggleBottom': 'a.toggle(1000, null, "bottom")',
+				'Dom.prototype.hide(1000)':'a.hide(1000)',
+				'Dom.prototype.hide': 'a.hide(0);',
 				
-				'Control': '-',
-				'Control.prototype.highlight': '@a;'
+				'Dom': '-',
+				'Dom.prototype.highlight': 'a.highlight()'
 			};
 			
 			Demo.writeTestCases(testcases, {times: 8});

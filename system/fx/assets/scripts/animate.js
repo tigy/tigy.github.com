@@ -138,7 +138,7 @@ using("System.Fx.Base");
 			
 			/**
 			 * 当前绑定的节点。
-			 * @type Control
+			 * @type Dom
 			 * @protected
 			 */
 			target: null,
@@ -336,7 +336,7 @@ using("System.Fx.Base");
 	
 	String.map('left right top bottom', Function.from({$slide: true}), maps);
 	
-	Control.implement({
+	Dom.implement({
 		
 		/**
 		 * 获取和当前节点有关的 Animate 实例。
@@ -464,7 +464,7 @@ using("System.Fx.Base");
 		 * @return this
 		 */
 		highlight: function(color, duration, callBack){
-			assert(!callBack || Function.isFunction(callBack), "Control.prototype.highlight(color, duration, callBack): 参数 {callBack} 不是可执行的函数。", callBack);
+			assert(!callBack || Function.isFunction(callBack), "Dom.prototype.highlight(color, duration, callBack): 参数 {callBack} 不是可执行的函数。", callBack);
 			var from = {},
 				to = {
 					backgroundColor: color || '#ffff88'
@@ -473,7 +473,7 @@ using("System.Fx.Base");
 			duration /= 2;
 			
 			this.fx().start(from, to, duration, null, function (from) {
-				from.backgroundColor = Dom.getStyle(this.dom.dom, 'backgroundColor');
+				from.backgroundColor = Dom.getStyle(this.target.dom, 'backgroundColor');
 			}).start(to, from, duration, callBack);
 			return this;
 		}
@@ -507,4 +507,4 @@ using("System.Fx.Base");
 
 	/// #endregion
 	
-})(JPlus);
+})(System);

@@ -22,7 +22,7 @@ var MenuItem = ContentControl.extend({
 	 */
 	init: function(){
 		this.base('init');
-		this.setUnselectable();
+		this.unselectable();
 		this.on('mouseover', this.onMouseEnter);
 		this.on('mouseout', this.onMouseLeave);
 		

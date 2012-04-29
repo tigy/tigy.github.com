@@ -1,7 +1,7 @@
 module("System");
 
 test("System", function() {
-	ok( JPlus, "JPlus" );
+	ok( System, "System" );
 	ok( $, "$" );
 	ok( Dom, "Dom" );
 });
@@ -26,34 +26,34 @@ test( "execScript", function() {
 	window.globalEvalTest = undefined;
 });
 
-test("Object.type", function() {
-
-	equal( Object.type(null), "null", "null" );
-	equal( Object.type(undefined), "undefined", "undefined" );
-	equal( Object.type(true), "boolean", "Boolean" );
-	equal( Object.type(false), "boolean", "Boolean" );
-	equal( Object.type(Boolean(true)), "boolean", "Boolean" );
-	equal( Object.type(0), "number", "Number" );
-	equal( Object.type(1), "number", "Number" );
-	equal( Object.type(Number(1)), "number", "Number" );
-	equal( Object.type(""), "string", "String" );
-	equal( Object.type("a"), "string", "String" );
-	equal( Object.type(String("a")), "string", "String" );
-	equal( Object.type({}), "object", "Object" );
-	equal( Object.type(/foo/), "regexp", "RegExp" );
-	equal( Object.type(new RegExp("asdf")), "regexp", "RegExp" );
-	equal( Object.type([1]), "array", "Array" );
-	equal( Object.type(new Date()), "date", "Date" );
-	equal( Object.type(new Function("return;")), "function", "Function" );
-	equal( Object.type(function(){}), "function", "Function" );
-	equal( Object.type(window), "object", "Window" );
-	equal( Object.type(document), "control", "Document" );
-	equal( Object.type(Dom.get(document.body)), "control", "Element" );
-	equal( Object.type(document.createTextNode("foo")), "object", "TextNode" );
-	
-	// !Safari
-	//equal( Object.type(document.getElementsByTagName("*")), "object", "DomList" );
-});
+// test("Object.type", function() {
+// 
+	// equal( Object.type(null), "null", "null" );
+	// equal( Object.type(undefined), "undefined", "undefined" );
+	// equal( Object.type(true), "boolean", "Boolean" );
+	// equal( Object.type(false), "boolean", "Boolean" );
+	// equal( Object.type(Boolean(true)), "boolean", "Boolean" );
+	// equal( Object.type(0), "number", "Number" );
+	// equal( Object.type(1), "number", "Number" );
+	// equal( Object.type(Number(1)), "number", "Number" );
+	// equal( Object.type(""), "string", "String" );
+	// equal( Object.type("a"), "string", "String" );
+	// equal( Object.type(String("a")), "string", "String" );
+	// equal( Object.type({}), "object", "Object" );
+	// equal( Object.type(/foo/), "regexp", "RegExp" );
+	// equal( Object.type(new RegExp("asdf")), "regexp", "RegExp" );
+	// equal( Object.type([1]), "array", "Array" );
+	// equal( Object.type(new Date()), "date", "Date" );
+	// equal( Object.type(new Function("return;")), "function", "Function" );
+	// equal( Object.type(function(){}), "function", "Function" );
+	// equal( Object.type(window), "object", "Window" );
+	// equal( Object.type(document), "control", "Document" );
+	// equal( Object.type(Dom.get(document.body)), "control", "Element" );
+	// equal( Object.type(document.createTextNode("foo")), "object", "TextNode" );
+// 	
+	// // !Safari
+	// //equal( Object.type(document.getElementsByTagName("*")), "object", "DomList" );
+// });
 
 test("Object.extend", function() {
 
@@ -201,7 +201,7 @@ test("Array.create", function(){
 	deepEqual( Array.create({length: "0"}), [], "Make sure object is coerced properly.");
 });
 
-test("Function.bind", function(){
+test("Function.prototype.bind", function(){
 
 	var test = function(){ equal( this, thisObject, "Make sure that scope is set properly." ); };
 	var thisObject = { foo: "bar", method: test };
@@ -210,7 +210,7 @@ test("Function.bind", function(){
 	test.call( thisObject );
 
 	// Basic scoping
-	Function.bind( test, thisObject )();
+	test.bind( thisObject )();
 });
 
 test("Function.isFunction", function() {

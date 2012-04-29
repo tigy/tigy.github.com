@@ -131,7 +131,7 @@ var Droppable = (function(p){
 		
 		afterDrag = dp.afterDrag,
 		
-		mouseEvents = p.Events.control.mousemove;
+		mouseEvents = Dom.$event.mousemove;
 	
 	Draggable.implement({
 		
@@ -185,7 +185,7 @@ var Droppable = (function(p){
 		}
 	});
 	
-	Control.addEvents(String.map('dragenter dragleave dragover drop', Function.from(Object.extendIf({
+	Dom.addEvents(String.map('dragenter dragleave dragover drop', Function.from(Object.extendIf({
 		add:  function(elem, type, fn){
 			mouseEvents.add(elem, type, fn);
 			fn = p.getData(elem, 'droppable');
@@ -205,5 +205,5 @@ var Droppable = (function(p){
 	
 	return Droppable;
 
-})(JPlus);
+})(System);
 

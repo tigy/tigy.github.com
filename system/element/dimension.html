@@ -36,18 +36,32 @@
 		
 		<script>
 		
-			var a = $$('a'), b = $$('b'), c = $$('c'), d = $$('d'), o = $$('o');
+			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o');
 			
 			
 			var testcases = {
 				'Dimension': '-',
-				'Control.prototype.getSize': '@a;',
-				'Control.prototype.setSize': '@a;',
-				'Control.prototype.getWidth': '@a;',
-				'Control.prototype.setWidth': '@a; 23',
-				'Control.prototype.getHeight': '@a;',
-				'Control.prototype.setHeight': '@a; 54',
-				'Control.prototype.getScrollSize': '@a;'
+				'Dom.prototype.getSize': {
+                    'a.getSize()': '-'
+                },
+				'Dom.prototype.setSize':  {
+                    'a.setSize()': '-'
+                },
+				'Dom.prototype.getWidth':  {
+                    'a.getWidth()': '-'
+                },
+				'Dom.prototype.setWidth':  {
+                    'a.setWidth(23)': '-'
+                },
+				'Dom.prototype.getHeight':  {
+                    'a.getHeight()': '-'
+                },
+				'Dom.prototype.setHeight':  {
+                    'a.setHeight(54)': '-'
+                },
+				'Dom.prototype.getScrollSize':  {
+                    'a.getScrollSize()': '-'
+                }
 			};
 			
 			Demo.writeTestCases(testcases);

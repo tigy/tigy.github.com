@@ -279,7 +279,7 @@ Fx.Base = (function(){
 					value.push(me);
 					me.timer = value[0].timer;
 				}else{
-					me.timer = setInterval(Function.bind(interval, cache[fps] = [me]), Math.round(1000 / fps ));
+					me.timer = setInterval(interval.bind(cache[fps] = [me]), Math.round(1000 / fps ));
 				}
 			}
 			return me;

@@ -68,7 +68,7 @@ function assert(bValue, msg) {
             }
 
             if (val)
-                msg += "\r\n--------------------------------------------------------------------\r\n" + String.ellipsis(String.decodeUTF8(val.toString()), 600);
+                msg += "\r\n--------------------------------------------------------------------\r\n" + String.ellipsis(trace.decodeUTF8(val.toString()), 600);
 
         }
 

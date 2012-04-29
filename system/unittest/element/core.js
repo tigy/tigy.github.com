@@ -1,7 +1,6 @@
 module("Element");
 
 test("Dom.get", function() {
-	ok( JPlus, "JPlus" );
 	ok( Dom, "Dom" );
 	ok( Dom.get, "Dom.get" );
 });
@@ -117,7 +116,7 @@ test("DomList",  function() {
 	equal(el.item(-1).dom, el[el.length -1], "item(-1) 返回最后的节点。");
 });
 
-test("Control",  function() {
-	var el = new Control(document);
+test("Dom",  function() {
+	var el = new Dom(document);
 	equal(el.dom, document, "dom 属性");
 });

@@ -34,23 +34,57 @@
 		
 		<script>
 		
-			var a = $$('a'), b = $$('b'), c = $$('c'), d = $$('d'), o = $$('o');
+			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o');
 			
 			var testcases = {
 				'Attribute': '-',
-				'Control.prototype.setAttr': '@a; "innerText", "12121" => assert.areEqual(a.getAttr("innerText"), "12121")',
-				'Control.prototype.getAttr': '@a; "innerText" =>  "12121"',
-				'Control.prototype.set': '@a; {"innerHTML": "cv"} => assert',
+				'Dom.prototype.setAttr': {
+                    'a.setAttr("innerText", "12121")': function(value, assert){
+                        assert.areEqual(a.getAttr("innerText"), "12121");
+                    }
+                },
+				'Dom.prototype.getAttr':  {
+                    'a.getAttr("innerText")': "12121"
+                },
+				'Dom.prototype.set': {
+                    'a.set({"innerHTML": "cv"})': '-'
+                },
 				'Application': '-',
-				'Control.prototype.getText': '@a; => "cv"',
-				'Control.prototype.setText': '@a; "cv" => assert.areEqual(a.getText(), "cv")',
-				'Control.prototype.getHtml': '@a; => "cv"',
-				'Control.prototype.setHtml': '@a; "cv" => assert.areEqual(a.getHtml(), "cv")',
+				'Dom.prototype.setText': {
+                    'a.setText("cv")': function(value, assert){
+                        assert.areEqual(a.getText(), "cv");
+                    }
+                },
+                'Dom.prototype.getText': {
+                    'a.getText()': "cv"
+                },
+				'Dom.prototype.setHtml': {
+                    'a.setHtml("cv")': function(value, assert){
+                        assert.areEqual(a.getHtml(), "cv");
+                    }
+                },
+                'Dom.prototype.getHtml': {
+                    'a.getHtml()': "cv"
+                },
 				'Class': '-',
-				'Control.prototype.addClass': '@a; "light" => assert.areEqual(a.hasClass("light"), true)  ',
-				'Control.prototype.hasClass': '@a; "light" => true ',
-				'Control.prototype.removeClass': '@a; "light" => assert.areEqual(a.hasClass("light"), false)',
-				'Control.prototype.toggleClass': '@a; "light" => assert.areEqual(a.hasClass("light"), true)'
+				'Dom.prototype.addClass': {
+                    'a.addClass("light")': function(value, assert){
+                        assert.areEqual(a.hasClass("light"), true);
+                    }
+                },
+				'Dom.prototype.hasClass': {
+                    'a.hasClass("light")':true
+                },
+				'Dom.prototype.removeClass': {
+                    'a.removeClass("light")': function(value, assert){
+                        assert.areEqual(a.hasClass("light"), false);
+                    }
+                },
+				'Dom.prototype.toggleClass': {
+                    'a.toggleClass("light")': function(value, assert){
+                        assert.areEqual(a.hasClass("light"), true);
+                    }
+                }
 			};
 			
 			Demo.writeTestCases(testcases);

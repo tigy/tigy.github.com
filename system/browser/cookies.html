@@ -10,8 +10,18 @@
 	<body>
 		<script>
 			var testcases = {
-				'Cookies.set': '"a", "b" => assert.areEqual(Cookies.get("a"), "b"); "a", null => assert.areEqual(Cookies.get("a"), undefined); "a", "b", 1',
-				'Cookies.get': '"a"=>"b"'
+				'Cookies.set': {
+				    '~("a", "b")': function(value, assert){
+				        assert.areEqual(Cookies.get("a"), "b");
+				    },
+                    '~("a", null)': function(value, assert){
+                        assert.areEqual(Cookies.get("a"), undefined);
+                    },
+                    '~("a", "b", 1)': '-'
+				},
+				'Cookies.get': {
+				    '~("a")': "b"
+				}
 			};
 			
 			Demo.writeTestCases(testcases);

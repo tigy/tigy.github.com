@@ -19,8 +19,15 @@
 			list.insert(0, 8);   // [8, 2]
 			
 			var testcases = {
-				'Collection.prototype.length': {method: false, tests:  '@list; => 2' },
-				'Collection.prototype.item': '@list; 0=>8; 1=>2; -1=>2;2=>undefined'
+				'Collection.prototype.length': {
+				    'list.length': 2   
+				},
+				'Collection.prototype.item': {
+                    'list.item(0)': 8,
+                    'list.item(1)': 2,
+                    'list.item(-1)': 2,
+                    'list.item(2)': undefined
+                }
 			};
 			
 			Demo.writeTestCases(testcases);

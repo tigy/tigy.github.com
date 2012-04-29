@@ -5,7 +5,7 @@
 
 
 
-using("System.Fx.Element");
+using("System.Fx.Animate");
 
 
 Object.extend(Fx.Animate.parsers.color, {

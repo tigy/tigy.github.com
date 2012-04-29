@@ -42,43 +42,95 @@
 			//  Element Class
 			
 			
-			Control.implement({
+			Dom.implement({
 				a: function(){return 1;}
 			});
 			
-			Control.implement({
+			Dom.implement({
 				b: function(){return 1;}
 			}, 2);
 			
-			Control.implement({
+			Dom.implement({
 				c: function(){return this;}
 			}, 3);
 			
-			Control.implement({
+			Dom.implement({
 				d: function(){return  new DomList([this]);}
 			}, 3);
 		
-			var a = $$('a'), b = $$('b'), c = $$('c'), d = $$('d'), o = $$('o'), abcd = new DomList($$('all').dom.getElementsByTagName("div"));
+			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o'), abcd = new DomList($('all').dom.getElementsByTagName("div"));
 			
 			var testcases = {
 				'Dom': '-',
-				'Dom.get': '"o" => assert.isTrue(value.a)',
-				'Dom.query': '"#o" => assert.isTrue(value[0])',
-				'Dom.create': '"div", "a" => assert.isTrue(value.dom.tagName === "DIV")',
-				'Dom.parse': '"<div/>" ; "<div><div />a<\/div>"; "   <div/> f <div/>"; "<object />"; "<input type=\'radio\' checked=\'checked\'>"',
-				'Dom.getDocument': 'a.dom=>document; document=>document', 
+				'Dom.get': {
+				    '~(o)': function(value, assert){
+				        assert.isTrue(value.a);
+				    }
+				},
+				'Dom.query': {
+                    '~("#o")': function(value, assert){
+                       assert.isTrue(value[0]);
+                    }
+                },
+				'Dom.create': {
+                    '~("div")': function(value, assert){
+                       assert.isTrue(value.dom.tagName === "DIV");
+                    },
+                    '~("a")': function(value, assert){
+                       assert.isTrue(value.dom.tagName === "A");
+                    }
+                },
+				'Dom.parse': {
+                    '~("<div/>")': '-',
+                    '~("<div><div />a<\/div>")': '-',
+                    '~("   <div/> f <div/>")': '-',
+                    '~("<object />")': '-',
+                    '~("<input type=\'radio\' checked=\'checked\'>")': '-'
+                },
+				'Dom.getDocument': {
+                    '~(a.dom)': document,
+                    '~(document)': document
+                },
+                'new Dom': {
+                    '~(a.dom)': function(value, assert){
+                       assert.areEqual(value.dom, a.dom);
+                    }
+                },
 				'DomList': '-',
-				'DomList.prototype.length': {method: false, tests:  '@abcd;4'},
-				'DomList.prototype.each': '@abcd; function(value){ assert.log(value.id)} => assert.logged("abcd")',
-				'DomList.prototype.filter': '@abcd; function(value) {return value === a.dom || value === c.dom} => assert.areEqual(value, [a.dom, c.dom])',
-				'DomList.prototype.invoke': '@abcd; "setAttr", ["ff", 1] => assert.isTrue(a.getAttr("ff") == 1),  assert.isTrue(d.getAttr("ff") == 1) ',
-				'DomList.prototype.indexOf': '@abcd; a.dom => 0; d.dom => 3; o.dom => -1',
-				'DomList.prototype.a': '@abcd; => abcd',
-				'DomList.prototype.b': '@abcd; => [1,1,1,1]',
-				'DomList.prototype.c': '@abcd; => assert.areEqual(value, [a.dom, b.dom,c.dom, d.dom])',
-				'DomList.prototype.d': '@abcd; => assert.areEqual(value, [a.dom, b.dom,c.dom, d.dom])',
-				'Control': '-',
-				'new Control': 'a => assert.areEqual(value.dom, a.dom)'
+				'DomList.prototype.length': {
+                    'abcd.length': 4
+                },
+				'DomList.prototype.each': {
+                    'abcd.each(function(value){ assert.log(value.id)})': function(value, assert){
+                       assert.logged("abcd");
+                    }
+                },
+				'DomList.prototype.filter': {
+                    'abcd.filter(function(value){ return value === a.dom || value === c.dom})': function(value, assert){
+                       assert.areEqual(value, [a.dom, c.dom]);
+                    }
+                },
+				'DomList.prototype.invoke': {
+                    'abcd.invoke("setAttr", ["ff", 1])': function(value, assert){
+                       assert.isTrue(a.getAttr("ff") == 1);
+                       assert.isTrue(d.getAttr("ff") == 1);
+                    }
+                },
+				'DomList.prototype.indexOf': {
+                    'abcd.indexOf(a.dom)': 0,
+                    'abcd.indexOf(d.dom)': 3,
+                    'abcd.indexOf(o.dom)': -1
+                },
+                'DomList 扩展': {
+                    'abcd.a()': abcd,
+                    'abcd.b()': [1,1,1,1],
+                    'abcd.c()': function(value, assert){
+                      assert.areEqual(value, [a.dom, b.dom,c.dom, d.dom]);
+                    },
+                    'abcd.d()': function(value, assert){
+                      assert.areEqual(value, [a.dom, b.dom,c.dom, d.dom]);
+                    }
+                }
 			};
 			
 			Demo.writeTestCases(testcases);

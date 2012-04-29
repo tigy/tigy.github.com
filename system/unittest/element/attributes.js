@@ -4,7 +4,7 @@ var bareObj = function(value) { return value; };
 var functionReturningObj = function(value) { return (function() { return value; }); };
 
 
-test("Control.prototype.getAttr", function() {
+test("Dom.prototype.getAttr", function() {
 
 	equal( Dom.get("text1").getAttr("type"), "text", "Check for type attribute" );
 	equal( Dom.get("radio1").getAttr("type"), "radio", "Check for type attribute" );
@@ -95,7 +95,7 @@ test("Control.prototype.getAttr", function() {
 	equal( Dom.parse("<input/>").getAttr("value"), "", "An unset value on an input returns current value." );
 });
 
-test("Control.prototype.setAttr", function() {
+test("Dom.prototype.setAttr", function() {
 
 	var div = document.query("div").set("foo", "bar"),
 		fail = false;
@@ -267,7 +267,7 @@ test("Control.prototype.setAttr", function() {
 	$svg.remove();
 });
 
-test("Control.prototype.set", function(){
+test("Dom.prototype.set", function(){
 	
 	
    var pass = true;
@@ -300,7 +300,7 @@ test("Control.prototype.set", function(){
 	equal( elem.dom.style.paddingRight, "1px", "set({...})");
 });
 
-test("Control.prototype.getAttr('tabindex')", function() {
+test("Dom.prototype.getAttr('tabindex')", function() {
 
 	// elements not natively tabbable
 	equal(Dom.get("listWithTabIndex").getAttr("tabindex"), 5, "not natively tabbable, with tabindex set to 0");
@@ -317,7 +317,7 @@ test("Control.prototype.getAttr('tabindex')", function() {
 	equal(Dom.get("linkWithNoHrefWithNegativeTabIndex").getAttr("tabindex"), -1, "anchor without href, no tabindex set");
 });
 
-test("Control.prototype.setAttr('tabindex', value)", function() {
+test("Dom.prototype.setAttr('tabindex', value)", function() {
 
 	var element = Dom.get("divWithNoTabIndex");
 	//equal(element.getAttr("tabindex"), -1, "start with no tabindex");
@@ -353,7 +353,7 @@ test("Control.prototype.setAttr('tabindex', value)", function() {
 	equal(element.getAttr("tabindex"), -1, "set negative tabindex");
 });
 
-test("Control.prototype.setAttr(String, null)", function() {
+test("Dom.prototype.setAttr(String, null)", function() {
 	
 	var form = Dom.get("form");
 	// equal( Dom.get("mark").setAttr( "class", null ).dom.className, "", "remove class" );
@@ -409,7 +409,7 @@ test("setText(select) after form.reset()", function() {
 	Dom.get("kk").remove();
 });
 
-test("Control.prototype.addClass", function() {
+test("Dom.prototype.addClass", function() {
 
 	var div = document.query("div");
 	div.addClass( "test" );
@@ -449,7 +449,7 @@ test("Control.prototype.addClass", function() {
 
 });
 
-test("Control.prototype.removeClass", function() {
+test("Dom.prototype.removeClass", function() {
 
 	var $divs =  document.query("div");
 
@@ -487,7 +487,7 @@ test("Control.prototype.removeClass", function() {
 	equal( div.className, "", "Make sure there is nothing left after everything is removed." );
 });
 
-test("Control.prototype.toggleClass", function() {
+test("Dom.prototype.toggleClass", function() {
 
 	var e = Dom.get("firstp");
 	ok( !e.hasClass("test"), "Assert class not present" );

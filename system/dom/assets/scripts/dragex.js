@@ -49,12 +49,12 @@ Draggable.implement({
 	
 	revert: function(){
 		var me = this.proxy;
-		me.setDraggable(false);
+		me.draggable(false);
 		me.animate({
 			left: this.offset.x,
 			top: this.offset.y
 		}, -1, function () {
-			me.setDraggable();
+			me.draggable();
 		});
 	},
 	

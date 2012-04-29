@@ -4393,16 +4393,16 @@ JPlus.resolveNamespace = function(ns, isStyle){
 		 * @param {Boolean} value 是否可选。
 		 * @return this
 		 */
-		setUnselectable: 'unselectable' in div ? function(value) {
-			assert.isElement(this.dom, "Control.prototype.setUnselectable(value): 当前 dom 不支持此操作");
+		unselectable: 'unselectable' in div ? function(value) {
+			assert.isElement(this.dom, "Control.prototype.unselectable(value): 当前 dom 不支持此操作");
 			this.dom.unselectable = value !== false ? 'on': '';
 			return this;
 		}: 'onselectstart' in div ? function(value) {
-			assert.isElement(this.dom, "Control.prototype.setUnselectable(value): 当前 dom 不支持此操作");
+			assert.isElement(this.dom, "Control.prototype.unselectable(value): 当前 dom 不支持此操作");
 			this.dom.onselectstart = value !== false ? Function.returnFalse: null;
 			return this;
 		}: function(value) {
-			assert.isElement(this.dom, "Control.prototype.setUnselectable(value): 当前 dom 不支持此操作");
+			assert.isElement(this.dom, "Control.prototype.unselectable(value): 当前 dom 不支持此操作");
 			this.dom.style.MozUserSelect = value !== false ? 'none': '';
 			return this;
 		},

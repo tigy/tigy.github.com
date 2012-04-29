@@ -194,7 +194,7 @@ var Draggable = Class({
 	constructor: function(dom, handle){
 		this.proxy = this.target = dom;
 		this.handle = handle || dom;
-		this.setDraggable();
+		this.draggable();
 	},
 
 	/**
@@ -206,7 +206,7 @@ var Draggable = Class({
 		Draggable.current = null;
 	},
 	
-	setDraggable: function(value){
+	draggable: function(value){
 		this.handle[value !== false ? 'on' : 'un']('mousedown', this.initDrag, this);
 	}
 	
@@ -219,28 +219,28 @@ var Draggable = Class({
 /**
  * @class Element
  */
-Control.implement({
+Dom.implement({
 	
 	/**
 	 * 使当前元素支持拖动。
 	 * @param {Element} [handle] 拖动句柄。
 	 * @return this
 	 */
-	setDraggable: function(handle) {
-		var draggable = JPlus.getData(this, 'draggable');
+	draggable: function(handle) {
+		var draggable = System.getData(this, 'draggable');
 		if(handle !== false) {
 			if (handle === true) handle = null;
 			if(draggable) {
-				assert(!handle || draggable.handle.target === handle.target, "Control.prototype.setDraggable(handle): 无法重复设置 {handle}, 如果希望重新设置handle，使用以下代码：dom.setDraggable(false);JPlus.removeData(dom, 'draggable');dom.setDraggable(handle) 。", handle);
-				draggable.setDraggable();
+				assert(!handle || draggable.handle.target === handle.target, "Dom.prototype.draggable(handle): 无法重复设置 {handle}, 如果希望重新设置handle，使用以下代码：dom.draggable(false);System.removeData(dom, 'draggable');dom.draggable(handle) 。", handle);
+				draggable.draggable();
 			} else  {
 				Dom.movable(this.dom);
-				draggable = JPlus.setData(this, 'draggable', new Draggable(this, handle));
+				draggable = System.setData(this, 'draggable', new Draggable(this, handle));
 			}
 			
 			
 		} else if(draggable)
-			draggable.setDraggable(false);
+			draggable.draggable(false);
 		return this;
 	}
 	

@@ -5,7 +5,7 @@
 using("System.Fx.Animate");
 using("System.Dom.Element");
 
-var Marquee = Control.extend({
+var Marquee = Dom.extend({
 	
 	direction: 'left',
 	
