@@ -2814,7 +2814,7 @@ JPlus.resolveNamespace = function(ns, isStyle){
 // Offset - 定位部分
 
 
-JPlus.scripts.push('System.Dom.Dom');
+JPlus.scripts.push('System.Dom.Base');
 	
 (function($) {
 	

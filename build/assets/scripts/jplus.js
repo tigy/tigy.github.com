@@ -5,7 +5,7 @@
 
 
 /**********************************************
- * System.Core.System
+ * System.Core.Base
  **********************************************/
 /**
  * J+ Library, 3.0
@@ -2850,7 +2850,7 @@ JPlus.resolveNamespace = function(ns, isStyle){
 
 
 /**********************************************
- * System.Dom.Dom
+ * System.Dom.Base
  **********************************************/
 ﻿﻿/**
  * @fileOverview 提供最底层的 DOM 辅助函数。

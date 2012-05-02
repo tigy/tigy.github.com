@@ -2840,7 +2840,7 @@ JPlus.resolveNamespace = function(ns, isStyle){
 
 /// #endif
 /************************************
- * System.Dom.Dom
+ * System.Dom.Base
  ************************************/
 (function(window) {
 	

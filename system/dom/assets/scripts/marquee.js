@@ -3,7 +3,7 @@
 
 
 using("System.Fx.Animate");
-using("System.Dom.Dom");
+using("System.Dom.Base");
 
 var Marquee = Dom.extend({
 	

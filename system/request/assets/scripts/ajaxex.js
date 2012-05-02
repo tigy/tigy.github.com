@@ -4,7 +4,7 @@
 
 
 
-using("System.Ajax.Ajax");		
+using("System.Request.Ajax");		
 	  
 
 /**

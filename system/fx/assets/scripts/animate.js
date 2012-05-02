@@ -4,7 +4,7 @@
  */
 
 
-using("System.Dom.Dom");
+using("System.Dom.Base");
 using("System.Fx.Base");
 
 

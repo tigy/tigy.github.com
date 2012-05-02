@@ -2,7 +2,7 @@
 //  请求处理XML数据     A
 //===========================================
 
-using("System.Ajax.Ajax");
+using("System.Request.Ajax");
 
 Ajax.XML = Ajax.extend({
 	

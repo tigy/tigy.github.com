@@ -2837,7 +2837,7 @@ JPlus.resolveNamespace = function(ns, isStyle){
 
 /// #endif
 /************************************
- * System.Dom.Dom
+ * System.Dom.Base
  ************************************/
 (function(window) {
 	
@@ -6265,7 +6265,7 @@ JPlus.resolveNamespace = function(ns, isStyle){
 	
 })(this);
 /************************************
- * System.Ajax.Request
+ * System.Request.Request
  ************************************/
 var Ajax = Ajax || {};
 
@@ -6403,7 +6403,7 @@ Ajax.Request = Class({
 
 
 /************************************
- * System.Ajax.JSONP
+ * System.Request.JSONP
  ************************************/
 Ajax.JSONP = Ajax.Request.extend({
 

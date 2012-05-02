@@ -46,11 +46,11 @@
 				
                 'Using': '-',
                 'using': {
-                    '~("System.Ajax.Ajax")': function (value, assert) {
+                    '~("System.Request.Ajax")': function (value, assert) {
                         assert.isTrue(window.Ajax)
                     }
                 },
-                'imports': '~("System.Ajax.Ajax")',
+                'imports': '~("System.Request.Ajax")',
                 'using.checkStatusCode': {
                     '~(200)': true,
                     '~(500)': false

@@ -4,7 +4,7 @@
  */
 
 
-using("System.Ajax.Request");
+using("System.Request.Request");
 
 Ajax.JSONP = Ajax.Request.extend({
 

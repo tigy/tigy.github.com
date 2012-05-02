@@ -94,7 +94,7 @@ var DplBuilder = {
 		
 		DplBuilder.currentBuildFileName = buildFileName;
 		DplBuilder.currentBuildFile = BuildFiles[buildFileName] || DplBuilder.addFile || ( DplBuilder.addFile = {
-			top: ['System.Core.System', 'Controls.Core.Base']
+			top: ['System.Core.Base', 'Controls.Core.Base']
 		});
 		
 		var html = Tpl.parse('<div class="x-formfield">\
@@ -248,7 +248,7 @@ var DplBuilder = {
 			return false;	
 		}	
 		if(namespace.indexOf('.') === -1 || namespace.indexOf('.') === namespace.lastIndexOf('.') || /\.$/.test(namespace)) {
-			alert('组件名字空间格式如下：组件库.分类.组件名。  如  System.Dom.Dom ');	
+			alert('组件名字空间格式如下：组件库.分类.组件名。  如  System.Dom.Base ');	
 			return  false;
 		}
 	},

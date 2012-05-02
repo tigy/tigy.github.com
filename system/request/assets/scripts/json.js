@@ -3,7 +3,7 @@
 //   A: xuld
 //===========================================
 
-using("System.Ajax.Ajax");
+using("System.Request.Ajax");
 
 JPlus.namespace("Ajax").JSON = Ajax.extend({
 	

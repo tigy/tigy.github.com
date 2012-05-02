@@ -4,7 +4,7 @@
 
 
 
-using("System.Ajax.Ajax");
+using("System.Request.Ajax");
 
 /**
  * 返回一个表单的参数表示形式。

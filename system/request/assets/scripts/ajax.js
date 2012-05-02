@@ -3,7 +3,7 @@
  */
 
 
-using("System.Ajax.Request");
+using("System.Request.Request");
 
 /**
  * 处理异步请求的功能。
