@@ -298,14 +298,7 @@ var Dpl = {
 	},
 	"libs": {
 		"System": {
-			"Core": {
-				"System": {
-					"summary": "",
-					"status": "+",
-					"attribute": "~"
-				}
-			},
-			"System": {
+			"Core-Base": {
 				"Object": {
 					"summary": "",
 					"status": "+",
@@ -327,7 +320,7 @@ var Dpl = {
 					"attribute": "$"
 				}
 			},
-			"Element": {
+			"Dom-Base": {
 				"Core": {
 					"summary": "",
 					"status": "+",
@@ -545,7 +538,19 @@ var Dpl = {
 					"attribute": ""
 				}
 			},
+			"Core": {
+				"Base": {
+					"summary": "",
+					"status": "+",
+					"attribute": "~"
+				}
+			},
 			"Dom": {
+				"Base": {
+					"summary": "",
+					"status": "",
+					"attribute": "~"
+				},
 				"Drag": {
 					"summary": "",
 					"status": "+",
@@ -710,11 +715,6 @@ var Dpl = {
 					"summary": "",
 					"status": "",
 					"attribute": ""
-				},
-				"Base": {
-					"summary": "",
-					"status": "",
-					"attribute": "~"
 				},
 				"DisableTab": {
 					"summary": "",
@@ -1005,6 +1005,38 @@ var Dpl = {
 					"attribute": ""
 				}
 			},
+			"Lib": {
+				"jQuery-Core": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				},
+				"jQuery-Offset": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				},
+				"Mootools-Core": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				},
+				"jQuery-Adapter-Core": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				},
+				"jQuery-Adapter-Attributes": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				},
+				"jQuery-Adapter-Offset": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				}
+			},
 			"UnitTest": {
 				"Index": {
 					"summary": "",
@@ -1042,38 +1074,6 @@ var Dpl = {
 					"attribute": "$"
 				},
 				"Offset": {
-					"summary": "",
-					"status": "+",
-					"attribute": "$"
-				}
-			},
-			"Lib": {
-				"jQuery-Core": {
-					"summary": "",
-					"status": "+",
-					"attribute": "$"
-				},
-				"jQuery-Offset": {
-					"summary": "",
-					"status": "+",
-					"attribute": "$"
-				},
-				"Mootools-Core": {
-					"summary": "",
-					"status": "+",
-					"attribute": "$"
-				},
-				"jQuery-Adapter-Core": {
-					"summary": "",
-					"status": "+",
-					"attribute": "$"
-				},
-				"jQuery-Adapter-Attributes": {
-					"summary": "",
-					"status": "+",
-					"attribute": "$"
-				},
-				"jQuery-Adapter-Offset": {
 					"summary": "",
 					"status": "+",
 					"attribute": "$"
