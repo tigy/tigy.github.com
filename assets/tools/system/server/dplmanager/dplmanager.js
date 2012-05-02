@@ -41,7 +41,7 @@ if(typeof module === \'object\') {\
 		var path = name.replace(/\./g, "/").toLowerCase();
 		var tpl =  tplFolder + 'index.html';
 		var text = IO.readFile(tpl);
-		text = text.replace("\"assets/styles/index", "\"assets/styles/" + path).replace("\"assets/scripts/index", "\"assets/scripts/" + path);
+		text = text.replace(/MODULE/g, module.toLowerCase()).replace(/CATEGORY/g, category.toLowerCase()).replace(/NAME/g, path);
 		
 		IO.writeFile(createFolder + path + '.html', text);
 		

@@ -4,14 +4,15 @@
 
 
 
+var Browser = Browser || {};
 
 
 /**
  * 允许动态载入一个模块。
  */
-namespace(".use", function (namespaces, callBack) {
+Browser.use = function (namespaces, callBack) {
   
-});
+};
 
  
 // // 实现 载入  JS  或 CSS

@@ -4,7 +4,7 @@
 
 
 
-using("System.Dom.Element");
+using("System.Dom.Dom");
 
 var Validator = Class({
 	

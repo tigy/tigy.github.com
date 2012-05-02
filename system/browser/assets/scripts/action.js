@@ -1,7 +1,5 @@
-//===========================================
-//  浏览器常用按钮   action.js   A
-//===========================================
 
+var Browser = Browser || {};
 
 
 /**
@@ -10,7 +8,7 @@
  * @param {String} url 地址。
  * @return {Boolean} 是否成功。
  */
-System.addFavorite = function(title, url) {
+Browser.addFavorite = function (title, url) {
 	title = title || document.title;
 	url = url || location.href;
 	if (window.sidebar) {
@@ -26,7 +24,7 @@ System.addFavorite = function(title, url) {
  * @param {String} url 地址。
  * @return {Boolean} 是否成功。
  */
-System.setHomepage = function(url) {
+Browser.setHomepage = function (url) {
 	url = url || location.href;
 	if (navigator.isIE) {
 		document.body.style.behavior = "url(#default#homepage)";

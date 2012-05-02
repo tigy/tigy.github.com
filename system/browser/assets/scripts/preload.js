@@ -1,10 +1,7 @@
-//===========================================
-//  预加载一个图片 
-//    A: xuld
-//===========================================
 
+var Browser = Browser || {};
 
-System.preload = (function(){
+Browser.preload = (function () {
 	
 	var loadings = [], isLoading = false;
 	

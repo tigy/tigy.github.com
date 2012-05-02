@@ -1,7 +1,7 @@
 
 
 
-using("System.Dom.Element");
+using("System.Dom.Dom");
 
 Dom.resize = (function(){
 	

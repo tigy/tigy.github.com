@@ -5,7 +5,7 @@
 
 
 
-using("System.Dom.Element");
+using("System.Dom.Dom");
 
 
 Element.implement({

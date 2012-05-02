@@ -2,7 +2,7 @@
 //  CSS3   选择器    
 //===========================================
 
-using("System.Dom.Element");
+using("System.Dom.Dom");
 
 
 

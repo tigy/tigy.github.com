@@ -248,7 +248,7 @@ var DplBuilder = {
 			return false;	
 		}	
 		if(namespace.indexOf('.') === -1 || namespace.indexOf('.') === namespace.lastIndexOf('.') || /\.$/.test(namespace)) {
-			alert('组件名字空间格式如下：组件库.分类.组件名。  如  System.Dom.Element ');	
+			alert('组件名字空间格式如下：组件库.分类.组件名。  如  System.Dom.Dom ');	
 			return  false;
 		}
 	},

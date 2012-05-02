@@ -35,30 +35,5 @@ Object.extendIf(navigator, (function(ua) {
 		 */
 		engine: engine
 		
-		// /**
- // * APIProperty: {Boolean} isAir
- // * indicates if JxLib is running in an Adobe Air environment.  This is
- // * normally auto-detected but you can manually set it by declaring the Jx
- // * namespace before including jxlib:
- // * (code)
- // * Jx = {
- // *   isAir: true
- // * }
- // * (end)
- // */
-// if (!$defined(Jx.isAir)) {
-  // (function() {
-    // /**
-     // * Determine if we're running in Adobe AIR.
-     // */
-    // var aScripts = document.getElementsByTagName('SCRIPT'),
-        // src = aScripts[0].src;
-    // if (src.contains('app:')) {
-   //     Jx.isAir = true;
- //   } else {
- //     Jx.isAir = false;
- //   }
- // })(); }
-		
 	}
 })(navigator.userAgent));

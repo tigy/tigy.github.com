@@ -2850,7 +2850,7 @@ JPlus.resolveNamespace = function(ns, isStyle){
 
 
 /**********************************************
- * System.Dom.Element
+ * System.Dom.Dom
  **********************************************/
 ﻿﻿/**
  * @fileOverview 提供最底层的 DOM 辅助函数。

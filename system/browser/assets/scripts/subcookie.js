@@ -1,22 +1,13 @@
-//===========================================
-//  Cookie辅助   cookiesex.js     A
-//===========================================
 
-/**
- * 浏览器 Cookies 处理。
- * @param {Object} name 名字。
- */
-namespace(".Cookies.", {
+using("System.Browser.Cookie");
 	
-	getSub: function(name){
+Browser.getSubCookie = function (key, subkey) {
 		
-	},
+};
 	
-	setSub: function(name, value, expires, props){
-		
-	}
-	
-});
+Browser.setSubCookie = function (key, subkey, value, expires, props) {
+
+};
 
 ///*
 //
