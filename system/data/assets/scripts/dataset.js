@@ -1,54 +1,390 @@
 //===========================================
-//  数据集对�?  dataset.js     
+//  鏁版嵁闆嗗璞?  dataset.js     
 //===========================================
+
+
+Ext.data.Store = function(config){
+    this.data = new Ext.util.MixedCollection(false);
+    this.data.getKey = function(o){
+        return o.id;
+    };
+    this.baseParams = {};
+    this.paramNames = {
+        "start" : "start",
+        "limit" : "limit",
+        "sort" : "sort",
+        "dir" : "dir"
+    };
+    Ext.apply(this, config);
+
+    if(this.reader && !this.recordType){ 
+        this.recordType = this.reader.recordType;
+    }
+
+    this.fields = this.recordType.prototype.fields;
+
+    this.modified = [];
+
+    this.addEvents({
+        
+        datachanged : true,
+        
+        add : true,
+        
+        remove : true,
+        
+        update : true,
+        
+        clear : true,
+        
+        beforeload : true,
+        
+        load : true,
+        
+        loadexception : true
+    });
+
+    if(this.proxy){
+        this.relayEvents(this.proxy,  ["loadexception"]);
+    }
+    this.sortToggle = {};
+    
+    Ext.data.Store.superclass.constructor.call(this);
+};
+Ext.extend(Ext.data.Store, Ext.util.Observable, {
+    
+    
+    
+    
+    
+    remoteSort : false,
+
+    
+    lastOptions : null,
+
+    
+    add : function(records){
+        records = [].concat(records);
+        for(var i = 0, len = records.length; i < len; i++){
+            records[i].join(this);
+        }
+        var index = this.data.length;
+        this.data.addAll(records);
+        this.fireEvent("add", this, records, index);
+    },
+
+    
+    remove : function(record){
+        var index = this.data.indexOf(record);
+        this.data.removeAt(index);
+        this.fireEvent("remove", this, record, index);
+    },
+
+    
+    removeAll : function(){
+        this.data.clear();
+        this.fireEvent("clear", this);
+    },
+
+    
+    insert : function(index, records){
+        records = [].concat(records);
+        for(var i = 0, len = records.length; i < len; i++){
+            this.data.insert(index, records[i]);
+            records[i].join(this);
+        }
+        this.fireEvent("add", this, records, index);
+    },
+
+    
+    indexOf : function(record){
+        return this.data.indexOf(record);
+    },
+
+    
+    indexOfId : function(id){
+        return this.data.indexOfKey(id);
+    },
+
+    
+    getById : function(id){
+        return this.data.key(id);
+    },
+
+    
+    getAt : function(index){
+        return this.data.itemAt(index);
+    },
+
+    
+    getRange : function(start, end){
+        return this.data.getRange(start, end);
+    },
+
+    
+    storeOptions : function(o){
+        o = Ext.apply({}, o);
+        delete o.callback;
+        delete o.scope;
+        this.lastOptions = o;
+    },
+
+    
+    load : function(options){
+        options = options || {};
+        if(this.fireEvent("beforeload", this, options) !== false){
+            this.storeOptions(options);
+            var p = Ext.apply(options.params || {}, this.baseParams);
+            if(this.sortInfo && this.remoteSort){
+                var pn = this.paramNames;
+                p[pn["sort"]] = this.sortInfo.field;
+                p[pn["dir"]] = this.sortInfo.direction;
+            }
+            this.proxy.load(p, this.reader, this.loadRecords, this, options);
+        }
+    },
+
+    
+    reload : function(options){
+        this.load(Ext.applyIf(options||{}, this.lastOptions));
+    },
+
+    
+    
+    loadRecords : function(o, options, success){
+        if(!o || success === false){
+            if(success !== false){
+                this.fireEvent("load", this, [], options);
+            }
+            if(options.callback){
+                options.callback.call(options.scope || this, [], options, false);
+            }
+            return;
+        }
+        var r = o.records, t = o.totalRecords || r.length;
+        for(var i = 0, len = r.length; i < len; i++){
+            r[i].join(this);
+        }
+        if(!options || options.add !== true){
+            this.data.clear();
+            this.data.addAll(r);
+            this.totalLength = t;
+            this.applySort();
+            this.fireEvent("datachanged", this);
+        }else{
+            this.totalLength = Math.max(t, this.data.length+r.length);
+            this.data.addAll(r);
+        }
+        this.fireEvent("load", this, r, options);
+        if(options.callback){
+            options.callback.call(options.scope || this, r, options, true);
+        }
+    },
+
+    
+    loadData : function(o, append){
+        var r = this.reader.readRecords(o);
+        this.loadRecords(r, {add: append}, true);
+    },
+
+    
+    getCount : function(){
+        return this.data.length || 0;
+    },
+
+    
+    getTotalCount : function(){
+        return this.totalLength || 0;
+    },
+
+    
+    getSortState : function(){
+        return this.sortInfo;
+    },
+
+    
+    applySort : function(){
+        if(this.sortInfo && !this.remoteSort){
+            var s = this.sortInfo, f = s.field;
+            var st = this.fields.get(f).sortType;
+            var fn = function(r1, r2){
+                var v1 = st(r1.data[f]), v2 = st(r2.data[f]);
+                return v1 > v2 ? 1 : (v1 < v2 ? -1 : 0);
+            };
+            this.data.sort(s.direction, fn);
+            if(this.snapshot && this.snapshot != this.data){
+                this.snapshot.sort(s.direction, fn);
+            }
+        }
+    },
+
+    
+    setDefaultSort : function(field, dir){
+        this.sortInfo = {field: field, direction: dir ? dir.toUpperCase() : "ASC"};
+    },
+
+    
+    sort : function(fieldName, dir){
+        var f = this.fields.get(fieldName);
+        if(!dir){
+            if(this.sortInfo && this.sortInfo.field == f.name){ 
+                dir = (this.sortToggle[f.name] || "ASC").toggle("ASC", "DESC");
+            }else{
+                dir = f.sortDir;
+            }
+        }
+        this.sortToggle[f.name] = dir;
+        this.sortInfo = {field: f.name, direction: dir};
+        if(!this.remoteSort){
+            this.applySort();
+            this.fireEvent("datachanged", this);
+        }else{
+            this.load(this.lastOptions);
+        }
+    },
+
+    
+    each : function(fn, scope){
+        this.data.each(fn, scope);
+    },
+
+    
+    getModifiedRecords : function(){
+        return this.modified;
+    },
+
+    
+    filter : function(property, value){
+        if(!value.exec){ 
+            value = String(value);
+            if(value.length == 0){
+                return this.clearFilter();
+            }
+            value = new RegExp("^" + Ext.escapeRe(value), "i");
+        }
+        this.filterBy(function(r){
+            return value.test(r.data[property]);
+        });
+    },
+
+    
+    filterBy : function(fn, scope){
+        var data = this.snapshot || this.data;
+        this.snapshot = data;
+        this.data = data.filterBy(fn, scope);
+        this.fireEvent("datachanged", this);
+    },
+
+    
+    clearFilter : function(suppressEvent){
+        if(this.snapshot && this.snapshot != this.data){
+            this.data = this.snapshot;
+            delete this.snapshot;
+            if(suppressEvent !== true){
+                this.fireEvent("datachanged", this);
+            }
+        }
+    },
+
+    
+    afterEdit : function(record){
+        if(this.modified.indexOf(record) == -1){
+            this.modified.push(record);
+        }
+        this.fireEvent("update", this, record, Ext.data.Record.EDIT);
+    },
+
+    
+    afterReject : function(record){
+        this.modified.remove(record);
+        this.fireEvent("update", this, record, Ext.data.Record.REJECT);
+    },
+
+    
+    afterCommit : function(record){
+        this.modified.remove(record);
+        this.fireEvent("update", this, record, Ext.data.Record.COMMIT);
+    },
+
+    
+    commitChanges : function(){
+        var m = this.modified.slice(0);
+        this.modified = [];
+        for(var i = 0, len = m.length; i < len; i++){
+            m[i].commit();
+        }
+    },
+
+    
+    rejectChanges : function(){
+        var m = this.modified.slice(0);
+        this.modified = [];
+        for(var i = 0, len = m.length; i < len; i++){
+            m[i].reject();
+        }
+    }
+});
+
+Ext.data.SimpleStore = function(config){
+    Ext.data.SimpleStore.superclass.constructor.call(this, {
+        reader: new Ext.data.ArrayReader({
+                id: config.id
+            },
+            Ext.data.Record.create(config.fields)
+        ),
+        proxy : new Ext.data.MemoryProxy(config.data)
+    });
+    this.load();
+};
+Ext.extend(Ext.data.SimpleStore, Ext.data.Store);
 
 
 
 // //==========================================
 // // PyObject  by xuld
 // //
-// //   ����ݵ���?// //
+// //   锟斤拷锟斤拷莸锟斤拷锟?// //
 // //
-// //����˵��: ����Ҫ���ڴ洢������ݿ�ṹ�ı��?// //              ȫ�ֱ���  DataSet :  ȫ����ݵļ���?// //              һ��DataSet���ж��DataTable  ÿ��DataTable ����һ��DataTitle�Ͷ��DataRow
-// //              ���ṩUI���档ֻ����Ϊһ�����?XML,��ݿ�?JSON)�ӿڡ�
-// //���ʾ��?
+// //锟斤拷锟斤拷说锟斤拷: 锟斤拷锟斤拷要锟斤拷锟节存储锟斤拷锟斤拷锟斤拷菘锟结构锟侥憋拷锟?// //              全锟街憋拷锟斤拷  DataSet :  全锟斤拷锟斤拷莸募锟斤拷锟?// //              一锟斤拷DataSet锟斤拷锟叫讹拷锟紻ataTable  每锟斤拷DataTable 锟斤拷锟斤拷一锟斤拷DataTitle锟酵讹拷锟紻ataRow
+// //              锟斤拷锟结供UI锟斤拷锟芥。只锟斤拷锟斤拷为一锟斤拷锟斤拷锟?XML,锟斤拷菘锟?JSON)锟接口★拷
+// //锟斤拷锟绞撅拷锟?
 // //     /*  js code 
-// //		* * PyObject ���ʾ��?// //		* * ����һ����񲢴���һ����?// //      */
-// //          var Table = DataSet.add("�������?,["����1","����2","����3"]);    //����һ�����?������������Щ����
-// //			Table.add("����1",["��һ�е�1��","��һ�е�2��","��һ�е�3��"]);           //����һ��
-// //          Table.add("����2",["�ڶ��е�1��","�ڶ��е�2��","�ڶ��е�3��"]);           //����һ��
-// //			Table["����1"]["����1"] = 3;             // �����������Ϊ����?���еĵ�һ�С�
-// //			Table[0][3] = 6                          // Ҳ����ʹ������
-// //			Table.create()                           // ����һ�� <TABLE> ��ǩ,�������һ�����ڵ���?�۲����еı�����
+// //		* * PyObject 锟斤拷锟绞撅拷锟?// //		* * 锟斤拷锟斤拷一锟斤拷锟斤拷癫⒋锟斤拷锟揭伙拷锟斤拷锟?// //      */
+// //          var Table = DataSet.add("锟斤拷锟斤拷锟斤拷锟?,["锟斤拷锟斤拷1","锟斤拷锟斤拷2","锟斤拷锟斤拷3"]);    //锟斤拷锟斤拷一锟斤拷锟斤拷锟?锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷些锟斤拷锟斤拷
+// //			Table.add("锟斤拷锟斤拷1",["锟斤拷一锟叫碉拷1锟斤拷","锟斤拷一锟叫碉拷2锟斤拷","锟斤拷一锟叫碉拷3锟斤拷"]);           //锟斤拷锟斤拷一锟斤拷
+// //          Table.add("锟斤拷锟斤拷2",["锟节讹拷锟叫碉拷1锟斤拷","锟节讹拷锟叫碉拷2锟斤拷","锟节讹拷锟叫碉拷3锟斤拷"]);           //锟斤拷锟斤拷一锟斤拷
+// //			Table["锟斤拷锟斤拷1"]["锟斤拷锟斤拷1"] = 3;             // 锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟轿拷锟斤拷锟?锟斤拷锟叫的碉拷一锟叫★拷
+// //			Table[0][3] = 6                          // 也锟斤拷锟斤拷使锟斤拷锟斤拷锟斤拷
+// //			Table.create()                           // 锟斤拷锟斤拷一锟斤拷 <TABLE> 锟斤拷签,锟斤拷锟斤拷锟斤拷锟揭伙拷锟斤拷锟斤拷诘锟斤拷锟?锟桔诧拷锟斤拷锟叫的憋拷锟斤拷锟斤拷
 // //
-// //��ʾ��:
-// //       ���÷���˵��: 
-// //          add   ����һ��
-// //          del   ɾ��һ��
-// //          indexOf   ����ָ�����������?// //          find   ����ָ����������,����Ҳ����й�����?���� -1
-// //          insert   �ڵ�ǰλ��ĩβ����һ������
-// //          insertAt   ��һ��λ�ò���һ������
-// //          remove   ��������ɾ��,���Դ���һ������
-// //          removeAt   ��������ɾ��
-// //          search   ���ص�ǰ����ָ������
-// //          getAt   ����ָ������λ��,�������Խ��?����һ�� NULL
-// //          length  ����
-// //          key     ����
+// //锟斤拷示锟斤拷:
+// //       锟斤拷锟矫凤拷锟斤拷说锟斤拷: 
+// //          add   锟斤拷锟斤拷一锟斤拷
+// //          del   删锟斤拷一锟斤拷
+// //          indexOf   锟斤拷锟斤拷指锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟?// //          find   锟斤拷锟斤拷指锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷,锟斤拷锟斤拷也锟斤拷锟斤拷泄锟斤拷锟斤拷锟?锟斤拷锟斤拷 -1
+// //          insert   锟节碉拷前位锟斤拷末尾锟斤拷锟斤拷一锟斤拷锟斤拷锟斤拷
+// //          insertAt   锟斤拷一锟斤拷位锟矫诧拷锟斤拷一锟斤拷锟斤拷锟斤拷
+// //          remove   锟斤拷锟斤拷锟斤拷锟斤拷删锟斤拷,锟斤拷锟皆达拷锟斤拷一锟斤拷锟斤拷锟斤拷
+// //          removeAt   锟斤拷锟斤拷锟斤拷锟斤拷删锟斤拷
+// //          search   锟斤拷锟截碉拷前锟斤拷锟斤拷指锟斤拷锟斤拷锟斤拷
+// //          getAt   锟斤拷锟斤拷指锟斤拷锟斤拷锟斤拷位锟斤拷,锟斤拷锟斤拷锟斤拷锟皆斤拷锟?锟斤拷锟斤拷一锟斤拷 NULL
+// //          length  锟斤拷锟斤拷
+// //          key     锟斤拷锟斤拷
 // //
-// //       DataSet::add()    ����һ����,����:�����?������ʾ������,���?��,ǰ������Ϊ�����?����Ǳ���?// //       DataSet::del()    ɾ��һ����,����:������֡�?// //       DataSet::table    ȫ�����ļ���
-// //                              �������һ������?Ҫʹ��table���ϻ�øñ��     DataSet.table[����]  �� DataSet.table[��]
-// //       DataSet::count    �����?// //       DataSet::xType    JPlus����������˵��
-// //       DataTable::addTitle    ���ӱ��ı���,�������������?�򶺺Ÿ������ַ�
-// //       DataTable::addTitleAt    ���ӱ��ı��⵽һ��λ��,��һ������Ϊλ��(����),�ڶ���Ϊ����
-// //       DataTable::render    ��Ⱦ��һ��DIVԪ��
-// //       DataTable::container    ��ȡһ��<TABLE>
-// //       DataTable::sort(��,�ȽϺ���,˳��/����,��ʼλ��,����λ��)    ����
-// //                                 ������ʹ�ý϶�Ĺ���?ʹ�õĲ���ȫ��ѡ,
-// //                                 ��û����ʱ,��ʹ�����С�
-// //                                 �ȽϺ���,Ĭ���Ƿ�����С����
-// //                                       �Ƚк���  2   ������,  ��ʾ 2���С� ����һ������ �� function(x,y){return x<y};  ����  x<y  ����
-// //                                 ˳��,����:����,ʼ�������෴(Ĭ��true)��   
-// //                                 ��ʼλ��,��ʼ�����λ�á�? 
+// //       DataSet::add()    锟斤拷锟斤拷一锟斤拷锟斤拷,锟斤拷锟斤拷:锟斤拷锟斤拷锟?锟斤拷锟斤拷锟斤拷示锟斤拷锟斤拷锟斤拷,锟斤拷锟?锟斤拷,前锟斤拷锟斤拷锟斤拷为锟斤拷锟斤拷锟?锟斤拷锟斤拷潜锟斤拷狻?// //       DataSet::del()    删锟斤拷一锟斤拷锟斤拷,锟斤拷锟斤拷:锟斤拷锟斤拷锟斤拷帧锟?// //       DataSet::table    全锟斤拷锟斤拷锟侥硷拷锟斤拷
+// //                              锟斤拷锟斤拷锟斤拷锟揭伙拷锟斤拷锟斤拷锟?要使锟斤拷table锟斤拷锟较伙拷酶帽锟斤拷     DataSet.table[锟斤拷锟斤拷]  锟斤拷 DataSet.table[锟斤拷]
+// //       DataSet::count    锟斤拷锟斤拷锟?// //       DataSet::xType    JPlus锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷说锟斤拷
+// //       DataTable::addTitle    锟斤拷锟接憋拷锟侥憋拷锟斤拷,锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟?锟津逗号革拷锟斤拷锟斤拷锟街凤拷
+// //       DataTable::addTitleAt    锟斤拷锟接憋拷锟侥憋拷锟解到一锟斤拷位锟斤拷,锟斤拷一锟斤拷锟斤拷锟斤拷为位锟斤拷(锟斤拷锟斤拷),锟节讹拷锟斤拷为锟斤拷锟斤拷
+// //       DataTable::render    锟斤拷染锟斤拷一锟斤拷DIV元锟斤拷
+// //       DataTable::container    锟斤拷取一锟斤拷<TABLE>
+// //       DataTable::sort(锟斤拷,锟饺较猴拷锟斤拷,顺锟斤拷/锟斤拷锟斤拷,锟斤拷始位锟斤拷,锟斤拷锟斤拷位锟斤拷)    锟斤拷锟斤拷
+// //                                 锟斤拷锟斤拷锟斤拷使锟矫较讹拷墓锟斤拷锟?使锟矫的诧拷锟斤拷全锟斤拷选,
+// //                                 锟斤拷没锟斤拷锟斤拷时,锟斤拷使锟斤拷锟斤拷锟叫★拷
+// //                                 锟饺较猴拷锟斤拷,默锟斤拷锟角凤拷锟斤拷锟斤拷小锟斤拷锟斤拷
+// //                                       锟饺叫猴拷锟斤拷  2   锟斤拷锟斤拷锟斤拷,  锟斤拷示 2锟斤拷锟叫★拷 锟斤拷锟斤拷一锟斤拷锟斤拷锟斤拷 锟斤拷 function(x,y){return x<y};  锟斤拷锟斤拷  x<y  锟斤拷锟斤拷
+// //                                 顺锟斤拷,锟斤拷锟斤拷:锟斤拷锟斤拷,始锟斤拷锟斤拷锟斤拷锟洁反(默锟斤拷true)锟斤拷   
+// //                                 锟斤拷始位锟斤拷,锟斤拷始锟斤拷锟斤拷锟轿伙拷谩锟? 
 // //       
 // //==========================================
 // 
@@ -56,28 +392,28 @@
  // /* dataSet
 // *     by xuld
 // *      http://www.xuld.net
-// *   ע�Ͱ�
-// *      ���ڼ�������:�����jsû�кܶ��Ż���,�����������⡣������и�õ��޸Ľ���,ϣ���ܷ�����һ���޸ĵ�Դ�롣
-// *   ȫ��˵��
-// *      �������ʹ��js����
-// *   �����о���ѧϰ��
+// *   注锟酵帮拷
+// *      锟斤拷锟节硷拷锟斤拷锟斤拷锟斤拷:锟斤拷锟斤拷锟絡s没锟叫很讹拷锟脚伙拷锟斤拷,锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟解。锟斤拷锟斤拷锟斤拷懈锟矫碉拷锟睫改斤拷锟斤拷,希锟斤拷锟杰凤拷锟斤拷锟斤拷一锟斤拷锟睫改碉拷源锟诫。
+// *   全锟斤拷说锟斤拷
+// *      锟斤拷锟斤拷锟斤拷锟绞癸拷锟絡s锟斤拷锟斤拷
+// *   锟斤拷锟斤拷锟叫撅拷锟斤拷学习锟斤拷
 // */
 // if(!window.dataSet && dataSet.xType!="dataSet"){
 	// dataSet = function(name){
 		// var playDataSet = {
 // 			
-			// //ȫ�����?			// table:new Array(),
+			// //全锟斤拷锟斤拷锟?			// table:new Array(),
 // 			
-			// //�����?			// count:0,
+			// //锟斤拷锟斤拷锟?			// count:0,
 // 			
-			// //�汾
+			// //锟芥本
 			// version:0.1,
 // 			
-			// //��񳤶�?			// length:function(){
+			// //锟斤拷癯ざ锟?			// length:function(){
 				// return this.table.length;
 			// },
 // 
-			// //��ݴ�������ݷ���һ������
+			// //锟斤拷荽锟斤拷锟斤拷锟斤拷锟捷凤拷锟斤拷一锟斤拷锟斤拷锟斤拷
 			// _getAt:function(t,x){
 				// if(isNaN(x)){
 					// return this._indexOf(x);
@@ -88,10 +424,10 @@
 // 			
 			// xType:"dataSet",
 // 			
-			// //����һ��ֵ��ĩβ
-			// //����:
-			// //  value : ����
-			// //  key : ֵ 
+			// //锟斤拷锟斤拷一锟斤拷值锟斤拷末尾
+			// //锟斤拷锟斤拷:
+			// //  value : 锟斤拷锟斤拷
+			// //  key : 值 
 			// _insert:function(t,value,key){
 				// t.key = t.length;
 // 
@@ -104,11 +440,11 @@
 				// return t[t.key];
 			// },
 // 			
-			// //��һ��λ�ò���һ��ֵ
-			// //����:
-			// //  table : ����
-			// //  value : ����
-			// //  key : ֵ
+			// //锟斤拷一锟斤拷位锟矫诧拷锟斤拷一锟斤拷值
+			// //锟斤拷锟斤拷:
+			// //  table : 锟斤拷锟斤拷
+			// //  value : 锟斤拷锟斤拷
+			// //  key : 值
 			// _insertAt:function(t,table,value,key){
 				// t.key = table;
 // 				
@@ -124,9 +460,9 @@
 				// return t[t.key];
 			// },
 // 			
-			// //����,��������,�Ҳ��� ���� -1
-			// //����:
-			// //  name : ����
+			// //锟斤拷锟斤拷,锟斤拷锟斤拷锟斤拷锟斤拷,锟揭诧拷锟斤拷 锟斤拷锟斤拷 -1
+			// //锟斤拷锟斤拷:
+			// //  name : 锟斤拷锟斤拷
 			// _indexOf:function(t,name){
 				// for(var i=0;i<t.length;i++)
 					// if(t[i] &&  t[i].name==name)
@@ -135,9 +471,9 @@
 // 				
 			// },
 // 			
-			// //ɾ��һ��ֵ
-			// //����:
-			// //  name : ֵ
+			// //删锟斤拷一锟斤拷值
+			// //锟斤拷锟斤拷:
+			// //  name : 值
 			// _remove:function(t,name){
 				// if(isArray(name)){
 					// var aa=new Array();
@@ -159,10 +495,10 @@
 			// },
 // 			
 // 			
-			// //ɾ��
-			// //����:
-			// //  table : ����
-			// //  ���ر�ɾ��ĸ���?			// _removeAt:function(t,table){
+			// //删锟斤拷
+			// //锟斤拷锟斤拷:
+			// //  table : 锟斤拷锟斤拷
+			// //  锟斤拷锟截憋拷删锟斤拷母锟斤拷锟?			// _removeAt:function(t,table){
 				// if(isArray(table)){
 					// var count = 0;
 					// for(var v=0;v<table.length;v++)
@@ -219,8 +555,8 @@
 			// },
 // 			
 // 			
-			// //����һ��ֵ�����Ƿ����?			// //����:
-			// //  table : ����
+			// //锟斤拷锟斤拷一锟斤拷值锟斤拷锟斤拷锟角凤拷锟斤拷锟?			// //锟斤拷锟斤拷:
+			// //  table : 锟斤拷锟斤拷
 			// _search:function(t,table){
 				// if(isArray(table)){
 					// for(var v in table)
@@ -233,61 +569,61 @@
 // 				
 			// },  
 // 			
-			// //��ݴ�������ݷ���һ�����?			// getAt:function(x){
+			// //锟斤拷荽锟斤拷锟斤拷锟斤拷锟捷凤拷锟斤拷一锟斤拷锟斤拷锟?			// getAt:function(x){
 				// return this._getAt(this.table,x);
 			// },
 // 			
-			// //����һ�����ĩ�?			// //����:
-			// //  tableName : ����
+			// //锟斤拷锟斤拷一锟斤拷锟斤拷锟侥┪?			// //锟斤拷锟斤拷:
+			// //  tableName : 锟斤拷锟斤拷
 			// insert:function(tableName,value){
 				// this.count++;
 				// return this._insert(this.table,tableName,playDataTable(tableName,value));
 			// },
 // 			
-			// //��һ��λ�ò���һ��ֵ
-			// //����:
-			// //  n : ����
-			// // tableName: ����
+			// //锟斤拷一锟斤拷位锟矫诧拷锟斤拷一锟斤拷值
+			// //锟斤拷锟斤拷:
+			// //  n : 锟斤拷锟斤拷
+			// // tableName: 锟斤拷锟斤拷
 			// insertAt:function(x,tableName,value){
 				// this.count++;
 				// return this._insertAt(this.table,x,tableName,playDataTable(tableName,value));
 			// },
 // 
-			// //���ұ���,��������,�Ҳ��� ���� -1
-			// //����:
-			// //  name : ����
+			// //锟斤拷锟揭憋拷锟斤拷,锟斤拷锟斤拷锟斤拷锟斤拷,锟揭诧拷锟斤拷 锟斤拷锟斤拷 -1
+			// //锟斤拷锟斤拷:
+			// //  name : 锟斤拷锟斤拷
 			// indexOf:function(name){
 				// return this._indexOf(this.table,name);
 // 				
 			// },
 // 
-			// //ɾ��һ����
-			// //����:
-			// //  table : ����
+			// //删锟斤拷一锟斤拷锟斤拷
+			// //锟斤拷锟斤拷:
+			// //  table : 锟斤拷锟斤拷
 			// remove:function(tableName){
 				// this.count -= this._remove(this.table,tableName);
 			// },
 // 
-			// //ɾ��һ����
-			// //����:
-			// //  table : ������
+			// //删锟斤拷一锟斤拷锟斤拷
+			// //锟斤拷锟斤拷:
+			// //  table : 锟斤拷锟斤拷锟斤拷
 			// removeAt:function(x){
 				// this.count -= this._removeAt(this.table,x);
 			// },
 // 			
-			// //����һ�������Ƿ����?			// //����:
-			// //  table : ����
+			// //锟斤拷锟斤拷一锟斤拷锟斤拷锟斤拷锟角凤拷锟斤拷锟?			// //锟斤拷锟斤拷:
+			// //  table : 锟斤拷锟斤拷
 			// search:function(tableName){
 				// return this._search(this.table,tableName);
 // 				
 			// },
 // 			
-			// //����
+			// //锟斤拷锟斤拷
 			// key:0
 		// };
 // 		
-		// //���һ����? ����:λ�ñ���
-		// // add λ�� ���� ����
+		// //锟斤拷锟揭伙拷锟斤拷锟? 锟斤拷锟斤拷:位锟矫憋拷锟斤拷
+		// // add 位锟斤拷 锟斤拷锟斤拷 锟斤拷锟斤拷
 		// playDataSet.table.add =playDataSet.add =  function(table,TableName,C){
 			// if(C && typeof table!="Object")
 				// return playDataSet.insertAt(table,TableName,C);		
@@ -299,7 +635,7 @@
 				// return playDataSet.insert(table,TableName);
 		// };
 // 
-		// //ɾ��һ��  ����:λ�ñ���
+		// //删锟斤拷一锟斤拷  锟斤拷锟斤拷:位锟矫憋拷锟斤拷
 		// playDataSet.table.del = playDataSet.del = function(table){
 			// if(isNaN(table))
 				// playDataSet.remove(table);
@@ -320,50 +656,50 @@
 // 	   
 	    // var DataTable = new Array();
 // 			
-		// //ȫ����
+		// //全锟斤拷锟斤拷
 		// DataTable.title = playDataColumn(name+"Title",title,this);
 // 		
-		// //����
+		// //锟斤拷锟斤拷
 		// DataTable.name = name;
 // 		
-		// //����һ���е�ĩβ
-		// //����:
-		// //  value : ����
+		// //锟斤拷锟斤拷一锟斤拷锟叫碉拷末尾
+		// //锟斤拷锟斤拷:
+		// //  value : 锟斤拷锟斤拷
 		// DataTable.insert = function(value,vals){
 			// return dataSet._insert(this,value,playDataRow(value,vals,this));
 		// };
 // 		
-		// //����һ��
-		// //����:
-		// //  name : ����
+		// //锟斤拷锟斤拷一锟斤拷
+		// //锟斤拷锟斤拷:
+		// //  name : 锟斤拷锟斤拷
 		// DataTable.addTitle = function(value){
 			// dataSet._load(this.title,value); 
 		// };  
 // 		
-		// //����һ��һ��λ��
+		// //锟斤拷锟斤拷一锟斤拷一锟斤拷位锟斤拷
 		// DataTable.addTitleAt = function(row,value){
 			// dataSet._insertAt(this.title,row,value,value); 
 		// };  
-		// //��һ��λ�ò�����
-		// //����:
-		// //  row : ����
-		// //  value : ����
+		// //锟斤拷一锟斤拷位锟矫诧拷锟斤拷锟斤拷
+		// //锟斤拷锟斤拷:
+		// //  row : 锟斤拷锟斤拷
+		// //  value : 锟斤拷锟斤拷
 		// DataTable.insertAt = function(row,value,vals){
 			// var title = this.title;
 			// return dataSet._insertAt(this,row,value,playDataRow(value,vals,this));
 		// };
 // 
-		// //��������,��������,�Ҳ��� ���� -1
-		// //����:
-		// //  name : ����
+		// //锟斤拷锟斤拷锟斤拷锟斤拷,锟斤拷锟斤拷锟斤拷锟斤拷,锟揭诧拷锟斤拷 锟斤拷锟斤拷 -1
+		// //锟斤拷锟斤拷:
+		// //  name : 锟斤拷锟斤拷
 		// DataTable.indexOf = function(name){
 			// return dataSet._indexOf(this);
 // 			
 		// };
 // 
-		// //��һ���в���һ����Ԫ��,������,�Ҳ��� ���� -1
-		// //����:
-		// //  name : ֵ
+		// //锟斤拷一锟斤拷锟叫诧拷锟斤拷一锟斤拷锟斤拷元锟斤拷,锟斤拷锟斤拷锟斤拷,锟揭诧拷锟斤拷 锟斤拷锟斤拷 -1
+		// //锟斤拷锟斤拷:
+		// //  name : 值
 		// DataTable.findAt = function(){
 			// if(arguments.length==2)
 				// for(var i=0;i<this.length;i++)
@@ -378,9 +714,9 @@
 		// };	
 // 		
 		// DataTable.xType = "playDataTable";		
-		// //����һ����Ԫ��,������������(��,��),�Ҳ��� ���� (-1,-1)
-		// //����:
-		// //  value : ֵ
+		// //锟斤拷锟斤拷一锟斤拷锟斤拷元锟斤拷,锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷(锟斤拷,锟斤拷),锟揭诧拷锟斤拷 锟斤拷锟斤拷 (-1,-1)
+		// //锟斤拷锟斤拷:
+		// //  value : 值
 		// DataTable.searchOf = function(value){
 			// for(var i=0;i<this.length;i++)
 				// for(var j=0;j<this[i].length;j++)
@@ -390,30 +726,30 @@
 // 			
 		// };		
 // 		
-		// //ɾ��һ��
-		// //����:
-		// //  row : ����
+		// //删锟斤拷一锟斤拷
+		// //锟斤拷锟斤拷:
+		// //  row : 锟斤拷锟斤拷
 		// DataTable.remove = function(row){
 			// dataSet._remove(this,row);
 		// };
 // 			
-		// //ɾ��һ����
-		// //����:
-		// //  row : ����
+		// //删锟斤拷一锟斤拷锟斤拷
+		// //锟斤拷锟斤拷:
+		// //  row : 锟斤拷锟斤拷
 		// DataTable.removeAt = function(row){
 			// dataSet._removeAt(this,row);
 		// };
 // 			
-		// //����һ�������Ƿ����?		// //����:
-		// //  table : ����
+		// //锟斤拷锟斤拷一锟斤拷锟斤拷锟斤拷锟角凤拷锟斤拷锟?		// //锟斤拷锟斤拷:
+		// //  table : 锟斤拷锟斤拷
 		// DataTable.search = function(row){
 			// return !!this[row];
 		// }
 // 		
-		// //������,��������
-		// // ����:
-		// //  �е�����
-		// //   ֵ �����Ƕ��Ÿ�����ֵ,��json,������,playDataRow
+		// //锟斤拷锟斤拷锟斤拷,锟斤拷锟斤拷锟斤拷锟斤拷
+		// // 锟斤拷锟斤拷:
+		// //  锟叫碉拷锟斤拷锟斤拷
+		// //   值 锟斤拷锟斤拷锟角讹拷锟脚革拷锟斤拷锟斤拷值,锟斤拷json,锟斤拷锟斤拷锟斤拷,playDataRow
 		// DataTable.add = function(row,value){
 			// if(!value){
 				// return this.insert("",row);
@@ -434,14 +770,14 @@
 // 		
 		// }
 // 		
-		// //�������һ��?û�� null
+		// //锟斤拷锟斤拷锟斤拷锟揭伙拷锟?没锟斤拷 null
 		// DataTable.getAt = function(x){
 			// return dataSet._getAt(x);
 		// }
 // 
 // 
-		// //����  (ð��)
-		// //����: name id������
+		// //锟斤拷锟斤拷  (冒锟斤拷)
+		// //锟斤拷锟斤拷: name id锟斤拷锟斤拷锟斤拷
 		// //  row  name bool f 
 		// DataTable.sort = function(row,f,bool,start,end){
 			// row = row || this.key;
@@ -460,7 +796,7 @@
 			// }
 		// }
 // 
-		// //��һ��<table>��ǩ��������
+		// //锟斤拷一锟斤拷<table>锟斤拷签锟斤拷锟斤拷锟斤拷锟斤拷
 		// DataTable.container = function(id){
 			// id = typeof id=="string"?document.getElementById(id):id;
 			// if(id.tagName.toUpperCase()!="TABLE") return;
@@ -471,7 +807,7 @@
 // 
 // 
 // 
-		// //д��һ��<table>��ǩ
+		// //写锟斤拷一锟斤拷<table>锟斤拷签
 		// DataTable.render = function(id){
 			// id = typeof id=="string"?document.getElementById(id):id;
 			// var sHTML="  <tr>\n";
@@ -497,8 +833,8 @@
 		// }
 // 
 // 
-		// //����������id��
-		// //����: name id������
+		// //锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷id锟斤拷
+		// //锟斤拷锟斤拷: name id锟斤拷锟斤拷锟斤拷
 		// DataTable.autoID = function(name,start,row){
 			// name = name || "ID";
 			// this.addTitleAt(row || 0,name);
@@ -507,7 +843,7 @@
 				// this[i].insertAt(0,name,start+i);
 		// }
 // 		
-		// //������
+		// //锟斤拷锟斤拷锟斤拷
 		// DataTable.key = 0;
 // 		
 // 		
@@ -537,41 +873,41 @@
 			// return dataSet._insert(this,value,values); 	
 		// }
 // 		
-		// //��һ��λ�ò�����
-		// //����:
-		// //  row : ����
-		// //  value : ����
+		// //锟斤拷一锟斤拷位锟矫诧拷锟斤拷锟斤拷
+		// //锟斤拷锟斤拷:
+		// //  row : 锟斤拷锟斤拷
+		// //  value : 锟斤拷锟斤拷
 		// DataColumn.insertAt = function(row,value,values){
 			// return dataSet._insertAt(this,row,value,values);
 		// };
 // 
-		// //�����в���ֵ,��������,�Ҳ��� ���� -1
-		// //����:
-		// //  name : ����
+		// //锟斤拷锟斤拷锟叫诧拷锟斤拷值,锟斤拷锟斤拷锟斤拷锟斤拷,锟揭诧拷锟斤拷 锟斤拷锟斤拷 -1
+		// //锟斤拷锟斤拷:
+		// //  name : 锟斤拷锟斤拷
 		// DataColumn.indexOf = function(name){
 			// return dataSet._indexOf(this,name);
 // 			
 		// };
 // 		
-		// //�������õ���һ����������λ�õ�ֵ
-		// //����:
-		// //  value : ֵ
+		// //锟斤拷锟斤拷锟斤拷锟矫碉拷锟斤拷一锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷位锟矫碉拷值
+		// //锟斤拷锟斤拷:
+		// //  value : 值
 		// DataColumn.getAt = function(value){
 			// return dataSet._getAt(this,value); 
 // 			
 // 			
 		// };		
 // 		
-		// //ɾ��һ��
-		// //����:
-		// //  row : ����
+		// //删锟斤拷一锟斤拷
+		// //锟斤拷锟斤拷:
+		// //  row : 锟斤拷锟斤拷
 		// DataColumn.remove = function(row){
 			// dataSet._remove(this,row);
 		// };
 // 			
-		// //ɾ��һ��
-		// //����:
-		// //  table : ����
+		// //删锟斤拷一锟斤拷
+		// //锟斤拷锟斤拷:
+		// //  table : 锟斤拷锟斤拷
 		// DataColumn.removeAt = function(row){
 			// dataSet._removeAt(this,row);
 		// };
@@ -579,8 +915,8 @@
 		// DataColumn.loadData = function(vals){
 			// dataSet._load(this,vals);
 		// }
-		// //�������Ƿ����?		// //����:
-		// //  table : ����
+		// //锟斤拷锟斤拷锟斤拷锟角凤拷锟斤拷锟?		// //锟斤拷锟斤拷:
+		// //  table : 锟斤拷锟斤拷
 		// DataColumn.search = function(row){
 			// return !!this[row];
 // 			
@@ -595,14 +931,14 @@
 		// return typeof a == "object" && (a.constructor ==Array || typeof a.sort=="function" && !isNaN(a.length)) && !a.xType;
 // 		
 	// }
-	// //���һ��?   // playDataRow = function(name,vals,parent){
+	// //锟斤拷锟揭伙拷锟?   // playDataRow = function(name,vals,parent){
 // 	  
 	    // var DataRow = new Array();
 // 		
 		// DataRow.xType = "playDataRow";
 // 		
 		// DataRow.title = parent.title;
-		// //����
+		// //锟斤拷锟斤拷
 		// DataRow.name = name;
 // 		
 		// DataRow.parent = parent;
@@ -611,71 +947,71 @@
 // 		
 		// DataRow.show = true,
 // 		
-		// //�����е�ĩβ
-		// //����:
-		// //  value : ����
+		// //锟斤拷锟斤拷锟叫碉拷末尾
+		// //锟斤拷锟斤拷:
+		// //  value : 锟斤拷锟斤拷
 		// DataRow.insert = function(value,values){
 			// return dataSet._insert(this,value,values);
 		// };
 // 		
-		// //��һ��λ�ò�����
-		// //����:
-		// //  row : ����
-		// //  value : ����
+		// //锟斤拷一锟斤拷位锟矫诧拷锟斤拷锟斤拷
+		// //锟斤拷锟斤拷:
+		// //  row : 锟斤拷锟斤拷
+		// //  value : 锟斤拷锟斤拷
 		// DataRow.insertAt = function(row,value,values){
 			// return dataSet._insertAt(this,row,value,values);
 		// };
 // 
-		// //���뵽һ������
+		// //锟斤拷锟诫到一锟斤拷锟斤拷锟斤拷
 		// DataRow.loadData =function(value){
 			// dataSet._load(this,value);
 		// };
 // 		
-		// //��ϱ���?		// DataRow.bind = function(v){
+		// //锟斤拷媳锟斤拷锟?		// DataRow.bind = function(v){
 			// for(var i=0;i<v.length;i++)
 				// this[v[i]] = this[i];
 // 			
 		// }
 // 		
-		// //�����в���ֵ,��������,�Ҳ��� ���� -1
-		// //����:
-		// //  name : ����
+		// //锟斤拷锟斤拷锟叫诧拷锟斤拷值,锟斤拷锟斤拷锟斤拷锟斤拷,锟揭诧拷锟斤拷 锟斤拷锟斤拷 -1
+		// //锟斤拷锟斤拷:
+		// //  name : 锟斤拷锟斤拷
 		// DataRow.indexOf = function(name){
 			// return dataSet._indexOf(this,name);
 // 			
 		// };
 // 	
-		// //�������õ���һ����������λ�õ�ֵ
-		// //����:
-		// //  value : ֵ
+		// //锟斤拷锟斤拷锟斤拷锟矫碉拷锟斤拷一锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷位锟矫碉拷值
+		// //锟斤拷锟斤拷:
+		// //  value : 值
 		// DataRow.getAt = function(value){
 			// return dataSet._getAt(this,value); 
 // 			
 // 			
 		// };		
 // 		
-		// //ɾ��һ��
-		// //����:
-		// //  row : ����
+		// //删锟斤拷一锟斤拷
+		// //锟斤拷锟斤拷:
+		// //  row : 锟斤拷锟斤拷
 		// DataRow.remove = function(row){
 			// dataSet.remove(this,row);
 		// };
 // 			
-		// //ɾ��һ��
-		// //����:
-		// //  table : ����
+		// //删锟斤拷一锟斤拷
+		// //锟斤拷锟斤拷:
+		// //  table : 锟斤拷锟斤拷
 		// DataRow.removeAt = function(row){
 			// dataSet.removeAt(this,row);
 		// };
 // 			
-		// //�������Ƿ����?		// //����:
-		// //  table : ����
+		// //锟斤拷锟斤拷锟斤拷锟角凤拷锟斤拷锟?		// //锟斤拷锟斤拷:
+		// //  table : 锟斤拷锟斤拷
 		// DataRow.search = function(row){
 			// return !!this[row];
 // 			
 		// }
 // 		
-		// //������
+		// //锟斤拷锟斤拷锟斤拷
 		// DataRow.key = 0;
 // 		
 		// DataRow.loadData(vals);

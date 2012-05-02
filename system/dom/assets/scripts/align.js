@@ -11,7 +11,7 @@ using("System.Dom.Dom");
  * 为控件提供按控件定位的方法。
  * @interface
  */
-Control.implement((function(){
+Dom.implement((function(){
 	
 	var aligns = {
 		
