@@ -475,13 +475,17 @@
 	    	
 	    	assert(Function.isFunction(fn), "Object.map(iterable, fn, dest): {fn} 必须是函数。 ", fn);
 	    	
+	    	var isArray;
+	    	
 			// 如果是目标对象是一个字符串，则改为数组。
-	    	if(typeof iterable === 'string')
+	    	if(typeof iterable === 'string') {
 	    		iterable = iterable.split(' ');
-			
+	    		isArray = true;
+	    	}
+	    	
 		    // 遍历源。
 		    Object.each(iterable, dest ? function(value, key) {
-				dest[value] = fn(value, key);
+				dest[isArray ? value : key] = fn(value, key);
 		    } : fn);
 
 		    // 返回目标。

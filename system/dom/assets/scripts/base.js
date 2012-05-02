@@ -1070,7 +1070,7 @@
 			var borders = {
 				m: 'margin#',
 				b: 'border#Width',
-				System: 'padding#'
+				p: 'padding#'
 			}, map = {
 				t: 'Top',
 				r: 'Right',

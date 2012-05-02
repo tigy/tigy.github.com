@@ -92,7 +92,7 @@ var DplBuilder = {
 		
 		DplBuilder.currentBuildFileName = buildFileName;
 		DplBuilder.currentBuildFile = BuildFiles[buildFileName] || DplBuilder.addFile || ( DplBuilder.addFile = {
-			top: ['System.Core.Base', 'Controls.Core.Base']
+			
 		});
 		
 		var html = Tpl.parse('<div class="x-formfield">\

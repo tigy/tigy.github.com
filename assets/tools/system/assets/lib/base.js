@@ -1,5 +1,5 @@
 ﻿/*
- * This file is created by a tool at 2012/05/02 21:04:42
+ * This file is created by a tool at 2012/05/02 22:32:31
  */
 
 
@@ -471,13 +471,17 @@
 	    	
 	    	assert(Function.isFunction(fn), "Object.map(iterable, fn, dest): {fn} 必须是函数。 ", fn);
 	    	
+	    	var isArray;
+	    	
 			// 如果是目标对象是一个字符串，则改为数组。
-	    	if(typeof iterable === 'string')
+	    	if(typeof iterable === 'string') {
 	    		iterable = iterable.split(' ');
-			
+	    		isArray = true;
+	    	}
+	    	
 		    // 遍历源。
 		    Object.each(iterable, dest ? function(value, key) {
-				dest[value] = fn(value, key);
+				dest[isArray ? value : key] = fn(value, key);
 		    } : fn);
 
 		    // 返回目标。
@@ -3651,7 +3655,7 @@ function imports(ns){
 			var borders = {
 				m: 'margin#',
 				b: 'border#Width',
-				System: 'padding#'
+				p: 'padding#'
 			}, map = {
 				t: 'Top',
 				r: 'Right',
@@ -6242,7 +6246,6 @@ Dom.implement((function(){
 	
 	setter = Object.map({
 		bl: 'il ob',
-		bl: 'il ob',
 		rt: 'or it',
 		rb: 'or ib',
 		lt: 'ol it',
@@ -6697,12 +6700,6 @@ location.getHash = function() {
 var Control = Dom.extend({
 
 	/**
-	 * xType 。
-	 * @virtual
-	 */
-	xtype: "control",
-
-	/**
 	 * 存储当前控件的默认配置。
 	 * @getter {Object} options
 	 * @protected
@@ -6788,7 +6785,13 @@ var Control = Dom.extend({
 
 		// 复制各个选项。
 		Object.set(me, opt);
-	}
+	},
+
+	/**
+	 * xType 。
+	 * @virtual
+	 */
+	xtype: "control"
 	
 });
 /************************************

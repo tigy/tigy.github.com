@@ -3893,10 +3893,10 @@ JPlus.scripts.push('System.Dom.Base');
 		 * @static
 		 */
 		delegate: function(control, target, setters, getters) {
-			assert(control && control.prototype, "Control.delegate(control, target, setters, getters): {control} 必须是一个类", control);
+			assert(control && control.prototype, "Dom.define(control, target, setters, getters): {control} 必须是一个类", control);
 			
 			if(typeof getters === 'string'){
-				Control.delegate(control, target, getters, true);
+				Dom.define(control, target, getters, true);
 				getters = false;
 			}
 			
@@ -3908,7 +3908,7 @@ JPlus.scripts.push('System.Dom.Base');
 					return this;
 				};
 			}, control.prototype);
-			return Control.delegate;
+			return Dom.define;
 		}
 	})
 
@@ -4783,7 +4783,7 @@ JPlus.scripts.push('System.Dom.Base');
 
 	// 变量初始化。
 
-	Control.delegate(Control, 'dom', 'scrollIntoView focus blur select click submit reset');
+	Dom.define(Control, 'dom', 'scrollIntoView focus blur select click submit reset');
 
 	map("push shift unshift pop include indexOf each forEach", ap, DomList.prototype);
 	DomList.prototype.insertItem = ap.insert;
