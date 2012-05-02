@@ -2495,14 +2495,16 @@
 
 	Dom.define(Dom, 'dom', 'scrollIntoView focus blur select click submit reset');
 	Dom.addEvent('$default', eventObj);
-	Dom.implementIf(map('on un trigger', function (name) {
-		Dom.Document.prototype[name] = function () {
+	t = {};
+	Dom.implement(map('on un trigger', function (name) {
+		t[name] = function () {
 			Dom.document[name].apply(Dom.document, arguments);
 			return this;
 		};
 
 		return Dom.prototype[name];
 	}, {}));
+	Dom.Document.implement(t);
 
 	t = DomList.prototype;
 

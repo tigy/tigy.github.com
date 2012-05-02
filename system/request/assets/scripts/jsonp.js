@@ -4,7 +4,7 @@
  */
 
 
-using("System.Request.Request");
+using("System.Request.Base");
 
 Ajax.JSONP = Ajax.Request.extend({
 
@@ -58,7 +58,7 @@ Ajax.JSONP = Ajax.Request.extend({
         url = me.combineUrl(url, data);
         
         // 处理 callback=?
-        var callback = me.callback || ( 'jsonp' + JPlus.id++ );
+        var callback = me.callback || ( 'jsonp' + System.id++ );
         
         if(url.indexOf(me.jsonp + '=?') >= 0){
         	url = url.replace(me.jsonp + '=?', me.jsonp + '=' + callback);
