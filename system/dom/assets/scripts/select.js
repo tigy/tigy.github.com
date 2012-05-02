@@ -1,5 +1,5 @@
 //===========================================
-//    选择                 select.js       A
+//    閫夋嫨                 select.js       A
 //===========================================
 using("System.Controls.Control");
 
@@ -18,25 +18,25 @@ namespace(".HtmlSelect", JPlus.Control.extend({
 // // class - select
 // // copyright:xuld
 // // edited by xuld
-// // ʹ�÷���:
+// // 使锟矫凤拷锟斤拷:
 // // var Select=new cls_select(
 // //					id,     // id
-// //					arr,    // �б� [array]  arr[0][0] ֵ arr[0][1]  value
-// //					size,   // �б� ��С
-// //					multi,  // ��ѡ
-// //					cf      //  �ı��б���ִ�еĺ�����  ����������  Ĭ��Ϊѡ�������?  cf=alert    �������ѡ�������
-// //                          //  �����Ҫ���°��? cf=state('��ɾ','����','����');
+// //					arr,    // 锟叫憋拷 [array]  arr[0][0] 值 arr[0][1]  value
+// //					size,   // 锟叫憋拷 锟斤拷小
+// //					multi,  // 锟斤拷选
+// //					cf      //  锟侥憋拷锟叫憋拷锟斤拷执锟叫的猴拷锟斤拷锟斤拷  锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷  默锟斤拷为选锟斤拷锟斤拷锟斤拷锟?  cf=alert    锟斤拷锟斤拷锟斤拷锟窖★拷锟斤拷锟斤拷锟斤拷
+// //                          //  锟斤拷锟斤拷锟揭拷锟斤拷掳锟脚? cf=state('锟斤拷删','锟斤拷锟斤拷','锟斤拷锟斤拷');
 // //			  );
-// // Select.creat()           //  ����
-// // Select.add(o,t,i)        //  ���? o  Ϊ �ı�   t Ϊֵ    iΪ˳��  Ĭ�����?// // Select.del(i)            //   ɾ��  i  ����Ϊ  ����   ֵ
-// // Select.dels()            //   ɾ��ѡ��
-// // Select.gets()            //  ��ȡ ����:ѡ�е��� �б� [array]   ����  ѡ�е��б�
-// // Select.state()           //  ����״̬( Select.hc ; ѡ��?  Select.canup  :  ������    Select.candown  :  ������   �� 
-// //							    �����?������ʹ��3����������id�Ķ��󲻿���
-// // Select.moveon(k,i)       // �ƶ� ��i�� Ĭ��ѡ�� kλ  ��k==0 ���ƶ� k==1 ����һ��  k==-1 ���� ��
-// // Select.movetop(i)        // �ƶ� ��i�� Ĭ��ѡ��  ����
-// // Select.movedown(i)       // �ƶ� ��i�� Ĭ��ѡ��  ���?// // Select.getall()          //  ȫ������
-// // Select.getsall ()        //    ����:ѡ�е��� �б� [array] ֵ  ����  ѡ�е�ֵ
+// // Select.creat()           //  锟斤拷锟斤拷
+// // Select.add(o,t,i)        //  锟斤拷锟? o  为 锟侥憋拷   t 为值    i为顺锟斤拷  默锟斤拷锟斤拷锟?// // Select.del(i)            //   删锟斤拷  i  锟斤拷锟斤拷为  锟斤拷锟斤拷   值
+// // Select.dels()            //   删锟斤拷选锟斤拷
+// // Select.gets()            //  锟斤拷取 锟斤拷锟斤拷:选锟叫碉拷锟斤拷 锟叫憋拷 [array]   锟斤拷锟斤拷  选锟叫碉拷锟叫憋拷
+// // Select.state()           //  锟斤拷锟斤拷状态( Select.hc ; 选锟斤拷?  Select.canup  :  锟斤拷锟斤拷锟斤拷    Select.candown  :  锟斤拷锟斤拷锟斤拷   锟斤拷 
+// //							    锟斤拷锟斤拷锟?锟斤拷锟斤拷锟斤拷使锟斤拷3锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷id锟侥讹拷锟襟不匡拷锟斤拷
+// // Select.moveon(k,i)       // 锟狡讹拷 锟斤拷i锟斤拷 默锟斤拷选锟斤拷 k位  锟斤拷k==0 锟斤拷锟狡讹拷 k==1 锟斤拷锟斤拷一锟斤拷  k==-1 锟斤拷锟斤拷 锟斤拷
+// // Select.movetop(i)        // 锟狡讹拷 锟斤拷i锟斤拷 默锟斤拷选锟斤拷  锟斤拷锟斤拷
+// // Select.movedown(i)       // 锟狡讹拷 锟斤拷i锟斤拷 默锟斤拷选锟斤拷  锟斤拷锟?// // Select.getall()          //  全锟斤拷锟斤拷锟斤拷
+// // Select.getsall ()        //    锟斤拷锟斤拷:选锟叫碉拷锟斤拷 锟叫憋拷 [array] 值  锟斤拷锟斤拷  选锟叫碉拷值
 // //===============================================
 // try{
 	// var Select=new cls_select("objselect");

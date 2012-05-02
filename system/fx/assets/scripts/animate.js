@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @fileOverview 通过改变CSS实现的变换。
  * @author xuld
  */

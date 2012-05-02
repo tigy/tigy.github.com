@@ -1,30 +1,1 @@
-/** * @author  */String.map("Array Date RegExp", function(nativeType){	window[nativeType].prototype.xtype = nativeType.toLowerCase();});
-
-/**
- * ·µ»ØÒ»¸ö±äÁ¿µÄÀàĞÍµÄ×Ö·û´®ĞÎÊ½¡£
- * @param {Object} obj ±äÁ¿¡£
- * @return {String} ËùÓĞ¿ÉÒÔ·µ»ØµÄ×Ö·û´®£º string number boolean undefined null
- *         array function element class date regexp object¡£
- * @example <code> 
- * Object.type(null); // "null"
- * Object.type(); // "undefined"
- * Object.type(new Function); // "function"
- * Object.type(+'a'); // "number"
- * Object.type(/a/); // "regexp"
- * Object.type([]); // "array"
- * </code>
- */
-Object.type = function(obj) {
-
-		// »ñµÃÀàĞÍ ¡£
-	var typeName = typeof obj;
-
-	return typeName === "object" ?
-		obj === null ? 
-					"null" :
-					obj.xtype || (
-						typeof obj.nodeType === "number" ? "node" : 
-						typeName
-					)
-		: typeName;
-}
+/** * @author  */String.map("Array Date RegExp", function(nativeType){	window[nativeType].prototype.xtype = nativeType.toLowerCase();});/** * è¿”å›ä¸€ä¸ªå˜é‡çš„ç±»å‹çš„å­—ç¬¦ä¸²å½¢å¼ã€‚ * @param {Object} obj å˜é‡ã€‚ * @return {String} æ‰€æœ‰å¯ä»¥è¿”å›çš„å­—ç¬¦ä¸²ï¼š string number boolean undefined null *         array function element class date regexp objectã€‚ * @example <code>  * Object.type(null); // "null" * Object.type(); // "undefined" * Object.type(new Function); // "function" * Object.type(+'a'); // "number" * Object.type(/a/); // "regexp" * Object.type([]); // "array" * </code> */Object.type = function(obj) {		// è·å¾—ç±»å‹ ã€‚	var typeName = typeof obj;	return typeName === "object" ?		obj === null ? 					"null" :					obj.xtype || (						typeof obj.nodeType === "number" ? "node" : 						typeName					)		: typeName;}
