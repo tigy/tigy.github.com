@@ -178,21 +178,6 @@
 			 * @property
 			 */
 			length: 0,
-	
-			/**
-			 * 获取指定索引的元素。如果 index < 0， 则获取倒数 index 元素。
-			 * @param {Number} index 元素。
-			 * @return { Base} 指定位置所在的元素。
-			 * @example <code>
-			 * [1,7,8,8].item(0); //   1
-			 * [1,7,8,8].item(-1); //   8
-			 * [1,7,8,8].item(5); //   undefined
-			 * </code>
-			 */
-			item: function (index) {
-				index = this[index < 0 ? this.length + index : index];
-				return index ? new Dom(index) : null;
-			},
 			
 			/**
 			 * 对数组成员调用指定的成员，返回结果数组。
@@ -2521,13 +2506,20 @@
 
 	t = DomList.prototype;
 
-	map("push include indexOf each forEach", function (value) {
+	map("shift pop item", function (value) {
+		t[value] = function() {
+			var elem = ap[value].apply(this, arguments);
+			return elem ? new Dom(elem) : null;
+		};
+	});
+
+	map("unshift push include indexOf each forEach", function (value) {
 		t[value] = ap[value];
 	});
 
-	map("filter slice splice reverse unique", function(func) {
-		t[func] = function() {
-			return new DomList(ap[func].apply(this, arguments));
+	map("filter slice splice reverse unique", function(value) {
+		t[value] = function() {
+			return new DomList(ap[value].apply(this, arguments));
 		};
 	});
 

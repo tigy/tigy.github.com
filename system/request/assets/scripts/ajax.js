@@ -3,13 +3,13 @@
  */
 
 
-using("System.Request.Request");
+using("System.Request.Base");
 
 /**
  * 处理异步请求的功能。
  * @class Ajax
  */
-var Ajax = Object.extend(Ajax.Request.extend({
+var Ajax = Object.extend(Request.extend({
 	
 	/**
 	 * 当前 AJAX 发送的地址。

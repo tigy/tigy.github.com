@@ -106,5 +106,7 @@ var Collection = Class({
 	
 });
 
-Object.map("indexOf forEach each invoke lastIndexOf item filter", Array.prototype, Collection.prototype);
+Object.map("indexOf forEach each invoke lastIndexOf item filter", function(value){
+	return Array.prototype[value];
+}, Collection.prototype);
 

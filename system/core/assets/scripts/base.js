@@ -481,7 +481,7 @@
 			
 		    // 遍历源。
 		    Object.each(iterable, dest ? function(value, key) {
-				dest[key] = fn(value, key);
+				dest[value] = fn(value, key);
 		    } : fn);
 
 		    // 返回目标。

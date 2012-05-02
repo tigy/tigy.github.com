@@ -2,14 +2,12 @@
  * @fileOverview 提供最底层的 AJAX 辅助函数。
  */
 
-var Ajax = Ajax || {};
-
 /**
  * 提供一个请求的基本功能。
  * @class Request
  * @abstract
  */
-Ajax.Request = Class({
+var Request = Class({
 	
 	/**
 	 * 返回变量的地址形式。
@@ -132,7 +130,7 @@ Ajax.Request = Class({
 	/**
 	 * xType。
 	 */
-	xType: "request"
+	xtype: "request"
 	
 });
 
