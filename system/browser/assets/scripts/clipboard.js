@@ -2,7 +2,7 @@
 
 
 
-var Browser = Browser || {};
+using("System.Browser.Base");
 
 Browser.getClipBoard = function () {
 

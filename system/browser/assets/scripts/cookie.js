@@ -1,8 +1,9 @@
 
 
 
-var Browser = Browser || {};
-	
+using("System.Browser.Base");
+
+
 /**
  * 获取 Cookies 。
  * @param {String} name 名字。

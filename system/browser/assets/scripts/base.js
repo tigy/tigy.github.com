@@ -1,1 +1,1 @@
-/** * @author  */
+/** * @author  */var Browser = Browser || {};
