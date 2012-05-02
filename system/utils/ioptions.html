@@ -11,7 +11,26 @@
 	<body>
 		<script>
 			
-		
+            
+            var testcases = {
+                "Array.plain": '~([1,2,3])',
+                "Array.prototype.clone": '[1,2,3].clone()',
+                "Array.prototype.clean": '[1,2,3].clean()',
+                "Array.prototype.link": '[1,2,3].link()',
+                "Array.prototype.random": '[1,2,3].random()',
+                "Array.prototype.append": '[1,2,3].append()',
+                "Array.prototype.sortByRandom": '[1,2,3].sortByRandom()',
+                "Array.prototype.first": '[1,2,3].first()',
+                "Array.prototype.last": '[1,2,3].last()',
+                "Array.prototype.associate": '[1,2,3].associate()',
+                "Array.prototype.clear": '[1,2,3].clear()',
+                "Array.prototype.flatten": '[1,2,3].flatten()',
+                "Array.prototype.pick": '[1,2,3].pick()',
+                "Array.prototype.difference": '[1,2,3].difference()'
+            };
+
+            Demo.writeTestCases(testcases);
+            
 		</script>
 	</body>
 </html>
