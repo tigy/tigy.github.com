@@ -394,7 +394,7 @@ var findLocation =  function findLocation()
             if (backDir)
             {
                 var j = backDir[1].length/3;
-                var p;
+                var System;
                 while (j-- > 0)
                     path = reLastDir.exec(path)[1];
 
@@ -1312,7 +1312,7 @@ this.getClientOffset = function(elt)
 {
     var addOffset = function addOffset(elt, coords, view)
     {
-        var p = elt.offsetParent;
+        var System = elt.offsetParent;
 
         ///var style = isIE ? elt.currentStyle : view.getComputedStyle(elt, "");
         var chrome = Firebug.chrome;
@@ -1324,10 +1324,10 @@ this.getClientOffset = function(elt)
             ///coords.y += elt.offsetTop + parseInt(style.borderTopWidth);
             coords.y += elt.offsetTop + chrome.getMeasurementInPixels(elt, "borderTop");
 
-        if (p)
+        if (System)
         {
-            if (p.nodeType == 1)
-                addOffset(p, coords, view);
+            if (System.nodeType == 1)
+                addOffset(System, coords, view);
         }
         else
         {
@@ -1355,46 +1355,46 @@ this.getViewOffset = function(elt, singleFrame)
 {
     function addOffset(elt, coords, view)
     {
-        var p = elt.offsetParent;
-        coords.x += elt.offsetLeft - (p ? p.scrollLeft : 0);
-        coords.y += elt.offsetTop - (p ? p.scrollTop : 0);
+        var System = elt.offsetParent;
+        coords.x += elt.offsetLeft - (System ? System.scrollLeft : 0);
+        coords.y += elt.offsetTop - (System ? System.scrollTop : 0);
 
-        if (p)
+        if (System)
         {
-            if (p.nodeType == 1)
+            if (System.nodeType == 1)
             {
-                var parentStyle = view.getComputedStyle(p, "");
+                var parentStyle = view.getComputedStyle(System, "");
                 if (parentStyle.position != "static")
                 {
                     coords.x += parseInt(parentStyle.borderLeftWidth);
                     coords.y += parseInt(parentStyle.borderTopWidth);
 
-                    if (p.localName == "TABLE")
+                    if (System.localName == "TABLE")
                     {
                         coords.x += parseInt(parentStyle.paddingLeft);
                         coords.y += parseInt(parentStyle.paddingTop);
                     }
-                    else if (p.localName == "BODY")
+                    else if (System.localName == "BODY")
                     {
                         var style = view.getComputedStyle(elt, "");
                         coords.x += parseInt(style.marginLeft);
                         coords.y += parseInt(style.marginTop);
                     }
                 }
-                else if (p.localName == "BODY")
+                else if (System.localName == "BODY")
                 {
                     coords.x += parseInt(parentStyle.borderLeftWidth);
                     coords.y += parseInt(parentStyle.borderTopWidth);
                 }
 
                 var parent = elt.parentNode;
-                while (p != parent)
+                while (System != parent)
                 {
                     coords.x -= parent.scrollLeft;
                     coords.y -= parent.scrollTop;
                     parent = parent.parentNode;
                 }
-                addOffset(p, coords, view);
+                addOffset(System, coords, view);
             }
         }
         else
@@ -7692,15 +7692,15 @@ FBL.PanelBar =
         }
         
         var panels = Firebug.panelTypes;
-        for (var i=0, p; p=panels[i]; i++)
+        for (var i=0, System; System=panels[i]; i++)
         {
             if ( // normal Panel  of the Chrome's PanelBar
-                !ownerPanel && !p.prototype.parentPanel ||
+                !ownerPanel && !System.prototype.parentPanel ||
                 // Child Panel of the current Panel's SidePanelBar
-                ownerPanel && p.prototype.parentPanel && 
-                ownerPanel.name == p.prototype.parentPanel)
+                ownerPanel && System.prototype.parentPanel && 
+                ownerPanel.name == System.prototype.parentPanel)
             {
-                this.addPanel(p.prototype.name);
+                this.addPanel(System.prototype.name);
             }
         }
     },
@@ -9071,7 +9071,7 @@ FBL.Context.prototype =
             return {top:0, left:0, bottom:0, right:0};
             /**/
             
-        if (isIE && " h1 h2 h3 h4 h5 h6 h7 ul p ".indexOf(" "+el.nodeName.toLowerCase()+" ") == -1)
+        if (isIE && " h1 h2 h3 h4 h5 h6 h7 ul System ".indexOf(" "+el.nodeName.toLowerCase()+" ") == -1)
             return {top:0, left:0, bottom:0, right:0};
             /**/
             
@@ -9949,7 +9949,7 @@ append(ChromeBase,
             
             visitIssueTracker: function()
             {
-                this.visit("http://code.google.com/p/fbug/issues/list");
+                this.visit("http://code.google.com/System/fbug/issues/list");
             },
             
             visit: function(url)
@@ -10230,11 +10230,11 @@ append(ChromeBase,
         // initialize all panels
         /*
         var panelMap = Firebug.panelTypes;
-        for (var i=0, p; p=panelMap[i]; i++)
+        for (var i=0, System; System=panelMap[i]; i++)
         {
-            if (!p.parentPanel)
+            if (!System.parentPanel)
             {
-                this.addPanel(p.prototype.name);
+                this.addPanel(System.prototype.name);
             }
         }
         /**/
@@ -11855,7 +11855,7 @@ Firebug.Lite.Proxy =
             var source = data.results[0];
             
             // clean up YQL bogus elements
-            var match = /<body>\s+<p>([\s\S]+)<\/p>\s+<\/body>$/.exec(source);
+            var match = /<body>\s+<System>([\s\S]+)<\/System>\s+<\/body>$/.exec(source);
             if (match)
                 source = match[1];
             
@@ -13489,7 +13489,7 @@ if ( document.documentElement.compareDocumentPosition ) {
 
 if ( document.querySelectorAll ) (function(){
     var oldSizzle = Sizzle, div = document.createElement("div");
-    div.innerHTML = "<p class='TEST'></p>";
+    div.innerHTML = "<System class='TEST'></System>";
 
     // Safari can't handle uppercase or unicode characters when
     // in quirks mode.
@@ -15320,7 +15320,7 @@ function defineTags()
 
 defineTags(
     "a", "button", "br", "canvas", "code", "col", "colgroup", "div", "fieldset", "form", "h1", "h2", "h3", "hr",
-     "img", "input", "label", "legend", "li", "ol", "optgroup", "option", "p", "pre", "select",
+     "img", "input", "label", "legend", "li", "ol", "optgroup", "option", "System", "pre", "select",
     "span", "strong", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "tr", "tt", "ul", "iframe"
 );
 
@@ -15967,7 +15967,7 @@ this.Arr = domplate(Firebug.Rep,
         return this.isArray(object);
     },
 
-    // http://code.google.com/p/fbug/issues/detail?id=874
+    // http://code.google.com/System/fbug/issues/detail?id=874
     // BEGIN Yahoo BSD Source (modified here)  YAHOO.lang.isArray, YUI 2.2.2 June 2007
     isArray: function(obj) {
         try {
@@ -24008,8 +24008,8 @@ Firebug.CommandLine = extend(Firebug.Module,
                 buffer = autoCompleteBuffer = isIE ?
                     _completion[objName || "window"] || [] : [];
                 
-                for(var p in obj)
-                    buffer.push(p);
+                for(var System in obj)
+                    buffer.push(System);
             }
     
         // if it is the continuation of the last completion
@@ -26776,7 +26776,7 @@ Firebug.CSSModule = extend(Firebug.Module,
         // Firefox to regenerate it's CSS hierarchy.
         //
         // WARN: This behavior was determined anecdotally.
-        // See http://code.google.com/p/fbug/issues/detail?id=2440
+        // See http://code.google.com/System/fbug/issues/detail?id=2440
         var style = doc.createElementNS("http://www.w3.org/1999/xhtml", "style");
         style.setAttribute("charset","utf-8");
         unwrapObject(style).firebugIgnore = true;
@@ -27955,7 +27955,7 @@ CSSElementPanel.prototype = extend(Firebug.CSSStyleSheetPanel.prototype,
                     continue;
                 
                 if (!href)
-                    href = element.ownerDocument.location.href; // http://code.google.com/p/fbug/issues/detail?id=452
+                    href = element.ownerDocument.location.href; // http://code.google.com/System/fbug/issues/detail?id=452
 
                 var props = this.getRuleProperties(this.context, rule, inheritMode);
                 if (inheritMode && !props.length)
@@ -28007,7 +28007,7 @@ CSSElementPanel.prototype = extend(Firebug.CSSStyleSheetPanel.prototype,
                 if (!Firebug.showUserAgentCSS && isSystemSheet) // This removes user agent rules
                     continue;
                 if (!href)
-                    href = element.ownerDocument.location.href; // http://code.google.com/p/fbug/issues/detail?id=452
+                    href = element.ownerDocument.location.href; // http://code.google.com/System/fbug/issues/detail?id=452
 
                 var props = this.getRuleProperties(this.context, rule, inheritMode);
                 if (inheritMode && !props.length)
@@ -29068,7 +29068,7 @@ var getScriptURL = function getScriptURL(script)
             if (backDir)
             {
                 var j = backDir[1].length/3;
-                var p;
+                var System;
                 while (j-- > 0)
                     path = reLastDir.exec(path)[1];
 

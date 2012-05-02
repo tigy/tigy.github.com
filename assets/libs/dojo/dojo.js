@@ -406,11 +406,11 @@ dojo.global = {
 
 	dojo._getProp = function(/*Array*/parts, /*Boolean*/create, /*Object*/context){
 		var obj=context || d.global;
-		for(var i=0, p; obj && (p=parts[i]); i++){
-			if(i == 0 && d._scopeMap[p]){
-				p = d._scopeMap[p];
+		for(var i=0, System; obj && (System=parts[i]); i++){
+			if(i == 0 && d._scopeMap[System]){
+				System = d._scopeMap[System];
 			}
-			obj = (p in obj ? obj[p] : (create ? obj[p]={} : undefined));
+			obj = (System in obj ? obj[System] : (create ? obj[System]={} : undefined));
 		}
 		return obj; // mixed
 	}
@@ -441,8 +441,8 @@ dojo.global = {
 		//	|	obj.parent.child.prop = "some value";
 		//		wheras with `dojo.setObject`, we can shorten that to:
 		//	|	dojo.setObject("parent.child.prop", "some value", obj);
-		var parts=name.split("."), p=parts.pop(), obj=d._getProp(parts, true, context);
-		return obj && p ? (obj[p]=value) : undefined; // Object
+		var parts=name.split("."), System=parts.pop(), obj=d._getProp(parts, true, context);
+		return obj && System ? (obj[System]=value) : undefined; // Object
 	}
 
 	dojo.getObject = function(/*String*/name, /*Boolean?*/create, /*Object?*/context){
@@ -2556,7 +2556,7 @@ dojo.provide("dojo._base.declare");
 		meta = this.constructor._meta;
 		bases = meta.bases;
 
-		pos = cache.p;
+		pos = cache.System;
 		if(name != cname){
 			// method
 			if(cache.c !== caller){
@@ -2634,7 +2634,7 @@ dojo.provide("dojo._base.declare");
 
 		// cache the found super method
 		cache.c = f;
-		cache.p = pos;
+		cache.System = pos;
 
 		// now we have the result
 		if(f){
@@ -5963,13 +5963,13 @@ if(dojo.isIE || dojo.isOpera){
 		//		directly, and will use the ...box... functions instead.
 		var 
 			s = computedStyle||gcs(n),
-			p = d._getPadExtents(n, s),
+			System = d._getPadExtents(n, s),
 			b = d._getBorderExtents(n, s);
 		return {
-			l: p.l + b.l,
-			t: p.t + b.t,
-			w: p.w + b.w,
-			h: p.h + b.h
+			l: System.l + b.l,
+			t: System.t + b.t,
+			w: System.w + b.w,
+			h: System.h + b.h
 		};
 	}
 
@@ -6028,7 +6028,7 @@ if(dojo.isIE || dojo.isOpera){
 		//		returns an object that encodes the width, height, left and top
 		//		positions of the node's margin box.
 		var s = computedStyle || gcs(node), me = d._getMarginExtents(node, s);
-		var l = node.offsetLeft - me.l, t = node.offsetTop - me.t, p = node.parentNode;
+		var l = node.offsetLeft - me.l, t = node.offsetTop - me.t, System = node.parentNode;
 				if(d.isMoz){
 			// Mozilla:
 			// If offsetParent has a computed overflow != visible, the offsetLeft is decreased
@@ -6041,18 +6041,18 @@ if(dojo.isIE || dojo.isOpera){
 			}else{
 				// If child's computed left/top are not parseable as a number (e.g. "auto"), we
 				// have no choice but to examine the parent's computed style.
-				if(p && p.style){
-					var pcs = gcs(p);
+				if(System && System.style){
+					var pcs = gcs(System);
 					if(pcs.overflow != "visible"){
-						var be = d._getBorderExtents(p, pcs);
+						var be = d._getBorderExtents(System, pcs);
 						l += be.l, t += be.t;
 					}
 				}
 			}
 		}else if(d.isOpera || (d.isIE > 7 && !d.isQuirks)){
 			// On Opera and IE 8, offsetLeft/Top includes the parent's border
-			if(p){
-				be = d._getBorderExtents(p);
+			if(System){
+				be = d._getBorderExtents(System);
 				l -= be.l;
 				t -= be.t;
 			}
@@ -6763,7 +6763,7 @@ if(dojo.isIE || dojo.isOpera){
 		//		node, passing along the optional reference node and position.
 		//
 		// tag: String|DomNode
-		//		A string of the element to create (eg: "div", "a", "p", "li", "script", "br"),
+		//		A string of the element to create (eg: "div", "a", "System", "li", "script", "br"),
 		//		or an existing DOM node to process.
 		//
 		// attrs: Object
@@ -6790,7 +6790,7 @@ if(dojo.isIE || dojo.isOpera){
 		//
 		// example:
 		//	Create a DIV with content:
-		//	|	var n = dojo.create("div", { innerHTML:"<p>hi</p>" });
+		//	|	var n = dojo.create("div", { innerHTML:"<System>hi</System>" });
 		//
 		// example:
 		//	Place a new DIV in the BODY, with no attributes set
@@ -7213,9 +7213,9 @@ dojo.provide("dojo._base.NodeList");
 	var orphan = function(node){
 		//	summary:
 		//		function to orphan nodes
-		var p = node.parentNode;
-		if(p){
-			p.removeChild(node);
+		var System = node.parentNode;
+		if(System){
+			System.removeChild(node);
 		}
 	};
 	// FIXME: should we move orphan() to dojo.html?
@@ -7288,7 +7288,7 @@ dojo.provide("dojo._base.NodeList");
 		//		|	// many common event handlers are already available directly:
 		//		|	dojo.query("li").onclick(console, "log");
 		//		|	var toggleHovered = dojo.hitch(dojo, "toggleClass", "hovered");
-		//		|	dojo.query("p")
+		//		|	dojo.query("System")
 		//		|		.onmouseenter(toggleHovered)
 		//		|		.onmouseleave(toggleHovered);
 		//	example:
@@ -7879,18 +7879,18 @@ dojo.provide("dojo._base.NodeList");
 			//	example:
 			//		assume a DOM created by this markup:
 			//	|	<div id="foo">
-			//	|		<p>
+			//	|		<System>
 			//	|			bacon is tasty, <span>dontcha think?</span>
-			//	|		</p>
+			//	|		</System>
 			//	|	</div>
 			//	|	<div id="bar">
-			//	|		<p>great commedians may not be funny <span>in person</span></p>
+			//	|		<System>great commedians may not be funny <span>in person</span></System>
 			//	|	</div>
 			//		If we are presented with the following defintion for a NodeList:
 			//	|	var l = new dojo.NodeList(dojo.byId("foo"), dojo.byId("bar"));
 			//		it's possible to find all span elements under paragraphs
 			//		contained by these elements with this sub-query:
-			//	| 	var spans = l.query("p span");
+			//	| 	var spans = l.query("System span");
 
 			// FIXME: probably slow
 			if(!queryStr){ return this; }
@@ -7917,11 +7917,11 @@ dojo.provide("dojo._base.NodeList");
 			//		"regular" JS filter syntax as exposed in dojo.filter:
 			//		|	dojo.query("*").filter(function(item){
 			//		|		// highlight every paragraph
-			//		|		return (item.nodeName == "p");
+			//		|		return (item.nodeName == "System");
 			//		|	}).style("backgroundColor", "yellow");
 			// example:
 			//		the same filtering using a CSS selector
-			//		|	dojo.query("*").filter("p").styles("backgroundColor", "yellow");
+			//		|	dojo.query("*").filter("System").styles("backgroundColor", "yellow");
 
 			var a = arguments, items = this, start = 0;
 			if(typeof simpleFilter == "string"){ // inline'd type check
@@ -7976,7 +7976,7 @@ dojo.provide("dojo._base.NodeList");
 			// 		or an offset in the childNodes property
 			//	example:
 			//		appends content to the end if the position is ommitted
-			//	|	dojo.query("h3 > p").addContent("hey there!");
+			//	|	dojo.query("h3 > System").addContent("hey there!");
 			//	example:
 			//		add something to the front of each element that has a
 			//		"thinger" property:
@@ -8688,15 +8688,15 @@ if(typeof dojo != "undefined"){
 			}
 		},
 		"not": function(name, condition){
-			var p = getQueryParts(condition)[0];
+			var System = getQueryParts(condition)[0];
 			var ignores = { el: 1 }; 
-			if(p.tag != "*"){
+			if(System.tag != "*"){
 				ignores.tag = 1;
 			}
-			if(!p.classes.length){
+			if(!System.classes.length){
 				ignores.classes = 1;
 			}
-			var ntf = getSimpleFilterFunc(p, ignores);
+			var ntf = getSimpleFilterFunc(System, ignores);
 			return function(elem){
 				return (!ntf(elem));
 			}
@@ -9491,7 +9491,7 @@ if(typeof dojo != "undefined"){
 		//		these elements will match:
 		//	|	<span class="foo"></span>
 		//	|	<span class="foo bar"></span>
-		//	|	<p class="thud foo"></p>
+		//	|	<System class="thud foo"></System>
 		//	example:
 		//		search the entire document for elements with the classes "foo" *and* "bar":
 		//	|	dojo.query(".foo.bar");
@@ -9499,17 +9499,17 @@ if(typeof dojo != "undefined"){
 		//	|	<span class="foo bar"></span>
 		//		while these will not:
 		//	|	<span class="foo"></span>
-		//	|	<p class="thud foo"></p>
+		//	|	<System class="thud foo"></System>
 		//	example:
 		//		find `<span>` elements which are descendants of paragraphs and
 		//		which have a "highlighted" class:
-		//	|	dojo.query("p span.highlighted");
+		//	|	dojo.query("System span.highlighted");
 		//		the innermost span in this fragment matches:
-		//	|	<p class="foo">
+		//	|	<System class="foo">
 		//	|		<span>...
 		//	|			<span class="highlighted foo bar">...</span>
 		//	|		</span>
-		//	|	</p>
+		//	|	</System>
 		//	example:
 		//		set an "odd" class on all odd table rows inside of the table
 		//		`#tabular_data`, using the `>` (direct child) selector to avoid
@@ -9893,9 +9893,9 @@ dojo.provide("dojo._base.xhr");
 				//so be sure to test dojo.io.iframe if making changes below.
 				var ms = function(n){ return "MSXML" + n + ".DOMDocument"; }
 				var dp = ["Microsoft.XMLDOM", ms(6), ms(4), ms(3), ms(2)];
-				_d.some(dp, function(p){
+				_d.some(dp, function(System){
 					try{
-						var dom = new ActiveXObject(p);
+						var dom = new ActiveXObject(System);
 						dom.async = false;
 						dom.loadXML(xhr.responseText);
 						result = dom;
@@ -10970,8 +10970,8 @@ dojo.provide("dojo._base.fx");
 		// particular, the "getValue" function handles getting interpolated
 		// values between start and end for a particular CSS value.
 		this._properties = properties;
-		for(var p in properties){
-			var prop = properties[p];
+		for(var System in properties){
+			var prop = properties[System];
 			if(prop.start instanceof d.Color){
 				// create a reusable temp color object to keep intermediate results
 				prop.tempColor = new d.Color();
@@ -10981,13 +10981,13 @@ dojo.provide("dojo._base.fx");
 
 	PropLine.prototype.getValue = function(r){
 		var ret = {};
-		for(var p in this._properties){
-			var prop = this._properties[p],
+		for(var System in this._properties){
+			var prop = this._properties[System],
 				start = prop.start;
 			if(start instanceof d.Color){
-				ret[p] = d.blendColors(start, prop.end, r, prop.tempColor).toCss();
+				ret[System] = d.blendColors(start, prop.end, r, prop.tempColor).toCss();
 			}else if(!d.isArray(start)){
-				ret[p] = ((prop.end - start) * r) + start + (p != "opacity" ? prop.units || "px" : 0);
+				ret[System] = ((prop.end - start) * r) + start + (System != "opacity" ? prop.units || "px" : 0);
 			}
 		}
 		return ret;
@@ -11099,19 +11099,19 @@ dojo.provide("dojo._base.fx");
 		var anim = new d.Animation(args);
 		d.connect(anim, "beforeBegin", anim, function(){
 			var pm = {};
-			for(var p in this.properties){
+			for(var System in this.properties){
 				// Make shallow copy of properties into pm because we overwrite
 				// some values below. In particular if start/end are functions
 				// we don't want to overwrite them or the functions won't be
 				// called if the animation is reused.
-				if(p == "width" || p == "height"){
+				if(System == "width" || System == "height"){
 					this.node.display = "block";
 				}
-				var prop = this.properties[p];
+				var prop = this.properties[System];
 				if(d.isFunction(prop)){
 					prop = prop(n);
 				}
-				prop = pm[p] = _mixin({}, (d.isObject(prop) ? prop: { end: prop }));
+				prop = pm[System] = _mixin({}, (d.isObject(prop) ? prop: { end: prop }));
 
 				if(d.isFunction(prop.start)){
 					prop.start = prop.start(n);
@@ -11119,25 +11119,25 @@ dojo.provide("dojo._base.fx");
 				if(d.isFunction(prop.end)){
 					prop.end = prop.end(n);
 				}
-				var isColor = (p.toLowerCase().indexOf("color") >= 0);
-				function getStyle(node, p){
+				var isColor = (System.toLowerCase().indexOf("color") >= 0);
+				function getStyle(node, System){
 					// dojo.style(node, "height") can return "auto" or "" on IE; this is more reliable:
-					var v = { height: node.offsetHeight, width: node.offsetWidth }[p];
+					var v = { height: node.offsetHeight, width: node.offsetWidth }[System];
 					if(v !== undefined){ return v; }
-					v = d.style(node, p);
-					return (p == "opacity") ? +v : (isColor ? v : parseFloat(v));
+					v = d.style(node, System);
+					return (System == "opacity") ? +v : (isColor ? v : parseFloat(v));
 				}
 				if(!("end" in prop)){
-					prop.end = getStyle(n, p);
+					prop.end = getStyle(n, System);
 				}else if(!("start" in prop)){
-					prop.start = getStyle(n, p);
+					prop.start = getStyle(n, System);
 				}
 
 				if(isColor){
 					prop.start = new d.Color(prop.start);
 					prop.end = new d.Color(prop.end);
 				}else{
-					prop.start = (p == "opacity") ? +prop.start : parseFloat(prop.start);
+					prop.start = (System == "opacity") ? +prop.start : parseFloat(prop.start);
 				}
 			}
 			this.curve = new PropLine(pm);

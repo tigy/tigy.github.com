@@ -132,7 +132,7 @@ var backDir=/^((?:\.\.\/)+)(.*)/.exec(src);
 var reLastDir=/^(.*\/)[^\/]+\/$/;
 path=rePath.exec(location.href)[1];
 if(backDir){var j=backDir[1].length/3;
-var p;
+var System;
 while(j-->0){path=reLastDir.exec(path)[1]
 }path+=backDir[2]
 }else{if(src.indexOf("/")!=-1){if(/^\.\/./.test(src)){path+=src.substring(2)
@@ -459,11 +459,11 @@ win;
 win=win.parent){if(!win.parent||win==win.parent||!this.instanceOf(win.parent,"Window")){return win
 }}return null
 };
-this.getClientOffset=function(elt){var addOffset=function addOffset(elt,coords,view){var p=elt.offsetParent;
+this.getClientOffset=function(elt){var addOffset=function addOffset(elt,coords,view){var System=elt.offsetParent;
 var chrome=Firebug.chrome;
 if(elt.offsetLeft){coords.x+=elt.offsetLeft+chrome.getMeasurementInPixels(elt,"borderLeft")
 }if(elt.offsetTop){coords.y+=elt.offsetTop+chrome.getMeasurementInPixels(elt,"borderTop")
-}if(p){if(p.nodeType==1){addOffset(p,coords,view)
+}if(System){if(System.nodeType==1){addOffset(System,coords,view)
 }}else{var otherView=isIE?elt.ownerDocument.parentWindow:elt.ownerDocument.defaultView;
 if(!otherView.opener&&otherView.frameElement){addOffset(otherView.frameElement,coords,otherView)
 }}};
@@ -473,24 +473,24 @@ if(elt){var view=isIE?elt.ownerDocument.parentWindow:elt.ownerDocument.defaultVi
 addOffset(elt,coords,view)
 }return coords
 };
-this.getViewOffset=function(elt,singleFrame){function addOffset(elt,coords,view){var p=elt.offsetParent;
-coords.x+=elt.offsetLeft-(p?p.scrollLeft:0);
-coords.y+=elt.offsetTop-(p?p.scrollTop:0);
-if(p){if(p.nodeType==1){var parentStyle=view.getComputedStyle(p,"");
+this.getViewOffset=function(elt,singleFrame){function addOffset(elt,coords,view){var System=elt.offsetParent;
+coords.x+=elt.offsetLeft-(System?System.scrollLeft:0);
+coords.y+=elt.offsetTop-(System?System.scrollTop:0);
+if(System){if(System.nodeType==1){var parentStyle=view.getComputedStyle(System,"");
 if(parentStyle.position!="static"){coords.x+=parseInt(parentStyle.borderLeftWidth);
 coords.y+=parseInt(parentStyle.borderTopWidth);
-if(p.localName=="TABLE"){coords.x+=parseInt(parentStyle.paddingLeft);
+if(System.localName=="TABLE"){coords.x+=parseInt(parentStyle.paddingLeft);
 coords.y+=parseInt(parentStyle.paddingTop)
-}else{if(p.localName=="BODY"){var style=view.getComputedStyle(elt,"");
+}else{if(System.localName=="BODY"){var style=view.getComputedStyle(elt,"");
 coords.x+=parseInt(style.marginLeft);
 coords.y+=parseInt(style.marginTop)
-}}}else{if(p.localName=="BODY"){coords.x+=parseInt(parentStyle.borderLeftWidth);
+}}}else{if(System.localName=="BODY"){coords.x+=parseInt(parentStyle.borderLeftWidth);
 coords.y+=parseInt(parentStyle.borderTopWidth)
 }}var parent=elt.parentNode;
-while(p!=parent){coords.x-=parent.scrollLeft;
+while(System!=parent){coords.x-=parent.scrollLeft;
 coords.y-=parent.scrollTop;
 parent=parent.parentNode
-}addOffset(p,coords,view)
+}addOffset(System,coords,view)
 }}else{if(elt.localName=="BODY"){var style=view.getComputedStyle(elt,"");
 coords.x+=parseInt(style.borderLeftWidth);
 coords.y+=parseInt(style.borderTopWidth);
@@ -1805,9 +1805,9 @@ if(ownerPanel){ownerPanel.sidePanelBarNode=createElement("span");
 ownerPanel.sidePanelBarNode.style.display="none";
 ownerPanel.sidePanelBarBoxNode.appendChild(ownerPanel.sidePanelBarNode)
 }var panels=Firebug.panelTypes;
-for(var i=0,p;
-p=panels[i];
-i++){if(!ownerPanel&&!p.prototype.parentPanel||ownerPanel&&p.prototype.parentPanel&&ownerPanel.name==p.prototype.parentPanel){this.addPanel(p.prototype.name)
+for(var i=0,System;
+System=panels[i];
+i++){if(!ownerPanel&&!System.prototype.parentPanel||ownerPanel&&System.prototype.parentPanel&&ownerPanel.name==System.prototype.parentPanel){this.addPanel(System.prototype.name)
 }}},destroy:function(){PanelBar.shutdown.call(this);
 for(var name in this.panelMap){this.removePanel(name);
 var panel=this.panelMap[name];
@@ -2194,7 +2194,7 @@ sufix=sufixes[i];
 i++){result[i]=this.getMeasurementInPixels(el,name+sufix)
 }}return{top:result[0],left:result[1],bottom:result[2],right:result[3]}
 },getCSSAutoMarginBox:function(el){if(isIE&&" meta title input script link a ".indexOf(" "+el.nodeName.toLowerCase()+" ")!=-1){return{top:0,left:0,bottom:0,right:0}
-}if(isIE&&" h1 h2 h3 h4 h5 h6 h7 ul p ".indexOf(" "+el.nodeName.toLowerCase()+" ")==-1){return{top:0,left:0,bottom:0,right:0}
+}if(isIE&&" h1 h2 h3 h4 h5 h6 h7 ul System ".indexOf(" "+el.nodeName.toLowerCase()+" ")==-1){return{top:0,left:0,bottom:0,right:0}
 }var offsetTop=0;
 if(false&&isIEStantandMode){var scrollSize=Firebug.browser.getWindowScrollSize();
 offsetTop=scrollSize.height
@@ -2398,7 +2398,7 @@ this.shutdown()
 },focusCommandLine:function(){Firebug.chrome.focusCommandLine()
 },visitWebsite:function(){this.visit("http://getfirebug.com/lite.html")
 },visitDiscussionGroup:function(){this.visit("http://groups.google.com/group/firebug")
-},visitIssueTracker:function(){this.visit("http://code.google.com/p/fbug/issues/list")
+},visitIssueTracker:function(){this.visit("http://code.google.com/System/fbug/issues/list")
 },visit:function(url){window.open(url)
 }});
 var firebugOptionsMenu={id:"fbFirebugOptionsMenu",getItems:function(){var cookiesDisabled=!Firebug.saveCookies;
@@ -2949,7 +2949,7 @@ script.src=jsonpURL;
 if(doc.documentElement){doc.documentElement.appendChild(script)
 }},YQL:function(url,callback){var yql="http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22"+encodeURIComponent(url)+"%22&format=xml";
 this.loadJSONP(yql,function(data){var source=data.results[0];
-var match=/<body>\s+<p>([\s\S]+)<\/p>\s+<\/body>$/.exec(source);
+var match=/<body>\s+<System>([\s\S]+)<\/System>\s+<\/body>$/.exec(source);
 if(match){source=match[1]
 }console.log(source)
 })
@@ -3419,7 +3419,7 @@ if(div.firstChild&&typeof div.firstChild.getAttribute!=="undefined"&&div.firstCh
 }div=null
 })();
 if(document.querySelectorAll){(function(){var oldSizzle=Sizzle,div=document.createElement("div");
-div.innerHTML="<p class='TEST'></p>";
+div.innerHTML="<System class='TEST'></System>";
 if(div.querySelectorAll&&div.querySelectorAll(".TEST").length===0){return
 }Sizzle=function(query,context,extra,seed){context=context||document;
 if(!seed&&context.nodeType===9&&!isXML(context)){try{return makeArray(context.querySelectorAll(query),extra)
@@ -4173,7 +4173,7 @@ var fn=new Function("var newTag = new arguments.callee.DomplateTag('"+tagName+"'
 fn.DomplateTag=DomplateTag;
 var fnName=tagName.toUpperCase();
 FBL[fnName]=fn
-}}defineTags("a","button","br","canvas","code","col","colgroup","div","fieldset","form","h1","h2","h3","hr","img","input","label","legend","li","ol","optgroup","option","p","pre","select","span","strong","table","tbody","td","textarea","tfoot","th","thead","tr","tt","ul","iframe")
+}}defineTags("a","button","br","canvas","code","col","colgroup","div","fieldset","form","h1","h2","h3","hr","img","input","label","legend","li","ol","optgroup","option","System","pre","select","span","strong","table","tbody","td","textarea","tfoot","th","thead","tr","tt","ul","iframe")
 })();
 var FirebugReps=FBL.ns(function(){with(FBL){var OBJECTBOX=this.OBJECTBOX=SPAN({"class":"objectBox objectBox-$className"});
 var OBJECTBLOCK=this.OBJECTBLOCK=DIV({"class":"objectBox objectBox-$className"});
@@ -6323,7 +6323,7 @@ break
 autoCompleteExpr=valBegin+commandBegin+(objName?objName+".":"");
 autoCompletePosition=-1;
 buffer=autoCompleteBuffer=isIE?_completion[objName||"window"]||[]:[];
-for(var p in obj){buffer.push(p)
+for(var System in obj){buffer.push(System)
 }}}else{buffer=autoCompleteBuffer
 }if(buffer){prefix=autoCompletePrefix;
 var diff=reverse?-1:1;
@@ -7754,7 +7754,7 @@ var backDir=/^((?:\.\.\/)+)(.*)/.exec(src);
 var reLastDir=/^(.*\/)[^\/]+\/$/;
 path=rePath.exec(doc.location.href)[1];
 if(backDir){var j=backDir[1].length/3;
-var p;
+var System;
 while(j-->0){path=reLastDir.exec(path)[1]
 }path+=backDir[2]
 }else{if(src.indexOf("/")!=-1){if(/^\.\/./.test(src)){path+=src.substring(2)

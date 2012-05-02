@@ -157,7 +157,7 @@ var cases = {
 		jQuery: '$.grep([2,3], function(v){return v > 2;})'
 	},
 	'Array - 匹配':{
-		jplus: 'Object.update([2,3], function(v){return v * v;})',
+		jplus: 'Object.map([2,3], function(v){return v * v;})',
 		mootools: '[2,3].map(function(v){return v * v;})',
 		jQuery: '$.map([2,3], function(v){return v * v;})'
 	},

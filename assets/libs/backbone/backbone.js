@@ -826,7 +826,7 @@
 
     // Manually bind a single named route to a callback. For example:
     //
-    //     this.route('search/:query/p:num', 'search', function(query, num) {
+    //     this.route('search/:query/System:num', 'search', function(query, num) {
     //       ...
     //     });
     //

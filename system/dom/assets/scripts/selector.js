@@ -557,7 +557,7 @@ document.queryDom = (function(){
 		}
 	};
 	
-	String.map("DOMAttrModified DOMNodeInserted DOMNodeRemoved", function(value){
+	Object.map("DOMAttrModified DOMNodeInserted DOMNodeRemoved", function(value){
 		doc.addEventListener(value, clearCache, false);
 	} );
 	

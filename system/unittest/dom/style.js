@@ -42,7 +42,7 @@ test("Dom.prototype.getStyle", function() {
 	equal( Dom.get("floatTest").getStyle("float"), "right", "Modified CSS float using \"float\": Assert float is right");
 	Dom.get("floatTest").setStyle("font-size",  "30px");
 	equal( Dom.get("floatTest").getStyle("font-size"), "30px", "Modified CSS font-size: Assert font-size is 30px");
-	String.map("0 0.25 0.5 0.75 1", function(n, i) {
+	Object.map("0 0.25 0.5 0.75 1", function(n, i) {
 		Dom.get("foo").setStyle('opacity', n);
 
 		equal( Dom.get("foo").getStyle("opacity"), n, "Assert opacity is " + n + " as a String" );
@@ -120,7 +120,7 @@ test("Dom.prototype.setStyle", function() {
 	Dom.get("floatTest").setStyle("font-size", "20px");
 	equal( Dom.get("floatTest").getStyle("font-size"), "20px", "Modified CSS font-size: Assert font-size is 20px");
 
-	String.map("0 0.25 0.5 0.75 1", function(n, i) {
+	Object.map("0 0.25 0.5 0.75 1", function(n, i) {
 		Dom.get("foo").setStyle("opacity", n);
 		equal( Dom.get("foo").getStyle("opacity"), parseFloat(n), "Assert opacity is " + parseFloat(n) + " as a String" );
 		Dom.get("foo").setStyle("opacity", parseFloat(n));

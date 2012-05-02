@@ -48,6 +48,14 @@
 						return value === true;
 					}
 				},
+				'Object.map': {
+					'~(["aa","aa23"], assert.log)': function(value, assert){
+						assert.logged("aaaa23");
+					},
+					'~("aa aa23", assert.log)': function(value, assert){
+						assert.logged("aaaa23");
+					}
+				},
 				'Object.set': {
 					'~({a:assert.log}, {a:2, b:4})':  function (value, assert) {
 						assert.logged("2");
@@ -57,10 +65,6 @@
 				//	init: 'var a = {click: assert.log}',
 				//	tests: 'a, "click", function(){assert.log(2)} =>assert, a.click(1), assert.logged("12")'
 				//},
-				'Object.update': {
-					'~(["aa","aa23"], "length")': [2, 4],
-					'~([{a: 1},{a: 4}], "a")': [1, 4]
-				},
 				'Array': '-',
 				'Array.isArray': {
 					'~([])': true,
@@ -154,11 +158,6 @@
 				'String.format': {
 					'~("{0} {1}", "h", "v")': "h v",
 					'~("{a}", {a: 1})': "1"
-				},
-				'String.map': {
-					'~("1 2 3", assert.log)':  function(value, assert){
-						assert.logged("123");
-					}	
 				},
 				'String.prototype.capitalize':  {
 					'"ab".capitalize()':  "Ab"	

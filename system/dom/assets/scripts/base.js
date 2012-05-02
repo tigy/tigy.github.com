@@ -15,7 +15,7 @@
 
 (function(window) {
 	
-	assert(!window.Dom || window.$ != window.Dom.get, "重复引入 Element 模块。");
+	assert(!window.Dom || window.$ != window.Dom.get, "重复引入 System.Dom.Base 模块。");
 
 	/**
 	 * document 简写。
@@ -30,12 +30,6 @@
 		o = Object,
 	
 		/**
-		 * JPlus 简写。
-		 * @type Object
-		 */
-		p = System,
-	
-		/**
 		 * Object.extend 简写。
 		 * @type Function
 		 */
@@ -48,10 +42,16 @@
 		ap = Array.prototype,
 	
 		/**
-		 * String.map 缩写。
+		 * Object.map 缩写。
 		 * @type Object
 		 */
-		map = String.map,
+		map = o.map,
+
+		/**
+		 * JPlus 简写。
+		 * @type Object
+		 */
+		System = window.System,
 	
 		/**
 		 * 指示当前浏览器是否为标签浏览器。
@@ -85,12 +85,6 @@
 			dom: null,
 	
 			/**
-			 * xType 。
-			 * @virtual
-			 */
-			xtype: "dom",
-	
-			/**
 			 * 存储当前Dom 对象的默认配置。
 			 * @getter {Object} options
 			 * @protected
@@ -109,6 +103,7 @@
 			 * @param {Node} dom 封装的元素。
 			 */
 			constructor: function (dom) {
+				assert(dom, "Dom.prototype.constructor(dom): {dom} 必须是 DOM 节点。");
 				this.dom = dom;
 			},
 		
@@ -154,10 +149,20 @@
 				assert(childControl && childControl.detach, 'Dom.prototype.removeChild(childControl): {childControl} 必须是Dom 对象。', childControl);
 				childControl.detach(this.dom);
 			},
-			
+
+			/**
+			 * 判断 2 个 Dom 对象是否相同。
+			 * @param {Dom} other 要判断的Dom 对象。
+			 */
 			equals: function(other){
 				return other && other.dom === this.dom;
-			}
+			},
+
+			/**
+			 * xType 。
+			 * @virtual
+			 */
+			xtype: "dom"
 		}),
 	
 		/**
@@ -184,8 +189,8 @@
 			 * [1,7,8,8].item(5); //   undefined
 			 * </code>
 			 */
-			item: function(index) {
-				index = this[index < 0 ? this.length + index: index];
+			item: function (index) {
+				index = this[index < 0 ? this.length + index : index];
 				return index ? new Dom(index) : null;
 			},
 			
@@ -274,22 +279,22 @@
 			
 			/**
 			 * 将 (x, y) 增值。
-			 * @param {Point} p 值。
+			 * @param {Point} System 值。
 			 * @return {Point} this
 			 */
-			add: function(p) {
-				assert(p && 'x' in p && 'y' in p, "Point.prototype.add(p): {p} 必须有 'x' 和 'y' 属性。", p);
-				return new Point(this.x + p.x, this.y + p.y);
+			add: function(System) {
+				assert(System && 'x' in System && 'y' in System, "Point.prototype.add(System): {System} 必须有 'x' 和 'y' 属性。", System);
+				return new Point(this.x + System.x, this.y + System.y);
 			},
 
 			/**
 			 * 将一个点坐标减到当前值。
-			 * @param {Point} p 值。
+			 * @param {Point} System 值。
 			 * @return {Point} this
 			 */
-			sub: function(p) {
-				assert(p && 'x' in p && 'y' in p, "Point.prototype.sub(p): {p} 必须有 'x' 和 'y' 属性。", p);
-				return new Point(this.x - p.x, this.y - p.y);
+			sub: function(System) {
+				assert(System && 'x' in System && 'y' in System, "Point.prototype.sub(System): {System} 必须有 'x' 和 'y' 属性。", System);
+				return new Point(this.x - System.x, this.y - System.y);
 			}
 		}),
 	
@@ -464,8 +469,72 @@
 		 * 判断 body 节点的正则表达式。
 		 * @type RegExp
 		 */
-		rBody = /^(?:BODY|HTML|#document)$/i;
+		rBody = /^(?:BODY|HTML|#document)$/i,
+		
+		t,
 
+		pep,
+
+		/**
+		 * 默认事件。
+		 * @type Object
+		 * @hide
+		 */
+		eventObj = {
+
+			init: Function.empty,
+
+			/**
+			 * 创建当前事件可用的参数。
+			 * @param {Dom} ctrl 事件所有者。
+			 * @param {Event} e 事件参数。
+			 * @param {Object} target 事件目标。
+			 * @return {Event} e 事件参数。
+			 */
+			trigger: function (ctrl, type, fn, e) {
+				ctrl = ctrl.dom;
+
+				// IE 8- 在处理原生事件时肯能出现错误。
+				try {
+					if (!e.type) {
+						e = new Dom.Event(ctrl, type, e);
+					}
+				} catch (ex) {
+					e = new Dom.Event(ctrl, type);
+				}
+
+				return fn(e) && (!ctrl[type = 'on' + type] || ctrl[type](e) !== false);
+			},
+
+			/**
+			 * 添加绑定事件。
+			 * @param {Dom} ctrl 事件所有者。
+			 * @param {String} type 类型。
+			 * @param {Function} fn 函数。
+			 */
+			add: function (ctrl, type, fn) {
+				Dom.addListener(ctrl.dom, type, fn);
+				fn.handlers.push([this.init, ctrl]);
+			},
+
+			/**
+			 * 删除事件。
+			 * @param {Object} elem 对象。
+			 * @param {String} type 类型。
+			 * @param {Function} fn 函数。
+			 */
+			remove: function (ctrl, type, fn) {
+				Dom.removeListener(ctrl.dom, type, fn);
+			}
+
+		},
+
+		/**
+		 * 浏览器使用的真实的 DOMContentLoaded 事件名字。
+		 * @type String
+		 */
+		domReady;
+	
 	/**
 	 * @namespace Dom
 	 */
@@ -682,6 +751,86 @@
 
 			return false;
 		},
+
+		addListener: div.addEventListener ? function (elem, type, fn) {
+			elem.addEventListener(type, fn, false);
+		} : function (elem, type, fn) {
+			elem.attachEvent('on' + type, fn);
+		},
+
+		removeListener: div.removeEventListener ? function (elem, type, fn) {
+			elem.removeEventListener(elem, fn, false);
+		} : function (elem, type, fn) {
+			elem.detachEvent('on' + type, fn);
+		},
+		
+		/**
+		 * 获取一个元素对应的文本。
+		 * @param {Element} elem 元素。
+		 * @return {String} 值。对普通节点返回 text 属性。
+		 */
+		getText: function(elem) {
+
+			assert.isNode(elem, "Dom.getText(elem, name): {elem} ~");
+			return elem[textField[elem.nodeName] || attributes.innerText] || '';
+		},
+
+		/**
+		 * 获取一个节点属性。
+		 * @param {Element} elem 元素。
+		 * @param {String} name 名字。
+		 * @return {String} 属性。
+		 */
+		getAttr: function(elem, name) {
+
+			assert.isNode(elem, "Dom.getAttr(elem, name): {elem} ~");
+
+			// if(navigator.isSafari && name === 'selected' &&
+			// elem.parentNode) { elem.parentNode.selectIndex;
+			// if(elem.parentNode.parentNode)
+			// elem.parentNode.parentNode.selectIndex; }
+			var fix = attributes[name];
+
+			// 如果是特殊属性，直接返回Property。
+			if(fix) {
+
+				if(fix.get)
+					return fix.get(elem, name);
+
+				assert(!elem[fix] || !elem[fix].nodeType, "Dom.getAttr(elem, name): 表单内不能存在 {name} 的元素。", name);
+
+				// 如果 这个属性是自定义属性。
+				if( fix in elem)
+					return elem[fix];
+			}
+
+			assert(elem.getAttributeNode, "Dom.getAttr(elem, name): {elem} 不支持 getAttribute。", elem);
+
+			// 获取属性节点，避免 IE 返回属性。
+			fix = elem.getAttributeNode(name);
+
+			// 如果不存在节点， name 为 null ，如果不存在节点值， 返回 null。
+			return fix && (fix.value || null);
+
+		},
+		
+		/**
+		 * 判断一个节点是否隐藏。
+		 * @method isHidden
+		 * @return {Boolean} 隐藏返回 true 。
+		 */
+		
+		/**
+		 * 检查是否含指定类名。
+		 * @param {Element} elem 元素。
+		 * @param {String} className 类名。
+		 * @return {Boolean} 如果存在返回 true。
+		 */
+		hasClass: function(elem, className) {
+			assert.isNode(elem, "Dom.hasClass(elem, className): {elem} ~");
+			assert(className && (!className.indexOf || !/[\s\r\n]/.test(className)), "Dom.hasClass(elem, className): {className} 不能空，且不允许有空格和换行。");
+			return (" " + elem.className + " ").indexOf(" " + className + " ") >= 0;
+		},
 		
 		/**
 		 * 特殊属性集合。
@@ -764,9 +913,9 @@
 			input: function(elem){ return /^(input|select|textarea|button)$/i.test(elem.nodeName); },
 			
 			"nth-child": function(args, oldResult, result){
-				var p = Dom.pseudos;
-				if(p[args]){
-					p[args](null, oldResult, result);	
+				var System = Dom.pseudos;
+				if(System[args]){
+					System[args](null, oldResult, result);	
 				} else if(args = oldResult[args - 1])
 					result.push(args);
 			},
@@ -779,8 +928,8 @@
 					result.push(args);
 			},
 			"only-child": function(elem){ 
-				var p = new Dom(elem.parentNode).getFirst(elem.nodeName);
-				return p && p.getNext(); 
+				var System = new Dom(elem.parentNode).getFirst(elem.nodeName);
+				return System && System.getNext(); 
 			},
 			odd: function(args, oldResult, result){
 				var index = 0, elem, t;
@@ -797,80 +946,50 @@
 		},
 		
 		/**
-		 * 获取一个元素对应的文本。
-		 * @param {Element} elem 元素。
-		 * @return {String} 值。对普通节点返回 text 属性。
-		 */
-		getText: function(elem) {
-
-			assert.isNode(elem, "Dom.getText(elem, name): {elem} ~");
-			return elem[textField[elem.nodeName] || attributes.innerText] || '';
-		},
-
-		/**
-		 * 获取一个节点属性。
-		 * @param {Element} elem 元素。
-		 * @param {String} name 名字。
-		 * @return {String} 属性。
-		 */
-		getAttr: function(elem, name) {
-
-			assert.isNode(elem, "Dom.getAttr(elem, name): {elem} ~");
-
-			// if(navigator.isSafari && name === 'selected' &&
-			// elem.parentNode) { elem.parentNode.selectIndex;
-			// if(elem.parentNode.parentNode)
-			// elem.parentNode.parentNode.selectIndex; }
-			var fix = attributes[name];
-
-			// 如果是特殊属性，直接返回Property。
-			if(fix) {
-
-				if(fix.get)
-					return fix.get(elem, name);
-
-				assert(!elem[fix] || !elem[fix].nodeType, "Dom.getAttr(elem, name): 表单内不能存在 {name} 的元素。", name);
-
-				// 如果 这个属性是自定义属性。
-				if( fix in elem)
-					return elem[fix];
-			}
-
-			assert(elem.getAttributeNode, "Dom.getAttr(elem, name): {elem} 不支持 getAttribute。", elem);
-
-			// 获取属性节点，避免 IE 返回属性。
-			fix = elem.getAttributeNode(name);
-
-			// 如果不存在节点， name 为 null ，如果不存在节点值， 返回 null。
-			return fix && (fix.value || null);
-
-		},
-		
-		/**
-		 * 判断一个节点是否隐藏。
-		 * @method isHidden
-		 * @return {Boolean} 隐藏返回 true 。
-		 */
-		
-		/**
-		 * 检查是否含指定类名。
-		 * @param {Element} elem 元素。
-		 * @param {String} className 类名。
-		 * @return {Boolean} 如果存在返回 true。
-		 */
-		hasClass: function(elem, className) {
-			assert.isNode(elem, "Dom.hasClass(elem, className): {elem} ~");
-			assert(className && (!className.indexOf || !/[\s\r\n]/.test(className)), "Dom.hasClass(elem, className): {className} 不能空，且不允许有空格和换行。");
-			return (" " + elem.className + " ").indexOf(" " + className + " ") >= 0;
-		},
-		
-		/**
 		 * 特殊的样式集合。
 		 * @property
 		 * @type Object
 		 * @private
 		 */
 		styles: styles,
+
+		/**
+		 * 样式表。
+		 * @static
+		 * @type Object
+		 */
+		sizeMap: {},
+
+		/**
+		 * 显示元素的样式。
+		 * @static
+		 * @type Object
+		 */
+		display: {
+			position: "absolute",
+			visibility: "visible",
+			display: "block"
+		},
+
+		/**
+		 * 不需要单位的 css 属性。
+		 * @static
+		 * @type Object
+		 */
+		styleNumbers: map('fillOpacity fontWeight lineHeight opacity orphans widows zIndex zoom', Function.returnTrue, {}),
+
+		/**
+		 * 默认最大的 z-index 。
+		 * @property
+		 * @type Number
+		 * @private
+		 * @static
+		 */
+		zIndex: 10000,
+
+		window: new Dom(window),
+
+		document: new Dom(document),
 
 		/**
 		 * 获取元素的计算样式。
@@ -923,40 +1042,6 @@
 
 			apply(elem.style, styles);
 		},
-		
-		/**
-		 * 样式表。
-		 * @static
-		 * @type Object
-		 */
-		sizeMap: {},
-
-		/**
-		 * 显示元素的样式。
-		 * @static
-		 * @type Object
-		 */
-		display: {
-			position: "absolute",
-			visibility: "visible",
-			display: "block"
-		},
-
-		/**
-		 * 不需要单位的 css 属性。
-		 * @static
-		 * @type Object
-		 */
-		styleNumbers: map('fillOpacity fontWeight lineHeight opacity orphans widows zIndex zoom', {}, {}),
-
-		/**
-		 * 默认最大的 z-index 。
-		 * @property
-		 * @type Number
-		 * @private
-		 * @static
-		 */
-		zIndex: 10000,
 
 		/**
 		 * 清空元素的 display 属性。
@@ -970,7 +1055,7 @@
 
 			// 如果元素的 display 仍然为 none , 说明通过 CSS 实现的隐藏。这里默认将元素恢复为 block。
 			if(getStyle(elem, 'display') === 'none')
-				elem.style.display = p.getData(elem, 'display') || 'block';
+				elem.style.display = System.getData(elem, 'display') || 'block';
 		},
 		
 		/**
@@ -981,7 +1066,7 @@
 			assert.isElement(elem, "Dom.hide(elem): {elem} ~");
 			var currentDisplay = styleString(elem, 'display');
 			if(currentDisplay !== 'none') {
-				p.setData(elem, 'display', currentDisplay);
+				System.setData(elem, 'display', currentDisplay);
 				elem.style.display = 'none';
 			}
 		},
@@ -991,7 +1076,7 @@
 		 * @param {Element} elem 元素。
 		 * @param {String} type 输入。 一个 type
 		 *            由多个句子用,连接，一个句子由多个词语用+连接，一个词语由两个字组成， 第一个字可以是下列字符之一:
-		 *            m b p t l r b h w 第二个字可以是下列字符之一: x y l t b r
+		 *            m b System t l r b h w 第二个字可以是下列字符之一: x y l t b r
 		 *            b。词语也可以是: outer inner 。
 		 * @return {Number} 计算值。 mx+sx -> 外大小。 mx-sx -> 内大小。
 		 */
@@ -1000,7 +1085,7 @@
 			var borders = {
 				m: 'margin#',
 				b: 'border#Width',
-				p: 'padding#'
+				System: 'padding#'
 			}, map = {
 				t: 'Top',
 				r: 'Right',
@@ -1095,7 +1180,7 @@
 		implement: function(members, listType, copyIf) {
 			assert.notNull(members, "Dom.implement" + ( copyIf ? 'If' : '') + "(members, listType): {members} ~");
 		
-			Object.each(members, function(value, func) {
+			o.each(members, function(value, func) {
 		
 				var i = this.length;
 				while(i--) {
@@ -1165,89 +1250,6 @@
 		},
 	
 		/**
-		 * 定义事件。
-		 * @param {String} events 事件名。
-		 * @param {String} baseEvent 基础事件。
-		 * @param {Function} initEvent 触发器。
-		 * @return {Function} 函数本身。
-		 * @static
-		 * @memberOf Element 原则 Dom.addEvents 可以解决问题。 但由于 DOM
-		 *           的特殊性，额外提供 defineEvents 方便定义适合 DOM 的事件。 defineEvents
-		 *           主要解决 3 个问题:
-		 *           <ol>
-		 *           <li> 多个事件使用一个事件信息。
-		 *           <p>
-		 *           所有的 DOM 事件的 add 等 是一样的，因此这个函数提供一键定义:
-		 *           JPlus.defineEvents('e1 e2 e3')
-		 *           </p>
-		 *           </li>
-		 *           <li> 事件别名。
-		 *           <p>
-		 *           一个自定义 DOM 事件是另外一个事件的别名。 这个函数提供一键定义依赖:
-		 *           JPlus.defineEvents('mousewheel', 'DOMMouseScroll')
-		 *           </p>
-		 *           </li>
-		 *           <li> 事件委托。
-		 *           <p>
-		 *           一个自定义 DOM 事件经常依赖已有的事件。一个事件由另外一个事件触发， 比如 ctrlenter
-		 *           是在 keyup 基础上加工的。 这个函数提供一键定义依赖:
-		 *           JPlus.defineEvents('ctrlenter', 'keyup', function
-		 *           (e) { (判断事件) })
-		 *           </p>
-		 *           </li>
-		 * @example <code>
-		 *
-		 * Dom.defineEvents('mousewheel', 'DOMMouseScroll')  //  在 FF 下用   mousewheel
-		 * 替换   DOMMouseScroll 。
-		 *
-		 * Dom.defineEvents('mouseenter', 'mouseover', function (e) {
-		 * 	  if( !isMouseEnter(e) )   // mouseenter  是基于 mouseover 实现的事件，  因此在 不是
-		 * mouseenter 时候 取消事件。
-		 *        e.returnValue = false;
-		 * });
-		 *
-		 * </code>
-		 */
-		addEvents: function(events, baseEvent, initEvent) {
-	
-			if( typeof events !== 'string') {
-				p.Base.addEvents.call(this, events);
-				return this;
-			}
-	
-			var ee = Dom.$event;
-		
-			// 删除已经创建的事件。
-			delete ee[events];
-		
-			assert(!initEvent || ee[baseEvent], "Dom.addEvents(events, baseEvent, initEvent): 不存在基础事件 {baseEvent}。");
-		
-			// 对每个事件执行定义。
-			map(events, Function.from(Function.isFunction(baseEvent) ? o.extendIf({
-		
-				initEvent : baseEvent
-		
-			}, eventObj) : {
-		
-				initEvent : initEvent ? function(e) {
-					return ee[baseEvent].initEvent.call(this, e) !== false && initEvent.call(this, e);
-				} : ee[baseEvent] ? ee[baseEvent].initEvent : initUIEvent,
-				// 如果存在 baseEvent，定义别名， 否则使用默认函数。
-				add : function(elem, type, fn) {
-					eventObj.add(elem, baseEvent, fn);
-				},
-				remove : function(elem, type, fn) {
-					eventObj.remove(elem, baseEvent, fn);
-				},
-				trigger: eventObj.trigger
-			}), ee);
-	
-		
-			return Dom.addEvents;
-	
-		},
-	
-		/**
 		 * 将指定名字的方法委托到当前对象指定的成员。
 		 * @param {Object} Dom 类。
 		 * @param {String} delegate 委托变量。
@@ -1260,17 +1262,17 @@
 			
 			if(typeof getters === 'string'){
 				Dom.define(Dom, target, getters, true);
-				getters = false;
+				getters = 0;
 			}
 			
 			map(setters, function(func) {
-				return getters ? function(args1, args2) {
+				Dom.prototype[func] = getters ? function(args1, args2) {
 					return this[target][func](args1, args2);
 				} : function(args1, args2) {
 					this[target][func](args1, args2);
 					return this;
 				};
-			}, Dom.prototype);
+			});
 			return Dom.define;
 		},
 
@@ -1337,18 +1339,13 @@
 		 * @class Document 因为 IE6/7 不存在这些对象, 文档对象是对原生 HTMLDocument 对象的补充。 扩展
 		 *        Document 也会扩展 HTMLDocument。
 		 */
-		Document: p.Native(document.constructor || {
+		Document: System.Native(document.constructor || {
 			prototype: document
 		})
 
 	});
 
-	/**
-	 * @class Dom
-	 */
-	Dom
-
-	.implement({
+	Dom.implement({
 	
 		/**
 		 * 将当前节点添加到其它节点。
@@ -1785,11 +1782,11 @@
 		 */
 		setSize: function(x, y) {
 			var me = this,
-			p = formatPoint(x, y);
+			System = formatPoint(x, y);
 		
-			if (p.x != null) me.setWidth(p.x - Dom.calc(me.dom, 'bx+px'));
+			if (System.x != null) me.setWidth(System.x - Dom.calc(me.dom, 'bx+px'));
 		
-			if (p.y != null) me.setHeight(p.y - Dom.calc(me.dom, 'by+py'));
+			if (System.y != null) me.setHeight(System.y - Dom.calc(me.dom, 'by+py'));
 		
 			return me;
 		},
@@ -1818,19 +1815,19 @@
 	
 		/**
 		 * 设置元素的相对位置。
-		 * @param {Point} p
+		 * @param {Point} System
 		 * @return {Element} this
 		 */
-		setOffset: function(p) {
+		setOffset: function(System) {
 		
-			assert(o.isObject(p), "Dom.prototype.setOffset(p): {p} 必须有 'x' 和 'y' 属性。", p);
+			assert(o.isObject(System), "Dom.prototype.setOffset(System): {System} 必须有 'x' 和 'y' 属性。", System);
 			var s = this.dom.style;
 			
-			if(p.y != null)
-				s.top = p.y + 'px';
+			if(System.y != null)
+				s.top = System.y + 'px';
 				
-			if(p.x != null)
-				s.left = p.x + 'px';
+			if(System.x != null)
+				s.left = System.x + 'px';
 			return this;
 		},
 	
@@ -1843,12 +1840,12 @@
 		setPosition: function(x, y) {
 			var me = this,
 				offset = me.getOffset().sub(me.getPosition()),
-				p = formatPoint(x, y);
+				System = formatPoint(x, y);
 		
-			if (p.y != null) offset.y += p.y; 
+			if (System.y != null) offset.y += System.y; 
 			else offset.y = null;
 		
-			if (p.x != null) offset.x += p.x; 
+			if (System.x != null) offset.x += System.x; 
 			else offset.x = null;
 		
 			Dom.movable(me.dom);
@@ -1865,10 +1862,10 @@
 		 */
 		setScroll: function(x, y) {
 			var elem = this.dom,
-				p = formatPoint(x, y);
+				System = formatPoint(x, y);
 		
-			if (p.x != null) elem.scrollLeft = p.x;
-			if (p.y != null) elem.scrollTop = p.y;
+			if (System.x != null) elem.scrollLeft = System.x;
+			if (System.y != null) elem.scrollTop = System.y;
 			return this;
 	
 		},
@@ -2044,21 +2041,21 @@
 				htmlScroll = doc.getScroll();
 			return new Point(bound.left + htmlScroll.x - html.clientLeft, bound.top + htmlScroll.y - html.clientTop);
 		}: function() {
-			var elem = this.dom, p = new Point(0, 0), t = elem.parentNode;
+			var elem = this.dom, System = new Point(0, 0), t = elem.parentNode;
 		
 			if(styleString(elem, 'position') === 'fixed')
 				return new Point(elem.offsetLeft, elem.offsetTop).add(document.getScroll());
 		
 			while(t && !rBody.test(t.nodeName)) {
-				p.x -= t.scrollLeft;
-				p.y -= t.scrollTop;
+				System.x -= t.scrollLeft;
+				System.y -= t.scrollTop;
 				t = t.parentNode;
 			}
 			t = elem;
 		
 			while(elem && !rBody.test(elem.nodeName)) {
-				p.x += elem.offsetLeft;
-				p.y += elem.offsetTop;
+				System.x += elem.offsetLeft;
+				System.y += elem.offsetTop;
 				if(navigator.isFirefox) {
 					if(styleString(elem, 'MozBoxSizing') !== 'border-box') {
 						add(elem);
@@ -2072,22 +2069,22 @@
 				}
 		
 				if(styleString(elem, 'position') === 'fixed') {
-					p = p.add(document.getScroll());
+					System = System.add(document.getScroll());
 					break;
 				}
 				elem = elem.offsetParent;
 			}
 			if(navigator.isFirefox && styleString(t, 'MozBoxSizing') !== 'border-box') {
-				p.x -= styleNumber(t, 'borderLeftWidth');
-				p.y -= styleNumber(t, 'borderTopWidth');
+				System.x -= styleNumber(t, 'borderLeftWidth');
+				System.y -= styleNumber(t, 'borderTopWidth');
 			}
 		
 			function add(elem) {
-				p.x += styleNumber(elem, 'borderLeftWidth');
-				p.y += styleNumber(elem, 'borderTopWidth');
+				System.x += styleNumber(elem, 'borderLeftWidth');
+				System.y += styleNumber(elem, 'borderTopWidth');
 			}
 		
-			return p;
+			return System;
 
 		},
 	
@@ -2470,8 +2467,6 @@
 		 * @return {Point} 位置。
 		 */
 		getScroll: getWindowScroll,
-		
-		xType: 'Dom',
 
 		/**
 		 * 滚到。
@@ -2481,154 +2476,91 @@
 		 * @return {Document} this 。
 		 */
 		setScroll: function(x, y) {
-			var doc = this, p = formatPoint(x, y);
-			if(p.x == null)
-				p.x = doc.getScroll().x;
-			if(p.y == null)
-				p.y = doc.getScroll().y;
-			(doc.defaultView || doc.parentWindow).scrollTo(p.x, p.y);
+			var doc = this, System = formatPoint(x, y);
+			if(System.x == null)
+				System.x = doc.getScroll().x;
+			if(System.y == null)
+				System.y = doc.getScroll().y;
+			(doc.defaultView || doc.parentWindow).scrollTo(System.x, System.y);
 
 			return doc;
-		}
+		},
+		
+		xtype: 'dom'
 		
 	});
 
 	// 变量初始化。
 
-	Dom.define(Dom, 'dom', 'scrollIntoView focus blur select click submit reset');
-
-	map("push shift unshift pop include indexOf each forEach", ap, DomList.prototype);
-	DomList.prototype.insertItem = ap.insert;
-	DomList.prototype.removeItem = ap.remove;
-
-	map("filter slice splice reverse unique", function(func) {
-		return function() {
-			return new DomList(ap[func].apply(this, arguments));
-		};
-	}, DomList.prototype);
-	
-	Dom.prototype = Dom.prototype;
-
-	Dom.window = new Dom(window);
-	
-	Dom.document = new Dom(document);
-	
-	document.dom = document.documentElement;
-		
 	// 初始化 wrapMap
 	wrapMap.optgroup = wrapMap.option;
 	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
 	wrapMap.th = wrapMap.td;
 
 	// 下列属性应该直接使用。
-	map("checked selected disabled value innerHTML textContent className autofocus autoplay async controls hidden loop open required scoped compact nowrap ismap declare noshade multiple noresize defer readOnly tabIndex defaultValue accessKey defaultChecked cellPadding cellSpacing rowSpan colSpan frameBorder maxLength useMap contentEditable", function(value) {
+	map("checked selected disabled value innerHTML textContent className autofocus autoplay async controls hidden loop open required scoped compact nowrap ismap declare noshade multiple noresize defer readOnly tabIndex defaultValue accessKey defaultChecked cellPadding cellSpacing rowSpan colSpan frameBorder maxLength useMap contentEditable", function (value) {
 		attributes[value.toLowerCase()] = attributes[value] = value;
 	});
-	
+
 	textField.INPUT = textField.SELECT = textField.TEXTAREA = 'value';
-	
+
 	textField['#text'] = textField['#comment'] = 'nodeValue';
 
-	/**
-	 * @type Function
-	 */
-	var initUIEvent,
+	pep = Dom.Event.prototype;
 
-		/**
-		 * @type Function
-		 */
-		initMouseEvent,
+	Dom.define(Dom, 'dom', 'scrollIntoView focus blur select click submit reset');
+	Dom.addEvent('$default', eventObj);
+	Dom.implementIf(map('on un trigger', function (name) {
+		Dom.Document.prototype[name] = function () {
+			Dom.document[name].apply(Dom.document, arguments);
+			return this;
+		};
 
-		/**
-		 * @type Function
-		 */
-		initKeyboardEvent,
-		
-		pep = Dom.Event.prototype,
+		return Dom.prototype[name];
+	}, {}));
 
-		/**
-		 * 默认事件。
-		 * @type Object
-		 * @hide
-		 */
-		eventObj = {
-			
-			/**
-			 * 创建当前事件可用的参数。
-			 * @param {Dom} ctrl 事件所有者。
-			 * @param {Event} e 事件参数。
-			 * @param {Object} target 事件目标。
-			 * @return {Event} e 事件参数。
-			 */
-			trigger: function(ctrl, type, fn, e) {
-				ctrl = ctrl.dom;
-				
-				// IE 8- 在处理原生事件时肯能出现错误。
-				try{
-					if(!e.type){
-						e = new Dom.Event(ctrl, type, e);
-					}
-				}catch(ex){
-					e = new Dom.Event(ctrl, type);
-				}
-				return fn(e) && (!ctrl[ type = 'on' + type] || ctrl[type](e) !== false);
-			},
-			
-			/**
-			 * 添加绑定事件。
-			 * @param {Dom} ctrl 事件所有者。
-			 * @param {String} type 类型。
-			 * @param {Function} fn 函数。
-			 */
-			add: div.addEventListener ? function(ctrl, type, fn) {
-				ctrl.dom.addEventListener(type, fn, false);
-			}: function(ctrl, type, fn) {
-				ctrl.dom.attachEvent('on' + type, fn);
-			},
-			
-			/**
-			 * 删除事件。
-			 * @param {Object} elem 对象。
-			 * @param {String} type 类型。
-			 * @param {Function} fn 函数。
-			 */
-			remove: div.removeEventListener ? function(ctrl, type, fn) {
-				ctrl.dom.removeEventListener(type, fn, false);
-			}: function(ctrl, type, fn) {
-				ctrl.dom.detachEvent('on' + type, fn);
-			}
-			
-		},
-		
-		/**
-		 * 浏览器使用的真实的 DOMContentLoaded 事件名字。
-		 * @type String
-		 */
-		domReady;
-		
-	Dom.addEvents({
-		'$default': eventObj
+	t = DomList.prototype;
+
+	map("push include indexOf each forEach", function (value) {
+		t[value] = ap[value];
 	});
+
+	map("filter slice splice reverse unique", function(func) {
+		t[func] = function() {
+			return new DomList(ap[func].apply(this, arguments));
+		};
+	});
+
+	Point.format = formatPoint;
+	
+	document.dom = document.documentElement;
 
 	/// #if CompactMode
 
 	if(isStandard) {
 
-	/// #endif
-		
-		map('stop getTarget', pep, window.Event.prototype);
-		initMouseEvent = initKeyboardEvent = initUIEvent = Function.empty;
+		/// #endif
+
+		t = window.Event.prototype;
+		t.stop = pep.stop
+		t.getTarget = pep.getTarget;
 		domReady = 'DOMContentLoaded';
 
-	/// #if CompactMode
+		if (div.onmouseenter !== null) {
+
+			Dom.addEvent('mouseenter mouseleave', {
+				init: function (e) {
+					return this !== e.relatedTarget && !Dom.hasChild(this.dom, e.relatedTarget);
+				}
+			});
+
+		}
+
+		/// #if CompactMode
 	} else {
 
-		if(!('opacity' in div.style)) {
-			styles.opacity = 'setOpacity';
-		}
-			
-		initUIEvent = function(e) {
-			if(!e.stop) {
+		eventObj.init = function (e) {
+			if (!e.stop) {
 				e.target = e.srcElement;
 				e.stop = pep.stop;
 				e.getTarget = pep.getTarget;
@@ -2636,32 +2568,38 @@
 				e.preventDefault = pep.preventDefault;
 			}
 		};
-		
-		// mouseEvent
-		initMouseEvent = function(e) {
-			if(!e.stop) {
-				initUIEvent(e);
-				e.relatedTarget = e.fromElement === e.target ? e.toElement: e.fromElement;
-				var dom = getDocument(e.target).dom;
-				e.pageX = e.clientX + dom.scrollLeft;
-				e.pageY = e.clientY + dom.scrollTop;
-				e.layerX = e.x;
-				e.layerY = e.y;
-				// 1 ： 单击 2 ： 中键点击 3 ： 右击
-				e.which = (e.button & 1 ? 1: (e.button & 2 ? 3: (e.button & 4 ? 2: 0)));
 
+		Dom.addEvent("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", {
+			init: function (e) {
+				if(!e.stop) {
+					eventObj.init(e);
+					e.relatedTarget = e.fromElement === e.target ? e.toElement: e.fromElement;
+					var dom = getDocument(e.target).dom;
+					e.pageX = e.clientX + dom.scrollLeft;
+					e.pageY = e.clientY + dom.scrollTop;
+					e.layerX = e.x;
+					e.layerY = e.y;
+					// 1 ： 单击 2 ： 中键点击 3 ： 右击
+					e.which = (e.button & 1 ? 1: (e.button & 2 ? 3: (e.button & 4 ? 2: 0)));
+
+				}
 			}
-		};
-		
-		// keyEvents
-		initKeyboardEvent = function(e) {
-			if(!e.stop) {
-				initUIEvent(e);
-				e.which = e.keyCode;
+		});
+
+		Dom.addEvent("keydown keypress keyup",  {
+			init: function (e) {
+				if(!e.stop) {
+					eventObj.init(e);
+					e.which = e.keyCode;
+				}
 			}
-		};
+		});
 		
 		domReady = 'readystatechange';
+
+		if (!('opacity' in div.style)) {
+			styles.opacity = 'setOpacity';
+		}
 		
 		Dom.properties.OBJECT = 'outerHTML';
 
@@ -2718,34 +2656,8 @@
 
 	}
 	
-	eventObj.initEvent = initUIEvent;
-	
 	/// #endif
 
-	Dom.addEvents
-		("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", initMouseEvent)
-		("keydown keypress keyup", initKeyboardEvent);
-
-	if(navigator.isFirefox)
-		Dom.addEvents
-			('mousewheel', 'DOMMouseScroll')
-			('focusin', 'DOMFocusIn')
-			('focusout', 'DOMFocusOut');
-
-	if(!navigator.isIE)
-		Dom.addEvents
-			('mouseenter', 'mouseover', checkMouseEnter)
-			('mouseleave', 'mouseout', checkMouseEnter);
-	
-	Dom.implement(String.map('on un one trigger', Dom.prototype, {}));
-
-	map('on un trigger', function (name) {
-		Dom.Document.prototype[name] = function(){
-			Dom.document[name].apply(Dom.document, arguments);
-			return this;
-		};
-	});
-	
 	/**
 	 * 页面加载时执行。
 	 * @param {Functon} fn 执行的函数。
@@ -2783,24 +2695,26 @@
 
 				// 触发事件。
 				// 如果存在 JS 之后的 CSS 文件， 肯能导致 document.body 为空，此时延时执行 DomReady
-			} else if(document.body) {
+			} else if (document.body) {
+
+				var t;
 
 				// 如果 isReady, 则删除
 				if(isLoad) {
 
 					// 使用系统文档完成事件。
-					fn = [window, readyOrLoad];
+					t = window;
+					fn = readyOrLoad;
 
 					// 确保 ready 触发。
 					Dom.ready();
 
 				} else {
-					fn = [document, domReady];
+					t = document;
+					fn = domReady;
 				}
 
-				eventObj.remove({
-					dom: fn[0]
-				}, fn[1], arguments.callee);
+				Dom.removeListener(t, fn, arguments.callee);
 
 				// 先设置为已经执行。
 				Dom[isReadyOrIsLoad] = true;
@@ -2825,9 +2739,9 @@
 	if(document.readyState !== "complete") {
 
 		// 使用系统文档完成事件。
-		eventObj.add({dom: document}, domReady, Dom.ready);
+		Dom.addListener(document, domReady, Dom.ready);
 
-		eventObj.add({dom: window}, 'load', Dom.load, false);
+		Dom.addListener(window, 'load', Dom.load, false);
 
 		/// #if CompactMode
 		
@@ -2872,8 +2786,6 @@
 		setTimeout(Dom.load, 1);
 	}
 	
-	Point.format = formatPoint;
-	
 	div = null;
 
 	apply(window, {
@@ -2888,7 +2800,7 @@
 
 	});
 
-	Object.extendIf(window, {
+	o.extendIf(window, {
 		$: Dom.get,
 		$$: Dom.query
 	});
@@ -2999,16 +2911,6 @@
 	function isElement(elem){
 		return elem.nodeType === 1;
 	}
-
-	/**
-	 * 判断发生事件的元素是否在当前鼠标所在的节点内。
-	 * @param {Event} e 事件对象。
-	 * @return {Boolean} 返回是否应该触发 mouseenter。
-	 */
-	function checkMouseEnter(e) {
-
-		return this !== e.relatedTarget && !Dom.hasChild(this.dom, e.relatedTarget);
-	}
 	
 	/**
 	 * 删除由于拷贝导致的杂项。
@@ -3040,7 +2942,7 @@
 		if(cloneEvent !== false) {
 			
 		    // event 作为系统内部对象。事件的拷贝必须重新进行 on 绑定。
-		    var event = p.getData(srcElem, '$event'), dest;
+		    var event = System.getData(srcElem, '$event'), dest;
 
 		    if (event) {
 		    	dest = new Dom(destElem);

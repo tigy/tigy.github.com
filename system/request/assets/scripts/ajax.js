@@ -270,7 +270,7 @@ var Ajax = Object.extend(Ajax.Request.extend({
 	
 }), Ajax);
 
-String.map("get post", function(k) {
+Object.map("get post", function(k) {
 	
 	var emptyFn = Function.empty;
 

@@ -18,7 +18,7 @@ Object.extend(JSON, {
 			case 'string':
 				return '"' + obj.replace(/[\x00-\x1f\\"]/g, JSON.replaceChars) + '"';
 			case 'array':
-				return '[' + String(Object.update(obj, JSON.encode, [])) + ']';
+				return '[' + String(Object.map(obj, JSON.encode, [])) + ']';
 			case 'object':
 				var string = [];
 				for(var key in obj) {

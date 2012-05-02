@@ -26,7 +26,7 @@ JPlus.namespace("Ajax").JSON = Ajax.extend({
 
 
 
-String.map("get post", function(k) {
+Object.map("get post", function(k) {
 	
 	Ajax[k + 'JSON'] = function(url, data, onsuccess, onerror, timeouts, ontimeout, oncomplete){
 		var emptyFn = Function.empty;

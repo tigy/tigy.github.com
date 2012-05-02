@@ -103,7 +103,7 @@ Dom.implement((function(){
 		
 	},
 	
-	setter = Object.update({
+	setter = Object.map({
 		bl: 'il ob',
 		bl: 'il ob',
 		rt: 'or it',

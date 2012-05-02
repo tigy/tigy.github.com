@@ -202,18 +202,17 @@
 		 *         </p>
 		 *         <p>
 		 *         addEvents 函数的参数是一个事件信息，格式如: {click: { add: ..., remove: ...,
-		 *         initEvent: ..., trigger: ...} 。 其中 click 表示事件名。一般建议事件名是小写的。
+		 *        trigger: ...} 。 其中 click 表示事件名。一般建议事件名是小写的。
 		 *         </p>
 		 *         <p>
-		 *         一个事件有多个相应，分别是: 绑定(add), 删除(remove), 触发(trigger),
-		 *         初始化事件参数(initEvent)
+		 *         一个事件有多个相应，分别是: 绑定(add), 删除(remove), 触发(trigger)
 		 *         </p>
 		 *         </p>
 		 *         当用户使用 o.on('事件名', 函数) 时， 系统会判断这个事件是否已经绑定过， 如果之前未绑定事件，则会创建新的函数
 		 *         evtTrigger， evtTrigger 函数将遍历并执行 evtTrigger.handlers 里的成员,
 		 *         如果其中一个函数执行后返回 false， 则中止执行，并返回 false， 否则返回 true。
 		 *         evtTrigger.handlers 表示 当前这个事件的所有实际调用的函数的数组。
-		 *         evtTrigger.handlers[0] 是事件的 initEvent 函数。 然后系统会调用 add(o,
+		 *         然后系统会调用 add(o,
 		 *         '事件名', evtTrigger) 然后把 evtTrigger 保存在 o.data.event['事件名'] 中。
 		 *         如果 之前已经绑定了这个事件，则 evtTrigger 已存在，无需创建。 这时系统只需把 函数 放到
 		 *         evtTrigger.handlers 即可。
@@ -250,9 +249,6 @@
 		 *         remove 同理。
 		 *         </p>
 		 *         <p>
-		 *         initEvent 的参数是一个事件参数，它只能有1个参数。
-		 *         </p>
-		 *         <p>
 		 *         trigger 是高级的事件。参考上面的说明。
 		 *         </p>
 		 *         <p>
@@ -263,18 +259,10 @@
 	     * // 创建一个新的类。
 	     * var MyCls = new Class();
 	     * 
-	     * MyCls.addEvents({
-	     * 
-	     *     click: {
+	     * MyCls.addEvent('click', {
 	     * 			
-	     * 			add:  function (elem, type, fn) {
-	     * 	   			alert("为  elem 绑定 事件 " + type );
-	     * 			},
-	     * 
-	     * 			initEvent: function (e) {
-	     * 	   			alert("初始化 事件参数  " + e );
-	     * 			}
-	     * 
+	     * 		add:  function (elem, type, fn) {
+	     * 	   		alert("为  elem 绑定 事件 " + type );
 	     * 		}
 	     * 
 	     * });
@@ -288,15 +276,18 @@
 	     * 
 	     * </code>
 		 */
-	    addEvents: function(events) {
+	    addEvent: function(eventName, properties) {
 
-		    assert(!events || Object.isObject(events),
-		            "Class.addEvents(events): {event} 必须是一个包含事件的对象。 如 {click: { add: ..., remove: ..., initEvent: ..., trigger: ... } ", events);
+	    	assert.isString(eventName, "System.Base.addEvents(eventName, properties): {eventName} ~");
+
+	    	var eventObj = this.$event || (this.$event = {});
 
 			// 更新事件对象。
-		    apply(this.$event || (this.$event = {}), events);
-
-		    return this;
+	    	eventName.split(' ').forEach(function(value){
+	    		eventObj[value] = this;
+			}, properties ? applyIf(properties, eventObj.$default) : (eventObj.$default || emptyObj));
+			
+			return this;
 	    },
 
 	    /**
@@ -477,48 +468,24 @@
 		 * @param { Base/Boolean} [args] 参数/是否间接传递。
 		 * @return {Object} 返回的对象。
 		 * @example 该函数支持多个功能。主要功能是将一个对象根据一个关系变成新的对象。 <code>
-	     * Object.update(["aa","aa23"], "length", []); // => [2, 4];
-	     * Object.update([{a: 1},{a: 4}], "a", [{},{}], true); // => [{a: 1},{a: 4}];
+	     * Object.map(["aa","aa23"], function(a){return a.length} , []); // => [2, 4];
 	     * </code>
 		 */
-	    update: function(iterable, fn, dest, args) {
-
-		    // 如果没有目标，源和目标一致。
-		    dest = dest || iterable;
-
+	    map: function(iterable, fn, dest) {
+	    	
+	    	assert(Function.isFunction(fn), "Object.map(iterable, fn, dest): {fn} 必须是函数。 ", fn);
+	    	
+			// 如果是目标对象是一个字符串，则改为数组。
+	    	if(typeof iterable === 'string')
+	    		iterable = iterable.split(' ');
+			
 		    // 遍历源。
-		    Object.each(iterable, Function.isFunction(fn) ? function(value, key) {
-
-			    // 执行函数获得返回。
-			    value = fn.call(args, value, key);
-
-			    // 只有不是 undefined 更新。
-			    if (value !== undefined)
-				    dest[key] = value;
-		    } : function(value, key) {
-
-			    // 如果存在这个值。即源有 fn 内容。
-			    if (value != undefined) {
-
-				    value = value[fn];
-
-				    assert(!args || dest[key], "Object.update(iterable, fn, dest, args): 试图把iterable[{key}][{fn}] 放到 dest[key][fn], 但  dest[key] 是一个空的成员。",
-				            key, fn);
-
-				    // 如果属性是非函数，则说明更新。 a.value
-				    // -> b.value
-				    if (args)
-					    dest[key][fn] = value;
-
-				    // 类似函数的更新。 a.value -> value
-				    else
-					    dest[key] = value;
-			    }
-
-		    });
+		    Object.each(iterable, dest ? function(value, key) {
+				dest[key] = fn(value, key);
+		    } : fn);
 
 		    // 返回目标。
-		    return dest;
+		    return dest || iterable;
 	    },
 
 	    /**
@@ -693,34 +660,6 @@
 			    // match , 同时为了代码简短, 故去该功能。
 			    return name in args ? toString(args[name]) : "";
 		    });
-	    },
-
-	    /**
-		 * 将一个数组源形式的字符串内容拷贝。
-		 * @param {Object} str 字符串。用空格隔开。
-		 * @param { Base/Function} source 更新的函数或源。
-		 * @param {Object} [dest] 如果指明了， 则拷贝结果到这个目标。
-		 * @example <code>
-	     * String.map("aaa bbb ccc", trace); //  aaa bbb ccc
-	     * String.map("aaa bbb ccc", function (v) { return v; }, {});    //    {aaa:aaa, bbb:bbb, ccc:ccc};
-	     * </code>
-		 */
-	    map: function(str, src, dest) {
-
-		    assert(typeof str == 'string', 'String.map(str, src, dest, copyIf): {str} 必须是字符串。', str);
-
-		    var isFn = Function.isFunction(src);
-		    // 使用 ' '、分隔, 这是约定的。
-		    str.split(' ').forEach(function(value, index, array) {
-
-			    // 如果是函数，调用函数， 否则是属性。
-			    var val = isFn ? src(value, index, array) : src[value];
-
-			    // 如果有 dest ，则复制。
-			    if (dest)
-				    dest[value] = val;
-		    });
-		    return dest;
 	    },
 
 	    /**
@@ -1053,17 +992,20 @@
 					        return false;
 
 			        return true;
-		        };
+				};
+
+				// 当前事件的全部函数。
+		        evt.handlers = [];
 
 		        // 获取事件管理对象。
 		        d = getMgr(me, type);
 
-		        // 当前事件的全部函数。
-		        evt.handlers = d.initEvent ? [[d.initEvent, me]] : [];
-
                 // 添加事件。
-                if(d.add)
-                    d.add(me, type, evt);
+                if(d.add) {
+                	d.add(me, type, evt);
+
+                	evt.min = evt.handlers.length;
+                }
 
 	        }
 
@@ -1110,6 +1052,9 @@
 				        for (i = handlers.length - 1; i; i--) {
 					        if (handlers[i][0] === listener) {
 						        handlers.splice(i, 1);
+						        
+						        listener = handlers.length > (evt.min || 0);
+								
 						        break;
 					        }
 				        }
@@ -1117,9 +1062,9 @@
 			        }
 
 			        // 检查是否存在其它函数或没设置删除的函数。
-			        if (!listener || handlers.length < 2) {
+			        if (!listener) {
 
-				        // 删除对事件处理句柄的全部引用，以允许内容回收。
+				        // 删除对事件处理句柄的全部引用，以允许内存回收。
 				        delete d[type];
 
                         d = getMgr(me, type);

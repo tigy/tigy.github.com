@@ -269,8 +269,8 @@ for (var i = arguments.length; i >= -1 && !resolvedAbsolute; i--) {
 // handle relative paths to be safe (might happen when process.cwd() fails)
 
 // Normalize the path
-resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(p) {
-    return !!p;
+resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(System) {
+    return !!System;
   }), !resolvedAbsolute).join('/');
 
   return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
@@ -283,8 +283,8 @@ var isAbsolute = path.charAt(0) === '/',
     trailingSlash = path.slice(-1) === '/';
 
 // Normalize the path
-path = normalizeArray(filter(path.split('/'), function(p) {
-    return !!p;
+path = normalizeArray(filter(path.split('/'), function(System) {
+    return !!System;
   }), !isAbsolute).join('/');
 
   if (!path && !isAbsolute) {
@@ -301,8 +301,8 @@ path = normalizeArray(filter(path.split('/'), function(p) {
 // posix version
 exports.join = function() {
   var paths = Array.prototype.slice.call(arguments, 0);
-  return exports.normalize(filter(paths, function(p, index) {
-    return p && typeof p === 'string';
+  return exports.normalize(filter(paths, function(System, index) {
+    return System && typeof System === 'string';
   }).join('/'));
 };
 
@@ -394,10 +394,10 @@ util.extend(PrettyCSS.prototype, {
 });
 
 exports.parse = function (str, options) {
-	var p = new PrettyCSS(options);
+	var System = new PrettyCSS(options);
 	var t = tokenizer.tokenize(str, options);
-	p.parse(t);
-	return p;
+	System.parse(t);
+	return System;
 };
 
 exports.parseFile = function (filename, callback, options) {
@@ -405,9 +405,9 @@ exports.parseFile = function (filename, callback, options) {
 		if (err) {
 			callback(err);
 		} else {
-			p = new PrettyCSS(options);
-			p.parse(t);
-			callback(err, p);
+			System = new PrettyCSS(options);
+			System.parse(t);
+			callback(err, System);
 		}
 	}, options);
 };
@@ -874,12 +874,12 @@ exports.extend = (function (undefined) {
 var subPat = /{([a-z][a-z0-9_]*)}/ig;
 exports.expandIntoRegExpPattern = function (pattern, expansion) {
 	while (subPat.test(pattern)) {
-		pattern = pattern.replace(subPat, function (str, p) {
-			if (expansion[p]) {
-				return "(" + expansion[p] + ")";
+		pattern = pattern.replace(subPat, function (str, System) {
+			if (expansion[System]) {
+				return "(" + expansion[System] + ")";
 			}
 
-			throw "Invalid pattern referenced: " + p;
+			throw "Invalid pattern referenced: " + System;
 		});
 	}
 
@@ -7182,7 +7182,7 @@ require.define("/css/values/minmax.js", function (require, module, exports, __di
 /* <minmax>
  *
  * Used by <col-width>
- * minmax( WS? p WS? , WS? q WS? )
+ * minmax( WS? System WS? , WS? q WS? )
  */
 
 "use strict";
@@ -7208,14 +7208,14 @@ exports.parse = function (unparsed, bucket, container) {
 		return null;
 	}
 
-	var P = minmax.list[1];
+	var System = minmax.list[1];
 	var Q = minmax.list[2];
 
-	if (P.name && P.name == 'length' && Q.name && Q.name == 'length') {
-		// CSS spec says if P > Q, assume minmax(P,P)
+	if (System.name && System.name == 'length' && Q.name && Q.name == 'length') {
+		// CSS spec says if System > Q, assume minmax(System,System)
 		// TODO:  Find a way to compare across units
-		if (P.getUnit() == Q.getUnit() && P.getValue() > Q.getValue()) {
-			minmax.addWarning('minmax-p-q', minmax.firstToken());
+		if (System.getUnit() == Q.getUnit() && System.getValue() > Q.getValue()) {
+			minmax.addWarning('minmax-System-q', minmax.firstToken());
 		}
 	}
 

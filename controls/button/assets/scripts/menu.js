@@ -89,7 +89,7 @@ var MenuItem = ContentControl.extend({
 
 });
 
-String.map("Selected Checked Disabled", function(key){
+Object.map("Selected Checked Disabled", function(key){
 	var p = MenuItem.prototype, c = 'x-menuitem-' + key.toLowerCase();
 	p['set' + key] = function(value){
 		return this.toggleClass(c, value);

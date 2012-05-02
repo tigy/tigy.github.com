@@ -330,11 +330,11 @@ using("System.Fx.Base");
 		show = ep.show,
 		hide = ep.hide;
 	
-	Object.update(maps, function(value){
-		return String.map(value, Function.from(0), {});
-	});
+	Object.map(maps, function(value){
+		return Object.map(value, Function.from(0), {});
+	}, maps);
 	
-	String.map('left right top bottom', Function.from({$slide: true}), maps);
+	Object.map('left right top bottom', Function.from({$slide: true}), maps);
 	
 	Dom.implement({
 		

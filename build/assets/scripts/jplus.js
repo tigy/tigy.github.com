@@ -635,8 +635,8 @@
 		 * @param { Base/Boolean} [args] 参数/是否间接传递。
 		 * @return {Object} 返回的对象。
 		 * @example 该函数支持多个功能。主要功能是将一个对象根据一个关系变成新的对象。 <code>
-	     * Object.update(["aa","aa23"], "length", []); // => [2, 4];
-	     * Object.update([{a: 1},{a: 4}], "a", [{},{}], true); // => [{a: 1},{a: 4}];
+	     * Object.map(["aa","aa23"], "length", []); // => [2, 4];
+	     * Object.map([{a: 1},{a: 4}], "a", [{},{}], true); // => [{a: 1},{a: 4}];
 	     * </code>
 		 */
 	    update: function(iterable, fn, dest, args) {
@@ -660,7 +660,7 @@
 
 				    value = value[fn];
 
-				    assert(!args || dest[key], "Object.update(iterable, fn, dest, args): 试图把iterable[{key}][{fn}] 放到 dest[key][fn], 但  dest[key] 是一个空的成员。",
+				    assert(!args || dest[key], "Object.map(iterable, fn, dest, args): 试图把iterable[{key}][{fn}] 放到 dest[key][fn], 但  dest[key] 是一个空的成员。",
 				            key, fn);
 
 				    // 如果属性是非函数，则说明更新。 a.value
@@ -955,13 +955,13 @@
 		 * @param { Base/Function} source 更新的函数或源。
 		 * @param {Object} [dest] 如果指明了， 则拷贝结果到这个目标。
 		 * @example <code>
-	     * String.map("aaa bbb ccc", trace); //  aaa bbb ccc
-	     * String.map("aaa bbb ccc", function (v) { return v; }, {});    //    {aaa:aaa, bbb:bbb, ccc:ccc};
+	     * Object.map("aaa bbb ccc", trace); //  aaa bbb ccc
+	     * Object.map("aaa bbb ccc", function (v) { return v; }, {});    //    {aaa:aaa, bbb:bbb, ccc:ccc};
 	     * </code>
 		 */
 	    map: function(str, src, dest) {
 
-		    assert(typeof str == 'string', 'String.map(str, src, dest, copyIf): {str} 必须是字符串。', str);
+		    assert(typeof str == 'string', 'Object.map(str, src, dest, copyIf): {str} 必须是字符串。', str);
 
 		    var isFn = Function.isFunction(src);
 		    // 使用 ' '、分隔, 这是约定的。
@@ -1642,7 +1642,7 @@
 	/// #endregion
 	
     // 将以下成员赋予 window ，这些成员是全局成员。
-    String.map('undefined Class', p, window);
+    Object.map('undefined Class', p, window);
 
 	/// #region Private Functions
 
@@ -1858,7 +1858,7 @@ function trace() {
         } else if(hasLog && arguments.length === 1){
         	console.log(arguments[0]);
         } else {
-			(hasLog ? console : trace).log(Object.update(arguments, trace.inspect, []).join(" "));
+			(hasLog ? console : trace).log(Object.map(arguments, trace.inspect, []).join(" "));
         }
     }
 }
@@ -2521,7 +2521,7 @@ function assert(bValue, msg) {
                         return obj.toString();
 
                     if (Array.isArray(obj)) {
-                        return "[" +  Object.update(obj, trace.inspect, []).join(", ") + "]";
+                        return "[" +  Object.map(obj, trace.inspect, []).join(", ") + "]";
 
                     } else {
                         if (obj.setInterval && obj.resizeTo)
@@ -2903,10 +2903,10 @@ JPlus.resolveNamespace = function(ns, isStyle){
 		ap = Array.prototype,
 	
 		/**
-		 * String.map 缩写。
+		 * Object.map 缩写。
 		 * @type Object
 		 */
-		map = String.map,
+		map = Object.map,
 	
 		/**
 		 * 指示当前浏览器是否为标签浏览器。
@@ -5652,7 +5652,7 @@ JPlus.resolveNamespace = function(ns, isStyle){
 			('mouseenter', 'mouseover', checkMouseEnter)
 			('mouseleave', 'mouseout', checkMouseEnter);
 	
-	Control.implement(String.map('on un one trigger', Dom.prototype, {}));
+	Control.implement(Object.map('on un one trigger', Dom.prototype, {}));
 
 	map('on un trigger', function (name) {
 		Dom.Document.prototype[name] = function(){
@@ -6442,7 +6442,7 @@ var Collection = Class({
 	
 });
 
-String.map("indexOf forEach each invoke lastIndexOf item filter", Array.prototype, Collection.prototype);
+Object.map("indexOf forEach each invoke lastIndexOf item filter", Array.prototype, Collection.prototype);
 
 /**********************************************
  * Controls.Core.ScrollableControl
@@ -7122,7 +7122,7 @@ Control.implement((function(){
 		
 	},
 	
-	setter = Object.update({
+	setter = Object.map({
 		bl: 'il ob',
 		bl: 'il ob',
 		rt: 'or it',
@@ -7295,7 +7295,7 @@ var MenuItem = ContentControl.extend({
 
 });
 
-String.map("Selected Checked Disabled", function(key){
+Object.map("Selected Checked Disabled", function(key){
 	var p = MenuItem.prototype, c = 'x-menuitem-' + key.toLowerCase();
 	p['set' + key] = function(value){
 		return this.toggleClass(c, value);

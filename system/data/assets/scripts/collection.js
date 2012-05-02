@@ -106,5 +106,5 @@ var Collection = Class({
 	
 });
 
-String.map("indexOf forEach each invoke lastIndexOf item filter", Array.prototype, Collection.prototype);
+Object.map("indexOf forEach each invoke lastIndexOf item filter", Array.prototype, Collection.prototype);
 

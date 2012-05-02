@@ -185,7 +185,7 @@ var Droppable = (function(p){
 		}
 	});
 	
-	Dom.addEvents(String.map('dragenter dragleave dragover drop', Function.from(Object.extendIf({
+	Dom.addEvents(Object.map('dragenter dragleave dragover drop', Function.from(Object.extendIf({
 		add:  function(elem, type, fn){
 			mouseEvents.add(elem, type, fn);
 			fn = p.getData(elem, 'droppable');

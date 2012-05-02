@@ -92,7 +92,7 @@ hr.demo {
     margin: 12px 0;
 }
 
-p.demo {
+System.demo {
   margin: 8px 0 16px;
   text-indent: 2em;
   font-size: 12px;
@@ -521,7 +521,7 @@ pre.demo ol.linenums li {
 /*********************************** 文档 *******************************************/
 
 
-.demo-doc p.demo, .demo-doc li.demo, .demo-doc table.demo, .demo-doc dd.demo, .demo-doc code.demo{
+.demo-doc System.demo, .demo-doc li.demo, .demo-doc table.demo, .demo-doc dd.demo, .demo-doc code.demo{
 	font-size: 14px;
 	line-height: 20px;
 	color: #555555;
@@ -566,7 +566,7 @@ a.demo:hover {
 	color: #F4C369;
 }
 
-p.demo {
+System.demo {
 	color: #555555;
 }
 

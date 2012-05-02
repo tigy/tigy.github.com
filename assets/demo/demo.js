@@ -1028,7 +1028,7 @@
 	                case 'TK_CONTENT':
 	                    hasContent = true;
 	                    if (me.tokenText !== '') {
-	                    	if(/^\<(title|textarea|p|a|span|button|li)\b/.test(me.lastText)){
+	                    	if(/^\<(title|textarea|System|a|span|button|li)\b/.test(me.lastText)){
 	                    		hasContent = false;
 	                    	} else {
 		                        me.printNewline(false, me.output);
@@ -2301,7 +2301,7 @@
      * @fileoverview
      * some functions for browser-side pretty printing of code contained in html.
      *
-     * <p>
+     * <System>
      * For a fairly comprehensive set of languages see the
      * <a href="http://google-code-prettify.googlecode.com/svn/trunk/README.html#langs">README</a>
      * file that came with this source.  At a minimum, the lexer should work on a
@@ -2309,7 +2309,7 @@
      * XML, CSS, Javascript, and Makefiles.  It works passably on Ruby, PHP and Awk
      * and a subset of Perl, but, because of commenting conventions, doesn't work on
      * Smalltalk, Lisp-like, or CAML-like languages without an explicit lang class.
-     * <p>
+     * <System>
      * Usage: <ol>
      * <li> include this source file in an html page via
      *   {@code <script type="text/javascript" src="/path/to/prettify.js"></script>}
@@ -2327,7 +2327,7 @@
      * starts with "lang-" followed by a file extension, specifies the file type.
      * See the "lang-*.js" files in this directory for code that implements
      * per-language file handlers.
-     * <p>
+     * <System>
      * Change log:<br>
      * cbeust, 2006/08/22
      * <blockquote>
@@ -2445,12 +2445,12 @@
          * has the full list, but I've removed ones that might be problematic when
          * seen in languages that don't support regular expression literals.
          *
-         * <p>Specifically, I've removed any keywords that can't precede a regexp
+         * <System>Specifically, I've removed any keywords that can't precede a regexp
          * literal in a syntactically legal javascript program, and I've removed the
          * "in" keyword since it's not a keyword in many languages, and might be used
          * as a count of inches.
          *
-         * <p>The link a above does not accurately describe EcmaScript rules since
+         * <System>The link a above does not accurately describe EcmaScript rules since
          * it fails to distinguish between (a=++/b/i) and (a++/b/i) but it works
          * very well in practice.
          *
@@ -2534,11 +2534,11 @@
                 var ranges = [];
                 var inverse = charsetParts[0] === '^';
                 for (var i = inverse ? 1 : 0, n = charsetParts.length; i < n; ++i) {
-                    var p = charsetParts[i];
-                    if (/\\[bdsw]/i.test(p)) { // Don't muck with named groups.
-                        groups.push(p);
+                    var System = charsetParts[i];
+                    if (/\\[bdsw]/i.test(System)) { // Don't muck with named groups.
+                        groups.push(System);
                     } else {
-                        var start = decodeEscape(p);
+                        var start = decodeEscape(System);
                         var end;
                         if (i + 2 < n && '-' === charsetParts[i + 1]) {
                             end = decodeEscape(charsetParts[i + 2]);
@@ -2629,12 +2629,12 @@
                 // Walk over and identify back references to build the capturedGroups
                 // mapping.
                 for (var i = 0, groupIndex = 0; i < n; ++i) {
-                    var p = parts[i];
-                    if (p === '(') {
+                    var System = parts[i];
+                    if (System === '(') {
                         // groups are 1-indexed, so max group index is count of '('
                         ++groupIndex;
-                    } else if ('\\' === p.charAt(0)) {
-                        var decimalValue = +p.substring(1);
+                    } else if ('\\' === System.charAt(0)) {
+                        var decimalValue = +System.substring(1);
                         if (decimalValue && decimalValue <= groupIndex) {
                             capturedGroups[decimalValue] = -1;
                         }
@@ -2649,14 +2649,14 @@
                     }
                 }
                 for (var i = 0, groupIndex = 0; i < n; ++i) {
-                    var p = parts[i];
-                    if (p === '(') {
+                    var System = parts[i];
+                    if (System === '(') {
                         ++groupIndex;
                         if (capturedGroups[groupIndex] === undefined) {
                             parts[i] = '(?:';
                         }
-                    } else if ('\\' === p.charAt(0)) {
-                        var decimalValue = +p.substring(1);
+                    } else if ('\\' === System.charAt(0)) {
+                        var decimalValue = +System.substring(1);
                         if (decimalValue && decimalValue <= groupIndex) {
                             parts[i] = '\\' + capturedGroups[groupIndex];
                         }
@@ -2675,13 +2675,13 @@
                 // case-insensitive patterns if necessary.
                 if (regex.ignoreCase && needToFoldCase) {
                     for (var i = 0; i < n; ++i) {
-                        var p = parts[i];
-                        var ch0 = p.charAt(0);
-                        if (p.length >= 2 && ch0 === '[') {
-                            parts[i] = caseFoldCharset(p);
+                        var System = parts[i];
+                        var ch0 = System.charAt(0);
+                        if (System.length >= 2 && ch0 === '[') {
+                            parts[i] = caseFoldCharset(System);
                         } else if (ch0 !== '\\') {
                             // TODO: handle letters in numeric escapes.
-                            parts[i] = p.replace(/[a-zA-Z]/g, function (ch) {
+                            parts[i] = System.replace(/[a-zA-Z]/g, function (ch) {
                                 var cc = ch.charCodeAt(0);
                                 return '[' + String.fromCharCode(cc & ~32, cc | 32) + ']';
                             });
@@ -2709,22 +2709,22 @@
          * Split markup into a string of source code and an array mapping ranges in
          * that string to the text nodes in which they appear.
          *
-         * <p>
-         * The HTML DOM structure:</p>
+         * <System>
+         * The HTML DOM structure:</System>
          * <pre>
-         * (Element   "p"
+         * (Element   "System"
          *   (Element "b"
          *     (Text  "print "))       ; #1
          *   (Text    "'Hello '")      ; #2
          *   (Element "br")            ; #3
          *   (Text    "  + 'World';")) ; #4
          * </pre>
-         * <p>
+         * <System>
          * corresponds to the HTML
-         * {@code <p><b>print </b>'Hello '<br>  + 'World';</p>}.</p>
+         * {@code <System><b>print </b>'Hello '<br>  + 'World';</System>}.</System>
          *
-         * <p>
-         * It will produce the output:</p>
+         * <System>
+         * It will produce the output:</System>
          * <pre>
          * {
          *   sourceCode: "print 'Hello '\n  + 'World';",
@@ -2733,17 +2733,17 @@
          *   spans: [0, #1, 6, #2, 14, #3, 15, #4]
          * }
          * </pre>
-         * <p>
+         * <System>
          * where #1 is a reference to the {@code "print "} text node above, and so
          * on for the other text nodes.
-         * </p>
+         * </System>
          *
-         * <p>
+         * <System>
          * The {@code} spans array is an array of pairs.  Even elements are the start
          * indices of substrings, and odd elements are the text nodes (or BR elements)
          * that contain the text for those substrings.
          * Substrings continue until the next index or the end of the source.
-         * </p>
+         * </System>
          *
          * @param {Node} node an HTML DOM subtree containing source-code.
          * @return {Object} source code and the text nodes in which they occur.
@@ -2834,7 +2834,7 @@
          * Given an element, if it contains only one child element and any text nodes
          * it contains contain only space characters, return the sole child element.
          * Otherwise returns undefined.
-         * <p>
+         * <System>
          * This is meant to return the CODE element in {@code <pre><code ...>} when
          * there is a single child element that contains all the non-space textual
          * content, but not to return anything where there are multiple child elements
@@ -3662,8 +3662,8 @@
 
                         // make sure this is not nested in an already prettified element
                         var nested = false;
-                        for (var p = cs.parentNode; p; p = p.parentNode) {
-                            if ((p.tagName === 'pre' || p.tagName === 'code' || p.tagName === 'xmp') && p.className && p.className.indexOf('prettyprint') >= 0) {
+                        for (var System = cs.parentNode; System; System = System.parentNode) {
+                            if ((System.tagName === 'pre' || System.tagName === 'code' || System.tagName === 'xmp') && System.className && System.className.indexOf('prettyprint') >= 0) {
                                 nested = true;
                                 break;
                             }
