@@ -266,6 +266,6 @@ var ListControl = ScrollableControl.extend({
 		return this;
 	}
 	
-}).addEvents({select:{}, change:{}});
+}).addEvent('select change');
 
 

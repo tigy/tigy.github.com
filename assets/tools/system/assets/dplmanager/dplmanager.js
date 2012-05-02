@@ -1,33 +1,31 @@
 
 
-var System = {
-	
-	getJSONP: function (path, data, onSuccess) {
-		Ajax.getJSONP(Dpl.configs.host + ':' + Dpl.configs.port + '/' + path, data, onSuccess, 1000, function(){
-			var r = 'assets/bin/startserver.bat';
-			if(navigator.platform.indexOf("Win") === -1) {
-				r = 'assets/bin-linux/startserver.sh';
-			}
-			alert("无法连接到代理服务器 " + Dpl.configs.host + ':' + Dpl.configs.port + '\r\n请先执行 ' + r + '\r\n更多信息见 文档/DPL管理系统/使用说明');
-		});
-	},
+var System = System || {};
 
-	submit: function (path, data) {
-		var form = Dom.create('form');
-		form.setAttr('action', Dpl.configs.host + ':' + Dpl.configs.port + '/' + path);
-		form.setAttr('method', 'post');
-		form.setHtml('<textarea name="data"></textarea>');
-		form.find('textarea').setText(JSON.encode(data));
-		form.hide().appendTo();
-		form.submit();
-	},
-	
-	/**
-	 * 在网页里显示的跟地址。
-	 */
-	rootUrl: '../../../'
-	
+System.getJSONP = function (path, data, onSuccess) {
+	Ajax.getJSONP(Dpl.configs.host + ':' + Dpl.configs.port + '/' + path, data, onSuccess, 1000, function(){
+		var r = 'assets/bin/startserver.bat';
+		if(navigator.platform.indexOf("Win") === -1) {
+			r = 'assets/bin-linux/startserver.sh';
+		}
+		alert("无法连接到代理服务器 " + Dpl.configs.host + ':' + Dpl.configs.port + '\r\n请先执行 ' + r + '\r\n更多信息见 文档/DPL管理系统/使用说明');
+	});
 };
+
+System.submit = function (path, data) {
+	var form = Dom.create('form');
+	form.setAttr('action', Dpl.configs.host + ':' + Dpl.configs.port + '/' + path);
+	form.setAttr('method', 'post');
+	form.setHtml('<textarea name="data"></textarea>');
+	form.find('textarea').setText(JSON.encode(data));
+	form.hide().appendTo();
+	form.submit();
+};
+	
+/**
+ * 在网页里显示的跟地址。
+ */
+System.rootUrl = '../../../';
 
 var DplManager = {
 

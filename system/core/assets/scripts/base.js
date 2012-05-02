@@ -1520,30 +1520,7 @@
 
 })(this);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/// #if !Debug
+/// #if !Publish
 
 /**
  * Debug Tools
@@ -2167,7 +2144,7 @@ function imports(ns){
          */
         log: function(message) {
            if (trace.enable && window.console && console.log) {
-           	console.log(message);
+			   window.console.log(message);
            }
         },
         
@@ -2178,7 +2155,7 @@ function imports(ns){
         error: function(msg) {
             if (trace.enable) {
                 if (window.console && console.error)
-                    console.error(msg); // 如果错误在此行产生，说明这是预知错误。
+                    window.console.error(msg); // 如果错误在此行产生，说明这是预知错误。
                 else
                     throw msg; // 如果错误在此行产生，说明这是预知错误。
             }
@@ -2191,9 +2168,9 @@ function imports(ns){
         warn: function(msg) {
             if (trace.enable) {
                 if (window.console && console.warn)
-                    console.warn(msg);
+                    window.console.warn(msg);
                 else
-                    trace("[警告]" + msg);
+                    window.trace("[警告]" + msg);
             }
         },
 
@@ -2204,9 +2181,9 @@ function imports(ns){
         info: function(msg) {
             if (trace.enable) {
                 if (window.console && console.info)
-                    console.info(msg);
+                    window.console.info(msg);
                 else
-                    trace.write("[信息]" + msg);
+                    window.trace.write("[信息]" + msg);
             }
         },
 
@@ -2217,12 +2194,12 @@ function imports(ns){
         dir: function(obj) {
             if (trace.enable) {
                 if (window.console && console.dir)
-                    console.dir(obj);
+                    window.console.dir(obj);
                 else if (obj) {
                     var r = "", i;
                     for (i in obj)
                         r += i + " = " + trace.inspect(obj[i], 1) + "\r\n";
-                    trace(r);
+                    window.trace(r);
                 }
             }
         },
@@ -2232,7 +2209,7 @@ function imports(ns){
          */
         clear: function() {
             if (window.console && console.clear)
-                console.clear();
+                window.console.clear();
         },
 
         /**
@@ -2262,7 +2239,7 @@ function imports(ns){
             while (times-- > 0)
                 fn();
             times = Date.now() - d;
-            trace("[时间] " + times);
+            window.trace("[时间] " + times);
         }
 
     });
@@ -2416,7 +2393,7 @@ function imports(ns){
     assertInternal.debugStepThrough = assert.debugStepThrough = true;
 
     for ( var fn in assert) {
-        assert[fn].debugStepThrough = true;
+        window.assert[fn].debugStepThrough = true;
     }
 
     /// #endregion

@@ -1242,16 +1242,16 @@
 		 *            因此经常需要将一个函数转换为对节点的调用。
 		 * @static
 		 */
-		define: function(Dom, target, setters, getters) {
-			assert(Dom && Dom.prototype, "Dom.define(Dom, target, setters, getters): {Dom} 必须是一个类", Dom);
+		define: function(ctrl, target, setters, getters) {
+			assert(ctrl && ctrl.prototype, "Dom.define(ctrl, target, setters, getters): {ctrl} 必须是一个类", ctrl);
 			
 			if(typeof getters === 'string'){
-				Dom.define(Dom, target, getters, true);
+				Dom.define(ctrl, target, getters, true);
 				getters = 0;
 			}
 			
 			map(setters, function(func) {
-				Dom.prototype[func] = getters ? function(args1, args2) {
+				ctrl.prototype[func] = getters ? function(args1, args2) {
 					return this[target][func](args1, args2);
 				} : function(args1, args2) {
 					this[target][func](args1, args2);
