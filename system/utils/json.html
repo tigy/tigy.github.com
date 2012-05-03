@@ -12,8 +12,12 @@
             
             
             var testcases = {
-            	'JSON.encode': '[{}] => "[{}]"',
-            	'JSON.decode': '"[{}]" => [{}]'
+            	'JSON.encode': {
+            		'~([{}])': "[{}]"
+            	},
+            	'JSON.decode': {
+            		'~("[{}]")': [{}]
+            	}
             };
             
             Demo.writeTestCases(testcases);

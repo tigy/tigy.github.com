@@ -12,8 +12,12 @@
         <script>
 			
 			var testcases = {
-				'JSON.stringify': '{} => "{}"',
-				'JSON.parse': '"[{\\\"a\\\":true}]" => [{a:true}]'
+				'JSON.stringify': {
+					'~({})': "{}"'
+				},
+				'JSON.parse': {
+					'~("[{\\\"a\\\":true}]")': [{a:true}]
+				}
 			};
 			
 			Demo.writeTestCases(testcases);
