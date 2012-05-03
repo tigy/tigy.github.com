@@ -10,7 +10,7 @@
 		return textBox.tagName == "TEXTAREA" ? textBox.createTextRange() : document.selection.createRange();
 	}
 	
-	Control.implement({
+	Dom.implement({
 		
 		/**
 		 * 选中一个文本框从 start 到 end 的内容。

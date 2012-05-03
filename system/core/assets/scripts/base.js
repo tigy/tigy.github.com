@@ -2159,9 +2159,9 @@ function imports(ns){
         error: function(msg) {
             if (trace.enable) {
                 if (window.console && console.error)
-                    window.console.error(msg); // 如果错误在此行产生，说明这是预知错误。
+                    window.console.error(msg); // 这是一个预知的错误，请根据函数调用堆栈查找错误原因。
                 else
-                    throw msg; // 如果错误在此行产生，说明这是预知错误。
+                    throw msg; // 这是一个预知的错误，请根据函数调用堆栈查找错误原因。
             }
         },
 
