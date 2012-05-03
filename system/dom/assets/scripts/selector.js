@@ -573,12 +573,12 @@ document.queryDom = (function(){
 	 * Css 选择器。
 	 * @param {String} selector Css3查询选择器。
 	 * @param {Boolean} quick 是否快速查找。
-	 * @return {JPlus.ElementList} 元素集合。
+	 * @return {System.ElementList} 元素集合。
 	 * @memberOf Element
 	 * @alias window.$$
 	 */
 	function query(selector, quick){
-		return new JPlus.ElementList(document.queryDom(selector, this, false, quick));
+		return new System.ElementList(document.queryDom(selector, this, false, quick));
 	}
 	
 	/**
@@ -616,7 +616,7 @@ document.queryDom = (function(){
 	}, 3);
 	
 	this.$$ = function $$(selector, quick){
-		return new JPlus.ElementList(document.queryDom(selector, document, false, quick));
+		return new System.ElementList(document.queryDom(selector, document, false, quick));
 	};
 	
 })();

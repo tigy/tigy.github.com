@@ -5,7 +5,7 @@
 
 using("System.Request.Ajax");
 
-JPlus.namespace("Ajax").JSON = Ajax.extend({
+System.namespace("Ajax").JSON = Ajax.extend({
 	
 	/**
 	 * 获取请求头。

@@ -44,12 +44,12 @@ var BuildFile = function(name, options) {
 			case 'excludeCss':
 				options.excludeCss.forEach(function(value){
 					this.exclude[value] = true;
-				});
+				}, this);
 				break;
 			case 'excludeJs':
 				options.excludeJs.forEach(function(value){
 					this.exclude[value] = false;
-				});
+				}, this);
 				break;
 			default:
 				this[item] = options[item];	
@@ -59,16 +59,17 @@ var BuildFile = function(name, options) {
 	}
 	
 	if(this.top){
-		var pp =   this.top.reverse();
-		this.js = this.js.concat(pp);
-		this.css = this.css.concat(pp);
+		this.js = this.top.concat(this.js);
+		this.css = this.top.concat(this.css);
 	}
 	
 	if(this.bottom){
-		this.js = this.bottom.concat(this.js);
-		this.css = this.bottom.concat(this.css);
+		this.js = this.js.concat(this.bottom);
+		this.css = this.css.concat(this.bottom);
 	}
 	
+	this.js = this.js.reverse();
+	this.css = this.css.reverse();
 	
 	this.compile();
 

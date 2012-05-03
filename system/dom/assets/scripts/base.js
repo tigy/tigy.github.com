@@ -48,7 +48,7 @@
 		map = o.map,
 
 		/**
-		 * JPlus 简写。
+		 * System 简写。
 		 * @type Object
 		 */
 		System = window.System,
@@ -1263,7 +1263,7 @@
 
 		/**
 		 * 表示事件的参数。
-		 * @class JPlus.Event
+		 * @class System.Event
 		 */
 		Event: Class({
 
@@ -2504,6 +2504,8 @@
 
 		return Dom.prototype[name];
 	}, {}));
+	
+	t.once = Dom.prototype.once;
 	Dom.Document.implement(t);
 
 	t = DomList.prototype;

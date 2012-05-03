@@ -373,7 +373,7 @@ Ext.extend(Ext.data.SimpleStore, Ext.data.Store);
 // //
 // //       DataSet::add()    锟斤拷锟斤拷一锟斤拷锟斤拷,锟斤拷锟斤拷:锟斤拷锟斤拷锟?锟斤拷锟斤拷锟斤拷示锟斤拷锟斤拷锟斤拷,锟斤拷锟?锟斤拷,前锟斤拷锟斤拷锟斤拷为锟斤拷锟斤拷锟?锟斤拷锟斤拷潜锟斤拷狻?// //       DataSet::del()    删锟斤拷一锟斤拷锟斤拷,锟斤拷锟斤拷:锟斤拷锟斤拷锟斤拷帧锟?// //       DataSet::table    全锟斤拷锟斤拷锟侥硷拷锟斤拷
 // //                              锟斤拷锟斤拷锟斤拷锟揭伙拷锟斤拷锟斤拷锟?要使锟斤拷table锟斤拷锟较伙拷酶帽锟斤拷     DataSet.table[锟斤拷锟斤拷]  锟斤拷 DataSet.table[锟斤拷]
-// //       DataSet::count    锟斤拷锟斤拷锟?// //       DataSet::xType    JPlus锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷说锟斤拷
+// //       DataSet::count    锟斤拷锟斤拷锟?// //       DataSet::xType    System锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷说锟斤拷
 // //       DataTable::addTitle    锟斤拷锟接憋拷锟侥憋拷锟斤拷,锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟?锟津逗号革拷锟斤拷锟斤拷锟街凤拷
 // //       DataTable::addTitleAt    锟斤拷锟接憋拷锟侥憋拷锟解到一锟斤拷位锟斤拷,锟斤拷一锟斤拷锟斤拷锟斤拷为位锟斤拷(锟斤拷锟斤拷),锟节讹拷锟斤拷为锟斤拷锟斤拷
 // //       DataTable::render    锟斤拷染锟斤拷一锟斤拷DIV元锟斤拷

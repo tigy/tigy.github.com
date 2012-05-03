@@ -2,7 +2,7 @@
 //  表示地址   uri.js    A
 //===========================================
 
-namespace(".Uri", JPlus.Class({
+namespace(".Uri", System.Class({
 	
 	originalString: null,
 	

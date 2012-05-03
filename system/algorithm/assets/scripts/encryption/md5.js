@@ -8,7 +8,7 @@
  * @param {String} s 字符串。
  * @return {String} md5 字符串。 
  */
-JPlus.namespace("Encryption", (function(){
+System.namespace("Encryption", (function(){
 	
 	var hexcase = false;
 	var charSize = 8;

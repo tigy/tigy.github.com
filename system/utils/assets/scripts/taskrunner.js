@@ -2,10 +2,10 @@
 //  模拟多线程的任务   taskrunner.js  A
 //===========================================
 
-using("JPlus.Fx.Base");
+using("System.Fx.Base");
 
 
-namespace(".TaskRunner", JPlus.Fx.Base.extend({
+namespace(".TaskRunner", System.Fx.Base.extend({
 	
 	tasks: null,
 	

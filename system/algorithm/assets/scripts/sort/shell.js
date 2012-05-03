@@ -12,7 +12,7 @@ using("System.Algorithm.Sort.Sort");
  * @param {Number} start 开始排序的位置。
  * @param {Number} end 结束排序的位置。
  * @param {Function} fn 比较函数。
- * @memberOf JPlus.Sorter
+ * @memberOf System.Sorter
  */
 Sorter.shell = function(iterater){
 

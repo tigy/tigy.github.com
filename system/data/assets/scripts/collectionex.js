@@ -2,7 +2,7 @@
 //  集合的扩展   collection.js         A
 //===========================================
 
-JPlus.CollectionBase.implement({
+System.CollectionBase.implement({
 	
 	/**
 	 * 返回当前集合的副本。

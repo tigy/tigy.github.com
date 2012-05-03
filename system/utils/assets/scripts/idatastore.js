@@ -5,7 +5,7 @@
 
 /**
  * 使类具有存储的方法。
- * @interface JPlus.IDataStore
+ * @interface System.IDataStore
  */
 var IDataStore = {
 	
@@ -16,7 +16,7 @@ var IDataStore = {
 	 * @return {Object} 值。
 	 */
 	data: function(type){
-		return JPlus.data(this, type);
+		return System.data(this, type);
 	},
 	
 	/**
@@ -26,7 +26,7 @@ var IDataStore = {
 	 * @return {Object} 值。
 	 */
 	getData: function(type){
-		return JPlus.getData(this, type);
+		return System.getData(this, type);
 	},
 	
 	/**
@@ -37,7 +37,7 @@ var IDataStore = {
 	 * @param {mixed} data 内容。
 	 */
 	setData: function(type, data){
-		return JPlus.setData(this, type, data);
+		return System.setData(this, type, data);
 	},
 	
 	/**
@@ -45,7 +45,7 @@ var IDataStore = {
 	 * @param {String} [type] 类型。
 	 */
 	removeData: function(type) {
-		JPlus.removeData(this, type);
+		System.removeData(this, type);
 		return this;
 	}
 };

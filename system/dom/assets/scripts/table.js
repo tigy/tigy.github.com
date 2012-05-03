@@ -7,7 +7,7 @@ using("System.Controls.Control");
  * IFrame
  * @class IFrame
  */
-namespace(".HtmlTable", JPlus.Control.extend({
+namespace(".HtmlTable", System.Control.extend({
 	
 	
 	build: function(){

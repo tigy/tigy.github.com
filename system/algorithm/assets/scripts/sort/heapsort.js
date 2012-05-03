@@ -13,7 +13,7 @@ namespace("Sorter", {
 	 * @param {Number} start 开始排序的位置。
 	 * @param {Number} end 结束排序的位置。
 	 * @param {Function} fn 比较函数。
-	 * @memberOf JPlus.Sorter
+	 * @memberOf System.Sorter
 	 */
 	heapSort: (function() {
 	
@@ -46,7 +46,7 @@ namespace("Sorter", {
 		}
 		
 		return function() {
-			qsort.apply(null, JPlus.Sorter._setup(arguments));
+			qsort.apply(null, System.Sorter._setup(arguments));
 			
 			return arguments[0];
 		};

@@ -6646,7 +6646,7 @@ var Menu = ListControl.extend({
 	
 	onShow: function(){
 		this.floating = true;
-		document.one('mouseup', this.hideMenu, this);
+		document.once('mouseup', this.hideMenu, this);
 		this.trigger('show');
 	},
 	
@@ -6668,7 +6668,7 @@ var Menu = ListControl.extend({
 		
 		// 如果不是右键的菜单，在打开子菜单后监听点击，并关闭此子菜单。
 		if(!this.floating)
-			document.one('mouseup', this.hideSub, this);
+			document.once('mouseup', this.hideSub, this);
 		
 		// 隐藏当前项子菜单。
 		this.hideSub();

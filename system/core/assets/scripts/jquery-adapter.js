@@ -69,28 +69,28 @@
 		},
 	
 		/**
-		 * JPlus 全局静态对象。包含系统有关的函数。
-		 * @namespace JPlus
+		 * System 全局静态对象。包含系统有关的函数。
+		 * @namespace System
 		 */
-		p = namespace("JPlus", {
+		p = namespace("System", {
 	
 		    /**
 			 * 获取用于在一个对象读写数据的对象。
 			 * @param {Object} obj 任何对象。
 			 * @param {String} dataType 数据类型名。
 			 * @return {Object} 用于读写数据的对象。
-			 * @remark {JPlus.data} 总是返回一个对象，该对象和指定的 obj 关联。对于同一个 obj，如果 dataType 相同，则返回相同的数据对象。
-			 * @see JPlus.getData
-			 * @see JPlus.setData
+			 * @remark {System.data} 总是返回一个对象，该对象和指定的 obj 关联。对于同一个 obj，如果 dataType 相同，则返回相同的数据对象。
+			 * @see System.getData
+			 * @see System.setData
 			 * @example <code>
 		     * var obj = {};
-			 * var data =  JPlus.data(obj, 'a'); // 创建并返回数据对象 'a'
+			 * var data =  System.data(obj, 'a'); // 创建并返回数据对象 'a'
              * data.c = 2; // 读写数据对象的值。
              * </code>
 			 */
 		    data: function(obj, dataType) {
 	
-			    assert.isObject(obj, "JPlus.data(obj, dataType): {obj} ~");
+			    assert.isObject(obj, "System.data(obj, dataType): {obj} ~");
 
                 // 内部支持 dom 属性。
                 if(obj.dom)
@@ -109,17 +109,17 @@
 			 * @param {Object} obj 任何对象。
 			 * @param {String} dataType 数据类型名。
 			 * @return {Object} 返回对应的值。如果数据不存在，则返回 undefined。
-			 * @see JPlus.data
-			 * @see JPlus.setData
+			 * @see System.data
+			 * @see System.setData
 			 * @example <code>
 		     * var obj = {};
-			 * var a = JPlus.getData(obj, 'a'); // 获取 a 字段的数据。 
+			 * var a = System.getData(obj, 'a'); // 获取 a 字段的数据。 
 		     * trace( a )
 		     * </code>
 			 */
 		    getData: function(obj, dataType) {
 	
-			    assert.isObject(obj, "JPlus.getData(obj, dataType): {obj} ~");
+			    assert.isObject(obj, "System.getData(obj, dataType): {obj} ~");
 
                 // 内部支持 dom 属性。
                 if(obj.dom)
@@ -136,17 +136,17 @@
 			 * @param {String} dataType 数据类型名。
 			 * @param {Object} data 要设置的数据内容。
 			 * @return {Object} data 返回 data 本身。
-			 * @see JPlus.data
-			 * @see JPlus.getData
+			 * @see System.data
+			 * @see System.getData
 			 * @example <code>
 		     * var obj = {};
-		     * JPlus.setData(obj, 'a', 5);    // 设置 a 字段的数据值为 5。 
-			 * var val = JPlus.getData(obj, 'a'); // 获取值， 返回 5
+		     * System.setData(obj, 'a', 5);    // 设置 a 字段的数据值为 5。 
+			 * var val = System.getData(obj, 'a'); // 获取值， 返回 5
 		     * </code>
 			 */
 		    setData: function(obj, dataType, data) {
 	
-			    assert.isObject(obj, "JPlus.setData(obj, dataType): {obj} ~");
+			    assert.isObject(obj, "System.setData(obj, dataType): {obj} ~");
 
                 // 内部支持 dom 属性。
                 if(obj.dom)
@@ -161,7 +161,7 @@
 			 * @param {Object} obj 任何对象。
 			 * @example <code>
 		     * var obj = {};
-		     * JPlus.removeData(obj);
+		     * System.removeData(obj);
 		     * </code>
 			 */
 			removeData: function(obj){
@@ -174,7 +174,7 @@
 			 * 创建一个类。
 			 * @param {Object/Function} [methods] 类成员列表对象或类构造函数。
 			 * @return {Class} 返回创建的类。
-			 * @see JPlus.Object.extend
+			 * @see System.Object.extend
 			 * @example 以下代码演示了如何创建一个类:
 			 * <code>
 		     * var MyCls = Class({
@@ -202,7 +202,7 @@
 	
 		    /**
 			 * 所有类的基类。
-			 * @class JPlus.Object
+			 * @class System.Object
 			 */
 		    Object:  Base,
 	
@@ -249,18 +249,18 @@
 			 *            使用名字空间有助于帮助不同组件之间的对象命名冲突。
 			 *            </p>
 			 *			  <p>
-			 * 如果使用 JPlus.namespace(namespace) 重载，则函数会创建对应的对象，但如果要创建的对象已存在，则函数不进行任何操作。
+			 * 如果使用 System.namespace(namespace) 重载，则函数会创建对应的对象，但如果要创建的对象已存在，则函数不进行任何操作。
 			 *            名字空间用来快速表示资源。 {@link using} 可以根据制定的名字空间载入相应的内容。
 			 *            </p>
 			 *            <p>
-			 * 如果使用 JPlus.namespace(namespace, obj) 重载，则函数将对应的对象值更改为 obj，如果要创建的对象已存在，则拷贝已有对象的属性到新对象。 如<code>
-		     * JPlus.namespace("A.B.C", 5); // 最后 A = {B: {C: 5}}  
+			 * 如果使用 System.namespace(namespace, obj) 重载，则函数将对应的对象值更改为 obj，如果要创建的对象已存在，则拷贝已有对象的属性到新对象。 如<code>
+		     * System.namespace("A.B.C", 5); // 最后 A = {B: {C: 5}}  
 		     * </code>
 			 * @example <code>
-		     * JPlus.namespace("A.B");  // 创建 A 和 A.B 对象，避免修改已存在的对象。
+		     * System.namespace("A.B");  // 创建 A 和 A.B 对象，避免修改已存在的对象。
 		     * 
 		     * var A = {   B:  {b: 5},  C: {b: 5}    };
-		     * JPlus.namespace("A.B", {a: 6})  // A = { B: {a: 6}, C: {b: 5}  }
+		     * System.namespace("A.B", {a: 6})  // A = { B: {a: 6}, C: {b: 5}  }
 		     * </code>
 			 */
 		    namespace: namespace,
@@ -268,8 +268,8 @@
             /**
              * id种子 。
              * @type Number
-			 * @example 下例演示了 JPlus.id 的用处。<code>
-			 *		var uid = JPlus.id++;  // 每次使用之后执行 ++， 保证页面内的 id 是唯一的。
+			 * @example 下例演示了 System.id 的用处。<code>
+			 *		var uid = System.id++;  // 每次使用之后执行 ++， 保证页面内的 id 是唯一的。
 			 * </code>
              */
             id: 1,
@@ -290,7 +290,7 @@
 	/// #region Functions
 
 	/**
-	 * @namespace JPlus.Object
+	 * @namespace System.Object
 	 */
 	apply(Base, {
 
@@ -463,10 +463,10 @@
 		 *         这个函数实现的是 单继承。如果子类有定义构造函数，则仅调用子类的构造函数，否则调用父类的构造函数。
 		 *         </p>
 		 *         <p>
-		 *         要想在子类的构造函数调用父类的构造函数，可以使用 {@link JPlus.Object.prototype.base} 。
+		 *         要想在子类的构造函数调用父类的构造函数，可以使用 {@link System.Object.prototype.base} 。
 		 *         </p>
 		 *         <p>
-		 *         这个函数返回的类实际是一个函数，但它被使用 JPlus.Object 修饰过。
+		 *         这个函数返回的类实际是一个函数，但它被使用 System.Object 修饰过。
 		 *         </p>
 		 *         <p>
 		 *         由于原型链的关系， 肯能存在共享的引用。 如: 类 A ， A.prototype.c = []; 那么，A的实例 b ,
@@ -1068,7 +1068,7 @@
 	RegExp.prototype.xType = "regexp";
 	
 	/**
-	 * @class JPlus.Object
+	 * @class System.Object
 	 */
     Base.implement({
     	
@@ -1149,7 +1149,7 @@
 		 */
         on: function(type, listener, bind) {
 
-	        assert.isFunction(listener, 'JPlus.Object.prototype.on(type, listener, bind): {listener} ~');
+	        assert.isFunction(listener, 'System.Object.prototype.on(type, listener, bind): {listener} ~');
 
 	        // 获取本对象 本对象的数据内容 本事件值
 	        var me = this, d = p.data(me, 'event'), evt = d[type];
@@ -1209,7 +1209,7 @@
 		 */
         un: function(type, listener) {
 
-	        assert(!listener || Function.isFunction(listener), 'JPlus.Object.prototype.un(type, listener): {listener} 必须是函数或空参数。', listener);
+	        assert(!listener || Function.isFunction(listener), 'System.Object.prototype.un(type, listener): {listener} 必须是函数或空参数。', listener);
 
 	        // 获取本对象 本对象的数据内容 本事件值
 	        var me = this, d = p.getData(me, 'event'), evt, handlers, i;
@@ -1286,7 +1286,7 @@
 		 */
         one: function(type, listener, bind) {
 
-	        assert.isFunction(listener, 'JPlus.Object.prototype.one(type, listener): {listener} ~');
+	        assert.isFunction(listener, 'System.Object.prototype.one(type, listener): {listener} ~');
 			
 			var me = this;
 
@@ -1713,7 +1713,7 @@
 	 */
 	function namespace(ns, obj) {
 
-		assert(ns && ns.split, "JPlus.namespace(namespace, obj, value): {namespace} 不是合法的名字空间。", ns);
+		assert(ns && ns.split, "System.namespace(namespace, obj, value): {namespace} 不是合法的名字空间。", ns);
 
 		// 取值，创建。
 		ns = ns.split('.');
@@ -1751,7 +1751,7 @@ function using(ns, isStyle) {
 
     assert.isString(ns, "using(ns): {ns} 不是合法的名字空间。");
     
-    var p = JPlus;
+    var p = System;
 
     // 已经载入。
     if (p[isStyle ? 'styles' : 'scripts'].include(ns))
@@ -1799,7 +1799,7 @@ function imports(ns){
  * @param {Object} ... 要输出的变量。
  */
 function trace() {
-    if (JPlus.debug) {
+    if (System.debug) {
     	
     	var hasLog = window.console && console.log;
 
@@ -1843,7 +1843,7 @@ function assert(bValue, msg) {
         // 错误源
         val = arguments.callee.caller;
 
-        if (JPlus.stackTrace) {
+        if (System.stackTrace) {
 
             while (val.debugStepThrough)
                 val = val.caller;
@@ -1878,7 +1878,7 @@ function assert(bValue, msg) {
          * 同步载入代码。
          * @param {String} uri 地址。
          * @example <code>
-         * JPlus.loadScript('./v.js');
+         * System.loadScript('./v.js');
          * </code>
          */
         loadScript: function(url) {
@@ -1889,7 +1889,7 @@ function assert(bValue, msg) {
          * 异步载入样式。
          * @param {String} uri 地址。
          * @example <code>
-         * JPlus.loadStyle('./v.css');
+         * System.loadStyle('./v.css');
          * </code>
          */
         loadStyle: function(url) {
@@ -1908,15 +1908,15 @@ function assert(bValue, msg) {
          * @param {Function} [callback] 对返回值的处理函数。
          * @return {String} 载入的值。 因为同步，所以无法跨站。
          * @example <code>
-         * trace(  JPlus.loadText('./v.html')  );
+         * trace(  System.loadText('./v.html')  );
          * </code>
          */
         loadText: function(url, callback) {
 
-            assert.notNull(url, "JPlus.loadText(url, callback): {url} ~");
+            assert.notNull(url, "System.loadText(url, callback): {url} ~");
 
             // assert(window.location.protocol != "file:",
-            // "JPlus.loadText(uri, callback): 当前正使用 file 协议，请使用 http
+            // "System.loadText(uri, callback): 当前正使用 file 协议，请使用 http
             // 协议。 \r\n请求地址: {0}", uri);
 
             // 新建请求。
@@ -1956,7 +1956,7 @@ function assert(bValue, msg) {
         },
 
         /**
-         * JPlus 安装的根目录, 可以为相对目录。
+         * System 安装的根目录, 可以为相对目录。
          * @config {String}
          */
         rootPath: (function(){
@@ -2134,7 +2134,7 @@ function assert(bValue, msg) {
                     getBaseClassDescription: function(obj) {
                         if (obj && obj.base && obj.base !== p.Object) {
                             var extObj = this.getTypeName(obj.base, window, "", 3);
-                            return " 类" + (extObj && extObj != "JPlus.Object" ? "(继承于 " + extObj + " 类)" : "");
+                            return " 类" + (extObj && extObj != "System.Object" ? "(继承于 " + extObj + " 类)" : "");
                         }
 
                         return " 类";
@@ -2772,7 +2772,7 @@ function assert(bValue, msg) {
     /// #endregion
 
 
-})(JPlus, Object.extend);
+})(System, Object.extend);
 
 
 /// #if !Publish
@@ -2781,17 +2781,17 @@ function assert(bValue, msg) {
  * 是否打开调试。启用调试后，将支持assert检查。
  * @config {Boolean}
  */
-JPlus.debug = true;
+System.debug = true;
 
 /**
  * 是否在 assert 失败时显示函数调用堆栈。
  * @config {Boolean} stackTrace
  */
-JPlus.stackTrace = true;
+System.stackTrace = true;
 
-JPlus.rootPath = JPlus.rootPath.substr(0, JPlus.rootPath.length - "system/core/assets/scripts/".length);
+System.rootPath = System.rootPath.substr(0, System.rootPath.length - "system/core/assets/scripts/".length);
 
-JPlus.resolveNamespace = function(ns, isStyle){
+System.resolveNamespace = function(ns, isStyle){
 	return ns.replace(/^([^.]+\.[^.]+)\./, isStyle ? '$1.assets.styles.' : '$1.assets.scripts.').replace(/\./g, '/') + (isStyle ? '.css' : '.js');
 };
 
@@ -2814,7 +2814,7 @@ JPlus.resolveNamespace = function(ns, isStyle){
 // Offset - 定位部分
 
 
-JPlus.scripts.push('System.Dom.Base');
+System.scripts.push('System.Dom.Base');
 	
 (function($) {
 	
@@ -2833,10 +2833,10 @@ JPlus.scripts.push('System.Dom.Base');
 		o = Object,
 	
 		/**
-		 * JPlus 简写。
+		 * System 简写。
 		 * @type Object
 		 */
-		p = JPlus,
+		p = System,
 	
 		/**
 		 * Object.extend 简写。
@@ -3644,7 +3644,7 @@ JPlus.scripts.push('System.Dom.Base');
 
 		/**
 		 * 表示事件的参数。
-		 * @class JPlus.Event
+		 * @class System.Event
 		 */
 		Event: Class({
 
@@ -3815,20 +3815,20 @@ JPlus.scripts.push('System.Dom.Base');
 		 *           <li> 多个事件使用一个事件信息。
 		 *           <p>
 		 *           所有的 DOM 事件的 add 等 是一样的，因此这个函数提供一键定义:
-		 *           JPlus.defineEvents('e1 e2 e3')
+		 *           System.defineEvents('e1 e2 e3')
 		 *           </p>
 		 *           </li>
 		 *           <li> 事件别名。
 		 *           <p>
 		 *           一个自定义 DOM 事件是另外一个事件的别名。 这个函数提供一键定义依赖:
-		 *           JPlus.defineEvents('mousewheel', 'DOMMouseScroll')
+		 *           System.defineEvents('mousewheel', 'DOMMouseScroll')
 		 *           </p>
 		 *           </li>
 		 *           <li> 事件委托。
 		 *           <p>
 		 *           一个自定义 DOM 事件经常依赖已有的事件。一个事件由另外一个事件触发， 比如 ctrlenter
 		 *           是在 keyup 基础上加工的。 这个函数提供一键定义依赖:
-		 *           JPlus.defineEvents('ctrlenter', 'keyup', function
+		 *           System.defineEvents('ctrlenter', 'keyup', function
 		 *           (e) { (判断事件) })
 		 *           </p>
 		 *           </li>
@@ -4803,7 +4803,7 @@ JPlus.scripts.push('System.Dom.Base');
 	
 	textField['#text'] = textField['#comment'] = 'nodeValue';
 	
-	p.namespace("JPlus.Events.control");
+	p.namespace("System.Events.control");
 
 	/**
 	 * @type Function

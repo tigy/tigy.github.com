@@ -8,7 +8,7 @@
 /**
  * 提供排序算法。
  */
-JPlus.namespace("Sorter", {
+System.namespace("Sorter", {
 	
 	/**
 	 * 默认比较的函数。

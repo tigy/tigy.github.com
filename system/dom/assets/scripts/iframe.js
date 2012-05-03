@@ -7,7 +7,7 @@ using("System.Controls.Control");
  * IFrame
  * @class IFrame
  */
-var IFrame = JPlus.Control.extend({
+var IFrame = System.Control.extend({
 	
 	xType: 'iframe',
 	
@@ -44,7 +44,7 @@ var IFrame = JPlus.Control.extend({
 	
 	update: function(){
 		var me = this;
-		JPlus.setupWindow(me.window = me.dom.contentWindow);
+		System.setupWindow(me.window = me.dom.contentWindow);
 		
 		if(eval("!-[1,]")){
 			me.window.document.getDom = function(){

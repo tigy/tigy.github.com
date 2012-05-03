@@ -4,7 +4,7 @@
 
 /**
  * 使类具有扩展自身的方法。
- * @interface JPlus.IOptions
+ * @interface System.IOptions
  */
 var IOptions = {
 	

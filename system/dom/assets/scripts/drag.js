@@ -212,10 +212,6 @@ var Draggable = Class({
 	
 });
 
-/// #endregion
-
-/// #region Element
-
 /**
  * @class Element
  */
@@ -245,7 +241,5 @@ Dom.implement({
 	}
 	
 });
-
-/// #endregion
 	
 

@@ -183,7 +183,7 @@ var Ajax = Object.extend(Ajax.Request.extend({
 		
 		// 禁止缓存，为地址加上随机数。
 		if(!me.cache){
-			url = me.combineUrl(url, '_=' +  JPlus.id++);
+			url = me.combineUrl(url, '_=' +  System.id++);
 		}
 		
 		/// #endregion

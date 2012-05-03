@@ -6,7 +6,7 @@ using("System.Controls.Control");
 
 
 
-namespace(".Swiff", JPlus.Control.extend({
+namespace(".Swiff", System.Control.extend({
 
 	options: {
 		id: null,

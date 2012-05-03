@@ -4,7 +4,7 @@
 
 
 
-JPlus.namespace("BigInteger", {
+System.namespace("BigInteger", {
 	
 	/**
 	 * 计算大数的乘积。

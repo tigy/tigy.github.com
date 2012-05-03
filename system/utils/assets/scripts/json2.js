@@ -157,7 +157,7 @@ redistribute.
 
 
 
-JPlus.namespace("JSON", (function () {
+System.namespace("JSON", (function () {
 
     function f(n) {
         // Format integers to have at least two digits.

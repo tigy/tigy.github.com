@@ -11,7 +11,7 @@ using("System.Fx.Animate");
 /**
  * 文字。
  */
-JPlus.Fx.Animate.parses.string = {
+System.Fx.Animate.parses.string = {
 
 	parse: function(value){
 		return typeof value === 'string' && value;

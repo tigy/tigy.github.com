@@ -5,7 +5,7 @@ using("System.Dom.Base");
 
 Dom.resize = (function(){
 	
-	var controlEvent = JPlus.Events.control,
+	var controlEvent = System.Events.control,
 		oldResize = controlEvent.resize,
 		timer,
 		win = new Dom(window);

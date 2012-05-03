@@ -7,7 +7,7 @@ using("System.Controls.Control");
  * IFrame
  * @class IFrame
  */
-namespace(".HtmlSelect", JPlus.Control.extend({
+namespace(".HtmlSelect", System.Control.extend({
 	
 	
 	

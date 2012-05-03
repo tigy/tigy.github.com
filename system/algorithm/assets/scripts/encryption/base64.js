@@ -4,7 +4,7 @@
 
 
 
-JPlus.namespace("Encryption", {
+System.namespace("Encryption", {
 	
 	encodeBase64: function (value) {
 		

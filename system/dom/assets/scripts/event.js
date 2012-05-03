@@ -114,7 +114,7 @@ DomEvent.getCurrentEvent = navigator.isIE || navigator.isOpera ? function(){
 	while(fn){
 		var arg0 = f.arguments[0];
 		if(arg0 && args0.preventDefault && args0.stopPropagation){
-			return new JPlus.DomEvent(arg0);
+			return new System.DomEvent(arg0);
 		}
 		fn = fn.caller;
 	}

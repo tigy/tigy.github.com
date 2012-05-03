@@ -12,7 +12,7 @@
  * @param {Element} elem 目标节点。
  * @param {Number} size 圆角的大小。
  */
-JPlus.borderRadius = !navigator.isW3C ? function(elem, size){
+System.borderRadius = !navigator.isW3C ? function(elem, size){
 
 	//  elem.style.background = 'transparent';
 	//  elem.style.borderColor = 'transparent';

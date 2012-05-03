@@ -188,12 +188,12 @@ var DplBuilder = {
 	           	{end}\
             	{for c in $data.using}\
             	<div class="namespace">\
-	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'js\')">删除</a>\
+	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'using\')">删除</a>\
 	           	</div>\
 	           	{end}\
             	{for c in $data.imports}\
             	<div class="namespace">\
-	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[样式]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', true)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'css\')">删除</a>\
+	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[样式]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', true)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'imports\')">删除</a>\
 	           	</div>\
 	           	{end}\
             	{for c in $data.excludeJs}\
