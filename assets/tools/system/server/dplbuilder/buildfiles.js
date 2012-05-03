@@ -52,7 +52,7 @@ DplBuilder.buildAndLogInternal = function(buildFileName, response){
 		buildFile.build();
 		
 	}catch(e) {
-		response.write('<br>');
+		response.write('<br>Build Error:');
 		response.end(e.message);
 	}
 	
@@ -65,9 +65,14 @@ DplBuilder.buildAndLog = function(buildFileName, response, url){
 		'Content-Type': 'text/html'
 	});
 	
+	response.write('<!doctype html><html><head><meta charset="utf-8"><title>Build</title>');
+	response.write('</head><body>');
+	
 	DplBuilder.buildAndLogInternal(buildFileName, response);
 	
 	response.write('<a href="' + url + '">Back</a>');
+	
+	response.write('</body></html>');
 	
 	response.end();
 };

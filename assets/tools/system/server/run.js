@@ -30,7 +30,7 @@ server.createServer(configs.root, Dpl.configs.port, {
 		
 		FS.readFile(filePath, 'utf-8', function(e, data){
 			if (e) {
-				response.writeHead(500, '500 - Internal Server Error');
+				response.writeHead(500, 'Internal Server Error');
 				response.end(e.message);
 			}
 			
@@ -58,7 +58,7 @@ server.createServer(configs.root, Dpl.configs.port, {
 			try{
 				VM.runInNewContext(data, context, filePath);
 			} catch(e) {
-				response.writeHead(500, '500 - Internal Server Error');
+				response.writeHead(500, 'Internal Server Error');
 				response.end(e.message);
 			}
 		});
