@@ -27,7 +27,7 @@ Demo.onLoad(function(){
 	if(isLibs){
 	    var div = document.createElement('div');
 	    div.className = 'demo-control-toolbar';
-	    div.innerHTML = '<input type="text" class="goto" placeholder="按空格输入组件名转到" id="control-searchbox">';
+	    div.innerHTML = '<input type="text" class="goto" placeholder="输入组件名转到" id="control-searchbox">';
 	    body.insertBefore(div, body.firstChild);
 	}
 	    
@@ -79,9 +79,10 @@ Demo.onLoad(function(){
 		  }
 		});
 		
-		document.on('keypress', function(e){
-			if(e.which === 32)
+		document.on('keydown', function(e){
+			if(e.target === document.body) {
 				a.focus();
+			}
 		});
 	}
 });
