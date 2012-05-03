@@ -4,8 +4,9 @@ using("System.Browser.Base");
 
 /**
  * 允许动态载入一个模块。
+ * @return {Node} 返回动态创建的相关节点。
  */
-Browser.loadScript = function(source, properties){
+Browser.loadScript = function(url, onLoad, doc){
 	if (!properties) properties = {};
 
 	var script = new Element('script', {src: source, type: 'text/javascript'}),
@@ -29,7 +30,7 @@ Browser.loadScript = function(source, properties){
 	return script.set(properties).inject(doc.head);
 };
 
-Browser.loadStyle = function(source, properties){
+Browser.loadStyle = function(url, onLoad, doc){
 	if (!properties) properties = {};
 
 	var link = new Element('link', {
@@ -50,7 +51,7 @@ Browser.loadStyle = function(source, properties){
 	return link.set(properties).inject(doc.head);
 };
 
-Browser.loadImage = function(source, properties){
+Browser.loadImage = function(url, onLoad, onError, onAbort){
 	if (!properties) properties = {};
 
 	var image = new Image(),
@@ -81,7 +82,7 @@ Browser.loadImage = function(source, properties){
 	return element.set(properties);
 };
 
-Browser.loadImages = function (sources, options) {
+Browser.loadImages = function (urls, onComplete, onSuccess, onError) {
 	sources = Array.from(sources);
 
 	var fn = function () { },
