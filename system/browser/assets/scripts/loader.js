@@ -7,110 +7,76 @@ using("System.Browser.Base");
  * @return {Node} 返回动态创建的相关节点。
  */
 Browser.loadScript = function(url, onLoad, doc){
-	if (!properties) properties = {};
-
-	var script = new Element('script', {src: source, type: 'text/javascript'}),
-			doc = properties.document || document,
-			load = properties.onload || properties.onLoad;
-
-	delete properties.onload;
-	delete properties.onLoad;
-	delete properties.document;
-
-	if (load){
-		if (typeof script.onreadystatechange != 'undefined'){
-			script.addEvent('readystatechange', function(){
-				if (['loaded', 'complete'].contains(this.readyState)) load.call(this);
-			});
-		} else {
-			script.addEvent('load', load);
-		}
-	}
-
-	return script.set(properties).inject(doc.head);
+	
+	var doc = doc|| document,
+	onLoad = onLoad||'',
+	script = doc.createElement("script");
+	script.type = "text/javascript";	
+	script.src = url;
+	
+	Browser.onLoad(script,url,onLoad);
+	return doc.getElementsByTagName("head")[0].appendChild(script);
 };
 
 Browser.loadStyle = function(url, onLoad, doc){
-	if (!properties) properties = {};
-
-	var link = new Element('link', {
-		rel: 'stylesheet',
-		media: 'screen',
-		type: 'text/css',
-		href: source
-	});
-
-	var load = properties.onload || properties.onLoad,
-			doc = properties.document || document;
-
-	delete properties.onload;
-	delete properties.onLoad;
-	delete properties.document;
-
-	if (load) link.addEvent('load', load);
-	return link.set(properties).inject(doc.head);
+	var doc = doc|| document,
+		onLoad = onLoad||'',
+		link = doc.createElement("link");
+		link.rel =  'stylesheet';
+		link.media =  'screen';
+		link.type =  'text/css';
+		link.href = url;
+		
+		Browser.onLoad(link,url,onLoad);
+	return doc.getElementsByTagName("head")[0].appendChild(link);
 };
 
 Browser.loadImage = function(url, onLoad, onError, onAbort){
-	if (!properties) properties = {};
 
 	var image = new Image(),
-			element = document.id(image) || new Element('img');
-
-	['load', 'abort', 'error'].each(function(name){
-		var type = 'on' + name,
-				cap = 'on' + name.capitalize(),
-				event = properties[type] || properties[cap] || function(){};
-
-		delete properties[cap];
-		delete properties[type];
-
-		image[type] = function(){
-			if (!image) return;
-			if (!element.parentNode){
-				element.width = image.width;
-				element.height = image.height;
-			}
-			image = image.onload = image.onabort = image.onerror = null;
-			event.delay(1, element, element);
-			element.fireEvent(name, element, 1);
-		};
-	});
-
-	image.src = element.src = source;
-	if (image && image.complete) image.onload.delay(1);
-	return element.set(properties);
+	onLoad = onLoad||'',
+	onError = onError||'',
+	onAbort = onAbort||'';
+	image.src = url;
+	Browser.onLoad(image,url,onLoad);
+	if(onError){
+		image.onerror = function(){
+			onError();
+		}
+	}
+	if(onAbort){
+		image.onabort = function(){
+			onAbort();
+		}		
+	}
+	return image;
 };
 
 Browser.loadImages = function (urls, onComplete, onSuccess, onError) {
-	sources = Array.from(sources);
-
-	var fn = function () { },
-			counter = 0;
-
-	options = Object.merge({
-		onComplete: fn,
-		onProgress: fn,
-		onError: fn,
-		properties: {}
-	}, options);
-
-	return new Elements(sources.map(function (source, index) {
-		return Asset.image(source, Object.append(options.properties, {
-			onload: function () {
-				counter++;
-				options.onProgress.call(this, counter, index, source);
-				if (counter == sources.length) options.onComplete();
-			},
-			onerror: function () {
-				counter++;
-				options.onError.call(this, counter, index, source);
-				if (counter == sources.length) options.onComplete();
-			}
-		}));
-	}));
+	var images = [],
+		onSuccess = onSuccess||Function.empty,
+		onComplete = onComplete||Function.empty,	
+		completeNum = 0;
+	var complete = function(){
+			onSuccess();
+			onComplete();
+		}
+	for(var i=0;i<urls.length;i++){
+		if(completeNum==urls.length-1) onSuccess = complete;
+		images[i] = Browser.loadImage(urls[i],onSuccess,onError);
+		completeNum = completeNum+1; 
+	}
+	return images;
 };
-
+Browser.onLoad = function(obj,url,callback){
+	var callback = callback||'';
+	if(callback){
+		obj.onload = obj.onreadystatechange = function() {
+			if (!obj.readyState || obj.readyState == "loaded" || obj.readyState == "complete")
+					callback();
+		};		
+	}
+}
 
 
 
