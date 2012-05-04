@@ -71,6 +71,7 @@ var BuildFile = function(name, options) {
 	this.js = this.js.reverse();
 	this.css = this.css.reverse();
 	
+	this.oninit();
 	this.compile();
 
 };

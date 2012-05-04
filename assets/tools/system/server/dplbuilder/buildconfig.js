@@ -291,8 +291,9 @@ var BuildConfig = {
 				
 				var src = Path.join(f, c2);
 				var destName = Path.basename(c2);
-				if(!images[src]) {
-                    images[src] = true;
+				
+				if(!me.images[src]) {
+                    me.images[src] = true;
                     
                     if(!me.exist(src)){
                     	me.error('Can\'t Find "' + src + '". (' + path + ')');
@@ -327,12 +328,14 @@ var BuildConfig = {
 	
 	writeContent: function(writer, content){
 		writer.write(content);
+	},
+	
+	oninit: function(){
+		this.images = {};
 	}
 	
 	
 };
-
-var images = {};
 
 var less;
 
