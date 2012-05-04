@@ -295,16 +295,12 @@ var BuildConfig = {
                     images[src] = true;
                     
                     if(!me.exist(src)){
-                    	me.error('Can\'t Found "' + src + '". (' + path + ')');
+                    	me.error('Can\'t Find "' + src + '". (' + path + ')');
                     	
                     	return  all;
                     }
-		                    
-					if(!me.exist(p)){
-						require("../lib/io").createDirectory(p);
-					}
 					
-                    require("../lib/io").copyFile(src, Path.join(p, destName));
+                    require("../lib/io").copyFileAndOverwrite(src, Path.join(p, destName));
                 }
                 return "url(" + Path.join(targetImages, destName).replace(/\\/g, "/") + ")";
 			});

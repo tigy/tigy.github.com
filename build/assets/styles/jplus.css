@@ -1,5 +1,5 @@
 /**********************************************
- * This file is created by a tool at 2012/5/2 22:33
+ * This file is created by a tool at 2012/5/3 17:17
  **********************************************/
 
 
@@ -328,40 +328,146 @@ select {
   background-color: #ffffff;
 }
 /**********************************************
- * Controls.Button.CloseButton
+ * Controls.Core.Common
  **********************************************/
-.x-closebutton {
-  font-size: 20px;
-  font-weight: bold;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -o-user-select: none;
-  user-select: none;
-  color: #000000;
-  text-shadow: 0 1px 0 #ffffff;
-  opacity: 0.2;
-  filter: alpha(opacity=20);
-  cursor: pointer;
+html .x-left {
+  float: left;
+}
+html .x-right {
   float: right;
 }
-.x-closebutton:hover {
-  color: #000000;
-  text-decoration: none;
-  opacity: 0.4;
-  filter: alpha(opacity=40);
+html .x-left,
+html .x-right {
+  _display: inline;
+}
+html .x-middle {
+  vertical-align: middle;
+}
+.x-center {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+html .x-relative,
+html div.x-relative {
+  position: relative;
+}
+html .x-absolute,
+html div.x-absolute {
+  position: absolute;
+}
+html .x-inline {
+  display: inline;
+}
+html .x-block {
+  display: block;
+}
+html .x-inline-block {
+  display: inline-block;
+  *display: inline;
+  *zoom: 1;
+}
+html .x-hide,
+html div.x-hide {
+  display: none;
+}
+.x-break-word {
+  word-wrap: break-word;
+  word-break: break-all;
+}
+html .x-plain,
+html div.x-plain {
+  margin: 0;
+  padding: 0;
+}
+.x-clear {
+  *zoom: 1;
+}
+.x-clear:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+html .x-alt,
+.x-alt a {
+  color: #70a3cd;
+}
+html .x-hint,
+.x-hint a {
+  color: #999999;
+}
+.x-alt a:hover,
+.x-hint a:hover,
+a.x-alt:hover,
+a.x-hint:hover {
+  color: #005580;
+}
+.x-highlight {
+  color: #ff6600 !important;
+}
+.x-warning {
+  color: #c09853 !important;
+}
+.x-error {
+  color: #b94a48 !important;
+}
+.x-success {
+  color: #468847 !important;
+}
+html .x-row,
+html div.x-row {
+  margin-bottom: 10px;
+}
+.x-blank {
+  height: 10px;
+  display: block;
+  visibility: hidden;
+  color: #ffffff;
+}
+.x-debug {
+  background: #C03!important;
+  color: #fff!important;
+}
+blockquote.x-right {
+  padding-left: 0;
+  padding-right: 15px;
+  border-left: 0;
+  border-right: 5px solid #eeeeee;
+}
+blockquote.x-right p,
+blockquote.x-right small {
+  text-align: right;
 }
 /**********************************************
- * Controls.Core.ScrollableControl
+ * Controls.Display.Thumbnail
  **********************************************/
-/**
- * @author 
- */
-/**********************************************
- * Controls.Core.ListControl
- **********************************************/
-/**
- * @author 
- */
+.x-thumbnail {
+  display: inline-block;
+  *display: inline;
+  padding: 4px;
+  line-height: 1;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
+  -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+a.x-thumbnail:hover {
+  border-color: #0088cc;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
+  -moz-box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
+  box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
+}
+.x-thumbnail img {
+  display: block;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
 /**********************************************
  * Controls.Display.Icon
  **********************************************/
@@ -746,6 +852,444 @@ select {
 }
 .x-icon-resize-horizontal {
   background-position: -456px -118px;
+}
+/**********************************************
+ * Controls.Display.List
+ **********************************************/
+/**
+ * @author 
+ */
+ul.x-list,
+.x-list ul {
+  margin: 0 0 9px 25px;
+  padding: 0;
+}
+li.x-list,
+.x-list li {
+  list-style-type: disc;
+}
+.x-list .x-list {
+  margin-bottom: 0;
+}
+/**********************************************
+ * Controls.Display.Arrow
+ **********************************************/
+/**
+ * @author
+ */
+.x-arrow {
+  font-family: "SimSun";
+  overflow: hidden;
+  display: block;
+  font-size: 21px;
+  line-height: 20px;
+  position: absolute;
+  content: "◆";
+  color: #000000;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.x-arrow-fore {
+  position: absolute;
+}
+.x-arrow-back {
+  position: absolute;
+}
+.x-arrow-top {
+  _font-size: 20px;
+}
+.x-arrow-top,
+.x-arrow-bottom {
+  height: 10px;
+  width: 20px;
+}
+.x-arrow-top .x-arrow-fore {
+  top: 1px;
+  left: 0;
+}
+.x-arrow-top .x-arrow-back {
+  top: 2px;
+  left: 0;
+}
+.x-arrow-bottom .x-arrow-fore {
+  bottom: 0;
+  left: 0;
+}
+.x-arrow-bottom .x-arrow-back {
+  bottom: 1px;
+  left: 0;
+}
+.x-arrow-left,
+.x-arrow-right {
+  height: 20px;
+  width: 10px;
+}
+.x-arrow-left .x-arrow-fore {
+  top: 0;
+  left: 0;
+}
+.x-arrow-left .x-arrow-back {
+  top: 0;
+  left: 1px;
+}
+.x-arrow-right .x-arrow-fore {
+  top: 0;
+  right: 0;
+}
+.x-arrow-right .x-arrow-back {
+  top: 0;
+  right: 1px;
+}
+.x-arrow-bottom {
+  bottom: -10px;
+  left: 36%;
+}
+.x-arrow-top {
+  top: -10px;
+  left: 36%;
+}
+.x-arrow-left {
+  left: -10px;
+  top: 50%;
+  margin-top: -10px;
+}
+.x-arrow-right {
+  top: 50%;
+  margin-top: -10px;
+  right: -10px;
+}
+/**********************************************
+ * Controls.Core.ScrollableControl
+ **********************************************/
+/**
+ * @author 
+ */
+/**********************************************
+ * Controls.Core.ListControl
+ **********************************************/
+/**
+ * @author 
+ */
+/**********************************************
+ * Controls.Container.Tabbable
+ **********************************************/
+/**
+ * @author 
+ */
+.x-tabbable {
+  border-bottom: 1px solid #ddd;
+  *zoom: 1;
+}
+.x-tabbable:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+.x-tabbable-container {
+  margin: 0;
+}
+.x-tabbable-content {
+  margin: 0 0 -1px;
+  list-style: none;
+  float: left;
+}
+.x-tabbable-content a {
+  display: block;
+  border: 1px solid transparent;
+  _border-color: white;
+  _filter: chroma(color=#ffffff);
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
+  padding: 7px 12px;
+  text-decoration: none;
+}
+.x-tabbable-content a:hover {
+  border-color: #eeeeee #eeeeee #dddddd;
+  background-color: #eeeeee;
+}
+.x-tabbable-selected a,
+.x-tabbable-selected a:hover {
+  color: #555555;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-bottom-color: transparent;
+  _border-bottom-color: white;
+  _filter: chroma(color=#ffffff);
+  cursor: default;
+}
+.x-tabbable-alt {
+  border-bottom: none;
+}
+.x-tabbable-alt .x-tabbable-content a,
+.x-tabbable-alt .x-tabbable-content a:hover {
+  border-color: transparent;
+  _border-color: white;
+}
+.x-tabbable-alt .x-tabbable-content a {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+.x-tabbable-alt .x-tabbable-selected a,
+.x-tabbable-alt .x-tabbable-selected a:hover {
+  color: #ffffff;
+  background-color: #0088cc;
+}
+/**********************************************
+ * Controls.DataView.Table
+ **********************************************/
+.x-table {
+  max-width: 100%;
+  width: 100%;
+  border: 1px solid #dddddd;
+  border-collapse: separate;
+  *border-collapse: collapse;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+.x-table th,
+.x-table td {
+  padding: 8px;
+  line-height: 18px;
+  text-align: left;
+  vertical-align: top;
+  border-top: 1px solid #dddddd;
+}
+.x-table thead:first-child tr th,
+.x-table thead:first-child tr td {
+  border-top: 0;
+}
+.x-table tbody + tbody {
+  border-top: 2px solid #dddddd;
+}
+.x-table th + th,
+.x-table td + td,
+.x-table th + td,
+.x-table td + th {
+  border-left: 1px solid #dddddd;
+}
+.x-table thead:first-child tr:first-child th,
+.x-table tbody:first-child tr:first-child th,
+.x-table tbody:first-child tr:first-child td {
+  border-top: 0;
+}
+.x-table thead:first-child tr:first-child th:first-child,
+.x-table tbody:first-child tr:first-child td:first-child {
+  -webkit-border-radius: 4px 0 0 0;
+  -moz-border-radius: 4px 0 0 0;
+  border-radius: 4px 0 0 0;
+}
+.x-table thead:first-child tr:first-child th:last-child,
+.x-table tbody:first-child tr:first-child td:last-child {
+  -webkit-border-radius: 0 4px 0 0;
+  -moz-border-radius: 0 4px 0 0;
+  border-radius: 0 4px 0 0;
+}
+.x-table thead:last-child tr:last-child th:first-child,
+.x-table tbody:last-child tr:last-child td:first-child {
+  -webkit-border-radius: 0 0 0 4px;
+  -moz-border-radius: 0 0 0 4px;
+  border-radius: 0 0 0 4px;
+}
+.x-table thead:last-child tr:last-child th:last-child,
+.x-table tbody:last-child tr:last-child td:last-child {
+  -webkit-border-radius: 0 0 4px 0;
+  -moz-border-radius: 0 0 4px 0;
+  border-radius: 0 0 4px 0;
+}
+.x-table-baseline {
+  border: none;
+}
+.x-table-baseline thead th {
+  vertical-align: bottom;
+}
+.x-table-baseline th + th,
+.x-table-baseline td + td,
+.x-table-baseline th + td,
+.x-table-baseline td + th {
+  border-left: none;
+}
+.x-table-striped tbody tr:nth-child(odd) td,
+.x-table-striped tbody tr:nth-child(odd) th {
+  background-color: #f6f6f6;
+}
+.x-table tbody tr:hover td,
+.x-table tbody tr:hover th {
+  background-color: #f3f3f3;
+}
+/**********************************************
+ * Controls.Core.ICollapsable
+ **********************************************/
+/**
+ * @author 
+ */
+/**********************************************
+ * Controls.DataView.TreeView
+ **********************************************/
+/**
+ * @author 
+ */
+/**
+ * @author 
+ */
+/* Tree */.x-treeview {
+  padding: 3px 0;
+  border: 1px solid #CCCCCC;
+  overflow: auto;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+.x-treeview-plain {
+  border: 0;
+}
+.x-treenode,
+.x-treeview a,
+.x-treenode-space {
+  height: 20px;
+}
+.x-treenode {
+  overflow: hidden;
+  cursor: default;
+  display: block;
+  color: #333333;
+  font-size: 14px;
+}
+.x-treenode-space {
+  float: left;
+  display: block;
+  width: 19px;
+  background-repeat: no-repeat;
+}
+.x-treenode-none {
+  background-image: none!important;
+}
+.x-treenode-selected {
+  background-color: #D9E8FB;
+}
+.x-treenode:hover {
+  background-color: #EEEEEE;
+  text-decoration: none;
+}
+.x-treenode-space {
+  background-image: url(../images/dataview/treeview.gif);
+  background-repeat: no-repeat;
+}
+.x-treenode-plus {
+  background-position: 0 -30px;
+}
+.x-treenode-minus {
+  background-position: 0 -60px;
+}
+.x-treenode-plus:hover {
+  background-position: -30px -30px;
+}
+.x-treenode-minus:hover {
+  background-position: -30px -60px;
+}
+.x-treeview-alt .x-treenode-space {
+  background-image: url(../images/dataview/treeview-alt.gif);
+}
+.x-treeview-alt .x-treenode-normal {
+  background-position: 0 -90px;
+}
+.x-treeview-alt .x-treenode-last .x-treenode-plus {
+  background-position: 0 -120px;
+}
+.x-treeview-alt .x-treenode-last .x-treenode-minus {
+  background-position: 0 -150px;
+}
+.x-treeview-alt .x-treenode-last .x-treenode-normal {
+  background-position: 0 -180px;
+}
+.x-treenode-loading {
+  background-image: url(../images/dataview/loading.gif) !important;
+  background-position: 50% 50%;
+}
+/**********************************************
+ * Controls.Page.Scaffolding
+ **********************************************/
+/**
+ * @author 
+ */
+/**********************************************
+ * Controls.Page.Grid
+ **********************************************/
+.x-grid {
+  margin-top: 10px;
+  *zoom: 1;
+}
+.x-grid:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+.x-col {
+  float: left;
+  margin-left: 16px;
+}
+.x-container {
+  width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+  *zoom: 1;
+}
+.x-container:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+.x-col-1 {
+  width: 67px;
+}
+.x-col-2 {
+  width: 150px;
+}
+.x-col-3 {
+  width: 233px;
+}
+.x-col-4 {
+  width: 316px;
+}
+.x-col-5 {
+  width: 399px;
+}
+.x-col-6 {
+  width: 482px;
+}
+.x-col-7 {
+  width: 565px;
+}
+.x-col-8 {
+  width: 648px;
+}
+.x-col-9 {
+  width: 731px;
+}
+.x-col-10 {
+  width: 814px;
+}
+.x-col-11 {
+  width: 897px;
+}
+.x-col-12 {
+  width: 980px;
+}
+.x-col-first,
+.x-col:first-child {
+  margin-left: 0;
 }
 /**********************************************
  * Controls.Core.ContentControl
@@ -1185,569 +1729,28 @@ input.x-button-small {
   _margin-bottom: 5px;
 }
 /**********************************************
- * Controls.Page.Grid
+ * Controls.Button.CloseButton
  **********************************************/
-.x-grid {
-  margin-top: 10px;
-  *zoom: 1;
-}
-.x-grid:after {
-  content: ".";
-  display: block;
-  height: 0;
-  clear: both;
-  visibility: hidden;
-}
-.x-col {
-  float: left;
-  margin-left: 16px;
-}
-.x-container {
-  width: 980px;
-  margin-left: auto;
-  margin-right: auto;
-  *zoom: 1;
-}
-.x-container:after {
-  content: ".";
-  display: block;
-  height: 0;
-  clear: both;
-  visibility: hidden;
-}
-.x-col-1 {
-  width: 67px;
-}
-.x-col-2 {
-  width: 150px;
-}
-.x-col-3 {
-  width: 233px;
-}
-.x-col-4 {
-  width: 316px;
-}
-.x-col-5 {
-  width: 399px;
-}
-.x-col-6 {
-  width: 482px;
-}
-.x-col-7 {
-  width: 565px;
-}
-.x-col-8 {
-  width: 648px;
-}
-.x-col-9 {
-  width: 731px;
-}
-.x-col-10 {
-  width: 814px;
-}
-.x-col-11 {
-  width: 897px;
-}
-.x-col-12 {
-  width: 980px;
-}
-.x-col-first,
-.x-col:first-child {
-  margin-left: 0;
-}
-/**********************************************
- * Controls.Page.Scaffolding
- **********************************************/
-/**
- * @author 
- */
-/**********************************************
- * Controls.Core.ICollapsable
- **********************************************/
-/**
- * @author 
- */
-/**********************************************
- * Controls.DataView.TreeView
- **********************************************/
-/**
- * @author 
- */
-/**
- * @author 
- */
-/* Tree */.x-treeview {
-  padding: 3px 0;
-  border: 1px solid #CCCCCC;
-  overflow: auto;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-}
-.x-treeview-plain {
-  border: 0;
-}
-.x-treenode,
-.x-treeview a,
-.x-treenode-space {
-  height: 20px;
-}
-.x-treenode {
-  overflow: hidden;
-  cursor: default;
-  display: block;
-  color: #333333;
-  font-size: 14px;
-}
-.x-treenode-space {
-  float: left;
-  display: block;
-  width: 19px;
-  background-repeat: no-repeat;
-}
-.x-treenode-none {
-  background-image: none!important;
-}
-.x-treenode-selected {
-  background-color: #D9E8FB;
-}
-.x-treenode:hover {
-  background-color: #EEEEEE;
-  text-decoration: none;
-}
-.x-treenode-space {
-  background-image: url(../images/dataview/treeview.gif);
-  background-repeat: no-repeat;
-}
-.x-treenode-plus {
-  background-position: 0 -30px;
-}
-.x-treenode-minus {
-  background-position: 0 -60px;
-}
-.x-treenode-plus:hover {
-  background-position: -30px -30px;
-}
-.x-treenode-minus:hover {
-  background-position: -30px -60px;
-}
-.x-treeview-alt .x-treenode-space {
-  background-image: url(../images/dataview/treeview-alt.gif);
-}
-.x-treeview-alt .x-treenode-normal {
-  background-position: 0 -90px;
-}
-.x-treeview-alt .x-treenode-last .x-treenode-plus {
-  background-position: 0 -120px;
-}
-.x-treeview-alt .x-treenode-last .x-treenode-minus {
-  background-position: 0 -150px;
-}
-.x-treeview-alt .x-treenode-last .x-treenode-normal {
-  background-position: 0 -180px;
-}
-.x-treenode-loading {
-  background-image: url(../images/dataview/loading.gif) !important;
-  background-position: 50% 50%;
-}
-/**********************************************
- * Controls.DataView.Table
- **********************************************/
-.x-table {
-  max-width: 100%;
-  width: 100%;
-  border: 1px solid #dddddd;
-  border-collapse: separate;
-  *border-collapse: collapse;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-}
-.x-table th,
-.x-table td {
-  padding: 8px;
-  line-height: 18px;
-  text-align: left;
-  vertical-align: top;
-  border-top: 1px solid #dddddd;
-}
-.x-table thead:first-child tr th,
-.x-table thead:first-child tr td {
-  border-top: 0;
-}
-.x-table tbody + tbody {
-  border-top: 2px solid #dddddd;
-}
-.x-table th + th,
-.x-table td + td,
-.x-table th + td,
-.x-table td + th {
-  border-left: 1px solid #dddddd;
-}
-.x-table thead:first-child tr:first-child th,
-.x-table tbody:first-child tr:first-child th,
-.x-table tbody:first-child tr:first-child td {
-  border-top: 0;
-}
-.x-table thead:first-child tr:first-child th:first-child,
-.x-table tbody:first-child tr:first-child td:first-child {
-  -webkit-border-radius: 4px 0 0 0;
-  -moz-border-radius: 4px 0 0 0;
-  border-radius: 4px 0 0 0;
-}
-.x-table thead:first-child tr:first-child th:last-child,
-.x-table tbody:first-child tr:first-child td:last-child {
-  -webkit-border-radius: 0 4px 0 0;
-  -moz-border-radius: 0 4px 0 0;
-  border-radius: 0 4px 0 0;
-}
-.x-table thead:last-child tr:last-child th:first-child,
-.x-table tbody:last-child tr:last-child td:first-child {
-  -webkit-border-radius: 0 0 0 4px;
-  -moz-border-radius: 0 0 0 4px;
-  border-radius: 0 0 0 4px;
-}
-.x-table thead:last-child tr:last-child th:last-child,
-.x-table tbody:last-child tr:last-child td:last-child {
-  -webkit-border-radius: 0 0 4px 0;
-  -moz-border-radius: 0 0 4px 0;
-  border-radius: 0 0 4px 0;
-}
-.x-table-baseline {
-  border: none;
-}
-.x-table-baseline thead th {
-  vertical-align: bottom;
-}
-.x-table-baseline th + th,
-.x-table-baseline td + td,
-.x-table-baseline th + td,
-.x-table-baseline td + th {
-  border-left: none;
-}
-.x-table-striped tbody tr:nth-child(odd) td,
-.x-table-striped tbody tr:nth-child(odd) th {
-  background-color: #f6f6f6;
-}
-.x-table tbody tr:hover td,
-.x-table tbody tr:hover th {
-  background-color: #f3f3f3;
-}
-/**********************************************
- * Controls.Container.Tabbable
- **********************************************/
-/**
- * @author 
- */
-.x-tabbable {
-  border-bottom: 1px solid #ddd;
-  *zoom: 1;
-}
-.x-tabbable:after {
-  content: ".";
-  display: block;
-  height: 0;
-  clear: both;
-  visibility: hidden;
-}
-.x-tabbable-container {
-  margin: 0;
-}
-.x-tabbable-content {
-  margin: 0 0 -1px;
-  list-style: none;
-  float: left;
-}
-.x-tabbable-content a {
-  display: block;
-  border: 1px solid transparent;
-  _border-color: white;
-  _filter: chroma(color=#ffffff);
-  -webkit-border-radius: 4px 4px 0 0;
-  -moz-border-radius: 4px 4px 0 0;
-  border-radius: 4px 4px 0 0;
-  padding: 7px 12px;
-  text-decoration: none;
-}
-.x-tabbable-content a:hover {
-  border-color: #eeeeee #eeeeee #dddddd;
-  background-color: #eeeeee;
-}
-.x-tabbable-selected a,
-.x-tabbable-selected a:hover {
-  color: #555555;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-bottom-color: transparent;
-  _border-bottom-color: white;
-  _filter: chroma(color=#ffffff);
-  cursor: default;
-}
-.x-tabbable-alt {
-  border-bottom: none;
-}
-.x-tabbable-alt .x-tabbable-content a,
-.x-tabbable-alt .x-tabbable-content a:hover {
-  border-color: transparent;
-  _border-color: white;
-}
-.x-tabbable-alt .x-tabbable-content a {
-  padding-top: 6px;
-  padding-bottom: 6px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-}
-.x-tabbable-alt .x-tabbable-selected a,
-.x-tabbable-alt .x-tabbable-selected a:hover {
-  color: #ffffff;
-  background-color: #0088cc;
-}
-/**********************************************
- * Controls.Display.Arrow
- **********************************************/
-/**
- * @author
- */
-.x-arrow {
-  font-family: "SimSun";
-  overflow: hidden;
-  display: block;
-  font-size: 21px;
-  line-height: 20px;
-  position: absolute;
-  content: "◆";
-  color: #000000;
+.x-closebutton {
+  font-size: 20px;
+  font-weight: bold;
   -webkit-user-select: none;
   -moz-user-select: none;
   -o-user-select: none;
   user-select: none;
-}
-.x-arrow-fore {
-  position: absolute;
-}
-.x-arrow-back {
-  position: absolute;
-}
-.x-arrow-top {
-  _font-size: 20px;
-}
-.x-arrow-top,
-.x-arrow-bottom {
-  height: 10px;
-  width: 20px;
-}
-.x-arrow-top .x-arrow-fore {
-  top: 1px;
-  left: 0;
-}
-.x-arrow-top .x-arrow-back {
-  top: 2px;
-  left: 0;
-}
-.x-arrow-bottom .x-arrow-fore {
-  bottom: 0;
-  left: 0;
-}
-.x-arrow-bottom .x-arrow-back {
-  bottom: 1px;
-  left: 0;
-}
-.x-arrow-left,
-.x-arrow-right {
-  height: 20px;
-  width: 10px;
-}
-.x-arrow-left .x-arrow-fore {
-  top: 0;
-  left: 0;
-}
-.x-arrow-left .x-arrow-back {
-  top: 0;
-  left: 1px;
-}
-.x-arrow-right .x-arrow-fore {
-  top: 0;
-  right: 0;
-}
-.x-arrow-right .x-arrow-back {
-  top: 0;
-  right: 1px;
-}
-.x-arrow-bottom {
-  bottom: -10px;
-  left: 36%;
-}
-.x-arrow-top {
-  top: -10px;
-  left: 36%;
-}
-.x-arrow-left {
-  left: -10px;
-  top: 50%;
-  margin-top: -10px;
-}
-.x-arrow-right {
-  top: 50%;
-  margin-top: -10px;
-  right: -10px;
-}
-/**********************************************
- * Controls.Display.List
- **********************************************/
-/**
- * @author 
- */
-ul.x-list,
-.x-list ul {
-  margin: 0 0 9px 25px;
-  padding: 0;
-}
-li.x-list,
-.x-list li {
-  list-style-type: disc;
-}
-.x-list .x-list {
-  margin-bottom: 0;
-}
-/**********************************************
- * Controls.Display.Thumbnail
- **********************************************/
-.x-thumbnail {
-  display: inline-block;
-  *display: inline;
-  padding: 4px;
-  line-height: 1;
-  border: 1px solid #ddd;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
-  -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
-}
-a.x-thumbnail:hover {
-  border-color: #0088cc;
-  -webkit-box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
-  -moz-box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
-  box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
-}
-.x-thumbnail img {
-  display: block;
-  max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-/**********************************************
- * Controls.Core.Common
- **********************************************/
-html .x-left {
-  float: left;
-}
-html .x-right {
+  color: #000000;
+  text-shadow: 0 1px 0 #ffffff;
+  opacity: 0.2;
+  filter: alpha(opacity=20);
+  cursor: pointer;
   float: right;
 }
-html .x-left,
-html .x-right {
-  _display: inline;
+.x-closebutton:hover {
+  color: #000000;
+  text-decoration: none;
+  opacity: 0.4;
+  filter: alpha(opacity=40);
 }
-html .x-middle {
-  vertical-align: middle;
-}
-.x-center {
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-}
-html .x-relative,
-html div.x-relative {
-  position: relative;
-}
-html .x-absolute,
-html div.x-absolute {
-  position: absolute;
-}
-html .x-inline {
-  display: inline;
-}
-html .x-block {
-  display: block;
-}
-html .x-inline-block {
-  display: inline-block;
-  *display: inline;
-  *zoom: 1;
-}
-html .x-hide,
-html div.x-hide {
-  display: none;
-}
-.x-break-word {
-  word-wrap: break-word;
-  word-break: break-all;
-}
-html .x-plain,
-html div.x-plain {
-  margin: 0;
-  padding: 0;
-}
-.x-clear {
-  *zoom: 1;
-}
-.x-clear:after {
-  content: ".";
-  display: block;
-  height: 0;
-  clear: both;
-  visibility: hidden;
-}
-html .x-alt,
-.x-alt a {
-  color: #70a3cd;
-}
-html .x-hint,
-.x-hint a {
-  color: #999999;
-}
-.x-alt a:hover,
-.x-hint a:hover,
-a.x-alt:hover,
-a.x-hint:hover {
-  color: #005580;
-}
-.x-highlight {
-  color: #ff6600 !important;
-}
-.x-warning {
-  color: #c09853 !important;
-}
-.x-error {
-  color: #b94a48 !important;
-}
-.x-success {
-  color: #468847 !important;
-}
-html .x-row,
-html div.x-row {
-  margin-bottom: 10px;
-}
-.x-blank {
-  height: 10px;
-  display: block;
-  visibility: hidden;
-  color: #ffffff;
-}
-.x-debug {
-  background: #C03!important;
-  color: #fff!important;
-}
-blockquote.x-right {
-  padding-left: 0;
-  padding-right: 15px;
-  border-left: 0;
-  border-right: 5px solid #eeeeee;
-}
-blockquote.x-right p,
-blockquote.x-right small {
-  text-align: right;
-}
+/**********************************************
+ * System.Browser.Cookie
+ **********************************************/

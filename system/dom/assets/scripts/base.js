@@ -481,7 +481,7 @@
 
 				// IE 8- 在处理原生事件时肯能出现错误。
 				try {
-					if (!e.type) {
+					if (!e || !e.type) {
 						e = new Dom.Event(ctrl, type, e);
 					}
 				} catch (ex) {

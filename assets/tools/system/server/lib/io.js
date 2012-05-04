@@ -101,6 +101,19 @@ var IO = {
 			copyFile(srcFile, destFile);
 	},
 	
+	copyFileAndOverwrite: function(srcFile, destFile) {
+		if(!IO.exist(srcFile))
+			return;
+			
+		if(IO.exist(destFile)){
+			FS.unlinkSync(destFile);
+		} else {
+			IO.ensureDir(destFile);	
+		}
+		
+		copyFile(srcFile, destFile);
+	},
+	
 	copyDirectory: function(src, dest) {
 		if(!IO.exist(src) || IO.exist(dest))
 			return;
