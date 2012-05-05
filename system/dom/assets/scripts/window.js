@@ -64,11 +64,11 @@
             return {x: Math.max(doc.scrollWidth, min.x), y: Math.max(doc.scrollHeight, min.y)};
         },
         /// <summary>
-        /// xType
+        /// xtype
         /// </summary>
         /// <type name="String" />
         /// <const />
-        xType: "Element",
+        xtype: "Element",
 
         /// <summary>
         /// 返回节点

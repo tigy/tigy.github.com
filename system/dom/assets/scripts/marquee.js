@@ -102,7 +102,7 @@ var Marquee = Dom.extend({
 	moveTo: function(index){
 		clearInterval(this.timer);
 		this.timer = 0;
-		this.one('change', this.restart);
+		this.once('change', this.restart);
 		this.moveToInternal(index % (this.loop ? this.childCount * 3 : this.childCount));
 		return this;
 	},

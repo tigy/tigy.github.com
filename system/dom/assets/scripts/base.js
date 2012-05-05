@@ -159,7 +159,7 @@
 			},
 
 			/**
-			 * xType 。
+			 * xtype 。
 			 * @virtual
 			 */
 			xtype: "dom"
@@ -239,7 +239,7 @@
 			},
 			
 			/**
-			 * xType
+			 * xtype
 			 */
 			xtype: "domlist"
 	

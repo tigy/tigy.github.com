@@ -1051,9 +1051,11 @@
 			        handlers = evt.handlers;
 
 			        if (listener) {
+			        	
+			        	i = handlers.length;
 
 				        // 搜索符合的句柄。
-				        for (i = handlers.length - 1; i; i--) {
+				        while (--i >= 0) {
 					        if (handlers[i][0] === listener) {
 						        handlers.splice(i, 1);
 						        
@@ -1121,10 +1123,10 @@
 		 */
         once: function(type, listener, bind) {
 
-	        assert.isFunction(listener, 'System.Object.prototype.one(type, listener): {listener} ~');
+	        assert.isFunction(listener, 'System.Object.prototype.once(type, listener): {listener} ~');
 			
 			var me = this;
-
+			
 	        // one 本质上是 on , 只是自动为 listener 执行 un 。
 	        return this.on(type, function() {
 

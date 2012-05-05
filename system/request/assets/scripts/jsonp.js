@@ -10,16 +10,18 @@ Ajax.JSONP = Ajax.Request.extend({
 
     onReadyStateChange: function(exception){
         var me = this, script = me.script;
-        if (script && (exception || !script.readyState || /loaded|complete/.test(script.readyState))) {
+        if (script && (exception || !/in/.test(script.readyState))) {
         
             // 删除全部绑定的函数。
-            script.onload = script.onreadystatechange = null;
+            script.onerror = script.onload = script.onreadystatechange = null;
             
             // 删除当前脚本。
             script.parentNode.removeChild(script);
             
             // 删除回调。
             delete window[me.callback];
+            
+            me.script = null;
             
             try {
             
@@ -30,10 +32,9 @@ Ajax.JSONP = Ajax.Request.extend({
                 
                 me.onComplete(script);
                 
-            }
-            finally {
+            } finally {
             
-                script = me.script = null;
+                script = null;
                 
             }
         }
@@ -77,17 +78,19 @@ Ajax.JSONP = Ajax.Request.extend({
         script.src = url;
         script.type = "text/javascript";
         
-        t.parentNode.insertBefore(script, t);
+        script.onerror = function(){
+            me.onReadyStateChange(true);
+        };
         
         if (me.timeouts > 0) {
-            setTimeout(function(){
-                me.onReadyStateChange(true);
-            }, me.timeouts);
+            setTimeout(script.onerror, me.timeouts);
         }
         
         script.onload = script.onreadystatechange = function(){
             me.onReadyStateChange();
         };
+        
+        t.parentNode.insertBefore(script, t);
     },
     
     abort: function(){

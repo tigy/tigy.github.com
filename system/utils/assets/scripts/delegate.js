@@ -33,10 +33,10 @@ var Delegate = Class({
 	},
 	
 	/**
-	 * xType 。
+	 * xtype 。
 	 * @type String
 	 */
-	xType: "delegate",
+	xtype: "delegate",
 	
 	/**
 	 * 增加一个函数。

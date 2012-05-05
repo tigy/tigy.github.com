@@ -1117,7 +1117,7 @@
 		 */
         once: function(type, listener, bind) {
 
-	        assert.isFunction(listener, 'System.Object.prototype.one(type, listener): {listener} ~');
+	        assert.isFunction(listener, 'System.Object.prototype.once(type, listener): {listener} ~');
 			
 			var me = this;
 
@@ -2744,7 +2744,7 @@ function imports(ns){
 			},
 
 			/**
-			 * xType 。
+			 * xtype 。
 			 * @virtual
 			 */
 			xtype: "dom"
@@ -2824,7 +2824,7 @@ function imports(ns){
 			},
 			
 			/**
-			 * xType
+			 * xtype
 			 */
 			xtype: "domlist"
 	
@@ -5938,7 +5938,7 @@ Ajax.Request = Class({
 			case 'wait':
 			
 				// 在 complete 事件中处理下一个请求。
-				me.one('complete', function() {
+				me.once('complete', function() {
 					this.send(data, true);
 					return false;
 				});
@@ -5982,7 +5982,7 @@ Ajax.Request = Class({
 	 */
 	
 	/**
-	 * xType。
+	 * xtype。
 	 */
 	xtype: "request"
 	
@@ -6622,7 +6622,7 @@ location.getHash = function() {
 			if (!iframe) {
 				Dom.ready(function(){
 					iframe = Dom.parse('<iframe style="display: none" height="0" width="0" tabindex="-1" title="empty"/>');
-					iframe.one('load', function() {
+					iframe.once('load', function() {
 						
 						// 绑定当 iframe 内容被重写后处理。
 						this.on("load", function() {
@@ -6773,7 +6773,7 @@ var Control = Dom.extend({
 		// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。
 		me.dom = dom || me.create(opt);
 
-		assert(me.dom && me.dom.nodeType, "Control.prototype.constructor(options): 当前实例的 dom 属性为空，或此属性不是 DOM 对象。(检查 options.dom 是否是合法的节点或ID(ID不存在?) 或当前实例的 create 方法是否正确返回一个节点)\r\n当前控件: {dom} {xType}", me.dom, me.xType);
+		assert(me.dom && me.dom.nodeType, "Control.prototype.constructor(options): 当前实例的 dom 属性为空，或此属性不是 DOM 对象。(检查 options.dom 是否是合法的节点或ID(ID不存在?) 或当前实例的 create 方法是否正确返回一个节点)\r\n当前控件: {dom} {xtype}", me.dom, me.xtype);
 
 		// 调用 init 初始化控件。
 		me.init(opt);
@@ -6788,7 +6788,7 @@ var Control = Dom.extend({
 	},
 
 	/**
-	 * xType 。
+	 * xtype 。
 	 * @virtual
 	 */
 	xtype: "control"
@@ -6804,7 +6804,7 @@ var IInput = {
 	
 	setAttr: function (name, value) {
 		if(typeof value === 'boolean'){
-			this.toggleClass('x-' + this.xType + '-' + name, value);
+			this.toggleClass('x-' + this.xtype + '-' + name, value);
 		}
 		return this.base('setAttr');
 	},
@@ -6852,7 +6852,7 @@ var IInput = {
  ************************************/
 var TextBox = Control.extend({
 	
-	xType: 'textbox',
+	xtype: 'textbox',
 	
 	tpl: '<input type="text" class="x-textbox">',
 	
@@ -7022,14 +7022,14 @@ ScrollableControl.ControlCollection = Collection.extend({
  ************************************/
 var ListControl = ScrollableControl.extend({
 	
-	xType: 'listcontrol',
+	xtype: 'listcontrol',
 	
 	tpl: '<div></div>',
 	
 	onControlAdded: function(childControl, index){
 		var t = childControl;
 		if(childControl.dom.tagName !== 'LI') {
-			childControl = Dom.create('li', 'x-' + this.xType + '-content');
+			childControl = Dom.create('li', 'x-' + this.xtype + '-content');
 			childControl.append(t);
 		}
 		
@@ -7088,7 +7088,7 @@ var ListControl = ScrollableControl.extend({
 	
 	init: function(options){
 		this.items = this.controls;
-		var classNamePreFix = 'x-' + this.xType;
+		var classNamePreFix = 'x-' + this.xtype;
 		this.addClass(classNamePreFix);
 		
 		// 获取容器。
@@ -7114,14 +7114,14 @@ var ListControl = ScrollableControl.extend({
 	 * 底层获取某项的选中状态。该函数仅仅检查元素的 class。
 	 */
 	baseGetSelected: function (itemContainerLi) {
-		return itemContainerLi.hasClass('x-' + this.xType + '-selected');
+		return itemContainerLi.hasClass('x-' + this.xtype + '-selected');
 	},
 	
 	/**
 	 * 底层设置某项的选中状态。该函数仅仅设置元素的 class。
 	 */
 	baseSetSelected: function (itemContainerLi, value) {
-		itemContainerLi.toggleClass('x-' + this.xType + '-selected', value);
+		itemContainerLi.toggleClass('x-' + this.xtype + '-selected', value);
 	},
 	
 	onOverFlowY: function(max){
@@ -7380,7 +7380,7 @@ var IDropDownMenuContainer = {
  ************************************/
 var ListBox = ListControl.extend(IInput).implement({
 	
-	xType: 'listbox',
+	xtype: 'listbox',
 	
 	/**
 	 * 当用户点击一项时触发。
@@ -7540,7 +7540,7 @@ var ListBox = ListControl.extend(IInput).implement({
  ************************************/
 var AutoComplete = Control.extend({
 	
-	xType: 'autocomplete',
+	xtype: 'autocomplete',
 	
 	onKeyDown: function(e){
 		switch(e.keyCode) {
@@ -7652,7 +7652,7 @@ var AutoComplete = Control.extend({
 
 // AutoComplete.SuggestListBox = ListBox.extend({
 // 	
-	// xType: 'suggest'
+	// xtype: 'suggest'
 // 	
 // });
 /************************************
@@ -7781,13 +7781,13 @@ var Button = ContentControl.extend({
  ************************************/
 var MenuButton = Button.extend(IDropDownMenuContainer).implement({
 	
-	xType: 'menubutton',
+	xtype: 'menubutton',
 	
 	tpl: '<button class="x-button"><span class="x-button-menu x-button-menu-down"></span></button>',
 	
 	init: function () {
 		this.base('init');
-		this.addClass('x-' + this.xType);
+		this.addClass('x-' + this.xtype);
 		this.menuButton = this.find('.x-button-menu');
 		this.on('click', this.toggleDropDownMenu);
 		this.setDropDownMenu(new Menu());
@@ -7828,7 +7828,7 @@ var MenuButton = Button.extend(IDropDownMenuContainer).implement({
  ************************************/
 var SplitButton = MenuButton.extend({
 	
-	xType: 'splitbutton',
+	xtype: 'splitbutton',
 	
 	tpl: '<span class="x-splitbutton x-buttongroup">\
 				<button class="x-button">&nbsp;</button>\
@@ -7855,7 +7855,7 @@ var SplitButton = MenuButton.extend({
  ************************************/
 var Tabbable = ListControl.extend({
 	
-	xType: 'tabbable',
+	xtype: 'tabbable',
 	
 	init: function(){
 		this.base('init');

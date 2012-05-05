@@ -61,7 +61,7 @@ var cases = {
 		jQuery: 'el.unbind("click")'
 	},
 	'事件 - 单一':{
-		jplus: 'el.one("click", function(e){})',
+		jplus: 'el.once("click", function(e){})',
 		mootools: '-',
 		jQuery: 'el.one("click", function(e){})'
 	},

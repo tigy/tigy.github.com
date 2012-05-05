@@ -9,7 +9,7 @@ using("System.Controls.Control");
  */
 var IFrame = System.Control.extend({
 	
-	xType: 'iframe',
+	xtype: 'iframe',
 	
 	tpl: '<iframe src="about:blank"></iframe>',
 	

@@ -339,8 +339,8 @@
 		 * @return this
 		 * @remark
 		 *         <p>
-		 *         由于一个类的事件是按照 xType 属性存放的，拥有相同 xType 的类将有相同的事件，为了避免没有 xType
-		 *         属性的类出现事件冲突， 这个方法会自动补全 xType 属性。
+		 *         由于一个类的事件是按照 xtype 属性存放的，拥有相同 xtype 的类将有相同的事件，为了避免没有 xtype
+		 *         属性的类出现事件冲突， 这个方法会自动补全 xtype 属性。
 		 *         </p>
 		 *         <p>
 		 *         这个函数是实现自定义事件的关键。
@@ -438,10 +438,10 @@
 		    assert(!events || Object.isObject(events),
 		            "Class.addEvents(events): {event} 必须是一个包含事件的对象。 如 {click: { add: ..., remove: ..., initEvent: ..., trigger: ... } ", events);
 
-			var ep = this.prototype, xType = hasOwnProperty.call(ep, 'xType') ? ep.xType : (ep.xType = (p.id++).toString());
+			var ep = this.prototype, xtype = hasOwnProperty.call(ep, 'xtype') ? ep.xtype : (ep.xtype = (p.id++).toString());
 
 			// 更新事件对象。
-			apply(eventMgr[xType] || (eventMgr[xType] = {}), events);
+			apply(eventMgr[xtype] || (eventMgr[xtype] = {}), events);
 
 		    return this;
 	    },
@@ -762,8 +762,8 @@
 		    // 获得类型 。
 		    var typeName = typeof obj;
 
-		    // 对象， 直接获取 xType 。
-		    return obj ? obj.xType || typeName : obj === null ? "null" : typeName;
+		    // 对象， 直接获取 xtype 。
+		    return obj ? obj.xtype || typeName : obj === null ? "null" : typeName;
 
 	    }
 
@@ -1058,14 +1058,14 @@
 	each.call([String, Array, Function, Date, Number], p.Native);
 
 	/**
-	 * xType。
+	 * xtype。
 	 */
-	Date.prototype.xType = "date";
+	Date.prototype.xtype = "date";
 
 	/**
-	 * xType。
+	 * xtype。
 	 */
-	RegExp.prototype.xType = "regexp";
+	RegExp.prototype.xtype = "regexp";
 	
 	/**
 	 * @class System.Object
@@ -1276,7 +1276,7 @@
 		 * @param {Object} bind=this listener 执行时的作用域。
 		 * @return  Base this
 		 * @example <code>
-         * elem.one('click', function (e) {
+         * elem.once('click', function (e) {
          * 		trace('a');  
          * });
          * 
@@ -1286,7 +1286,7 @@
 		 */
         one: function(type, listener, bind) {
 
-	        assert.isFunction(listener, 'System.Object.prototype.one(type, listener): {listener} ~');
+	        assert.isFunction(listener, 'System.Object.prototype.once(type, listener): {listener} ~');
 			
 			var me = this;
 
@@ -1306,7 +1306,7 @@
 		 * @return {String} 对应的字符串。
 		 */
 		toString: function(){
-			return this.xType || toString.call(this);
+			return this.xtype || toString.call(this);
 		}
 		
 	});
@@ -1554,9 +1554,9 @@
 	    /// #endif
 
 	    /**
-		 * xType。
+		 * xtype。
 		 */
-	    xType: "array"
+	    xtype: "array"
 
 	});
 
@@ -1693,7 +1693,7 @@
 		var evt = eMgr.constructor;
 
 		// 遍历父类， 找到适合的 eMgr 。
-		while (!(eMgr = eventMgr[eMgr.xType]) || !(eMgr = eMgr[type])) {
+		while (!(eMgr = eventMgr[eMgr.xtype]) || !(eMgr = eMgr[type])) {
 
 			if (evt && (evt = evt.base)) {
 				eMgr = evt.prototype;
@@ -2271,12 +2271,12 @@ function assert(bValue, msg) {
                     },
 
 					addEvents: function(obj, extInfo){
-						var evtInfo = obj.prototype && p.Events[obj.prototype.xType];
+						var evtInfo = obj.prototype && p.Events[obj.prototype.xtype];
 						
 						if(evtInfo){
 						
 							for(var evt in evtInfo){
-								this.sortInfo[this.members[evt] = obj.prototype.xType + '.' + evt + ' 事件' + extInfo] = 4 + evt;
+								this.sortInfo[this.members[evt] = obj.prototype.xtype + '.' + evt + ' 事件' + extInfo] = 4 + evt;
 							}
 							
 							if(obj.base){
@@ -2456,10 +2456,10 @@ function assert(bValue, msg) {
                 deep = 0;
             switch (typeof obj) {
                 case "function":
-                    if (deep == 0 && obj.prototype && obj.prototype.xType) {
+                    if (deep == 0 && obj.prototype && obj.prototype.xtype) {
                         // 类
-                        return String.format("class {0} : {1} {2}", obj.prototype.xType,
-                            (obj.prototype.base && obj.prototype.base.xType || "Basee"), trace.inspect(obj.prototype, deep + 1));
+                        return String.format("class {0} : {1} {2}", obj.prototype.xtype,
+                            (obj.prototype.base && obj.prototype.base.xtype || "Basee"), trace.inspect(obj.prototype, deep + 1));
                     }
 
                     // 函数
@@ -2888,10 +2888,10 @@ System.scripts.push('System.Dom.Base');
 			dom: null,
 	
 			/**
-			 * xType 。
+			 * xtype 。
 			 * @virtual
 			 */
-			xType: "control",
+			xtype: "control",
 	
 			/**
 			 * 存储当前控件的默认配置。
@@ -3010,7 +3010,7 @@ System.scripts.push('System.Dom.Base');
 				// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。
 				me.dom = dom || me.create(opt);
 	
-				assert(me.dom && me.dom.nodeType, "Control.prototype.constructor(options): 当前实例的 dom 属性为空，或此属性不是 DOM 对象。(检查 options.dom 是否是合法的节点或ID(ID不存在?) 或当前实例的 create 方法是否正确返回一个节点)\r\n当前控件: {dom} {xType}", me.dom, me.xType);
+				assert(me.dom && me.dom.nodeType, "Control.prototype.constructor(options): 当前实例的 dom 属性为空，或此属性不是 DOM 对象。(检查 options.dom 是否是合法的节点或ID(ID不存在?) 或当前实例的 create 方法是否正确返回一个节点)\r\n当前控件: {dom} {xtype}", me.dom, me.xtype);
 	
 				// 调用 init 初始化控件。
 				me.init(opt);
@@ -3125,9 +3125,9 @@ System.scripts.push('System.Dom.Base');
 			},
 			
 			/**
-			 * xType
+			 * xtype
 			 */
-			xType: "nodelist"
+			xtype: "nodelist"
 	
 		}),
 	
@@ -4759,7 +4759,7 @@ System.scripts.push('System.Dom.Base');
 		 */
 		getScroll: getWindowScroll,
 		
-		xType: 'control',
+		xtype: 'control',
 
 		/**
 		 * 滚到。

@@ -53,10 +53,10 @@ Fx.Base = (function(){
 		link: 'ignore',
 		
 		/**
-		 * xType
+		 * xtype
 		 * @type {String}
 		 */
-		xType: 'fx',
+		xtype: 'fx',
 		
 		/**
 		 * 初始化当前特效。

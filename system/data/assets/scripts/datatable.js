@@ -38,7 +38,7 @@
 //       playjs.DataSet::table    全部表格的集合
 //                              当您添加一个表格后,要使用table集合获得该表格     playjs.DataSet.table[索引]  或 playjs.DataSet.table[名]
 //       playjs.DataSet::count    表格数
-//       playjs.DataSet::xType    System对象对自身的说明
+//       playjs.DataSet::xtype    System对象对自身的说明
 //       playjs.DataTable::addTitle    增加表格的标题,参数可以是数组,或逗号隔开的字符串。
 //       playjs.DataTable::addTitleAt    增加表格的标题到一个位置,第一个参数为位置(数字),第二个为标题
 //       playjs.DataTable::render    渲染到一个DIV元素
@@ -83,11 +83,11 @@ System.Data.DataRow = Array.extend({
     },
 
     ///	<summary>
-	///	xType。
+	///	xtype。
 	///	</summary>
 	/// <type name="String" />
 	/// <const />
-	xType : "DataRow",
+	xtype : "DataRow",
 	
 	///	<summary>
 	///	结合标题。
@@ -195,11 +195,11 @@ System.Data.DataTable = Array.extend({
     },
     
     ///	<summary>
-	///	xType。
+	///	xtype。
 	///	</summary>
 	/// <type name="String" />
 	/// <const />
-    xType : "DataTable",
+    xtype : "DataTable",
     
     ///	<summary>
 	///	设置所有内容。

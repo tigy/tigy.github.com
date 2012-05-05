@@ -373,7 +373,7 @@ Ext.extend(Ext.data.SimpleStore, Ext.data.Store);
 // //
 // //       DataSet::add()    锟斤拷锟斤拷一锟斤拷锟斤拷,锟斤拷锟斤拷:锟斤拷锟斤拷锟?锟斤拷锟斤拷锟斤拷示锟斤拷锟斤拷锟斤拷,锟斤拷锟?锟斤拷,前锟斤拷锟斤拷锟斤拷为锟斤拷锟斤拷锟?锟斤拷锟斤拷潜锟斤拷狻?// //       DataSet::del()    删锟斤拷一锟斤拷锟斤拷,锟斤拷锟斤拷:锟斤拷锟斤拷锟斤拷帧锟?// //       DataSet::table    全锟斤拷锟斤拷锟侥硷拷锟斤拷
 // //                              锟斤拷锟斤拷锟斤拷锟揭伙拷锟斤拷锟斤拷锟?要使锟斤拷table锟斤拷锟较伙拷酶帽锟斤拷     DataSet.table[锟斤拷锟斤拷]  锟斤拷 DataSet.table[锟斤拷]
-// //       DataSet::count    锟斤拷锟斤拷锟?// //       DataSet::xType    System锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷说锟斤拷
+// //       DataSet::count    锟斤拷锟斤拷锟?// //       DataSet::xtype    System锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷说锟斤拷
 // //       DataTable::addTitle    锟斤拷锟接憋拷锟侥憋拷锟斤拷,锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟?锟津逗号革拷锟斤拷锟斤拷锟街凤拷
 // //       DataTable::addTitleAt    锟斤拷锟接憋拷锟侥憋拷锟解到一锟斤拷位锟斤拷,锟斤拷一锟斤拷锟斤拷锟斤拷为位锟斤拷(锟斤拷锟斤拷),锟节讹拷锟斤拷为锟斤拷锟斤拷
 // //       DataTable::render    锟斤拷染锟斤拷一锟斤拷DIV元锟斤拷
@@ -398,7 +398,7 @@ Ext.extend(Ext.data.SimpleStore, Ext.data.Store);
 // *      锟斤拷锟斤拷锟斤拷锟绞癸拷锟絡s锟斤拷锟斤拷
 // *   锟斤拷锟斤拷锟叫撅拷锟斤拷学习锟斤拷
 // */
-// if(!window.dataSet && dataSet.xType!="dataSet"){
+// if(!window.dataSet && dataSet.xtype!="dataSet"){
 	// dataSet = function(name){
 		// var playDataSet = {
 // 			
@@ -422,7 +422,7 @@ Ext.extend(Ext.data.SimpleStore, Ext.data.Store);
 				// }
 			// },
 // 			
-			// xType:"dataSet",
+			// xtype:"dataSet",
 // 			
 			// //锟斤拷锟斤拷一锟斤拷值锟斤拷末尾
 			// //锟斤拷锟斤拷:
@@ -532,7 +532,7 @@ Ext.extend(Ext.data.SimpleStore, Ext.data.Store);
 			// _load :  function(t,value){
 				// switch(typeof value){
 					// case "object" :
-						// if(value.xType){
+						// if(value.xtype){
 							// t = value;
 						// }else{
 							// for(var i in value){
@@ -713,7 +713,7 @@ Ext.extend(Ext.data.SimpleStore, Ext.data.Store);
 // 			
 		// };	
 // 		
-		// DataTable.xType = "playDataTable";		
+		// DataTable.xtype = "playDataTable";		
 		// //锟斤拷锟斤拷一锟斤拷锟斤拷元锟斤拷,锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷(锟斤拷,锟斤拷),锟揭诧拷锟斤拷 锟斤拷锟斤拷 (-1,-1)
 		// //锟斤拷锟斤拷:
 		// //  value : 值
@@ -857,7 +857,7 @@ Ext.extend(Ext.data.SimpleStore, Ext.data.Store);
 // 		
 		// DataColumn.name = name;
 // 		
-		// DataColumn.xType = "playDataColumn";
+		// DataColumn.xtype = "playDataColumn";
 // 		
 		// DataColumn.sorted = false;
 // 		
@@ -928,14 +928,14 @@ Ext.extend(Ext.data.SimpleStore, Ext.data.Store);
 	// }
 // 	
 	// function isArray(a){
-		// return typeof a == "object" && (a.constructor ==Array || typeof a.sort=="function" && !isNaN(a.length)) && !a.xType;
+		// return typeof a == "object" && (a.constructor ==Array || typeof a.sort=="function" && !isNaN(a.length)) && !a.xtype;
 // 		
 	// }
 	// //锟斤拷锟揭伙拷锟?   // playDataRow = function(name,vals,parent){
 // 	  
 	    // var DataRow = new Array();
 // 		
-		// DataRow.xType = "playDataRow";
+		// DataRow.xtype = "playDataRow";
 // 		
 		// DataRow.title = parent.title;
 		// //锟斤拷锟斤拷

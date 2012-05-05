@@ -298,9 +298,9 @@ var Ajax = Object.extend(Ajax.Request.extend({
 	},
 	
 	/**
-	 * xType。
+	 * xtype。
 	 */
-	xType: "ajax"
+	xtype: "ajax"
 	
 }), Ajax);
 

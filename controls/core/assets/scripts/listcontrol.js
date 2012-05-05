@@ -16,14 +16,14 @@ using("Controls.Core.ScrollableControl");
  */
 var ListControl = ScrollableControl.extend({
 	
-	xType: 'listcontrol',
+	xtype: 'listcontrol',
 	
 	tpl: '<div></div>',
 	
 	onControlAdded: function(childControl, index){
 		var t = childControl;
 		if(childControl.dom.tagName !== 'LI') {
-			childControl = Dom.create('li', 'x-' + this.xType + '-content');
+			childControl = Dom.create('li', 'x-' + this.xtype + '-content');
 			childControl.append(t);
 		}
 		
@@ -82,7 +82,7 @@ var ListControl = ScrollableControl.extend({
 	
 	init: function(options){
 		this.items = this.controls;
-		var classNamePreFix = 'x-' + this.xType;
+		var classNamePreFix = 'x-' + this.xtype;
 		this.addClass(classNamePreFix);
 		
 		// 获取容器。
@@ -108,14 +108,14 @@ var ListControl = ScrollableControl.extend({
 	 * 底层获取某项的选中状态。该函数仅仅检查元素的 class。
 	 */
 	baseGetSelected: function (itemContainerLi) {
-		return itemContainerLi.hasClass('x-' + this.xType + '-selected');
+		return itemContainerLi.hasClass('x-' + this.xtype + '-selected');
 	},
 	
 	/**
 	 * 底层设置某项的选中状态。该函数仅仅设置元素的 class。
 	 */
 	baseSetSelected: function (itemContainerLi, value) {
-		itemContainerLi.toggleClass('x-' + this.xType + '-selected', value);
+		itemContainerLi.toggleClass('x-' + this.xtype + '-selected', value);
 	},
 	
 	onOverFlowY: function(max){

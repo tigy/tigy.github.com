@@ -11,7 +11,7 @@ using("Controls.Core.ListControl");
 
 var MenuItem = ContentControl.extend({
 	
-	xType: 'menuitem',
+	xtype: 'menuitem',
 	
 	tpl: '<a class="x-menuitem"></a>',
 	
@@ -110,7 +110,7 @@ var MenuSeperator = Control.extend({
 
 var Menu = ListControl.extend({
 	
-	xType: 'menu',
+	xtype: 'menu',
 	
 	initChild: function (item) {
 		if(item instanceof MenuItem || item instanceof MenuSeperator){

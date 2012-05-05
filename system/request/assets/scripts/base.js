@@ -86,7 +86,7 @@ Ajax.Request = Class({
 			case 'wait':
 			
 				// 在 complete 事件中处理下一个请求。
-				me.one('complete', function() {
+				me.once('complete', function() {
 					this.send(data, true);
 					return false;
 				});
@@ -130,7 +130,7 @@ Ajax.Request = Class({
 	 */
 	
 	/**
-	 * xType。
+	 * xtype。
 	 */
 	xtype: "request"
 	

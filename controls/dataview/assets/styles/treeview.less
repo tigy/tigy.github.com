@@ -28,12 +28,16 @@
 	border: 0;
 }
 
+.x-treeview-content {
+  white-space: nowrap; 
+}
+
 .x-treenode, .x-treeview a, .x-treenode-space {
-    height: 20px;
+  height: 20px;
+  vertical-align: top;
 }
 
 .x-treenode {
-  overflow: hidden;
   cursor: default;
   display: block;
   color: @textColor;
@@ -41,8 +45,7 @@
 }
 
 .x-treenode-space {
-  float: left;
-  display: block;
+  display: inline-block;
   width: 19px;
 	background-repeat: no-repeat;
 }
