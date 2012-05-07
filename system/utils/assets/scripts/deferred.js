@@ -1,38 +1,4 @@
-/** * @author  *//** * 表示一个可以延时的操作。 */var Deferred = Class({
-
-	state: 'inited',
-
-	queue: 0,
-	/**	 * 实际执行的函数。	 */	run: Function.empty,
-
-	then: function (fn, bind) {
-		return this.once('done', fn, bind);
-	},	start: function () {
-		this.state = 'running';		this.run();		return this;
-	},	pause: function () {
-		this.state = 'pause';
-	},	stop: function () {
-		this.pause();
-		this.state = 'stopped';		this.trigger('done');
-	},	defer: function(timeout){		var me = this;		return setTimeout(function () {
-			me.start();
-		}, timeout || 0);	},	concat: function(deferred){		if (!this.queue) {
-			this.queue = [];		}		this.queue.push(deferred);	},	/**	 * 调用下一个关联的 Deferred 对象。	 */	progress: function () {		if (this.queue.length) {
-			this.queue.shift()
-				.once('alldone', function () {
-					this.progress();
-				}, this)
-				.start();
-		} else {
-			this.trigger('alldone');		}	},	abort: function () {
-		this.state = 'abort';
-		this.un('done');
-		this.progress();
-	},	done: function (args) {
-		this.state = 'done';
-		this.trigger('done', args);
-		this.progress();	}
-});Deferred.instances = {};
+/** * @author  *//** * 表示一个可以延时的操作。 */var Deferred = Class({    constructor: function() {        this._funs = [];        this._nextDef = null;        this._preDef = null;        this.isRunning = false;    },        then: function(f, arg) {        this._funs.push([f, arg]);    },        stop: function() {        //        this.pause();    },        abort: function() {        //        this.isRunning = false;        this._funs.length = 0;        this.pause();    },        pause: function() {        //        clearTimeout(this.timer);    },        done: function() {        //    },        run: function(args) {        this.timer = setTimeout(function(){trace(args);  this.next();}.bind(this), 1000);    },        start: function(args) {        this.then(this.run, args);        if (!this.isRunning) this.next();    },        next: function() {        if (this._funs.length)        {            this.isRunning = true;            var d2 = this._funs.shift();            d2[0].call(this, d2[1]);        }        else if (this._nextDef)        {            this.isRunning = false;            this.done();            this._nextDef.next();        }    },});Deferred.instances = {};
 /**
  * 多个请求同时发生后的处理方法。
  * wait - 等待上个操作完成。

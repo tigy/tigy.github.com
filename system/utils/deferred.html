@@ -17,22 +17,27 @@
             var d = new Deferred();
 
             // 添加 Deferred 对象执行结束后的回调函数。
-            d.then(function () {
+            /*d.then(function () {
                 alert('执行完成了');
-            });
+            });*/
 
             // 设置 Deferred 对象实际执行的函数。
-            d.run = function () {
+            /*d.run = function () {
                 var me = this;
                 setTimeout(function () {
 
                     // 通知当前类程序已经执行完成。
                     me.done();
                 }, 500);
-            };
+            };*/
 
             // 自己执行 Deferred 对象对应的函数。
-            d.start();
+            d.start("1");
+            d.start("2");
+            d.abort();
+            d.start("3");
+            d.start("4");
+            d.start("5");
 
 
         </script>
