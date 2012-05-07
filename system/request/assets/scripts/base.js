@@ -2,6 +2,8 @@
  * @fileOverview 提供最底层的请求底层辅助函数。
  */
 
+using("System.Utils.Deferred");
+
 var Request = Request || {};
 
 /**
@@ -9,9 +11,13 @@ var Request = Request || {};
  * @class Request.Base
  * @abstract
  */
-Request.Base = Class({
+Request.Base = Deferred.extend({
 
-	run: function (args) {
+	run: function (options) {
+		
+	},
+	
+	pause : function() {
 		
 	}
 
@@ -19,6 +25,17 @@ Request.Base = Class({
 
 });
 
+Request.param = function (obj) {
+	if (!obj)
+        return "";
+    var s = [], e = encodeURIComponent;
+    Object.each(obj, function(value, key) {
+        s.push(e(key) + '=' + e(value));
+    });
+
+    // %20 -> + 。
+    return s.join('&').replace(/%20/g, '+');
+};
 
 
 	; Class({
@@ -31,17 +48,7 @@ Request.Base = Class({
 	 * String.param({a: 4, g: 7}); //  a=4&g=7
 	 * </code>
 	 */
-	toParam: function (obj) {
-		if (!obj)
-	        return "";
-	    var s = [], e = encodeURIComponent;
-	    Object.each(obj, function(value, key) {
-	        s.push(e(key) + '=' + e(value));
-	    });
-	
-	    // %20 -> + 。
-	    return s.join('&').replace(/%20/g, '+');
-	},
+	toParam: ,
 	
 	combineUrl: function (url, param) {
 		return url + (url.indexOf('?') >= 0 ? '&' : '?') + param;

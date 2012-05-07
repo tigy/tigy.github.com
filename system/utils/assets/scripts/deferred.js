@@ -1,36 +1,1 @@
-/** * @author  *//** * ±íÊ¾Ò»¸ö¿ÉÒÔÑÓÊ±µÄ²Ù×÷¡£ */var Deferred = Class({    constructor: function() {        this._funs = [];        this._nextDef = null;        this._preDef = null;        this.isRunning = false;    },        then: function(f, arg) {        this._funs.push([f, arg]);    },        stop: function() {        //        this.pause();    },        abort: function() {        //        this.isRunning = false;        this._funs.length = 0;        this.pause();    },        pause: function() {        //        clearTimeout(this.timer);    },        done: function() {        //    },        run: function(args) {        this.timer = setTimeout(function(){trace(args);  this.next();}.bind(this), 1000);    },        start: function(args) {        this.then(this.run, args);        if (!this.isRunning) this.next();    },        next: function() {        if (this._funs.length)        {            this.isRunning = true;            var d2 = this._funs.shift();            d2[0].call(this, d2[1]);        }        else if (this._nextDef)        {            this.isRunning = false;            this.done();            this._nextDef.next();        }    },});Deferred.instances = {};
-/**
- * ¶à¸öÇëÇóÍ¬Ê±·¢ÉúºóµÄ´¦Àí·½·¨¡£
- * wait - µÈ´ıÉÏ¸ö²Ù×÷Íê³É¡£
- * ignore - ºöÂÔµ±Ç°²Ù×÷¡£
- * stop - Õı³£ÖĞ¶ÏÉÏ¸ö²Ù×÷£¬ÉÏ¸ö²Ù×÷µÄ»Øµ÷±»Á¢¼´Ö´ĞĞ£¬È»ºóÖ´ĞĞµ±Ç°²Ù×÷¡£
- * abort - ·Ç·¨Í£Ö¹ÉÏ¸ö²Ù×÷£¬ÉÏ¸ö²Ù×÷µÄ»Øµ÷±»ºöÂÔ£¬È»ºóÖ´ĞĞµ±Ç°²Ù×÷¡£
- * replace - Ìæ»»ÉÏ¸ö²Ù×÷ÎªĞÂµÄ²Ù×÷£¬ÉÏ¸ö²Ù×÷µÄ»Øµ÷½«±»¸´ÖÆ¡£
- */Deferred.link = function (deferredA, deferredB, linkType, type) {
-	if (deferredA && deferredA.state === 'running') {
-		switch (linkType) {
-			case 'wait':
-				// ½« deferred ·Åµ½µÈ´ı¶ÓÁĞ¡£
-				deferredA.then(function () {
-					Deferred.instances[type] = this;
-					this.start();
-				}, deferredB);
-				return deferredB;
-			case 'stop':
-				deferredA.stop();
-				break;
-			case 'abort':
-				deferredA.abort();
-				break;
-				//case 'replace':
-				//	deferredA.pause();
-				//	deferredA.run = deferredB.run;
-				//	deferredA.start();
-				//	break;
-			default:
-				assert(!linkType || linkType === 'ignore', "Deferred.link(data): ³ÉÔ± {link} ±ØĞëÊÇ wait¡¢cancel¡¢ignore Ö®Ò»¡£", linkType);
-				return deferredB;
-		}
-
-	}
-	//    Deferred.instances[type] = deferredB;	return deferredB.start();};
+/** * @author *//** * è¡¨ç¤ºä¸€ä¸ªå¯ä»¥å»¶æ—¶çš„æ“ä½œã€‚ */var Deferred = Class({		isRunning: false,		constructor : function() {		this._funs = [];	},		then : function(f, arg) {		this._funs.push([f, arg]);	},		stop : function() {		this.pause();	},		abort : function() {		this.isRunning = false;		this._funs.length = 0;		this.pause();	},		pause : function() {		clearTimeout(this.timer);	},		done : function() {		//	},		run : function(args) {		this.timer = setTimeout( function() {			trace(args);			this.progress();		}.bind(this), 1000);	},		start : function(args) {		this.then(this.run, args);		if(!this.isRunning)			this.progress();	},		progress : function() {		if(this._funs.length) {			this.isRunning = true;			var d2 = this._funs.shift();			d2[0].call(this, d2[1]);		} else if(this._progressDef) {			this.isRunning = false;			this.done();			this._progressDef.progress();		}	}});Deferred.instances = {};/** * å¤šä¸ªè¯·æ±‚åŒæ—¶å‘ç”Ÿåçš„å¤„ç†æ–¹æ³•ã€‚ * wait - ç­‰å¾…ä¸Šä¸ªæ“ä½œå®Œæˆã€‚ * ignore - å¿½ç•¥å½“å‰æ“ä½œã€‚ * stop - æ­£å¸¸ä¸­æ–­ä¸Šä¸ªæ“ä½œï¼Œä¸Šä¸ªæ“ä½œçš„å›è°ƒè¢«ç«‹å³æ‰§è¡Œï¼Œç„¶åæ‰§è¡Œå½“å‰æ“ä½œã€‚ * abort - éæ³•åœæ­¢ä¸Šä¸ªæ“ä½œï¼Œä¸Šä¸ªæ“ä½œçš„å›è°ƒè¢«å¿½ç•¥ï¼Œç„¶åæ‰§è¡Œå½“å‰æ“ä½œã€‚ * replace - æ›¿æ¢ä¸Šä¸ªæ“ä½œä¸ºæ–°çš„æ“ä½œï¼Œä¸Šä¸ªæ“ä½œçš„å›è°ƒå°†è¢«å¤åˆ¶ã€‚ */Deferred.link = function(deferredA, deferredB, linkType, type) {	if(deferredA && deferredA.state === 'running') {		switch (linkType) {			case 'wait':				// å°† deferred æ”¾åˆ°ç­‰å¾…é˜Ÿåˆ—ã€‚				deferredA.then(function() {					Deferred.instances[type] = this;					this.start();				}, deferredB);				return deferredB;			case 'stop':				deferredA.stop();				break;			case 'abort':				deferredA.abort();				break;			//case 'replace':			//	deferredA.pause();			//	deferredA.run = deferredB.run;			//	deferredA.start();			//	break;			default:				assert(!linkType || linkType === 'ignore', "Deferred.link(data): æˆå‘˜ {link} å¿…é¡»æ˜¯ waitã€cancelã€ignore ä¹‹ä¸€ã€‚", linkType);				return deferredB;		}	}	//    Deferred.instances[type] = deferredB;	return deferredB.start();};

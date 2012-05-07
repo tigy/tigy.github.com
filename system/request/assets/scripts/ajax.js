@@ -5,16 +5,7 @@
 
 using("System.Request.Base");
 
-/**
- * 处理异步请求的功能。
- * @class Ajax
- */
-var Ajax = Object.extend(Ajax.Request.extend({
-	
-	/**
-	 * 当前 AJAX 发送的地址。
-	 * @field url
-	 */
+Request.XMLHttpRequest = Class({
 
 	/**
 	 * 获取或设置请求类型。
@@ -37,6 +28,11 @@ var Ajax = Object.extend(Ajax.Request.extend({
 	},
 	
 	/**
+	 * 当前 AJAX 发送的地址。
+	 * @field url
+	 */
+	
+	/**
 	 * 获取或设置是否忽略缓存。
 	 * @property disableCache=false
 	 */
@@ -52,41 +48,41 @@ var Ajax = Object.extend(Ajax.Request.extend({
 	  * @property enableCache
 	  * @type Boolean
 	  */
-	 
+	
 	 /**
 		 * 判断一个 HTTP 状态码是否表示正常响应。
 		 * @param {Number} statusCode 要判断的状态码。
 		 * @return {Boolean} 如果正常则返回true, 否则返回 false 。
 		 * 一般地， 200、304、1223 被认为是正常的状态吗。
 		 */
-		checkStatusCode: function(statusCode) {
+	checkStatusCode: function(statusCode) {
 
-			// 获取状态。
-			if (!statusCode) {
+		// 获取状态。
+		if (!statusCode) {
 
-				// 获取协议。
-				var protocol = window.location.protocol;
+			// 获取协议。
+			var protocol = window.location.protocol;
 
-				// 对谷歌浏览器, 在有些协议， statusCode 不存在。
-				return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");
-			}
+			// 对谷歌浏览器, 在有些协议， statusCode 不存在。
+			return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");
+		}
 
-			// 检查， 各浏览器支持不同。
-			return (statusCode >= 200 && statusCode < 300) || statusCode == 304 || statusCode == 1223;
-		},
-		
-		/**
-		 * 初始化一个 XMLHttpRequest 对象。
-		 * @constructor
-		 * @class XMLHttpRequest
-		 * @return {XMLHttpRequest} 请求的对象。
-		 */
-		createRequest: window.XMLHttpRequest ? function(){
-			return new XMLHttpRequest();
-		} : function() {
-			return new ActiveXObject("Microsoft.XMLHTTP");
-		},
+		// 检查， 各浏览器支持不同。
+		return (statusCode >= 200 && statusCode < 300) || statusCode == 304 || statusCode == 1223;
+	},
 	
+	/**
+	 * 初始化一个 XMLHttpRequest 对象。
+	 * @constructor
+	 * @class XMLHttpRequest
+	 * @return {XMLHttpRequest} 请求的对象。
+	 */
+	createNativeRequest: window.XMLHttpRequest ? function(){
+		return new XMLHttpRequest();
+	} : function() {
+		return new ActiveXObject("Microsoft.XMLHTTP");
+	},
+
 	onReadyStateChange: function(exception){
 		var me = this, xhr = me.xhr;
 			
@@ -295,7 +291,24 @@ var Ajax = Object.extend(Ajax.Request.extend({
 		}
 		
 		return this;
-	},
+	}
+	
+});
+
+Request.Ajax = Request.Base.extend({
+	
+	options: {
+	
+	}
+	
+	
+});
+
+/**
+ * 处理异步请求的功能。
+ * @class Ajax
+ */
+var Ajax = Object.extend(Ajax.Request.extend({
 	
 	/**
 	 * xtype。
