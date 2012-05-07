@@ -2,7 +2,6 @@
  * @fileOverview 提供最底层的请求底层辅助函数。
  */
 
-using("System.Utils.Deferred");
 
 var Request = Request || {};
 
@@ -11,20 +10,52 @@ var Request = Request || {};
  * @class Request.Base
  * @abstract
  */
-Request.Base = Deferred.extend({
-
-	run: function (options) {
-		
+Request.Base = Class({
+	
+	/**
+	 * 当前 AJAX 发送的地址。
+	 * @field url
+	 */
+	
+	/**
+	 * 超时的时间大小。 (单位: 毫秒)
+	 * @property timeouts
+	 * @type Number
+	 */
+	
+	onStart: function () {
+		return this.trigger('start');
 	},
 	
-	pause : function() {
-		
+	onError: function (errorNo, message) {
+		return this.trigger('error', {
+			type: errorNo,
+			message: message
+		});
+	},
+	
+	onSuccess: function (data) {
+		return this.trigger('success', data);
+	},
+	
+	onComplete: function () {
+		return this.trigger('complete');
+	},
+	
+	onAbort: function () {
+		return this.trigger('abort');
 	}
-
-
-
+	
 });
 
+/**
+ * 返回变量的地址形式。
+ * @param { Base} obj 变量。
+ * @return {String} 字符串。
+ * @example <code>
+ * Request.param({a: 4, g: 7}); //  a=4&g=7
+ * </code>
+ */
 Request.param = function (obj) {
 	if (!obj)
         return "";
@@ -37,122 +68,8 @@ Request.param = function (obj) {
     return s.join('&').replace(/%20/g, '+');
 };
 
-
-	; Class({
-	
-	/**
-	 * 返回变量的地址形式。
-	 * @param { Base} obj 变量。
-	 * @return {String} 字符串。
-	 * @example <code>
-	 * String.param({a: 4, g: 7}); //  a=4&g=7
-	 * </code>
-	 */
-	toParam: ,
-	
-	combineUrl: function (url, param) {
-		return url + (url.indexOf('?') >= 0 ? '&' : '?') + param;
-	},
-	
-	onStart: function(data){
-		this.trigger("start", data);
-	},
-	
-	onSuccess: function(response){
-		this.trigger("success", response);
-	},
-	
-	onError: function(errorMessage){
-		this.trigger("error", errorMessage);
-	},
-	
-	onTimeout: function(){
-		this.trigger("timeout");
-	},
-	
-	onComplete: function(status){
-		this.trigger("complete", status);
-	},
-
-	onAbort: function(){
-		this.trigger("abort");
-	},
-	
-	/**
-	 * 多个请求同时发生后的处理方法。 wait - 等待上个请求。 cancel - 中断上个请求。 ignore - 忽略新请求。
-	 */
-	link: 'wait',
-
-	/**
-	 * 发送请求前检查。
-	 * @param {Object} data 数据。
-	 * @return {Boolean} 是否可发。
-	 * @protected virtual
-	 */
-	delay: function (data) {
-		var me = this;
-
-		switch (me.link) {
-			case 'wait':
-
-				// 在 complete 事件中处理下一个请求。
-				me.once('complete', function () {
-					this.send(data, true);
-					return false;
-				});
-				return false;
-			case 'cancel':
-
-				// 中止请求。
-				me.abort();
-				return true;
-			default:
-				assert(!link || link == 'ignore', "Ajax.prototype.send(data): 成员 {link} 必须是 wait、cancel、ignore 之一。", me.link);
-				return false;
-		}
-		return true;
-	},
-
-	/**
-	 * 初始化当前请求。
-	 * @param {Object} obj 配置对象。
-	 * @constructor Ajax
-	 */
-	constructor: function(obj) {
-		Object.extend(this, obj);
-	},
-	
-	/**
-	 * 超时的时间大小。 (单位: 毫秒)
-	 * @property timeouts
-	 * @type Number
-	 */
-	 
-	 /**
-	  * 是否允许缓存。
-	  * @property enableCache
-	  * @type Boolean
-	  */
-	
-	/**
-	 * 发送请求。
-	 * @param {Object} [data] 发送的数据。
-	 * @method send
-	 * @abstract
-	 */
-	
-	/**
-	 * 停止当前的请求。
-	 * @return this
-	 * @method abort
-	 * @abstract
-	 */
-	
-	/**
-	 * xtype。
-	 */
-	xtype: "request"
-	
-});
+Request.combineUrl = function (url, param) {
+	return url + (url.indexOf('?') >= 0 ? '&' : '?') + param;
+};
 
 

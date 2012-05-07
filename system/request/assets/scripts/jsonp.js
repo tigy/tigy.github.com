@@ -6,9 +6,9 @@
 
 using("System.Request.Base");
 
-Ajax.JSONP = Ajax.Request.extend({
+Request.JSONP = Request.Base.extend({
 
-    onReadyStateChange: function(exception){
+    onReadyStateChange: function(errorNo, message){
     	var me = this, script = me.script;
     	if (script && (exception || !script.readyState || !/in/.test(script.readyState))) {
         
@@ -28,7 +28,6 @@ Ajax.JSONP = Ajax.Request.extend({
             	if (exception) {
 
             		if (exception === 1) {
-            			me.onTimeout(script);
             			me.onError('Request Timeout');
 					} else {
 						me.onError('JSONP Error');
@@ -48,11 +47,8 @@ Ajax.JSONP = Ajax.Request.extend({
     
     jsonp: 'callback',
     
-    send: function(data){
+    send: function(){
         var me = this, url = me.url, script, t;
-        
-        if (me.script && !me.delay(data)) 
-            return me;
         
         me.onStart(data);
         
@@ -106,16 +102,3 @@ Ajax.JSONP = Ajax.Request.extend({
         this.onReadyStateChange('Aborted');
     }
 });
-
-Ajax.getJSONP = function(url, data, onsuccess, timeouts, ontimeout, oncomplete){
-    assert.isString(url, "Ajax.getJSONP(url, data, onsuccess, timeouts, ontimeout): 参数{url} 必须是一个地址。如果需要提交至本页，使用 location.href。");
-    var emptyFn = Function.empty;
-    new Ajax.JSONP({
-        url: url,
-        onSuccess: onsuccess || emptyFn,
-        timeouts: timeouts,
-        onTimeout: ontimeout || emptyFn,
-        onComplete: oncomplete || emptyFn
-    }).send(data);
-};
-
