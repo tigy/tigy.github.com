@@ -1,15 +1,27 @@
 /**
- * @fileOverview 提供最底层的 AJAX 辅助函数。
+ * @fileOverview 提供最底层的请求底层辅助函数。
  */
 
-var Ajax = Ajax || {};
+var Request = Request || {};
 
 /**
  * 提供一个请求的基本功能。
- * @class Request
+ * @class Request.Base
  * @abstract
  */
-Ajax.Request = Class({
+Request.Base = Class({
+
+	run: function (args) {
+		
+	}
+
+
+
+});
+
+
+
+	; Class({
 	
 	/**
 	 * 返回变量的地址形式。
@@ -65,34 +77,25 @@ Ajax.Request = Class({
 	link: 'wait',
 
 	/**
-	 * 初始化当前请求。
-	 * @param {Object} obj 配置对象。
-	 * @constructor Ajax
-	 */
-	constructor: function(obj) {
-		Object.extend(this, obj);
-	},
-	
-	/**
 	 * 发送请求前检查。
 	 * @param {Object} data 数据。
 	 * @return {Boolean} 是否可发。
 	 * @protected virtual
 	 */
-	delay: function(data) {
+	delay: function (data) {
 		var me = this;
-		
+
 		switch (me.link) {
 			case 'wait':
-			
+
 				// 在 complete 事件中处理下一个请求。
-				me.once('complete', function() {
+				me.once('complete', function () {
 					this.send(data, true);
 					return false;
 				});
 				return false;
 			case 'cancel':
-			
+
 				// 中止请求。
 				me.abort();
 				return true;
@@ -101,6 +104,15 @@ Ajax.Request = Class({
 				return false;
 		}
 		return true;
+	},
+
+	/**
+	 * 初始化当前请求。
+	 * @param {Object} obj 配置对象。
+	 * @constructor Ajax
+	 */
+	constructor: function(obj) {
+		Object.extend(this, obj);
 	},
 	
 	/**

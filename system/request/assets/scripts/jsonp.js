@@ -9,8 +9,8 @@ using("System.Request.Base");
 Ajax.JSONP = Ajax.Request.extend({
 
     onReadyStateChange: function(exception){
-        var me = this, script = me.script;
-        if (script && (exception || !/in/.test(script.readyState))) {
+    	var me = this, script = me.script;
+    	if (script && (exception || !script.readyState || !/in/.test(script.readyState))) {
         
             // 删除全部绑定的函数。
             script.onerror = script.onload = script.onreadystatechange = null;
@@ -25,9 +25,15 @@ Ajax.JSONP = Ajax.Request.extend({
             
             try {
             
-                if (exception === true) {
-                    me.onTimeout(script);
-                    exception = 'Request Timeout';
+            	if (exception) {
+
+            		if (exception === 1) {
+            			me.onTimeout(script);
+            			me.onError('Request Timeout');
+					} else {
+						me.onError('JSONP Error');
+            		}
+
                 }
                 
                 me.onComplete(script);
@@ -79,11 +85,13 @@ Ajax.JSONP = Ajax.Request.extend({
         script.type = "text/javascript";
         
         script.onerror = function(){
-            me.onReadyStateChange(true);
+            me.onReadyStateChange(1);
         };
         
         if (me.timeouts > 0) {
-            setTimeout(script.onerror, me.timeouts);
+        	setTimeout(script.onerror, function () {
+        		me.onReadyStateChange(2);
+        	});
         }
         
         script.onload = script.onreadystatechange = function(){
