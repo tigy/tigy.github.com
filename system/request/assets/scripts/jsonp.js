@@ -1,6 +1,6 @@
 /**
  * @fileOverview 请求处理JSON-P数据。
- * @author aki xuld
+ * @author xuld
  */
 
 
@@ -8,9 +8,13 @@ using("System.Request.Base");
 
 Request.JSONP = Request.Base.extend({
 
-    onReadyStateChange: function(errorNo, message){
+	jsonp: 'callback',
+
+	success: Function.empty,
+
+    onStateChange: function(errorNo, message){
     	var me = this, script = me.script;
-    	if (script && (exception || !script.readyState || !/in/.test(script.readyState))) {
+    	if (script && (errorNo || !script.readyState || !/in/.test(script.readyState))) {
         
             // 删除全部绑定的函数。
             script.onerror = script.onload = script.onreadystatechange = null;
@@ -18,47 +22,38 @@ Request.JSONP = Request.Base.extend({
             // 删除当前脚本。
             script.parentNode.removeChild(script);
             
-            // 删除回调。
-            delete window[me.callback];
+    		// 删除回调。
+			delete window[me.callback];
             
             me.script = null;
             
             try {
             
-            	if (exception) {
-
-            		if (exception === 1) {
-            			me.onError('Request Timeout');
-					} else {
-						me.onError('JSONP Error');
-            		}
-
-                }
+            	if (errorNo && me.error) {
+					me.error(errorNo, message, script);
+				}
                 
-                me.onComplete(script);
+            	if (me.complete) {
+            		me.complete(script, message, errorNo);
+            	}
                 
             } finally {
             
                 script = null;
                 
+                me.done();
             }
         }
     },
     
-    jsonp: 'callback',
-    
     send: function(){
-        var me = this, url = me.url, script, t;
+    	var me = this,
+			url = me.initUrl(me.url),
+			data = me.initData(me.data),
+			script,
+			t;
         
-        me.onStart(data);
-        
-        // 改成字符串。
-        if (typeof data !== 'string') {
-            
-            data = me.toParam(data);
-        }
-        
-        url = me.combineUrl(url, data);
+    	url = Request.combineUrl(url, data);
         
         // 处理 callback=?
         var callback = me.callback || ( 'jsonp' + System.id++ );
@@ -66,39 +61,38 @@ Request.JSONP = Request.Base.extend({
         if(url.indexOf(me.jsonp + '=?') >= 0){
         	url = url.replace(me.jsonp + '=?', me.jsonp + '=' + callback);
         } else {
-      		url = me.combineUrl(url, me.jsonp + "=" + callback);
+        	url = Request.combineUrl(url, me.jsonp + "=" + callback);
       	}
         
         script = me.script = document.createElement("script");
-        t = document.getElementsByTagName("script")[0];
+
+        if (me.start)
+        	me.start(data, me.script);
         
         window[callback] = function(){
         	delete window[callback];
-            me.onSuccess.apply(me, arguments);
+
+        	return me.success.apply(me, arguments);
         };
         
         script.src = url;
         script.type = "text/javascript";
+
+        script.onload = script.onreadystatechange = function () {
+        	me.onStateChange();
+        };
         
         script.onerror = function(){
-            me.onReadyStateChange(1);
+        	me.onStateChange(1);
         };
         
         if (me.timeouts > 0) {
-        	setTimeout(script.onerror, function () {
-        		me.onReadyStateChange(2);
-        	});
+        	setTimeout(function () {
+        		me.onStateChange(-1);
+			}, me.timeouts);
         }
-        
-        script.onload = script.onreadystatechange = function(){
-            me.onReadyStateChange();
-        };
-        
+
+        t = document.getElementsByTagName("script")[0];
         t.parentNode.insertBefore(script, t);
-    },
-    
-    abort: function(){
-        this.onAbort();
-        this.onReadyStateChange('Aborted');
     }
 });

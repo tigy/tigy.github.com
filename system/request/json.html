@@ -12,33 +12,31 @@
     </head>
     <body>
         <script>
-            var url = 'data/json.html';
-            var json = new Ajax.JSON({
+            var req = new Request.XML({
+                url: 'data/json.html',
                 data: {
                     "d1": "内容"
                 },
-                url: url,
-                onSuccess: function(m){
-                    trace.log("成功 =>", this.parseJSON(m));
+                start: function (m) {
+                    trace.info("开始 =>", m);
                 },
-                onComplete: function(m){
-                    trace.info("完成 => " + m);
+                success: function (m) {
+                    trace("成功 =>", m);
                 },
-                onError: function(m){
-                    trace.error("错误 => " + m);
+                error: function (m) {
+                    trace.error("错误 => ", m);
                 },
-                onTimeout: function(m){
-                    trace.error("超时 => " + m);
+                complete: function (m) {
+                    trace.info("完成 => ", m);
                 }
             });
-            
+
             var testcases = {
-            	'Ajax.JSON.prototype.send': '@json;',
-            	'Ajax.getJSON': 'url, {p1:"v1"}, trace'
+                'Request.XML.prototype.send': 'req.send()'
             };
-            
-            Demo.writeTestCases(testcases, {times: 8});
-            
+
+            Demo.writeTestCases(testcases, { times: 8 });
+
         </script>
     </body>
 </html>

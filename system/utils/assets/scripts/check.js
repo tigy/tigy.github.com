@@ -3,15 +3,16 @@
  */
 
 
+var Check = Check || {};
 
-namespace(".Check.", {
+Object.extend(Check, {
 	
 	/**
 	 * 测试字符串是否为邮箱格式.
 	 * @param {String} value
 	 * @return {Boolean}
 	 */
-    isMail : function(value) {
+	isEmail: function (value) {
         return /\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/.test(value);
     },
 	
@@ -59,6 +60,7 @@ namespace(".Check.", {
 	checkPasswordLevel: function(value){
 		return value.replace(/^(?:(?=.{4})(?=.*([a-z])|.)(?=.*([A-Z])|.)(?=.*(\d)|.)(?=.*(\W)|.).*|.*)$/, "$1$2$3$4").length;
 	},
+
 	/**
 	 * 检查一个字符串是否为空。 
 	 * @param {String} value
@@ -66,10 +68,12 @@ namespace(".Check.", {
 	isNotEmpty: function(value){
 		return value.length > 0;
 	},
+
 	//检查是否为中文
 	isChinese:function(value){
 		return /^([\u4E00-\u9FA5]|[\uFE30-\uFFA0])+$/gi.test(value);
 	},
+
 	/**
 	 * 判断是否为合法用户名。合法的用户名必须是非数字开头的 字母、_、数字、中文。
 	 * @param {Object} value

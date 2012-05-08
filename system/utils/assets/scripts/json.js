@@ -13,18 +13,21 @@ Object.extend(JSON, {
 		return JSON.specialChars[chr] || '\\u00' + Math.floor(chr.charCodeAt() / 16).toString(16) + (chr.charCodeAt() % 16).toString(16);
 	},
 
-	encode: JSON.stringify || function(obj){
-		switch (Object.type(obj)){
+	encode: function(obj){
+		switch (typeof obj){
 			case 'string':
 				return '"' + obj.replace(/[\x00-\x1f\\"]/g, JSON.replaceChars) + '"';
-			case 'array':
-				return '[' + String(Object.map(obj, JSON.encode, [])) + ']';
 			case 'object':
-				var string = [];
-				for(var key in obj) {
-					string.push(JSON.encode(key) + ':' + JSON.encode(obj[key]));
+				if (obj) {
+					if (Array.isArray(obj)) {
+						return '[' + String(Object.map(obj, JSON.encode, [])) + ']';
+					}
+					var s = [];
+					for (var key in obj) {
+						s.push(JSON.encode(key) + ':' + JSON.encode(obj[key]));
+					}
+					return '{' + s + '}';
 				}
-				return '{' + string + '}';
 			default:
 				return String(obj);
 		}
@@ -32,9 +35,6 @@ Object.extend(JSON, {
 
 	decode: function(string){
 		if (typeof string != 'string' || !string.length) return null;
-		
-		if (JSON.parse)
-			return JSON.parse(string);
 		
 		// 摘自 json2.js
 		if (/^[\],:{}\s]*$/
@@ -51,7 +51,9 @@ Object.extend(JSON, {
 
 });
 
-
-
+Object.extendIf(JSON, {
+	stringify: JSON.encode,
+	parse: JSON.decode
+});
 
 

@@ -12,7 +12,12 @@
 		<script>
 
 		    var testcases = {
-		        "JSON.fromQueryString": '"a=2&c=4" => {a:"2", c:"4"}'
+		        "QueryString.parse": {
+		            '~("a=2&c=4")': {a:"2", c:"4"}
+                },
+		        "QueryString.stringify": {
+		            '~({ a: "2", c: "4" })': "a=2&c=4"
+		        }
 		    };
 
 		    Demo.writeTestCases(testcases);

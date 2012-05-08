@@ -24,7 +24,7 @@ Fx.Base = (function(){
 	function interval(){
 		var i = this.length;
 		while(--i >= 0)
-			this[i].step();
+			this[i].progress();
 	}
 	
 	/// #endregion
@@ -47,24 +47,10 @@ Fx.Base = (function(){
 		duration: 500,
 		
 		/**
-		 * 在特效运行时，第二个特效的执行方式。 可以为 'ignore' 'cancel' 'wait' 'restart' 'replace'
-		 * @type {String}
-		 */
-		link: 'ignore',
-		
-		/**
 		 * xtype
 		 * @type {String}
 		 */
 		xtype: 'fx',
-		
-		/**
-		 * 初始化当前特效。
-		 * @param {Object} options 选项。
-		 */
-		constructor: function() {
-			this._competeListeners = [];
-		},
 		
 		/**
 		 * 实现变化。
@@ -81,28 +67,25 @@ Fx.Base = (function(){
 		 * @param {Object} to 结束位置。
 		 * @return {Base} this
 		 */
-		compile: function(from, to) {
+		compile: function (options) {
 			var me = this;
-			me.from = from;
-			me.to = to;
 			return me;
 		},
 		
 		/**
 		 * 进入变换的下步。
 		 */
-		step: function() {
+		progress: function() {
 			var me = this, time = Date.now() - me.time;
 			if (time < me.duration) {
 				me.set(me.transition(time / me.duration));
 			}  else {
-				me.set(1);
-				me.complete();
+				me.stop();
 			}
 		},
 		
 		/**
-		 * @event step 当进度改变时触发。
+		 * @event progress 当进度改变时触发。
 		 * @param {Number} value 当前进度值。
 		 */
 		
@@ -112,77 +95,7 @@ Fx.Base = (function(){
 		 * @abstract
 		 */
 		set: function(value){
-			this.trigger('step', Fx.compute(this.from, this.to, value));
-		},
-		
-		/**
-		 * 增加完成后的回调工具。
-		 * @param {Function} fn 回调函数。
-		 */
-		ready: function(fn){
-			assert.isFunction(fn, "Fx.Base.prototype.ready(fn): 参数 {fn} ~。    ");
-			this._competeListeners.unshift(fn);	
-			return this;
-		},
-		
-		/**
-		 * 检查当前的运行状态。
-		 * @param {Object} from 开始位置。
-		 * @param {Object} to 结束位置。
-		 * @param {Number} duration=-1 变化的时间。
-		 * @param {Function} [onStop] 停止回调。
-		 * @param {Function} [onStart] 开始回调。
-		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 reset 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。 replace 直接替换成新的渐变。
-		 * @return {Boolean} 是否可发。
-		 */
-		delay: function() {
-			var me = this, args = arguments;
-			
-			//如正在运行。
-			if(me.timer){
-				switch (args[5] || me.link) {
-					
-					// 链式。
-					case 'wait':
-						this._competeListeners.unshift(function() {
-							
-							this.start.apply(this, args);
-							return false;
-						});
-						
-						//  如当前fx完成， 会执行 _competeListeners 。
-						
-						//  [新任务开始2, 新任务开始1]
-						
-						//  [新任务开始2, 回调函数] 
-						
-						//  [新任务开始2]
-						
-						//  []
-						
-						return false;
-						
-					case 'reset':
-						me.pause();
-						while(me._competeListeners.pop());
-						break;
-						
-					// 停掉目前项。
-					case 'cancel':
-						me.stop();
-						break;
-						
-					case 'replace':
-						me.pause();
-						break;
-						
-					// 忽视新项。
-					default:
-						return false;
-				}
-			}
-			
-			return true;
+			this.trigger('progress', value);
 		},
 		
 		/**
@@ -195,32 +108,17 @@ Fx.Base = (function(){
 		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 restart 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
 		 * @return {Base} this
 		 */
-		start: function() {
-			var me = this, args = arguments;
-			
-			if (!me.timer || me.delay.apply(me, args)) {
-				
-				// 如果 duration > 0  更新。
-				if (args[2] > 0) this.duration = args[2];
-				else if(args[2] < -1) this.duration /= -args[2];
-				
-				// 存储 onStop
-				if (args[3]) {
-					assert.isFunction(args[3], "Fx.Base.prototype.start(from, to, duration, onStop, onStart, link): 参数 {callback} ~。      ");
-					me._competeListeners.push(args[3]);
-				}
-				
-				// 执行 onStart
-				if (args[4] && args[4].apply(me, args) === false) {
-					return me.complete();
-				}
-			
-				// 设置时间
-				me.time = 0;
-				
-				me.compile(args[0], args[1]).set(0);
-				me.resume();
+		start: function(options) {
+			var me = this;
+			me.compile(options);
+			me.set(0);
+			me.time = 0;
+
+			if (me.start) {
+				me.start();
 			}
+				
+			me.resume();
 			return me;
 		},
 		
@@ -228,25 +126,17 @@ Fx.Base = (function(){
 		 * 完成当前效果。
 		 */
 		complete: function() {
-			var me = this;
-			me.pause();
-			var handlers = me._competeListeners;
-			while(handlers.length)  {
-				if(handlers.pop().call(me) === false)
-					return me;
-			}
 			
-			return me;
 		},
 		
 		/**
 		 * 中断当前效果。
 		 */
 		stop: function() {
-			var me = this;
-			me.set(1);
-			me.pause();
-			return me;
+			this.set(1);
+			this.pause();
+			this.complete();
+			return this;
 		},
 		
 		/**
@@ -262,7 +152,7 @@ Fx.Base = (function(){
 					clearInterval(me.timer);
 					delete cache[fps];
 				}
-				me.timer = undefined;
+				me.timer = 0;
 			}
 			return me;
 		},

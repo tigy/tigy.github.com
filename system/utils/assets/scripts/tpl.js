@@ -28,12 +28,12 @@
 var Tpl = {
 	
 	cache: {},
+
+	_blockStack: [],
 	
 	encodeJs: function(input){
 		return input.replace(/[\r\n]/g, '\\n').replace(/"/g, '\\"');
 	},
-	
-	_blockStack: [],
 	
 	processCommand: function(command){
 		var c = command.match(/^(if|for|end|else|eval|var|\$|\W+)(\b[\s\S]*)?$/);

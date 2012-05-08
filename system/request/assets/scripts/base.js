@@ -5,6 +5,13 @@
 
 var Request = Request || {};
 
+// errorNo
+//  0 - 无错误
+//  1 - 服务器响应错误 (404, 500, etc)
+//  2 - 客户端出现异常
+//  -1 - 服务器超时
+//  -2 - 用户主动结束请求
+
 /**
  * 提供一个请求的基本功能。
  * @class Request.Base
@@ -22,28 +29,73 @@ Request.Base = Class({
 	 * @property timeouts
 	 * @type Number
 	 */
-	
-	onStart: function () {
-		return this.trigger('start');
+
+	url: null,
+
+	/**
+	 * 是否允许缓存。
+	 * @type Boolean
+	 */
+	cache: true,
+
+	data: null,
+
+	timeout: -1,
+
+	start: null,
+
+	success: null,
+
+	error: null,
+
+	complete: null,
+
+	initData: function (data) {
+		return !data ? null : typeof data === 'string' ? data : Request.param(data);
 	},
-	
-	onError: function (errorNo, message) {
-		return this.trigger('error', {
-			type: errorNo,
-			message: message
-		});
+
+	initUrl: function (url) {
+		assert.notNull(url, "Request.Base.prototype.initUrl(url): {url} ~。", url);
+		url = url.replace(/#.*$/, '');
+
+		// 禁止缓存，为地址加上随机数。
+		return this.cache ? url : Request.combineUrl(url, '_=' + Date.now());
 	},
-	
-	onSuccess: function (data) {
-		return this.trigger('success', data);
+
+	/**
+	 * @param options
+	 * url - 请求的地址。
+	 * data - 请求的数据。
+	 * cache - 是否允许缓存。默认为 true 。
+	 * start - 请求开始时的回调。参数是 data, xhr
+	 * error - 请求失败时的回调。参数是 errorNo, message, xhr
+	 * success - 请求成功时的回调。参数是 content, message, xhr
+	 * complete - 请求完成时的回调。参数是 xhr, message, errorNo
+	 * timeout - 请求超时时间。单位毫秒。默认为 -1 无超时 。
+	 */
+	constructor: function (options) {
+
+		for (var option in options) {
+			var value = options[option];
+			if (value !== undefined) {
+				this[option] = value;
+			}
+		}
 	},
-	
-	onComplete: function () {
-		return this.trigger('complete');
-	},
-	
-	onAbort: function () {
-		return this.trigger('abort');
+
+	/**
+	 * 子类可重写此函数，用于在请求完成时调用。
+	 * @protected abstract
+	 */
+	done: Function.empty,
+
+	/**
+	 * 停止当前的请求。
+	 * @return this
+	 */
+	abort: function () {
+		this.onStateChange(-2);
+		return this;
 	}
 	
 });
@@ -56,16 +108,20 @@ Request.Base = Class({
  * Request.param({a: 4, g: 7}); //  a=4&g=7
  * </code>
  */
-Request.param = function (obj) {
-	if (!obj)
-        return "";
-    var s = [], e = encodeURIComponent;
-    Object.each(obj, function(value, key) {
-        s.push(e(key) + '=' + e(value));
-    });
+Request.param = function (obj, name) {
 
-    // %20 -> + 。
-    return s.join('&').replace(/%20/g, '+');
+	var s;
+	if (Object.isObject(obj)) {
+		s = [];
+		Object.each(obj, function (value, key) {
+			s.push(Request.param(value, name ? name + "[" + key + "]" : key));
+		});
+		s = s.join('&');
+	} else {
+		s = encodeURIComponent(name) + "=" + encodeURIComponent(obj);
+	}
+
+	return s.replace(/%20/g, '+');
 };
 
 Request.combineUrl = function (url, param) {

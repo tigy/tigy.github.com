@@ -6,9 +6,33 @@ using("System.Request.Base");
 using("System.Utils.Deferred");
 
 
-var Ajax = Ajax || {};
+var Ajax = Deferred.extend({
 
-Ajax.deferred = new Deferred();
+	constructor: function(){
+
+	},
+	
+	run: function (options) {
+		if (options.req) {
+
+		}
+		this.req = new Request[Ajax.dataTypes[options.dataType || '']](options);
+		this.req.send();
+	},
+
+	pause: function(){
+		this.req.abort();
+	}
+	
+});
+
+Ajax.send = function (options) {
+
+	var dataType = options.dataType;
+
+};
+
+Ajax.instance = new Ajax();
 
 Ajax.dataTypes  ={
 	'': 'XMLHttpRequest',
@@ -16,31 +40,6 @@ Ajax.dataTypes  ={
 	'json': 'JSON',
 	'xml': 'XML'
 };
-
-Ajax.deferred.run = function(options){
-	this.req = new Request[Ajax.dataTypes[options.dataType || '']](options);
-	this.req.send(options);
-};
-
-Ajax.deferred.pause = function(){
-	this.req.abort();
-};
-
-var Ajax = {};
-
-Request.Ajax = Request.Base.extend({
-	
-	run: function (options) {
-		this.xhr = new Request.XMLHttpRequest(options);
-		this.xhr.send();
-	},
-	
-	pause : function() {
-		this.xhr.abort();
-	}
-
-	
-});
 
 Object.map("get post", function(k) {
 	
