@@ -3,6 +3,7 @@
  * @author xuld
  */
 
+using("System.Utils.Deferred");
 
 var Fx = Fx || {};
 
@@ -32,7 +33,7 @@ Fx.Base = (function(){
 	/**
 	 * @namespace Fx
 	 */
-	return Class({
+	return Deferred.extend({
 	
 		/**
 		 * 每秒的运行帧次。
@@ -108,7 +109,7 @@ Fx.Base = (function(){
 		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 restart 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
 		 * @return {Base} this
 		 */
-		start: function(options) {
+		run: function (options) {
 			var me = this;
 			me.compile(options);
 			me.set(0);
@@ -117,7 +118,7 @@ Fx.Base = (function(){
 			if (me.start) {
 				me.start();
 			}
-				
+			
 			me.resume();
 			return me;
 		},

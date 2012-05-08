@@ -6,6 +6,19 @@ using("System.Request.Base");
 using("System.Utils.Deferred");
 
 
+Request.Base.implement({
+
+	run: function (args, deferred) {
+		this.deferred = deferred;
+		this.send();
+	},
+
+	done: function () {
+		this.deferred.progress();
+	}
+
+});
+
 var Ajax = Deferred.extend({
 
 	constructor: function(){
@@ -26,16 +39,33 @@ var Ajax = Deferred.extend({
 	
 });
 
+Ajax.deferred = new Deferred();
+
 Ajax.send = function (options) {
 
-	var dataType = options.dataType;
+	var req = new Request[Ajax.dataTypes[options.dataType] || 'Text'](options),
+		deferred = Ajax.deferred;
 
+	switch (options.link) {
+		case 'wait':
+			deferred.add(req, options);
+			break;
+		case 'stop':
+			deferredA.stop();
+			deferred.add(req, options);
+			break;
+		case 'abort':
+			deferredA.abort();
+			deferred.add(req, options);
+			break;
+	}
+
+
+	Ajax.deferred.start();
 };
 
-Ajax.instance = new Ajax();
-
 Ajax.dataTypes  ={
-	'': 'XMLHttpRequest',
+	'text': 'Text',
 	'jsonp': 'JSONP',
 	'json': 'JSON',
 	'xml': 'XML'

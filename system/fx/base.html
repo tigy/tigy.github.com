@@ -11,22 +11,23 @@
 	</head>
 	<body>
 		<script>
+
+		    var fx = new Fx.Base()
+                .on('progress', function (value) {
+                    console.log(value);
+                });
+		    fx.run();
+
+		    fx.strat({}, 'wait');
+		    fx.strat({}, 'abort');
 			
 			var testcases = {
 				
 				// 简单创建一个特效。
 				'createAnimate': function () {
-					
-					Object.extend(new Fx.Base(),{link: 'wait'})
-						.on('step', function (value) {
-							console.log(value);
-						})
-						.start(1, 2, -1, function () {
-						  console.log("COMPLETE");
-						})
-						.start(10, 20, -1, function () {
-						  console.log("COMPLETE");
-						});
+				    fx.start();
+				    fx.start();
+				    fx.start();
 				}
 			};
 			
