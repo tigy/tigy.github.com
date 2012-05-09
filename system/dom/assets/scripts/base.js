@@ -2666,6 +2666,7 @@
 	 * @member document.onLoad
 	 */
 
+	Dom.addEvent('domready domload');
 
 	map('ready load', function(readyOrLoad, isLoad) {
 
@@ -2729,6 +2730,8 @@
 
 			return document;
 		};
+
+		readyOrLoad = 'dom' + readyOrLoad;
 	});
 	
 	// 如果readyState 不是 complete, 说明文档正在加载。

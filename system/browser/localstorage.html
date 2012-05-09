@@ -13,15 +13,22 @@
 	</head>
 	<body>
 		<script>
+		    ;
 		    var testcases = {
-		        "Browser.setData": '~("key", "value")',
-		        "Browser.getData": {
-		            '~("key")': "value"
+		        "获取本地存储数据": {
+		            'Browser.getData("key")': function (value, assert) {
+		                Browser.setData("key", "value");
+		                assert.areEqual(Browser.getData("key"), "value");
+		            }
 		        },
-		        "Browser.setJSON": '~("key", {value: 1})',
-		        "Browser.getJSON": {
-		            '~("key")': { value: 1 }
-		        }
+		        "设置本地存储数据": 'Browser.setData("key", "value")',
+		        "获取本地存储数据的JSON": {
+		            'Browser.getJSON("key")': function (value, assert) {
+		                Browser.setJSON("key", { value: 1 });
+		                assert.areEqual(Browser.getJSON("key"), { value: 1 });
+		            }
+		        },
+		        "设置本地存储数据的JSON": 'Browser.setJSON("key", {value: 1})'
 		    };
 
 		    Demo.writeTestCases(testcases);

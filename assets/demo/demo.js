@@ -197,21 +197,28 @@
 
         },
 
+        setDisplay: function (elems, newValue) {
+        	for (var i = 0; elems[i]; i++) {
+        		elems[i].style.display = newValue;
+        	}
+        },
+
         toggleViewSource: function (targetNode) {
             if (Demo.viewSourceState === undefined) {
                 Demo.initViewSource(document);
                 Demo.viewSourceState = false;
             }
 
-            var newValue = Demo.viewSourceState = !Demo.viewSourceState,
-                elems = Demo.getElementsByClassName('demo-control-viewsource');
+            var newValue = Demo.viewSourceState = !Demo.viewSourceState;
             document.getElementById('demo-toggleviewsource').innerHTML = newValue ? '♦ 隐藏源码' : '♢ 显示源码';
             Demo.setData('demo_source', newValue ? 'true' : 'false');
             newValue = newValue ? '' : 'none';
-            for (var i = 0; elems[i]; i++) {
-                elems[i].style.display = newValue;
-            }
 
+            Demo.setDisplay(Demo.getElementsByClassName('demo-control-viewsource'), newValue);
+
+            if (Demo.hashTestCases) {
+            	Demo.setDisplay(Demo.getElementsByClassName('demo-control-viewsource2'), newValue);
+            }
 
         },
 
@@ -284,6 +291,12 @@
                     Demo.toggleSource(Demo.getFirstElement(nodes[i]));
                 }
 
+			}
+
+            if (Demo.hashTestCases) {
+            	for (var name in testcases) {
+            		Demo.viewSource(name);
+            	}
             }
 
         },
@@ -292,6 +305,7 @@
          * 初始化测试用例。
          */
         writeTestCases: function (testcases, dftOptions) {
+        	Demo.hashTestCases = true;
             document.write('<div id="demo-testcases" class="demo-clear">');
 
             document.write('<div class="demo-right demo-small"><a class="demo" href="javascript://按顺序执行全部函数;" onclick="Demo.runTestAll();">全部测试</a> | <a class="demo" href="javascript:;" onclick="Demo.speedTestAll();">全部效率</a></div>');
@@ -420,23 +434,40 @@
 
                 switch (typeof info) {
 
-                    // 字符串: 转函数。
-                case 'string':
-                    info = info.replace(/~/g, name);
-                    break;
+						// 字符串: 转函数。
+					case 'string':
+						info = info.replace(/~/g, name);
+						break;
 
-                case 'object':
-                    info = complieTestCase(info, name);
+                	case 'object':
+                		var ret = []
+						for (var test in info) {
+        					ret.push(test.replace(/~/g, name));
+						}
+						info = ret.join(';');
 
-                    // fall through
-                    // 函数: 直接执行。
-                case 'function':
-                    info = info.toString();
-                    if (String.decodeUTF8) info = String.decodeUTF8(info);
-                    break;
+						// fall through
+						// 函数: 直接执行。
+					case 'function':
+						info = info.toString();
+						if (String.decodeUTF8) info = String.decodeUTF8(info);
+						break;
 
+				}
+
+				
+                var div = document.getElementById('demo-testcases-' + name);
+
+
+                var nextNode = Demo.getNextElement(div);
+                if (nextNode && nextNode.tagName === 'PRE') {
+                	newValue = nextNode.style.display === 'none';
+                	nextNode.style.display = newValue ? '' : 'none';
+                } else {
+                	div.parentNode.insertBefore(Demo.getCode(info, 'text/js'), div.nextSibling).className += ' demo-control-viewsource2';
                 }
-                return console.info('[' + name + ']', info);
+
+              //  return console.info('[' + name + ']', info);
 
             }
         },

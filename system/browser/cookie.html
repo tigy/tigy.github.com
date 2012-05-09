@@ -11,18 +11,18 @@
 	</head>
 	<body>
 		<script>
-			var testcases = {
-			    'Browser.setCookie': {
-				    '~("a", "b")': function(value, assert){
-				        assert.areEqual(Browser.getCookie("a"), "b");
+		    var testcases = {
+			    '获取 Cookie': {
+			        'Browser.getCookie("aaaa")': "-"
+                },
+			    '设置 Cookie': {
+			        'Browser.setCookie("aaaa", "b")': function (value, assert) {
+				        assert.areEqual(Browser.getCookie("aaaa"), "b");
 				    },
-                    '~("a", null)': function(value, assert){
-                        assert.areEqual(Browser.getCookie("a"), undefined);
+			        'Browser.setCookie("aaaa", null)': function (value, assert) {
+                        assert.areEqual(Browser.getCookie("aaaa"), undefined);
                     },
-                    '~("a", "b", 1)': '-'
-				},
-				'Browser.getCookie': {
-				    '~("a")': "b"
+			        'Browser.setCookie("aaaa", "b", 1)': '-'
 				}
 			};
 			

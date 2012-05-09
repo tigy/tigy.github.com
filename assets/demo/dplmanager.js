@@ -80,7 +80,7 @@ Demo.onLoad(function(){
 		});
 		
 		document.on('keydown', function(e){
-			if(e.target === document.body) {
+			if (e.target === document.body && !e.ctrlKey && !e.altKey) {
 				a.focus();
 			}
 		});
