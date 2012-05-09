@@ -17,7 +17,7 @@ Object.extend(Check, {
     },
 	
 	/**
-	 * 判断一个值是否为无符整数。
+	 * 判断一个值是否为整数。
 	 * @param {Object} value
 	 */
 	isInteger:function(value){
@@ -57,7 +57,7 @@ Object.extend(Check, {
 	 * @param {Object} value
 	 * @return {Number} 数字越大，复杂度越高。 这个数字在 0 - 5 变化。
 	 */
-	checkPasswordLevel: function(value){
+	checkLevel: function(value){
 		return value.replace(/^(?:(?=.{4})(?=.*([a-z])|.)(?=.*([A-Z])|.)(?=.*(\d)|.)(?=.*(\W)|.).*|.*)$/, "$1$2$3$4").length;
 	},
 
@@ -67,11 +67,6 @@ Object.extend(Check, {
 	 */
 	isNotEmpty: function(value){
 		return value.length > 0;
-	},
-
-	//检查是否为中文
-	isChinese:function(value){
-		return /^([\u4E00-\u9FA5]|[\uFE30-\uFFA0])+$/gi.test(value);
 	},
 
 	/**
@@ -87,14 +82,6 @@ Object.extend(Check, {
 			if( RegExp.$1 <256 && RegExp.$2<256 && RegExp.$3<256 && RegExp.$4<256) return true; 
 		} 
 		return false; 
-	},
-	
-	isMobile:function(value){
-		return /^1[358]\d{9}$/.test(value);
-	},
-	
-	isPhone:function(value){
-		return /^(\d{3,4}-)?\d{7,8}$/.test(value);
 	}
 		
 }); 

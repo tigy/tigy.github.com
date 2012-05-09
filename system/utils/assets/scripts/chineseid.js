@@ -6,14 +6,11 @@
 
 
 
-/**
- * 设为主页。
- * @param {String} url 地址。
- * @return {Boolean} 是否成功。
- */
-namespace('.Check.', {
+var Check = Check || {};
+
+Check.checkId = (function(){
 	
-	_data:  {
+	var data = {
 		'11': '北京',
 		'12': '天津',
 		'13': '河北',
@@ -49,17 +46,17 @@ namespace('.Check.', {
 		'81': '香港',
 		'82': '澳门',
 		'91': '国外'
-	},
+	};
 	
-	checkId:  function(id){
+	return function(id){
 		
-		var city = Check._data[parseInt(id.substring(0, 2))], valid = !!city;
+		var province = data[parseInt(id.substring(0, 2))], valid = !!province;
 		
 		var birthdayYear = parseInt(id.substr(6, 4)),
 			birthdayMonth = parseInt(id.substr(10, 2)),
 			birthdayDay = parseInt(id.substr(12, 2)),
-			date = new Date(birthdayYear, birthdayMonth, birthdayDay); 
-
+			date = new Date(birthdayYear, birthdayMonth - 1, birthdayDay); 
+		
 		valid = valid && date.getFullYear() == birthdayYear && 
 			date.getMonth() + 1 == birthdayMonth &&
 			date.getDate() == birthdayDay;
@@ -68,20 +65,19 @@ namespace('.Check.', {
 			
 			var sum = 0;
 		
-			for(var i = 17;i >= 0;i --) 
+			for(var i = 17; i >= 0; i--) 
 				sum += ((1 << i) % 11) * parseInt(id.charAt(17 - i), 11) ;
-			
-			valid = sum%11 == 1;
+			valid = sum % 11 == 1;
 		
 		}
 	
 		return {
 			valid: valid,
-			city: city,
+			province: province,
 			birthday: date,
 			sex: id.substr(16, 1) == '1' // true ? '男': '女'
 		};
 
-	}
+	};
 	
-} );
+})();

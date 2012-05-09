@@ -13,11 +13,17 @@
 			
 			
 			var testcases = {
-			    'Check.isEmail': {
-			        '~("a")': false,
-			        '~("a@aaa")': false,
-			        '~("a@my.f.com.cn")': true,
-			        '~("a@b.com")': true
+			    '判断是否为邮箱地址': {
+			        'Check.isEmail("a")': false,
+			        'Check.isEmail("a@aaa")': false,
+			        'Check.isEmail("a@my.f.com.cn")': true,
+			        'Check.isEmail("a@b.com")': true
+			    },
+			    '判断一个值是否为整数': {
+			        'Check.isInteger("a")': false,
+			        'Check.isInteger("a@aaa")': false,
+			        'Check.isInteger("a@my.f.com.cn")': true,
+			        'Check.isInteger("a@b.com")': true
 			    }
 			};
 			

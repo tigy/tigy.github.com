@@ -2,7 +2,7 @@
 //  类扩展   class.js  A
 //===========================================
 
-Object.extend(System.Object, {
+Object.extend(System.Base, {
 	
 	/**
 	 * 扩充类的静态成员。
