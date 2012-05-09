@@ -284,7 +284,7 @@ test("Dom.prototype.append", function() {
 	QUnit.reset();
 	var pass = true;
 	try {
-		var body = Dom.get("iframe").contentWindow.document.body;
+		var body = Dom.get("iframe").dom.contentWindow.document.body;
 	
 		if(body !== null) {
 			pass = false;
@@ -896,29 +896,29 @@ test("Dom.prototype.empty", function() {
 
 });
 
-test( "Dom.parse - execute scripts escaped with html comment or CDATA (#9221)", function() {
-	Dom.parse( [
-	         '<script type="text/javascript">',
-	         '<!--',
-	         'ok( true, "<!-- handled" );',
-	         '//-->',
-	         '</script>'
-	     ].join ( "\n" ) ).appendTo( "qunit-fixture" );
-	// Dom.parse( [
-	 //        '<script type="text/javascript">',
-	 //        '<![CDATA[',
-	 //        'ok( true, "<![CDATA[ handled" );',
-	 //        '//]]>',
-	 //        '</script>'
-	  //    ].join ( "\n" ) ).appendTo( "qunit-fixture" );
-	Dom.parse( [
-	         '<script type="text/javascript">',
-	         '<!--//--><![CDATA[//><!--',
-	         'ok( true, "<!--//--><![CDATA[//><!-- (Drupal case) handled" );',
-	         '//--><!]]>',
-	         '</script>'
-	     ].join ( "\n" ) ).appendTo( "qunit-fixture" );
-});
+//test( "Dom.parse - execute scripts escaped with html comment or CDATA (#9221)", function() {
+//	Dom.parse( [
+//	         '<script type="text/javascript">',
+//	         '<!--',
+//	         'ok( true, "<!-- handled" );',
+//	         '//-->',
+//	         '</script>'
+//	     ].join ( "\n" ) ).appendTo( "qunit-fixture" );
+//	// Dom.parse( [
+//	 //        '<script type="text/javascript">',
+//	 //        '<![CDATA[',
+//	 //        'ok( true, "<![CDATA[ handled" );',
+//	 //        '//]]>',
+//	 //        '</script>'
+//	  //    ].join ( "\n" ) ).appendTo( "qunit-fixture" );
+//	Dom.parse( [
+//	         '<script type="text/javascript">',
+//	         '<!--//--><![CDATA[//><!--',
+//	         'ok( true, "<!--//--><![CDATA[//><!-- (Drupal case) handled" );',
+//	         '//--><!]]>',
+//	         '</script>'
+//	     ].join ( "\n" ) ).appendTo( "qunit-fixture" );
+//});
 
 test("clone - no exceptions for object elements #9587", function() {
 	expect(1);

@@ -217,6 +217,11 @@
 				}
 
 			},
+
+			item: function(index){
+				var elem = this[index < 0 ? this.length + index : index];
+				return elem ? new Dom(elem) : null;
+			},
 			
 			/**
 			 * 将参数数组添加到当前集合。
@@ -2510,14 +2515,7 @@
 
 	t = DomList.prototype;
 
-	map("shift pop item", function (value) {
-		t[value] = function() {
-			var elem = ap[value].apply(this, arguments);
-			return elem ? new Dom(elem) : null;
-		};
-	});
-
-	map("unshift push include indexOf each forEach", function (value) {
+	map("shift pop unshift push include indexOf each forEach", function (value) {
 		t[value] = ap[value];
 	});
 
@@ -2666,27 +2664,26 @@
 	 * @member document.onLoad
 	 */
 
-	Dom.addEvent('domready domload');
+	Dom.addEvent('domready domload', {});
 
 	map('ready load', function(readyOrLoad, isLoad) {
 
 		var isReadyOrIsLoad = isLoad ? 'isLoaded': 'isReady';
 
 		// 设置 ready load
-		Dom[readyOrLoad] = function(fn, bind) {
-
+		Dom[readyOrLoad] = function (fn, bind) {
+			
 			// 忽略参数不是函数的调用。
-			if(!Function.isFunction(fn))
-				fn = 0;
+			var isFn = Function.isFunction(fn);
 
 			// 如果已载入，则直接执行参数。
 			if(Dom[isReadyOrIsLoad]) {
 
-				if(fn)
+				if (isFn)
 					fn.call(bind);
 
-				// 如果参数是函数。
-			} else if(fn) {
+			// 如果参数是函数。
+			} else if (isFn) {
 
 				document.on(readyOrLoad, fn, bind);
 
@@ -2694,30 +2691,28 @@
 				// 如果存在 JS 之后的 CSS 文件， 肯能导致 document.body 为空，此时延时执行 DomReady
 			} else if (document.body) {
 
-				var t;
-
 				// 如果 isReady, 则删除
 				if(isLoad) {
 
 					// 使用系统文档完成事件。
-					t = window;
+					isFn = window;
 					fn = readyOrLoad;
 
 					// 确保 ready 触发。
 					Dom.ready();
 
 				} else {
-					t = document;
+					isFn = document;
 					fn = domReady;
 				}
 
-				Dom.removeListener(t, fn, arguments.callee);
+				Dom.removeListener(isFn, fn, arguments.callee);
 
 				// 先设置为已经执行。
 				Dom[isReadyOrIsLoad] = true;
 
 				// 触发事件。
-				if(document.trigger(readyOrLoad)) {
+				if (document.trigger(readyOrLoad, fn)) {
 
 					// 删除事件。
 					document.un(readyOrLoad);

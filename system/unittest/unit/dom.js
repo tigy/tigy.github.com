@@ -1,8 +1,54 @@
-module("Element");
+module("Dom");
 
-test("Dom.get", function() {
+test("基本坏境", function () {
+	expect(3);
 	ok( Dom, "Dom" );
-	ok( Dom.get, "Dom.get" );
+	ok(Dom.get, "Dom.get");
+
+	var el = new Dom(document);
+	equal(el.dom, document, "dom 属性");
+});
+
+test("DomList", function () {
+	var el = new DomList(document.getElementsByTagName('span'));
+	var length = el.length;
+	equal(length > 0, true, "可以获取长度");
+
+	el.push(document.body);
+	equal(el.length, length + 1, "push() 增加长度");
+	equal(el[length], document.body, "push() 添加到最后一个元素");
+
+	el.unshift(document.body);
+	equal(el.length, length + 2, "unshift() 增加长度");
+	equal(el[0], document.body, "unshift() 添加到第一个元素");
+
+	equal(el.shift(), document.body, "shift() 移除返回第一个。");
+	equal(el.length, length + 1, "shift() 减少长度");
+
+	equal(el.pop(), document.body, "pop() 移除返回最后一个。");
+	equal(el.length, length, "pop() 减少长度");
+
+	deepEqual(el.filter(Function.returnTrue).length, el.length, "filter() 返回");
+
+	deepEqual(el.filter(Function.returnFalse).length, 0, "filter() 返回");
+
+	equal(el.indexOf(document), -1, "indexOf() 返回");
+
+	el.each(function (node) { node.foo = "zoo"; });
+	var pass = true;
+	for (var i = 0; i < el.length; i++) {
+		if (el[i].foo != "zoo") pass = false;
+	}
+	ok(pass, "each() 执行");
+
+	equal(el.item(-1).dom, el[el.length - 1], "item(-1) 返回最后的节点。");
+});
+
+test("Dom.get", function () {
+	Dom.parse('<div id="a"></div>').appendTo("qunit-fixture");
+	var el = Dom.get('a');
+	equal(el.dom.tagName, 'DIV', "成功创建");
+	equal(el.append, Dom.prototype.append, "包括 Dom 方法");
 });
 
 test("Dom.parse", function() {
@@ -72,51 +118,4 @@ test("Dom.create",  function() {
 	var el = Dom.create('div');
 	equal(el.dom.tagName, 'DIV', "成功创建");
 	equal(el.append, Dom.prototype.append, "包括 Element 方法");
-});
-
-test("Dom.get",  function() {
-	Dom.parse('<div id="a"></div>').appendTo("qunit-fixture");
-	var el = Dom.get('a');
-	equal(el.dom.tagName, 'DIV', "成功创建");
-	equal(el.append, Dom.prototype.append, "包括 Element 方法");
-});
-
-test("DomList",  function() {
-	var el = new DomList(document.getElementsByTagName('span'));
-	var length = el.length ;
-	equal(length > 0, true, "可以获取长度");
-	
-	el.push(document.body);
-	equal(el.length, length + 1, "push() 增加长度");
-	equal(el[length], document.body, "push() 添加到最后一个元素");
-	
-	el.unshift(document.body);
-	equal(el.length, length + 2, "unshift() 增加长度");
-	equal(el[0], document.body, "unshift() 添加到第一个元素");
-	
-	equal(el.shift(), document.body, "shift() 移除返回第一个。");
-	equal(el.length, length + 1, "shift() 减少长度");
-	
-	equal(el.pop(), document.body, "pop() 移除返回最后一个。");
-	equal(el.length, length, "pop() 减少长度");
-	
-	deepEqual(el.filter(Function.returnTrue).length, el.length, "filter() 返回");
-	
-	deepEqual(el.filter(Function.returnFalse).length, 0, "filter() 返回");
-	
-	equal(el.indexOf(document), -1, "indexOf() 返回");
-	
-	el.each(function(node){node.foo = "zoo";});
-	var pass = true;
-	for ( var i = 0; i < el.length; i++ ) {
-		if ( el[i].foo != "zoo" ) pass = false;
-	}
-	ok( pass, "each() 执行" );
-	
-	equal(el.item(-1).dom, el[el.length -1], "item(-1) 返回最后的节点。");
-});
-
-test("Dom",  function() {
-	var el = new Dom(document);
-	equal(el.dom, document, "dom 属性");
 });

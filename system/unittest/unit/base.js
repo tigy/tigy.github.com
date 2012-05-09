@@ -1,9 +1,13 @@
-module("System");
+module("Base");
 
-test("System", function() {
-	ok( System, "System" );
-	ok( $, "$" );
-	ok( Dom, "Dom" );
+test("基本的坏境需求", function () {
+	expect(6);
+	ok(Array.prototype.push, "Array.push()");
+	ok(Function.prototype.apply, "Function.apply()");
+	ok(document.getElementById, "getElementById");
+	ok(document.getElementsByTagName, "getElementsByTagName");
+	ok(RegExp, "RegExp");
+	ok(System, "System");
 });
 
 test( "execScript", function() {
@@ -300,33 +304,6 @@ test("Function.isFunction", function() {
 	});
 });
 
-test("JSON.decode", function(){return
-	expect(8);
-
-	equal( JSON.decode(), null, "Nothing in, null out." );
-	equal( JSON.decode( null ), null, "Nothing in, null out." );
-	equal( JSON.decode( "" ), null, "Nothing in, null out." );
-
-	deepEqual( JSON.decode("{}"), {}, "Plain object parsing." );
-	deepEqual( JSON.decode("{\"test\":1}"), {"test":1}, "Plain object parsing." );
-
-	deepEqual( JSON.decode("\n{\"test\":1}"), {"test":1}, "Make sure leading whitespaces are handled." );
-
-	try {
-		JSON.decode("{a:1}");
-		ok( false, "Test malformed JSON string." );
-	} catch( e ) {
-		ok( true, "Test malformed JSON string." );
-	}
-
-	try {
-		JSON.decode("{'a':1}");
-		ok( false, "Test malformed JSON string." );
-	} catch( e ) {
-		ok( true, "Test malformed JSON string." );
-	}
-});
-
 test("String.format", function() {
 
 	var nbsp = String.fromCharCode(160);
@@ -351,10 +328,6 @@ test("String.prototype.trim", function() {
 	equal( "".trim(), "", "空字符串" );
 });
 
-
-
-/*
-
 test("String.prototype.toCamelCase", function() {
 
 	var tests = {
@@ -372,8 +345,5 @@ test("String.prototype.toCamelCase", function() {
 		equal( key.toCamelCase(), val, "Converts: " + key + " => " + val );
 	});
 });
-
-*/
-
 
 

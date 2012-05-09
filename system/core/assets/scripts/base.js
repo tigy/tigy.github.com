@@ -769,15 +769,12 @@
 	apply(navigator, (function(ua) {
 
 		// 检查信息
-		var match = ua.match(/(IE|Firefox|Chrome|Safari|Opera|Navigator).((\d+)\.?[\d.]*)/i) || ["", "Other", 0, 0],
-	
-			// 版本信息。
-			version = ua.match(/(Version).((\d+)\.?[\d.]*)/i) || match,
+		var match = ua.match(/(IE|Firefox|Chrome|Safari|Opera).((\d+?)[\.\w]*)/i) || ua.match(/(WebKit|Gecko).((\d+?)[\.\w]*)/i) || ["", "", 0, 0],
 	
 			// 浏览器名字。
 			browser = match[1];
 
-		navigator["is" + browser] = navigator["is" + browser + version[3]] = true;
+		navigator["is" + browser] = navigator["is" + browser + match[3]] = true;
 
 		/**
 		 * 获取一个值，该值指示是否为 IE 浏览器。
@@ -833,7 +830,7 @@
 			 * @type String 输出的格式比如 6.0.0 。 这是一个字符串，如果需要比较版本，应该使用
 			 *       parseFloat(navigator.version) < 4 。
 			 */
-		    version: version[2]
+		    version: match[2]
 
 		};
 
