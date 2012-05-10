@@ -1,6 +1,3 @@
-//===========================================
-//  移到后独显样式   hover.js    A
-//===========================================
 
 
 
@@ -8,7 +5,7 @@
 using("System.Dom.Base");
 
 
-Element.implement({
+Dom.implement({
 	
 	
 	setHoverClass: function(){

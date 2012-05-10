@@ -1,10 +1,10 @@
-//===========================================
-//  处理 HTML 字符串           A
-//===========================================
 
 
 
-System.namespace("BigInteger", {
+
+var BigInteger = BigInteger || {};
+
+Object.extend(BigInteger, {
 	
 	/**
 	 * 计算大数的乘积。
@@ -47,7 +47,7 @@ System.namespace("BigInteger", {
 		return ret.reverse().join('');
 	},
 	
-	power: function(a,    b){
+	power: function(a,      b){
 		var ret = "1";
 		for(var i = 0; i < b; i++){
 			ret = BigInteger.multiple(ret, a);

@@ -1,4 +1,4 @@
-//===========================================
+﻿//===========================================
 //  Swf      swiff.js  A
 //===========================================
 
@@ -24,7 +24,7 @@ namespace(".Swiff", System.Control.extend({
 		vars: {}
 	},
 
-	constructor: function(path, options){
+	constructor: function (path, options) {
 		this.instance = 'Swiff_' + String.uniqueID();
 
 		this.setOptions(options);
@@ -35,13 +35,13 @@ namespace(".Swiff", System.Control.extend({
 		Swiff.CallBacks[this.instance] = {};
 
 		var params = options.params, vars = options.vars, callBacks = options.callBacks;
-		var properties = Object.append({height: options.height, width: options.width}, options.properties);
+		var properties = Object.append({ height: options.height, width: options.width }, options.properties);
 
 		var self = this;
 
-		for (var callBack in callBacks){
-			Swiff.CallBacks[this.instance][callBack] = (function(option){
-				return function(){
+		for (var callBack in callBacks) {
+			Swiff.CallBacks[this.instance][callBack] = (function (option) {
+				return function () {
 					return option.apply(self.object, arguments);
 				};
 			})(callBacks[callBack]);
@@ -49,7 +49,7 @@ namespace(".Swiff", System.Control.extend({
 		}
 
 		params.flashVars = Object.toQueryString(vars);
-		if (Browser.ie){
+		if (Browser.ie) {
 			properties.classid = 'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000';
 			params.movie = path;
 		} else {
@@ -60,14 +60,14 @@ namespace(".Swiff", System.Control.extend({
 		var build = '<object id="' + id + '"';
 		for (var property in properties) build += ' ' + property + '="' + properties[property] + '"';
 		build += '>';
-		for (var param in params){
+		for (var param in params) {
 			if (params[param]) build += '<param name="' + param + '" value="' + params[param] + '" />';
 		}
 		build += '</object>';
 		this.object = ((container) ? container.empty() : new Element('div')).set('html', build).firstChild;
 	},
 
-	remote: function(){
+	remote: function () {
 		return Swiff.remote.apply(Swiff, [this.dom || this].append(arguments));
 	}
 
@@ -75,7 +75,7 @@ namespace(".Swiff", System.Control.extend({
 
 Swiff.CallBacks = {};
 
-Swiff.remote = function(obj, fn){
+Swiff.remote = function (obj, fn) {
 	var rs = obj.CallFunction('<invoke name="' + fn + '" returntype="javascript">' + __flash__argumentsToXML(arguments, 2) + '</invoke>');
 	return eval(rs);
 };
