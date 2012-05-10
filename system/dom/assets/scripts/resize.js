@@ -5,26 +5,19 @@ using("System.Dom.Base");
 
 Dom.resize = (function(){
 	
-	var controlEvent = System.Events.control,
-		oldResize = controlEvent.resize,
-		timer,
-		win = new Dom(window);
-		
-	controlEvent.resize = {
-		
-		add: function(ctrl, type, fn){
-			oldResize.add(ctrl, type, resizeProxy);
+	var timer;
+
+	Dom.addEvent('resize', {
+
+		add: function (ctrl, type, fn) {
+			Dom.$event.$default.add(ctrl, type, resizeProxy);
 		},
-		
-		remove: function(ctrl, type, fn){
-			oldResize.remove(ctrl, type, resizeProxy);
-		},
-		
-		trigger: oldResize.trigger,
-		
-		initEvent: oldResize.initEvent
-		
-	};
+
+		remove: function (ctrl, type, fn) {
+			Dom.$event.$default.remove(ctrl, type, resizeProxy);
+		}
+
+	});
 		
 	function resizeProxy(e){
 		if(timer)
@@ -32,14 +25,14 @@ Dom.resize = (function(){
 		
 		timer = setTimeout(function (){
 			timer = 0;
-			win.trigger('resize', e);
+			Dom.window.trigger('resize', e);
 		}, 100);
 	}
 	
 	
 	
 	return function(fn){
-		win[Function.isFunction(fn) ? 'on' : 'trigger']('resize', fn);
+		Dom.window[Function.isFunction(fn) ? 'on' : 'trigger']('resize', fn);
 	}
 
 	

@@ -1,16 +1,40 @@
-//===========================================
-//  让文本框有默认字段   placeholder.js       A
-//===========================================
+
+using('System.Dom.Base')
 
 
-
-namespace("HTMLFormElement.", {
+Dom.implement({
 	
 	/**
 	 * 设置当文本框空的时候，显示的文本。
 	 */
-	setPlaceHolder: function (elem, value) {
-		
+	placeholder: function (value) {
+		var dom = this.dom.form;
+
+		function hidePlaceHolder() {
+			if (this.getText() === value) {
+				this.removeClass('placeholder');
+				this.setText('');
+			}
+		}
+
+		function showPlaceHolder() {
+			if (!this.getText()) {
+				this.setText(value);
+				this.addClass('placeholder');
+			}
+		}
+
+		this.on('focus', hidePlaceHolder);
+		this.on('blur', showPlaceHolder);
+
+		if (dom) {
+			Dom.get(dom).on('submit',hidePlaceHolder, this);
+		}
+
+
+
+		hidePlaceHolder.call(this);
+		showPlaceHolder.call(this);
 	}
-	
+
 });

@@ -1,23 +1,67 @@
-//===========================================
-//    閫夋嫨                 select.js       A
-//===========================================
-using("System.Controls.Control");
 
-/**
- * IFrame
- * @class IFrame
- */
-namespace(".HtmlSelect", System.Control.extend({
-	
-	
-	
-}));
+using("System.Dom.Base");
+
+
+var HtmlSelect = Dom.extend({
+
+	constructor: function(id){
+		this.dom = Dom.getNode(id);
+	},
+
+	add: function(option){
+
+	},
+
+	addItem: function (text, value, selected) {
+
+	},
+
+	removeItem: function () {
+
+	},
+
+	clearItems: function () {
+
+	},
+
+	getSelectedItem: function () {
+
+	},
+
+	setSelectedItem: function () {
+
+	},
+
+	getValue: function () {
+
+	},
+
+	setValue: function () {
+
+	},
+
+	getSelectedIndex: function () {
+
+	},
+
+	getSelected: function (item) {
+
+	},
+
+	setSelected: function (item, value) {
+
+	},
+
+	setSelectedIndex: function () {
+
+	}
+
+
+});
 
 
 // //===============================================
 // // class - select
-// // copyright:xuld
-// // edited by xuld
 // // 使锟矫凤拷锟斤拷:
 // // var Select=new cls_select(
 // //					id,     // id

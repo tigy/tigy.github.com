@@ -202,7 +202,7 @@
 		 *         </p>
 		 *         <p>
 		 *         addEvents 函数的参数是一个事件信息，格式如: {click: { add: ..., remove: ...,
-		 *        trigger: ...} 。 其中 click 表示事件名。一般建议事件名是小写的。
+		 *        trigger: ..., initEvent: ...} 。 其中 click 表示事件名。一般建议事件名是小写的。
 		 *         </p>
 		 *         <p>
 		 *         一个事件有多个相应，分别是: 绑定(add), 删除(remove), 触发(trigger)
@@ -995,18 +995,16 @@
 			        return true;
 				};
 
-				// 当前事件的全部函数。
-		        evt.handlers = [];
-
 		        // 获取事件管理对象。
 		        d = getMgr(me, type);
+
+				// 当前事件的全部函数。
+		        evt.handlers = d.initEvent ? [[d.initEvent, me]] : [];
 
                 // 添加事件。
                 if(d.add) {
                 	d.add(me, type, evt);
-
-                	evt.min = evt.handlers.length;
-                }
+				}
 
 	        }
 
@@ -1056,7 +1054,9 @@
 					        if (handlers[i][0] === listener) {
 						        handlers.splice(i, 1);
 						        
-						        listener = handlers.length > (evt.min || 0);
+						        if (!i || (i === 1 && handlers[0] === d.initEvent)) {
+						        	listener = 0;
+						        }
 								
 						        break;
 					        }

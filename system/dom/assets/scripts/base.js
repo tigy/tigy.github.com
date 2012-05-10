@@ -472,8 +472,6 @@
 		 */
 		eventObj = {
 
-			init: Function.empty,
-
 			/**
 			 * 创建当前事件可用的参数。
 			 * @param {Dom} ctrl 事件所有者。
@@ -502,9 +500,10 @@
 			 * @param {String} type 类型。
 			 * @param {Function} fn 函数。
 			 */
-			add: function (ctrl, type, fn) {
-				Dom.addListener(ctrl.dom, type, fn);
-				fn.handlers.push([this.init, ctrl]);
+			add: div.addEventListener ? function (elem, type, fn) {
+				elem.dom.addEventListener(type, fn, false);
+			} : function (elem, type, fn) {
+				elem.dom.attachEvent('on' + type, fn);
 			},
 
 			/**
@@ -513,8 +512,10 @@
 			 * @param {String} type 类型。
 			 * @param {Function} fn 函数。
 			 */
-			remove: function (ctrl, type, fn) {
-				Dom.removeListener(ctrl.dom, type, fn);
+			remove: div.removeEventListener ? function (elem, type, fn) {
+				elem.dom.removeEventListener(elem, fn, false);
+			} : function (elem, type, fn) {
+				elem.dom.detachEvent('on' + type, fn);
 			}
 
 		},
@@ -740,18 +741,6 @@
 					return true;
 
 			return false;
-		},
-
-		addListener: div.addEventListener ? function (elem, type, fn) {
-			elem.addEventListener(type, fn, false);
-		} : function (elem, type, fn) {
-			elem.attachEvent('on' + type, fn);
-		},
-
-		removeListener: div.removeEventListener ? function (elem, type, fn) {
-			elem.removeEventListener(elem, fn, false);
-		} : function (elem, type, fn) {
-			elem.detachEvent('on' + type, fn);
 		},
 		
 		/**
@@ -2543,7 +2532,7 @@
 		if (div.onmouseenter !== null) {
 
 			Dom.addEvent('mouseenter mouseleave', {
-				init: function (e) {
+				initEvent: function (e) {
 					return this !== e.relatedTarget && !Dom.hasChild(this.dom, e.relatedTarget);
 				}
 			});
@@ -2553,7 +2542,7 @@
 		/// #if CompactMode
 	} else {
 
-		eventObj.init = function (e) {
+		eventObj.initEvent = function (e) {
 			if (!e.stop) {
 				e.target = e.srcElement;
 				e.stop = pep.stop;
@@ -2566,7 +2555,7 @@
 		Dom.addEvent("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", {
 			init: function (e) {
 				if(!e.stop) {
-					eventObj.init(e);
+					eventObj.initEvent(e);
 					e.relatedTarget = e.fromElement === e.target ? e.toElement: e.fromElement;
 					var dom = getDocument(e.target).dom;
 					e.pageX = e.clientX + dom.scrollLeft;
@@ -2583,7 +2572,7 @@
 		Dom.addEvent("keydown keypress keyup",  {
 			init: function (e) {
 				if(!e.stop) {
-					eventObj.init(e);
+					eventObj.initEvent(e);
 					e.which = e.keyCode;
 				}
 			}
@@ -2695,18 +2684,18 @@
 				if(isLoad) {
 
 					// 使用系统文档完成事件。
-					isFn = window;
+					isFn = Dom.window;
 					fn = readyOrLoad;
 
 					// 确保 ready 触发。
 					Dom.ready();
 
 				} else {
-					isFn = document;
+					isFn = Dom.document;
 					fn = domReady;
 				}
 
-				Dom.removeListener(isFn, fn, arguments.callee);
+				eventObj.remove(isFn, fn, arguments.callee);
 
 				// 先设置为已经执行。
 				Dom[isReadyOrIsLoad] = true;
@@ -2733,9 +2722,9 @@
 	if(document.readyState !== "complete") {
 
 		// 使用系统文档完成事件。
-		Dom.addListener(document, domReady, Dom.ready);
+		eventObj.add(Dom.document, domReady, Dom.ready);
 
-		Dom.addListener(window, 'load', Dom.load, false);
+		eventObj.add(Dom.window, 'load', Dom.load, false);
 
 		/// #if CompactMode
 		
