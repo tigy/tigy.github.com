@@ -1,1 +1,2 @@
-﻿/** * @author  */
+﻿/** * @author  */var RichTextBox = Control.extend({
+});

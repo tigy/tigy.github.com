@@ -16,8 +16,10 @@
 		<body id="docs">
 			<div id="header">
 				<div id="headerMain">
-					<h2>XSLT/CSS/JS Written by <a href="http://shawphy.com">Shawphy</a> Translated by <a href="http://www.cn-cuckoo.com/">为之漫笔</a>, <a href="http://shawphy.com">Shawphy</a> and <a href="http://cloudream.name">Cloudream</a>.</h2>
-					<h1>J+ Core API 文档</h1>
+					<h2>文档作者： <a href="http://webin.us/chunterg" target="_blank">chunterg</a> &amp; <a href="http://xuld.cnblogs.com" target="_blank">xuld</a>
+          </h2>
+					<h1>
+            J+ Core <xsl:value-of select="@version"/> API 文档</h1>
 				</div>
 			</div>
 			<div id="wrapper">
