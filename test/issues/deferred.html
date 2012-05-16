@@ -22,8 +22,7 @@
 		            this._handlers.push([deferrable, args]);
 		        },
                 
-                run: function (deferred, args) {
-                    this._parent = deferred;
+                run: function (args) {
                     this.play();
                 },
                 
@@ -59,7 +58,8 @@
                 next: function () {
                     if (this._handlers.length) {
                         var c = this._current = this._handlers.shift();
-                        c[0].run(this, c[1]);
+                        c[0]._parent = this;
+                        c[0].run(c[1]);
                     } else {
                         this._current = null;
                         this.stop();
@@ -95,14 +95,19 @@
                             this._task.play();
                             break;
                     }
+
+                    return this;
                 },
                 
                 then: function (callback, args) {
+                    if (this === callback) {
+                        return this.start(args);
+                    }
                     var dable;
                     if (Function.isFunction(callback)) {
-                        dable = {run: function (deferred, arg) {
+                        dable = {run: function (arg) {
                             callback.call(this, arg);
-                            deferred.next();
+                            this._parent.next();
                         }, abort: function () {
                         }};
                     } else {
@@ -112,7 +117,13 @@
                     this._task.play();
                 },
                 
-                run: function (deferred, args) {
+                run: function (args) {
+                },
+
+                progress: function () {
+                    if (this._parent) {
+                        this._parent.next();
+                    }
                 },
                 
                 abort: function () {
@@ -124,9 +135,10 @@
 
 
 
-		    var Fx = Class({
+		    var Fx = Deferred.extend({
 
 		        onCallback: function(){
+		            var me = this;
 		            trace(me.options);
 		            me.done();
 		        },
@@ -134,11 +146,23 @@
 		        run: function(options){
 		            var me = this;
 		            me.options = options;
-		            setTimeout(me.onCallback, 1000);
+		           me.resume();
 		        },
+				
+				pause: function(){
+		            var me = this;
+					clearTimeout(me.timer);
+				},
+				
+				resume: function(){
+		            var me = this;
+					 me.timer = setTimeout(me.onCallback.bind(me), 2000);
+				},
 
-		        done: function(){
+				done: function () {
+				    var me = this;
 		            trace('fx  done');
+					me.progress();
 		        }
 
 		    });
@@ -152,7 +176,15 @@
 
 		    fx.then(function () {
 		        trace('3');
-		    });
+            });
+
+		    fx.then(fx, '4');
+
+		    var fx2 = new Fx();
+
+		   fx.then(fx2, '5');
+
+		    fx2.start('6', 'wait');
 
 
 			
