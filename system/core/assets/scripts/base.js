@@ -1580,11 +1580,11 @@ function assert(bValue, msg) {
         }
 
         // 错误源
-        val = arguments.callee.caller;
+        val = val.callee.caller;
 
         if (assert.stackTrace) {
 
-            while (val.debugStepThrough)
+            while (val && val.debugStepThrough)
                 val = val.caller;
 
             if (val && val.caller) {
