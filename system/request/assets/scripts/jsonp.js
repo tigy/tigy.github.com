@@ -40,13 +40,14 @@ Request.JSONP = Request.Base.extend({
             } finally {
             
                 script = null;
-                
-                me.done();
+
+				me.progress();
             }
         }
     },
     
     send: function(){
+    	
     	var me = this,
 			url = me.initUrl(me.url),
 			data = me.initData(me.data),

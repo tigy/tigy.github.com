@@ -3,6 +3,8 @@
  */
 
 
+using("System.Utils.Deferrable");
+
 var Request = Request || {};
 
 // errorNo
@@ -17,7 +19,7 @@ var Request = Request || {};
  * @class Request.Base
  * @abstract
  */
-Request.Base = Class({
+Request.Base = Deferrable.extend({
 	
 	/**
 	 * 当前 AJAX 发送的地址。
@@ -82,18 +84,20 @@ Request.Base = Class({
 			}
 		}
 	},
-
-	/**
-	 * 子类可重写此函数，用于在请求完成时调用。
-	 * @protected abstract
-	 */
-	done: Function.empty,
+	
+	run: function(link){
+    	if(this.defer(link)){
+    		return;
+    	}
+    	
+    	this.send();
+	},
 
 	/**
 	 * 停止当前的请求。
 	 * @return this
 	 */
-	abort: function () {
+	pause: function () {
 		this.onStateChange(-2);
 		return this;
 	}
