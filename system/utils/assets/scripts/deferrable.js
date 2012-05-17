@@ -5,9 +5,9 @@
 /**
  * 用于异步执行任务时保证任务是串行的。
  */
-var Deferred = Class({
+var Deferrable = Class({
 
-	addDeferred: function (deferrable, args) {
+	chain: function (deferrable, args) {
 		var lastTask = [deferrable, args];
 
 		if (this._firstTask) {
@@ -39,9 +39,6 @@ var Deferred = Class({
 		switch (link) {
 			case undefined:
 				break;
-			case "clear":
-				this.deferClear();
-				return false;
 			case "abort":
 				this.abort();
 				return false;
@@ -54,7 +51,7 @@ var Deferred = Class({
 				assert(!link || link === 'wait', "Deferred.prototype.defer(args, link): 成员 {link} 必须是 wait、cancel、ignore 之一。", link);
 		}
 
-		this.addDeferred(this, args);
+		this.chain(this, args);
 
 		return true;
 	},
@@ -87,7 +84,7 @@ var Deferred = Class({
 
 	then: function (callback, args) {
 		if (this.isRunning) {
-			this.addDeferred({
+			this.chain({
 				owner: this,
 				run: function (args) {
 					if(callback.call(this.owner, args) !== false)
@@ -106,6 +103,7 @@ var Deferred = Class({
 	stop: function () {
 		this.pause();
 		this._firstTask = this._lastTask = null;
+		this.isRunning = false;
 	}
 
 });
