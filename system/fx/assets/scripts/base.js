@@ -68,7 +68,7 @@ Fx.Base = (function(){
 		 * @param {Object} to 结束位置。
 		 * @return {Base} this
 		 */
-		compile: function (options) {
+		init: function (options) {
 			var me = this;
 			return me;
 		},
@@ -111,12 +111,12 @@ Fx.Base = (function(){
 		 */
 		run: function (options) {
 			var me = this;
-			me.compile(options);
+			me.init(options);
 			me.set(0);
 			me.time = 0;
 
 			if (me.start) {
-				me.start();
+				me.start(options);
 			}
 			
 			me.resume();

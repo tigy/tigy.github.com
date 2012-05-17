@@ -75,32 +75,21 @@
                 start: function (args, link) {
                     if (!this._task) this._task = new DeferredTask();
                     switch (link) {
+                        case undefined:
+                            break;
                         case "clear":
                             this._task.clear();
-                            this._task.add(this, args);
-                            this._task.play();
                         case "abort":
                             this._task.abort();
-                            this._task.add(this, args);
-                            this._task.play();
                             break;
                         case "stop":
                             this._task.stop();
-                            this._task.add(this, args);
-                            this._task.play();
                             break;
                         case "ignore":
-                            if (!this._task._current) {
-                                this._task.add(this, args);
-                                this._task.play();
-                            }
-                            break;
-                        default:
-                            this._task.add(this, args);
-                            this._task.play();
-                            break;
+                            if (this._task._current) return;
                     }
-
+                    this._task.add(this, args);
+                    this._task.play();
                     return this;
                 },
                 
@@ -118,8 +107,12 @@
                         this._task.add(dable, args);
                         this._task.play();
                     } else {
+					if(callback === this){
+						return this.start(args, 'wait');
+					}
                         if (!callback._task) {
                             if (!this._task) this._task = new DeferredTask();
+							callback._task = this._task;
                             this._task.add(callback, args);
                             this._task.play();
                         } else {
@@ -127,6 +120,7 @@
                                 this._task = callback._task;
                             } else {
                                 this._task.link(callback._task);
+								callback._task = this._task;
                             }
                             this._task.play();
                         }
@@ -151,35 +145,35 @@
 
 
 
-		    var Fx = Deferred.extend({
+            var Fx = Deferred.extend({
+
+                run: function (options) {
+                    var me = this;
+                    me.options = options;
+                    me.resume();
+                },
+
+                done: function () {
+                    var me = this;
+                    trace('fx  done');
+                    me.progress();
+                },
+
+                pause: function () {
+                    var me = this;
+                    clearTimeout(me.timer);
+                },
 
 		        onCallback: function(){
 		            var me = this;
 		            trace(me.options);
 		            me.done();
 		        },
-
-		        run: function(options){
-		            var me = this;
-		            me.options = options;
-		           me.resume();
-		        },
-				
-				pause: function(){
-		            var me = this;
-					clearTimeout(me.timer);
-				},
 				
 				resume: function(){
 		            var me = this;
 					 me.timer = setTimeout(me.onCallback.bind(me), 2000);
-				},
-
-				done: function () {
-				    var me = this;
-		            trace('fx  done');
-					me.progress();
-		        }
+				}
 
 		    });
 			
@@ -190,15 +184,15 @@
 
 		    fx.start('2', 'wait');
 
-		    fx.then(function () {
-		        trace('3');
-            });
-
-		    fx.then(fx, '4');
+			fx.then(function () {
+				trace('3');
+			});
+	
+			fx.then(fx, '4');
 
 		    var fx2 = new Fx();
 
-		   fx.then(fx2, '5');
+			fx.then(fx2, '5');
 
 		    fx2.start('6', 'wait');
 

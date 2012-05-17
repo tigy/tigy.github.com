@@ -189,7 +189,7 @@ using("System.Fx.Base");
 			 * @param {Object} from 开始。
 			 * @param {Object} to 结束。
 			 */
-			compile: function(from, to){
+			init: function (from, to) {
 				assert.notNull(from, "Fx.Animate.prototype.start(from, to, duration, callback, link): 参数 {from} ~。");
 				assert.notNull(to, "Fx.Animate.prototype.start(from, to, duration, callback, link): 参数 {to} ~。");
 					

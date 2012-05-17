@@ -3,142 +3,109 @@
  */
 
 /**
- * 表示一个可以延时的操作。
+ * 用于异步执行任务时保证任务是串行的。
  */
 var Deferred = Class({
-	
-	currentHandler: null,
-	
-	constructor: function() {
-		this._handlers = [];
-		Object.each(arguments, this.add, this);
+
+	addDeferred: function (deferrable, args) {
+		var lastTask = [deferrable, args];
+
+		if (this._firstTask) {
+			this._lastTask[2] = lastTask;
+		} else {
+			this._firstTask = lastTask;
+		}
+			
+		this._lastTask = lastTask;
 	},
 
 	/**
-	 *
-	 * @param deferrable deferrable 是一个对象，该对象必须存在这些方法：
-	 *		run - 执行当前函数。
-	 *		abort - 禁止执行。
+	 * 多个请求同时发生后的处理方法。
+	 * wait - 等待上个操作完成。
+	 * ignore - 忽略当前操作。
+	 * stop - 正常中断上个操作，上个操作的回调被立即执行，然后执行当前操作。
+	 * abort - 非法停止上个操作，上个操作的回调被忽略，然后执行当前操作。
+	 * replace - 替换上个操作为新的操作，上个操作的回调将被复制。
 	 */
-	add: function (deferrable, args) {
-		this._handlers.push([deferrable, args]);
-	},
-	
-	then: function (fn, args) {
-		if (this.isRunning) {
-			fn.call(this, args);
-		} else {
-			this.add({
-				run: function (args, deferred) {
-					fn.call(deferred, args);
-					deferred.progress();
-				},
-				abort: Function.empty
-			}, args);
-		}
-	},
-	
-	stop: function() {
-		this.pause();
-	},
-	
-	abort: function() {
-		this.currentHandler = null;
-		if (this._handlers.length) {
+	defer: function (args, link) {
 
-			if(this._handlers[0][0] !== this){
-				this._handlers[0][0].abort();
-			}
-			
-			this._handlers.length = 0;
-		}
-		this.pause();
-	},
-	
-	pause: function() {
-		clearTimeout(this.timer);
-	},
-	
-	done: function() {
-		this.deferred.progress();
-	},
-	
-	run: function (args, deferred) {
-		this.deferred = deferred;
-		this.timer = setTimeout( function() {
-			trace(args);
-			this.progress();
-		}.bind(this), 1000);
-	},
-	
-	start: function (args) {
-		this.add(this, args);
-		if (!this.isRunning) {
-			this.progress();
-		}
-	},
-	
-	progress: function () {
-		if (this._handlers.length) {
-			var nextHandler = this._handlers.shift();
-			this.currentHandler = nextHandler[0];
-			nextHandler[0].run(nextHandler[1], this);
-		} else {
-			if (this.deferred !== this) {
-				this.done();
-			}
-			this.currentHandler = null;
-		}
-	}
-});
+		var isRunning = this.isRunning;
 
-/**
- * 连接指定的 deferreds ，创建新的 Deferred
- */
-Deferred.when = function (deferreds) {
+		this.isRunning = true;
 
+		if (!isRunning)
+			return false;
 
-};
-
-Deferred.instances = {};
-
-/**
- * 多个请求同时发生后的处理方法。
- * wait - 等待上个操作完成。
- * ignore - 忽略当前操作。
- * stop - 正常中断上个操作，上个操作的回调被立即执行，然后执行当前操作。
- * abort - 非法停止上个操作，上个操作的回调被忽略，然后执行当前操作。
- * replace - 替换上个操作为新的操作，上个操作的回调将被复制。
- */
-Deferred.link = function(deferredA, deferredB, linkType, type) {
-
-	if(deferredA && deferredA.state === 'running') {
-		switch (linkType) {
-			case 'wait':
-				// 将 deferred 放到等待队列。
-				deferredA.then(function() {
-					Deferred.instances[type] = this;
-					this.start();
-				}, deferredB);
-				return deferredB;
-			case 'stop':
-				deferredA.stop();
+		switch (link) {
+			case undefined:
 				break;
-			case 'abort':
-				deferredA.abort();
-				break;
-			//case 'replace':
-			//	deferredA.pause();
-			//	deferredA.run = deferredB.run;
-			//	deferredA.start();
-			//	break;
+			case "clear":
+				this.deferClear();
+				return false;
+			case "abort":
+				this.abort();
+				return false;
+			case "stop":
+				this.stop();
+				return false;
+			case "ignore":
+				return true;
 			default:
-				assert(!linkType || linkType === 'ignore', "Deferred.link(data): 成员 {link} 必须是 wait、cancel、ignore 之一。", linkType);
-				return deferredB;
+				assert(!link || link === 'wait', "Deferred.prototype.defer(args, link): 成员 {link} 必须是 wait、cancel、ignore 之一。", link);
 		}
 
+		this.addDeferred(this, args);
+
+		return true;
+	},
+
+	/**
+	 * 让当前队列等待指定的 deferred 全部执行完毕后执行。
+	 */
+	wait: function (deferred) {
+		if (this.isRunning) {
+			this.stop();
+		}
+
+		this.defer = deferred.defer.bind(deferred);
+		this.progress = deferred.progress.bind(deferred);
+	},
+
+	progress: function () {
+
+		var firstTask = this._firstTask;
+		this.isRunning = false;
+
+		if (firstTask) {
+			this._firstTask = firstTask[2];
+			
+			firstTask[0].run(firstTask[1]);
+		}
+
+		
+	},
+
+	then: function (callback, args) {
+		if (this.isRunning) {
+			this.addDeferred({
+				owner: this,
+				run: function (args) {
+					if(callback.call(this.owner, args) !== false)
+						this.owner.progress();
+				}
+			}, args);
+		} else {
+			callback.call(this, args);
+		}
+	},
+
+	abort: function(){
+		this.stop();
+	},
+
+	stop: function () {
+		this.pause();
+		this._firstTask = this._lastTask = null;
 	}
 
-	//    Deferred.instances[type] = deferredB;
-	return deferredB.start();
-};
+});
