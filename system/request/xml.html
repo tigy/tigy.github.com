@@ -12,7 +12,7 @@
     </head>
     <body>
         <script>
-            var req = new Request.JSON({
+            var req = new Request.XML({
                 url: 'data/json.html',
                 data: {
                     "d1": "内容"
@@ -32,7 +32,7 @@
             });
 
             var testcases = {
-                'Request.JSON.prototype.send': 'req.send()'
+                'Request.XML.prototype.send': 'req.send()'
             };
 
             Demo.writeTestCases(testcases, { times: 8 });

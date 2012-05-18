@@ -56,7 +56,7 @@
 		/**
 		 * 指示当前浏览器是否为标签浏览器。
 		 */
-		isStandard = eval("-[1,]"),
+		isStandard = navigator.isStd,
 	
 		/**
 		 * 用于测试的元素。

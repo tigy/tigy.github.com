@@ -44,13 +44,13 @@
 			var testcases = {
 				'Animate': '-',
 				'createAnimate': function() { 
-					new Fx.Animate(a).run({}, {
-						height: 500
-					}).run({}, {
-						height: 100
-					}).run({}, {
-						height: 30
-					})
+				    new Fx.Animate(a).run({
+				        to: { height: 500 }
+                    }).run({
+                        to: { height: 200 }
+                    }).run({
+                        to: { height: 100 }
+                    })
 					
 				 },
 				'animateHeight': 'd.animate({height: 500}).animate({height: 100}).animate({height: 30})',
@@ -59,13 +59,13 @@
 				'animateBackgroundColor': 'a.animate({"background-color": "#efefef"})',
 				'Toggle': '-',
 				'Dom.prototype.toggle': 'a.toggle(1000)',
-				'toggleHeight': 'a.toggle(1000, null, "height")',
-				'toggleWidth': 'a.toggle(1000, null, "width")',
-				'toggleOpacity': 'a.toggle(1000, null, "opacity")',
-				'toggleLeft': 'a.toggle(1000, null, "left")',
-				'toggleTop': 'a.toggle(1000, null, "top")',
-				'toggleRight': 'a.toggle(1000, null, "right")',
-				'toggleBottom': 'a.toggle(1000, null, "bottom")',
+				'toggleHeight': 'a.toggle(1000, null, null, "height")',
+				'toggleWidth': 'a.toggle(1000, null, null, "width")',
+				'toggleOpacity': 'a.toggle(1000, null, null, "opacity")',
+				'toggleLeft': 'a.toggle(1000, null, null, "left")',
+				'toggleTop': 'a.toggle(1000, null, null, "top")',
+				'toggleRight': 'a.toggle(1000, null, null, "right")',
+				'toggleBottom': 'a.toggle(1000, null, null, "bottom")',
 				'Dom.prototype.hide(1000)':'a.hide(1000)',
 				'Dom.prototype.hide': 'a.hide(0);',
 				

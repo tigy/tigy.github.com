@@ -107,7 +107,7 @@ Fx.Base = (function(){
 		run: function (options, link) {
 			var me = this;
             if (me.defer(options, link))
-                return;
+                return me;
 			me.init(options);
 			me.set(0);
 			me.time = 0;

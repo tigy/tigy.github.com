@@ -15,13 +15,13 @@
 		        url: 'data/json.html',
 		        data: {
 		            "d1": "内容"
-                },
+		        },
 		        start: function (m) {
 		            trace.info("开始 =>", m);
 		        },
 		        success: function (m) {
 		            trace("成功 =>", m);
-                },
+		        },
 		        error: function (m) {
 		            trace.error("错误 => ", m);
 		        },
@@ -32,7 +32,7 @@
 
 		    var testcases = {
 		        'Request.Text.prototype.send': 'req.send()',
-                'Request.Text.prototype.run': 'req.run()'
+		        'Request.Text.prototype.run': 'req.run()'
 		    };
 
 		    Demo.writeTestCases(testcases, { times: 8 });

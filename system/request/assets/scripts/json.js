@@ -12,7 +12,7 @@ Request.JSON = Request.Text.extend({
 	 */
 	headers: Object.extendIf({
 		'Accept': 'application/json'
-	}, Ajax.prototype.headers),
+	}, Request.Text.prototype.headers),
 	
 	parseJSON: function(response){
 		return eval("(" + response + ")");

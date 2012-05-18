@@ -112,7 +112,7 @@ Request.Text = Request.Base.extend({
 			}
 		}
 	},
-	
+
 	/**
 	 * @param options
 	 * url - 请求的地址。
@@ -130,25 +130,22 @@ Request.Text = Request.Base.extend({
 	 * timeout - 请求超时时间。单位毫秒。默认为 -1 无超时 。
 	 */
 	constructor: function (options) {
-
 		for (var option in options) {
 			var value = options[option];
-			if (value !== undefined) {
-				if (option in this) {
-					this[option] = value;
-				} else {
-					switch (option) {
-						case "encoding":
-							this.setEncoding(value);
-							break;
-						case "contentType":
-							option = "Content-Type";
+			if (option in this) {
+				this[option] = value;
+			} else {
+				switch (option) {
+					case "encoding":
+						this.setEncoding(value);
+						break;
+					case "contentType":
+						option = "Content-Type";
 
-							// fall through
-						default:
-							this.setHeader(option, value);
-							break;
-					}
+						// fall through
+					default:
+						this.setHeader(option, value);
+						break;
 				}
 			}
 		}

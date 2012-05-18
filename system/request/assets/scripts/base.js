@@ -64,6 +64,10 @@ Request.Base = Deferrable.extend({
 		return this.cache ? url : Request.combineUrl(url, '_=' + Date.now());
 	},
 
+	constructor: function (options) {
+		Object.extend(this, options);
+	},
+
 	/**
 	 * @param options
 	 * url - 请求的地址。
@@ -78,15 +82,9 @@ Request.Base = Deferrable.extend({
 	run: function(options, link){
     	if(this.defer(options, link)){
     		return this;
-    	}
-
-		for (var option in options) {
-			var value = options[option];
-			if (value !== undefined) {
-				this[option] = value;
-			}
 		}
-    	
+
+    	this.constructor(options);
     	return this.send();
 	},
 

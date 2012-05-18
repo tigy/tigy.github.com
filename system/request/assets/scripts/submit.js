@@ -1,7 +1,7 @@
 
 
 using("System.Request.Base");
-using("System.Request.Text");
+using("System.Request.Ajax");
 using("System.Dom.Base");
 
 /**

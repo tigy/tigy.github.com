@@ -4,8 +4,8 @@
  */
 
 
-using("System.Dom.Base");
 using("System.Fx.Base");
+using("System.Dom.Base");
 
 
 (function(p){
@@ -90,9 +90,11 @@ using("System.Fx.Base");
 	 * @param {Object} delta 变化。
 	 * @return {Object} 结果。
 	 */
-	var c = Fx.compute,
+	var compute = Fx.compute,
 	
 		Dom = window.Dom,
+
+		emptyObj = {},
 		
 		/**
 		 * 缓存已解析的属性名。
@@ -100,7 +102,7 @@ using("System.Fx.Base");
 		cache = {
 			opacity: {
 				set: function(target, name, from, to, delta){
-					target.setOpacity(c(from, to, delta));
+					target.setOpacity(compute(from, to, delta));
 				},
 				parse: self,
 				get: function(target){
@@ -110,7 +112,7 @@ using("System.Fx.Base");
 			
 			scrollTop:{
 				set: function (target, name, from, to, delta) {
-					target.setScroll(null, c(from, to, delta));
+					target.setScroll(null, compute(from, to, delta));
 				},
 				parse: self,
 				get: function(target){
@@ -120,7 +122,7 @@ using("System.Fx.Base");
 			
 			scrollLeft:{
 				set: function (target, name, from, to, delta) {
-					target.setScroll(c(from, to, delta));
+					target.setScroll(compute(from, to, delta));
 				},
 				parse: self,
 				get: function(target){
@@ -151,12 +153,6 @@ using("System.Fx.Base");
 			current: null,
 			
 			/**
-			 * 链接方式。
-			 * @type String
-			 */
-			link: "wait",
-			
-			/**
 			 * 初始化当前特效。
 			 * @param {Object} options 选项。
 			 * @param {Object} key 键。
@@ -164,8 +160,6 @@ using("System.Fx.Base");
 			 */
 			constructor: function(target){
 				this.target = target;
-				
-				this._competeListeners = [];
 			},
 			
 			/**
@@ -190,17 +184,28 @@ using("System.Fx.Base");
 			 * @param {Object} to 结束。
 			 */
 			init: function (options) {
-				assert.notNull(from, "Fx.Animate.prototype.run(from, to, duration, callback, link): 参数 {from} ~。");
-				assert.notNull(to, "Fx.Animate.prototype.run(from, to, duration, callback, link): 参数 {to} ~。");
+			//	assert.notNull(from, "Fx.Animate.prototype.run(from, to, duration, callback, link): 参数 {from} ~。");
+			//	assert.notNull(to, "Fx.Animate.prototype.run(from, to, duration, callback, link): 参数 {to} ~。");
 					
 				// 对每个设置属性
 				var me = this,
+					form,
+					to,
 					key;
+
+				Object.extend(this, options);
 				
 				// 生成新的 current 对象。
 				me.current = {};
+
+				if (this.start) {
+					this.start(options);
+				}
+
+				from = this.from || emptyObj;
+				to = this.to;
 				
-				for (key in options.to) {
+				for (key in to) {
 					
 					var parsed = undefined,
 						fromValue = from[key],
@@ -252,7 +257,7 @@ using("System.Fx.Base");
 		
 		numberParser = {
 			set: function(target, name, from, to, delta){
-				target.dom.style[name] = c(from, to, delta);
+				target.dom.style[name] = compute(from, to, delta);
 			},
 			parse: function(value){
 				return typeof value == "number" ? value : parseFloat(value);
@@ -269,14 +274,14 @@ using("System.Fx.Base");
 		 */
 		length: {
 			
-			set: eval("-[1,]") ? function(target, name, from, to, delta){
+			set: navigator.isStd ? function (target, name, from, to, delta) {
 				
-				target.dom.style[name] = c(from, to, delta) + 'px';
+				target.dom.style[name] = compute(from, to, delta) + 'px';
 			} : function(target, name, from, to, delta){
 				try {
 					
 					// ie 对某些负属性内容报错
-					target.dom.style[name] = c(from, to, delta);
+					target.dom.style[name] = compute(from, to, delta);
 				}catch(e){}
 			},
 			
@@ -293,9 +298,9 @@ using("System.Fx.Base");
 			
 			set: function set(target, name, from, to, delta){
 				target.dom.style[name] = String.arrayToHex([
-					Math.round(c(from[0], to[0], delta)),
-					Math.round(c(from[1], to[1], delta)),
-					Math.round(c(from[2], to[2], delta))
+					Math.round(compute(from[0], to[0], delta)),
+					Math.round(compute(from[1], to[1], delta)),
+					Math.round(compute(from[2], to[2], delta))
 				]);
 			},
 			
@@ -360,23 +365,28 @@ using("System.Fx.Base");
 		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 rerun 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
 		 * @return this
 		 */
-		animate: function(){
-			var args = arguments, value = args[1];
-			if(typeof args[0] === 'string'){
-				(args[1] = {})[args[0]] = value;
-				args[0] = {};
-			} else if(typeof value !== 'object'){
-				Array.prototype.unshift.call(args, {});
+		animate: function (from, to, duration, onstop, onstart, link) {
+			if (typeof to === 'string') {
+				var t = {};
+				t[from] = to;
+				to = t;
+				from = null;
+			} else if (typeof to !== 'object') {
+				link = onstart;
+				onstart = onstop;
+				onstop = duration;
+				to = from;
+				from = null;
 			}
-			
-			if (args[2] !== 0) {
-				value = this.fx();
-				value.run.apply(value, args);
-			} else {
-				this.set(args[0], args[1]);
-				if(args[4]) args[4].call(this);
-				if(args[3]) args[3].call(this);
-			}
+
+			this.fx().run({
+				target: this,
+				duration: duration === undefined ? -1 : duration,
+				complete: onstop,
+				start: onstart,
+				from: from,
+				to: to
+			}, link);
 			
 			return this;
 		},
@@ -388,33 +398,40 @@ using("System.Fx.Base");
 		 * @param {String} [type] 方式。
 		 * @return {Element} this
 		 */
-		show: function(duration, callBack, type){
+		show: function(duration, callBack, type, link){
 			var me = this;
 			if (duration) {
 				var elem = me.dom, savedStyle = {};
 		       
-				me.fx().run(getAnimate(type),  {}, duration, function(){
-					Dom.setStyles(elem, savedStyle);
+				me.fx().run({
+					from: getAnimate(type),
+					to: {},
+					duration: duration,
+					start: function () {
+						var to = this.to;
+						if (!Dom.isHidden(elem))
+							return false;
+						Dom.show(elem);
+
+						if (from.$slide) {
+							initSlide(from, elem, type, savedStyle);
+						} else {
+							savedStyle.overflow = elem.style.overflow;
+							elem.style.overflow = 'hidden';
+						}
+
+						for (var style in from) {
+							savedStyle[style] = elem.style[style];
+							to[style] = Dom.styleNumber(elem, style);
+						}
+					},
+					complete:  function(){
+						Dom.setStyles(elem, savedStyle);
 					
-					if(callBack)
-						callBack.call(me, true);
-				}, function(from, to){
-					if(!Dom.isHidden(elem))
-						return false;
-					Dom.show(elem);
-					
-					if(from.$slide){
-						initSlide(from, elem, type, savedStyle);
-					} else {
-						savedStyle.overflow = elem.style.overflow;
-						elem.style.overflow = 'hidden';
+						if(callBack)
+							callBack.call(me, true);
 					}
-					
-					for(var style in from){
-						savedStyle[style] = elem.style[style];
-						to[style] = Dom.styleNumber(elem, style);
-					}
-				});
+				}, link);
 			} else {
 				show.apply(me, arguments);
 			}
@@ -428,26 +445,33 @@ using("System.Fx.Base");
 		 * @param {String} [type] 方式。
 		 * @return {Element} this
 		 */
-		hide: function(duration, callBack, type){
+		hide: function (duration, callBack, type) {
 			var me = this;
 			if (duration) {
 				var  elem = me.dom || me, savedStyle = {};
-				me.fx().run({}, getAnimate(type), duration, function(){  
-					Dom.hide(elem);
-					Dom.setStyles(elem, savedStyle);
-					if(callBack)
-						callBack.call(me, false);
-				}, function (from, to) {
-					if(Dom.isHidden(elem))
-						return false;
-					if(to.$slide) {
-						initSlide(to, elem, type, savedStyle);
-					} else {
-						savedStyle.overflow = elem.style.overflow;
-						elem.style.overflow = 'hidden';
-					}
-					for(var style in to){
-						savedStyle[style] = elem.style[style];
+				me.fx().run({
+					from: null,
+					to: getAnimate(type),
+					duration: duration,
+					start: function () {
+						var to = this.to;
+						if (Dom.isHidden(elem))
+							return false;
+						if (to.$slide) {
+							initSlide(to, elem, type, savedStyle);
+						} else {
+							savedStyle.overflow = elem.style.overflow;
+							elem.style.overflow = 'hidden';
+						}
+						for (var style in to) {
+							savedStyle[style] = elem.style[style];
+						}
+					},
+					complete: function () {
+						Dom.hide(elem);
+						Dom.setStyles(elem, savedStyle);
+						if (callBack)
+							callBack.call(me, false);
 					}
 				});
 			}else{
@@ -472,9 +496,9 @@ using("System.Fx.Base");
 			
 			duration /= 2;
 			
-			this.fx().run(from, to, duration, null, function (from) {
+			this.animate(from, to, duration, null, function (from) {
 				from.backgroundColor = Dom.getStyle(this.target.dom, 'backgroundColor');
-			}).run(to, from, duration, callBack);
+			}).animate(to, from, duration, callBack);
 			return this;
 		}
 	});

@@ -772,7 +772,9 @@
 		var match = ua.match(/(IE|Firefox|Chrome|Safari|Opera).((\d+?)[\.\w]*)/i) || ua.match(/(WebKit|Gecko).((\d+?)[\.\w]*)/i) || ["", "", 0, 0],
 	
 			// 浏览器名字。
-			browser = match[1];
+			browser = match[1],
+			
+			isStd = eval("-[1,]");
 
 		navigator["is" + browser] = navigator["is" + browser + match[3]] = true;
 
@@ -809,13 +811,15 @@
 		// 结果
 		return {
 
-		    /// #if CompactMode
+			/// #if CompactMode
+
+			isStd: isStd,
 
 		    /**
 			 * 获取一个值，该值指示当前浏览器是否支持标准事件。就目前浏览器状况， IE6，7 中 isQuirks = true 其它浏览器都为 false 。
 			 * @type Boolean 此处认为 IE6,7 是怪癖的。
 			 */
-		    isQuirks: eval("!-[1,]") && !Object.isObject(document.constructor),
+			isQuirks: !isStd && !Object.isObject(document.constructor),
 
 		    /// #endif
 
