@@ -107,7 +107,7 @@ Request.Text = Request.Base.extend({
 		
 				xhr = me.xhr = null;
 
-				me.done();
+				me.progress();
 			
 			}
 		}
@@ -158,7 +158,7 @@ Request.Text = Request.Base.extend({
 	 * 发送请求。
 	 */
 	send: function() {
-	
+    	
 		/**
 		 * 当前实例。
 		 * @type Ajax

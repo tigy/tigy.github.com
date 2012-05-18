@@ -3,66 +3,12 @@
  */
 
 using("System.Request.Base");
-using("System.Utils.Deferred");
+using("System.Request.Text");
+using("System.Request.JSONP");
+using("System.Request.JSON");
+using("System.Request.XML");
 
-
-Request.Base.implement({
-
-	run: function (args, deferred) {
-		this.deferred = deferred;
-		this.send();
-	},
-
-	done: function () {
-		this.deferred.progress();
-	}
-
-});
-
-var Ajax = Deferred.extend({
-
-	constructor: function(){
-
-	},
-	
-	run: function (options) {
-		if (options.req) {
-
-		}
-		this.req = new Request[Ajax.dataTypes[options.dataType || '']](options);
-		this.req.send();
-	},
-
-	pause: function(){
-		this.req.abort();
-	}
-	
-});
-
-Ajax.deferred = new Deferred();
-
-Ajax.send = function (options) {
-
-	var req = new Request[Ajax.dataTypes[options.dataType] || 'Text'](options),
-		deferred = Ajax.deferred;
-
-	switch (options.link) {
-		case 'wait':
-			deferred.add(req, options);
-			break;
-		case 'stop':
-			deferredA.stop();
-			deferred.add(req, options);
-			break;
-		case 'abort':
-			deferredA.abort();
-			deferred.add(req, options);
-			break;
-	}
-
-
-	Ajax.deferred.start();
-};
+var Ajax = Ajax || {};
 
 Ajax.dataTypes  ={
 	'text': 'Text',
@@ -71,9 +17,16 @@ Ajax.dataTypes  ={
 	'xml': 'XML'
 };
 
-Object.map("get post", function(k) {
-	
-	var emptyFn = Function.empty;
+Ajax.send = function (options) {
+	return new Request[Ajax.dataTypes[options.dataType] || 'Text']().run(options);
+};
+
+Object.each({
+	get: 'Text',
+	post: 'Text',
+	getJSONP: 'JSONP',
+	getJSON: 'JSON'
+}, function(value, key) {
 
 	/**
 	 * 快速请求一个地址。
@@ -97,34 +50,24 @@ Object.map("get post", function(k) {
 	 * @method Ajax.post
 	 */
 	
-	k = k.toUpperCase();
+	var type = value === "Text" ? key.toUpperCase() : null;
 	
-	return function(url, data, onsuccess, onerror, timeouts, oncomplete) {
-		assert.isString(url, "Ajax." + k.toLowerCase() + "(url, data, onsuccess, onerror, timeouts, ontimeout, oncomplete): 参数{url} 必须是一个地址。如果需要提交至本页，使用 location.href。");
-		return Ajax.deferred.start({
+	Ajax[key] = function(url, data, onsuccess, onerror, oncomplete, timeouts) {
+		assert.isString(url, "Ajax." + key + "(url, data, onsuccess, onerror, timeouts, ontimeout, oncomplete): 参数{url} 必须是一个地址。如果需要提交至本页，使用 location.href。");
+		if(typeof data == 'function'){
+			timeouts = oncomplete;
+			oncomplete = onerror;
+			onerror = data;
+			data = null;
+		}
+		return new Request[value]().run({
 			url: url,
-			onSuccess: onsuccess || emptyFn,
-			onError: onerror || emptyFn,
-			timeouts: timeouts,
-			onComplete: oncomplete || emptyFn,
-			type: k,
-			data: data
+			type: type,
+			data: data,
+			success: onsuccess,
+			error: onerror,
+			complete: oncomplete,
+			timeouts: timeouts
 		});
 	};
-}, Ajax);
-
-
-Ajax.getJSONP = function(url, data, onsuccess, timeouts, oncomplete){
-    assert.isString(url, "Ajax.getJSONP(url, data, onsuccess, timeouts, ontimeout): 参数{url} 必须是一个地址。如果需要提交至本页，使用 location.href。");
-    var emptyFn = Function.empty;
-    Ajax.deferred.start({
-        url: url,
-        onSuccess: onsuccess || emptyFn,
-        timeouts: timeouts,
-        onComplete: oncomplete || emptyFn,
-		data: data,
-		dataType: 'jsonp'
-    }).send();
-};
-
-
+});

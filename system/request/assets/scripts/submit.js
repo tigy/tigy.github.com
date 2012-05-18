@@ -1,6 +1,7 @@
 
 
 using("System.Request.Base");
+using("System.Request.Text");
 using("System.Dom.Base");
 
 /**
@@ -9,7 +10,7 @@ using("System.Dom.Base");
  * @return {String} 参数形式。
  */
 Request.formParam = function(formElem) {
-	formElem = Dom.get(formElem).dom;
+	formElem = Dom.getNode(formElem);
 	assert(formElem && formElem.tagName == "FORM", "HTMLFormElement.param(formElem): 参数 {formElem} 不是合法的 表单 元素", formElem);
 	var s = [], input, e = encodeURIComponent, value, name;
 	for (var i = 0, len = formElem.length; i < len; i++) {
@@ -44,7 +45,6 @@ Request.formParam = function(formElem) {
 
 };
 
-
 /**
  * 通过 ajax 提交一个表单。
  * @param {HTMLFormElement} form 表单元素。
@@ -54,8 +54,9 @@ Request.formParam = function(formElem) {
  * @param {Object} timeouts=-1 超时时间， -1 表示不限。
  * @param {Function} [ontimeout] 超时回调函数。
  */
-Ajax.submit = function(form, onsuccess, onerror, timeouts, ontimeout, oncomplete) {
+Ajax.submit = function(form, onsuccess, onerror, timeouts, oncomplete) {
 	assert.isNode(form, "Ajax.submit(form, onsuccess, onerror, timeouts, ontimeout): 参数 {form} 必须是一个节点，如果已知节点的 ID， 使用 document.getElementById 函数转换为相应节点。");
-	return Ajax[/^post$/i.test(form.method) ? "post" : "get"](form.action || location.href, Request.formParam(form), onsuccess, onerror, timeouts, ontimeout, oncomplete);
+	form = Dom.getNode(form);
+	return Ajax[/^post$/i.test(form.method) ? "post" : "get"](form.action || location.href, Request.formParam(form), onsuccess, onerror, timeouts, oncomplete);
 };
 

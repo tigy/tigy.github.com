@@ -3,6 +3,8 @@
  */
 
 
+using("System.Utils.Deferrable");
+
 var Request = Request || {};
 
 // errorNo
@@ -17,7 +19,7 @@ var Request = Request || {};
  * @class Request.Base
  * @abstract
  */
-Request.Base = Class({
+Request.Base = Deferrable.extend({
 	
 	/**
 	 * 当前 AJAX 发送的地址。
@@ -73,7 +75,10 @@ Request.Base = Class({
 	 * complete - 请求完成时的回调。参数是 xhr, message, errorNo
 	 * timeout - 请求超时时间。单位毫秒。默认为 -1 无超时 。
 	 */
-	constructor: function (options) {
+	run: function(options, link){
+    	if(this.defer(options, link)){
+    		return this;
+    	}
 
 		for (var option in options) {
 			var value = options[option];
@@ -81,19 +86,15 @@ Request.Base = Class({
 				this[option] = value;
 			}
 		}
+    	
+    	return this.send();
 	},
-
-	/**
-	 * 子类可重写此函数，用于在请求完成时调用。
-	 * @protected abstract
-	 */
-	done: Function.empty,
 
 	/**
 	 * 停止当前的请求。
 	 * @return this
 	 */
-	abort: function () {
+	pause: function () {
 		this.onStateChange(-2);
 		return this;
 	}

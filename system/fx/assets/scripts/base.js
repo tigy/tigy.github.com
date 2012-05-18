@@ -3,7 +3,7 @@
  * @author xuld
  */
 
-using("System.Utils.Deferred");
+using("System.Utils.Deferrable");
 
 var Fx = Fx || {};
 
@@ -25,7 +25,7 @@ Fx.Base = (function(){
 	function interval(){
 		var i = this.length;
 		while(--i >= 0)
-			this[i].progress();
+			this[i].step();
 	}
 	
 	/// #endregion
@@ -33,7 +33,7 @@ Fx.Base = (function(){
 	/**
 	 * @namespace Fx
 	 */
-	return Deferred.extend({
+	return Deferrable.extend({
 	
 		/**
 		 * 每秒的运行帧次。
@@ -54,6 +54,26 @@ Fx.Base = (function(){
 		xtype: 'fx',
 		
 		/**
+		 * 当被子类重写时，实现生成当前变化所进行的初始状态。
+		 * @param {Object} from 开始位置。
+		 * @param {Object} to 结束位置。
+		 * @return {Base} this
+		 */
+		init: Function.empty,
+		
+		/**
+		 * @event step 当进度改变时触发。
+		 * @param {Number} value 当前进度值。
+		 */
+		
+		/**
+		 * 根据指定变化量设置值。
+		 * @param {Number} delta 变化量。 0 - 1 。
+		 * @abstract
+		 */
+		set: Function.empty,
+		
+		/**
 		 * 实现变化。
 		 * @param {Object} p 值。
 		 * @return {Object} p 变化值。
@@ -63,40 +83,15 @@ Fx.Base = (function(){
 		},
 		
 		/**
-		 * 当被子类重写时，实现生成当前变化所进行的初始状态。
-		 * @param {Object} from 开始位置。
-		 * @param {Object} to 结束位置。
-		 * @return {Base} this
-		 */
-		init: function (options) {
-			var me = this;
-			return me;
-		},
-		
-		/**
 		 * 进入变换的下步。
 		 */
-		progress: function() {
+		step: function() {
 			var me = this, time = Date.now() - me.time;
 			if (time < me.duration) {
 				me.set(me.transition(time / me.duration));
 			}  else {
-				me.stop();
+				me.done();
 			}
-		},
-		
-		/**
-		 * @event progress 当进度改变时触发。
-		 * @param {Number} value 当前进度值。
-		 */
-		
-		/**
-		 * 根据指定变化量设置值。
-		 * @param {Number} delta 变化量。 0 - 1 。
-		 * @abstract
-		 */
-		set: function(value){
-			this.trigger('progress', value);
 		},
 		
 		/**
@@ -109,8 +104,10 @@ Fx.Base = (function(){
 		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 restart 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
 		 * @return {Base} this
 		 */
-		run: function (options) {
+		run: function (options, link) {
 			var me = this;
+            if (me.defer(options, link))
+                return;
 			me.init(options);
 			me.set(0);
 			me.time = 0;
@@ -123,20 +120,21 @@ Fx.Base = (function(){
 			return me;
 		},
 		
-		/**
-		 * 完成当前效果。
-		 */
-		complete: function() {
-			
+		done: function(){
+			this.pause();
+			this.set(1);
+			if(this.complete){
+				this.complete();
+			}
+			this.progress();
 		},
 		
 		/**
 		 * 中断当前效果。
 		 */
 		stop: function() {
-			this.set(1);
-			this.pause();
-			this.complete();
+			this.abort();
+			this.done();
 			return this;
 		},
 		
@@ -169,7 +167,7 @@ Fx.Base = (function(){
 				if(value){
 					value.push(me);
 					me.timer = value[0].timer;
-				}else{
+				} else {
 					me.timer = setInterval(interval.bind(cache[fps] = [me]), Math.round(1000 / fps ));
 				}
 			}

@@ -189,9 +189,9 @@ using("System.Fx.Base");
 			 * @param {Object} from 开始。
 			 * @param {Object} to 结束。
 			 */
-			init: function (from, to) {
-				assert.notNull(from, "Fx.Animate.prototype.start(from, to, duration, callback, link): 参数 {from} ~。");
-				assert.notNull(to, "Fx.Animate.prototype.start(from, to, duration, callback, link): 参数 {to} ~。");
+			init: function (options) {
+				assert.notNull(from, "Fx.Animate.prototype.run(from, to, duration, callback, link): 参数 {from} ~。");
+				assert.notNull(to, "Fx.Animate.prototype.run(from, to, duration, callback, link): 参数 {to} ~。");
 					
 				// 对每个设置属性
 				var me = this,
@@ -200,7 +200,7 @@ using("System.Fx.Base");
 				// 生成新的 current 对象。
 				me.current = {};
 				
-				for (key in to) {
+				for (key in options.to) {
 					
 					var parsed = undefined,
 						fromValue = from[key],
@@ -357,7 +357,7 @@ using("System.Fx.Base");
 		 * @param {Number} duration=-1 变化的时间。
 		 * @param {Function} [onStop] 停止回调。
 		 * @param {Function} [onStart] 开始回调。
-		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 restart 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
+		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 rerun 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
 		 * @return this
 		 */
 		animate: function(){
@@ -371,7 +371,7 @@ using("System.Fx.Base");
 			
 			if (args[2] !== 0) {
 				value = this.fx();
-				value.start.apply(value, args);
+				value.run.apply(value, args);
 			} else {
 				this.set(args[0], args[1]);
 				if(args[4]) args[4].call(this);
@@ -393,7 +393,7 @@ using("System.Fx.Base");
 			if (duration) {
 				var elem = me.dom, savedStyle = {};
 		       
-				me.fx().start(getAnimate(type),  {}, duration, function(){
+				me.fx().run(getAnimate(type),  {}, duration, function(){
 					Dom.setStyles(elem, savedStyle);
 					
 					if(callBack)
@@ -432,7 +432,7 @@ using("System.Fx.Base");
 			var me = this;
 			if (duration) {
 				var  elem = me.dom || me, savedStyle = {};
-				me.fx().start({}, getAnimate(type), duration, function(){  
+				me.fx().run({}, getAnimate(type), duration, function(){  
 					Dom.hide(elem);
 					Dom.setStyles(elem, savedStyle);
 					if(callBack)
@@ -472,9 +472,9 @@ using("System.Fx.Base");
 			
 			duration /= 2;
 			
-			this.fx().start(from, to, duration, null, function (from) {
+			this.fx().run(from, to, duration, null, function (from) {
 				from.backgroundColor = Dom.getStyle(this.target.dom, 'backgroundColor');
-			}).start(to, from, duration, callBack);
+			}).run(to, from, duration, callBack);
 			return this;
 		}
 	});
