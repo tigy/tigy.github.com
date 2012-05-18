@@ -1,5 +1,5 @@
 /**********************************************
- * This file is created by a tool at 2012/5/3 17:17
+ * This file is created by a tool at 2012/5/18 17:2
  **********************************************/
 
 
@@ -1151,21 +1151,23 @@ li.x-list,
 .x-treeview-plain {
   border: 0;
 }
+.x-treeview-content {
+  white-space: nowrap;
+}
 .x-treenode,
 .x-treeview a,
 .x-treenode-space {
   height: 20px;
+  vertical-align: top;
 }
 .x-treenode {
-  overflow: hidden;
   cursor: default;
   display: block;
   color: #333333;
   font-size: 14px;
 }
 .x-treenode-space {
-  float: left;
-  display: block;
+  display: inline-block;
   width: 19px;
   background-repeat: no-repeat;
 }

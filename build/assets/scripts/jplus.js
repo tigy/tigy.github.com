@@ -1,5 +1,5 @@
 /**********************************************
- * This file is created by a tool at 2012/5/3 17:17
+ * This file is created by a tool at 2012/5/18 17:2
  **********************************************/
 
 
@@ -211,7 +211,7 @@
 		 *         </p>
 		 *         <p>
 		 *         addEvents 函数的参数是一个事件信息，格式如: {click: { add: ..., remove: ...,
-		 *        trigger: ...} 。 其中 click 表示事件名。一般建议事件名是小写的。
+		 *        trigger: ..., initEvent: ...} 。 其中 click 表示事件名。一般建议事件名是小写的。
 		 *         </p>
 		 *         <p>
 		 *         一个事件有多个相应，分别是: 绑定(add), 删除(remove), 触发(trigger)
@@ -574,6 +574,8 @@
 
 		    }
 
+		    return obj;
+
 	    }
 
 	});
@@ -778,15 +780,14 @@
 	apply(navigator, (function(ua) {
 
 		// 检查信息
-		var match = ua.match(/(IE|Firefox|Chrome|Safari|Opera|Navigator).((\d+)\.?[\d.]*)/i) || ["", "Other", 0, 0],
-	
-			// 版本信息。
-			version = ua.match(/(Version).((\d+)\.?[\d.]*)/i) || match,
+		var match = ua.match(/(IE|Firefox|Chrome|Safari|Opera).([\w\.]*)/i) || ua.match(/(WebKit|Gecko).([\w\.]*)/i) || [0, "", 0],
 	
 			// 浏览器名字。
-			browser = match[1];
+			browser = match[1],
+			
+			isStd = eval("-[1,]");
 
-		navigator["is" + browser] = navigator["is" + browser + version[3]] = true;
+		navigator["is" + browser] = navigator["is" + browser + parseInt(match[2])] = true;
 
 		/**
 		 * 获取一个值，该值指示是否为 IE 浏览器。
@@ -821,13 +822,15 @@
 		// 结果
 		return {
 
-		    /// #if CompactMode
+			/// #if CompactMode
+
+			isStd: isStd,
 
 		    /**
 			 * 获取一个值，该值指示当前浏览器是否支持标准事件。就目前浏览器状况， IE6，7 中 isQuirks = true 其它浏览器都为 false 。
 			 * @type Boolean 此处认为 IE6,7 是怪癖的。
 			 */
-		    isQuirks: eval("!-[1,]") && !Object.isObject(document.constructor),
+			isQuirks: !isStd && !Object.isObject(document.constructor),
 
 		    /// #endif
 
@@ -842,7 +845,7 @@
 			 * @type String 输出的格式比如 6.0.0 。 这是一个字符串，如果需要比较版本，应该使用
 			 *       parseFloat(navigator.version) < 4 。
 			 */
-		    version: version[2]
+		    version: match[2]
 
 		};
 
@@ -1007,18 +1010,16 @@
 			        return true;
 				};
 
-				// 当前事件的全部函数。
-		        evt.handlers = [];
-
 		        // 获取事件管理对象。
 		        d = getMgr(me, type);
+
+				// 当前事件的全部函数。
+		        evt.handlers = d.initEvent ? [[d.initEvent, me]] : [];
 
                 // 添加事件。
                 if(d.add) {
                 	d.add(me, type, evt);
-
-                	evt.min = evt.handlers.length;
-                }
+				}
 
 	        }
 
@@ -1060,13 +1061,17 @@
 			        handlers = evt.handlers;
 
 			        if (listener) {
+			        	
+			        	i = handlers.length;
 
 				        // 搜索符合的句柄。
-				        for (i = handlers.length - 1; i; i--) {
+				        while (--i >= 0) {
 					        if (handlers[i][0] === listener) {
 						        handlers.splice(i, 1);
 						        
-						        listener = handlers.length > (evt.min || 0);
+						        if (!i || (i === 1 && handlers[0] === d.initEvent)) {
+						        	listener = 0;
+						        }
 								
 						        break;
 					        }
@@ -1133,7 +1138,7 @@
 	        assert.isFunction(listener, 'System.Object.prototype.once(type, listener): {listener} ~');
 			
 			var me = this;
-
+			
 	        // one 本质上是 on , 只是自动为 listener 执行 un 。
 	        return this.on(type, function() {
 
@@ -1590,11 +1595,11 @@ function assert(bValue, msg) {
         }
 
         // 错误源
-        val = arguments.callee.caller;
+        val = val.callee.caller;
 
         if (assert.stackTrace) {
 
-            while (val.debugStepThrough)
+            while (val && val.debugStepThrough)
                 val = val.caller;
 
             if (val && val.caller) {
@@ -2664,7 +2669,7 @@ function imports(ns){
 		/**
 		 * 指示当前浏览器是否为标签浏览器。
 		 */
-		isStandard = eval("-[1,]"),
+		isStandard = navigator.isStd,
 	
 		/**
 		 * 用于测试的元素。
@@ -2824,6 +2829,11 @@ function imports(ns){
 
 				}
 
+			},
+
+			item: function(index){
+				var elem = this[index < 0 ? this.length + index : index];
+				return elem ? new Dom(elem) : null;
 			},
 			
 			/**
@@ -3075,8 +3085,6 @@ function imports(ns){
 		 */
 		eventObj = {
 
-			init: Function.empty,
-
 			/**
 			 * 创建当前事件可用的参数。
 			 * @param {Dom} ctrl 事件所有者。
@@ -3105,9 +3113,10 @@ function imports(ns){
 			 * @param {String} type 类型。
 			 * @param {Function} fn 函数。
 			 */
-			add: function (ctrl, type, fn) {
-				Dom.addListener(ctrl.dom, type, fn);
-				fn.handlers.push([this.init, ctrl]);
+			add: div.addEventListener ? function (elem, type, fn) {
+				elem.dom.addEventListener(type, fn, false);
+			} : function (elem, type, fn) {
+				elem.dom.attachEvent('on' + type, fn);
 			},
 
 			/**
@@ -3116,8 +3125,10 @@ function imports(ns){
 			 * @param {String} type 类型。
 			 * @param {Function} fn 函数。
 			 */
-			remove: function (ctrl, type, fn) {
-				Dom.removeListener(ctrl.dom, type, fn);
+			remove: div.removeEventListener ? function (elem, type, fn) {
+				elem.dom.removeEventListener(elem, fn, false);
+			} : function (elem, type, fn) {
+				elem.dom.detachEvent('on' + type, fn);
 			}
 
 		},
@@ -3343,18 +3354,6 @@ function imports(ns){
 					return true;
 
 			return false;
-		},
-
-		addListener: div.addEventListener ? function (elem, type, fn) {
-			elem.addEventListener(type, fn, false);
-		} : function (elem, type, fn) {
-			elem.attachEvent('on' + type, fn);
-		},
-
-		removeListener: div.removeEventListener ? function (elem, type, fn) {
-			elem.removeEventListener(elem, fn, false);
-		} : function (elem, type, fn) {
-			elem.detachEvent('on' + type, fn);
 		},
 		
 		/**
@@ -5118,14 +5117,7 @@ function imports(ns){
 
 	t = DomList.prototype;
 
-	map("shift pop item", function (value) {
-		t[value] = function() {
-			var elem = ap[value].apply(this, arguments);
-			return elem ? new Dom(elem) : null;
-		};
-	});
-
-	map("unshift push include indexOf each forEach", function (value) {
+	map("shift pop unshift push include indexOf each forEach", function (value) {
 		t[value] = ap[value];
 	});
 
@@ -5153,7 +5145,7 @@ function imports(ns){
 		if (div.onmouseenter !== null) {
 
 			Dom.addEvent('mouseenter mouseleave', {
-				init: function (e) {
+				initEvent: function (e) {
 					return this !== e.relatedTarget && !Dom.hasChild(this.dom, e.relatedTarget);
 				}
 			});
@@ -5163,7 +5155,7 @@ function imports(ns){
 		/// #if CompactMode
 	} else {
 
-		eventObj.init = function (e) {
+		eventObj.initEvent = function (e) {
 			if (!e.stop) {
 				e.target = e.srcElement;
 				e.stop = pep.stop;
@@ -5176,7 +5168,7 @@ function imports(ns){
 		Dom.addEvent("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", {
 			init: function (e) {
 				if(!e.stop) {
-					eventObj.init(e);
+					eventObj.initEvent(e);
 					e.relatedTarget = e.fromElement === e.target ? e.toElement: e.fromElement;
 					var dom = getDocument(e.target).dom;
 					e.pageX = e.clientX + dom.scrollLeft;
@@ -5193,7 +5185,7 @@ function imports(ns){
 		Dom.addEvent("keydown keypress keyup",  {
 			init: function (e) {
 				if(!e.stop) {
-					eventObj.init(e);
+					eventObj.initEvent(e);
 					e.which = e.keyCode;
 				}
 			}
@@ -5274,26 +5266,26 @@ function imports(ns){
 	 * @member document.onLoad
 	 */
 
+	Dom.addEvent('domready domload', {});
 
 	map('ready load', function(readyOrLoad, isLoad) {
 
 		var isReadyOrIsLoad = isLoad ? 'isLoaded': 'isReady';
 
 		// 设置 ready load
-		Dom[readyOrLoad] = function(fn, bind) {
-
+		Dom[readyOrLoad] = function (fn, bind) {
+			
 			// 忽略参数不是函数的调用。
-			if(!Function.isFunction(fn))
-				fn = 0;
+			var isFn = Function.isFunction(fn);
 
 			// 如果已载入，则直接执行参数。
 			if(Dom[isReadyOrIsLoad]) {
 
-				if(fn)
+				if (isFn)
 					fn.call(bind);
 
-				// 如果参数是函数。
-			} else if(fn) {
+			// 如果参数是函数。
+			} else if (isFn) {
 
 				document.on(readyOrLoad, fn, bind);
 
@@ -5301,30 +5293,28 @@ function imports(ns){
 				// 如果存在 JS 之后的 CSS 文件， 肯能导致 document.body 为空，此时延时执行 DomReady
 			} else if (document.body) {
 
-				var t;
-
 				// 如果 isReady, 则删除
 				if(isLoad) {
 
 					// 使用系统文档完成事件。
-					t = window;
+					isFn = Dom.window;
 					fn = readyOrLoad;
 
 					// 确保 ready 触发。
 					Dom.ready();
 
 				} else {
-					t = document;
+					isFn = Dom.document;
 					fn = domReady;
 				}
 
-				Dom.removeListener(t, fn, arguments.callee);
+				eventObj.remove(isFn, fn, arguments.callee);
 
 				// 先设置为已经执行。
 				Dom[isReadyOrIsLoad] = true;
 
 				// 触发事件。
-				if(document.trigger(readyOrLoad)) {
+				if (document.trigger(readyOrLoad, fn)) {
 
 					// 删除事件。
 					document.un(readyOrLoad);
@@ -5337,15 +5327,17 @@ function imports(ns){
 
 			return document;
 		};
+
+		readyOrLoad = 'dom' + readyOrLoad;
 	});
 	
 	// 如果readyState 不是 complete, 说明文档正在加载。
 	if(document.readyState !== "complete") {
 
 		// 使用系统文档完成事件。
-		Dom.addListener(document, domReady, Dom.ready);
+		eventObj.add(Dom.document, domReady, Dom.ready);
 
-		Dom.addListener(window, 'load', Dom.load, false);
+		eventObj.add(Dom.window, 'load', Dom.load, false);
 
 		/// #if CompactMode
 		
@@ -6298,10 +6290,10 @@ var ListControl = ScrollableControl.extend({
 /** * @author  *//**********************************************
  * Controls.Core.ICollapsable
  **********************************************/
-/** * @author  *//** * 表示一个可折叠的控件。 * @interface ICollapsable */var ICollapsable = {		/**	 * 获取目前是否折叠。	 * @virtual	 * @return {Boolean} 获取一个值，该值指示当前面板是否折叠。	 */	isCollapsed: function() {		return this.container && Dom.isHidden(this.container.dom);	},		collapseDuration: -1,		onToggleCollapse: function(value){			},		onCollapsing: function(duration){		return this.trigger('collapse', duration);	},		onExpanding: function(duration){		return this.trigger('expanding', duration);	},		onCollapse: function(){		this.trigger('collapse');		this.onToggleCollapse(true);	},		onExpand: function(){		this.trigger('expand');		this.onToggleCollapse(false);	},		collapse: function(duration){		var me = this;		if(me.onCollapsing(duration) && me.container)			me.container.hide(duration === undefined ? me.collapseDuration : duration, function(){			me.addClass('x-' + me.xtype + '-collapsed');			me.onCollapse();		}  , 'height');		return this;	},		expand: function(duration){		if(this.onExpanding(duration)  ) {			this.removeClass('x-' + this.xtype + '-collapsed');			this.container && this.container.show(duration === undefined ? this.collapseDuration : duration, this.onExpand.bind(this), 'height');		}		return this;	},		/**	 * 切换面板的折叠。	 * @method toggleCollapse	 * @param {Number} collapseDuration 时间。	 */	toggleCollapse: function(duration) {		return this.isCollapsed() ? this.expand(duration) : this.collapse(duration);	}	};/**********************************************
+/** * @author  *//** * 表示一个可折叠的控件。 * @interface ICollapsable */var ICollapsable = {		/**	 * 获取目前是否折叠。	 * @virtual	 * @return {Boolean} 获取一个值，该值指示当前面板是否折叠。	 */	isCollapsed: function() {		return !this.container || Dom.isHidden(this.container.dom);	},		collapseDuration: -1,		onToggleCollapse: function(value){			},		onCollapsing: function(duration){		return this.trigger('collapse', duration);	},		onExpanding: function(duration){		return this.trigger('expanding', duration);	},		onCollapse: function(){		this.trigger('collapse');		this.onToggleCollapse(true);	},		onExpand: function(){		this.trigger('expand');		this.onToggleCollapse(false);	},		collapse: function(duration){		var me = this;		if(me.onCollapsing(duration) && me.container)			me.container.hide(duration === undefined ? me.collapseDuration : duration, function(){			me.addClass('x-' + me.xtype + '-collapsed');			me.onCollapse();		}  , 'height');		return this;	},		expand: function(duration){		if(this.onExpanding(duration)  ) {			this.removeClass('x-' + this.xtype + '-collapsed');			this.container && this.container.show(duration === undefined ? this.collapseDuration : duration, this.onExpand.bind(this), 'height');		}		return this;	},		/**	 * 切换面板的折叠。	 * @method toggleCollapse	 * @param {Number} collapseDuration 时间。	 */	toggleCollapse: function(duration) {		return this.isCollapsed() ? this.expand(duration) : this.collapse(duration);	}	};/**********************************************
  * Controls.DataView.TreeView
  **********************************************/
-/** * @author  */var TreeNode = ScrollableControl.extend(ICollapsable).implement({		/**	 * 更新节点前面的占位符状态。	 */	_updateSpan: function(){				var span = this.getSpan(0), current = this;				while((current = current.parentControl) && (span = span.getPrevious())){						span.dom.className = current.isLastNode() ? 'x-treenode-space x-treenode-none' : 'x-treenode-space';				}				this.updateNodeType();	},		/**	 * 更新一个节点前面指定的占位符的类名。	 */	_setSpan: function(depth, className){				this.nodes.each(function(node){			var first = node.getFirst(depth).dom;			if(first.tagName == 'SPAN')				first.className = className;			node._setSpan(depth, className);		});			},		_markAsLastNode: function(){		this.addClass('x-treenode-last');		this._setSpan(this.depth - 1, 'x-treenode-space x-treenode-none');	},		_clearMarkAsLastNode: function(){		this.removeClass('x-treenode-last');		this._setSpan(this.depth - 1, 'x-treenode-space');	},		_initContainer: function(childControl){		var me = this, li = Dom.create('li', 'x-list-content');		li.append(childControl);				// 如果 子节点有子节点，那么插入子节点的子节点。		if(childControl.container){			li.append(childControl.container);		}				if(childControl.duration === -1){			childControl.duration = me.duration;		}				return li;	},		updateNodeType: function(){		this.setNodeType(this.nodes.length === 0 ? 'normal' : this.isCollapsed() ? 'plus' : 'minus');	},		xtype: 'treenode',		   	depth: 0,		create: function(){		var a = document.createElement('a');		a.href = 'javascript:;';		a.className = 'x-' + this.xtype;		a.innerHTML = '<span></span>';		return a;	},		onDblClick: function(e){		this.toggleCollapse();		e.stop();	},		init: function(options){		this.content = this.getLast();		this.unselectable();		this.on('dblclick', this.onDblClick, this);		this.nodes = this.controls;		this.container = null;		System.setData(this.dom, 'treenode', this);	},		initChild: function(childControl){		if(!(childControl instanceof TreeNode)) {			var t = childControl;			childControl = new TreeNode();			if(typeof t === 'string')				childControl.setText(t);			else				Dom.get(childControl).append(t);		}		return childControl;	},		onControlAdded: function(childControl, index){		var me = this,			t = this.initContainer(childControl),			re = this.controls[index];				this.container.insertBefore(t, re && re.getParent());				// 只有 已经更新过 才去更新。		if(this.depth || this instanceof TreeView){			childControl.setDepth(this.depth + 1);		}				me.update();	},		onControlRemoved: function(childControl, index){		this.container.removeChild(childControl.getParent());		this.update();	},		initContainer: function(childControl){				// 第一次执行创建容器。		this.container = Dom.create('ul', 'x-list-container x-treeview-container');				if(this instanceof TreeView){			this.dom.appendChild(this.container.dom);			} else if(this.dom.parentNode){			this.dom.parentNode.appendChild(this.container.dom);			}				this.initContainer = this._initContainer;				return this.initContainer (childControl);			},		// 由于子节点的改变刷新本节点和子节点状态。	update: function(){				// 更新图标。		this.updateNodeType();				// 更新 lastNode		if(this.nodes.length){			var currentLastNode = this.nodes[this.nodes.length - 1],				lastNode = this.lastNode;			if (lastNode !== currentLastNode) {				currentLastNode._markAsLastNode();				this.lastNode = currentLastNode;				if (lastNode) lastNode._clearMarkAsLastNode();			}		}			},		setNodeType: function(type){		var handle = this.getSpan(0);		if(handle) {			handle.dom.className = 'x-treenode-space x-treenode-' + type;		}		return this;	},		expandAll: function(duration, maxDepth){		if (this.container && maxDepth !== 0) {			this.expand(duration);			this.nodes.invoke('expandAll', [duration, --maxDepth]);		}		return this;	},		collapseAll: function(duration, maxDepth){		if (this.container && maxDepth !== 0) {			this.nodes.invoke('collapseAll', [duration, --maxDepth]);			this.collapse(duration);		}		return this;	},		isLastNode: function(){		return this.parentControl &&  this.parentControl.lastNode === this;	},		onToggleCollapse: function(value){		this.setNodeType(this.nodes.length === 0 ? 'normal' : value ? 'plus' : 'minus');		if(!value && (value = this.getNext('ul'))){			value.dom.style.height = 'auto';		}	},		setSelected: function(value){		this.toggleClass('x-treenode-selected', value);	},		// 获取当前节点的占位 span 。 最靠近右的是 index == 0	getSpan: function(index){		return this.content.getPrevious(index);	},	// 设置当前节点的深度。	setDepth: function(value){				var me = this;			var currentDepth = this.depth, span, elem = this.dom;				assert(value >= 0, "value 非法。 value = {0}", value);				// 删除已经存在的占位符。				while(currentDepth > value){			elem.removeChild(elem.firstChild);			currentDepth--;		}			// 重新生成占位符。			while(currentDepth < value){			span = document.createElement('span');			span.className ='x-treenode-space';			elem.insertBefore(span, elem.firstChild);			currentDepth++;		}				if(elem.lastChild.previousSibling)			elem.lastChild.previousSibling.onclick = function(){				me.toggleCollapse();				return !(/\bx-treenode-(minus|plus|loading|uninit)\b/.test(this.className));			};				// 更新深度。				this.depth = value;				this._updateSpan();				// 对子节点设置深度+1		this.nodes.invoke('setDepth', [value + 1]);	},		setHref: function(value){		this.setAttr('href', value);		return this;	},		getTreeView: function(){		var n = this;		while(n && !(n instanceof TreeView))			n = n.parentControl;							return  n;	},		ensureVisible: function(duration){		duration = duration === undefined ? 0 : duration;		var n = this;		n.scrollIntoView();		while(n = n.parentControl) {			n.expand(duration);		}	},		/**	 * 展开当前节点，但折叠指定深度以后的节点。	 */	collapseTo: function(depth, duration){		duration = duration === undefined ? 0 : duration;		depth = depth === undefined ? 1 : depth;				if(depth > 0){			this.expand(duration);		} else {			this.collapse(duration);		}				this.nodes.invoke('collapseTo', [--depth, duration]);	},		toString: function(){		return String.format("{0}#{1}", this.getText(), this.depth);	}});Dom.define	(TreeNode, 'content', 'setHtml setText')	(TreeNode, 'content', 'getHtml getText', true);var TreeView = TreeNode.extend({		xtype: 'treeview',		create: function(){		var div = document.createElement('div');		div.className = 'x-' + this.xtype;		div.innerHTML = '<a href="javascript:;"></a>';		return div;	},		/**	 * 当用户点击一项时触发。	 */	onNodeClick: function (node) {		return this.trigger('nodeclick', node);	},		init: function(){		this.base('init');		this.on('click', this.onClick);	},		/**	 * 当一个选项被选中时触发。	 */	onSelect: function(node){		return this.trigger('select', node);	},		/**	 * 点击时触发。	 */	onClick: function (e) {				var target = e.target;				//if(/\bx-treenode-(minus|plus|loading)\b/.test(target.className))		//	return;				while(target && !Dom.hasClass(target, 'x-treenode')) {			target = target.parentNode;		}				if(target){			target = System.getData(target, 'treenode');						if(target && !this.clickNode(target)){				e.stop();			}		}					},		/**	 * 当选中的项被更新后触发。	 */	onChange: function (old, item){		return this.trigger('change', old);	},		/**	 * 模拟点击一项。	 */	clickNode: function(node){		if(this.onNodeClick(node)){			this.setSelectedNode(node);			return true;		}				return false;	},		setSelectedNode: function(node){				// 先反选当前选择项。		var old = this.getSelectedNode();		if(old)			old.setSelected(false);			if(this.onSelect(node)){					// 更新选择项。			this.selectedNode = node;						if(node != null){				node.setSelected(true);			}					}					if(old !== node)			this.onChange(old, node);					return this;	},		getSelectedNode: function(){		return this.selectedNode;	}	});/**********************************************
+/** * @author  */var TreeNode = ScrollableControl.extend(ICollapsable).implement({		/**	 * 更新节点前面的占位符状态。	 */	_updateSpan: function(){				var span = this.getSpan(0), current = this;				while((current = current.parentControl) && (span = span.getPrevious())){						span.dom.className = current.isLastNode() ? 'x-treenode-space x-treenode-none' : 'x-treenode-space';				}				this.updateNodeType();	},		/**	 * 更新一个节点前面指定的占位符的类名。	 */	_setSpan: function(depth, className){				this.nodes.each(function(node){			var first = node.getFirst(depth).dom;			if(first.tagName == 'SPAN')				first.className = className;			node._setSpan(depth, className);		});			},		_markAsLastNode: function(){		this.addClass('x-treenode-last');		this._setSpan(this.depth - 1, 'x-treenode-space x-treenode-none');	},		_clearMarkAsLastNode: function(){		this.removeClass('x-treenode-last');		this._setSpan(this.depth - 1, 'x-treenode-space');	},		_initContainer: function(childControl){		var me = this, li = Dom.create('li', 'x-treeview-content');		li.append(childControl);				// 如果 子节点有子节点，那么插入子节点的子节点。		if(childControl.container){			li.append(childControl.container);		}				if(childControl.duration === -1){			childControl.duration = me.duration;		}				return li;	},		updateNodeType: function(){		this.setNodeType(this.nodes.length === 0 ? 'normal' : this.isCollapsed() ? 'plus' : 'minus');	},		xtype: 'treenode',		   	depth: 0,		create: function(){		var a = document.createElement('a');		a.href = 'javascript:;';		a.className = 'x-' + this.xtype;		a.innerHTML = '<span></span>';		return a;	},		onDblClick: function(e){		this.toggleCollapse();		e.stop();	},		init: function(options){		this.content = this.getLast();		this.unselectable();		this.on('dblclick', this.onDblClick, this);		this.nodes = this.controls;		this.container = null;		System.setData(this.dom, 'treenode', this);	},		initChild: function(childControl){		if(!(childControl instanceof TreeNode)) {			var t = childControl;			childControl = new TreeNode();			if(typeof t === 'string')				childControl.setText(t);			else				Dom.get(childControl).append(t);		}		return childControl;	},		onControlAdded: function(childControl, index){		var me = this,			t = this.initContainer(childControl),			re = this.controls[index];				this.container.insertBefore(t, re && re.getParent());				// 只有 已经更新过 才去更新。		if(this.depth || this instanceof TreeView){			childControl.setDepth(this.depth + 1);		}				me.update();	},		onControlRemoved: function(childControl, index){		this.container.removeChild(childControl.getParent());		this.update();	},		initContainer: function(childControl){				// 第一次执行创建容器。		this.container = Dom.create('ul', 'x-treeview-container');				if(this instanceof TreeView){			this.dom.appendChild(this.container.dom);			} else if(this.dom.parentNode){			this.dom.parentNode.appendChild(this.container.dom);			}				this.initContainer = this._initContainer;				return this.initContainer (childControl);			},		// 由于子节点的改变刷新本节点和子节点状态。	update: function(){				// 更新图标。		this.updateNodeType();				// 更新 lastNode		if(this.nodes.length){			var currentLastNode = this.nodes[this.nodes.length - 1],				lastNode = this.lastNode;			if (lastNode !== currentLastNode) {				currentLastNode._markAsLastNode();				this.lastNode = currentLastNode;				if (lastNode) lastNode._clearMarkAsLastNode();			}		}			},		setNodeType: function(type){		var handle = this.getSpan(0);		if(handle) {			handle.dom.className = 'x-treenode-space x-treenode-' + type;		}		return this;	},		expandAll: function(duration, maxDepth){		if (this.container && maxDepth !== 0) {			this.expand(duration);			this.nodes.invoke('expandAll', [duration, --maxDepth]);		}		return this;	},		collapseAll: function(duration, maxDepth){		if (this.container && maxDepth !== 0) {			this.nodes.invoke('collapseAll', [duration, --maxDepth]);			this.collapse(duration);		}		return this;	},		isLastNode: function(){		return this.parentControl &&  this.parentControl.lastNode === this;	},		onToggleCollapse: function(value){		this.setNodeType(this.nodes.length === 0 ? 'normal' : value ? 'plus' : 'minus');		if(!value && (value = this.getNext('ul'))){			value.dom.style.height = 'auto';		}	},		setSelected: function(value){		this.toggleClass('x-treenode-selected', value);	},		// 获取当前节点的占位 span 。 最靠近右的是 index == 0	getSpan: function(index){		return this.content.getPrevious(index);	},	// 设置当前节点的深度。	setDepth: function(value){				var me = this;			var currentDepth = this.depth, span, elem = this.dom;				assert(value >= 0, "value 非法。 value = {0}", value);				// 删除已经存在的占位符。				while(currentDepth > value){			elem.removeChild(elem.firstChild);			currentDepth--;		}			// 重新生成占位符。			while(currentDepth < value){			span = document.createElement('span');			span.className ='x-treenode-space';			elem.insertBefore(span, elem.firstChild);			currentDepth++;		}				if(elem.lastChild.previousSibling)			elem.lastChild.previousSibling.onclick = function(){				me.toggleCollapse();				return !(/\bx-treenode-(minus|plus|loading|uninit)\b/.test(this.className));			};				// 更新深度。				this.depth = value;				this._updateSpan();				// 对子节点设置深度+1		this.nodes.invoke('setDepth', [value + 1]);	},		setHref: function(value){		this.setAttr('href', value);		return this;	},		getTreeView: function(){		var n = this;		while(n && !(n instanceof TreeView))			n = n.parentControl;							return  n;	},		ensureVisible: function(duration){		duration = duration === undefined ? 0 : duration;		var n = this;		n.scrollIntoView();		while(n = n.parentControl) {			n.expand(duration);		}	},		/**	 * 展开当前节点，但折叠指定深度以后的节点。	 */	collapseTo: function(depth, duration){		duration = duration === undefined ? 0 : duration;		depth = depth === undefined ? 1 : depth;				if(depth > 0){			this.expand(duration);		} else {			this.collapse(duration);		}				this.nodes.invoke('collapseTo', [--depth, duration]);	},		toString: function(){		return String.format("{0}#{1}", this.getText(), this.depth);	}});Dom.define	(TreeNode, 'content', 'setHtml setText')	(TreeNode, 'content', 'getHtml getText', true);var TreeView = TreeNode.extend({		xtype: 'treeview',		create: function(){		var div = document.createElement('div');		div.className = 'x-' + this.xtype;		div.innerHTML = '<a href="javascript:;"></a>';		return div;	},		/**	 * 当用户点击一项时触发。	 */	onNodeClick: function (node) {		return this.trigger('nodeclick', node);	},		init: function(){		this.base('init');		this.on('click', this.onClick);	},		/**	 * 当一个选项被选中时触发。	 */	onSelect: function(node){		return this.trigger('select', node);	},		/**	 * 点击时触发。	 */	onClick: function (e) {				var target = e.target;				//if(/\bx-treenode-(minus|plus|loading)\b/.test(target.className))		//	return;				while(target && !Dom.hasClass(target, 'x-treenode')) {			target = target.parentNode;		}				if(target){			target = System.getData(target, 'treenode');						if(target && !this.clickNode(target)){				e.stop();			}		}					},		/**	 * 当选中的项被更新后触发。	 */	onChange: function (old, item){		return this.trigger('change', old);	},		/**	 * 模拟点击一项。	 */	clickNode: function(node){		if(this.onNodeClick(node)){			this.setSelectedNode(node);			return true;		}				return false;	},		setSelectedNode: function(node){				// 先反选当前选择项。		var old = this.getSelectedNode();		if(old)			old.setSelected(false);			if(this.onSelect(node)){					// 更新选择项。			this.selectedNode = node;						if(node != null){				node.setSelected(true);			}					}					if(old !== node)			this.onChange(old, node);					return this;	},		getSelectedNode: function(){		return this.selectedNode;	}	});/**********************************************
  * Controls.Page.Scaffolding
  **********************************************/
 /** * @author  *//**********************************************
