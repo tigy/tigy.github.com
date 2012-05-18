@@ -95,42 +95,6 @@ using("System.Dom.Base");
 		Dom = window.Dom,
 
 		emptyObj = {},
-		
-		/**
-		 * 缓存已解析的属性名。
-		 */
-		cache = {
-			opacity: {
-				set: function(target, name, from, to, delta){
-					target.setOpacity(compute(from, to, delta));
-				},
-				parse: self,
-				get: function(target){
-					return target.getOpacity();
-				}
-			},
-			
-			scrollTop:{
-				set: function (target, name, from, to, delta) {
-					target.setScroll(null, compute(from, to, delta));
-				},
-				parse: self,
-				get: function(target){
-					return target.getScroll().y;
-				}
-			},
-			
-			scrollLeft:{
-				set: function (target, name, from, to, delta) {
-					target.setScroll(compute(from, to, delta));
-				},
-				parse: self,
-				get: function(target){
-					return target.getScroll().x;
-				}
-			}
-			
-		},
 	
 		/**
 		 * @class Animate
@@ -254,6 +218,42 @@ using("System.Dom.Base");
 			}
 		
 		}),
+
+		/**
+		 * 缓存已解析的属性名。
+		 */
+		cache = Animate.props = {
+			opacity: {
+				set: function (target, name, from, to, delta) {
+					target.setOpacity(compute(from, to, delta));
+				},
+				parse: self,
+				get: function (target) {
+					return target.getOpacity();
+				}
+			},
+
+			scrollTop: {
+				set: function (target, name, from, to, delta) {
+					target.setScroll(null, compute(from, to, delta));
+				},
+				parse: self,
+				get: function (target) {
+					return target.getScroll().y;
+				}
+			},
+
+			scrollLeft: {
+				set: function (target, name, from, to, delta) {
+					target.setScroll(compute(from, to, delta));
+				},
+				parse: self,
+				get: function (target) {
+					return target.getScroll().x;
+				}
+			}
+
+		},
 		
 		numberParser = {
 			set: function(target, name, from, to, delta){
@@ -381,7 +381,7 @@ using("System.Dom.Base");
 
 			this.fx().run({
 				target: this,
-				duration: duration === undefined ? -1 : duration,
+				duration: duration === undefined ? Fx.Base.prototype.duration : duration,
 				complete: onstop,
 				start: onstart,
 				from: from,
@@ -408,7 +408,8 @@ using("System.Dom.Base");
 					to: {},
 					duration: duration,
 					start: function () {
-						var to = this.to;
+						var from = this.from,
+							to = this.to;
 						if (!Dom.isHidden(elem))
 							return false;
 						Dom.show(elem);

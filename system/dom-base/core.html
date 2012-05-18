@@ -88,10 +88,6 @@
                     '~("<object />")': '-',
                     '~("<input type=\'radio\' checked=\'checked\'>")': '-'
                 },
-				'Dom.getDocument': {
-                    '~(a.dom)': document,
-                    '~(document)': document
-                },
                 'new Dom': {
                     '~(a.dom)': function(value, assert){
                        assert.areEqual(value.dom, a.dom);

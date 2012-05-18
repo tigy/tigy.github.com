@@ -565,6 +565,8 @@
 
 		    }
 
+		    return obj;
+
 	    }
 
 	});
@@ -769,14 +771,14 @@
 	apply(navigator, (function(ua) {
 
 		// 检查信息
-		var match = ua.match(/(IE|Firefox|Chrome|Safari|Opera).((\d+?)[\.\w]*)/i) || ua.match(/(WebKit|Gecko).((\d+?)[\.\w]*)/i) || ["", "", 0, 0],
+		var match = ua.match(/(IE|Firefox|Chrome|Safari|Opera).([\w\.]*)/i) || ua.match(/(WebKit|Gecko).([\w\.]*)/i) || [0, "", 0],
 	
 			// 浏览器名字。
 			browser = match[1],
 			
 			isStd = eval("-[1,]");
 
-		navigator["is" + browser] = navigator["is" + browser + match[3]] = true;
+		navigator["is" + browser] = navigator["is" + browser + parseInt(match[2])] = true;
 
 		/**
 		 * 获取一个值，该值指示是否为 IE 浏览器。

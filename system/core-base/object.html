@@ -57,8 +57,8 @@
 					}
 				},
 				'Object.set': {
-					'~({a:assert.log}, {a:2, b:4})':  function (value, assert) {
-						assert.logged("2");
+				    'Object.set({setA: function () {assert.log("1");trace("设置 a =  ", value);}, b: function (value) {trace(value);}}, {a: 8, b: 6, c: 4});': function (value, assert) {
+					    assert.logged("1");
 					},
 				},
 				//'Object.addCallback': {
