@@ -83,20 +83,6 @@
 			 * @protected
 			 */
 			dom: null,
-	
-			/**
-			 * 存储当前Dom 对象的默认配置。
-			 * @getter {Object} options
-			 * @protected
-			 * @virtual
-			 */
-	
-			/**
-			 * 存储当前Dom 对象的默认模板字符串。
-			 * @getter {String} tpl
-			 * @protected
-			 * @virtual
-			 */
 		
 			/**
 			 * Dom 对象的封装。
@@ -464,11 +450,11 @@
 		t,
 
 		pep,
-
+		
 		/**
 		 * 默认事件。
 		 * @type Object
-		 * @hide
+		 * @ignore
 		 */
 		eventObj = {
 
@@ -1257,7 +1243,7 @@
 
 		/**
 		 * 表示事件的参数。
-		 * @class System.Event
+		 * @class Dom.Event
 		 */
 		Event: Class({
 
@@ -1315,7 +1301,8 @@
 
 		/**
 		 * 文档对象。
-		 * @class Document 因为 IE6/7 不存在这些对象, 文档对象是对原生 HTMLDocument 对象的补充。 扩展
+		 * @class Dom.Document 
+		 * @remark 因为 IE6/7 不存在这些对象, 文档对象是对原生 HTMLDocument 对象的补充。 扩展
 		 *        Document 也会扩展 HTMLDocument。
 		 */
 		Document: System.Native(document.constructor || {
@@ -1323,7 +1310,10 @@
 		})
 
 	});
-
+	
+	/**
+	 * @class Dom
+	 */
 	Dom.implement({
 	
 		/**
@@ -2335,7 +2325,7 @@
 	}, 4);
 	
 	/**
-	 * @class Document
+	 * @class Dom.Document
 	 */
 	Dom.Document.implement({
 		
@@ -2644,13 +2634,13 @@
 	/**
 	 * 页面加载时执行。
 	 * @param {Functon} fn 执行的函数。
-	 * @member document.onReady
+	 * @member Dom.ready
 	 */
 
 	/**
 	 * 在文档载入的时候执行函数。
 	 * @param {Functon} fn 执行的函数。
-	 * @member document.onLoad
+	 * @member Dom.load
 	 */
 
 	Dom.addEvent('domready domload', {});

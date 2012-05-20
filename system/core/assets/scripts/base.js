@@ -66,6 +66,9 @@
 
 	/// #region Functions
 	
+	/**
+	 * @namespace System
+	 */
 	apply(System,  {
 
 		/**
@@ -116,7 +119,7 @@
 
 		/**
 		 * 所有类的基类。
-		 * @class System.Object
+		 * @constructor
 		 */
 		Base:  Base,
 
@@ -149,7 +152,7 @@
 	});
 
 	/**
-	 * @namespace System.Object
+	 * @namespace System.Base
 	 */
 	apply(Base, {
 
@@ -814,12 +817,18 @@
 		return {
 
 			/// #if CompactMode
-
+			
+			/**
+			 * 判断当前浏览器是否符合W3C标准。
+			 * @type Boolean 
+			 * @remark 此处认为 IE6,7 是怪癖的。
+			 */
 			isStd: isStd,
 
 		    /**
 			 * 获取一个值，该值指示当前浏览器是否支持标准事件。就目前浏览器状况， IE6，7 中 isQuirks = true 其它浏览器都为 false 。
-			 * @type Boolean 此处认为 IE6,7 是怪癖的。
+			 * @type Boolean 
+			 * @remark 此处认为 IE6,7 是怪癖的。
 			 */
 			isQuirks: !isStd && !Object.isObject(document.constructor),
 
@@ -900,7 +909,7 @@
 	each.call([String, Array, Function, Date], System.Native);
 	
 	/**
-	 * @class System.Object
+	 * @class System.Base
 	 */
     Base.implement({
     	
