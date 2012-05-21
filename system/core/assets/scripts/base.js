@@ -77,11 +77,11 @@
 		 * @param {String} name 数据类型名。
 		 * @return {Object} 返回对应的值。如果数据不存在，则返回 undefined。
 		 * @see System.setData
-		 * @example <code>
+		 * @example <pre>
 		 * var obj = {};
 		 * var a = System.getData(obj, 'a'); // 获取 a 字段的数据。 
 		 * trace( a )
-		 * </code>
+		 * </pre>
 		 */
 		getData: function(obj, name) {
 
@@ -100,11 +100,11 @@
 		 * @param {Object} data 要设置的数据内容。
 		 * @return {Object} data 返回 data 本身。
 		 * @see System.getData
-		 * @example <code>
+		 * @example <pre>
 		 * var obj = {};
 		 * System.setData(obj, 'a', 5);    // 设置 a 字段的数据值为 5。 
 		 * var val = System.getData(obj, 'a'); // 获取值， 返回 5
-		 * </code>
+		 * </pre>
 		 */
 		setData: function (obj, name, data) {
 
@@ -143,9 +143,9 @@
 		/**
 		 * id种子 。
 		 * @type Number
-		 * @example 下例演示了 System.id 的用处。<code>
+		 * @example 下例演示了 System.id 的用处。<pre>
 		 *		var uid = System.id++;  // 每次使用之后执行 ++， 保证页面内的 id 是唯一的。
-		 * </code>
+		 * </pre>
 		 */
 		id: 1
 
@@ -161,7 +161,7 @@
 		 * @param {Object} members 用于扩展的成员列表。
 		 * @return this
 		 * @see #implementIf
-		 * @example 以下示例演示了如何扩展 Number 类的成员。<code>
+		 * @example 以下示例演示了如何扩展 Number 类的成员。<pre>
 	     * Number.implement({
 	     *   sin: function () {
 	     * 	    return Math.sin(this);
@@ -169,7 +169,7 @@
 	     * });
 	     * 
 	     * (1).sin();  //  Math.sin(1);
-	     * </code>
+	     * </pre>
 		 */
 	    implement: function(members) {
 
@@ -239,11 +239,11 @@
 		 *         <p>
 		 *         add 表示 事件被绑定时的操作。 原型为:
 		 *         </p>
-		 *         <code>
+		 *         <pre>
 	     * function add(elem, type, fn) {
 	     * 	   // 对于标准的 DOM 事件， 它会调用 elem.addEventListener(type, fn, false);
 	     * }
-	     * </code>
+	     * </pre>
 		 *         <p>
 		 *         elem表示绑定事件的对象，即类实例。 type 是事件类型， 它就是事件名，因为多个事件的 add 函数肯能一样的，
 		 *         因此 type 是区分事件类型的关键。fn 则是绑定事件的函数。
@@ -257,7 +257,7 @@
 		 *         <p>
 		 *         如果你不知道其中的几个参数功能，特别是 trigger ，请不要自定义。
 		 *         </p>
-		 * @example 下面代码演示了如何给一个类自定义事件，并创建类的实例，然后绑定触发这个事件。 <code>
+		 * @example 下面代码演示了如何给一个类自定义事件，并创建类的实例，然后绑定触发这个事件。 <pre>
 	     * 
 	     * // 创建一个新的类。
 	     * var MyCls = new Class();
@@ -277,7 +277,7 @@
 	     * 
 	     * m.trigger('click', 2);
 	     * 
-	     * </code>
+	     * </pre>
 		 */
 	    addEvent: function(eventName, properties) {
 
@@ -324,7 +324,7 @@
 		 *         <p>
 		 *         你也可以把动态成员的定义放到 构造函数， 如: this.c = []; 这是最好的解决方案。
 		 *         </p>
-		 * @example 下面示例演示了如何创建一个子类。<code>
+		 * @example 下面示例演示了如何创建一个子类。<pre>
 		 * var MyClass = new Class(); //创建一个类。
 		 * 
 		 * var Child = MyClass.extend({  // 创建一个子类。
@@ -332,7 +332,7 @@
 		 * });
 		 * 
 		 * var obj = new Child(); // 创建子类的实例。
-		 * </code>
+		 * </pre>
 		 */
 	    extend: function(members) {
 
@@ -379,11 +379,11 @@
 		 * @param {Object} obj 要复制的内容。
 		 * @return {Object} 复制后的对象 (dest)。
 		 * @see Object.extendIf
-		 * @example <code>
+		 * @example <pre>
 	     * var a = {v: 3}, b = {g: 2};
 	     * Object.extend(a, b);
 	     * trace(a); // {v: 3, g: 2}
-	     * </code>
+	     * </pre>
 		 */
 	    extend: (function() {
 		    for ( var item in {
@@ -412,11 +412,12 @@
 		 * @param {Object} dest 复制目标。
 		 * @param {Object} obj 要复制的内容。
 		 * @return {Object} 复制后的对象 (dest)。
-		 * @see Object.extend <code>
+		 * @see Object.extend 
+		 * @example <pre>
 	     * var a = {v: 3, g: 5}, b = {g: 2};
 	     * Object.extendIf(a, b);
 	     * trace(a); // {v: 3, g: 5}  b 未覆盖 a 任何成员。
-	     * </code>
+	     * </pre>
 		 */
 	    extendIf: applyIf,
 
@@ -429,12 +430,12 @@
 		 *            如果中止循环， 返回 false。}
 		 * @param {Object} bind 函数执行时的作用域。
 		 * @return {Boolean} 如果已经遍历完所传的所有值， 返回 true， 如果遍历被中断过，返回 false。
-		 * @example <code> 
+		 * @example <pre> 
 	     * Object.each({a: '1', c: '3'}, function (value, key) {
 	     * 		trace(key + ' : ' + value);
 	     * });
 	     * // 输出 'a : 1' 'c : 3'
-	     * </code>
+	     * </pre>
 		 */
 	    each: function(iterable, fn, bind) {
 
@@ -470,9 +471,9 @@
 		 * @param {Object} bind=iterable 函数执行时的作用域。
 		 * @param { Base/Boolean} [args] 参数/是否间接传递。
 		 * @return {Object} 返回的对象。
-		 * @example 该函数支持多个功能。主要功能是将一个对象根据一个关系变成新的对象。 <code>
+		 * @example 该函数支持多个功能。主要功能是将一个对象根据一个关系变成新的对象。 <pre>
 	     * Object.map(["aa","aa23"], function(a){return a.length} , []); // => [2, 4];
-	     * </code>
+	     * </pre>
 		 */
 	    map: function(iterable, fn, dest) {
 	    	
@@ -499,10 +500,10 @@
 		 * 判断一个变量是否是引用变量。
 		 * @param {Object} object 变量。
 		 * @return {Boolean} 所有对象变量返回 true, null 返回 false 。
-		 * @example <code>
+		 * @example <pre>
 	     * Object.isObject({}); // true
 	     * Object.isObject(null); // false
-	     * </code>
+	     * </pre>
 		 */
 	    isObject: function(obj) {
 
@@ -518,7 +519,7 @@
 		 *            检查，如果存在就调用: obj.key(value) 否则， 检查，如果存在就调用:
 		 *            obj.key.set(value) 否则，检查，如果存在就调用: obj.set(value) 否则，执行
 		 *            obj.key = value;
-		 * @example <code>
+		 * @example <pre>
 	     * document.setA = function (value) {
 	     * 	  this._a = value;
 	     * };
@@ -527,7 +528,7 @@
 	     * 
 	     * // 这样会调用     document.setA(3);
 	     * 
-	     * </code>
+	     * </pre>
 		 */
 	    set: function(obj, options) {
 		
@@ -591,6 +592,7 @@
 	    /**
 		 * 一个返回 true 的函数。
 		 * @property
+		 * @return {Boolean} true
 		 * @type Function
 		 */
 	    returnTrue: from(true),
@@ -598,6 +600,7 @@
 	    /**
 		 * 一个返回 false 的函数。
 		 * @property
+		 * @return {Boolean} false
 		 * @type Function
 		 */
 	    returnFalse: from(false),
@@ -606,11 +609,11 @@
 		 * 判断一个变量是否是函数。
 		 * @param {Object} obj 要判断的变量。
 		 * @return {Boolean} 如果是函数，返回 true， 否则返回 false。
-		 * @example <code>
+		 * @example <pre>
 	     * Function.isFunction(function () {}); // true
 	     * Function.isFunction(null); // false
 	     * Function.isFunction(new Function); // true
-	     * </code>
+	     * </pre>
 		 */
 	    isFunction: function(obj) {
 
@@ -623,9 +626,9 @@
 		 * @param {Object} v 需要返回的参数。
 		 * @return {Function} 执行得到参数的一个函数。
 		 * @hide
-		 * @example <code>
+		 * @example <pre>
 	     * Function.from(0)()    ; // 0
-	     * </code>
+	     * </pre>
 		 */
 	    from: from
 
@@ -642,14 +645,14 @@
 		 * @param {String} format 字符。
 		 * @param {Object} ... 参数。
 		 * @return {String} 格式化后的字符串。
-		 * @example <code>
+		 * @example <pre>
 	     *  String.format("{0}转换", 1); //  "1转换"
 	     *  String.format("{1}翻译",0,1); // "1翻译"
 	     *  String.format("{a}翻译",{a:"也可以"}); // 也可以翻译
 	     *  String.format("{{0}}不转换, {0}转换", 1); //  "{0}不转换1转换"
 	     *  格式化的字符串{}不允许包含空格。
 	     *  不要出现{{{ 和  }}} 这样将获得不可预知的结果。
-	     * </code>
+	     * </pre>
 		 */
 	    format: function(format, args) {
 
@@ -675,9 +678,9 @@
 		 * 把字符串转为指定长度。
 		 * @param {String} value 字符串。
 		 * @param {Number} len 需要的最大长度。
-		 * @example <code>
+		 * @example <pre>
 	     * String.ellipsis("123", 2); //   '1...'
-	     * </code>
+	     * </pre>
 		 */
 	    ellipsis: function(value, len) {
 		    assert.isString(value, "String.ellipsis(value, len): 参数  {value} ~");
@@ -697,11 +700,11 @@
 		 * 判断一个变量是否是数组。
 		 * @param {Object} obj 要判断的变量。
 		 * @return {Boolean} 如果是数组，返回 true， 否则返回 false。
-		 * @example <code> 
+		 * @example <pre> 
 	     * Array.isArray([]); // true
 	     * Array.isArray(document.getElementsByTagName("div")); // false
 	     * Array.isArray(new Array); // true
-	     * </code>
+	     * </pre>
 		 */
 	    isArray: function(obj) {
 
@@ -714,9 +717,9 @@
 		 * @param {Object} iterable 可迭代的实例。
 		 * @param {Number} startIndex=0 开始的位置。
 		 * @return {Array} 复制得到的数组。
-		 * @example <code>
+		 * @example <pre>
 	     * Array.create([4,6], 1); // [6]
-	     * </code>
+	     * </pre>
 		 */
 	    create: function(iterable, startIndex) {
 		    // if(!iterable)
@@ -752,9 +755,9 @@
 		 * 获取当前时间。
 		 * @static
 		 * @return {Number} 当前的时间点。
-		 * @example <code>
+		 * @example <pre>
 		 * Date.now(); //   相当于 new Date().getTime()
-		 * </code>
+		 * </pre>
 		 */
 		now: function() {
 			return +new Date;
@@ -864,7 +867,7 @@
 		 * @return {Class} 返回创建的类。
 		 * @see System.Object.extend
 		 * @example 以下代码演示了如何创建一个类:
-		 * <code>
+		 * <pre lang="js">
 		 * var MyCls = Class({
 		 * 
 		 *    constructor: function (g, h) {
@@ -880,7 +883,7 @@
 		 * 
 		 * var c = new MyCls(4, ' g');  // 创建类。
 		 * c.say();  //  调用 say 方法。
-		 * </code>
+		 * </pre>
 		 */
 		Class: function(members){
 			return Base.extend(members);
@@ -889,9 +892,9 @@
 		/**
 		 * 在全局作用域运行一个字符串内的代码。
 		 * @param {String} statement Javascript 语句。
-		 * @example <code>
+		 * @example <pre>
 		 * execScript('alert("hello")');
-		 * </code>
+		 * </pre>
 		 */
 		execScript: window.execScript || function(statements) {
 
@@ -920,7 +923,7 @@
 	     * @param {Object} [...] 调用的参数数组。
 	     * @return {Object} 父类返回。 注意只能从子类中调用父类的同名成员。
 	     * @protected
-	     * @example <code>
+	     * @example <pre>
 	     *
 	     * var MyBa = new Class({
 	     *    a: function (g, b) {
@@ -935,7 +938,7 @@
 	     * });
 	     *
 	     * new MyCls().a();
-	     * </code>
+	     * </pre>
 	     */
     	base: function(methodName) {
 	
@@ -983,11 +986,11 @@
 		 * @param {Function} listener 调用函数。
 		 * @param {Object} bind=this listener 执行时的作用域。
 		 * @return  Base this
-		 * @example <code>
+		 * @example <pre>
          * elem.on('click', function (e) {
          * 		return true;
          * });
-         * </code>
+         * </pre>
 		 */
         on: function(type, listener, bind) {
 
@@ -1035,20 +1038,20 @@
 		 * @param {String} [type] 监听名字。
 		 * @param {Function} [listener] 回调器。
 		 * @return  Base this 注意: function () {} !== function () {},
-		 *         这意味着这个代码有问题: <code>
+		 *         这意味着这个代码有问题: <pre>
          * elem.on('click', function () {});
          * elem.un('click', function () {});
-         * </code>
-		 *         你应该把函数保存起来。 <code>
+         * </pre>
+		 *         你应该把函数保存起来。 <pre>
          * var c =  function () {};
          * elem.on('click', c);
          * elem.un('click', c);
-         * </code>
-		 * @example <code>
+         * </pre>
+		 * @example <pre>
          * elem.un('click', function (e) {
          * 		return true;
          * });
-         * </code>
+         * </pre>
 		 */
         un: function(type, listener) {
 
@@ -1105,9 +1108,9 @@
 		 * @param {String} type 监听名字。
 		 * @param {Object} [e] 事件参数。
 		 * @return  Base this trigger 只是手动触发绑定的事件。
-		 * @example <code>
+		 * @example <pre>
          * elem.trigger('click');
-         * </code>
+         * </pre>
 		 */
         trigger: function(type, e) {
 
@@ -1125,14 +1128,14 @@
 		 * @param {Function} listener 调用函数。
 		 * @param {Object} bind=this listener 执行时的作用域。
 		 * @return  Base this
-		 * @example <code>
+		 * @example <pre>
          * elem.once('click', function (e) {
          * 		trace('a');  
          * });
          * 
          * elem.trigger('click');   //  输出  a
          * elem.trigger('click');   //  没有输出 
-         * </code>
+         * </pre>
 		 */
         once: function(type, listener, bind) {
 
@@ -1163,9 +1166,9 @@
 	    /**
 		 * 去除字符串的首尾空格。
 		 * @return {String} 处理后的字符串。
-		 * @example <code>
+		 * @example <pre>
 	     * "   g h   ".trim(); //  返回     "g h"
-	     * </code>
+	     * </pre>
 		 */
 	    trim: function() {
 
@@ -1179,9 +1182,9 @@
 		 * 转为骆驼格式。
 		 * @param {String} value 内容。
 		 * @return {String} 返回的内容。
-		 * @example <code>
+		 * @example <pre>
 	     * "font-size".toCamelCase(); //     "fontSize"
-	     * </code>
+	     * </pre>
 		 */
 	    toCamelCase: function() {
 		    return this.replace(/-(\w)/g, toUpperCase);
@@ -1190,9 +1193,9 @@
 	    /**
 		 * 将字符首字母大写。
 		 * @return {String} 大写的字符串。
-		 * @example <code>
+		 * @example <pre>
 	     * "bb".capitalize(); //     "Bb"
-	     * </code>
+	     * </pre>
 		 */
 	    capitalize: function() {
 
@@ -1212,9 +1215,9 @@
 		 * @param {Function} fn 函数。
 		 * @param {Object} bind 位置。 注意，未来 Function.prototype.bind 是系统函数，
 		 *            因此这个函数将在那个时候被 替换掉。
-		 * @example <code>
+		 * @example <pre>
 	     * (function () {trace( this );}).bind(0)()    ; // 0
-	     * </code>
+	     * </pre>
 		 */
 	    bind: function(bind) {
 		
@@ -1240,13 +1243,13 @@
 		 * @return {Boolean} 有无执行完。
 		 * @method
 		 * @see #forEach
-		 * @example <code> 
+		 * @example <pre> 
 	     * [2, 5].each(function (value, key) {
 	     * 		trace(value);
 	     * 		return false
 	     * });
 	     * // 输出 '2'
-	     * </code>
+	     * </pre>
 		 */
 	    each: each,
 
@@ -1254,10 +1257,10 @@
 		 * 包含一个元素。元素存在直接返回。
 		 * @param {Object} value 值。
 		 * @return {Boolean} 是否包含元素。
-		 * @example <code>
+		 * @example <pre>
 	     * ["", "aaa", "zzz", "qqq"].include(""); //   true
 	     * [false].include(0);	//   false
-	     * </code>
+	     * </pre>
 		 */
 	    include: function(value) {
 
@@ -1272,9 +1275,9 @@
 		 * 在指定位置插入项。
 		 * @param {Number} index 插入的位置。
 		 * @param {Object} value 插入的内容。
-		 * @example <code>
+		 * @example <pre>
 	     * ["", "aaa", "zzz", "qqq"].insert(3, 4); //   ["", "aaa", "zzz", 4, "qqq"]
-	     * </code>
+	     * </pre>
 		 */
 	    insert: function(index, value) {
 		    assert.isNumber(index, "Array.prototype.insert(index, value): 参数 index ~");
@@ -1296,9 +1299,9 @@
 		 * @param {String} func 调用的成员名。
 		 * @param {Array} args 调用的参数数组。
 		 * @return {Array} 结果。
-		 * @example <code>
+		 * @example <pre>
 	     * ["vhd"].invoke('charAt', [0]); //    ['v']
-	     * </code>
+	     * </pre>
 		 */
 	    invoke: function(func, args) {
 		    assert(args && typeof args.length === 'number', "Array.prototype.invoke(func, args): {args} 必须是数组, 无法省略。", args);
@@ -1314,9 +1317,9 @@
 	    /**
 		 * 删除数组中重复元素。
 		 * @return {Array} 结果。
-		 * @example <code>
+		 * @example <pre>
 	     * [1,7,8,8].unique(); //    [1, 7, 8]
-	     * </code>
+	     * </pre>
 		 */
 	    unique: function() {
 
@@ -1336,9 +1339,9 @@
 		 * 删除元素, 参数为元素的内容。
 		 * @param {Object} value 值。
 		 * @return {Number} 删除的值的位置。
-		 * @example <code>
+		 * @example <pre>
 	     * [1,7,8,8].remove(7); //   1
-	     * </code>
+	     * </pre>
 		 */
 	    remove: function(value, startIndex) {
 
@@ -1353,11 +1356,11 @@
 		 * 获取指定索引的元素。如果 index < 0， 则获取倒数 index 元素。
 		 * @param {Number} index 元素。
 		 * @return {Object} 指定位置所在的元素。
-		 * @example <code>
+		 * @example <pre>
 	     * [1,7,8,8].item(0); //   1
 	     * [1,7,8,8].item(-1); //   8
 	     * [1,7,8,8].item(5); //   undefined
-	     * </code>
+	     * </pre>
 		 */
 	    item: function(index) {
 		    return this[index < 0 ? this.length + index : index];
@@ -1369,7 +1372,7 @@
 		 * 返回数组某个值的第一个位置。值没有,则为-1 。
 		 * @param {Object} item 成员。
 		 * @param {Number} start=0 开始查找的位置。
-		 * @return Number 位置，找不到返回 -1 。 现在大多数浏览器已含此函数.除了 IE8- 。
+		 * @return {Number} 位置，找不到返回 -1 。 现在大多数浏览器已含此函数.除了 IE8- 。
 		 */
 	    indexOf: function(item, startIndex) {
 		    startIndex = startIndex || 0;
@@ -1385,9 +1388,9 @@
 		 * @param {Object} bind 绑定的对象。
 		 * @return {Array} 新的数组。
 		 * @seeAlso Array.prototype.select
-		 * @example <code> 
+		 * @example <pre> 
 	     * [1, 7, 2].filter(function (key) {return key &lt; 5 })   [1, 2]
-	     * </code>
+	     * </pre>
 		 */
 	    filter: function(fn, bind) {
 		    var r = [];
@@ -1410,12 +1413,12 @@
 		 *            当前变量的索引} {@param {Array} array 数组本身}
 		 * @param {Object} bind 函数执行时的作用域。
 		 * @seeAlso Array.prototype.each
-		 * @example <code> 
+		 * @example <pre> 
 	     * [2, 5].forEach(function (value, key) {
 	     * 		trace(value);
 	     * });
 	     * // 输出 '2' '5'
-	     * </code>
+	     * </pre>
 		 */
 	    forEach: each
 
@@ -1576,9 +1579,9 @@ function trace() {
  * @param {Object} bValue 值。
  * @param {String} msg="断言失败" 错误后的提示。
  * @return {Boolean} 返回 bValue 。
- * @example <code>
+ * @example <pre>
  * assert(true, "{value} 错误。", value);
- * </code>
+ * </pre>
  */
 function assert(bValue, msg) {
     if (!bValue) {
@@ -1622,9 +1625,9 @@ function assert(bValue, msg) {
 /**
  * 使用一个名空间。
  * @param {String} ns 名字空间。
- * @example <code>
+ * @example <pre>
  * using("System.Dom.Keys");
- * </code>
+ * </pre>
  */
 function using(ns, isStyle) {
 
@@ -2281,9 +2284,9 @@ function imports(ns){
          * @param {Object} bValue 值。
          * @param {String} msg="断言失败" 错误后的提示。
          * @return {Boolean} 返回 bValue 。
-         * @example <code>
+         * @example <pre>
          * assert.isFunction(a, "a ~");
-         * </code>
+         * </pre>
          */
         isFunction: function(value, msg) {
             return assertInternal(typeof value == 'function', msg, value, "必须是函数。");
@@ -2430,9 +2433,9 @@ function imports(ns){
         /**
          * 同步载入代码。
          * @param {String} uri 地址。
-         * @example <code>
+         * @example <pre>
          * System.loadScript('./v.js');
-         * </code>
+         * </pre>
          */
         loadScript: function(url) {
             return using.loadText(url, window.execScript || function(statements){
@@ -2446,9 +2449,9 @@ function imports(ns){
         /**
          * 异步载入样式。
          * @param {String} uri 地址。
-         * @example <code>
+         * @example <pre>
          * System.loadStyle('./v.css');
-         * </code>
+         * </pre>
          */
         loadStyle: function(url) {
 
@@ -2487,9 +2490,9 @@ function imports(ns){
          * @param {String} uri 地址。
          * @param {Function} [callback] 对返回值的处理函数。
          * @return {String} 载入的值。 因为同步，所以无法跨站。
-         * @example <code>
+         * @example <pre>
          * trace(  System.loadText('./v.html')  );
-         * </code>
+         * </pre>
          */
         loadText: function(url, callback) {
 
