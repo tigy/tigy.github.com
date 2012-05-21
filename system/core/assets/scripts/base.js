@@ -744,12 +744,13 @@
 
 	/**
 	 * 日期。
-	 * @namespace Date
+	 * @class Date
 	 */
 	applyIf(Date, {
 
 		/**
 		 * 获取当前时间。
+		 * @static
 		 * @return {Number} 当前的时间点。
 		 * @example <code>
 		 * Date.now(); //   相当于 new Date().getTime()

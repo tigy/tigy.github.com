@@ -55,15 +55,19 @@ Request.JSONP = Request.Base.extend({
 			t;
         
     	url = Request.combineUrl(url, data);
-        
-        // 处理 callback=?
-        var callback = me.callback || ( 'jsonp' + System.id++ );
-        
-        if(url.indexOf(me.jsonp + '=?') >= 0){
-        	url = url.replace(me.jsonp + '=?', me.jsonp + '=' + callback);
-        } else {
-        	url = Request.combineUrl(url, me.jsonp + "=" + callback);
-      	}
+
+    	// 处理 callback=?
+    	var callback = me.callback || ('jsonp' + Date.now());
+
+    	if (me.jsonp) {
+
+    		if (url.indexOf(me.jsonp + '=?') >= 0) {
+    			url = url.replace(me.jsonp + '=?', me.jsonp + '=' + callback);
+    		} else {
+    			url = Request.combineUrl(url, me.jsonp + "=" + callback);
+    		}
+
+    	}
         
         script = me.script = document.createElement("script");
 

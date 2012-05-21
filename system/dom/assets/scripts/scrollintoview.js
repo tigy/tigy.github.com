@@ -1,11 +1,53 @@
-//===========================================
-//  滚到视图   scrollintoview.js    A
-//===========================================
 
 
-Element.implement({
-	
-	
+
+using("System.Dom.Base");
+
+Dom.implement({
+
+	scrollIntoView: function (container, hscroll) {
+	if (typeof container == 'boolean') {
+		this.dom.scrollIntoView(container);
+	} else {
+		container = Dom.get(container) || document;
+		hscroll = hscroll === undefined ? true : hscroll;
+
+		//子区域渲染后在屏幕上和父区域视窗的左边距和上边距，
+		//为负时，表示子区域有上部分在父区域视窗上面，如第三种情况
+		var o = this.getPosition().sub(container.getPosition()),
+
+        //分别计算子区域相对父区域结点的坐标（不是父区域视窗）
+            l = o[0] + c.scrollLeft,
+            t = o[1] + c.scrollTop,
+            b = t + el.offsetHeight,
+            r = l + el.offsetWidth;
+
+		var ch = c.clientHeight;
+		var ct = parseInt(c.scrollTop, 10);
+		var cl = parseInt(c.scrollLeft, 10);
+		var cb = ct + ch;
+		var cr = cl + c.clientWidth;
+
+
+		//二三种情况，如果子区域比父区域视窗还高或者，
+		//区域有上部分在父区域视窗上面，就把子区域顶部和父区域视窗顶部对齐
+		//注意：子区域比父区域视窗还高，优先显示子区域顶部部分内容，比较合理。
+		if (el.offsetHeight > ch || t < ct) {
+
+			c.scrollTop = t;
+
+
+		} else
+
+			//第一种情况，如果子区域在父区域视窗下面，或者有下部分在父区域视窗下面，
+			//且子区域没有父区域视窗高，就把子区域底部和父区域视窗底部对齐
+			if (b > cb) {
+				c.scrollTop = b - ch;
+			}
+	}
+
+	return this;
+},
 
 /**
  * 滚动控件到指定视图
