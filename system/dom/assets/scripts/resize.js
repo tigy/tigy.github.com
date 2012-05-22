@@ -32,7 +32,7 @@ Dom.resize = (function(){
 	
 	
 	return function(fn){
-		Dom.window[Function.isFunction(fn) ? 'on' : 'trigger']('resize', fn);
+		Dom.window[Object.isFunction(fn) ? 'on' : 'trigger']('resize', fn);
 	}
 
 	

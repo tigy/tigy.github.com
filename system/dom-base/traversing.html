@@ -107,6 +107,11 @@
 					'b.getAllNext()' : function(value, assert) {
 						assert.areEqual(value[0], d.dom);
 					}
+                },
+				'Dom.prototype.getSiblings': {
+				    'b.getSiblings()': function (value, assert) {
+				        assert.areEqual(value[0], d.dom);
+				    }
 				}
 			};
 

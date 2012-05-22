@@ -71,16 +71,10 @@
 				},
 
 				'Insert' : '-',
-				'Dom.prototype.insertBefore' : {
-					'b.insertBefore(c, null)' : '-'
-				},
-				'Dom.prototype.attach' : {
-					'c.attach(b.dom, null)' : '-'
-				},
 				'Dom.prototype.append' : {
 					'a.append("appended")' : '-'
 				},
-				'Dom.prototype.insert' : {
+				'Dom.prototype.insert(插入到任何位置)' : {
 					'a.insert("beforeEnd", "inserted")' : '-'
 				},
 				'Dom.prototype.appendTo' : {
@@ -88,17 +82,11 @@
 				},
 
 				'Remove' : '-',
-				'Dom.prototype.removeChild' : {
-					'a.removeChild(b)' : '-'
-				},
 				'Dom.prototype.remove' : {
 					'b.remove()' : '-'
 				},
 				'Dom.prototype.empty' : {
 					'a.empty()' : '-'
-				},
-				'Dom.prototype.detach' : {
-					'c.detach(b.dom)' : '-'
 				},
 				'Dom.prototype.dispose' : {
 					'a.dispose()' : '-'
@@ -107,6 +95,21 @@
 				'Update' : '-',
 				'Dom.prototype.replaceWith' : {
 					'a.replaceWith(b)' : '-'
+                },
+
+			    '底层': '-',
+
+				'Dom.prototype.insertBefore': {
+				    'b.insertBefore(c, null)': '-'
+				},
+				'Dom.prototype.attach': {
+				    'c.attach(b.dom, null)': '-'
+                },
+				'Dom.prototype.removeChild': {
+				    'a.removeChild(b)': '-'
+				},
+				'Dom.prototype.detach': {
+				    'c.detach(b.dom)': '-'
 				}
 			};
 

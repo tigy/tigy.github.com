@@ -439,8 +439,8 @@
 		 */
 	    each: function(iterable, fn, bind) {
 
-		    assert(!Function.isFunction(iterable), "Object.each(iterable, fn, bind): {iterable} 不能是函数。 ", iterable);
-		    assert(Function.isFunction(fn), "Object.each(iterable, fn, bind): {fn} 必须是函数。 ", fn);
+		    assert(!Object.isFunction(iterable), "Object.each(iterable, fn, bind): {iterable} 不能是函数。 ", iterable);
+		    assert(Object.isFunction(fn), "Object.each(iterable, fn, bind): {fn} 必须是函数。 ", fn);
 
 		    // 如果 iterable 是 null， 无需遍历 。
 		    if (iterable != null) {
@@ -475,25 +475,57 @@
 	     * Object.map(["aa","aa23"], function(a){return a.length} , []); // => [2, 4];
 	     * </pre>
 		 */
-	    map: function(iterable, fn, dest) {
+	    map: function(iterable, fn) {
 	    	
-	    	assert(Function.isFunction(fn), "Object.map(iterable, fn, dest): {fn} 必须是函数。 ", fn);
-	    	
-	    	var isArray;
+	    	assert(Object.isFunction(fn), "Object.map(iterable, fn, dest): {fn} 必须是函数。 ", fn);
 	    	
 			// 如果是目标对象是一个字符串，则改为数组。
-	    	if(typeof iterable === 'string') {
+	    	if (isString) {
 	    		iterable = iterable.split(' ');
-	    		isArray = true;
-	    	}
+			} else {
+				var dest = iterable.length === undefined ? {} : [];
+				fn = function(value, key) {
+					dest[isString ? value : key] = fn(value, key);
+				};
+			}
 	    	
 		    // 遍历源。
-		    Object.each(iterable, dest ? function(value, key) {
-				dest[isArray ? value : key] = fn(value, key);
-		    } : fn);
+		    Object.each(iterable, fn);
 
 		    // 返回目标。
 		    return dest || iterable;
+		},
+
+		/**
+		 * 判断一个变量是否是数组。
+		 * @param {Object} obj 要判断的变量。
+		 * @return {Boolean} 如果是数组，返回 true， 否则返回 false。
+		 * @example <pre>
+	     * Array.isArray([]); // true
+	     * Array.isArray(document.getElementsByTagName("div")); // false
+	     * Array.isArray(new Array); // true
+	     * </pre>
+		 */
+	    isArray: function (obj) {
+
+	    	// 检查原型。
+	    	return toString.call(obj) === "[object Array]";
+		},
+
+		/**
+		 * 判断一个变量是否是函数。
+		 * @param {Object} obj 要判断的变量。
+		 * @return {Boolean} 如果是函数，返回 true， 否则返回 false。
+		 * @example <pre>
+	     * Object.isFunction(function () {}); // true
+	     * Object.isFunction(null); // false
+	     * Object.isFunction(new Function); // true
+	     * </pre>
+		 */
+	    isFunction: function (obj) {
+
+	    	// 检查原型。
+	    	return toString.call(obj) === "[object Function]";
 	    },
 
 	    /**
@@ -509,7 +541,7 @@
 
 		    // 只检查 null 。
 		    return obj !== null && typeof obj === "object";
-	    },
+		},
 
 	    /**
 		 * 将一个对象解析成一个类的属性。
@@ -539,7 +571,7 @@
 			    // 检查 setValue 。
 			    var setter = 'set' + key.capitalize(), val = options[key];
 
-			    if (Function.isFunction(obj[setter])) {
+			    if (Object.isFunction(obj[setter])) {
 				    obj[setter](val);
 					
 				} else if(key in obj) {
@@ -547,7 +579,7 @@
 					setter = obj[key];
 					
 					// 是否存在函数。
-					if (Function.isFunction(setter))
+					if (Object.isFunction(setter))
 						obj[key](val);
 
 					// 检查 value.set 。
@@ -604,22 +636,6 @@
 		 * @type Function
 		 */
 	    returnFalse: from(false),
-
-	    /**
-		 * 判断一个变量是否是函数。
-		 * @param {Object} obj 要判断的变量。
-		 * @return {Boolean} 如果是函数，返回 true， 否则返回 false。
-		 * @example <pre>
-	     * Function.isFunction(function () {}); // true
-	     * Function.isFunction(null); // false
-	     * Function.isFunction(new Function); // true
-	     * </pre>
-		 */
-	    isFunction: function(obj) {
-
-		    // 检查原型。
-		    return toString.call(obj) === "[object Function]";
-	    },
 
 	    /**
 		 * 返回自身的函数。
@@ -695,22 +711,6 @@
 	 * @namespace Array
 	 */
 	applyIf(Array, {
-
-	    /**
-		 * 判断一个变量是否是数组。
-		 * @param {Object} obj 要判断的变量。
-		 * @return {Boolean} 如果是数组，返回 true， 否则返回 false。
-		 * @example <pre> 
-	     * Array.isArray([]); // true
-	     * Array.isArray(document.getElementsByTagName("div")); // false
-	     * Array.isArray(new Array); // true
-	     * </pre>
-		 */
-	    isArray: function(obj) {
-
-		    // 检查原型。
-		    return toString.call(obj) === "[object Array]";
-	    },
 
 	    /**
 		 * 在原有可迭代对象生成一个数组。
@@ -1055,7 +1055,7 @@
 		 */
         un: function(type, listener) {
 
-	        assert(!listener || Function.isFunction(listener), 'System.Object.prototype.un(type, listener): {listener} 必须是函数或空参数。', listener);
+	        assert(!listener || Object.isFunction(listener), 'System.Object.prototype.un(type, listener): {listener} 必须是函数或空参数。', listener);
 
 	        // 获取本对象 本对象的数据内容 本事件值
 	        var me = this, d = System.getData(me, '$event'), evt, handlers, i;
@@ -1471,7 +1471,7 @@
 	 */
 	function each(fn, bind) {
 
-		assert(Function.isFunction(fn), "Array.prototype.each(fn, bind): {fn} 必须是一个函数。", fn);
+		assert(Object.isFunction(fn), "Array.prototype.each(fn, bind): {fn} 必须是一个函数。", fn);
 
 		var i = -1, me = this;
 

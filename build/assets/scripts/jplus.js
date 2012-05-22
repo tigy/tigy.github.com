@@ -444,8 +444,8 @@
 		 */
 	    each: function(iterable, fn, bind) {
 
-		    assert(!Function.isFunction(iterable), "Object.each(iterable, fn, bind): {iterable} 不能是函数。 ", iterable);
-		    assert(Function.isFunction(fn), "Object.each(iterable, fn, bind): {fn} 必须是函数。 ", fn);
+		    assert(!Object.isFunction(iterable), "Object.each(iterable, fn, bind): {iterable} 不能是函数。 ", iterable);
+		    assert(Object.isFunction(fn), "Object.each(iterable, fn, bind): {fn} 必须是函数。 ", fn);
 
 		    // 如果 iterable 是 null， 无需遍历 。
 		    if (iterable != null) {
@@ -482,7 +482,7 @@
 		 */
 	    map: function(iterable, fn, dest) {
 	    	
-	    	assert(Function.isFunction(fn), "Object.map(iterable, fn, dest): {fn} 必须是函数。 ", fn);
+	    	assert(Object.isFunction(fn), "Object.map(iterable, fn, dest): {fn} 必须是函数。 ", fn);
 	    	
 	    	var isArray;
 	    	
@@ -544,7 +544,7 @@
 			    // 检查 setValue 。
 			    var setter = 'set' + key.capitalize(), val = options[key];
 
-			    if (Function.isFunction(obj[setter])) {
+			    if (Object.isFunction(obj[setter])) {
 				    obj[setter](val);
 					
 				} else if(key in obj) {
@@ -552,7 +552,7 @@
 					setter = obj[key];
 					
 					// 是否存在函数。
-					if (Function.isFunction(setter))
+					if (Object.isFunction(setter))
 						obj[key](val);
 
 					// 检查 value.set 。
@@ -613,9 +613,9 @@
 		 * @param {Object} obj 要判断的变量。
 		 * @return {Boolean} 如果是函数，返回 true， 否则返回 false。
 		 * @example <code>
-	     * Function.isFunction(function () {}); // true
-	     * Function.isFunction(null); // false
-	     * Function.isFunction(new Function); // true
+	     * Object.isFunction(function () {}); // true
+	     * Object.isFunction(null); // false
+	     * Object.isFunction(new Function); // true
 	     * </code>
 		 */
 	    isFunction: function(obj) {
@@ -1051,7 +1051,7 @@
 		 */
         un: function(type, listener) {
 
-	        assert(!listener || Function.isFunction(listener), 'System.Object.prototype.un(type, listener): {listener} 必须是函数或空参数。', listener);
+	        assert(!listener || Object.isFunction(listener), 'System.Object.prototype.un(type, listener): {listener} 必须是函数或空参数。', listener);
 
 	        // 获取本对象 本对象的数据内容 本事件值
 	        var me = this, d = System.getData(me, '$event'), evt, handlers, i;
@@ -1467,7 +1467,7 @@
 	 */
 	function each(fn, bind) {
 
-		assert(Function.isFunction(fn), "Array.prototype.each(fn, bind): {fn} 必须是一个函数。", fn);
+		assert(Object.isFunction(fn), "Array.prototype.each(fn, bind): {fn} 必须是一个函数。", fn);
 
 		var i = -1, me = this;
 
@@ -5276,7 +5276,7 @@ function imports(ns){
 		Dom[readyOrLoad] = function (fn, bind) {
 			
 			// 忽略参数不是函数的调用。
-			var isFn = Function.isFunction(fn);
+			var isFn = Object.isFunction(fn);
 
 			// 如果已载入，则直接执行参数。
 			if(Dom[isReadyOrIsLoad]) {

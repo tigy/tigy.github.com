@@ -489,7 +489,7 @@ using("System.Dom.Base");
 		 * @return this
 		 */
 		highlight: function(color, duration, callBack){
-			assert(!callBack || Function.isFunction(callBack), "Dom.prototype.highlight(color, duration, callBack): 参数 {callBack} 不是可执行的函数。", callBack);
+			assert(!callBack || Object.isFunction(callBack), "Dom.prototype.highlight(color, duration, callBack): 参数 {callBack} 不是可执行的函数。", callBack);
 			var from = {},
 				to = {
 					backgroundColor: color || '#ffff88'

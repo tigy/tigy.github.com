@@ -2653,7 +2653,7 @@
 		Dom[readyOrLoad] = function (fn, bind) {
 			
 			// 忽略参数不是函数的调用。
-			var isFn = Function.isFunction(fn);
+			var isFn = Object.isFunction(fn);
 
 			// 如果已载入，则直接执行参数。
 			if(Dom[isReadyOrIsLoad]) {

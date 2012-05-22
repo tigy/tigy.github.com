@@ -182,7 +182,7 @@ var cases = {
 		jQuery: '$.proxy(fn, this)'
 	},
 	'Function - 函数判断':{
-		jplus: 'Function.isFunction(function(){})',
+		jplus: 'Object.isFunction(function(){})',
 		mootools: '$type(function(){}) == "function"',
 		jQuery: '$.isFunction(function(){})'
 	},

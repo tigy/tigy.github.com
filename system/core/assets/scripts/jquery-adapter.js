@@ -591,8 +591,8 @@
 		 */
 	    each: function(iterable, fn, bind) {
 
-		    assert(!Function.isFunction(iterable), "Basee.each(iterable, fn, bind): {iterable} 不能是函数。 ", iterable);
-		    assert(Function.isFunction(fn), "Basee.each(iterable, fn, bind): {fn} 必须是函数。 ", fn);
+		    assert(!Object.isFunction(iterable), "Basee.each(iterable, fn, bind): {iterable} 不能是函数。 ", iterable);
+		    assert(Object.isFunction(fn), "Basee.each(iterable, fn, bind): {fn} 必须是函数。 ", fn);
 
 		    // 如果 iterable 是 null， 无需遍历 。
 		    if (iterable != null) {
@@ -634,7 +634,7 @@
 		    dest = dest || iterable;
 
 		    // 遍历源。
-		    Object.each(iterable, Function.isFunction(fn) ? function(value, key) {
+		    Object.each(iterable, Object.isFunction(fn) ? function(value, key) {
 
 			    // 执行函数获得返回。
 			    value = fn.call(args, value, key);
@@ -711,7 +711,7 @@
 			    // 检查 setValue 。
 			    var setter = 'set' + key.capitalize(), val = options[key];
 
-			    if (Function.isFunction(obj[setter])) {
+			    if (Object.isFunction(obj[setter])) {
 				    obj[setter](val);
 					
 				} else if(key in obj) {
@@ -719,7 +719,7 @@
 					setter = obj[key];
 					
 					// 是否存在函数。
-					if (Function.isFunction(setter))
+					if (Object.isFunction(setter))
 						obj[key](val);
 
 					// 检查 value.set 。
@@ -844,9 +844,9 @@
 		 * @param {Object} obj 要判断的变量。
 		 * @return {Boolean} 如果是函数，返回 true， 否则返回 false。
 		 * @example <code>
-	     * Function.isFunction(function () {}); // true
-	     * Function.isFunction(null); // false
-	     * Function.isFunction(new Function); // true
+	     * Object.isFunction(function () {}); // true
+	     * Object.isFunction(null); // false
+	     * Object.isFunction(new Function); // true
 	     * </code>
 		 */
 	    isFunction: $.isFunction,
@@ -918,7 +918,7 @@
 
 		    assert(typeof str == 'string', 'Object.map(str, src, dest, copyIf): {str} 必须是字符串。', str);
 
-		    var isFn = Function.isFunction(src);
+		    var isFn = Object.isFunction(src);
 		    // 使用 ' '、分隔, 这是约定的。
 		    str.split(' ').forEach(function(value, index, array) {
 
@@ -1209,7 +1209,7 @@
 		 */
         un: function(type, listener) {
 
-	        assert(!listener || Function.isFunction(listener), 'System.Object.prototype.un(type, listener): {listener} 必须是函数或空参数。', listener);
+	        assert(!listener || Object.isFunction(listener), 'System.Object.prototype.un(type, listener): {listener} 必须是函数或空参数。', listener);
 
 	        // 获取本对象 本对象的数据内容 本事件值
 	        var me = this, d = p.getData(me, 'event'), evt, handlers, i;
@@ -1643,7 +1643,7 @@
 	 */
 	function each(fn, bind) {
 
-		assert(Function.isFunction(fn), "Array.prototype.each(fn, bind): {fn} 必须是一个函数。", fn);
+		assert(Object.isFunction(fn), "Array.prototype.each(fn, bind): {fn} 必须是一个函数。", fn);
 
 		var i = -1, me = this;
 
@@ -2634,7 +2634,7 @@ function assert(bValue, msg) {
          * </code>
          */
         isFunction: function() {
-            return assertInternal2(Function.isFunction, "必须是函数。", arguments);
+            return assertInternal2(Object.isFunction, "必须是函数。", arguments);
         },
 
         /**
@@ -2654,7 +2654,7 @@ function assert(bValue, msg) {
          * @return {Boolean} 返回 bValue 。
          */
         isObject: function(value, msg) {
-            return assertInternal( Object.isObject(value) || Function.isFunction(value) || value.nodeType, msg, value, "必须是引用的对象。", arguments);
+            return assertInternal( Object.isObject(value) || Object.isFunction(value) || value.nodeType, msg, value, "必须是引用的对象。", arguments);
         },
 
         /**
@@ -3860,7 +3860,7 @@ System.scripts.push('System.Dom.Base');
 			assert(!initEvent || ee[baseEvent], "Control.addEvents(events, baseEvent, initEvent): 不存在基础事件 {baseEvent}。");
 		
 			// 对每个事件执行定义。
-			map(events, Function.from(Function.isFunction(baseEvent) ? o.extendIf({
+			map(events, Function.from(Object.isFunction(baseEvent) ? o.extendIf({
 		
 				initEvent : baseEvent
 		
@@ -5027,7 +5027,7 @@ System.scripts.push('System.Dom.Base');
 		Dom[readyOrLoad] = function(fn, bind) {
 
 			// 忽略参数不是函数的调用。
-			if(!Function.isFunction(fn))
+			if(!Object.isFunction(fn))
 				fn = 0;
 
 			// 如果已载入，则直接执行参数。
