@@ -22,15 +22,15 @@
 				//	params: '',
 				//	tests: '[5] => [5]'
 				//},
-				'Object.extendIf': {
-					'~({"a":"g"}, [])': function (value, assert) {
-						assert.areEqual(value["a"], "g");
-					}
-				},
 				'Object.extend': {
-					'~({"a":"g"}, [])': function (value, assert) {
+				    'Object.extend({"a":"g"}, [])': function (value, assert) {
 						assert.areEqual(value["a"], "g");
 					}
+                },
+				'Object.extendIf': {
+				    'Object.extendIf({"a":"g"}, [])': function (value, assert) {
+				        assert.areEqual(value["a"], "g");
+				    }
 				},
 				'Object.isObject': {
 					'~({})': true,

@@ -6,8 +6,8 @@
  */
 
 // 可用的宏
-// 	CompactMode - 兼容模式 - 支持 IE6+ FF2.5+ Chrome1+ Opera9+ Safari4+ , 若无此宏，将只支持 HTML5。
-// 	Release - 启用发布操作 - 删除 assert 和 trace 和 using 支持。
+// 	CompactMode - 兼容模式 - 支持 IE6+ FF3.6+ Chrome10+ Opera10.5+ Safari5+ , 若无此宏，将只支持 HTML5。
+// 	Publish - 启用发布操作 - 删除 assert 和 trace 和 using 支持。
 
 
 (function(window, undefined) {
@@ -679,7 +679,7 @@
 		 * @param {String} value 字符串。
 		 * @param {Number} len 需要的最大长度。
 		 * @example <pre>
-	     * String.ellipsis("123", 2); //   '1...'
+	     * String.ellipsis("1234567", 4); //   '1...'
 	     * </pre>
 		 */
 	    ellipsis: function(value, len) {
