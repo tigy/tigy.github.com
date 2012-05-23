@@ -340,45 +340,45 @@
         /**
          * 执行一个单元测试。
          */
-        runTestCase: function (name) {
+        runTestCase: function ($name) {
 
-            var info = apply.testCases[name];
+            var $info = apply.testCases[$name];
 
-            if (info) {
+            if ($info) {
 
                 assert.reset();
 
-                var ret, displayName, isTestCase;
+                var $ret, $displayName, $isTestCase;
 
-                switch (typeof info) {
+                switch (typeof $info) {
 
                     // 字符串: 转函数。
-                case 'string':
-                    displayName = info.replace(/~/g, name);
-                    info = function () {
-                        return eval(displayName);
-                    };
+	                case 'string':
+	                    $displayName = $info.replace(/~/g, $name);
+	                    info = function () {
+	                        return eval($displayName);
+	                    };
 
                     // fall through
                     // 函数: 直接执行。
-                case 'function':
-                    try {
-                        ret = info();
-                    } catch (e) {
-                        if (info) reportError(name, e.message, displayName || info.toString());
-                        break;
-                    }
-
-                    console.info('[' + name + '] ', displayName || info.toString(), ' =>', ret);
-                    break;
-
-                    // 测试用例: 先处理。
-                case 'object':
-                    isTestCase = true;
-                    runTestCase(info, name);
+	                case 'function':
+	                    try {
+	                        $ret = info();
+	                    } catch (e) {
+	                        if ($info) reportError($name, e.message, $displayName || $info.toString());
+	                        break;
+	                    }
+	
+	                    console.info('[' + $name + '] ', $displayName || $info.toString(), ' =>', $ret);
+	                    break;
+	
+	                    // 测试用例: 先处理。
+	                case 'object':
+	                    $isTestCase = true;
+	                    runTestCase($info, $name);
                 }
 
-                document.getElementById('demo-testcases-' + name).className = assert.hasError === true ? 'demo-tip demo-tip-error' : !isTestCase ? 'demo-tip' : assert.hasError === false ? 'demo-tip demo-tip-success' : 'demo-tip demo-tip-warning';
+                document.getElementById('demo-testcases-' + $name).className = assert.hasError === true ? 'demo-tip demo-tip-error' : !$isTestCase ? 'demo-tip' : assert.hasError === false ? 'demo-tip demo-tip-success' : 'demo-tip demo-tip-warning';
 
             }
         },
@@ -400,7 +400,11 @@
 	                    info = complieTestCase(info, name);
 	                    break;
                 }
-
+                
+                if(window.trace){
+                	window.trace.enable = false;
+                }
+                
                 var time = 0,
                     maxTime = 0,
                     base = 100,
@@ -423,6 +427,10 @@
 
                 start = past * 1000 / time;
                 console.info('[' + name + '] ', start, 'ms/k');
+                
+                if(window.trace){
+                	window.trace.enable = true;
+                }
             }
 
         },
@@ -635,31 +643,31 @@
         return new Function(ret.join(';\r\n\r\n'));
     }
 
-    function runTestCase(info, name) {
-        var fn, ret;
+    function runTestCase($info, $name) {
+        var $ret;
 
-        for (var test in info) {
+        for (var $test in $info) {
             assert.clearLog();
             
-            var value = info[test];
+            var $value = $info[$test];
 
-            test = test.replace(/~/g, name);
+            $test = $test.replace(/~/g, $name);
 
             try {
-                ret = eval(test);
+                $ret = eval($test);
             } catch (e) {
-                reportError(name, e.message, test);
+                reportError($name, e.message, $test);
                 continue;
             }
 
-            console.info('[' + name + '] ', test, ' =>', ret);
+            console.info('[' + $name + '] ', $test, ' =>', $ret);
 
-            if (value !== '-') {
-                if (typeof value !== 'function') {
-                    assert.areEqual(ret, value);
-                } else if ((value = value.call(ret, ret, assert)) === false) {
+            if ($value !== '-') {
+                if (typeof $value !== 'function') {
+                    assert.areEqual($ret, $value);
+                } else if (($value = $value.call($ret, $ret, assert)) === false) {
                     assert.hasError = true;
-                } else if(value === true){
+                } else if($value === true){
                 	assert.hasError = !!assert.hasError;
                 }
             }

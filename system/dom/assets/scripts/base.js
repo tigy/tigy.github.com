@@ -27,13 +27,13 @@
 		 * Object 简写。
 		 * @type Object
 		 */
-		o = Object,
+		Object = window.Object,
 	
 		/**
 		 * Object.extend 简写。
 		 * @type Function
 		 */
-		apply = o.extend,
+		apply = Object.extend,
 	
 		/**
 		 * 数组原型。
@@ -45,7 +45,7 @@
 		 * Object.map 缩写。
 		 * @type Object
 		 */
-		map = o.map,
+		map = Object.map,
 
 		/**
 		 * System 简写。
@@ -821,11 +821,11 @@
 		 * @private
 		 */
 		combinators: {
-			' ': 'getAll',
-			'>': 'getChildren',
-			'+': 'getNext',
-			'~': 'getAllNext',
-			'<': 'getAllParent'
+			' ': 'all',
+			'>': 'children',
+			'+': 'next',
+			'~': 'nextAll',
+			'<': 'parentAll'
 		},
 		
 		/**
@@ -893,8 +893,8 @@
 					result.push(args);
 			},
 			"only-child": function(elem){ 
-				var System = new Dom(elem.parentNode).getFirst(elem.nodeName);
-				return System && System.getNext(); 
+				var System = new Dom(elem.parentNode).first(elem.nodeName);
+				return System && System.next(); 
 			},
 			odd: function(args, oldResult, result){
 				var index = 0, elem, t;
@@ -1145,7 +1145,7 @@
 		implement: function(members, listType, copyIf) {
 			assert.notNull(members, "Dom.implement" + ( copyIf ? 'If' : '') + "(members, listType): {members} ~");
 		
-			o.each(members, function(value, func) {
+			Object.each(members, function(value, func) {
 		
 				var i = this.length;
 				while(i--) {
@@ -1341,7 +1341,7 @@
 			if (arguments.length) {
 				assert(childControl && this.hasChild(childControl), 'Dom.prototype.remove(childControl): {childControl} 不是当前节点的子节点', childControl);
 				this.removeChild(childControl);
-			} else if (childControl = this.parentControl || this.getParent()){
+			} else if (childControl = this.parentControl || this.parent()){
 				childControl.removeChild(this);
 			}
 	
@@ -1355,8 +1355,8 @@
 		empty: function() {
 			var elem = this.dom;
 			if(elem.nodeType == 1)
-				o.each(elem.getElementsByTagName("*"), clean);
-			while (elem = this.getLast(true))
+				Object.each(elem.getElementsByTagName("*"), clean);
+			while (elem = this.last(true))
 				this.removeChild(elem);
 			return this;
 		},
@@ -1366,7 +1366,7 @@
 		 */
 		dispose: function() {
 			if(this.dom.nodeType == 1){
-				o.each(this.dom.getElementsByTagName("*"), clean)
+				Object.each(this.dom.getElementsByTagName("*"), clean)
 				clean(this.dom);
 			}
 			
@@ -1623,7 +1623,7 @@
 				else
 					me.setAttr(name, value);
 		
-			} else if(o.isObject(name)) {
+			} else if(Object.isObject(name)) {
 		
 				for(value in name)
 					me.set(value, name[value]);
@@ -1720,7 +1720,7 @@
 			assert(elem.nodeType === 1, "Dom.prototype.setHtml(value): 仅当 dom.nodeType === 1 时才能使用此函数。"); 
 			
 			value = (map[1] + value + map[2]).replace(rXhtmlTag, "<$1></$2>");
-			// o.each(elem.getElementsByTagName("*"), function(node){
+			// Object.each(elem.getElementsByTagName("*"), function(node){
 			// 	node.$data = null;
 			// });
 			
@@ -1789,7 +1789,7 @@
 		 */
 		setOffset: function(System) {
 		
-			assert(o.isObject(System), "Dom.prototype.setOffset(System): {System} 必须有 'x' 和 'y' 属性。", System);
+			assert(Object.isObject(System), "Dom.prototype.setOffset(System): {System} 必须有 'x' 和 'y' 属性。", System);
 			var s = this.dom.style;
 			
 			if(System.y != null)
@@ -2068,42 +2068,42 @@
 	.implement({
 		
 		// 父节点。
-		getParent: createTreeWalker(true, 'parentNode'),
+		parent: createTreeWalker(true, 'parentNode'),
 		
 		// 全部父节点。
-		getAllParent: createTreeWalker(false, 'parentNode'),
+		parentAll: createTreeWalker(false, 'parentNode'),
 
 		// 第一个节点。
-		getFirst: createTreeWalker(true, 'nextSibling', 'firstChild'),
+		first: createTreeWalker(true, 'nextSibling', 'firstChild'),
 
 		// 后面的节点。
-		getNext: createTreeWalker(true, 'nextSibling'),
+		next: createTreeWalker(true, 'nextSibling'),
 
 		// 前面的节点。
-		getPrevious: createTreeWalker(true, 'previousSibling'),
+		prev: createTreeWalker(true, 'previousSibling'),
 
 		// 后面的节点。
-		getAllNext: createTreeWalker(false, 'nextSibling'),
+		nextAll: createTreeWalker(false, 'nextSibling'),
 
 		// 最后的节点。
-		getLast: createTreeWalker(true, 'previousSibling', 'lastChild'),
+		last: createTreeWalker(true, 'previousSibling', 'lastChild'),
 
 		// 第一个节点。
-		getChild: createTreeWalker(true, 'nextSibling', 'firstChild'),
+		child: createTreeWalker(true, 'nextSibling', 'firstChild'),
 
 		// 前面的节点。
-		getAllPrevious: createTreeWalker(false, 'previousSibling'),
+		prevAll: createTreeWalker(false, 'previousSibling'),
 
 		// 全部子节点。
-		getChildren: createTreeWalker(false, 'nextSibling', 'firstChild'),
+		children: createTreeWalker(false, 'nextSibling', 'firstChild'),
 		
 		// 兄弟节点。
-		getSiblings: function(args) {
-			return this.getAllPrevious(args).concat(this.getAllNext(args));
+		siblings: function(args) {
+			return this.prevAll(args).concat(this.nextAll(args));
 		},
 		
 		// 号次。
-		getIndex: 'nodeIndex' in div ? function(){
+		index: 'nodeIndex' in div ? function(){
 			return this.dom.nodeIndex;
 		} : function() {
 			var i = 0, elem = this.dom;
@@ -2114,11 +2114,11 @@
 		},
 
 		// 全部子节点。
-		getAll: function(args) {
+		all: function(args) {
 			if(!args)
 				args = '*';	
 			else if(typeof args === 'function')
-				return this.getAll().filter(args);
+				return this.all().filter(args);
 			var r = new DomList, nodes = this.dom.getElementsByTagName(args), i = 0, node;
 			while( node = nodes[i++] ) {
 				if(node.nodeType === 1){
@@ -2195,7 +2195,7 @@
 		},
 			
 		// 偏移父位置。
-		getOffsetParent: function() {
+		offsetParent: function() {
 			var me = this.dom;
 			while(( me = me.offsetParent) && !rBody.test(me.nodeName) && styleString(me, "position") === "static");
 			return new Dom(me || getDocument(this.dom).body);
@@ -2220,15 +2220,15 @@
 		
 			switch (where) {
 				case "afterEnd":
-					refChild = me.getNext(true);
+					refChild = me.next(true);
 				
 					// 继续。
 				case "beforeBegin":
-					parentControl = me.getParent();
+					parentControl = me.parent();
 					assert(parentControl, "Dom.prototype.insert(where, html): 节点无父节点时无法执行 insert({where})。", where);
 					break;
 				case "afterBegin":
-					refChild = me.getFirst(true);
+					refChild = me.first(true);
 					break;
 				default:
 					refChild = null;
@@ -2258,7 +2258,7 @@
 		replaceWith: function(html) {
 			var elem;
 			html = Dom.parse(html, this.dom);
-			if (elem = this.getParent()) {
+			if (elem = this.parent()) {
 				elem.insertBefore(html, this);
 				elem.removeChild(this);
 			}
@@ -2385,24 +2385,6 @@
 			}
 			return new DomList(result);
 		},
-		
-		// /**
-		 // * 根据元素返回节点。
-		 // * @param {String} ... 对象的 id 或对象。
-		 // * @return {DomList} 如果只有1个参数，返回元素，否则返回元素集合。
-		 // */
-		// getDom: function(id) {
-			// return typeof id == "string" ? this.getElementById(id): id;
-		// },
-// 		
-		// /**
-		 // * 根据元素返回封装后的Dom 对象。
-		 // * @param {String} ... 对象的 id 或对象。
-		 // * @return {DomList} 如果只有1个参数，返回元素，否则返回元素集合。
-		 // */
-		// getControl: function() {
-			// return arguments.length === 1 ? new Dom(this.getDom(arguments[0])): new DomList(o.update(arguments, this.getDom, null, this));
-		// },
 		
 		/**
 		 * 获取元素可视区域大小。包括 padding 和 border 大小。
@@ -2773,7 +2755,7 @@
 
 	});
 
-	o.extendIf(window, {
+	Object.extendIf(window, {
 		$: Dom.get,
 		$$: Dom.query
 	});
@@ -2906,8 +2888,11 @@
 			destElem.mergeAttributes(srcElem);
 			destElem.$data = null;
 
-			if(srcElem.options)
-				o.update(srcElem.options, 'selected', destElem.options, true);
+			if(srcElem.options) {
+				Object.each(srcElem.options, function(value){
+					destElem.options.seleced = value.seleced;
+				});
+			}
 		}
 
 		/// #endif
@@ -3079,7 +3064,7 @@
 							
 						// ‘*’ ‘tagName’
 						default:
-							result = result.getAll(m[2].replace(rBackslash, ""));
+							result = result.all(m[2].replace(rBackslash, ""));
 							break;
 								
 					}
@@ -3090,7 +3075,7 @@
 					
 				// 无法加速，等待第四步进行过滤。
 				} else {
-					result = result.getAll();
+					result = result.all();
 				}
 			
 			// 解析的第二步: 解析父子关系操作符(比如子节点筛选)
@@ -3106,7 +3091,7 @@
 
 			// 解析的第三步: 解析剩余的选择器:获取所有子节点。第四步再一一筛选。
 			} else {
-				result = result.getAll();
+				result = result.all();
 			}
 			
 			// 解析的第四步: 筛选以上三步返回的结果。
