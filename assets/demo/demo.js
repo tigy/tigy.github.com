@@ -427,6 +427,17 @@
 
         },
 
+        /**
+         * 将字符串从 utf-8 字符串转义。
+         * @param {String} s 字符串。
+         * @return {String} 返回的字符串。
+         */
+        decodeUTF8: function(s) {
+            return s.replace(/\\u([0-9a-f]{3})([0-9a-f])/gi, function(a, b, c) {
+                return String.fromCharCode((parseInt(b, 16) * 16 + parseInt(c, 16)))
+            })
+        },
+
         viewSource: function (name) {
             var info = apply.testCases[name];
 
@@ -444,13 +455,13 @@
 						for (var test in info) {
         					ret.push(test.replace(/~/g, name));
 						}
-						info = ret.join(';');
+						info = ret.join(';\r\n\r\n');
 
 						// fall through
 						// 函数: 直接执行。
 					case 'function':
 						info = info.toString();
-						if (String.decodeUTF8) info = String.decodeUTF8(info);
+						info = Demo.decodeUTF8(info);
 						break;
 
 				}
@@ -621,7 +632,7 @@
             ret.push(test.replace(/~/g, name));
         }
 
-        return new Function(ret.join(';'));
+        return new Function(ret.join(';\r\n\r\n'));
     }
 
     function runTestCase(info, name) {

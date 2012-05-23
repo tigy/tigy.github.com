@@ -19,12 +19,6 @@
 	 * @type Document
 	 */
 	var document = window.document,
-	
-		/**
-		 * navigator 简写。
-		 * @type Navigator
-		 */
-		navigator = window.navigator,
 
         /**
          * Object 简写。
@@ -67,6 +61,7 @@
 	/// #region Functions
 	
 	/**
+	 * 系统有关对象。
 	 * @namespace System
 	 */
 	apply(System,  {
@@ -174,6 +169,7 @@
 	    implement: function(members) {
 
 		    assert(members && this.prototype, "Class.implement(members): 无法扩展类，因为 {members} 或 this.prototype 为空。", members);
+            
             // 复制到原型 。
 		    Object.extend(this.prototype, members);
 
@@ -368,10 +364,12 @@
 	});
 
 	/**
-	 * Object 简写。
+	 * Object
 	 * @namespace Object
 	 */
 	apply(Object, {
+		
+		/// #if CompactMode
 
 	    /**
 		 * 复制对象的所有属性到其它对象。
@@ -406,6 +404,12 @@
 			    return dest;
 		    }
 	    })(),
+	    
+	    /// #else
+	    
+	    /// extend: apply,
+	    
+	    /// #endif
 
 	    /**
 		 * 如果目标成员不存在就复制对象的所有属性到其它对象。
@@ -475,25 +479,30 @@
 	     * Object.map(["aa","aa23"], function(a){return a.length} , []); // => [2, 4];
 	     * </pre>
 		 */
-	    map: function(iterable, fn) {
+	    map: function(iterable, fn, dest) {
 	    	
-	    	assert(Object.isFunction(fn), "Object.map(iterable, fn, dest): {fn} 必须是函数。 ", fn);
+	    	assert(Object.isFunction(fn), "Object.map(iterable, fn): {fn} 必须是函数。 ", fn);
+	    	
+	    	var actualFn;
 	    	
 			// 如果是目标对象是一个字符串，则改为数组。
-	    	if (isString) {
+	    	if (typeof iterable === 'string') {
 	    		iterable = iterable.split(' ');
+	    		actualFn = dest ? function(value, key){
+	    			this[value] = fn(value, key);
+	    		} : fn;
 			} else {
-				var dest = iterable.length === undefined ? {} : [];
-				fn = function(value, key) {
-					dest[isString ? value : key] = fn(value, key);
+				dest = iterable.length === undefined ? {} : [];
+				actualFn = function(value, key) {
+					this[key] = fn(value, key);
 				};
 			}
 	    	
-		    // 遍历源。
-		    Object.each(iterable, fn);
+		    // 遍历对象。
+		    Object.each(iterable, fn, dest);
 
 		    // 返回目标。
-		    return dest || iterable;
+		    return dest;
 		},
 
 		/**
@@ -569,7 +578,8 @@
 		    for ( var key in options) {
 
 			    // 检查 setValue 。
-			    var setter = 'set' + key.capitalize(), val = options[key];
+			    var val = options[key],
+			    	setter = 'set' + key.capitalize();
 
 			    if (Object.isFunction(obj[setter])) {
 				    obj[setter](val);
@@ -606,166 +616,175 @@
 	    }
 
 	});
-
+	
 	/**
-	 * 函数。
-	 * @namespace Function
+	 * 空函数。
+	 * @property
+	 * @type Function
+	 * Function.empty返回空函数的引用。
 	 */
-	apply(Function, {
-
-	    /**
-		 * 空函数。
-		 * @property
-		 * @type Function
-		 * Function.empty返回空函数的引用。
-		 */
-	    empty: emptyFn,
-
-	    /**
-		 * 一个返回 true 的函数。
-		 * @property
-		 * @return {Boolean} true
-		 * @type Function
-		 */
-	    returnTrue: from(true),
-
-	    /**
-		 * 一个返回 false 的函数。
-		 * @property
-		 * @return {Boolean} false
-		 * @type Function
-		 */
-	    returnFalse: from(false),
-
-	    /**
-		 * 返回自身的函数。
-		 * @param {Object} v 需要返回的参数。
-		 * @return {Function} 执行得到参数的一个函数。
-		 * @hide
-		 * @example <pre>
-	     * Function.from(0)()    ; // 0
-	     * </pre>
-		 */
-	    from: from
-
-	});
-
+	Function.empty = emptyFn;
+	
 	/**
-	 * 字符串。
-	 * @namespace String
+	 * 返回返回指定结果的函数。
+	 * @param {Object} ret 需要返回的参数。
+	 * @return {Function} 执行得到参数的一个函数。
+	 * @example <pre>
+     * Function.from(0)()    ; // 0
+     * </pre>
+ 	 */
+	Function.from = function (ret) {
+
+		// 返回一个值，这个值是当前的参数。
+		return function() {
+			return ret;
+		}
+	};
+
+    /**
+	 * 格式化字符串。
+	 * @param {String} format 字符。
+	 * @param {Object} ... 参数。
+	 * @return {String} 格式化后的字符串。
+	 * @example <pre>
+     *  String.format("{0}转换", 1); //  "1转换"
+     *  String.format("{1}翻译",0,1); // "1翻译"
+     *  String.format("{a}翻译",{a:"也可以"}); // 也可以翻译
+     *  String.format("{{0}}不转换, {0}转换", 1); //  "{0}不转换1转换"
+     *  格式化的字符串{}不允许包含空格。
+     *  不要出现{{{ 和  }}} 这样将获得不可预知的结果。
+     * </pre>
 	 */
-	apply(String, {
+	String.format = function(format, args) {
 
-	    /**
-		 * 格式化字符串。
-		 * @param {String} format 字符。
-		 * @param {Object} ... 参数。
-		 * @return {String} 格式化后的字符串。
-		 * @example <pre>
-	     *  String.format("{0}转换", 1); //  "1转换"
-	     *  String.format("{1}翻译",0,1); // "1翻译"
-	     *  String.format("{a}翻译",{a:"也可以"}); // 也可以翻译
-	     *  String.format("{{0}}不转换, {0}转换", 1); //  "{0}不转换1转换"
-	     *  格式化的字符串{}不允许包含空格。
-	     *  不要出现{{{ 和  }}} 这样将获得不可预知的结果。
-	     * </pre>
-		 */
-	    format: function(format, args) {
+	    assert(!format || format.replace, 'String.format(format, args): {format} 必须是字符串。', format);
 
-		    assert(!format || format.replace, 'String.format(format, args): {format} 必须是字符串。', format);
+	    // 支持参数2为数组或对象的直接格式化。
+	    var toString = this;
 
-		    // 支持参数2为数组或对象的直接格式化。
-		    var toString = this;
+	    args = arguments.length === 2 && Object.isObject(args) ? args : ap.slice.call(arguments, 1);
 
-		    args = arguments.length === 2 && Object.isObject(args) ? args : ap.slice.call(arguments, 1);
+	    // 通过格式化返回
+	    return (format || "").replace(/\{+?(\S*?)\}+/g, function(match, name) {
+		    var start = match.charAt(1) == '{', end = match.charAt(match.length - 2) == '}';
+		    if (start || end)
+			    return match.slice(start, match.length - end);
+		    // LOG : {0, 2;yyyy} 为了支持这个格式, 必须在这里处理
+		    // match , 同时为了代码简短, 故去该功能。
+		    return name in args ? toString(args[name]) : "";
+	    });
+   };
 
-		    // 通过格式化返回
-		    return (format || "").replace(/\{+?(\S*?)\}+/g, function(match, name) {
-			    var start = match.charAt(1) == '{', end = match.charAt(match.length - 2) == '}';
-			    if (start || end)
-				    return match.slice(start, match.length - end);
-			    // LOG : {0, 2;yyyy} 为了支持这个格式, 必须在这里处理
-			    // match , 同时为了代码简短, 故去该功能。
-			    return name in args ? toString(args[name]) : "";
-		    });
-	    },
-
-	    /**
-		 * 把字符串转为指定长度。
-		 * @param {String} value 字符串。
-		 * @param {Number} len 需要的最大长度。
-		 * @example <pre>
-	     * String.ellipsis("1234567", 4); //   '1...'
-	     * </pre>
-		 */
-	    ellipsis: function(value, len) {
-		    assert.isString(value, "String.ellipsis(value, len): 参数  {value} ~");
-		    assert.isNumber(len, "String.ellipsis(value, len): 参数  {len} ~");
-		    return value.length > len ? value.substr(0, len - 3) + "..." : value;
-	    }
-
-	});
-
-	/**
-	 * 数组。
-	 * @namespace Array
+    /**
+	 * 把字符串转为指定长度。
+	 * @param {String} value 字符串。
+	 * @param {Number} len 需要的最大长度。
+	 * @example <pre>
+     * String.ellipsis("1234567", 4); //   '1...'
+     * </pre>
 	 */
-	applyIf(Array, {
+	String.ellipsis = function(value, len) {
+	    assert.isString(value, "String.ellipsis(value, len): 参数  {value} ~");
+	    assert.isNumber(len, "String.ellipsis(value, len): 参数  {len} ~");
+	    return value.length > len ? value.substr(0, len - 3) + "..." : value;
+	};
 
-	    /**
-		 * 在原有可迭代对象生成一个数组。
-		 * @param {Object} iterable 可迭代的实例。
-		 * @param {Number} startIndex=0 开始的位置。
-		 * @return {Array} 复制得到的数组。
-		 * @example <pre>
-	     * Array.create([4,6], 1); // [6]
-	     * </pre>
-		 */
-	    create: function(iterable, startIndex) {
-		    // if(!iterable)
-		    // return [];
+    /**
+	 * 在原有可迭代对象生成一个数组。
+	 * @param {Object} iterable 可迭代的实例。
+	 * @param {Number} startIndex=0 开始的位置。
+	 * @return {Array} 复制得到的数组。
+	 * @memberOf Array
+	 * @example <pre>
+     * Array.create([4,6], 1); // [6]
+     * </pre>
+	 */
+	Array.create = function(iterable, startIndex) {
+	    // if(!iterable)
+	    // return [];
 
-		    // [DOM Object] 。
-		    // if(iterable.item) {
-		    // var r = [], len = iterable.length;
-		    // for(startIndex = startIndex || 0; startIndex < len;
-		    // startIndex++)
-		    // r[startIndex] = iterable[startIndex];
-		    // return r;
-		    // }
+	    // [DOM Object] 。
+	    // if(iterable.item) {
+	    // var r = [], len = iterable.length;
+	    // for(startIndex = startIndex || 0; startIndex < len;
+	    // startIndex++)
+	    // r[startIndex] = iterable[startIndex];
+	    // return r;
+	    // }
 
-		    assert(!iterable || toString.call(iterable) !== '[object HTMLCollection]' || typeof iterable.length !== 'number',
-		            'Array.create(iterable, startIndex): {iterable} 不支持 DomCollection 。', iterable);
+	    assert(!iterable || toString.call(iterable) !== '[object HTMLCollection]' || typeof iterable.length !== 'number',
+	            'Array.create(iterable, startIndex): {iterable} 不支持 DomCollection 。', iterable);
 
-		    // 调用 slice 实现。
-		    return iterable ? ap.slice.call(iterable, startIndex) : [];
-	    }
-
-	});
+	    // 调用 slice 实现。
+	    return iterable ? ap.slice.call(iterable, startIndex) : [];
+    };
 
 	/// #if CompactMode
 
-	/**
-	 * 日期。
-	 * @class Date
-	 */
-	applyIf(Date, {
-
+	if(!Date.now) {
+			
 		/**
 		 * 获取当前时间。
-		 * @static
+		 * @memberOf now
 		 * @return {Number} 当前的时间点。
 		 * @example <pre>
 		 * Date.now(); //   相当于 new Date().getTime()
 		 * </pre>
 		 */
-		now: function() {
+		Date.now = function() {
 			return +new Date;
-		}
-
-	});
+		};
+		
+	}
 
 	/// #endif
+
+	/**
+	 * 创建一个类。
+	 * @param {Object/Function} [methods] 类成员列表对象或类构造函数。
+	 * @return {Class} 返回创建的类。
+	 * @see System.Object.extend
+	 * @memberOf window
+	 * @example 以下代码演示了如何创建一个类:
+	 * <pre>
+	 * var MyCls = Class({
+	 * 
+	 *    constructor: function (g, h) {
+	 * 	      alert('构造函数' + g + h)
+	 *    },
+	 *
+	 *    say: function(){
+	 *    	alert('say');
+	 *    } 
+	 * 
+	 * });
+	 * 
+	 * 
+	 * var c = new MyCls(4, ' g');  // 创建类。
+	 * c.say();  //  调用 say 方法。
+	 * </pre>
+	 */
+	window.Class = function(members){
+		return Base.extend(members);
+	};
+	
+	if(!window.execScript){
+		
+		/**
+		 * 在全局作用域运行一个字符串内的代码。
+		 * @param {String} statement Javascript 语句。
+		 * @example <pre>
+		 * execScript('alert("hello")');
+		 * </pre>
+		 */
+		window.execScript = function(statements) {
+
+			// 如果正常浏览器，使用 window.eval 。
+			window["eval"].call( window, statements );
+
+       };
+       
+	}
 
 	/// #endregion
 
@@ -775,10 +794,17 @@
 	 * 浏览器。
 	 * @namespace navigator
 	 */
-	apply(navigator, (function(ua) {
+	(function(navigator) {
 
+		/**
+		 * navigator 简写。
+		 * @type Navigator
+		 */
+		
 		// 检查信息
-		var match = ua.match(/(IE|Firefox|Chrome|Safari|Opera).([\w\.]*)/i) || ua.match(/(WebKit|Gecko).([\w\.]*)/i) || [0, "", 0],
+		var ua = navigator.userAgent,
+		
+			match = ua.match(/(IE|Firefox|Chrome|Safari|Opera).([\w\.]*)/i) || ua.match(/(WebKit|Gecko).([\w\.]*)/i) || [0, "", 0],
 	
 			// 浏览器名字。
 			browser = match[1],
@@ -818,7 +844,7 @@
 		 */
 
 		// 结果
-		return {
+		apply(navigator, {
 
 			/// #if CompactMode
 			
@@ -851,60 +877,10 @@
 			 */
 		    version: match[2]
 
-		};
+		});
 
-	})(navigator.userAgent));
+	})(window.navigator);
 
-	/**
-	 * 窗口对象。
-	 * @namespace window
-	 */
-	apply(window, {
-		
-		/**
-		 * 创建一个类。
-		 * @param {Object/Function} [methods] 类成员列表对象或类构造函数。
-		 * @return {Class} 返回创建的类。
-		 * @see System.Object.extend
-		 * @example 以下代码演示了如何创建一个类:
-		 * <pre lang="js">
-		 * var MyCls = Class({
-		 * 
-		 *    constructor: function (g, h) {
-		 * 	      alert('构造函数' + g + h)
-		 *    },
-		 *
-		 *    say: function(){
-		 *    	alert('say');
-		 *    } 
-		 * 
-		 * });
-		 * 
-		 * 
-		 * var c = new MyCls(4, ' g');  // 创建类。
-		 * c.say();  //  调用 say 方法。
-		 * </pre>
-		 */
-		Class: function(members){
-			return Base.extend(members);
-		},
-		
-		/**
-		 * 在全局作用域运行一个字符串内的代码。
-		 * @param {String} statement Javascript 语句。
-		 * @example <pre>
-		 * execScript('alert("hello")');
-		 * </pre>
-		 */
-		execScript: window.execScript || function(statements) {
-
-			// 如果正常浏览器，使用 window.eval 。
-			window["eval"].call( window, statements );
-
-        }
-		
-	});
-	
 	/// #endregion
 
 	/// #region Methods
@@ -1493,19 +1469,6 @@
 	 */
 	function emptyFn(){
 		
-	}
-
-	/**
-	 * 返回返回指定结果的函数。
-	 * @param {Object} ret 结果。
-	 * @return {Function} 函数。
-	 */
-	function from(ret) {
-
-		// 返回一个值，这个值是当前的参数。
-		return function() {
-			return ret;
-		}
 	}
 
 	/**
