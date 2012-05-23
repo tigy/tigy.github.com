@@ -89,7 +89,7 @@
 			 * @param {Node} dom 封装的元素。
 			 */
 			constructor: function (dom) {
-				assert(dom, "Dom.prototype.constructor(dom): {dom} 必须是 DOM 节点。");
+				assert.isNode(dom, "Dom.prototype.constructor(dom): {dom} 必须是 DOM 节点。");
 				this.dom = dom;
 			},
 		
@@ -134,21 +134,8 @@
 			removeChild: function(childControl) {
 				assert(childControl && childControl.detach, 'Dom.prototype.removeChild(childControl): {childControl} 必须是Dom 对象。', childControl);
 				childControl.detach(this.dom);
-			},
-
-			/**
-			 * 判断 2 个 Dom 对象是否相同。
-			 * @param {Dom} other 要判断的Dom 对象。
-			 */
-			equals: function(other){
-				return other && other.dom === this.dom;
-			},
-
-			/**
-			 * xtype 。
-			 * @virtual
-			 */
-			xtype: "dom"
+			}
+			
 		}),
 	
 		/**
@@ -227,12 +214,7 @@
 				}
 	
 				return this;
-			},
-			
-			/**
-			 * xtype
-			 */
-			xtype: "domlist"
+			}
 	
 		}),
 	
