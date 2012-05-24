@@ -64,7 +64,7 @@
 	 * 系统有关对象。
 	 * @namespace System
 	 */
-	apply(System,  {
+	extend(System, {
 
 		/**
 		 * 获取一个对象指定字段的数据，如果数据不存在，则返回 undefined。
@@ -128,7 +128,7 @@
 			// 简单拷贝 Object 的成员，即拥有类的特性。
 			// 在 JavaScript， 一切函数都可作为类，故此函数存在。
 			// Object 的成员一般对当前类构造函数原型辅助。
-			apply(constructor, Base);
+			extend(constructor, Base);
 
 			delete constructor.$data;
 
@@ -149,7 +149,7 @@
 	/**
 	 * @namespace System.Base
 	 */
-	apply(Base, {
+	extend(Base, {
 
 	    /**
 		 * 扩展当前类的动态方法。
@@ -186,7 +186,7 @@
 
 		    assert(members && this.prototype, "Class.implementIf(members): 无法扩展类，因为 {members} 或 this.prototype 为空。", members);
 
-		    applyIf(this.prototype, members);
+		    Object.extendIf(this.prototype, members);
 
 		    return this;
 	    },
@@ -284,7 +284,7 @@
 			// 更新事件对象。
 	    	eventName.split(' ').forEach(function(value){
 	    		eventObj[value] = this;
-			}, properties ? applyIf(properties, eventObj.$default) : (eventObj.$default || emptyObj));
+			}, properties ? Object.extendIf(properties, eventObj.$default) : (eventObj.$default || emptyObj));
 			
 			return this;
 	    },
@@ -340,7 +340,7 @@
 			} : (members || {}), "constructor") ? members.constructor : function () {
 
 			    // 调用父类构造函数 。
-			    arguments.callee.base.apply(this, arguments);
+			    arguments.callee.base.extend(this, arguments);
 
 		    };
 
@@ -364,10 +364,9 @@
 	});
 
 	/**
-	 * Object
 	 * @namespace Object
 	 */
-	apply(Object, {
+	extend(Object, {
 		
 		/// #if CompactMode
 
@@ -387,7 +386,7 @@
 		    for ( var item in {
 			    toString: true
 		    })
-			    return apply;
+			    return extend;
 
 		    System.enumerables = "toString hasOwnProperty valueOf constructor isPrototypeOf".split(' ');
 		    // IE6 不会遍历系统对象需要复制，所以强制去测试，如果改写就复制 。
@@ -398,7 +397,7 @@
 				    for ( var i = System.enumerables.length, value; i--;)
 					    if (hasOwnProperty.call(src, value = System.enumerables[i]))
 						    dest[value] = src[value];
-				    apply(dest, src);
+				    extend(dest, src);
 			    }
 
 			    return dest;
@@ -407,7 +406,7 @@
 	    
 	    /// #else
 	    
-	    /// extend: apply,
+	    /// extend: extend,
 	    
 	    /// #endif
 
@@ -423,7 +422,16 @@
 	     * trace(a); // {v: 3, g: 5}  b 未覆盖 a 任何成员。
 	     * </pre>
 		 */
-	    extendIf: applyIf,
+	    extendIf: function (dest, src) {
+	
+			assert(dest != null, "Object.extendIf(dest, src): {dest} 不可为空。", dest);
+	
+			// 和 extend 类似，只是判断目标的值是否为 undefiend 。
+			for ( var b in src)
+				if (dest[b] === undefined)
+					dest[b] = src[b];
+			return dest;
+		},
 
 	    /**
 		 * 在一个可迭代对象上遍历。
@@ -618,76 +626,90 @@
 	});
 	
 	/**
-	 * 空函数。
-	 * @property
-	 * @type Function
-	 * Function.empty返回空函数的引用。
+	 * @namespace Function
 	 */
-	Function.empty = emptyFn;
+	extend(Function, {
+		
+		/**
+		 * 空函数。
+		 * @property
+		 * @type Function
+		 * Function.empty返回空函数的引用。
+		 */
+		empty: emptyFn,
+		
+		/**
+		 * 返回返回指定结果的函数。
+		 * @param {Object} ret 需要返回的参数。
+		 * @return {Function} 执行得到参数的一个函数。
+		 * @example <pre>
+	     * Function.from(0)()    ; // 0
+	     * </pre>
+	 	 */
+		from: function (ret) {
+	
+			// 返回一个值，这个值是当前的参数。
+			return function() {
+				return ret;
+			}
+		}
+		
+	});
 	
 	/**
-	 * 返回返回指定结果的函数。
-	 * @param {Object} ret 需要返回的参数。
-	 * @return {Function} 执行得到参数的一个函数。
-	 * @example <pre>
-     * Function.from(0)()    ; // 0
-     * </pre>
- 	 */
-	Function.from = function (ret) {
-
-		// 返回一个值，这个值是当前的参数。
-		return function() {
-			return ret;
+	 * @namespace String
+	 */
+	extend(String, {
+			
+	    /**
+		 * 格式化字符串。
+		 * @param {String} formatString 字符。
+		 * @param {Object} ... 参数。
+		 * @return {String} 格式化后的字符串。
+		 * @example <pre>
+	     *  String.format("{0}转换", 1); //  "1转换"
+	     *  String.format("{1}翻译",0,1); // "1翻译"
+	     *  String.format("{a}翻译",{a:"也可以"}); // 也可以翻译
+	     *  String.format("{{0}}不转换, {0}转换", 1); //  "{0}不转换1转换"
+	     *  格式化的字符串{}不允许包含空格。
+	     *  不要出现{{{ 和  }}} 这样将获得不可预知的结果。
+	     * </pre>
+		 */
+		format: function(formatString, args) {
+	
+		    assert(!formatString || formatString.replace, 'String.format(formatString, args): {formatString} 必须是字符串。', formatString);
+	
+		    // 支持参数2为数组或对象的直接格式化。
+		    var toString = this;
+	
+		    args = arguments.length === 2 && Object.isObject(args) ? args : ap.slice.call(arguments, 1);
+	
+		    // 通过格式化返回
+		    return formatString ? formatString.replace(/\{+?(\S*?)\}+/g, function(match, name) {
+			    var start = match.charAt(1) == '{', end = match.charAt(match.length - 2) == '}';
+			    if (start || end)
+				    return match.slice(start, match.length - end);
+			    // LOG : {0, 2;yyyy} 为了支持这个格式, 必须在这里处理
+			    // match , 同时为了代码简短, 故去该功能。
+			    return name in args ? toString(args[name]) : "";
+		    }) : "";
+	  	},
+		  	
+	    /**
+		 * 把字符串转为指定长度。
+		 * @param {String} value 字符串。
+		 * @param {Number} len 需要的最大长度。
+		 * @example <pre>
+	     * String.ellipsis("1234567", 4); //   '1...'
+	     * </pre>
+		 */
+	  	ellipsis: function(value, len) {
+		    assert.isString(value, "String.ellipsis(value, len): 参数  {value} ~");
+		    assert.isNumber(len, "String.ellipsis(value, len): 参数  {len} ~");
+		    return value.length > len ? value.substr(0, len - 3) + "..." : value;
 		}
-	};
-
-    /**
-	 * 格式化字符串。
-	 * @param {String} format 字符。
-	 * @param {Object} ... 参数。
-	 * @return {String} 格式化后的字符串。
-	 * @example <pre>
-     *  String.format("{0}转换", 1); //  "1转换"
-     *  String.format("{1}翻译",0,1); // "1翻译"
-     *  String.format("{a}翻译",{a:"也可以"}); // 也可以翻译
-     *  String.format("{{0}}不转换, {0}转换", 1); //  "{0}不转换1转换"
-     *  格式化的字符串{}不允许包含空格。
-     *  不要出现{{{ 和  }}} 这样将获得不可预知的结果。
-     * </pre>
-	 */
-	String.format = function(format, args) {
-
-	    assert(!format || format.replace, 'String.format(format, args): {format} 必须是字符串。', format);
-
-	    // 支持参数2为数组或对象的直接格式化。
-	    var toString = this;
-
-	    args = arguments.length === 2 && Object.isObject(args) ? args : ap.slice.call(arguments, 1);
-
-	    // 通过格式化返回
-	    return (format || "").replace(/\{+?(\S*?)\}+/g, function(match, name) {
-		    var start = match.charAt(1) == '{', end = match.charAt(match.length - 2) == '}';
-		    if (start || end)
-			    return match.slice(start, match.length - end);
-		    // LOG : {0, 2;yyyy} 为了支持这个格式, 必须在这里处理
-		    // match , 同时为了代码简短, 故去该功能。
-		    return name in args ? toString(args[name]) : "";
-	    });
-   };
-
-    /**
-	 * 把字符串转为指定长度。
-	 * @param {String} value 字符串。
-	 * @param {Number} len 需要的最大长度。
-	 * @example <pre>
-     * String.ellipsis("1234567", 4); //   '1...'
-     * </pre>
-	 */
-	String.ellipsis = function(value, len) {
-	    assert.isString(value, "String.ellipsis(value, len): 参数  {value} ~");
-	    assert.isNumber(len, "String.ellipsis(value, len): 参数  {len} ~");
-	    return value.length > len ? value.substr(0, len - 3) + "..." : value;
-	};
+		
+	});
 
     /**
 	 * 在原有可迭代对象生成一个数组。
@@ -844,7 +866,7 @@
 		 */
 
 		// 结果
-		apply(navigator, {
+		extend(navigator, {
 
 			/// #if CompactMode
 			
@@ -947,9 +969,9 @@
 	        // 确保 bubble 记号被移除。
 	        try {
 	            if (args.length <= 1)
-	                return fn.apply(this, args.callee.caller.arguments);
+	                return fn.extend(this, args.callee.caller.arguments);
 	            args[0] = this;
-	            return fn.call.apply(fn, args);
+	            return fn.call.extend(fn, args);
 	        } finally {
 	            delete fn.$bubble;
 	            delete oldFn.$bubble;
@@ -1126,7 +1148,7 @@
 		        me.un(type, arguments.callee);
 
 		        // 然后调用。
-		        return listener.apply(this, arguments);
+		        return listener.extend(this, arguments);
 	        }, bind);
         }
 		
@@ -1201,7 +1223,7 @@
 
 		    // 返回对 bind 绑定。
 		    return function() {
-			    return me.apply(bind, arguments);
+			    return me.extend(bind, arguments);
 		    }
 	    }
 		
@@ -1264,7 +1286,7 @@
 			    tmp = ap.slice.call(me, index);
 			    me.length = index + 1;
 			    this[index] = value;
-			    ap.push.apply(me, tmp);
+			    ap.push.extend(me, tmp);
 			}
 		    return index;
 
@@ -1283,8 +1305,8 @@
 		    assert(args && typeof args.length === 'number', "Array.prototype.invoke(func, args): {args} 必须是数组, 无法省略。", args);
 		    var r = [];
 		    ap.forEach.call(this, function(value) {
-			    assert(value != null && value[func] && value[func].apply, "Array.prototype.invoke(func, args): {value} 不包含函数 {func}。", value, func);
-			    r.push(value[func].apply(value, args));
+			    assert(value != null && value[func] && value[func].extend, "Array.prototype.invoke(func, args): {value} 不包含函数 {func}。", value, func);
+			    r.push(value[func].extend(value, args));
 		    });
 
 		    return r;
@@ -1412,30 +1434,13 @@
 	 * @param {Object} src 要复制的内容。
 	 * @return {Object} 复制后的对象。
 	 */
-	function apply(dest, src) {
+	function extend(dest, src) {
 
 		assert(dest != null, "Object.extend(dest, src): {dest} 不可为空。", dest);
 
 		// 直接遍历，不判断是否为真实成员还是原型的成员。
 		for ( var b in src)
 			dest[b] = src[b];
-		return dest;
-	}
-
-	/**
-	 * 如果不存在就复制所有属性到任何对象。
-	 * @param {Object} dest 复制目标。
-	 * @param {Object} src 要复制的内容。
-	 * @return {Object} 复制后的对象。
-	 */
-	function applyIf(dest, src) {
-
-		assert(dest != null, "Object.extendIf(dest, src): {dest} 不可为空。", dest);
-
-		// 和 apply 类似，只是判断目标的值是否为 undefiend 。
-		for ( var b in src)
-			if (dest[b] === undefined)
-				dest[b] = src[b];
 		return dest;
 	}
 
@@ -1518,8 +1523,8 @@
 function trace() {
     if (trace.enable) {
         
-        if(window.console && console.debug && console.debug.apply) {
-        	return console.debug.apply(console, arguments);
+        if(window.console && console.debug && console.debug.extend) {
+        	return console.debug.extend(console, arguments);
         }
 
         var hasConsole = window.console && console.debug, data;
@@ -1527,8 +1532,8 @@ function trace() {
         if(arguments.length === 0) {
         	data = '(traced)';
         // 如果存在控制台，则优先使用控制台。
-        } else if (hasConsole && console.log.apply) {
-        	return console.log.apply(console, arguments);
+        } else if (hasConsole && console.log.extend) {
+        	return console.log.extend(console, arguments);
         } else {
         	data = trace.inspect(arguments);
         }
@@ -1659,7 +1664,7 @@ function imports(ns){
     /**
      * @namespace trace
      */
-    apply(trace, {
+    extend(trace, {
 
 		/**
 		 * 是否打开调试输出。
@@ -1701,7 +1706,7 @@ function imports(ns){
                      * reduceRight'
                      */
                     'Number': 'toExponential toFixed toLocaleString toPrecision',
-                    'Function': 'length apply call',
+                    'Function': 'length extend call',
                     'Date': 'getDate getDay getFullYear getHours getMilliseconds getMinutes getMonth getSeconds getTime getTimezoneOffset getUTCDate getUTCDay getUTCFullYear getUTCHours getUTCMinutes getUTCMonth getUTCSeconds getYear setDate setFullYear setHours setMinutes setMonth setSeconds setTime setUTCDate setUTCFullYear setUTCHours setUTCMilliseconds setUTCMinutes setUTCMonth setUTCSeconds setYear toGMTString toLocaleString toUTCString',
                     'RegExp': 'exec test'
                 },
@@ -2234,7 +2239,7 @@ function imports(ns){
     /**
      * @namespace assert
      */
-    apply(assert, {
+    extend(assert, {
     	
 		/**
 		 * 是否在 assert 失败时显示函数调用堆栈。
@@ -2292,7 +2297,7 @@ function imports(ns){
          * @return {Boolean} 返回 bValue 。
          */
         isNode: function(value, msg) {
-            return assertInternal(value && value.nodeType, msg, value, "必须是 DOM 节点。");
+            return assertInternal(value && (value.nodeType || value.setTimeout), msg, value, "必须是 DOM 节点。");
         },
 
         /**
@@ -2385,7 +2390,7 @@ function imports(ns){
 
     /// #region Using
 
-    apply(using, {
+    extend(using, {
     	
     	/**
     	 * 是否使用 lesscss
@@ -2419,7 +2424,7 @@ function imports(ns){
         loadStyle: function(url) {
 
             // 在顶部插入一个css，但这样肯能导致css没加载就执行 js 。所以，要保证样式加载后才能继续执行计算。
-            return document.getElementsByTagName("HEAD")[0].appendChild(apply(document.createElement('link'), {
+            return document.getElementsByTagName("HEAD")[0].appendChild(extend(document.createElement('link'), {
                 href: url,
                 rel: trace.useLess ? 'stylesheet/less' : 'stylesheet',
                 type: 'text/css'
@@ -2566,7 +2571,7 @@ function imports(ns){
 	 * @param {Object} src 要复制的内容。
 	 * @return {Object} 复制后的对象。
 	 */
-	function apply(dest, src) {
+	function extend(dest, src) {
 
 		assert(dest != null, "Object.extend(dest, src): {dest} 不可为空。", dest);
 

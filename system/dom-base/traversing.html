@@ -70,46 +70,46 @@
 					'a.match("div")' : true,
 					'a.match(".b")' : false
 				},
-				'Dom.prototype.getPrevious' : {
-					'b.getPrevious()' : null
+				'Dom.prototype.prev' : {
+					'b.prev()' : null
 				},
-				'Dom.prototype.getNext' : {
-					'b.getNext()' : function(value, assert) {
+				'Dom.prototype.next' : {
+					'b.next()' : function(value, assert) {
 						assert.areEqual(value.dom, d.dom);
 					}
 				},
-				'Dom.prototype.getFirst' : {
-					'b.getFirst()' : function(value, assert) {
+				'Dom.prototype.first' : {
+					'b.first()' : function(value, assert) {
 						assert.areEqual(value.dom, c.dom);
 					}
 				},
-				'Dom.prototype.getParent' : {
-					'b.getParent()' : function(value, assert) {
+				'Dom.prototype.parent' : {
+					'b.parent()' : function(value, assert) {
 						assert.areEqual(value.dom, a.dom);
 					}
 				},
-				'Dom.prototype.getLast' : {
-					'b.getLast()' : function(value, assert) {
+				'Dom.prototype.last' : {
+					'b.last()' : function(value, assert) {
 						assert.areEqual(value.dom, c.dom);
 					}
 				},
-				'Dom.prototype.getAllParent' : {
-					'b.getAllParent()' : function(value, assert) {
+				'Dom.prototype.parentAll' : {
+					'b.parentAll()' : function(value, assert) {
 						assert.areEqual(value[0], a.dom);
 					}
 				},
-				'Dom.prototype.getAllPrevious' : {
-					'b.getAllPrevious()' : function(value, assert) {
+				'Dom.prototype.prevAll' : {
+					'b.prevAll()' : function(value, assert) {
 						assert.areEqual(value[0], undefined);
 					}
 				},
-				'Dom.prototype.getAllNext' : {
-					'b.getAllNext()' : function(value, assert) {
+				'Dom.prototype.nextAll' : {
+					'b.nextAll()' : function(value, assert) {
 						assert.areEqual(value[0], d.dom);
 					}
                 },
-				'Dom.prototype.getSiblings': {
-				    'b.getSiblings()': function (value, assert) {
+				'Dom.prototype.siblings': {
+				    'b.siblings()': function (value, assert) {
 				        assert.areEqual(value[0], d.dom);
 				    }
 				}

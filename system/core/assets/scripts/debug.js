@@ -786,7 +786,7 @@ function imports(ns){
          * @return {Boolean} 返回 bValue 。
          */
         isNode: function(value, msg) {
-            return assertInternal(value && value.nodeType, msg, value, "必须是 DOM 节点。");
+            return assertInternal(value && (value.nodeType || value.setTimeout), msg, value, "必须是 DOM 节点。");
         },
 
         /**

@@ -60,12 +60,6 @@
 					'a.hasChild(c)' : true,
 					'a.hasChild(d)' : true
 				},
-				'Dom.prototype.contains' : {
-					'a.contains(a)' : true,
-					'a.contains(b)' : true,
-					'a.contains(c)' : true,
-					'a.contains(d)' : true
-				},
 				'Dom.prototype.clone' : {
 					'a.clone(a)' : '-'
 				},
@@ -86,10 +80,10 @@
 					'b.remove()' : '-'
 				},
 				'Dom.prototype.empty' : {
-					'a.empty()' : '-'
+					'd.empty()' : '-'
 				},
 				'Dom.prototype.dispose' : {
-					'a.dispose()' : '-'
+					'd.dispose()' : '-'
 				},
 
 				'Update' : '-',
@@ -103,13 +97,13 @@
 				    'b.insertBefore(c, null)': '-'
 				},
 				'Dom.prototype.attach': {
-				    'c.attach(b.dom, null)': '-'
+				    'd.attach(c.dom, null)': '-'
                 },
 				'Dom.prototype.removeChild': {
-				    'a.removeChild(b)': '-'
+				    'b.removeChild(c)': '-'
 				},
 				'Dom.prototype.detach': {
-				    'c.detach(b.dom)': '-'
+				    'd.detach(c.dom)': '-'
 				}
 			};
 

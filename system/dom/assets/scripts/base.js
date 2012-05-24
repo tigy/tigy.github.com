@@ -33,7 +33,7 @@
 		 * Object.extend 简写。
 		 * @type Function
 		 */
-		apply = Object.extend,
+		extend = Object.extend,
 	
 		/**
 		 * 数组原型。
@@ -56,24 +56,11 @@
 		/**
 		 * 指示当前浏览器是否为标签浏览器。
 		 */
-		isStandard = navigator.isStd,
-	
-		/**
-		 * 用于测试的元素。
-		 * @type Element
-		 */
-		div = document.createElement('DIV'),
+		isStd = navigator.isStd,
 	
 		/**
 		 * 所有Dom 对象基类。
 		 * @class Dom
-		 * @abstract
-		 * Dom 对象的周期： 
-		 * constructor - 创建Dom 对象对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。 
-		 * create - 创建本身的 dom 节点。 可重写 - 默认使用 this.tpl 创建。
-		 * init - 初始化Dom 对象本身。 可重写 - 默认为无操作。 
-		 * attach - 渲染Dom 对象到文档。不建议重写，如果你希望额外操作渲染事件，则重写。 
-		 * detach - 删除Dom 对象。不建议重写，如果一个Dom 对象用到多个 dom 内容需重写。
 		 */
 		Dom = Class({
 	
@@ -164,10 +151,10 @@
 			invoke: function(func, args) {
 				assert(args && typeof args.length === 'number', "DomList.prototype.invoke(func, args): {args} 必须是数组, 无法省略。", args);
 				var r = [];
-				assert(Dom.prototype[func] && Dom.prototype[func].apply, "DomList.prototype.invoke(func, args): Dom 不包含方法 {func}。", func);
+				assert(Dom.prototype[func] && Dom.prototype[func].extend, "DomList.prototype.invoke(func, args): Dom 不包含方法 {func}。", func);
 				ap.forEach.call(this, function(value) {
 					value = new Dom(value);
-					r.push(value[func].apply(value, args));
+					r.push(value[func].extend(value, args));
 				});
 				return r;
 			},
@@ -240,9 +227,9 @@
 			 * @param {Point} System 值。
 			 * @return {Point} this
 			 */
-			add: function(System) {
-				assert(System && 'x' in System && 'y' in System, "Point.prototype.add(System): {System} 必须有 'x' 和 'y' 属性。", System);
-				return new Point(this.x + System.x, this.y + System.y);
+			add: function(p) {
+				assert(p && 'x' in p && 'y' in p, "Point.prototype.add(p): {p} 必须有 'x' 和 'y' 属性。", p);
+				return new Point(this.x + p.x, this.y + p.y);
 			},
 
 			/**
@@ -250,188 +237,30 @@
 			 * @param {Point} System 值。
 			 * @return {Point} this
 			 */
-			sub: function(System) {
-				assert(System && 'x' in System && 'y' in System, "Point.prototype.sub(System): {System} 必须有 'x' 和 'y' 属性。", System);
-				return new Point(this.x - System.x, this.y - System.y);
+			sub: function(p) {
+				assert(p && 'x' in p && 'y' in p, "Point.prototype.sub(p): {p} 必须有 'x' 和 'y' 属性。", p);
+				return new Point(this.x - p.x, this.y - p.y);
 			}
 		}),
+		
+		/**
+		 * 用于测试的元素。
+		 * @type Element
+		 */
+		div = document.createElement('DIV'),
 	
 		/**
 		 * 函数 Dom.parseNode使用的新元素缓存。
 		 * @type Object
 		 */
 		cache = {},
-	
-		/**
-		 * 处理 <div/> 格式标签的正则表达式。
-		 * @type RegExp
-		 */
-		rXhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
-	
-		/**
-		 * 在 Dom.parseNode 和 setHtml 中对 HTML 字符串进行包装用的字符串。
-		 * @type Object 部分元素只能属于特定父元素， wrapMap 列出这些元素，并使它们正确地添加到父元素中。 IE678
-		 *       会忽视第一个标签，所以额外添加一个 div 标签，以保证此类浏览器正常运行。
-		 */
-		wrapMap = {
-			$default: isStandard ? [1, '', '']: [2, '$<div>', '</div>'],
-			option: [2, '<select multiple="multiple">', '</select>'],
-			legend: [2, '<fieldset>', '</fieldset>'],
-			thead: [2, '<table>', '</table>'],
-			tr: [3, '<table><tbody>', '</tbody></table>'],
-			td: [4, '<table><tbody><tr>', '</tr></tbody></table>'],
-			col: [3, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
-			area: [2, '<map>', '</map>']
-		},
 		
-		styles = {
-			height: 'setHeight',
-			width: 'setWidth'
-		},
-	
 		/**
-		 * 特殊属性的列表。
+		 * 样式表。
+		 * @static
 		 * @type Object
 		 */
-		attributes = {
-			innerText: 'innerText' in div ? 'innerText': 'textContent',
-			'for': 'htmlFor',
-			'class': 'className'
-		},
-		
-		/**
-		 * 字符串字段。
-		 * @type Object
-		 */
-		textField = {
-			
-		},
-	
-		/// #if CompactMode
-		
-		/**
-		 * 透明度的正则表达式。
-		 * @type RegExp IE8 使用滤镜支持透明度，这个表达式用于获取滤镜内的表示透明度部分的子字符串。
-		 */
-		rOpacity = /opacity=([^)]*)/,
-	
-		/**
-		 * 获取元素的实际的样式属性。
-		 * @param {Element} elem 需要获取属性的节点。
-		 * @param {String} name 需要获取的CSS属性名字。
-		 * @return {String} 返回样式字符串，肯能是 undefined、 auto 或空字符串。
-		 */
-		getStyle = window.getComputedStyle ? function(elem, name) {
-	
-			// getComputedStyle为标准浏览器获取样式。
-			assert.isElement(elem, "Dom.getStyle(elem, name): {elem} ~");
-	
-			// 获取真实的样式owerDocument返回elem所属的文档对象
-			// 调用getComputeStyle的方式为(elem,null)
-			var computedStyle = elem.ownerDocument.defaultView.getComputedStyle(elem, null);
-	
-			// 返回 , 在 火狐如果存在 IFrame， 则 computedStyle == null
-			// http://drupal.org/node/182569
-			return computedStyle ? computedStyle[name]: null;
-	
-		}: function(elem, name) {
-	
-			assert.isElement(elem, "Dom.getStyle(elem, name): {elem} ~");
-	
-			// 特殊样式保存在 styles 。
-			if( name in styles) {
-				switch (name) {
-					case 'height':
-						return elem.offsetHeight === 0 ? 'auto': elem.offsetHeight -  Dom.calc(elem, 'by+py') + 'px';
-					case 'width':
-						return elem.offsetWidth === 0 ? 'auto': elem.offsetWidth -  Dom.calc(elem, 'bx+px') + 'px';
-					case 'opacity':
-						return new Dom(elem).getOpacity().toString();
-				}
-			}
-			// currentStyle：IE的样式获取方法,runtimeStyle是获取运行时期的样式。
-			// currentStyle是运行时期样式与style属性覆盖之后的样式
-			var r = elem.currentStyle;
-	
-			if(!r)
-				return "";
-			r = r[name];
-	
-			// 来自 jQuery
-			// 如果返回值不是一个带px的 数字。 转换为像素单位
-			if(/^-?\d/.test(r) && !/^-?\d+(?:px)?$/i.test(r)) {
-	
-				// 保存初始值
-				var style = elem.style, left = style.left, rsLeft = elem.runtimeStyle.left;
-	
-				// 放入值来计算
-				elem.runtimeStyle.left = elem.currentStyle.left;
-				style.left = name === "fontSize" ? "1em": (r || 0);
-				r = style.pixelLeft + "px";
-	
-				// 回到初始值
-				style.left = left;
-				elem.runtimeStyle.left = rsLeft;
-	
-			}
-	
-			return r;
-		},
-		
-		/// #else
-		
-		/// getStyle = function (elem, name) {
-		///
-		/// 	// 获取样式
-		/// 	var computedStyle = elem.ownerDocument.defaultView.getComputedStyle(elem, null);
-		///
-		/// 	// 返回
-		/// 	return computedStyle ? computedStyle[ name ]: null;
-		///
-		/// },
-		/// #endif
-		
-		/**
-		 * 是否属性的正则表达式。
-		 * @type RegExp
-		 */
-		rStyle = /-(\w)|float/,
-		
-		/**
-		 * float 属性的名字。
-		 * @type String
-		 */
-		styleFloat = 'cssFloat' in div.style ? 'cssFloat': 'styleFloat',
-		
-		// IE：styleFloat Other：cssFloat
-		
-		/**
-		 * 获取滚动大小的方法。
-		 * @type Function
-		 */
-		getScroll = function() {
-			var elem = this.dom;
-			return new Point(elem.scrollLeft, elem.scrollTop);
-		},
-		
-		/**
-		 * 获取窗口滚动大小的方法。
-		 * @type Function
-		 */
-		getWindowScroll = 'pageXOffset' in window ? function() {
-			var win = this.defaultView;
-			return new Point(win.pageXOffset, win.pageYOffset);
-		}: getScroll,
-	
-		/**
-		 * 判断 body 节点的正则表达式。
-		 * @type RegExp
-		 */
-		rBody = /^(?:BODY|HTML|#document)$/i,
-		
-		t,
-
-		pep,
+		sizeMap = {},
 		
 		/**
 		 * 默认事件。
@@ -489,15 +318,192 @@
 		},
 
 		/**
+		 * 处理 <div/> 格式标签的正则表达式。
+		 * @type RegExp
+		 */
+		rXhtmlTag = /<(?!area|br|col|embed|hr|img|input|link|meta|param)(([\w:]+)[^>]*)\/>/ig,
+		
+		/// #if CompactMode
+		
+		/**
+		 * 透明度的正则表达式。
+		 * @type RegExp IE8 使用滤镜支持透明度，这个表达式用于获取滤镜内的表示透明度部分的子字符串。
+		 */
+		rOpacity = /opacity=([^)]*)/,
+		
+		/// #endif
+		
+		/**
+		 * 是否属性的正则表达式。
+		 * @type RegExp
+		 */
+		rStyle = /-(\w)|float/,
+		
+		/**
+		 * 判断 body 节点的正则表达式。
+		 * @type RegExp
+		 */
+		rBody = /^(?:BODY|HTML|#document)$/i,
+		
+		/**
+		 * 在 Dom.parseNode 和 setHtml 中对 HTML 字符串进行包装用的字符串。
+		 * @type Object 部分元素只能属于特定父元素， tagFix 列出这些元素，并使它们正确地添加到父元素中。 IE678
+		 *       会忽视第一个标签，所以额外添加一个 div 标签，以保证此类浏览器正常运行。
+		 */
+		tagFix = {
+			$default: isStd ? [1, '', '']: [2, '$<div>', '</div>'],
+			option: [2, '<select multiple="multiple">', '</select>'],
+			legend: [2, '<fieldset>', '</fieldset>'],
+			thead: [2, '<table>', '</table>'],
+			tr: [3, '<table><tbody>', '</tbody></table>'],
+			td: [4, '<table><tbody><tr>', '</tr></tbody></table>'],
+			col: [3, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
+			area: [2, '<map>', '</map>']
+		},
+		
+		styleFix = {
+			height: 'setHeight',
+			width: 'setWidth'
+		},
+	
+		/**
+		 * 特殊属性的列表。
+		 * @type Object
+		 */
+		attrFix = {
+			innerText: 'innerText' in div ? 'innerText': 'textContent',
+			'for': 'htmlFor',
+			'class': 'className'
+		},
+		
+		/**
+		 * 字符串字段。
+		 * @type Object
+		 */
+		textFix = {
+			
+		},
+		
+		/// #if CompactMode
+		 
+		/**
+		 * 获取元素的实际的样式属性。
+		 * @param {Element} elem 需要获取属性的节点。
+		 * @param {String} name 需要获取的CSS属性名字。
+		 * @return {String} 返回样式字符串，肯能是 undefined、 auto 或空字符串。
+		 */
+		getStyle = window.getComputedStyle ? function(elem, name) {
+	
+			// getComputedStyle为标准浏览器获取样式。
+			assert.isElement(elem, "Dom.getStyle(elem, name): {elem} ~");
+	
+			// 获取真实的样式owerDocument返回elem所属的文档对象
+			// 调用getComputeStyle的方式为(elem,null)
+			var computedStyle = elem.ownerDocument.defaultView.getComputedStyle(elem, null);
+	
+			// 返回 , 在 火狐如果存在 IFrame， 则 computedStyle == null
+			// http://drupal.org/node/182569
+			return computedStyle ? computedStyle[name]: null;
+	
+		}: function(elem, name) {
+	
+			assert.isElement(elem, "Dom.getStyle(elem, name): {elem} ~");
+	
+			// 特殊样式保存在 styleFix 。
+			if( name in styleFix) {
+				switch (name) {
+					case 'height':
+						return elem.offsetHeight === 0 ? 'auto': elem.offsetHeight -  Dom.calc(elem, 'by+py') + 'px';
+					case 'width':
+						return elem.offsetWidth === 0 ? 'auto': elem.offsetWidth -  Dom.calc(elem, 'bx+px') + 'px';
+					case 'opacity':
+						return new Dom(elem).getOpacity().toString();
+				}
+			}
+			// currentStyle：IE的样式获取方法,runtimeStyle是获取运行时期的样式。
+			// currentStyle是运行时期样式与style属性覆盖之后的样式
+			var r = elem.currentStyle;
+	
+			if(!r)
+				return "";
+			r = r[name];
+	
+			// 来自 jQuery
+			// 如果返回值不是一个带px的 数字。 转换为像素单位
+			if(/^-?\d/.test(r) && !/^-?\d+(?:px)?$/i.test(r)) {
+	
+				// 保存初始值
+				var style = elem.style, left = style.left, rsLeft = elem.runtimeStyle.left;
+	
+				// 放入值来计算
+				elem.runtimeStyle.left = elem.currentStyle.left;
+				style.left = name === "fontSize" ? "1em": (r || 0);
+				r = style.pixelLeft + "px";
+	
+				// 回到初始值
+				style.left = left;
+				elem.runtimeStyle.left = rsLeft;
+	
+			}
+	
+			return r;
+		},
+		
+		/// #else
+		
+		/// getStyle = function (elem, name) {
+		///
+		/// 	// 获取样式
+		/// 	var computedStyle = elem.ownerDocument.defaultView.getComputedStyle(elem, null);
+		///
+		/// 	// 返回
+		/// 	return computedStyle ? computedStyle[ name ]: null;
+		///
+		/// },
+		/// #endif
+		
+		/**
+		 * 获取滚动大小的方法。
+		 * @type Function
+		 */
+		getScroll = function() {
+			var elem = this.dom;
+			return new Point(elem.scrollLeft, elem.scrollTop);
+		},
+		
+		/**
+		 * 获取窗口滚动大小的方法。
+		 * @type Function
+		 */
+		getWindowScroll = 'pageXOffset' in window ? function() {
+			var win = this.defaultView;
+			return new Point(win.pageXOffset, win.pageYOffset);
+		}: getScroll,
+	
+		/**
+		 * float 属性的名字。
+		 * @type String
+		 */
+		styleFloat = 'cssFloat' in div.style ? 'cssFloat': 'styleFloat',
+		
+		/**
 		 * 浏览器使用的真实的 DOMContentLoaded 事件名字。
 		 * @type String
 		 */
-		domReady;
+		domReady,
+		
+		// IE：styleFloat Other：cssFloat
+
+		t,
+
+		pep;
+	
+	/// #region Dom
 	
 	/**
 	 * @namespace Dom
 	 */
-	apply(Dom, {
+	extend(Dom, {
 		
 		/**
 		 * 根据一个 id 获取元素。如果传入的id不是字符串，则直接返回参数。
@@ -647,7 +653,7 @@
 						assert.isString(srcHTML, 'Dom.parseNode(html, context, cachable): {html} ~');
 						html = context.createElement("div");
 
-						var wrap = wrapMap[tag[1].toLowerCase()] || wrapMap.$default;
+						var wrap = tagFix[tag[1].toLowerCase()] || tagFix.$default;
 
 						html.innerHTML = wrap[1] + srcHTML.trim().replace(rXhtmlTag, "<$1></$2>") + wrap[2];
 
@@ -719,7 +725,7 @@
 		getText: function(elem) {
 
 			assert.isNode(elem, "Dom.getText(elem, name): {elem} ~");
-			return elem[textField[elem.nodeName] || attributes.innerText] || '';
+			return elem[textFix[elem.nodeName] || attrFix.innerText] || '';
 		},
 
 		/**
@@ -736,7 +742,7 @@
 			// elem.parentNode) { elem.parentNode.selectIndex;
 			// if(elem.parentNode.parentNode)
 			// elem.parentNode.parentNode.selectIndex; }
-			var fix = attributes[name];
+			var fix = attrFix[name];
 
 			// 如果是特殊属性，直接返回Property。
 			if(fix) {
@@ -783,7 +789,7 @@
 		 * 特殊属性集合。
 		 * @type Object 特殊的属性，在节点复制时不会被复制，因此需要额外复制这些属性内容。
 		 */
-		properties: {
+		propFix: {
 			INPUT: 'checked',
 			OPTION: 'selected',
 			TEXTAREA: 'value'
@@ -796,8 +802,22 @@
 		 * @static
 		 * @private
 		 */
-		attributes: attributes,
+		attrFix: attrFix,
 		
+		/**
+		 * 获取文本时应使用的属性值。
+		 * @private
+		 */
+		textFix: textFix,
+		
+		/**
+		 * 特殊的样式集合。
+		 * @property
+		 * @type Object
+		 * @private
+		 */
+		styleFix: styleFix,
+
 		/**
 		 * 选择器中关系选择符的处理函数列表。
 		 * @private
@@ -809,12 +829,6 @@
 			'~': 'nextAll',
 			'<': 'parentAll'
 		},
-		
-		/**
-		 * 获取文本时应使用的属性值。
-		 * @private
-		 */
-		textField: textField,
 	
 		/**
 		 * 用于查找所有支持的伪类的函数集合。
@@ -891,21 +905,6 @@
 			}
 			
 		},
-		
-		/**
-		 * 特殊的样式集合。
-		 * @property
-		 * @type Object
-		 * @private
-		 */
-		styles: styles,
-
-		/**
-		 * 样式表。
-		 * @static
-		 * @type Object
-		 */
-		sizeMap: {},
 
 		/**
 		 * 显示元素的样式。
@@ -923,7 +922,7 @@
 		 * @static
 		 * @type Object
 		 */
-		styleNumbers: map('fillOpacity fontWeight lineHeight opacity orphans widows zIndex zoom', Function.returnTrue, {}),
+		styleNumbers: map('fillOpacity fontWeight lineHeight opacity orphans widows zIndex zoom', Function.from(true), {}),
 
 		/**
 		 * 默认最大的 z-index 。
@@ -987,7 +986,7 @@
 		setStyles: function(elem, styles) {
 			assert.isElement(elem, "Dom.getStyles(elem, styles): {elem} ~");
 
-			apply(elem.style, styles);
+			extend(elem.style, styles);
 		},
 
 		/**
@@ -1090,7 +1089,7 @@
 			return function(elem, type) {
 				assert.isElement(elem, "Dom.calc(elem, type): {elem} ~");
 				assert.isString(type, "Dom.calc(elem, type): {type} ~");
-				return (Dom.sizeMap[type] || (Dom.sizeMap[type] = new Function("e", init + type.replace(/\w+/g, format))))(elem);
+				return (sizeMap[type] || (sizeMap[type] = new Function("e", init + type.replace(/\w+/g, format))))(elem);
 			}
 		})(),
 
@@ -1147,7 +1146,7 @@
 									// return DomList
 									value = function() {
 										var r = new DomList;
-										return r.concat.apply(r, this.invoke(func, arguments));
+										return r.concat.extend(r, this.invoke(func, arguments));
 									};
 									break;
 								case 4:
@@ -1156,7 +1155,7 @@
 										var i = -1, item = null, target = new Dom();
 										while(++i < this.length && !item) {
 											target.dom = this[i];
-											item = target[func].apply(target, arguments);
+											item = target[func].extend(target, arguments);
 										}
 										return item;
 									};
@@ -1167,7 +1166,7 @@
 										var len = this.length, i = -1, target;
 										while(++i < len) {
 											target = new Dom(this[i]);
-											target[func].apply(target, arguments);
+											target[func].extend(target, arguments);
 										}
 										return this;
 									};
@@ -1242,7 +1241,7 @@
 				var me = this;
 				me.target = target;
 				me.type = type;
-				apply(me, e);
+				extend(me, e);
 			},
 			
 			/**
@@ -1374,10 +1373,10 @@
 				me.dom.style.cssText += ';' + name;
 				
 			// 特殊的属性值。
-			} else if( name in styles) {
+			} else if( name in styleFix) {
 		
 				// setHeight setWidth setOpacity
-				return me[styles[name]](value);
+				return me[styleFix[name]](value);
 		
 			} else {
 				name = name.replace(rStyle, formatStyle);
@@ -1501,7 +1500,7 @@
 			return this;
 		}: 'onselectstart' in div ? function(value) {
 			assert.isElement(this.dom, "Dom.prototype.unselectable(value): 当前 dom 不支持此操作");
-			this.dom.onselectstart = value !== false ? Function.returnFalse: null;
+			this.dom.onselectstart = value !== false ? Function.from(false): null;
 			return this;
 		}: function(value) {
 			assert.isElement(this.dom, "Dom.prototype.unselectable(value): 当前 dom 不支持此操作");
@@ -1542,15 +1541,15 @@
 		
 			/// #endif
 			// 如果是节点具有的属性。
-			if( name in attributes) {
+			if( name in attrFix) {
 		
-				if(attributes[name].set)
-					attributes[name].set(elem, name, value);
+				if(attrFix[name].set)
+					attrFix[name].set(elem, name, value);
 				else {
 		
 					assert(elem.tagName !== 'FORM' || name !== 'className' || typeof elem.className === 'string', "Dom.prototype.setAttr(name, type): 表单内不能存在 name='className' 的节点。");
 		
-					elem[attributes[name]] = value;
+					elem[attrFix[name]] = value;
 		
 				}
 		
@@ -1675,8 +1674,8 @@
 		 * @param {Boolean} [toggle] 自定义切换的方式。如果为 true， 则加上类名，否则删除。
 		 * @return {Element} this
 		 */
-		toggleClass: function(className, toggle) {
-			return (toggle !== undefined ? !toggle: this.hasClass(className)) ? this.removeClass(className): this.addClass(className);
+		toggleClass: function(className, stateVal) {
+			return (stateVal !== undefined ? !stateVal: this.hasClass(className)) ? this.removeClass(className): this.addClass(className);
 		},
 	
 		/**
@@ -1686,7 +1685,7 @@
 		 */
 		setText: function(value) {
 			var elem = this.dom;
-			elem[textField[elem.nodeName] || attributes.innerText] = value;
+			elem[textFix[elem.nodeName] || attrFix.innerText] = value;
 			return this;
 		},
 	
@@ -1697,7 +1696,7 @@
 		 */
 		setHtml: function(value) {
 			var elem = this.dom,
-				map = wrapMap.$default;
+				map = tagFix.$default;
 			
 			assert(elem.nodeType === 1, "Dom.prototype.setHtml(value): 仅当 dom.nodeType === 1 时才能使用此函数。"); 
 			
@@ -1769,16 +1768,16 @@
 		 * @param {Point} System
 		 * @return {Element} this
 		 */
-		setOffset: function(System) {
+		setOffset: function(offsetPoint) {
 		
-			assert(Object.isObject(System), "Dom.prototype.setOffset(System): {System} 必须有 'x' 和 'y' 属性。", System);
+			assert(Object.isObject(offsetPoint), "Dom.prototype.setOffset(System): {System} 必须有 'x' 和 'y' 属性。", System);
 			var s = this.dom.style;
 			
-			if(System.y != null)
-				s.top = System.y + 'px';
+			if(offsetPoint.y != null)
+				s.top = offsetPoint.y + 'px';
 				
-			if(System.x != null)
-				s.left = System.x + 'px';
+			if(offsetPoint.x != null)
+				s.left = offsetPoint.x + 'px';
 			return this;
 		},
 	
@@ -1791,12 +1790,12 @@
 		setPosition: function(x, y) {
 			var me = this,
 				offset = me.getOffset().sub(me.getPosition()),
-				System = formatPoint(x, y);
+				offsetPoint = formatPoint(x, y);
 		
-			if (System.y != null) offset.y += System.y; 
+			if (offsetPoint.y != null) offset.y += offsetPoint.y; 
 			else offset.y = null;
 		
-			if (System.x != null) offset.x += System.x; 
+			if (offsetPoint.x != null) offset.x += offsetPoint.x; 
 			else offset.x = null;
 		
 			Dom.movable(me.dom);
@@ -1813,10 +1812,10 @@
 		 */
 		setScroll: function(x, y) {
 			var elem = this.dom,
-				System = formatPoint(x, y);
+				offsetPoint = formatPoint(x, y);
 		
-			if (System.x != null) elem.scrollLeft = System.x;
-			if (System.y != null) elem.scrollTop = System.y;
+			if (offsetPoint.x != null) elem.scrollLeft = offsetPoint.x;
+			if (offsetPoint.y != null) elem.scrollTop = offsetPoint.y;
 			return this;
 	
 		},
@@ -2284,27 +2283,25 @@
 		},
 		
 		/**
-		 * 判断一个节点是否包含一个节点。 一个节点包含自身。
-		 * @param {Element} Dom 子节点。
-		 * @return {Boolean} 有返回true 。
-		 */
-		contains: function(dom) {
-			var elem = this.dom;
-			dom = Dom.getNode(dom);
-			assert.notNull(dom, "Dom.prototype.contains(Dom):{Dom} ~");
-			return dom == elem || Dom.hasChild(elem, dom);
-		},
-		
-		/**
 		 * 判断一个节点是否有子节点。
 		 * @param {Element} [Dom] 子节点。
 		 * @return {Boolean} 有返回true 。
 		 */
-		hasChild: function(dom) {
-			return dom ? Dom.hasChild(this.dom, Dom.getNode(dom)): !Dom.isEmpty(this.dom);
+		hasChild: function(dom, allowSelf) {
+			var elem = this.dom;
+			if(dom){
+				dom = Dom.getNode(dom);
+				return (allowSelf && elem === dom) || Dom.hasChild(elem, dom);
+			}
+			
+			return Dom.isEmpty(elem);
 		}
 		
 	}, 4);
+	
+	/// #endif
+	
+	/// #region Dom.Document
 	
 	/**
 	 * @class Dom.Document
@@ -2336,7 +2333,7 @@
 		 */
 		remove: function() {
 			var body = new Dom(this.body);
-			body.remove.apply(body, arguments);
+			body.remove.extend(body, arguments);
 			return this;
 		},
 		
@@ -2409,35 +2406,35 @@
 		 * @return {Document} this 。
 		 */
 		setScroll: function(x, y) {
-			var doc = this, System = formatPoint(x, y);
-			if(System.x == null)
-				System.x = doc.getScroll().x;
-			if(System.y == null)
-				System.y = doc.getScroll().y;
-			(doc.defaultView || doc.parentWindow).scrollTo(System.x, System.y);
+			var doc = this, offsetPoint = formatPoint(x, y);
+			if(offsetPoint.x == null)
+				offsetPoint.x = doc.getScroll().x;
+			if(offsetPoint.y == null)
+				offsetPoint.y = doc.getScroll().y;
+			(doc.defaultView || doc.parentWindow).scrollTo(offsetPoint.x, offsetPoint.y);
 
 			return doc;
-		},
-		
-		xtype: 'dom'
+		}
 		
 	});
 
+	/// #endif
+	
 	// 变量初始化。
 
-	// 初始化 wrapMap
-	wrapMap.optgroup = wrapMap.option;
-	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
-	wrapMap.th = wrapMap.td;
+	// 初始化 tagFix
+	tagFix.optgroup = tagFix.option;
+	tagFix.tbody = tagFix.tfoot = tagFix.colgroup = tagFix.caption = tagFix.thead;
+	tagFix.th = tagFix.td;
 
 	// 下列属性应该直接使用。
 	map("checked selected disabled value innerHTML textContent className autofocus autoplay async controls hidden loop open required scoped compact nowrap ismap declare noshade multiple noresize defer readOnly tabIndex defaultValue accessKey defaultChecked cellPadding cellSpacing rowSpan colSpan frameBorder maxLength useMap contentEditable", function (value) {
-		attributes[value.toLowerCase()] = attributes[value] = value;
+		attrFix[value.toLowerCase()] = attrFix[value] = value;
 	});
 
-	textField.INPUT = textField.SELECT = textField.TEXTAREA = 'value';
+	textFix.INPUT = textFix.SELECT = textFix.TEXTAREA = 'value';
 
-	textField['#text'] = textField['#comment'] = 'nodeValue';
+	textFix['#text'] = textFix['#comment'] = 'nodeValue';
 
 	pep = Dom.Event.prototype;
 
@@ -2446,7 +2443,7 @@
 	t = {};
 	Dom.implement(map('on un trigger', function (name) {
 		t[name] = function () {
-			Dom.document[name].apply(Dom.document, arguments);
+			Dom.document[name].extend(Dom.document, arguments);
 			return this;
 		};
 
@@ -2464,7 +2461,7 @@
 
 	map("filter slice splice reverse unique", function(value) {
 		t[value] = function() {
-			return new DomList(ap[value].apply(this, arguments));
+			return new DomList(ap[value].extend(this, arguments));
 		};
 	});
 
@@ -2474,7 +2471,7 @@
 
 	/// #if CompactMode
 
-	if(isStandard) {
+	if(isStd) {
 
 		/// #endif
 
@@ -2535,12 +2532,12 @@
 		domReady = 'readystatechange';
 
 		if (!('opacity' in div.style)) {
-			styles.opacity = 'setOpacity';
+			styleFix.opacity = 'setOpacity';
 		}
 		
-		Dom.properties.OBJECT = 'outerHTML';
+		Dom.propFix.OBJECT = 'outerHTML';
 
-		attributes.style = {
+		attrFix.style = {
 
 			get: function(elem, name) {
 				return elem.style.cssText.toLowerCase();
@@ -2552,7 +2549,7 @@
 
 		if(navigator.isQuirks) {
 
-			attributes.value = {
+			attrFix.value = {
 
 				node: function(elem, name) {
 					assert(elem.getAttributeNode, "Dom.prototype.getAttr(name, type): 当前元素不存在 getAttributeNode 方法");
@@ -2570,7 +2567,7 @@
 				}
 			};
 
-			attributes.href = attributes.src = attributes.usemap = {
+			attrFix.href = attrFix.src = attrFix.usemap = {
 
 				get: function(elem, name) {
 					return elem.getAttribute(name, 2);
@@ -2683,7 +2680,7 @@
 		/// #if CompactMode
 		
 		// 只对 IE 检查。
-		if(!isStandard) {
+		if(!isStd) {
 
 			// 来自 jQuery
 			// 如果是 IE 且不是框架
@@ -2725,7 +2722,7 @@
 	
 	div = null;
 
-	apply(window, {
+	extend(window, {
 
 		Dom: Dom,
 
@@ -2826,9 +2823,9 @@
 						return elem.nodeType === 1 && Dom.match(elem, args);
 					};
 					
-				// 布尔类型，而且是 true, 返回 Function.returnTrue，  表示不过滤。
+				// 布尔类型，而且是 true, 返回 Function.from(true)，  表示不过滤。
 				case 'boolean':
-					return Function.returnTrue;
+					return Function.from(true);
 				
 			}
 	
@@ -2899,7 +2896,7 @@
 		}
 
 		// 特殊属性复制。
-		if( keepId = Dom.properties[srcElem.tagName])
+		if( keepId = Dom.propFix[srcElem.tagName])
 			destElem[keepId] = srcElem[keepId];
 	}
 
@@ -2955,7 +2952,7 @@
 			value = parseFloat(getStyle(elem, name));
 
 			if(!value && value !== 0) {
-				if( name in styles) {
+				if( name in styleFix) {
 					var style = Dom.getStyles(elem, Dom.display);
 					Dom.setStyles(elem, Dom.display);
 					value = parseFloat(getStyle(elem, name)) || 0;
