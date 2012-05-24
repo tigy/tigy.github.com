@@ -139,7 +139,7 @@ mozilla	1.8.1.4pre	Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.4pre
 mozilla	1.8.1.2pre	Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.2pre) Gecko/20070215 K-Ninja/2.1.1\n\
 mozilla	1.9	Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9) Gecko/20080705 Firefox/3.0 Kapiko/3.0\n\
 mozilla	0	Mozilla/5.0 (X11; Linux i686; U;) Gecko/20070322 Kazehakase/0.4.5\n\
-	1.9.0.8	Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.8) Gecko Fedora/1.9.0.8-1.fc10 Kazehakase/0.5.6\n\
+mozilla	1.9.0.8	Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.8) Gecko Fedora/1.9.0.8-1.fc10 Kazehakase/0.5.6\n\
 msie	6.0	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; KKman2.0)\n\
 msie	6.0	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; KKMAN3.2)\n\
 msie	6.0	Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; KKman3.0)\n\
@@ -277,8 +277,8 @@ opera	10.50	Opera/9.80 (Macintosh; Intel Mac OS X; U; en) Presto/2.5.18 Version/
 function uaMatch(ua) {
 
 	// 检查信息
-	var match = ua.match(/(IE|Firefox|Chrome|Safari|Opera).((\d+?)[\.\w]*)/i) || ua.match(/(WebKit|Gecko).((\d+?)[\.\w]*)/i) || ["", "", 0, 0],
-
+	var match = ua.match(/(IE|Firefox|Chrome|Safari|Opera)[\/\s]([\w\.]*)/i) || ua.match(/(WebKit|Gecko)[\/\s]([\w\.]*)/i) || [0, "", 0],
+	
 		// 浏览器名字。
 		browser = match[1];
 

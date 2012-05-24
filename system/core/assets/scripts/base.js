@@ -67,52 +67,6 @@
 	extend(System, {
 
 		/**
-		 * 获取一个对象指定字段的数据，如果数据不存在，则返回 undefined。
-		 * @param {Object} obj 任何对象。
-		 * @param {String} name 数据类型名。
-		 * @return {Object} 返回对应的值。如果数据不存在，则返回 undefined。
-		 * @see System.setData
-		 * @example <pre>
-		 * var obj = {};
-		 * var a = System.getData(obj, 'a'); // 获取 a 字段的数据。 
-		 * trace( a )
-		 * </pre>
-		 */
-		getData: function(obj, name) {
-
-			assert.isObject(obj, "System.getData(obj, dataType): {obj} ~");
-
-		    // 内部支持 dom 属性。
-		    // 这里忽略 IE6/7 的内存泄露问题。
-			var data = (obj.dom ||  obj).$data;
-			return data && data[name];
-		},
-
-		/**
-		 * 设置属于一个对象指定字段的数据。
-		 * @param {Object} obj 任何对象。
-		 * @param {String} name 数据类型名。
-		 * @param {Object} data 要设置的数据内容。
-		 * @return {Object} data 返回 data 本身。
-		 * @see System.getData
-		 * @example <pre>
-		 * var obj = {};
-		 * System.setData(obj, 'a', 5);    // 设置 a 字段的数据值为 5。 
-		 * var val = System.getData(obj, 'a'); // 获取值， 返回 5
-		 * </pre>
-		 */
-		setData: function (obj, name, data) {
-
-			assert.isObject(obj, "System.setData(obj, dataType): {obj} ~");
-
-			// 内部支持 dom 属性。
-			obj = obj.dom || obj;
-
-			// 简单设置变量。
-			return (obj.$data || (obj.$data = {}))[name] = data;
-		},
-
-		/**
 		 * 所有类的基类。
 		 * @constructor
 		 */
@@ -128,11 +82,7 @@
 			// 简单拷贝 Object 的成员，即拥有类的特性。
 			// 在 JavaScript， 一切函数都可作为类，故此函数存在。
 			// Object 的成员一般对当前类构造函数原型辅助。
-			extend(constructor, Base);
-
-			delete constructor.$data;
-
-			return constructor;
+			return extend(constructor, Base);
 		},
 
 		/**
@@ -212,7 +162,7 @@
 		 *         如果其中一个函数执行后返回 false， 则中止执行，并返回 false， 否则返回 true。
 		 *         evtTrigger.handlers 表示 当前这个事件的所有实际调用的函数的数组。
 		 *         然后系统会调用 add(o,
-		 *         '事件名', evtTrigger) 然后把 evtTrigger 保存在 o.data.event['事件名'] 中。
+		 *         '事件名', evtTrigger) 然后把 evtTrigger 保存在 o.data.$event['事件名'] 中。
 		 *         如果 之前已经绑定了这个事件，则 evtTrigger 已存在，无需创建。 这时系统只需把 函数 放到
 		 *         evtTrigger.handlers 即可。
 		 *         </p>
@@ -340,7 +290,7 @@
 			} : (members || {}), "constructor") ? members.constructor : function () {
 
 			    // 调用父类构造函数 。
-			    arguments.callee.base.extend(this, arguments);
+			    arguments.callee.base.apply(this, arguments);
 
 		    };
 
@@ -507,7 +457,7 @@
 			}
 	    	
 		    // 遍历对象。
-		    Object.each(iterable, fn, dest);
+		    Object.each(iterable, actualFn, dest);
 
 		    // 返回目标。
 		    return dest;
@@ -523,7 +473,7 @@
 	     * Array.isArray(new Array); // true
 	     * </pre>
 		 */
-	    isArray: function (obj) {
+	    isArray: Array.isArray || function (obj) {
 
 	    	// 检查原型。
 	    	return toString.call(obj) === "[object Array]";
@@ -826,7 +776,7 @@
 		// 检查信息
 		var ua = navigator.userAgent,
 		
-			match = ua.match(/(IE|Firefox|Chrome|Safari|Opera).([\w\.]*)/i) || ua.match(/(WebKit|Gecko).([\w\.]*)/i) || [0, "", 0],
+			match = ua.match(/(IE|Firefox|Chrome|Safari|Opera)[\/\s]([\w\.]*)/i) || ua.match(/(WebKit|Gecko)[\/\s]([\w\.]*)/i) || [0, "", 0],
 	
 			// 浏览器名字。
 			browser = match[1],
@@ -915,6 +865,15 @@
 	 */
     Base.implement({
     	
+    	/**
+    	 * 获取当前类对应的数据字段。
+    	 * @proteced virtual
+    	 * @returns {Object} 一个可存储数据的对象。
+    	 */
+    	dataField: function(){
+    		return this;
+    	},
+    	
 	    /**
 	     * 调用父类的成员变量。
 	     * @param {String} methodName 属性名。
@@ -969,9 +928,9 @@
 	        // 确保 bubble 记号被移除。
 	        try {
 	            if (args.length <= 1)
-	                return fn.extend(this, args.callee.caller.arguments);
+	                return fn.apply(this, args.callee.caller.arguments);
 	            args[0] = this;
-	            return fn.call.extend(fn, args);
+	            return fn.call.apply(fn, args);
 	        } finally {
 	            delete fn.$bubble;
 	            delete oldFn.$bubble;
@@ -995,7 +954,13 @@
 	        assert.isFunction(listener, 'System.Object.prototype.on(type, listener, bind): {listener} ~');
 
 	        // 获取本对象 本对象的数据内容 本事件值
-	        var me = this, d = System.getData(me, '$event') || System.setData(me, '$event', {}), evt = d[type];
+	        var me = this, 
+	        	d = me.dataField(),
+	        	evt;
+	        	
+	        d = d.$event || (d.$event = {});
+	        
+	        evt = d[type];
 
 	        // 如果未绑定过这个事件。
 	        if (!evt) {
@@ -1056,7 +1021,7 @@
 	        assert(!listener || Object.isFunction(listener), 'System.Object.prototype.un(type, listener): {listener} 必须是函数或空参数。', listener);
 
 	        // 获取本对象 本对象的数据内容 本事件值
-	        var me = this, d = System.getData(me, '$event'), evt, handlers, i;
+	        var me = this, d = me.dataField().$event, evt, handlers, i;
 	        if (d) {
 		        if (evt = d[type]) {
 
@@ -1113,7 +1078,7 @@
         trigger: function(type, e) {
 
 	        // 获取本对象 本对象的数据内容 本事件值 。
-	        var me = this, evt = System.getData(me, '$event'), eMgr;
+	        var me = this, evt = me.dataField().$event, eMgr;
 
 	        // 执行事件。
 	        return !evt || !(evt = evt[type]) || ((eMgr = getMgr(me, type)).trigger ? eMgr.trigger(me, type, evt, e) : evt(e));
@@ -1148,7 +1113,7 @@
 		        me.un(type, arguments.callee);
 
 		        // 然后调用。
-		        return listener.extend(this, arguments);
+		        return listener.apply(this, arguments);
 	        }, bind);
         }
 		
@@ -1223,7 +1188,7 @@
 
 		    // 返回对 bind 绑定。
 		    return function() {
-			    return me.extend(bind, arguments);
+			    return me.apply(bind, arguments);
 		    }
 	    }
 		
@@ -1286,7 +1251,7 @@
 			    tmp = ap.slice.call(me, index);
 			    me.length = index + 1;
 			    this[index] = value;
-			    ap.push.extend(me, tmp);
+			    ap.push.apply(me, tmp);
 			}
 		    return index;
 
@@ -1305,8 +1270,8 @@
 		    assert(args && typeof args.length === 'number', "Array.prototype.invoke(func, args): {args} 必须是数组, 无法省略。", args);
 		    var r = [];
 		    ap.forEach.call(this, function(value) {
-			    assert(value != null && value[func] && value[func].extend, "Array.prototype.invoke(func, args): {value} 不包含函数 {func}。", value, func);
-			    r.push(value[func].extend(value, args));
+			    assert(value != null && value[func] && value[func].apply, "Array.prototype.invoke(func, args): {value} 不包含函数 {func}。", value, func);
+			    r.push(value[func].apply(value, args));
 		    });
 
 		    return r;
@@ -1523,8 +1488,8 @@
 function trace() {
     if (trace.enable) {
         
-        if(window.console && console.debug && console.debug.extend) {
-        	return console.debug.extend(console, arguments);
+        if(window.console && console.debug && console.debug.apply) {
+        	return console.debug.apply(console, arguments);
         }
 
         var hasConsole = window.console && console.debug, data;
@@ -1532,8 +1497,8 @@ function trace() {
         if(arguments.length === 0) {
         	data = '(traced)';
         // 如果存在控制台，则优先使用控制台。
-        } else if (hasConsole && console.log.extend) {
-        	return console.log.extend(console, arguments);
+        } else if (hasConsole && console.log.apply) {
+        	return console.log.apply(console, arguments);
         } else {
         	data = trace.inspect(arguments);
         }
@@ -1602,10 +1567,11 @@ function using(ns, isStyle) {
     assert.isString(ns, "using(ns): {ns} 不是合法的名字空间。");
     
     var cache = using[isStyle ? 'styles' : 'scripts'];
-
-    // 已经载入。
-    if (cache.indexOf(ns) >= 0)
-        return;
+	
+	for(var i = 0; i < cache.length; i++){
+		if(cache[i] === ns)
+			return;
+	}
         
     cache.push(ns);
 
@@ -1647,7 +1613,7 @@ function using(ns, isStyle) {
 	}
     
     callback(using.rootPath + ns + exts[0]);
-};
+}
 
 /**
  * 导入指定名字空间表示的样式文件。
@@ -1655,7 +1621,7 @@ function using(ns, isStyle) {
  */
 function imports(ns){
     return using(ns, true);
-};
+}
 
 (function(){
 	
@@ -2225,10 +2191,10 @@ function imports(ns){
          */
         time: function(fn, times) {
             times = times || 1000;
-            var d = Date.now();
+            var d = new Date();
             while (times-- > 0)
                 fn();
-            times = Date.now() - d;
+            times = new Date() - d;
             window.trace("[时间] " + times);
         }
 

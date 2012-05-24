@@ -53,7 +53,7 @@
 				'Dom.prototype.find' : {
 					'a.find("div")' : b,
 					'a.find(".b")' : b,
-					'a.find("[_tag=\\\"b\\\"]")' : b,
+					'a.find("[_tag=\\\"b\\\"]")' : b
 				},
 				'Dom.prototype.query' : {
 					'a.query("div")' : function(value, assert) {
@@ -93,26 +93,36 @@
 						assert.areEqual(value.dom, c.dom);
 					}
 				},
-				'Dom.prototype.parentAll' : {
-					'b.parentAll()' : function(value, assert) {
+                'Dom.prototype.children' : {
+                    'b.children()' : function(value, assert) {
+                        assert.areEqual(1, value.length);
+                    }
+                },
+                'Dom.prototype.getAll("child")' : {
+                    'b.getAll("child")' : function(value, assert) {
+                        assert.areEqual(value[0], c.dom);
+                    }
+                },
+                'Dom.prototype.getAll("sibling")' : {
+                    'b.getAll("sibling")' : function(value, assert) {
+                        assert.areEqual(value[0], d.dom);
+                    }
+                },
+				'Dom.prototype.getAll("parent")' : {
+					'b.getAll("parent")' : function(value, assert) {
 						assert.areEqual(value[0], a.dom);
 					}
 				},
-				'Dom.prototype.prevAll' : {
-					'b.prevAll()' : function(value, assert) {
+				'Dom.prototype.getAll("prev")' : {
+					'b.getAll("prev")' : function(value, assert) {
 						assert.areEqual(value[0], undefined);
 					}
 				},
-				'Dom.prototype.nextAll' : {
-					'b.nextAll()' : function(value, assert) {
+				'Dom.prototype.getAll("next")' : {
+					'b.getAll("next")' : function(value, assert) {
 						assert.areEqual(value[0], d.dom);
 					}
-                },
-				'Dom.prototype.siblings': {
-				    'b.siblings()': function (value, assert) {
-				        assert.areEqual(value[0], d.dom);
-				    }
-				}
+                }
 			};
 
 			Demo.writeTestCases(testcases);

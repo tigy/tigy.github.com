@@ -372,21 +372,21 @@ testoffset("body", function( iframe ) {
 
 test("offsetParent", function(){
 
-	var body = Dom.get(document.body).getOffsetParent();
+	var body = Dom.get(document.body).offsetParent();
 	equal( body.dom, document.body, "The body is its own offsetParent." );
 
-	var header = getDom(document, "qunit-header").getOffsetParent();
+	var header = getDom(document, "qunit-header").offsetParent();
 	equal( header.dom, document.body, "The body is the offsetParent." );
 
-	var div = getDom(document, "nothiddendivchild").getOffsetParent();
+	var div = getDom(document, "nothiddendivchild").offsetParent();
 	equal( div.dom, document.body, "The body is the offsetParent." );
 
 	getDom(document, "nothiddendiv").set("position", "relative");
 
-	div = getDom(document, "nothiddendivchild").getOffsetParent();
+	div = getDom(document, "nothiddendivchild").offsetParent();
 	equal( div.dom, getDom(document, "nothiddendiv").dom, "The div is the offsetParent." );
 
-	div = Dom.get(document.body).getOffsetParent();
+	div = Dom.get(document.body).offsetParent();
 	equal( div.dom, document.body, "The body is the offsetParent." );
 });
 

@@ -28,9 +28,9 @@ test("DomList", function () {
 	equal(el.pop(), document.body, "pop() 移除返回最后一个。");
 	equal(el.length, length, "pop() 减少长度");
 
-	deepEqual(el.filter(Function.returnTrue).length, el.length, "filter() 返回");
+	deepEqual(el.filter(Function.from(true)).length, el.length, "filter() 返回");
 
-	deepEqual(el.filter(Function.returnFalse).length, 0, "filter() 返回");
+	deepEqual(el.filter(Function.from(false)).length, 0, "filter() 返回");
 
 	equal(el.indexOf(document), -1, "indexOf() 返回");
 

@@ -255,8 +255,8 @@ test("Dom.prototype.setAttr", function() {
 		+ "<circle cx='200' cy='200' r='150' />"
 	+ "</svg>");
 	
-	if($svg.getFirst().dom.tagName == "SVG"){
-		$svg = $svg.getFirst(); 	
+	if($svg.first().dom.tagName == "SVG"){
+		$svg = $svg.first(); 	
 	}
 	
 	

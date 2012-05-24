@@ -111,56 +111,56 @@ test("Object.each", function() {
 
 });
 
-test("Array.isArray", function() {
+test("Object.isArray", function() {
 	expect(17);
 
 	// Make sure that false values return false
-	ok( !Array.isArray(), "No Value" );
-	ok( !Array.isArray( null ), "null Value" );
-	ok( !Array.isArray( undefined ), "undefined Value" );
-	ok( !Array.isArray( "" ), "Empty String Value" );
-	ok( !Array.isArray( 0 ), "0 Value" );
+	ok( !Object.isArray(), "No Value" );
+	ok( !Object.isArray( null ), "null Value" );
+	ok( !Object.isArray( undefined ), "undefined Value" );
+	ok( !Object.isArray( "" ), "Empty String Value" );
+	ok( !Object.isArray( 0 ), "0 Value" );
 
 	// Check built-ins
 	// Safari uses "(Internal Function)"
-	ok( !Array.isArray(String), "String Function("+String+")" );
-	ok( !Array.isArray(Array), "Array Function("+Array+")" );
-	ok( !Array.isArray(Object), "Object Function("+Object+")" );
-	ok( !Array.isArray(Function), "Function Function("+Function+")" );
+	ok( !Object.isArray(String), "String Function("+String+")" );
+	ok( !Object.isArray(Array), "Array Function("+Array+")" );
+	ok( !Object.isArray(Object), "Object Function("+Object+")" );
+	ok( !Object.isArray(Function), "Function Function("+Function+")" );
 
 	// When stringified, this could be misinterpreted
 	var mystr = "function";
-	ok( !Array.isArray(mystr), "Function String" );
+	ok( !Object.isArray(mystr), "Function String" );
 
 	// When stringified, this could be misinterpreted
 	var myarr = [ "function" ];
-	ok( Array.isArray(myarr), "Function Array" );
+	ok( Object.isArray(myarr), "Function Array" );
 
 	// When stringified, this could be misinterpreted
 	var myArray = { "function": "test", length: 3 };
-	ok( !Array.isArray(myArray), "Function Object" );
+	ok( !Object.isArray(myArray), "Function Object" );
 
 	// Make sure normal functions still work
 	var fn = function(){};
-	ok( !Array.isArray(fn), "Normal Function" );
+	ok( !Object.isArray(fn), "Normal Function" );
 
 	var obj = document.createElement("object");
 
 	// Firefox says this is a function
-	ok( !Array.isArray(obj), "Object Element" );
+	ok( !Object.isArray(obj), "Object Element" );
 
 	// IE says this is an object
 	// Since 1.3, this isn't supported (#2968)
-	//ok( Array.isArray(obj.getAttribute), "getAttribute Function" );
+	//ok( Object.isArray(obj.getAttribute), "getAttribute Function" );
 
 	var nodes = document.body.childNodes;
 
-	ok( !Array.isArray(nodes), "childNodes Property" );
+	ok( !Object.isArray(nodes), "childNodes Property" );
 
 	var first = document.body.firstChild;
 
 	// Normal elements are reported ok everywhere
-	ok( !Array.isArray(first), "A normal DOM Element" );
+	ok( !Object.isArray(first), "A normal DOM Element" );
 
 	var input = document.createElement("input");
 	input.type = "text";
@@ -168,7 +168,7 @@ test("Array.isArray", function() {
 
 	// IE says this is an object
 	// Since 1.3, this isn't supported (#2968)
-	//ok( Array.isArray(input.focus), "A default function property" );
+	//ok( Object.isArray(input.focus), "A default function property" );
 
 	document.body.removeChild( input );
 
@@ -177,14 +177,14 @@ test("Array.isArray", function() {
 	document.body.appendChild( a );
 
 	// This serializes with the word 'function' in it
-	ok( !Array.isArray(a), "Anchor Element" );
+	ok( !Object.isArray(a), "Anchor Element" );
 
 	document.body.removeChild( a );
 });
 
 test("Array.create", function(){
 
-	// equal( Array.create(document.findAll("head").doms)[0].nodeName.toUpperCase(), "HEAD", "Pass makeArray a List object" );
+	// equal( Array.create(document.findAll("head")[0]s)[0].nodeName.toUpperCase(), "HEAD", "Pass makeArray a List object" );
 
 	// equal( Array.create(document.getElementsByName("PWD")).slice(0,1)[0].name, "PWD", "Pass makeArray a nodelist" );
 

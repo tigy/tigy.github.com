@@ -35,7 +35,7 @@
 				'Object.isFunction': {
 				    '~(function(){})': true,
 				    '~(new Function())': true,
-				    '~()': false,
+				    '~()': false
 				},
 				'Object.each': {
 					'var target={a:1, b:2, c:3}; ~(target, assert.log)': function (value, assert) {
@@ -59,7 +59,7 @@
 				'Object.set': {
 				    'var target = {setA: function (value) {assert.log("1");trace("设置 a =  ", value);}, b: function (value) {trace(value);}};Object.set(target, {a: 8, b: 6, c: 4});': function (value, assert) {
 					    assert.logged("1");
-					},
+					}
 				},
 				'Array': '-',
                 'Array.prototype.indexOf': {
@@ -150,8 +150,6 @@
 					}
                 },
 				'System & Global': '-',
-				'System.getData': '~({}, "a")',
-				'System.setData': '~({}, "a", 5)',
                 'System.id': '~++',
 				'window.execScript': {
 				        '~("Demo.assert.log(false)")': function (value, assert) {

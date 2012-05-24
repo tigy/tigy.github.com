@@ -24,7 +24,7 @@ test("Dom.prototype.getWidth", function() {
 	Dom.setStyles(Dom.get("nothiddendiv").dom, { border: "", padding: "", width: "" });
 	Dom.setStyles(Dom.get("nothiddendivchild").dom, { border: "", padding: "", width: "" });
 	
-	System.setData($div, "display", null);
+	$div.dom.style.$display = null;
 });
 
 test("Dom.prototype.getHeight", function() {
@@ -52,7 +52,7 @@ test("Dom.prototype.getHeight", function() {
 	Dom.setStyles(Dom.get("nothiddendiv").dom, { border: "", padding: "", height: "" });
 	Dom.setStyles(Dom.get("nothiddendivchild").dom, { border: "", padding: "", height: "" });
 
-	System.setData($div, "display", null);
+	$div.dom.style.$display = null;
 });
 
 test("child of a hidden elem has accurate getWidth()/getHeight()  see #9441 #9300", function() {

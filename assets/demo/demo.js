@@ -107,12 +107,12 @@
         formatJS: js_beautify,
 
         encodeHTML: function (value) {
-            return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/ /g, "&nbsp;").replace(/\'/g, "&#39;").replace(/\"/g, "&quot;");
+            return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\'/g, "&#39;").replace(/\"/g, "&quot;");
 
         },
 
         encodeJs: function (value) {
-            return value.replace(/\\/g, "\\\\").replace(/'/g, "\\\'").replace(/"/g, "\\\"").replace(/\r/g, "\\r'").replace(/\n/g, "\\n'");
+            return value.replace(/\\/g, "\\\\").replace(/'/g, "\\\'").replace(/"/g, "\\\"").replace(/\r/g, "\\r").replace(/\n/g, "\\n");
 
         },
 
@@ -323,13 +323,13 @@
 
                 var encodedName = Demo.encodeHTML(name);
 
-                document.write(['<div title="', encodedName, '" id="demo-testcases-', name, '" class="demo-tip" onmouseover="this.className += \' demo-tip-selected\'" onmouseout="this.className = this.className.replace(\' demo-tip-selected\', \'\');">\
+                document.write(['<div title="', encodedName, '" id="demo-testcases-', encodedName, '" class="demo-tip" onmouseover="this.className += \' demo-tip-selected\'" onmouseout="this.className = this.className.replace(\' demo-tip-selected\', \'\');">\
 					<span class="demo-control-toolbar">\
-						<a class="demo" href="javascript://执行函数" onclick="Demo.runTestCase(\'', name, '\');">测试</a> | \
-						<a class="demo" href="javascript://测试函数执行的速度" onclick="Demo.speedTest(\'', name, '\');">效率</a> | \
-						<a class="demo" href="javascript://查看函数源码" onclick="Demo.viewSource(\'', name, '\');">查看源码</a>\
+						<a class="demo" href="javascript://执行函数" onclick="Demo.runTestCase(\'', encodedName, '\');">测试</a> | \
+						<a class="demo" href="javascript://测试函数执行的速度" onclick="Demo.speedTest(\'', encodedName, '\');">效率</a> | \
+						<a class="demo" href="javascript://查看函数源码" onclick="Demo.viewSource(\'', encodedName, '\');">查看源码</a>\
 					</span>\
-				    <a class="demo" href="javascript://', typeof testcase === 'object' ? '单元测试: ' + encodedName : Demo.encodeHTML(testcase.toString()), '" onclick="Demo.runTestCase(\'', name, '\')">', encodedName, '</a>\
+				    <a class="demo" href="javascript://', typeof testcase === 'object' ? '单元测试: ' + encodedName : Demo.encodeHTML(testcase.toString()), '" onclick="Demo.runTestCase(\'', encodedName, '\')">', encodedName, '</a>\
 				    </div>'].join(''));
 
             }
@@ -355,7 +355,7 @@
                     // 字符串: 转函数。
 	                case 'string':
 	                    $displayName = $info.replace(/~/g, $name);
-	                    info = function () {
+	                    $info = function () {
 	                        return eval($displayName);
 	                    };
 
@@ -363,7 +363,7 @@
                     // 函数: 直接执行。
 	                case 'function':
 	                    try {
-	                        $ret = info();
+	                        $ret = $info();
 	                    } catch (e) {
 	                        if ($info) reportError($name, e.message, $displayName || $info.toString());
 	                        break;
@@ -475,7 +475,7 @@
 				}
 
 				
-                var div = document.getElementById('demo-testcases-' + name);
+                var div = document.getElementById('demo-testcases-' + Demo.encodeHTML(name));
 
 
                 var nextNode = Demo.getNextElement(div);

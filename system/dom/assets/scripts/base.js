@@ -63,13 +63,19 @@
 		 * @class Dom
 		 */
 		Dom = Class({
-	
+			
 			/**
 			 * 当前Dom 对象实际对应的 HTMLNode 实例。
 			 * @type Node
 			 * @protected
 			 */
 			dom: null,
+			
+			dataField: function(){
+				
+				// 由于 IE 6/7 即将退出市场。此处忽略 IE 6/7 内存泄露问题。
+				return this.dom.$data || (this.dom.$data = {});
+			},
 		
 			/**
 			 * Dom 对象的封装。
@@ -151,10 +157,10 @@
 			invoke: function(func, args) {
 				assert(args && typeof args.length === 'number', "DomList.prototype.invoke(func, args): {args} 必须是数组, 无法省略。", args);
 				var r = [];
-				assert(Dom.prototype[func] && Dom.prototype[func].extend, "DomList.prototype.invoke(func, args): Dom 不包含方法 {func}。", func);
+				assert(Dom.prototype[func] && Dom.prototype[func].apply, "DomList.prototype.invoke(func, args): Dom 不包含方法 {func}。", func);
 				ap.forEach.call(this, function(value) {
 					value = new Dom(value);
-					r.push(value[func].extend(value, args));
+					r.push(value[func].apply(value, args));
 				});
 				return r;
 			},
@@ -169,10 +175,12 @@
 				if(nodes) {
 
 					assert(nodes.length !== undefined, 'DomList.prototype.constructor(nodes): {nodes} 必须是一个 DomList 或 Array 类型的变量。', nodes);
-	
-					var len = this.length = nodes.length;
-					while(len--)
-						this[len] = nodes[len].dom || nodes[len];
+					
+					var node;
+					
+					while(node = nodes[this.length]) {
+						this[this.length++] = node.dom || node;	
+					}
 
 				}
 
@@ -480,6 +488,8 @@
 			return new Point(win.pageXOffset, win.pageYOffset);
 		}: getScroll,
 	
+		returnTrue = Function.from(true),
+
 		/**
 		 * float 属性的名字。
 		 * @type String
@@ -501,7 +511,7 @@
 	/// #region Dom
 	
 	/**
-	 * @namespace Dom
+	 * @class Dom
 	 */
 	extend(Dom, {
 		
@@ -509,6 +519,7 @@
 		 * 根据一个 id 获取元素。如果传入的id不是字符串，则直接返回参数。
 		 * @param {String/Node/Dom/DomList} id 要获取元素的 id 或元素本身。
 	 	 * @return {Dom} 元素。
+	 	 * @static
 		 */
 		get: function(id) {
 			
@@ -528,6 +539,7 @@
 		 * 执行一个选择器，返回一个新的 {DomList} 对象。
 		 * @param {String} selecter 选择器。 如 "h2" ".cls" "[attr=value]" 。
 		 * @return {Element/undefined} 节点。
+	 	 * @static
 		 */
 		query: function(selector) {
 			
@@ -547,6 +559,7 @@
 		
 		/**
 		 * 判断一个元素是否符合一个选择器。
+	 	 * @static
 		 */
 		match: function (elem, selector) {
 			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
@@ -572,6 +585,7 @@
 		 * @param {Element} context=document 生成节点使用的文档中的任何节点。
 		 * @param {Boolean} cachable=true 指示是否缓存节点。
 		 * @return {Dom} Dom 对象。
+	 	 * @static
 		 */
 		parse: function(html, context, cachable) {
 
@@ -584,6 +598,7 @@
 		 * 创建一个节点。
 		 * @param {String} tagName 创建的节点的标签名。
 		 * @param {String} className 创建的节点的类名。
+	 	 * @static
 		 */
 		create: function(tagName, className) {
 			return new Dom(Dom.createNode(tagName, className || ''));
@@ -593,6 +608,7 @@
 		 * 创建一个节点。
 		 * @param {String} tagName 创建的节点的标签名。
 		 * @param {String} className 创建的节点的类名。
+	 	 * @static
 		 */
 		createNode: function(tagName, className) {
 			assert.isString(tagName, 'Dom.create(tagName, className): {tagName} ~');
@@ -605,6 +621,7 @@
 		 * 根据一个 id 获取元素。如果传入的id不是字符串，则直接返回参数。
 		 * @param {String/Node/Dom} id 要获取元素的 id 或元素本身。
 	 	 * @return {Node} 元素。
+	 	 * @static
 		 */
 		getNode: function (id) {
 			return typeof id === "string" ?
@@ -623,6 +640,7 @@
 		 * @param {Element} context=document 生成节点使用的文档中的任何节点。
 		 * @param {Boolean} cachable=true 指示是否缓存节点。
 		 * @return {Element/TextNode/DocumentFragment} 元素。
+	 	 * @static
 		 */
 		parseNode: function(html, context, cachable) {
 
@@ -702,6 +720,7 @@
 		 * @param {Element} elem 节点。
 		 * @param {Element} child 子节点。
 		 * @return {Boolean} 如果确实存在子节点，则返回 true ， 否则返回 false 。
+	 	 * @static
 		 */
 		hasChild: div.compareDocumentPosition ? function(elem, child) {
 			assert.isNode(elem, "Dom.hasChild(elem, child): {elem} ~");
@@ -721,6 +740,7 @@
 		 * 获取一个元素对应的文本。
 		 * @param {Element} elem 元素。
 		 * @return {String} 值。对普通节点返回 text 属性。
+	 	 * @static
 		 */
 		getText: function(elem) {
 
@@ -733,6 +753,7 @@
 		 * @param {Element} elem 元素。
 		 * @param {String} name 名字。
 		 * @return {String} 属性。
+	 	 * @static
 		 */
 		getAttr: function(elem, name) {
 
@@ -771,6 +792,7 @@
 		 * 判断一个节点是否隐藏。
 		 * @method isHidden
 		 * @return {Boolean} 隐藏返回 true 。
+	 	 * @static
 		 */
 		
 		/**
@@ -778,6 +800,7 @@
 		 * @param {Element} elem 元素。
 		 * @param {String} className 类名。
 		 * @return {Boolean} 如果存在返回 true。
+	 	 * @static
 		 */
 		hasClass: function(elem, className) {
 			assert.isNode(elem, "Dom.hasClass(elem, className): {elem} ~");
@@ -788,6 +811,7 @@
 		/**
 		 * 特殊属性集合。
 		 * @type Object 特殊的属性，在节点复制时不会被复制，因此需要额外复制这些属性内容。
+	 	 * @static
 		 */
 		propFix: {
 			INPUT: 'checked',
@@ -807,6 +831,7 @@
 		/**
 		 * 获取文本时应使用的属性值。
 		 * @private
+	 	 * @static
 		 */
 		textFix: textFix,
 		
@@ -815,24 +840,14 @@
 		 * @property
 		 * @type Object
 		 * @private
+	 	 * @static
 		 */
 		styleFix: styleFix,
-
-		/**
-		 * 选择器中关系选择符的处理函数列表。
-		 * @private
-		 */
-		combinators: {
-			' ': 'all',
-			'>': 'children',
-			'+': 'next',
-			'~': 'nextAll',
-			'<': 'parentAll'
-		},
 	
 		/**
 		 * 用于查找所有支持的伪类的函数集合。
 		 * @private
+	 	 * @static
 		 */
 		pseudos: {
 			
@@ -889,8 +904,8 @@
 					result.push(args);
 			},
 			"only-child": function(elem){ 
-				var System = new Dom(elem.parentNode).first(elem.nodeName);
-				return System && System.next(); 
+				var p = new Dom(elem.parentNode).first(elem.nodeName);
+				return p && p.next(); 
 			},
 			odd: function(args, oldResult, result){
 				var index = 0, elem, t;
@@ -911,18 +926,18 @@
 		 * @static
 		 * @type Object
 		 */
-		display: {
+		displayFix: {
 			position: "absolute",
 			visibility: "visible",
 			display: "block"
 		},
-
+		
 		/**
 		 * 不需要单位的 css 属性。
 		 * @static
 		 * @type Object
 		 */
-		styleNumbers: map('fillOpacity fontWeight lineHeight opacity orphans widows zIndex zoom', Function.from(true), {}),
+		styleNumbers: map('fillOpacity fontWeight lineHeight opacity orphans widows zIndex zoom', returnTrue, {}),
 
 		/**
 		 * 默认最大的 z-index 。
@@ -932,9 +947,17 @@
 		 * @static
 		 */
 		zIndex: 10000,
-
+		
+		/**
+		 * 
+	 	 * @static
+		 */
 		window: new Dom(window),
-
+		
+		/**
+		 * 
+	 	 * @static
+		 */
 		document: new Dom(document),
 
 		/**
@@ -942,6 +965,7 @@
 		 * @param {Element} dom 节点。
 		 * @param {String} name 名字。
 		 * @return {String} 样式。
+	 	 * @static
 		 */
 		getStyle: getStyle,
 
@@ -950,6 +974,7 @@
 		 * @param {Element} elem 元素。
 		 * @param {String} name 属性名。必须使用骆驼规则的名字。
 		 * @return {String} 字符串。
+	 	 * @static
 		 */
 		styleString: styleString,
 
@@ -967,6 +992,7 @@
 		 * @param {Element} elem 元素。
 		 * @param {Object} styles 需要收集的属性。
 		 * @return {Object} 收集的属性。
+	 	 * @static
 		 */
 		getStyles: function(elem, styles) {
 			assert.isElement(elem, "Dom.getStyles(elem, styles): {elem} ~");
@@ -982,6 +1008,7 @@
 		 * 设置指定css属性的当前值。
 		 * @param {Element} elem 元素。
 		 * @param {Object} styles 需要收集的属性。
+	 	 * @static
 		 */
 		setStyles: function(elem, styles) {
 			assert.isElement(elem, "Dom.getStyles(elem, styles): {elem} ~");
@@ -992,6 +1019,7 @@
 		/**
 		 * 清空元素的 display 属性。
 		 * @param {Element} elem 元素。
+	 	 * @static
 		 */
 		show: function(elem) {
 			assert.isElement(elem, "Dom.show(elem): {elem} ~");
@@ -1001,18 +1029,19 @@
 
 			// 如果元素的 display 仍然为 none , 说明通过 CSS 实现的隐藏。这里默认将元素恢复为 block。
 			if(getStyle(elem, 'display') === 'none')
-				elem.style.display = System.getData(elem, 'display') || 'block';
+				elem.style.display = elem.style.$display || 'block';
 		},
 		
 		/**
 		 * 赋予元素的 display 属性 none。
 		 * @param {Element} elem 元素。
+	 	 * @static
 		 */
 		hide: function(elem) {
 			assert.isElement(elem, "Dom.hide(elem): {elem} ~");
 			var currentDisplay = styleString(elem, 'display');
 			if(currentDisplay !== 'none') {
-				System.setData(elem, 'display', currentDisplay);
+				elem.style.$display = currentDisplay;
 				elem.style.display = 'none';
 			}
 		},
@@ -1025,6 +1054,7 @@
 		 *            m b System t l r b h w 第二个字可以是下列字符之一: x y l t b r
 		 *            b。词语也可以是: outer inner 。
 		 * @return {Number} 计算值。 mx+sx -> 外大小。 mx-sx -> 内大小。
+	 	 * @static
 		 */
 		calc: (function() {
 
@@ -1096,6 +1126,7 @@
 		/**
 		 * 设置一个元素可拖动。
 		 * @param {Element} elem 要设置的节点。
+	 	 * @static
 		 */
 		movable: function(elem) {
 			assert.isElement(elem, "Dom.movable(elem): 参数 elem ~");
@@ -1107,6 +1138,7 @@
 		 * 获取元素的文档。
 		 * @param {Element} elem 元素。
 		 * @return {Document} 文档。
+	 	 * @static
 		 */
 		getDocument: getDocument,
 	
@@ -1146,7 +1178,7 @@
 									// return DomList
 									value = function() {
 										var r = new DomList;
-										return r.concat.extend(r, this.invoke(func, arguments));
+										return r.concat.apply(r, this.invoke(func, arguments));
 									};
 									break;
 								case 4:
@@ -1155,7 +1187,7 @@
 										var i = -1, item = null, target = new Dom();
 										while(++i < this.length && !item) {
 											target.dom = this[i];
-											item = target[func].extend(target, arguments);
+											item = target[func].apply(target, arguments);
 										}
 										return item;
 									};
@@ -1166,7 +1198,7 @@
 										var len = this.length, i = -1, target;
 										while(++i < len) {
 											target = new Dom(this[i]);
-											target[func].extend(target, arguments);
+											target[func].apply(target, arguments);
 										}
 										return this;
 									};
@@ -1224,7 +1256,7 @@
 
 		/**
 		 * 表示事件的参数。
-		 * @class Dom.Event
+		 * @constructor Dom.Event
 		 */
 		Event: Class({
 
@@ -1282,7 +1314,7 @@
 
 		/**
 		 * 文档对象。
-		 * @class Dom.Document 
+		 * @constructor Dom.Document 
 		 * @remark 因为 IE6/7 不存在这些对象, 文档对象是对原生 HTMLDocument 对象的补充。 扩展
 		 *        Document 也会扩展 HTMLDocument。
 		 */
@@ -1290,12 +1322,9 @@
 			prototype: document
 		})
 
-	});
+	})
 	
-	/**
-	 * @class Dom
-	 */
-	Dom.implement({
+	.implement({
 	
 		/**
 		 * 将当前节点添加到其它节点。
@@ -1960,7 +1989,7 @@
 		
 				// 绝对定位需要返回绝对位置。
 				if(styleString(elem, "position") === 'absolute') {
-					top = this.getOffsetParent();
+					top = this.offsetParent();
 					left = this.getPosition();
 					if(!rBody.test(top.dom.nodeName))
 						left = left.sub(top.getPosition());
@@ -2049,38 +2078,23 @@
 	.implement({
 		
 		// 父节点。
-		parent: createTreeWalker(true, 'parentNode'),
-		
-		// 全部父节点。
-		parentAll: createTreeWalker(false, 'parentNode'),
+		parent: createTreeWalker('parentNode'),
 
 		// 第一个节点。
-		first: createTreeWalker(true, 'nextSibling', 'firstChild'),
-
-		// 后面的节点。
-		next: createTreeWalker(true, 'nextSibling'),
-
-		// 前面的节点。
-		prev: createTreeWalker(true, 'previousSibling'),
-
-		// 后面的节点。
-		nextAll: createTreeWalker(false, 'nextSibling'),
+		first: createTreeWalker('nextSibling', 'firstChild'),
 
 		// 最后的节点。
-		last: createTreeWalker(true, 'previousSibling', 'lastChild'),
+		last: createTreeWalker('previousSibling', 'lastChild'),
 
-		// 第一个节点。
-		child: createTreeWalker(true, 'nextSibling', 'firstChild'),
+		// 后面的节点。
+		next: createTreeWalker('nextSibling'),
 
 		// 前面的节点。
-		prevAll: createTreeWalker(false, 'previousSibling'),
+		prev: createTreeWalker('previousSibling'),
 
 		// 全部子节点。
-		children: createTreeWalker(false, 'nextSibling', 'firstChild'),
-		
-		// 兄弟节点。
-		siblings: function(args) {
-			return this.prevAll(args).concat(this.nextAll(args));
+		children: function(args){
+			return dir(this.dom.firstChild, 'nextSibling', args);
 		},
 		
 		// 号次。
@@ -2093,21 +2107,31 @@
 					i++;
 			return i;
 		},
-
-		// 全部子节点。
-		all: function(args) {
-			if(!args)
-				args = '*';	
-			else if(typeof args === 'function')
-				return this.all().filter(args);
-			var r = new DomList, nodes = this.dom.getElementsByTagName(args), i = 0, node;
-			while( node = nodes[i++] ) {
-				if(node.nodeType === 1){
-					r.push(node);
-				}	
+		
+		/**
+		 * 获取全部满足要求的节点的集合。
+		 * @param {String} direction 遍历的方向方向，可以是以下值之一:
+		 * - previousSibling: 遍历当前节点以前的节点。
+		 * - previousSibling: 遍历当前节点以后的节点。
+		 * - parentNode: 遍历当前节点的父节点。
+		 */
+		getAll: function(direction, args){
+			switch(direction) {
+				case 'child':
+					return new DomList(this.dom.getElementsByTagName(args || '*'));
+				case 'next':
+					direction += 'Sibling';
+					break;
+				case 'prev':
+					direction += 'iousSibling';
+					break;
+				case 'parent':
+					direction += 'Node';
+					break;
+				case 'sibling':
+					return this.getAll('prev').concat(this.getAll('next'));
 			}
-
-			return r;
+			return dir(this.dom[direction], direction, args);
 		},
 
 		/**
@@ -2329,11 +2353,11 @@
 		/**
 		 * 插入一个HTML 。
 		 * @param {String/Dom} html 内容。
-		 * @return {Element} 元素。
+@return {Element} 元素。
 		 */
 		remove: function() {
 			var body = new Dom(this.body);
-			body.remove.extend(body, arguments);
+			body.remove.apply(body, arguments);
 			return this;
 		},
 		
@@ -2443,7 +2467,7 @@
 	t = {};
 	Dom.implement(map('on un trigger', function (name) {
 		t[name] = function () {
-			Dom.document[name].extend(Dom.document, arguments);
+			Dom.document[name].apply(Dom.document, arguments);
 			return this;
 		};
 
@@ -2461,7 +2485,7 @@
 
 	map("filter slice splice reverse unique", function(value) {
 		t[value] = function() {
-			return new DomList(ap[value].extend(this, arguments));
+			return new DomList(ap[value].apply(this, arguments));
 		};
 	});
 
@@ -2760,38 +2784,41 @@
 	 * @param {String} first=next 获取第一个成员使用的名字。
 	 * @return {Function} 遍历函数。
 	 */
-	function createTreeWalker(getFirst, next, first) {
+	function createTreeWalker(next, first) {
 		first = first || next;
-		return getFirst ? function(args) {
+		return function(args) {
 			var node = this.dom[first];
 			
-			// 如果参数为空，则表示仅仅获取第一个节点，加速本函数的执行。
-			if(args == null) {
-				while(node) {
-					if(node.nodeType === 1)
-						return new Dom(node);
-					node = node[next];
-				}
-			} else {
+			// 如果存在 args 编译为函数。
+			if(args){
 				args = getFilter(args);
-				while(node) {
-					if(args.call(this.dom, node))
-						return new Dom(node);
-					node = node[next];
-				}
+			}
+			
+			while(node) {
+				if(args ? args.call(this, node) : node.nodeType === 1)
+					return new Dom(node);
+				node = node[next];
 			}
 			
 			return null;
-		}: function(args) {
-			args = getFilter(args);
-			var node = this.dom[first], r = new DomList;
-			while(node) {
-				if(args.call(this.dom, node))
-					r.push(node);
-				node = node[next];
-			}
-			return r;
 		};
+	}
+	
+	function dir(node, next, args){
+			
+		// 如果存在 args 编译为函数。
+		if(args){
+			args = getFilter(args);
+		}
+		
+		var r = new DomList;
+		while(node){
+			if(args ? args.call(this, node) : node.nodeType === 1)
+				r.push(node);	
+			node = node[next];
+		}
+		
+		return r;
 	}
 	
 	/**
@@ -2802,48 +2829,36 @@
 	function getFilter(args) {
 		
 		// 如果存在 args，则根据不同的类型返回不同的检查函数。
-		if(args){
-			switch (typeof args) {
+		switch (typeof args) {
+			
+			// 数字返回一个计数器函数。
+			case 'number':
+				return function(elem) {
+					return elem.nodeType === 1 && --args < 0;
+				};
 				
-				// 数字返回一个计数器函数。
-				case 'number':
+			// 字符串，表示选择器。
+			case 'string':
+				if(/^(?:[-\w:]|[^\x00-\xa0]|\\.)+$/.test(args)) {
+					args = args.toUpperCase();
 					return function(elem) {
-						return elem.nodeType === 1 && --args < 0;
+						return elem.nodeType === 1 && elem.tagName === args;
 					};
-					
-				// 字符串，表示选择器。
-				case 'string':
-					if(/^(?:[-\w:]|[^\x00-\xa0]|\\.)+$/.test(args)) {
-						args = args.toUpperCase();
-						return function(elem) {
-							return elem.nodeType === 1 && elem.tagName === args;
-						};
-					}
-					return args === '*' ? isElement : function(elem) {
-						return elem.nodeType === 1 && Dom.match(elem, args);
-					};
-					
-				// 布尔类型，而且是 true, 返回 Function.from(true)，  表示不过滤。
-				case 'boolean':
-					return Function.from(true);
+				}
+				return args === '*' ? null : function(elem) {
+					return elem.nodeType === 1 && Dom.match(elem, args);
+				};
 				
-			}
-	
-			assert.isFunction(args, "Dom.prototype.getXXX(args): {args} 必须是一个函数、空、数字或字符串。", args);
+			// 布尔类型，而且是 true, 返回 Function.from(true)，  表示不过滤。
+			case 'boolean':
+				args = returnTrue;
+				break;
 			
-		} else {
-			
-			// 默认返回只判断节点的函数。
-			args = isElement;
 		}
+
+		assert.isFunction(args, "Dom.prototype.getAll(direction, args): {args} 必须是一个函数、空、数字或字符串。", args);
+		
 		return args;
-	}
-	
-	/**
-	 * 判断一个节点是否为元素。
-	 */
-	function isElement(elem){
-		return elem.nodeType === 1;
 	}
 	
 	/**
@@ -2879,7 +2894,7 @@
 		if(cloneEvent !== false) {
 			
 		    // event 作为系统内部对象。事件的拷贝必须重新进行 on 绑定。
-		    var event = System.getData(srcElem, '$event'), dest;
+		    var event = srcElem.$data && srcElem.$data.$event, dest;
 
 		    if (event) {
 		    	dest = new Dom(destElem);
@@ -2953,8 +2968,8 @@
 
 			if(!value && value !== 0) {
 				if( name in styleFix) {
-					var style = Dom.getStyles(elem, Dom.display);
-					Dom.setStyles(elem, Dom.display);
+					var style = Dom.getStyles(elem, Dom.displayFix);
+					Dom.setStyles(elem, Dom.displayFix);
 					value = parseFloat(getStyle(elem, name)) || 0;
 					Dom.setStyles(elem, style);
 				} else {
@@ -3008,7 +3023,13 @@
 	 */
 	function query(selector, result) {
 
-		var prevResult = result, rBackslash = /\\/g, m, key, value, lastSelector, filterData;
+		var prevResult = result,
+			rBackslash = /\\/g, 
+			m, 
+			key, 
+			value, 
+			lastSelector, 
+			filterData;
 		
 		selector = selector.trim();
 
@@ -3043,7 +3064,7 @@
 							
 						// ‘*’ ‘tagName’
 						default:
-							result = result.all(m[2].replace(rBackslash, ""));
+							result = result.getAll('child', m[2].replace(rBackslash, ""));
 							break;
 								
 					}
@@ -3054,23 +3075,49 @@
 					
 				// 无法加速，等待第四步进行过滤。
 				} else {
-					result = result.all();
+					result = result.getAll('child');
 				}
 			
 			// 解析的第二步: 解析父子关系操作符(比如子节点筛选)
 			
 			// ‘a>b’ ‘a+b’ ‘a~b’ ‘a b’ ‘a *’
-			} else if(m = /^\s*([\s>+~])\s*(\*|(?:[-\w*]|[^\x00-\xa0]|\\.)*)/.exec(selector)) {
+			} else if(m = /^\s*([\s>+~<])\s*(\*|(?:[-\w*]|[^\x00-\xa0]|\\.)*)/.exec(selector)) {
 				selector = RegExp.rightContext;
-				result = result[Dom.combinators[m[1]] || throwError(m[1])](m[2].replace(rBackslash, ""));
-
+				
+				var value = m[2].replace(rBackslash, "");
+				
+				switch(m[1]){
+					case ' ':
+						result = result.getAll('child', value);
+						break;
+						
+					case '>':
+						result = result.children(value);
+						break;
+						
+					case '+':
+						result = result.next(value);
+						break;
+						
+					case '~':
+						result = result.getAll('next', value);
+						break;
+						
+					case '<':
+						result = result.getAll('parent', value);
+						break;
+						
+					default:
+						throwError(m[1]);
+				}
+				
 				// ‘a>b’: m = ['>', 'b']
 				// ‘a>.b’: m = ['>', '']
 				// result 始终实现了 IDom 接口，所以保证有 Dom.combinators 内的方法。
 
 			// 解析的第三步: 解析剩余的选择器:获取所有子节点。第四步再一一筛选。
 			} else {
-				result = result.all();
+				result = result.getAll('child');
 			}
 			
 			// 解析的第四步: 筛选以上三步返回的结果。

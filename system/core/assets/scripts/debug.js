@@ -91,10 +91,11 @@ function using(ns, isStyle) {
     assert.isString(ns, "using(ns): {ns} 不是合法的名字空间。");
     
     var cache = using[isStyle ? 'styles' : 'scripts'];
-
-    // 已经载入。
-    if (cache.indexOf(ns) >= 0)
-        return;
+	
+	for(var i = 0; i < cache.length; i++){
+		if(cache[i] === ns)
+			return;
+	}
         
     cache.push(ns);
 
@@ -136,7 +137,7 @@ function using(ns, isStyle) {
 	}
     
     callback(using.rootPath + ns + exts[0]);
-};
+}
 
 /**
  * 导入指定名字空间表示的样式文件。
@@ -144,7 +145,7 @@ function using(ns, isStyle) {
  */
 function imports(ns){
     return using(ns, true);
-};
+}
 
 (function(){
 	
@@ -714,11 +715,11 @@ function imports(ns){
          */
         time: function(fn, times) {
             times = times || 1000;
-            var d = Date.now();
+            var d = new Date();
             while (times-- > 0)
                 fn();
-            times = Date.now() - d;
-            trace("[时间] " + times);
+            times = new Date() - d;
+            window.trace("[时间] " + times);
         }
 
     });
