@@ -108,13 +108,23 @@ Fx.Base = (function(){
 			var me = this;
             if (me.defer(options, link))
                 return me;
-			me.init(options);
-			me.set(0);
-			me.time = 0;
+			
+			var duration = this.duration;
+			Object.extend(me, options);
+			
+			// 防止 duration 覆盖了值。
+			if(options.duration == undefined)
+				me.duration = duration;
+			else if(options.duration < 0)
+				me.duration = duration / -options.duration;
 
 			if (me.start) {
 				me.start(options);
 			}
+		
+			me.init(options);
+			me.set(0);
+			me.time = 0;
 			
 			me.resume();
 			return me;

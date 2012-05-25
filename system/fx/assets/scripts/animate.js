@@ -156,15 +156,9 @@ using("System.Dom.Base");
 					form,
 					to,
 					key;
-
-				Object.extend(this, options);
-				
+					
 				// 生成新的 current 对象。
 				me.current = {};
-
-				if (this.start) {
-					this.start(options);
-				}
 
 				from = this.from || emptyObj;
 				to = this.to;
@@ -209,7 +203,7 @@ using("System.Dom.Base");
 							parser: parser
 						};
 						
-						assert(me.current[key].from !== null && me.current[key].to !== null, "Animate.prototype.complie(from, to): 无法正确获取属性 {key} 的值({from} {to})。", key, me.current[key].from, me.current[key].to);
+						assert(me.current[key].from !== null && me.current[key].to !== null, "Animate.prototype.init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, me.current[key].from, me.current[key].to);
 					}
 					
 				}
@@ -324,22 +318,24 @@ using("System.Dom.Base");
 	
 	var height = 'height marginTop paddingTop marginBottom paddingBottom',
 		
-		maps = Animate.maps = {
+		maps = Animate.maps =  Object.map({
 			all: height + ' opacity width',
 			opacity: 'opacity',
 			height: height,
 			width: 'width marginLeft paddingLeft marginRight paddingRight'
-		},
+		}, function(value){
+			return Object.map(value, Function.from(0), {});
+		}),
 	
 		ep = Dom.prototype,
 		show = ep.show,
 		hide = ep.hide;
 	
-	Object.map(maps, function(value){
-		return Object.map(value, Function.from(0), {});
-	}, maps);
-	
 	Object.map('left right top bottom', Function.from({$slide: true}), maps);
+	
+	
+	///// TODO
+	
 	
 	Dom.implement({
 		
@@ -348,7 +344,8 @@ using("System.Dom.Base");
 		 * @return {Animate} 一个 Animate 的实例。
 		 */
 		fx: function(){
-			return p.getData(this, 'fx') || p.setData(this, 'fx', new Fx.Animate(this));
+			var data = this.dataField();
+			return data.$fx || (data.$fx = new Fx.Animate(this));
 		}
 		
 	}, 2)
@@ -360,33 +357,24 @@ using("System.Dom.Base");
 		 * @param {String/Object} [name] 变化的名字或变化的末值或变化的初值。
 		 * @param {Object} value 变化的值或变化的末值。
 		 * @param {Number} duration=-1 变化的时间。
-		 * @param {Function} [onStop] 停止回调。
+		 * @param {Function} [oncomplete] 停止回调。
 		 * @param {Function} [onStart] 开始回调。
 		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 rerun 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
 		 * @return this
 		 */
-		animate: function (from, to, duration, onstop, onstart, link) {
-			if (typeof to === 'string') {
-				var t = {};
-				t[from] = to;
-				to = t;
-				from = null;
-			} else if (typeof to !== 'object') {
-				link = onstart;
-				onstart = onstop;
-				onstop = duration;
-				to = from;
-				from = null;
+		animate: function (params, duration, callback, link) {
+			if(params.to){
+				link = duration;
+			} else {
+				params = {
+					target: this,
+					to: params,
+					duration: duration,
+					complete: callback
+				};
 			}
-
-			this.fx().run({
-				target: this,
-				duration: duration === undefined ? Fx.Base.prototype.duration : duration,
-				complete: onstop,
-				start: onstart,
-				from: from,
-				to: to
-			}, link);
+			
+			this.fx().run(params, link);
 			
 			return this;
 		},
@@ -394,121 +382,174 @@ using("System.Dom.Base");
 		/**
 		 * 显示当前元素。
 		 * @param {Number} duration=500 时间。
-		 * @param {Function} [callBack] 回调。
+		 * @param {Function} [callback] 回调。
 		 * @param {String} [type] 方式。
 		 * @return {Element} this
 		 */
-		show: function(duration, callBack, type, link){
-			var me = this;
-			if (duration) {
-				var elem = me.dom, savedStyle = {};
-		       
-				me.fx().run({
-					from: getAnimate(type),
-					to: {},
-					duration: duration,
-					start: function () {
-						var from = this.from,
-							to = this.to;
-						if (!Dom.isHidden(elem))
-							return false;
-						Dom.show(elem);
-
-						if (from.$slide) {
-							initSlide(from, elem, type, savedStyle);
-						} else {
-							savedStyle.overflow = elem.style.overflow;
-							elem.style.overflow = 'hidden';
-						}
-
-						for (var style in from) {
-							savedStyle[style] = elem.style[style];
-							to[style] = Dom.styleNumber(elem, style);
-						}
-					},
-					complete:  function(){
-						Dom.setStyles(elem, savedStyle);
-					
-						if(callBack)
-							callBack.call(me, true);
-					}
-				}, link);
-			} else {
-				show.apply(me, arguments);
+		show: function(duration, callback, link){
+			var me = this,
+				type = 'opacity';
+			
+			// 肯能是同步的请求。
+			if(arguments.length == 0){
+				Dom.show(me.dom);
+				return me;
 			}
+			
+			if(typeof duration === 'string'){
+				type = duration;
+				duration = callback;
+				link = arguments[3];
+			}
+		
+			me.fx().run({
+				target: this,
+				duration: duration,
+				start: function (options) {
+					
+					var elem = this.target.dom;
+					
+					var from = this.from = getAnimate(type),
+						to = this.to = {},
+						orignal = this.orignal = {};
+						
+					if(!Dom.isHidden(elem)){
+						return;
+					}
+					
+					Dom.show(elem);
+
+					if (from.$slide) {
+						initSlide(from, elem, type, orignal);
+					} else {
+						orignal.overflow = elem.style.overflow;
+						elem.style.overflow = 'hidden';
+					}
+
+					for (var style in from) {
+						orignal[style] = elem.style[style];
+						to[style] = Dom.styleNumber(elem, style);
+					}
+				},
+				complete:  function(){
+					Object.extend(this.target.dom.style, this.orignal);
+				
+					if(callback)
+						callback.call(this.target, true);
+				}
+			}, link);
+		
 			return me;
 		},
 		
 		/**
 		 * 隐藏当前元素。
 		 * @param {Number} duration=500 时间。
-		 * @param {Function} [callBack] 回调。
+		 * @param {Function} [callback] 回调。
 		 * @param {String} [type] 方式。
 		 * @return {Element} this
 		 */
-		hide: function (duration, callBack, type) {
-			var me = this;
-			if (duration) {
-				var  elem = me.dom || me, savedStyle = {};
-				me.fx().run({
-					from: null,
-					to: getAnimate(type),
-					duration: duration,
-					start: function () {
-						var to = this.to;
-						if (Dom.isHidden(elem))
-							return false;
-						if (to.$slide) {
-							initSlide(to, elem, type, savedStyle);
-						} else {
-							savedStyle.overflow = elem.style.overflow;
-							elem.style.overflow = 'hidden';
-						}
-						for (var style in to) {
-							savedStyle[style] = elem.style[style];
-						}
-					},
-					complete: function () {
-						Dom.hide(elem);
-						Dom.setStyles(elem, savedStyle);
-						if (callBack)
-							callBack.call(me, false);
-					}
-				});
-			}else{
-				hide.apply(me, arguments);
+		hide: function (duration, callback, type) {
+			var me = this,
+				type = 'opacity';
+			
+			// 肯能是同步的请求。
+			if(arguments.length == 0){
+				Dom.hide(me.dom);
+				return me;
 			}
+			
+			if(typeof duration === 'string'){
+				type = duration;
+				duration = callback;
+				link = arguments[3];
+			}
+		
+			me.fx().run({
+				duration: duration,
+				start: function () {
+					
+					var elem = this.target.dom;
+					
+					var to = this.to = getAnimate(type),
+						orignal = this.orignal = {};
+						
+					if(Dom.isHidden(elem)){
+						return;
+					}
+					if (to.$slide) {
+						initSlide(to, elem, type, orignal);
+					} else {
+						orignal.overflow = elem.style.overflow;
+						elem.style.overflow = 'hidden';
+					}
+					
+					for (var style in to) {
+						orignal[style] = elem.style[style];
+					}
+				},
+				complete: function () {
+					
+					var elem = this.target.dom;
+					Object.extend(elem.style, this.orignal);
+					Dom.hide(elem);
+					if (callback)
+						callback.call(this.target, false);
+				}
+			});
+			
 			return this;
 		},
 	
+		toggle: function(){
+			var args = arguments;
+			this.fx().then(function(){
+				this.target[Dom.isHidden(this.target.dom) ? 'show' : 'hide'].apply(this.target, args);
+				return false;
+			});
+		},
+		
 		/**
 		 * 高亮元素。
 		 * @param {String} color 颜色。
-		 * @param {Function} [callBack] 回调。
+		 * @param {Function} [callback] 回调。
 		 * @param {Number} duration=500 时间。
 		 * @return this
 		 */
-		highlight: function(color, duration, callBack){
-			assert(!callBack || Object.isFunction(callBack), "Dom.prototype.highlight(color, duration, callBack): 参数 {callBack} 不是可执行的函数。", callBack);
+		highlight: function(color, duration, callback){
+			assert(!callback || Object.isFunction(callback), "Dom.prototype.highlight(color, duration, callback): 参数 {callback} 不是可执行的函数。", callback);
 			var from = {},
 				to = {
 					backgroundColor: color || '#ffff88'
-				};
+				},
+				fx = this.fx();
 			
-			duration /= 2;
+			fx.run({
+				target: this,
+				from: from,
+				to: to,
+				duration: duration,
+				start: function(options){
+					options.from.backgroundColor = Dom.getStyle(this.target.dom, 'backgroundColor');
+				}
+			}).run({
+				target: this,
+				from: to,
+				to: from,
+				duration: duration,
+				stop: callback
+			});
 			
-			this.animate(from, to, duration, null, function (from) {
-				from.backgroundColor = Dom.getStyle(this.target.dom, 'backgroundColor');
-			}).animate(to, from, duration, callBack);
 			return this;
 		}
+	
 	});
 	
 	/**
 	 * 获取变换。
 	 */
 	function getAnimate(type){
-		return Object.extend({}, maps[type || 'opacity']);
+		return Object.extend({}, maps[type]);
 	}
 	
 	/**

@@ -988,35 +988,6 @@
 		styleNumber: styleNumber,
 
 		/**
-		 * 获取指定css属性的当前值。
-		 * @param {Element} elem 元素。
-		 * @param {Object} styles 需要收集的属性。
-		 * @return {Object} 收集的属性。
-	 	 * @static
-		 */
-		getStyles: function(elem, styles) {
-			assert.isElement(elem, "Dom.getStyles(elem, styles): {elem} ~");
-
-			var r = {};
-			for(var style in styles) {
-				r[style] = elem.style[style];
-			}
-			return r;
-		},
-		
-		/**
-		 * 设置指定css属性的当前值。
-		 * @param {Element} elem 元素。
-		 * @param {Object} styles 需要收集的属性。
-	 	 * @static
-		 */
-		setStyles: function(elem, styles) {
-			assert.isElement(elem, "Dom.getStyles(elem, styles): {elem} ~");
-
-			extend(elem.style, styles);
-		},
-
-		/**
 		 * 清空元素的 display 属性。
 		 * @param {Element} elem 元素。
 	 	 * @static
@@ -2332,6 +2303,10 @@
 	 */
 	Dom.Document.implement({
 		
+		dataField: function(){
+			return this.$data;
+		},
+		
 		/**
 		 * 插入一个HTML 。
 		 * @param {String/Dom} html 内容。
@@ -2968,10 +2943,15 @@
 
 			if(!value && value !== 0) {
 				if( name in styleFix) {
-					var style = Dom.getStyles(elem, Dom.displayFix);
-					Dom.setStyles(elem, Dom.displayFix);
+					
+					var styles = {};
+					for(var style in Dom.displayFix) {
+						styles[style] = elem.style[style];
+					}
+					
+					extend(elem.style, Dom.displayFix);
 					value = parseFloat(getStyle(elem, name)) || 0;
-					Dom.setStyles(elem, style);
+					extend(elem.style, styles);
 				} else {
 					value = 0;
 				}

@@ -1477,6 +1477,15 @@
 
 /// #if !Publish
 
+System.Base.prototype.toString = function(){
+	for(var item in window){
+		if(window[item] === this.constructor)
+			return item;	
+	}
+		
+	return "Object";
+};
+
 /**
  * Debug Tools
  */

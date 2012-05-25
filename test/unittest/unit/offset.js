@@ -264,8 +264,15 @@ testoffset("static", function( iframe ) {
 testoffset("fixed", function( iframe ) {
 
 
-if(navigator.isIE6)
+if(navigator.isIE6) {
+	
+	
+	expect(0);
+	
+	
 	return
+	
+}
 
 	var document = iframe.document ;
 
