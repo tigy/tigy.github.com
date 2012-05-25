@@ -29,6 +29,7 @@ var Deferrable = Class({
 			firstTask[0].run(firstTask[1]);
 		}
 
+		return this;
 		
 	},
 

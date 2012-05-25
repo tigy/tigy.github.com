@@ -118,8 +118,8 @@ Fx.Base = (function(){
 			else if(options.duration < 0)
 				me.duration = duration / -options.duration;
 
-			if (me.start) {
-				me.start(options);
+			if (me.start && me.start(options) === false) {
+				return me.progress();
 			}
 		
 			me.init(options);
@@ -136,7 +136,7 @@ Fx.Base = (function(){
 			if(this.complete){
 				this.complete();
 			}
-			this.progress();
+			return this.progress();
 		},
 		
 		/**

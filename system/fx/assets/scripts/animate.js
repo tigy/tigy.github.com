@@ -8,22 +8,10 @@ using("System.Fx.Base");
 using("System.Dom.Base");
 
 
-(function(p){
+(function(){
 	
 	
 	/// #region 字符串扩展
-	
-	/**
-	 * 表示 十六进制颜色。
-	 * @type RegExp
-	 */
-	var rhex = /^#([\da-f]{1,2})([\da-f]{1,2})([\da-f]{1,2})$/i,
-	
-		/**
-		 * 表示 RGB 颜色。
-		 * @type RegExp
-		 */
-		rRgb = /(\d+),\s*(\d+),\s*(\d+)/;
 	
 	/**
 	 * @namespace String
@@ -39,7 +27,7 @@ using("System.Dom.Base");
 			assert.isString(hex, "String.hexToArray(hex): 参数 {hex} ~。");
 			if(hex == 'transparent')
 				return [255, 255, 255];
-			var m = hex.match(rhex);
+			var m = hex.match(/^#([\da-f]{1,2})([\da-f]{1,2})([\da-f]{1,2})$/i);
 			if(!m)return null;
 			var i = 0, r = [];
 			while (++i <= 3) {
@@ -56,7 +44,7 @@ using("System.Dom.Base");
 		 */
 		rgbToArray: function(rgb){
 			assert.isString(rgb, "String.rgbToArray(rgb): 参数 {rgb} ~。");
-			var m = rgb.match(rRgb);
+			var m = rgb.match(/(\d+),\s*(\d+),\s*(\d+)/);
 			if(!m) return null;
 			var i = 0, r = [];
 			while (++i <= 3) {
@@ -314,29 +302,61 @@ using("System.Dom.Base");
 		return v;
 	}
 	
-	/// #region 元素
+	/// #region Dom
 	
 	var height = 'height marginTop paddingTop marginBottom paddingBottom',
 		
-		maps = Animate.maps =  Object.map({
-			all: height + ' opacity width',
-			opacity: 'opacity',
-			height: height,
-			width: 'width marginLeft paddingLeft marginRight paddingRight'
-		}, function(value){
-			return Object.map(value, Function.from(0), {});
-		}),
+		return0 = Function.from(0),
 	
 		ep = Dom.prototype,
 		show = ep.show,
 		hide = ep.hide;
+		
+	Fx.toggleTypes = {};
+		
+	Fx.toggleTypes.opacity = Function.from({opacity: 0});
+
+	Object.each({
+		all: height + ' opacity width',
+		height: height,
+		width: 'width marginLeft paddingLeft marginRight paddingRight'
+	}, function(value, key){
+		value = Object.map(value, return0, {});
+		Fx.toggleTypes[key] = function(animate, elem){
+			animate.orignal.overflow = elem.style.overflow;
+			elem.style.overflow = 'hidden';
+			
+			return value;
+		};
+	});
 	
-	Object.map('left right top bottom', Function.from({$slide: true}), maps);
-	
-	
-	///// TODO
-	
-	
+	Object.map('left right top bottom', function(key, index){
+		Fx.toggleTypes[key] = function(animate, elem, show){
+			
+			var from = animate.from = {},
+				to = animate.to = {};
+			
+			if(show) {
+				to = from;
+				from = animate.to;
+			}
+			
+			elem.parentNode.style.overflow = 'hidden';
+			if(index <= 1){
+				from[key] = -elem.offsetWidth;
+				var margin2 = index === 0 ? 'marginRight' : 'marginLeft';
+				from[margin2] = elem.offsetWidth;
+				to[key] = to[margin2] = 0;
+			} else {
+				from[key] = -elem.offsetHeight;
+				to[key] = 0;
+			}
+		
+		};
+		
+		key = 'margin' + key.capitalize();
+	});
+
 	Dom.implement({
 		
 		/**
@@ -391,7 +411,7 @@ using("System.Dom.Base");
 				type = 'opacity';
 			
 			// 肯能是同步的请求。
-			if(arguments.length == 0){
+			if(!duration){
 				Dom.show(me.dom);
 				return me;
 			}
@@ -399,6 +419,7 @@ using("System.Dom.Base");
 			if(typeof duration === 'string'){
 				type = duration;
 				duration = callback;
+				callback = link;
 				link = arguments[3];
 			}
 		
@@ -408,27 +429,30 @@ using("System.Dom.Base");
 				start: function (options) {
 					
 					var elem = this.target.dom;
-					
-					var from = this.from = getAnimate(type),
-						to = this.to = {},
-						orignal = this.orignal = {};
 						
 					if(!Dom.isHidden(elem)){
-						return;
+						if(callback)
+							callback.call(this.target, true, true);
+						return false;
 					}
 					
 					Dom.show(elem);
-
-					if (from.$slide) {
-						initSlide(from, elem, type, orignal);
-					} else {
-						orignal.overflow = elem.style.overflow;
-						elem.style.overflow = 'hidden';
+					
+					this.orignal = {};
+					
+					var from = Fx.toggleTypes[type](this, elem, false);
+					
+					if(from){
+						this.from = from;
+						this.to = {};	
+							
+						for(from in this.from) {
+							this.to[from] = Dom.styleNumber(elem, from);
+						}
 					}
-
-					for (var style in from) {
-						orignal[style] = elem.style[style];
-						to[style] = Dom.styleNumber(elem, style);
+					
+					for(from in this.to){
+						this.orignal[from] = elem.style[from];
 					}
 				},
 				complete:  function(){
@@ -449,12 +473,12 @@ using("System.Dom.Base");
 		 * @param {String} [type] 方式。
 		 * @return {Element} this
 		 */
-		hide: function (duration, callback, type) {
+		hide: function (duration, callback, link) {
 			var me = this,
 				type = 'opacity';
 			
 			// 肯能是同步的请求。
-			if(arguments.length == 0){
+			if(!duration){
 				Dom.hide(me.dom);
 				return me;
 			}
@@ -462,6 +486,7 @@ using("System.Dom.Base");
 			if(typeof duration === 'string'){
 				type = duration;
 				duration = callback;
+				callback = link;
 				link = arguments[3];
 			}
 		
@@ -470,22 +495,24 @@ using("System.Dom.Base");
 				start: function () {
 					
 					var elem = this.target.dom;
-					
-					var to = this.to = getAnimate(type),
-						orignal = this.orignal = {};
 						
 					if(Dom.isHidden(elem)){
-						return;
-					}
-					if (to.$slide) {
-						initSlide(to, elem, type, orignal);
-					} else {
-						orignal.overflow = elem.style.overflow;
-						elem.style.overflow = 'hidden';
+						if(callback)
+							callback.call(this.target, false, true);
+						return false;
 					}
 					
-					for (var style in to) {
-						orignal[style] = elem.style[style];
+					this.orignal = {};
+					
+					var to = Fx.toggleTypes[type](this, elem, true);
+					
+					if(to){
+						this.from = null;
+						this.to = to;
+					}
+					
+					for(var i in this.to){
+						this.orignal[i] = elem.style[i];
 					}
 				},
 				complete: function () {
@@ -529,8 +556,8 @@ using("System.Dom.Base");
 				from: from,
 				to: to,
 				duration: duration,
-				start: function(options){
-					options.from.backgroundColor = Dom.getStyle(this.target.dom, 'backgroundColor');
+				start: function(){
+					this.from.backgroundColor = Dom.getStyle(this.target.dom, 'backgroundColor');
 				}
 			}).run({
 				target: this,
@@ -545,32 +572,8 @@ using("System.Dom.Base");
 	
 	});
 	
-	/**
-	 * 获取变换。
-	 */
-	function getAnimate(type){
-		return Object.extend({}, maps[type]);
-	}
-	
-	/**
-	 * 初始化滑动变换。
-	 */
-	function initSlide(animate, elem, type, savedStyle){
-		delete animate.$slide;
-		elem.parentNode.style.overflow = 'hidden';
-		var margin = 'margin' + type.charAt(0).toUpperCase() + type.substr(1);
-		if(/^(l|r)/.test(type)){
-			animate[margin] = -elem.offsetWidth;
-			var margin2 = type.length === 4 ? 'marginRight' : 'marginLeft';
-			animate[margin2] = elem.offsetWidth;
-			savedStyle[margin2] = elem.style[margin2];
-		} else {
-			animate[margin] = -elem.offsetHeight;
-		}
-		 savedStyle[margin] = elem.style[margin];
-	}
-	
+				
 
 	/// #endregion
 	
-})(System);
+})();
