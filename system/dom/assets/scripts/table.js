@@ -313,7 +313,7 @@ namespace(".HtmlTable", System.Control.extend({
 
 		var rel;
 		if (!Browser.ie){
-			rel = this.body.getParent();
+			rel = this.body.parent();
 			this.body.dispose();
 		}
 

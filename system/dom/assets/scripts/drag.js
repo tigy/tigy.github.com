@@ -223,7 +223,7 @@ Dom.implement({
 	 * @return this
 	 */
 	draggable: function(handle) {
-		var draggable = System.getData(this, 'draggable');
+		var draggable = this.dataField().draggable;
 		if(handle !== false) {
 			if (handle === true) handle = null;
 			if(draggable) {

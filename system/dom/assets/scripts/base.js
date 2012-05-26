@@ -807,6 +807,10 @@
 			assert(className && (!className.indexOf || !/[\s\r\n]/.test(className)), "Dom.hasClass(elem, className): {className} 不能空，且不允许有空格和换行。");
 			return (" " + elem.className + " ").indexOf(" " + className + " ") >= 0;
 		},
+			
+		dataField: function(elem){
+			return Dom.prototype.dataField.call({dom: elem});
+		},
 		
 		/**
 		 * 特殊属性集合。

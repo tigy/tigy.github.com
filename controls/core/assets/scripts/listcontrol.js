@@ -28,7 +28,7 @@ var ListControl = ScrollableControl.extend({
 		}
 		
 		index = this.controls[index];
-		this.container.insertBefore(childControl, index && index.getParent());
+		this.container.insertBefore(childControl, index && index.parent());
 		
 		// 更新选中项。
 		if(this.baseGetSelected(childControl)){
@@ -40,7 +40,7 @@ var ListControl = ScrollableControl.extend({
 	onControlRemoved: function(childControl, index){
 		var t = childControl;
 		if(childControl.dom.tagName !== 'LI'){
-			childControl = childControl.getParent();
+			childControl = childControl.parent();
 			childControl.removeChild(t);
 		}
 		
@@ -57,7 +57,7 @@ var ListControl = ScrollableControl.extend({
 	 * 获取指定子控件的最外层 <li>元素。
 	 */
 	getContainerOf: function(childControl){
-		return childControl.dom.tagName === 'LI' ? childControl : childControl.getParent('li');
+		return childControl.dom.tagName === 'LI' ? childControl : childControl.parent('li');
 	},
 	
 	/**
@@ -86,7 +86,7 @@ var ListControl = ScrollableControl.extend({
 		this.addClass(classNamePreFix);
 		
 		// 获取容器。
-		var container = this.container = this.getFirst('ul');
+		var container = this.container = this.first('ul');
 		if(container) {
 			// 已经存在了一个 UL 标签，转换为 items 属性。
 			this.controls.addRange(container.query('>li').addClass(classNamePreFix + '-content'));

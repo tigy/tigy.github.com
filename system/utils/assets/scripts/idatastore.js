@@ -16,7 +16,7 @@ var IDataStore = {
 	 * @return {Object} 值。
 	 */
 	getData: function(type){
-		return System.getData(this, type);
+		return this.dataField()[type];
 	},
 	
 	/**
@@ -27,6 +27,6 @@ var IDataStore = {
 	 * @param {mixed} data 内容。
 	 */
 	setData: function(type, data){
-		return System.setData(this, type, data);
+		return this.dataField()[type] = data;
 	}
 };

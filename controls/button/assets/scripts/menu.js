@@ -153,7 +153,7 @@ var Menu = ListControl.extend({
 	 */
 	showAt: function(x, y){
 		
-		if(!this.getParent('body')){
+		if(!this.parent('body')){
 			this.appendTo();
 		}
 		
@@ -171,8 +171,8 @@ var Menu = ListControl.extend({
 	 */
 	showBy: function(ctrl, pos, offsetX, offsetY, enableReset){
 		
-		if(!this.getParent('body')){
-			this.appendTo(ctrl.getParent());
+		if(!this.parent('body')){
+			this.appendTo(ctrl.parent());
 		}
 		
 		// 显示节点。

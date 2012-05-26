@@ -57,17 +57,14 @@
 			
 			var testcases = {
 				'Control': '-',
-				'ListControl.prototype.append': "@c; d; e",
-				'ListControl.prototype.remove': "@c; d",
+				'ListControl.prototype.append': "c.append(d);c.append(e);",
+				'ListControl.prototype.remove': "c.remove(e)",
 
 				'ListControl#items': '-',
-				'ListControl.prototype.items.add': "@c; 'add'",
-				'ListControl.prototype.items.insert': "@c; 2, 'insert'",
-				'ListControl.prototype.items.length': {
-					tests: "@c;",
-					method: false
-				},
-				'ListControl.prototype.items.removeAt': "@c; 0"
+				'ListControl.prototype.items.add': "c.items.add('add')",
+				'ListControl.prototype.items.insert': "c.items.insert(2, 'insert')",
+				'ListControl.prototype.items.length': "c.items.length",
+				'ListControl.prototype.items.removeAt': "c.items.removeAt(0)"
 			};
 			
 			Demo.writeTestCases(testcases);
