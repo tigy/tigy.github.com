@@ -231,7 +231,7 @@ Dom.implement({
 				draggable.draggable();
 			} else  {
 				Dom.movable(this.dom);
-				draggable = System.setData(this, 'draggable', new Draggable(this, handle));
+				draggable = this.dataField().draggable = new Draggable(this, handle);
 			}
 			
 			

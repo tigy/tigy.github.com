@@ -134,7 +134,7 @@ var Menu = ListControl.extend({
 		me.base('init');
 		
 		// 绑定节点和控件，方便发生事件后，根据事件源得到控件。
-		System.setData(this.dom, 'menu', this);
+		this.dataField().menu = this;
 	},
 	
 	showMenu: function(){
