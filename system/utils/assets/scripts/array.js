@@ -255,3 +255,84 @@ Array.implementIf({
 });
 
 
+// 
+// 
+// 		
+		// /**
+		 // * 如果目标数组不存在值，则拷贝，否则忽略。
+		 // * @static
+		 // * @param {Array} src 来源数组。
+		 // * @param {Array} dest 目标数组。
+		 // * @example
+		 // * <code>
+		 // * Array.copyIf([4,6], [4, 7]); // [4, 7, 6]
+		 // * </code>
+		 // */
+		// copyIf: function(src, dest) {
+// 			
+			// for(var i = 0; i < src.length; i++)
+				// dest.include(src[i]);
+		// },
+// 		
+// 
+		// /**
+		 // * 把传入的值连接为新的数组。如果元素本身是数组，则合并。此函数会过滤存在的值。
+		 // * @static
+		 // * @param {Object} ... 数据成员。
+		 // * @return {Array} 新数组。
+		 // * @example
+		 // * <code>
+		 // * Array.plain([4,6], [[4], 7]); // [4, 7, 6]
+		 // * </code>
+		 // */
+		// plain: function() {
+// 
+			// var r = [];
+// 			
+			// // 对每个参数
+			// ap.forEach.call(arguments, function(d) {
+// 				
+// 				
+				// // 如果数组，把内部元素压入r。
+				// if (Array.isArray(d)) Array.copyIf(d, r);
+// 				
+				// // 不是数组，直接压入 r 。
+				// else r.include(d);
+			// });
+// 
+			// return r;
+		// },
+// 
+// 
+// ,
+// 		
+		// /**
+		 // * 创建当前 Object 的浅表副本。
+		 // * @return {Object} 当前变量的副本。
+		 // * @protected
+		 // * @example
+		 // * <code>
+		 // * var MyBa = new Class({
+		 // *    clone: function() {
+		 // * 	     return this.memberwiseClone();
+		 // *    }
+		 // * });
+		 // * </code>
+		 // */
+		// memberwiseClone : function() {
+// 			
+			// // 创建一个同类。
+			// var me = this, newObject = new me.constructor(), i;
+// 			
+			// // 复制自身。
+			// for(i in me) {
+				// if(hasOwnProperty.call(me, i)) {
+					// newObject[i] = me[i];
+				// }
+			// }
+// 			
+			// return newObject;
+		// }
+// 
+
+
