@@ -71,6 +71,11 @@
 			 */
 			dom: null,
 			
+			/**
+			 * 获取当前类对应的数据字段。
+			 * @proteced override
+			 * @returns {Object} 一个可存储数据的对象。
+			 */
 			dataField: function(){
 				
 				// 由于 IE 6/7 即将退出市场。此处忽略 IE 6/7 内存泄露问题。
@@ -134,6 +139,8 @@
 		/**
 		 * 表示节点的集合。用于批量操作节点。
 		 * @class DomList
+		 * @extends Dom
+		 * @remark
 		 * DomList 是对元素数组的只读包装。 DomList 允许快速操作多个节点。 DomList 的实例一旦创建，则不允许修改其成员。
 		 */
 		DomList = Class({
@@ -1231,7 +1238,7 @@
 
 		/**
 		 * 表示事件的参数。
-		 * @constructor Dom.Event
+		 * @class Dom.Event
 		 */
 		Event: Class({
 
@@ -1290,6 +1297,7 @@
 		/**
 		 * 文档对象。
 		 * @constructor Dom.Document 
+		 * @extends Dom
 		 * @remark 因为 IE6/7 不存在这些对象, 文档对象是对原生 HTMLDocument 对象的补充。 扩展
 		 *        Document 也会扩展 HTMLDocument。
 		 */
@@ -1298,6 +1306,8 @@
 		})
 
 	})
+	
+	/**@class Dom*/
 	
 	.implement({
 	

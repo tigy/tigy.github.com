@@ -97,7 +97,7 @@
 	});
 
 	/**
-	 * @namespace System.Base
+	 * @static class System.Base
 	 */
 	extend(Base, {
 
@@ -314,7 +314,7 @@
 	});
 
 	/**
-	 * @namespace Object
+	 * @static class Object
 	 */
 	extend(Object, {
 		
@@ -576,7 +576,7 @@
 	});
 	
 	/**
-	 * @namespace Function
+	 * @static class Function
 	 */
 	extend(Function, {
 		
@@ -607,7 +607,7 @@
 	});
 	
 	/**
-	 * @namespace String
+	 * @static class String
 	 */
 	extend(String, {
 			
@@ -692,12 +692,15 @@
     };
 
 	/// #if CompactMode
-
+	
+	/**
+	 * @static class Date
+	 */
 	if(!Date.now) {
 			
 		/**
 		 * 获取当前时间。
-		 * @memberOf now
+		 * @memberOf Date
 		 * @return {Number} 当前的时间点。
 		 * @example <pre>
 		 * Date.now(); //   相当于 new Date().getTime()
@@ -710,13 +713,16 @@
 	}
 
 	/// #endif
+	
+	/**
+	 * @namespace window
+	 */
 
 	/**
 	 * 创建一个类。
 	 * @param {Object/Function} [methods] 类成员列表对象或类构造函数。
 	 * @return {Class} 返回创建的类。
 	 * @see System.Object.extend
-	 * @memberOf window
 	 * @example 以下代码演示了如何创建一个类:
 	 * <pre>
 	 * var MyCls = Class({
