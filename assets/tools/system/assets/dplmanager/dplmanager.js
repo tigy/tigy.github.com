@@ -3,13 +3,13 @@
 var System = System || {};
 
 System.getJSONP = function (path, data, onSuccess) {
-	Ajax.getJSONP(Dpl.configs.host + ':' + Dpl.configs.port + '/' + path, data, onSuccess, 1000, function(){
+	Ajax.getJSONP(Dpl.configs.host + ':' + Dpl.configs.port + '/' + path, data, onSuccess, function(){
 		var r = 'assets/bin/startserver.bat';
 		if(navigator.platform.indexOf("Win") === -1) {
 			r = 'assets/bin-linux/startserver.sh';
 		}
 		alert("无法连接到代理服务器 " + Dpl.configs.host + ':' + Dpl.configs.port + '\r\n请先执行 ' + r + '\r\n更多信息见 文档/DPL管理系统/使用说明');
-	});
+	}, null, 1000);
 };
 
 System.submit = function (path, data) {
@@ -290,7 +290,7 @@ var DplManager = {
 		editControl: function(anchor){
 			
 			var me = Dom.get(anchor);
-			var tr = me.getParent(1);
+			var tr = me.parent(1);
 			var name = tr.find('td').getText();
 			
 			if(DplManager.ViewData.currentTr) {
@@ -307,7 +307,7 @@ var DplManager = {
 		deleteControl: function(anchor){
 		
 			var me = Dom.get(anchor);
-			var tr = me.getParent(1);
+			var tr = me.parent(1);
 			var info = DplManager.ViewData.getInfo(tr);
 			var ns = info[0] + '.' + info[1] + '.' + info[2];
 		
@@ -329,7 +329,7 @@ var DplManager = {
 		saveControl: function(anchor){
 		
 			var me = Dom.get(anchor);
-			var tr = me.getParent(1);
+			var tr = me.parent(1);
 			var isAdd = tr.getAttr('data-add');
 			
 			var arg = {
@@ -358,7 +358,7 @@ var DplManager = {
 		cancelEdit:  function(anchor){
 
 			var me = Dom.get(anchor);
-			var tr = me.getParent(1);
+			var tr = me.parent(1);
 			var info = DplManager.ViewData.getInfo(tr);
 			
 			tr.setHtml(this.initRow(info[0], info[1], info[2]));
@@ -409,7 +409,7 @@ var DplManager = {
 				
 				var autoComplete = new AutoComplete(node);
 				
-				var tr = autoComplete.getParent(1), info = DplManager.ViewData.getInfo(tr);
+				var tr = autoComplete.parent(1), info = DplManager.ViewData.getInfo(tr);
 				
 				for(var cat in Dpl.libs[info[0]]){
 					autoComplete.items.add(cat);
@@ -427,7 +427,7 @@ var DplManager = {
 				var a = new AutoComplete(node);
 				
 				a.getSuggestItems = function(text){
-					var tr = this.getParent(1), info = DplManager.ViewData.getInfo(tr), r= [];
+					var tr = this.parent(1), info = DplManager.ViewData.getInfo(tr), r= [];
 					
 					text = text.toLowerCase();
 					
@@ -519,7 +519,7 @@ var DplManager = {
 		deleteControl: function(anchor){
 		
 			var me = Dom.get(anchor);
-			var tr = me.getParent(1);
+			var tr = me.parent(1);
 			var info = DplManager.ViewData.getInfo(tr);
 		
 			if(prompt("确定删除资源 " + info[2] + " ?\r\n如果确认删除，请在下框输入 yes") != "yes"){
@@ -540,7 +540,7 @@ var DplManager = {
 		saveControl: function(anchor){
 		
 			var me = Dom.get(anchor);
-			var tr = me.getParent(1);
+			var tr = me.parent(1);
 			var isAdd = tr.getAttr('data-add');
 			
 			var arg = {
@@ -578,7 +578,7 @@ var DplManager = {
 		cancelEdit:  function(anchor){
 
 			var me = Dom.get(anchor);
-			var tr = me.getParent(1);
+			var tr = me.parent(1);
 			var info = DplManager.ViewData.getInfo(tr);
 			
 			tr.setHtml(this.initRow(info[0], info[1], info[2]));
@@ -632,7 +632,7 @@ var DplManager = {
 				
 				var autoComplete = new AutoComplete(node);
 				
-				var tr = autoComplete.getParent(1), info = DplManager.ViewData.getInfo(tr);
+				var tr = autoComplete.parent(1), info = DplManager.ViewData.getInfo(tr);
 				
 				for(var cat in Dpl.res[info[0]]){
 					autoComplete.items.add(cat);
@@ -650,7 +650,7 @@ var DplManager = {
 				var a = new AutoComplete(node);
 				
 				a.getSuggestItems = function(text){
-					var tr = this.getParent(1), info = DplManager.ViewData.getInfo(tr), r= [];
+					var tr = this.parent(1), info = DplManager.ViewData.getInfo(tr), r= [];
 					
 					text = text.toLowerCase();
 					
