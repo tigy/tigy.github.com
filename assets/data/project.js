@@ -478,18 +478,28 @@ var Dpl = {
 					"status" : "+",
 					"attribute" : ""
 				},
-				"Preload" : {
-					"summary" : "图片预加载",
-					"status" : "+",
-					"attribute" : ""
-				},
 				"ClipBoard" : {
 					"summary" : "剪贴板操作",
 					"status" : "",
 					"attribute" : ""
 				},
+				"Use" : {
+					"summary" : "模块动态载入",
+					"status" : "",
+					"attribute" : ""
+				},
 				"Loader" : {
 					"summary" : "资源文件动态载入",
+					"status" : "",
+					"attribute" : ""
+				},
+				"Preload" : {
+					"summary" : "图片预加载",
+					"status" : "+",
+					"attribute" : ""
+				},
+				"LazyLoad" : {
+					"summary" : "图片懒加载",
 					"status" : "",
 					"attribute" : ""
 				},
@@ -515,11 +525,6 @@ var Dpl = {
 				},
 				"SimulateIE" : {
 					"summary" : "模拟IE坏境",
-					"status" : "",
-					"attribute" : ""
-				},
-				"Use" : {
-					"summary" : "模块动态载入",
 					"status" : "",
 					"attribute" : ""
 				},
@@ -669,11 +674,6 @@ var Dpl = {
 				},
 				"Within" : {
 					"summary" : "",
-					"status" : "",
-					"attribute" : ""
-				},
-				"LazyLoad" : {
-					"summary" : "图片懒加载",
 					"status" : "",
 					"attribute" : ""
 				},
