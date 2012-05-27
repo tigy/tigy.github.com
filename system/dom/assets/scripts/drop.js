@@ -10,7 +10,7 @@ using("System.Dom.Drag");
 
 
 
-var Droppable = (function(p){
+var Droppable = (function(){
 	
 	/**
 	 * 全部的区。
@@ -185,25 +185,26 @@ var Droppable = (function(p){
 		}
 	});
 	
-	Dom.addEvents(Object.map('dragenter dragleave dragover drop', Function.from(Object.extendIf({
+	Dom.addEvent('dragenter dragleave dragover drop', {
 		add:  function(elem, type, fn){
-			mouseEvents.add(elem, type, fn);
-			fn = p.getData(elem, 'droppable');
+			Dom.$event.$default.add(elem, type, fn);
+			fn = elem.dataField().droppable;
 			if(fn){
 				fn.setDisabled(false);
 			} else {
-				p.setData(elem, 'droppable', new Droppable(elem));
+				elem.dataField().droppable = new Droppable(elem);
 			}
 		},
 		remove: function(elem, type, fn){
-			mouseEvents.remove(elem, type, fn);
-			p.getData(elem, 'droppable').setDisabled();
-			p.setData(elem, 'droppable', null);
-		}
-	}, mouseEvents)), {}));
+			Dom.$event.$default.remove(elem, type, fn);
+			elem.dataField().droppable.setDisabled();
+			delete elem.dataField().droppable;
+		},
+		initEvent: mouseEvents && mouseEvents.initEvent
+	});
 	
 	
 	return Droppable;
 
-})(System);
+})();
 
