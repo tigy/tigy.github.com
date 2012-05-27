@@ -417,7 +417,7 @@
 		    if (iterable != null) {
 
 			    // 普通对象使用 for( in ) , 数组用 0 -> length 。
-			    if (iterable.length === undefined) {
+			    if (typeof iterable.length !== "number") {
 
 				    // Object 遍历。
 				    for ( var t in iterable)
@@ -469,7 +469,7 @@
 	    			this[value] = fn(value, key, array);
 	    		} : fn;
 			} else {
-				dest = iterable.length === undefined ? {} : [];
+				dest = typeof iterable.length !== "number" ? {} : [];
 				actualFn = function(value, key, array) {
 					this[key] = fn(value, key, array);
 				};

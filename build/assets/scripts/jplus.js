@@ -1,5 +1,5 @@
 /**********************************************
- * This file is created by a tool at 2012/5/26 13:32
+ * This file is created by a tool at 2012/5/27 16:10
  **********************************************/
 
 
@@ -60,7 +60,7 @@
 		emptyObj = {},
 	
 		/**
-		 * System 全局静态对象。包含系统有关的函数。
+		 * 包含系统有关的函数。
 		 * @type Object
 		 */
 		System = window.System || (window.System = {});
@@ -70,7 +70,7 @@
 	/// #region Functions
 	
 	/**
-	 * 系统有关对象。
+	 * 包含系统有关的函数。
 	 * @namespace System
 	 */
 	extend(System, {
@@ -84,7 +84,8 @@
 		/**
 		 * 将一个原生的 Javascript 函数对象转换为一个类。
 		 * @param {Function/Class} constructor 用于转换的对象，将修改此对象，让它看上去和普通的类一样。
-		 * @return {Class} 返回生成的类。
+		 * @return {Function} 返回生成的类。
+		 * @remark 转换后的类将有继承、扩展等功能。
 		 */
 		Native: function(constructor) {
 
@@ -97,7 +98,9 @@
 		/**
 		 * id种子 。
 		 * @type Number
-		 * @example 下例演示了 System.id 的用处。<pre>
+		 * @defaultValue 1
+		 * @example 下例演示了 System.id 的用处。
+		 * <pre>
 		 *		var uid = System.id++;  // 每次使用之后执行 ++， 保证页面内的 id 是唯一的。
 		 * </pre>
 		 */
@@ -106,7 +109,7 @@
 	});
 
 	/**
-	 * @namespace System.Base
+	 * @static class System.Base
 	 */
 	extend(Base, {
 
@@ -151,69 +154,76 @@
 	    },
 
 	    /**
-		 * 为当前类添加事件。
-		 * @param {Object} [evens] 所有事件。 具体见下。
+		 * 为当前类注册一个事件。
+		 * @param {String} eventName 事件名。如果多个事件使用空格隔开。
+		 * @param {Object} properties={} 事件信息。 具体见备注。
 		 * @return this
 		 * @remark
-		 *         <p>
-		 *         这个函数是实现自定义事件的关键。
-		 *         </p>
-		 *         <p>
-		 *         addEvents 函数的参数是一个事件信息，格式如: {click: { add: ..., remove: ...,
-		 *        trigger: ..., initEvent: ...} 。 其中 click 表示事件名。一般建议事件名是小写的。
-		 *         </p>
-		 *         <p>
-		 *         一个事件有多个相应，分别是: 绑定(add), 删除(remove), 触发(trigger)
-		 *         </p>
-		 *         </p>
-		 *         当用户使用 o.on('事件名', 函数) 时， 系统会判断这个事件是否已经绑定过， 如果之前未绑定事件，则会创建新的函数
-		 *         evtTrigger， evtTrigger 函数将遍历并执行 evtTrigger.handlers 里的成员,
-		 *         如果其中一个函数执行后返回 false， 则中止执行，并返回 false， 否则返回 true。
-		 *         evtTrigger.handlers 表示 当前这个事件的所有实际调用的函数的数组。
-		 *         然后系统会调用 add(o,
-		 *         '事件名', evtTrigger) 然后把 evtTrigger 保存在 o.data.$event['事件名'] 中。
-		 *         如果 之前已经绑定了这个事件，则 evtTrigger 已存在，无需创建。 这时系统只需把 函数 放到
-		 *         evtTrigger.handlers 即可。
-		 *         </p>
-		 *         <p>
-		 *         也就是说，真正的事件触发函数是 evtTrigger， evtTrigger去执行用户定义的一个事件全部函数。
-		 *         </p>
-		 *         <p>
-		 *         当用户使用 o.un('事件名', 函数) 时， 系统会找到相应 evtTrigger， 并从
-		 *         evtTrigger.handlers 删除 函数。 如果 evtTrigger.handlers 是空数组， 则使用
-		 *         remove(o, '事件名', evtTrigger) 移除事件。
-		 *         </p>
-		 *         <p>
-		 *         当用户使用 o.trigger(参数) 时， 系统会找到相应 evtTrigger， 如果事件有trigger， 则使用
-		 *         trigger(对象, '事件名', evtTrigger, 参数) 触发事件。 如果没有， 则直接调用
-		 *         evtTrigger(参数)。
-		 *         </p>
-		 *         <p>
-		 *         下面分别介绍各函数的具体内容。
-		 *         </p>
-		 *         <p>
-		 *         add 表示 事件被绑定时的操作。 原型为:
-		 *         </p>
-		 *         <pre>
+		 * 事件信息是一个JSON对象，它表明了一个事件在绑定、删除和触发后的一些操作。
+		 * 
+		 * 事件信息的原型如:
+		 * <pre>
+		 * ({
+		 * 	
+		 *  // 当用户执行 target.on(type, fn) 时执行下列函数:
+		 * 	add: function(target, type, fn){
+		 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。
+		 *  },
+		 * 
+		 *  // 当用户执行 target.un(type, fn) 时执行下列函数:
+		 *  remove: function(target, type, fn){
+		 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。
+		 *  },
+		 * 
+		 *  // 当用户执行 target.trigger(e) 时执行下列函数:
+		 *  trigger: function(target, type, fn, e){
+		 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。e 是参数。
+		 *  },
+		 * 
+		 *  // 当 fn 被执行时首先执行下列函数:
+		 *  initEvent: function(e){
+		 * 		// 其中 e 是参数。
+		 *  }
+		 * 
+		 * });
+		 * </pre>
+		 * 
+		 * 当用户使用 obj.on('事件名', 函数) 时， 系统会判断这个事件是否已经绑定过， 如果之前未绑定事件，则会创建新的函数
+		 * evtTrigger， evtTrigger 函数将遍历并执行 evtTrigger.handlers 里的成员,
+		 * 如果其中一个函数执行后返回 false， 则中止执行，并返回 false， 否则返回 true。
+		 * evtTrigger.handlers 表示 当前这个事件的所有实际调用的函数的数组。
+		 * 然后系统会调用 add(obj, '事件名', evtTrigger) 然后把 evtTrigger 保存在 obj.dataField().$event['事件名'] 中。
+		 * 如果 之前已经绑定了这个事件，则 evtTrigger 已存在，无需创建。 这时系统只需把 函数 放到 evtTrigger.handlers 即可。
+		 * 
+		 * 真正的事件触发函数是 evtTrigger， evtTrigger会执行 initEvent 和用户定义的一个事件全部函数。
+		 * 
+		 * 当用户使用 obj.un('事件名', 函数) 时， 系统会找到相应 evtTrigger， 并从
+		 * evtTrigger.handlers 删除 函数。 如果 evtTrigger.handlers 是空数组， 则使用
+		 * remove(obj, '事件名', evtTrigger) 移除事件。
+		 * 
+		 * 当用户使用 obj.trigger(参数) 时， 系统会找到相应 evtTrigger， 如果事件有trigger， 则使用
+		 * trigger(obj, '事件名', evtTrigger, 参数) 触发事件。 如果没有， 则直接调用
+		 * evtTrigger(参数)。
+		 * 
+		 * 下面分别介绍各函数的具体内容。
+		 * 
+		 * add 表示 事件被绑定时的操作。 原型为:
+		 * 
+		 * <pre>
 	     * function add(elem, type, fn) {
 	     * 	   // 对于标准的 DOM 事件， 它会调用 elem.addEventListener(type, fn, false);
 	     * }
 	     * </pre>
-		 *         <p>
-		 *         elem表示绑定事件的对象，即类实例。 type 是事件类型， 它就是事件名，因为多个事件的 add 函数肯能一样的，
-		 *         因此 type 是区分事件类型的关键。fn 则是绑定事件的函数。
-		 *         </p>
-		 *         <p>
-		 *         remove 同理。
-		 *         </p>
-		 *         <p>
-		 *         trigger 是高级的事件。参考上面的说明。
-		 *         </p>
-		 *         <p>
-		 *         如果你不知道其中的几个参数功能，特别是 trigger ，请不要自定义。
-		 *         </p>
-		 * @example 下面代码演示了如何给一个类自定义事件，并创建类的实例，然后绑定触发这个事件。 <pre>
-	     * 
+		 * 
+		 * elem表示绑定事件的对象，即类实例。 type 是事件类型， 它就是事件名，因为多个事件的 add 函数肯能一样的，
+		 * 因此 type 是区分事件类型的关键。fn 则是绑定事件的函数。
+		 * 
+		 * remove 类似 add。
+		 * 
+		 * $default 是特殊的事件名，它的各个信息将会覆盖同类中其它事件未定义的信息。
+		 * 
+		 * @example 下面代码演示了如何给一个类自定义事件，并创建类的实例，然后绑定触发这个事件。 
+		 * <pre>
 	     * // 创建一个新的类。
 	     * var MyCls = new Class();
 	     * 
@@ -226,11 +236,11 @@
 	     * });
 	     * 
 	     * var m = new MyCls;
-	     * m.on('click', function () {
+	     * m.on('myEvt', function () {  //  输出 为  elem 绑定 事件  myEvt
 	     * 	  alert(' 事件 触发 ');
 	     * });
 	     * 
-	     * m.trigger('click', 2);
+	     * m.trigger('myEvt', 2);
 	     * 
 	     * </pre>
 		 */
@@ -251,35 +261,27 @@
 	    /**
 		 * 继承当前类创建并返回子类。
 		 * @param {Object/Function} [methods] 子类的员或构造函数。
-		 * @return {Class} 继承的子类。
-		 *         <p>
-		 *         这个函数是实现继承的核心。
-		 *         </p>
-		 *         <p>
-		 *         在 Javascript 中，继承是依靠原型链实现的， 这个函数仅仅是对它的包装，而没有做额外的动作。
-		 *         </p>
-		 *         <p>
-		 *         成员中的 constructor 成员 被认为是构造函数。
-		 *         </p>
-		 *         <p>
-		 *         这个函数实现的是 单继承。如果子类有定义构造函数，则仅调用子类的构造函数，否则调用父类的构造函数。
-		 *         </p>
-		 *         <p>
-		 *         要想在子类的构造函数调用父类的构造函数，可以使用 {@link System.Object.prototype.base} 。
-		 *         </p>
-		 *         <p>
-		 *         这个函数返回的类实际是一个函数，但它被使用 System.Object 修饰过。
-		 *         </p>
-		 *         <p>
-		 *         由于原型链的关系， 肯能存在共享的引用。 如: 类 A ， A.prototype.c = []; 那么，A的实例 b ,
-		 *         d 都有 c 成员， 但它们共享一个 A.prototype.c 成员。 这显然是不正确的。所以你应该把 参数 quick
-		 *         置为 false ， 这样， A创建实例的时候，会自动解除共享的引用成员。 当然，这是一个比较费时的操作，因此，默认
-		 *         quick 是 true 。
-		 *         </p>
-		 *         <p>
-		 *         你也可以把动态成员的定义放到 构造函数， 如: this.c = []; 这是最好的解决方案。
-		 *         </p>
-		 * @example 下面示例演示了如何创建一个子类。<pre>
+		 * @return {Function} 返回继承出来的子类。
+		 * @remark
+		 * 在 Javascript 中，继承是依靠原型链实现的， 这个函数仅仅是对它的包装，而没有做额外的动作。
+		 * 
+		 * 成员中的 constructor 成员 被认为是构造函数。
+		 * 
+		 * 这个函数实现的是 单继承。如果子类有定义构造函数，则仅调用子类的构造函数，否则调用父类的构造函数。
+		 * 
+		 * 要想在子类的构造函数调用父类的构造函数，可以使用 {@link System.Base#base} 调用。
+		 * 
+		 * 这个函数返回的类实际是一个函数，但它被 {@link System.Native} 修饰过。
+		 * 
+		 * 由于原型链的关系， 肯能存在共享的引用。 如: 类 A ， A.prototype.c = []; 那么，A的实例 b ,
+		 * d 都有 c 成员， 但它们共享一个 A.prototype.c 成员。 这显然是不正确的。所以你应该把 参数 quick
+		 * 置为 false ， 这样， A创建实例的时候，会自动解除共享的引用成员。 当然，这是一个比较费时的操作，因此，默认
+		 * quick 是 true 。
+		 *  
+		 * 也可以把动态成员的定义放到 构造函数， 如: this.c = []; 这是最好的解决方案。
+		 *  
+		 * @example 下面示例演示了如何创建一个子类。
+		 * <pre>
 		 * var MyClass = new Class(); //创建一个类。
 		 * 
 		 * var Child = MyClass.extend({  // 创建一个子类。
@@ -323,7 +325,8 @@
 	});
 
 	/**
-	 * @namespace Object
+	 * 系统原生的对象。
+	 * @static class Object
 	 */
 	extend(Object, {
 		
@@ -331,9 +334,9 @@
 
 	    /**
 		 * 复制对象的所有属性到其它对象。
-		 * @param {Object} dest 复制目标。
-		 * @param {Object} obj 要复制的内容。
-		 * @return {Object} 复制后的对象 (dest)。
+		 * @param {Object} dest 复制的目标对象。
+		 * @param {Object} src 复制的源对象。
+		 * @return {Object} 返回 *dest*。
 		 * @see Object.extendIf
 		 * @example <pre>
 	     * var a = {v: 3}, b = {g: 2};
@@ -370,12 +373,13 @@
 	    /// #endif
 
 	    /**
-		 * 如果目标成员不存在就复制对象的所有属性到其它对象。
-		 * @param {Object} dest 复制目标。
-		 * @param {Object} obj 要复制的内容。
-		 * @return {Object} 复制后的对象 (dest)。
+		 * 复制对象的所有属性到其它对象，但不覆盖原对象的相应值。
+		 * @param {Object} dest 复制的目标对象。
+		 * @param {Object} src 复制的源对象。
+		 * @return {Object} 返回 *dest*。
 		 * @see Object.extend 
-		 * @example <pre>
+		 * @example 
+		 * <pre>
 	     * var a = {v: 3, g: 5}, b = {g: 2};
 	     * Object.extendIf(a, b);
 	     * trace(a); // {v: 3, g: 5}  b 未覆盖 a 任何成员。
@@ -393,15 +397,20 @@
 		},
 
 	    /**
-		 * 在一个可迭代对象上遍历。
-		 * @param {Array/ Base} iterable 对象，不支持函数。
-		 * @param {Function} fn 对每个变量调用的函数。 {@param {Object} value 当前变量的值}
-		 *            {@param {Number} key 当前变量的索引} {@param {Number} index
-		 *            当前变量的索引} {@param {Array} array 数组本身} {@return {Boolean}
-		 *            如果中止循环， 返回 false。}
-		 * @param {Object} bind 函数执行时的作用域。
-		 * @return {Boolean} 如果已经遍历完所传的所有值， 返回 true， 如果遍历被中断过，返回 false。
-		 * @example <pre> 
+		 * 遍历一个类数组，并对每个元素执行函数 *fn*。
+		 * @param {Function} fn 对每个元素运行的函数。函数的参数依次为:
+		 * 
+		 * - {Object} value 当前元素的值。
+		 * - {Number} index 当前元素的索引。
+		 * - {Array} array 当前正在遍历的数组。
+		 * 
+		 * 可以让函数返回 **false** 来强制中止循环。
+		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @return {Boolean} 如果循环是因为 *fn* 返回 **false** 而中止，则返回 **false**， 否则返回 **true**。
+		 * @see Array#each
+		 * @see Array#forEach
+		 * @example 
+		 * <pre> 
 	     * Object.each({a: '1', c: '3'}, function (value, key) {
 	     * 		trace(key + ' : ' + value);
 	     * });
@@ -417,7 +426,7 @@
 		    if (iterable != null) {
 
 			    // 普通对象使用 for( in ) , 数组用 0 -> length 。
-			    if (iterable.length === undefined) {
+			    if (typeof iterable.length !== "number") {
 
 				    // Object 遍历。
 				    for ( var t in iterable)
@@ -434,16 +443,26 @@
 	    },
 
 	    /**
-		 * 更新一个可迭代对象。
-		 * @param {Array/ Base} iterable 对象，不支持函数。
-		 * @param {Function} fn 对每个变量调用的函数。 {@param {Object} value 当前变量的值}
-		 *            {@param {Number} key 当前变量的索引} {@param {Array} array 数组本身}
-		 *            {@return {Boolean} 如果中止循环， 返回 false。}
-		 * @param {Object} bind=iterable 函数执行时的作用域。
-		 * @param { Base/Boolean} [args] 参数/是否间接传递。
-		 * @return {Object} 返回的对象。
-		 * @example 该函数支持多个功能。主要功能是将一个对象根据一个关系变成新的对象。 <pre>
-	     * Object.map(["aa","aa23"], function(a){return a.length} , []); // => [2, 4];
+		 * 遍历一个类数组对象并调用指定的函数，返回每次调用的返回值数组。
+		 * @param {Array/String/Object} iterable 任何对象，不允许是函数。如果是字符串，将会先将字符串用空格分成数组。
+		 * @param {Function} fn 对每个元素运行的函数。函数的参数依次为:
+		 * 
+		 * - {Object} value 当前元素的值。
+		 * - {Number} index 当前元素的索引。
+		 * - {Array} array 当前正在遍历的数组。
+		 * 
+		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @param {Object} [dest] 仅当 *iterable* 是字符串时，传递 *dest* 可以将函数的返回值保存到 dest。
+		 * @return {Object/Undefiend} 返回的结果对象。当 *iterable* 是字符串时且未指定 dest 时，返回空。
+		 * @example 
+		 * <pre>
+	     * Object.map(["a","b"], function(a){return a + a}); // => ["aa", "bb"];
+	     * 
+	     * Object.map({a: "a", b: "b"}, function(a){return a + a}); // => {a: "aa", b: "bb"};
+	     * 
+	     * Object.map({length: 1, "0": "a"}, function(a){return a + a}); // => ["a"];
+	     * 
+	     * Object.map("a b", function(a){return a + a}, {}); // => {a: "aa", b: "bb"};
 	     * </pre>
 		 */
 	    map: function(iterable, fn, dest) {
@@ -455,13 +474,13 @@
 			// 如果是目标对象是一个字符串，则改为数组。
 	    	if (typeof iterable === 'string') {
 	    		iterable = iterable.split(' ');
-	    		actualFn = dest ? function(value, key){
-	    			this[value] = fn(value, key);
+	    		actualFn = dest ? function(value, key, array){
+	    			this[value] = fn(value, key, array);
 	    		} : fn;
 			} else {
-				dest = iterable.length === undefined ? {} : [];
-				actualFn = function(value, key) {
-					this[key] = fn(value, key);
+				dest = typeof iterable.length !== "number" ? {} : [];
+				actualFn = function(value, key, array) {
+					this[key] = fn(value, key, array);
 				};
 			}
 	    	
@@ -476,10 +495,11 @@
 		 * 判断一个变量是否是数组。
 		 * @param {Object} obj 要判断的变量。
 		 * @return {Boolean} 如果是数组，返回 true， 否则返回 false。
-		 * @example <pre>
-	     * Array.isArray([]); // true
-	     * Array.isArray(document.getElementsByTagName("div")); // false
-	     * Array.isArray(new Array); // true
+		 * @example 
+		 * <pre>
+	     * Object.isArray([]); // true
+	     * Object.isArray(document.getElementsByTagName("div")); // false
+	     * Object.isArray(new Array); // true
 	     * </pre>
 		 */
 	    isArray: Array.isArray || function (obj) {
@@ -492,7 +512,8 @@
 		 * 判断一个变量是否是函数。
 		 * @param {Object} obj 要判断的变量。
 		 * @return {Boolean} 如果是函数，返回 true， 否则返回 false。
-		 * @example <pre>
+		 * @example 
+		 * <pre>
 	     * Object.isFunction(function () {}); // true
 	     * Object.isFunction(null); // false
 	     * Object.isFunction(new Function); // true
@@ -506,9 +527,11 @@
 
 	    /**
 		 * 判断一个变量是否是引用变量。
-		 * @param {Object} object 变量。
-		 * @return {Boolean} 所有对象变量返回 true, null 返回 false 。
-		 * @example <pre>
+		 * @param {Object} obj 变量。
+		 * @return {Boolean} 如果 *obj* 是引用变量，则返回 **true**, 否则返回 **false** 。
+		 * @remark 此函数等效于 `obj !== null && typeof obj === "object"`
+		 * @example 
+		 * <pre>
 	     * Object.isObject({}); // true
 	     * Object.isObject(null); // false
 	     * </pre>
@@ -520,21 +543,32 @@
 		},
 
 	    /**
-		 * 将一个对象解析成一个类的属性。
-		 * @param {Object} obj 类实例。
-		 * @param {Object} options 参数。 这个函数会分析对象，并试图找到一个 属性设置函数。 当设置对象 obj 的 属性
-		 *            key 为 value: 发生了这些事: 检查，如果存在就调用: obj.setKey(value) 否则，
-		 *            检查，如果存在就调用: obj.key(value) 否则， 检查，如果存在就调用:
-		 *            obj.key.set(value) 否则，检查，如果存在就调用: obj.set(value) 否则，执行
-		 *            obj.key = value;
+		 * 一次性为一个对象设置属性。
+		 * @param {Object} obj 目标对象。将对这个对象设置属性。
+		 * @param {Object} options 要设置的属性列表。 函数会自动分析 *obj*, 以确认一个属性的设置方式。
+		 * 比如设置 obj 的 key 属性为 值 value 时，系统会依次检测:
+		 * 
+		 * - 尝试调用 obj.setKey(value)。
+		 * - 尝试调用 obj.key(value)
+		 * - 尝试调用 obj.key.set(value)
+		 * - 尝试调用 obj.set(key, value)
+		 * - 最后调用 obj.key = value
+		 * 
 		 * @example <pre>
-	     * document.setA = function (value) {
-	     * 	  this._a = value;
+	     * var target = {
+	     * 	
+	     * 		setA: function (value) {
+	     * 			assert.log("1");
+	     * 			trace("设置 a =  ", value);
+	     *		},
+	     * 
+	     * 		b: function (value) {
+	     * 			trace(value);
+	     *		}
+	     * 
 	     * };
 	     * 
-	     * Object.set(document, 'a', 3); 
-	     * 
-	     * // 这样会调用     document.setA(3);
+	     * Object.set(target, {a: 8, b: 6, c: 4});
 	     * 
 	     * </pre>
 		 */
@@ -585,53 +619,56 @@
 	});
 	
 	/**
-	 * @namespace Function
+	 * @static class Function
 	 */
 	extend(Function, {
 		
 		/**
-		 * 空函数。
+		 * 表示一个空函数。这个函数总是返回 undefined 。
 		 * @property
 		 * @type Function
-		 * Function.empty返回空函数的引用。
+		 * @remark
+		 * 在定义一个类的抽象函数时，可以让其成员的值等于 **Function.empty** 。
 		 */
 		empty: emptyFn,
 		
 		/**
-		 * 返回返回指定结果的函数。
-		 * @param {Object} ret 需要返回的参数。
+		 * 返回一个新函数，这个函数始终返回 *value*。
+		 * @param {Object} value 需要返回的参数。
 		 * @return {Function} 执行得到参数的一个函数。
-		 * @example <pre>
-	     * Function.from(0)()    ; // 0
+		 * @example 
+		 * <pre>
+		 * var fn = Function.from(0);
+	     * fn()    // 0
 	     * </pre>
 	 	 */
-		from: function (ret) {
+		from: function (value) {
 	
 			// 返回一个值，这个值是当前的参数。
 			return function() {
-				return ret;
+				return value;
 			}
 		}
 		
 	});
 	
 	/**
-	 * @namespace String
+	 * @static class String
 	 */
 	extend(String, {
 			
 	    /**
-		 * 格式化字符串。
+		 * 格式化指定的字符串。
 		 * @param {String} formatString 字符。
-		 * @param {Object} ... 参数。
+		 * @param {Object} ... 格式化用的参数。
 		 * @return {String} 格式化后的字符串。
+		 * @remark 格式化的字符串{}不允许包含空格。
+	     *  不要出现{{{ 和 }}} 这样将获得不可预知的结果。
 		 * @example <pre>
 	     *  String.format("{0}转换", 1); //  "1转换"
 	     *  String.format("{1}翻译",0,1); // "1翻译"
 	     *  String.format("{a}翻译",{a:"也可以"}); // 也可以翻译
 	     *  String.format("{{0}}不转换, {0}转换", 1); //  "{0}不转换1转换"
-	     *  格式化的字符串{}不允许包含空格。
-	     *  不要出现{{{ 和  }}} 这样将获得不可预知的结果。
 	     * </pre>
 		 */
 		format: function(formatString, args) {
@@ -655,29 +692,41 @@
 	  	},
 		  	
 	    /**
-		 * 把字符串转为指定长度。
-		 * @param {String} value 字符串。
-		 * @param {Number} len 需要的最大长度。
-		 * @example <pre>
-	     * String.ellipsis("1234567", 4); //   '1...'
+		 * 将字符串限定在指定长度内，超出部分用 ... 代替。
+		 * @param {String} value 要处理的字符串。
+		 * @param {Number} length 需要的最大长度。
+		 * @example 
+		 * <pre>
+	     * String.ellipsis("1234567", 6); //   "123..."
+	     * String.ellipsis("1234567", 9); //   "1234567"
 	     * </pre>
 		 */
-	  	ellipsis: function(value, len) {
-		    assert.isString(value, "String.ellipsis(value, len): 参数  {value} ~");
-		    assert.isNumber(len, "String.ellipsis(value, len): 参数  {len} ~");
-		    return value.length > len ? value.substr(0, len - 3) + "..." : value;
+	  	ellipsis: function(value, length) {
+		    assert.isString(value, "String.ellipsis(value, length): 参数  {value} ~");
+		    assert.isNumber(length, "String.ellipsis(value, length): 参数  {length} ~");
+		    return value.length > length ? value.substr(0, length - 3) + "..." : value;
 		}
 		
 	});
 
     /**
-	 * 在原有可迭代对象生成一个数组。
-	 * @param {Object} iterable 可迭代的实例。
-	 * @param {Number} startIndex=0 开始的位置。
-	 * @return {Array} 复制得到的数组。
+	 * 将一个伪数组对象转为原生数组。
+	 * @param {Object} iterable 一个伪数组对象。
+	 * @param {Number} startIndex=0 转换开始的位置。
+	 * @return {Array} 返回新数组，其值和 *value* 一一对应。
 	 * @memberOf Array
-	 * @example <pre>
+	 * @remark iterable 不支持原生的 DomList 对象。
+	 * @example 
+	 * <pre>
+     * // 将 arguments 对象转为数组。
+     * Array.create(arguments); // 返回一个数组
+     * 
+     * // 获取数组的子集。
      * Array.create([4,6], 1); // [6]
+     * 
+     * // 处理伪数组。
+     * Array.create({length: 1, "0": "value"}); // ["value"]
+     * 
      * </pre>
 	 */
 	Array.create = function(iterable, startIndex) {
@@ -701,14 +750,19 @@
     };
 
 	/// #if CompactMode
-
+	
+	/**
+	 * 系统原生的日期对象。
+	 * @class Date
+	 */
 	if(!Date.now) {
 			
 		/**
-		 * 获取当前时间。
-		 * @memberOf Date
+		 * 获取当前时间的数字表示。
 		 * @return {Number} 当前的时间点。
-		 * @example <pre>
+		 * @static
+		 * @example 
+		 * <pre>
 		 * Date.now(); //   相当于 new Date().getTime()
 		 * </pre>
 		 */
@@ -727,24 +781,25 @@
 	/**
 	 * 创建一个类。
 	 * @param {Object/Function} [methods] 类成员列表对象或类构造函数。
-	 * @return {Class} 返回创建的类。
-	 * @see System.Object.extend
+	 * @return {Function} 返回创建的类。
+	 * @see System.Base
+	 * @see System.Base.extend
 	 * @example 以下代码演示了如何创建一个类:
 	 * <pre>
 	 * var MyCls = Class({
 	 * 
-	 *    constructor: function (g, h) {
-	 * 	      alert('构造函数' + g + h)
+	 *    constructor: function (a, b) {
+	 * 	      alert('构造函数执行了 ' + a + b);
 	 *    },
 	 *
 	 *    say: function(){
-	 *    	alert('say');
+	 *    	alert('调用了 say 函数');
 	 *    } 
 	 * 
 	 * });
 	 * 
 	 * 
-	 * var c = new MyCls(4, ' g');  // 创建类。
+	 * var c = new MyCls('参数1', '参数2');  // 创建类。
 	 * c.say();  //  调用 say 方法。
 	 * </pre>
 	 */
@@ -757,7 +812,8 @@
 		/**
 		 * 在全局作用域运行一个字符串内的代码。
 		 * @param {String} statement Javascript 语句。
-		 * @example <pre>
+		 * @example 
+		 * <pre>
 		 * execScript('alert("hello")');
 		 * </pre>
 		 */
@@ -775,15 +831,11 @@
 	/// #region Navigator
 
 	/**
-	 * 浏览器。
+	 * 系统原生的浏览器对象实例。
+	 * @type Navigator
 	 * @namespace navigator
 	 */
 	(function(navigator) {
-
-		/**
-		 * navigator 简写。
-		 * @type Navigator
-		 */
 		
 		// 检查信息
 		var ua = navigator.userAgent,
@@ -800,6 +852,36 @@
 		/**
 		 * 获取一个值，该值指示是否为 IE 浏览器。
 		 * @getter isIE
+		 * @type Boolean
+		 */
+		
+		/**
+		 * 获取一个值，该值指示是否为 IE6 浏览器。
+		 * @getter isIE6
+		 * @type Boolean
+		 */
+		
+		/**
+		 * 获取一个值，该值指示是否为 IE7 浏览器。
+		 * @getter isIE7
+		 * @type Boolean
+		 */
+		
+		/**
+		 * 获取一个值，该值指示是否为 IE8 浏览器。
+		 * @getter isIE8
+		 * @type Boolean
+		 */
+		
+		/**
+		 * 获取一个值，该值指示是否为 IE9 浏览器。
+		 * @getter isIE9
+		 * @type Boolean
+		 */
+		
+		/**
+		 * 获取一个值，该值指示是否为 IE10 浏览器。
+		 * @getter isIE10
 		 * @type Boolean
 		 */
 
@@ -822,6 +904,12 @@
 		 */
 
 		/**
+		 * 获取一个值，该值指示是否为 Opera10 浏览器。
+		 * @getter isOpera10
+		 * @type Boolean
+		 */
+
+		/**
 		 * 获取一个值，该值指示是否为 Safari 浏览器。
 		 * @getter isSafari
 		 * @type Boolean
@@ -834,30 +922,51 @@
 			
 			/**
 			 * 判断当前浏览器是否符合W3C标准。
+			 * @getter
 			 * @type Boolean 
-			 * @remark 此处认为 IE6,7 是怪癖的。
+			 * @remark 就目前浏览器状况， 除了 IE6, 7, 8， 其它浏览器都返回 true。
 			 */
 			isStd: isStd,
 
 		    /**
-			 * 获取一个值，该值指示当前浏览器是否支持标准事件。就目前浏览器状况， IE6，7 中 isQuirks = true 其它浏览器都为 false 。
+			 * 获取一个值，该值指示当前浏览器是否支持标准事件。
+			 * @getter
 			 * @type Boolean 
-			 * @remark 此处认为 IE6,7 是怪癖的。
+			 * @remark 就目前浏览器状况， IE6，7 中 isQuirks = true 其它浏览器都为 false 。
 			 */
 			isQuirks: !isStd && !Object.isObject(document.constructor),
 
 		    /// #endif
 
 		    /**
-			 * 获取当前浏览器的简写。
+			 * 获取当前浏览器的名字。
+			 * @getter
 			 * @type String
+			 * @remark 
+			 * 肯能的值有: 
+			 * 
+			 * - IE
+			 * - Firefox
+			 * - Chrome
+			 * - Opera
+			 * - Safari
+			 * 
+			 * 对于其它非主流浏览器，返回其 HTML 引擎名:
+			 * 
+			 * - Webkit
+			 * - Gecko
+			 * - Other
 			 */
 		    name: browser,
 
 		    /**
 			 * 获取当前浏览器版本。
-			 * @type String 输出的格式比如 6.0.0 。 这是一个字符串，如果需要比较版本，应该使用
-			 *       parseFloat(navigator.version) < 4 。
+			 * @getter
+			 * @type String 
+			 * @remark 输出的格式比如 6.0.0 。 这是一个字符串，如果需要比较版本，应该使用
+			 * <pre>
+			 *       parseFloat(navigator.version) <= 5.5 。
+			 * </pre>
 			 */
 		    version: match[2]
 
@@ -873,6 +982,7 @@
 	each.call([String, Array, Function, Date], System.Native);
 	
 	/**
+	 * 所有由 new Class 创建的类的基类。
 	 * @class System.Base
 	 */
     Base.implement({
@@ -881,32 +991,54 @@
     	 * 获取当前类对应的数据字段。
     	 * @proteced virtual
     	 * @returns {Object} 一个可存储数据的对象。
+    	 * @remark 默认地， 此返回返回 this 。
+    	 * 此函数的意义在于将类对象和真实的数据对象分离。
+    	 * 这样可以让多个类实例共享一个数据对象。
+    	 * @example
+    	 * <pre>
+	     * 
+	     * // 创建一个类 A
+	     * var A = new Class({
+	     *    fn: function (a, b) {
+	     * 	    alert(a + b);
+	     *    }
+	     * });
+	     * 
+	     * // 创建一个变量。
+	     * var a = new A();
+	     * 
+	     * a.dataField().myData = 2;
+    	 * </pre>
     	 */
     	dataField: function(){
     		return this;
     	},
     	
 	    /**
-	     * 调用父类的成员变量。
-	     * @param {String} methodName 属性名。
-	     * @param {Object} [...] 调用的参数数组。
-	     * @return {Object} 父类返回。 注意只能从子类中调用父类的同名成员。
+	     * 调用父类的成员函数。
+	     * @param {String} methodName 调用的函数名。
+	     * @param {Object} [...] 调用的参数。如果不填写此项，则自动将当前函数的全部参数传递给父类的函数。
+	     * @return {Object} 返回父类函数的返回值。 
 	     * @protected
-	     * @example <pre>
-	     *
-	     * var MyBa = new Class({
-	     *    a: function (g, b) {
-	     * 	    alert(g + b);
+	     * @example 
+	     * <pre>
+	     * 
+	     * // 创建一个类 A
+	     * var A = new Class({
+	     *    fn: function (a, b) {
+	     * 	    alert(a + b);
 	     *    }
 	     * });
 	     *
-	     * var MyCls = MyBa.extend({
-	     * 	  a: function (g, b) {
-	     * 	    this.base('a'); // 调用 MyBa#a 成员。
+	     * // 创建一个子类 B
+	     * var B = A.extend({
+	     * 	  fn: function (a, b) {
+	     * 	    this.base('fn'); // 子类 B#a 调用父类 A#a
+	     * 	    this.base('fn', 2, 4); // 子类 B#a 调用父类 A#a
 	     *    }
 	     * });
 	     *
-	     * new MyCls().a();
+	     * new B().fn(1, 2); // 输出 3 和 6
 	     * </pre>
 	     */
     	base: function(methodName) {
@@ -950,13 +1082,24 @@
 	    },
 	
         /**
-		 * 增加一个监听者。
-		 * @param {String} type 监听名字。
-		 * @param {Function} listener 调用函数。
-		 * @param {Object} bind=this listener 执行时的作用域。
-		 * @return  Base this
-		 * @example <pre>
-         * elem.on('click', function (e) {
+		 * 增加一个事件监听者。
+		 * @param {String} type 事件名。
+		 * @param {Function} listener 监听函数。当事件被处罚时会执行此函数。
+		 * @param {Object} bind=this *listener* 执行时的作用域。
+		 * @return this
+		 * @example 
+		 * <pre>
+	     * 
+	     * // 创建一个类 A
+	     * var A = new Class({
+	     *    
+	     * });
+	     * 
+	     * // 创建一个变量。
+	     * var a = new A();
+	     * 
+	     * // 绑定一个 click 事件。
+         * a.on('click', function (e) {
          * 		return true;
          * });
          * </pre>
@@ -1009,23 +1152,43 @@
         },
 
         /**
-		 * 删除一个监听器。
-		 * @param {String} [type] 监听名字。
-		 * @param {Function} [listener] 回调器。
-		 * @return  Base this 注意: function () {} !== function () {},
-		 *         这意味着这个代码有问题: <pre>
+		 * 删除一个或多个事件监听器。
+		 * @param {String} [type] 事件名。如果不传递此参数，则删除全部事件的全部监听器。
+		 * @param {Function} [listener] 回调器。如果不传递此参数，在删除指定事件的全部监听器。
+		 * @return this 
+		 * @remark
+		 * 注意: `function () {} !== function () {}`, 这意味着下列代码的 un 将失败: 
+		 * <pre>
          * elem.on('click', function () {});
-         * elem.un('click', function () {});
+         * elem.un('click', function () {});   // 无法删除 on 绑定的函数。
          * </pre>
-		 *         你应该把函数保存起来。 <pre>
-         * var c =  function () {};
-         * elem.on('click', c);
-         * elem.un('click', c);
+		 * 正确的做法是把函数保存起来。 <pre>
+         * var fn =  function () {};
+         * elem.on('click', fn);
+         * elem.un('click', fn); // fn  被成功删除。
+         * 
+         * 如果同一个 *listener* 被增加多次， un 只删除第一个。
          * </pre>
-		 * @example <pre>
-         * elem.un('click', function (e) {
+		 * @example 
+		 * <pre>
+	     * 
+	     * // 创建一个类 A
+	     * var A = new Class({
+	     *    
+	     * });
+	     * 
+	     * // 创建一个变量。
+	     * var a = new A();
+	     * 
+	     * var fn = function (e) {
          * 		return true;
-         * });
+         * };
+	     * 
+	     * // 绑定一个 click 事件。
+         * a.on('click', fn);
+         * 
+         * // 删除一个 click 事件。
+         * a.un('click', fn);
          * </pre>
 		 */
         un: function(type, listener) {
@@ -1079,12 +1242,27 @@
         },
 
         /**
-		 * 触发一个监听器。
+		 * 手动触发一个监听器。
 		 * @param {String} type 监听名字。
-		 * @param {Object} [e] 事件参数。
-		 * @return  Base this trigger 只是手动触发绑定的事件。
+		 * @param {Object} [e] 传递给监听器的事件对象。
+		 * @return this
 		 * @example <pre>
-         * elem.trigger('click');
+	     * 
+	     * // 创建一个类 A
+	     * var A = new Class({
+	     *    
+	     * });
+	     * 
+	     * // 创建一个变量。
+	     * var a = new A();
+	     * 
+	     * // 绑定一个 click 事件。
+         * a.on('click', function (e) {
+         * 		return true;
+         * });
+         * 
+         * // 手动触发 click， 即执行  on('click') 过的函数。
+         * a.trigger('click');
          * </pre>
 		 */
         trigger: function(type, e) {
@@ -1098,18 +1276,27 @@
         },
 
         /**
-		 * 增加一个只执行一次的监听者。
-		 * @param {String} type 监听名字。
-		 * @param {Function} listener 调用函数。
-		 * @param {Object} bind=this listener 执行时的作用域。
-		 * @return  Base this
+		 * 增加一个仅监听一次的事件监听者。
+		 * @param {String} type 事件名。
+		 * @param {Function} listener 监听函数。当事件被处罚时会执行此函数。
+		 * @param {Object} bind=this *listener* 执行时的作用域。
+		 * @return this
 		 * @example <pre>
-         * elem.once('click', function (e) {
-         * 		trace('a');  
+	     * 
+	     * // 创建一个类 A
+	     * var A = new Class({
+	     *    
+	     * });
+	     * 
+	     * // 创建一个变量。
+	     * var a = new A();
+	     * 
+         * a.once('click', function (e) {
+         * 		trace('click 被触发了');  
          * });
          * 
-         * elem.trigger('click');   //  输出  a
-         * elem.trigger('click');   //  没有输出 
+         * a.trigger('click');   //  输出  click 被触发了
+         * a.trigger('click');   //  没有输出 
          * </pre>
 		 */
         once: function(type, listener, bind) {
@@ -1132,6 +1319,8 @@
 	});
 
 	/**
+	 * 系统原生的字符串对象。
+	 * @system
 	 * @class String
 	 */
 	String.implementIf({
@@ -1141,7 +1330,9 @@
 	    /**
 		 * 去除字符串的首尾空格。
 		 * @return {String} 处理后的字符串。
-		 * @example <pre>
+		 * @remark 目前除了 IE8-，主流浏览器都已内置此函数。
+		 * @example 
+		 * <pre>
 	     * "   g h   ".trim(); //  返回     "g h"
 	     * </pre>
 		 */
@@ -1154,10 +1345,12 @@
 	    /// #endif
 
 	    /**
-		 * 转为骆驼格式。
-		 * @param {String} value 内容。
+		 * 将字符串转为骆驼格式。
 		 * @return {String} 返回的内容。
-		 * @example <pre>
+		 * @remark
+		 * 比如 "awww-bwww-cwww" 的骆驼格式为 "awwBwwCww"
+		 * @example 
+		 * <pre>
 	     * "font-size".toCamelCase(); //     "fontSize"
 	     * </pre>
 		 */
@@ -1167,9 +1360,10 @@
 
 	    /**
 		 * 将字符首字母大写。
-		 * @return {String} 大写的字符串。
-		 * @example <pre>
-	     * "bb".capitalize(); //     "Bb"
+		 * @return {String} 处理后的字符串。
+		 * @example 
+		 * <pre>
+	     * "aa".capitalize(); //     "Aa"
 	     * </pre>
 		 */
 	    capitalize: function() {
@@ -1181,17 +1375,22 @@
 	});
 
 	/**
+	 * 系统原生的函数对象。
+	 * @system
 	 * @class Function
 	 */
 	Function.implementIf({
 		
 	    /**
-		 * 绑定函数作用域。返回一个函数，这个函数内的 this 为指定的 bind 。
-		 * @param {Function} fn 函数。
-		 * @param {Object} bind 位置。 注意，未来 Function.prototype.bind 是系统函数，
-		 *            因此这个函数将在那个时候被 替换掉。
-		 * @example <pre>
-	     * (function () {trace( this );}).bind(0)()    ; // 0
+		 * 绑定函数作用域(**this**)。并返回一个新函数，这个函数内的 **this** 为指定的 *bind* 。
+		 * @param {Object} bind 要绑定的作用域的值。 
+		 * @example 
+		 * <pre>
+		 * var fn = function(){ trace(this);  };
+		 * 
+		 * var fnProxy = fn.bind(0);
+		 * 
+	     * fnProxy()  ; //  输出 0
 	     * </pre>
 		 */
 	    bind: function(bind) {
@@ -1207,21 +1406,44 @@
 	});
 	
 	/**
+	 * 系统原生的数组对象。
+	 * @system
 	 * @class Array
 	 */
 	Array.implementIf({
 
 	    /**
-		 * 对数组运行一个函数。
-		 * @param {Function} fn 函数.参数 value, index
-		 * @param {Object} bind 对象。
-		 * @return {Boolean} 有无执行完。
+		 * 遍历当前数组，并对数组的每个元素执行函数 *fn*。
+		 * @param {Function} fn 对每个元素运行的函数。函数的参数依次为:
+		 * 
+		 * - {Object} value 当前元素的值。
+		 * - {Number} index 当前元素的索引。
+		 * - {Array} array 当前正在遍历的数组。
+		 * 
+		 * 可以让函数返回 **false** 来强制中止循环。
+		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @return {Boolean} 如果循环是因为 *fn* 返回 **false** 而中止，则返回 **false**， 否则返回 **true**。
 		 * @method
+		 * @see Object.each
 		 * @see #forEach
-		 * @example <pre> 
-	     * [2, 5].each(function (value, key) {
+		 * @see #filter
+		 * @see Object.map
+		 * @remark 
+		 * 在高版本浏览器中，forEach 和 each 功能大致相同，但是 forEach 不支持通过 return false 中止循环。
+		 * 在低版本(IE8-)浏览器中， forEach 为 each 的别名。 
+		 * @example 以下示例演示了如何遍历数组，并输出每个元素的值。 
+		 * <pre> 
+	     * [2, 5].each(function (value, index) {
 	     * 		trace(value);
-	     * 		return false
+	     * });
+	     * // 输出 '2 5'
+	     * </pre>
+	     * 
+	     * 以下示例演示了如何通过 return false 来中止循环。 
+	     * <pre> 
+	     * [2, 5].each(function (value, index) {
+	     * 		trace(value);
+	     * 		return false;
 	     * });
 	     * // 输出 '2'
 	     * </pre>
@@ -1229,12 +1451,14 @@
 	    each: each,
 
 	    /**
-		 * 包含一个元素。元素存在直接返回。
-		 * @param {Object} value 值。
-		 * @return {Boolean} 是否包含元素。
-		 * @example <pre>
-	     * ["", "aaa", "zzz", "qqq"].include(""); //   true
-	     * [false].include(0);	//   false
+		 * 如果当前数组中不存在指定 *value*， 则将 *value* 添加到当前数组的末尾。
+		 * @param {Object} value 要添加的值。
+		 * @return {Boolean} 如果此次操作已成功添加 *value*，则返回 **true**;
+		 * 否则表示原数组已经存在 *value*，返回 **false**。
+		 * @example 
+		 * <pre>
+	     * ["", "aaa", "zzz", "qqq"].include(""); // 返回 true， 数组不变。
+	     * [false].include(0);	// 返回 false， 数组变为 [false, 0]
 	     * </pre>
 		 */
 	    include: function(value) {
@@ -1247,11 +1471,13 @@
 	    },
 
 	    /**
-		 * 在指定位置插入项。
-		 * @param {Number} index 插入的位置。
-		 * @param {Object} value 插入的内容。
-		 * @example <pre>
-	     * ["", "aaa", "zzz", "qqq"].insert(3, 4); //   ["", "aaa", "zzz", 4, "qqq"]
+		 * 将指定的 *value* 插入到当前数组的指定位置。
+		 * @param {Number} index 要插入的位置。索引从 0 开始。如果 *index* 大于数组的长度，则插入到末尾。
+		 * @param {Object} value 要插入的内容。
+		 * @return {Number} 返回实际插入到的位置。
+		 * @example 
+		 * <pre>
+	     * ["I", "you"].insert(1, "love"); //   ["I", "love", "you"]
 	     * </pre>
 		 */
 	    insert: function(index, value) {
@@ -1270,20 +1496,21 @@
 	    },
 
 	    /**
-		 * 对数组成员调用指定的成员，返回结果数组。
-		 * @param {String} func 调用的成员名。
-		 * @param {Array} args 调用的参数数组。
-		 * @return {Array} 结果。
-		 * @example <pre>
-	     * ["vhd"].invoke('charAt', [0]); //    ['v']
+		 * 对当前数组的每个元素调用其指定属性名的函数，并将返回值放入新的数组返回。
+		 * @param {String} fnName 要调用的函数名。
+		 * @param {Array} args 调用时的参数数组。
+		 * @return {Array} 返回包含执行结果的数组。
+		 * @example 
+		 * <pre>
+	     * ["abc", "def", "ghi"].invoke('charAt', [0]); //  ['a', 'd', 'g']
 	     * </pre>
 		 */
-	    invoke: function(func, args) {
-		    assert(args && typeof args.length === 'number', "Array.prototype.invoke(func, args): {args} 必须是数组, 无法省略。", args);
+	    invoke: function(fnName, args) {
+		    assert(args && typeof args.length === 'number', "Array.prototype.invoke(fnName, args): {args} 必须是数组, 无法省略。", args);
 		    var r = [];
 		    ap.forEach.call(this, function(value) {
-			    assert(value != null && value[func] && value[func].apply, "Array.prototype.invoke(func, args): {value} 不包含函数 {func}。", value, func);
-			    r.push(value[func].apply(value, args));
+			    assert(value != null && value[fnName] && value[fnName].apply, "Array.prototype.invoke(fnName, args): {value} 不包含函数 {fnName}。", value, fnName);
+			    r.push(value[fnName].apply(value, args));
 		    });
 
 		    return r;
@@ -1291,9 +1518,10 @@
 
 	    /**
 		 * 删除数组中重复元素。
-		 * @return {Array} 结果。
-		 * @example <pre>
-	     * [1,7,8,8].unique(); //    [1, 7, 8]
+		 * @return {Array} this
+		 * @example 
+		 * <pre>
+	     * [1, 7, 8, 8].unique(); //    [1, 7, 8]
 	     * </pre>
 		 */
 	    unique: function() {
@@ -1311,11 +1539,25 @@
 	    },
 
 	    /**
-		 * 删除元素, 参数为元素的内容。
-		 * @param {Object} value 值。
-		 * @return {Number} 删除的值的位置。
-		 * @example <pre>
-	     * [1,7,8,8].remove(7); //   1
+		 * 删除当前数组中指定的元素。
+		 * @param {Object} value 要删除的值。
+		 * @param {Number} startIndex=0 开始搜索 *value* 的起始位置。
+		 * @return {Number} 被删除的值在原数组中的位置。如果要擅长的值不存在，则返回 -1 。
+		 * @remark
+		 * 如果数组中有多个相同的值， remove 只删除第一个。
+		 * @example 
+		 * <pre>
+	     * [1, 7, 8, 8].remove(7); // 返回 1,  数组变成 [7, 8, 8]
+	     * </pre>
+	     * 
+	     * 以下示例演示了如何删除数组全部相同项。
+	     * <pre>
+	     * var arr = ["wow", "wow", "J+ UI", "is", "powerful", "wow", "wow"];
+	     * 
+	     * // 反复调用 remove， 直到 remove 返回 -1， 即找不到值 wow
+	     * while(arr.remove(wow) >= 0);  
+	     * 
+	     * trace(arr); // 输出 ["J+ UI", "is", "powerful"]
 	     * </pre>
 		 */
 	    remove: function(value, startIndex) {
@@ -1328,13 +1570,16 @@
 	    },
 
 	    /**
-		 * 获取指定索引的元素。如果 index < 0， 则获取倒数 index 元素。
-		 * @param {Number} index 元素。
-		 * @return {Object} 指定位置所在的元素。
-		 * @example <pre>
-	     * [1,7,8,8].item(0); //   1
-	     * [1,7,8,8].item(-1); //   8
-	     * [1,7,8,8].item(5); //   undefined
+		 * 获取当前数组中指定索引的元素。
+		 * @param {Number} index 要获取的元素索引。如果 *index* 小于 0， 则表示获取倒数 *index* 位置的元素。
+		 * @return {Object} 指定位置所在的元素。如果指定索引的值不存在，则返回 undefined。
+		 * @remark
+		 * 使用 arr.item(-1) 可获取最后一个元素的值。
+		 * @example 
+		 * <pre>
+	     * [0, 1, 2, 3].item(0);  // 0
+	     * [0, 1, 2, 3].item(-1); // 3
+	     * [0, 1, 2, 3].item(5);  // undefined
 	     * </pre>
 		 */
 	    item: function(index) {
@@ -1344,27 +1589,40 @@
 	    /// #if CompactMode
 
 	    /**
-		 * 返回数组某个值的第一个位置。值没有,则为-1 。
+		 * 返回当前数组中某个值的第一个位置。
 		 * @param {Object} item 成员。
-		 * @param {Number} start=0 开始查找的位置。
-		 * @return {Number} 位置，找不到返回 -1 。 现在大多数浏览器已含此函数.除了 IE8- 。
+		 * @param {Number} startIndex=0 开始查找的位置。
+		 * @return {Number} 返回 *vaue* 的索引，如果不存在指定的值， 则返回-1 。
+		 * @remark 目前除了 IE8-，主流浏览器都已内置此函数。
 		 */
-	    indexOf: function(item, startIndex) {
+	    indexOf: function(value, startIndex) {
 		    startIndex = startIndex || 0;
 		    for ( var len = this.length; startIndex < len; startIndex++)
-			    if (this[startIndex] === item)
+			    if (this[startIndex] === value)
 				    return startIndex;
 		    return -1;
 	    },
 
 	    /**
 		 * 对数组每个元素通过一个函数过滤。返回所有符合要求的元素的数组。
-		 * @param {Function} fn 函数。参数 value, index, this。
-		 * @param {Object} bind 绑定的对象。
-		 * @return {Array} 新的数组。
-		 * @seeAlso Array.prototype.select
-		 * @example <pre> 
-	     * [1, 7, 2].filter(function (key) {return key &lt; 5 })   [1, 2]
+		 * @param {Function} fn 对每个元素运行的函数。函数的参数依次为:
+		 * 
+		 * - {Object} value 当前元素的值。
+		 * - {Number} index 当前元素的索引。
+		 * - {Array} array 当前正在遍历的数组。
+		 * 
+		 * 如果函数返回 **true**，则当前元素会被添加到返回值数组。
+		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @return {Array} 返回一个新的数组，包含过滤后的元素。
+		 * @remark 目前除了 IE8-，主流浏览器都已内置此函数。
+		 * @see #each
+		 * @see #forEach
+		 * @see Object.map
+		 * @example 
+		 * <pre> 
+	     * [1, 7, 2].filter(function (key) {
+	     * 		return key < 5;
+	     * })  //  [1, 2]
 	     * </pre>
 		 */
 	    filter: function(fn, bind) {
@@ -1381,14 +1639,26 @@
 	    },
 
 	    /**
-		 * 对数组内的所有变量执行函数，并可选设置作用域。
-		 * @method
-		 * @param {Function} fn 对每个变量调用的函数。 {@param {Object} value 当前变量的值}
-		 *            {@param {Number} key 当前变量的索引} {@param {Number} index
-		 *            当前变量的索引} {@param {Array} array 数组本身}
-		 * @param {Object} bind 函数执行时的作用域。
-		 * @seeAlso Array.prototype.each
-		 * @example <pre> 
+		 * 遍历当前数组，并对数组的每个元素执行函数 *fn*。
+		 * @param {Function} fn 对每个元素运行的函数。函数的参数依次为:
+		 * 
+		 * - {Object} value 当前元素的值。
+		 * - {Number} index 当前元素的索引。
+		 * - {Array} array 当前正在遍历的数组。
+		 * 
+		 * 可以让函数返回 **false** 来强制中止循环。
+		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @see #each
+		 * @see Object.each
+		 * @see #filter
+		 * @see Object.map
+		 * @remark 
+		 * 在高版本浏览器中，forEach 和 each 功能大致相同，但是 forEach 不支持通过 return false 中止循环。
+		 * 在低版本(IE8-)浏览器中， forEach 为 each 的别名。 
+		 * 
+		 * 目前除了 IE8-，主流浏览器都已内置此函数。
+		 * @example 以下示例演示了如何遍历数组，并输出每个元素的值。 
+		 * <pre> 
 	     * [2, 5].forEach(function (value, key) {
 	     * 		trace(value);
 	     * });
@@ -2572,6 +2842,7 @@ function imports(ns){
  **********************************************/
 ﻿/**
  * @fileOverview 提供最底层的 DOM 辅助函数。
+ * @pragma defaultExtends System.Base
  */
 
 // Core - 核心部分
@@ -2633,6 +2904,7 @@ function imports(ns){
 		/**
 		 * 所有Dom 对象基类。
 		 * @class Dom
+		 * @extends System.Base
 		 */
 		Dom = Class({
 			
@@ -2710,10 +2982,10 @@ function imports(ns){
 	
 		/**
 		 * 表示节点的集合。用于批量操作节点。
-		 * @class DomList
-		 * @extends Dom
+		 * @extends Array
 		 * @remark
-		 * DomList 是对元素数组的只读包装。 DomList 允许快速操作多个节点。 DomList 的实例一旦创建，则不允许修改其成员。
+		 * DomList 是对元素列表的包装。  DomList 允许快速操作多个节点。 
+		 * Dom 的所有方法对 DomList 都有效。
 		 */
 		DomList = Class({
 	
@@ -2723,30 +2995,28 @@ function imports(ns){
 			 * @property
 			 */
 			length: 0,
-			
-			/**
-			 * 对数组成员调用指定的成员，返回结果数组。
-			 * @param {String} func 调用的成员名。
-			 * @param {Array} args 调用的参数数组。
-			 * @return {Array} 结果。
-			 * @example <code>
-			 * ["vhd"].invoke('charAt', [0]); //    ['v']
-			 * </code>
+
+		    /**
+			 * 对当前集合的每个节点的 Dom 封装调用其指定属性名的函数，并将返回值放入新的数组返回。
+			 * @param {String} fnName 要调用的函数名。
+			 * @param {Array} args 调用时的参数数组。
+			 * @return {Array} 返回包含执行结果的数组。
+			 * @see Array#see
 			 */
-			invoke: function(func, args) {
-				assert(args && typeof args.length === 'number', "DomList.prototype.invoke(func, args): {args} 必须是数组, 无法省略。", args);
+			invoke: function(fnName, args) {
+				assert(args && typeof args.length === 'number', "DomList.prototype.invoke(fnName, args): {args} 必须是数组, 无法省略。", args);
 				var r = [];
-				assert(Dom.prototype[func] && Dom.prototype[func].apply, "DomList.prototype.invoke(func, args): Dom 不包含方法 {func}。", func);
+				assert(Dom.prototype[fnName] && Dom.prototype[fnName].apply, "DomList.prototype.invoke(fnName, args): Dom 不包含方法 {fnName}。", fnName);
 				ap.forEach.call(this, function(value) {
 					value = new Dom(value);
-					r.push(value[func].apply(value, args));
+					r.push(value[fnName].apply(value, args));
 				});
 				return r;
 			},
 			
 			/**
-			 * 初始化 DomList 实例。
-			 * @param {Array/DomList} nodes 节点集合。
+			 * 初始化 DomList 新实例。
+			 * @param {Array/DomList} nodes 用于初始化当前集合的节点集合。
 			 * @constructor
 			 */
 			constructor: function(nodes) {
@@ -2764,15 +3034,29 @@ function imports(ns){
 				}
 
 			},
-
+	
+		    /**
+			 * 获取当前集合中指定索引的 Dom 封装。
+			 * @param {Number} index 要获取的元素索引。如果 *index* 小于 0， 则表示获取倒数 *index* 位置的元素。
+			 * @return {Object} 指定位置所在的元素。如果指定索引的值不存在，则返回 undefined。
+			 * @remark
+			 * 使用 arr.item(-1) 可获取最后一个元素的值。
+			 * @see Array#see
+			 * @example 
+			 * <pre>
+		     * [0, 1, 2, 3].item(0);  // 0
+		     * [0, 1, 2, 3].item(-1); // 3
+		     * [0, 1, 2, 3].item(5);  // undefined
+		     * </pre>
+			 */
 			item: function(index){
 				var elem = this[index < 0 ? this.length + index : index];
 				return elem ? new Dom(elem) : null;
 			},
 			
 			/**
-			 * 将参数数组添加到当前集合。
-			 * @param {Element/DomList} value 元素。
+			 * 将参数节点添加到当前集合。
+			 * @param {Node/NodeList/Array/DomList} ... 要增加的内容。
 			 * @return this
 			 */
 			concat: function() {
@@ -2797,9 +3081,17 @@ function imports(ns){
 		 * @class Point
 		 */
 		Point = Class({
+			
+			/**
+			 * @field {Number} x X 坐标。
+			 */
+			
+			/**
+			 * @field {Number} y Y 坐标。
+			 */
 	
 			/**
-			 * 初始化 Point 的实例。
+			 * 初始化 Point 的新实例。
 			 * @param {Number} x X 坐标。
 			 * @param {Number} y Y 坐标。
 			 * @constructor
@@ -2810,8 +3102,8 @@ function imports(ns){
 			},
 			
 			/**
-			 * 将 (x, y) 增值。
-			 * @param {Point} System 值。
+			 * 将当前值加上 *p*。
+			 * @param {Point} p 值。
 			 * @return {Point} this
 			 */
 			add: function(p) {
@@ -2820,7 +3112,7 @@ function imports(ns){
 			},
 
 			/**
-			 * 将一个点坐标减到当前值。
+			 * 将当前值减去 *p*。
 			 * @param {Point} System 值。
 			 * @return {Point} this
 			 */
@@ -3066,7 +3358,10 @@ function imports(ns){
 			var win = this.defaultView;
 			return new Point(win.pageXOffset, win.pageYOffset);
 		}: getScroll,
-	
+		
+		/**
+		 * 一个返回 true 的函数。
+		 */
 		returnTrue = Function.from(true),
 
 		/**
@@ -3095,10 +3390,31 @@ function imports(ns){
 	extend(Dom, {
 		
 		/**
-		 * 根据一个 id 获取元素。如果传入的id不是字符串，则直接返回参数。
-		 * @param {String/Node/Dom/DomList} id 要获取元素的 id 或元素本身。
-	 	 * @return {Dom} 元素。
+		 * 根据一个 *id* 或原生节点获取一个 **Dom** 类的实例。
+		 * @param {String/Node/Dom/DomList} id 要获取元素的 id 或用于包装成 Dom 对象的任何元素，如是原生的 DOM 节点、原生的 DOM 节点列表数组或已包装过的 Dom 对象。。
+	 	 * @return {Dom} 此函数返回是一个 Dom 类型的变量。通过这个变量可以调用所有文档中介绍的 DOM 操作函数。如果无法找到指定的节点，则返回 null 。此函数可简写为 $。
 	 	 * @static
+	 	 * @example
+        <example>
+          <desc>找到 id 为 a 的元素。</desc>
+          <html>&lt;p id="a"&gt;once&lt;/p&gt; &lt;div&gt;&lt;p&gt;two&lt;/p&gt;&lt;/div&gt; &lt;p&gt;three&lt;/p&gt;</html>
+          <code>Dom.get("a");</code>
+          <result>{&lt;p id="a"&gt;once&lt;/p&gt;}</result>
+        </example>
+        <example>
+          <desc>返回 id 为 a1 的 DOM 对象</desc>
+          <html>&lt;p id="a1"&gt;&lt;/p&gt; &lt;p id="a2"&gt;&lt;/p&gt; </html>
+        </example>
+        <example>
+          <code>Dom.get(document.getElecmentById('a1')) // 等效于 Dom.get('a1')</code>
+        </example>
+        <example>
+          <code>Dom.get(['a1', 'a2']); // 等效于 Dom.get('a1')</code>
+        </example>
+        <example>
+          <code>Dom.get(Dom.get('a1')); // 等效于 Dom.get('a1')</code>
+          <result>{&lt;p id="a1"&gt;&lt;/p&gt;}</result>
+        </example>
 		 */
 		get: function(id) {
 			
@@ -3115,10 +3431,47 @@ function imports(ns){
 		},
 		
 		/**
-		 * 执行一个选择器，返回一个新的 {DomList} 对象。
-		 * @param {String} selecter 选择器。 如 "h2" ".cls" "[attr=value]" 。
-		 * @return {Element/undefined} 节点。
+		 * 执行一个 CSS 选择器，返回一个新的 **DomList** 对象。
+		 * @param {String/NodeList/DomList/Array/Dom} 用来查找的 CSS 选择器或原生的 DOM 节点列表。
+		 * @return {Element} 如果没有对应的节点则返回一个空的 DomList 对象。
 	 	 * @static
+	 	 * @see DomList
+	 	 * @example
+	 	 * 找到所有 p 元素。
+	 	 * #####HTML:
+	 	 * <pre lang="htm" format="none">
+	 	 * &lt;p&gt;one&lt;/p&gt; &lt;div&gt;&lt;p&gt;two&lt;/p&gt;&lt;/div&gt; &lt;p&gt;three&lt;/p&gt;
+	 	 * </pre>
+	 	 * 
+	 	 * #####Javascript:
+	 	 * <pre>
+	 	 * Dom.query("p");
+	 	 * </pre>
+	 	 * 
+	 	 * #####结果:
+	 	 * <pre lang="htm" format="none">
+	 	 * [  &lt;p&gt;one&lt;/p&gt; ,&lt;p&gt;two&lt;/p&gt;, &lt;p&gt;three&lt;/p&gt;  ]
+	 	 * </pre>
+	 	 * 
+	 	 * <br>
+	 	 * 找到所有 p 元素，并且这些元素都必须是 div 元素的子元素。
+	 	 * #####HTML:
+	 	 * <pre lang="htm" format="none">
+	 	 * &lt;p&gt;one&lt;/p&gt; &lt;div&gt;&lt;p&gt;two&lt;/p&gt;&lt;/div&gt; &lt;p&gt;three&lt;/p&gt;</pre>
+	 	 * 
+	 	 * #####Javascript:
+	 	 * <pre>
+	 	 * Dom.query("div &gt; p");
+	 	 * </pre>
+	 	 * 
+	 	 * #####结果:
+	 	 * <pre lang="htm" format="none">
+	 	 * [ &lt;p&gt;two&lt;/p&gt; ]
+	 	 * </pre>
+         * 
+	 	 * <br>
+         * 查找所有的单选按钮(即: type 值为 radio 的 input 元素)。
+         * <pre>Dom.query("input[type=radio]");</pre>
 		 */
 		query: function(selector) {
 			
@@ -3159,12 +3512,27 @@ function imports(ns){
 		},
 
 		/**
-		 * 解析一个 html 字符串，返回相应的Dom 对象。
-		 * @param {String/Element} html 字符。
-		 * @param {Element} context=document 生成节点使用的文档中的任何节点。
+		 * 根据提供的原始 HTML 标记字符串，解析并动态创建一个节点，并返回这个节点的 Dom 对象包装对象。
+		 * @param {String/Node} html 用于动态创建DOM元素的HTML字符串。
+		 * @param {Element} ownerDocument=document 创建DOM元素所在的文档。
 		 * @param {Boolean} cachable=true 指示是否缓存节点。
 		 * @return {Dom} Dom 对象。
 	 	 * @static
+	 	 * @remark
+	 	 * 可以传递一个手写的 HTML 字符串，或者由某些模板引擎或插件创建的字符串，也可以是通过 AJAX 加载过来的字符串。但是在你创建 input 元素的时会有限制，可以参考第二个示例。当然这个字符串可以包含斜杠 (比如一个图像地址)，还有反斜杠。当创建单个元素时，请使用闭合标签或 XHTML 格式。
+	 	 * @example
+        <example>
+          <desc>动态创建一个 div 元素（以及其中的所有内容），并将它追加到 body 元素中。在这个函数的内部，是通过临时创建一个元素，并将这个元素的 innerHTML 属性设置为给定的标记字符串，来实现标记到 DOM 元素转换的。所以，这个函数既有灵活性，也有局限性。</desc>
+          <code>Dom.parse("&lt;div&gt;&lt;p&gt;Hello&lt;/p&gt;&lt;/div&gt;").appendTo(document.body);</code>
+          <result>[&lt;div&gt;&lt;p&gt;Hello&lt;/p&gt;&lt;/div&gt;]</result>
+        </example>
+        <example>
+          <desc>创建一个 &lt;input&gt; 元素必须同时设定 type 属性。因为微软规定 &lt;input&gt; 元素的 type 只能写一次。</desc>
+          <code>// 在 IE 中无效:
+Dom.parse("&lt;input&gt;").setAttr("type", "checkbox");
+// 在 IE 中有效:
+Dom.parse("&lt;input type='checkbox'&gt;");</code>
+        </example>
 		 */
 		parse: function(html, context, cachable) {
 
@@ -3174,10 +3542,19 @@ function imports(ns){
 		},
 		
 		/**
-		 * 创建一个节点。
-		 * @param {String} tagName 创建的节点的标签名。
-		 * @param {String} className 创建的节点的类名。
+		 * 创建一个指定标签的节点，并返回这个节点的 Dom 对象包装对象。
+		 * @param {String} tagName 要创建的节点标签名。
+		 * @param {String} className 用于新节点的 CSS 类名。
 	 	 * @static
+        <example>
+          <desc>动态创建一个 div 元素（以及其中的所有内容），并将它追加到 body 元素中。在这个函数的内部，是通过临时创建一个元素，并将这个元素的 innerHTML 属性设置为给定的标记字符串，来实现标记到 DOM 元素转换的。所以，这个函数既有灵活性，也有局限性。</desc>
+          <code>Dom.create("div", "cls").appendTo(document.body);</code>
+        </example>
+        <example>
+          <desc>创建一个 div 元素同时设定 class 属性。</desc>
+          <code>Dom.create("div", "className");</code>
+          <result>{&lt;div class="className"&gt;&lt;/div&gt;}</result>
+        </example>
 		 */
 		create: function(tagName, className) {
 			return new Dom(Dom.createNode(tagName, className || ''));
@@ -3328,10 +3705,10 @@ function imports(ns){
 		},
 
 		/**
-		 * 获取一个节点属性。
-		 * @param {Element} elem 元素。
-		 * @param {String} name 名字。
-		 * @return {String} 属性。
+		 * 获取元素的属性值。
+		 * @param {Node} elem 元素。
+		 * @param {String} name 要获取的属性名称。
+		 * @return {String} 返回属性值。如果元素没有相应属性，则返回 null 。
 	 	 * @static
 		 */
 		getAttr: function(elem, name) {
@@ -3549,6 +3926,14 @@ function imports(ns){
 		 * @param {String} name 名字。
 		 * @return {String} 样式。
 	 	 * @static
+	 	 *  <desc>访问元素的样式属性。</desc>
+        <params name="name" type="String">
+          <desc>要访问的属性名称</desc>
+        </params>
+        <example>
+          <desc>取得第一个段落的color样式属性的值。</desc>
+          <code>Dom.query("p").getStyle("color");</code>
+        </example>
 		 */
 		getStyle: getStyle,
 
@@ -3700,7 +4085,7 @@ function imports(ns){
 		 * 将一个成员附加到 Dom 对象和相关类。
 		 * @param {Object} obj 要附加的对象。
 		 * @param {Number} listType = 1 说明如何复制到 DomList 实例。
-		 * @return {Element} this
+		 * @return this
 		 * @static
 		 * 对 Element 扩展，内部对 Element DomList document 皆扩展。
 		 *         这是由于不同的函数需用不同的方法扩展，必须指明扩展类型。 所谓的扩展，即一个类所需要的函数。 DOM 方法
@@ -3775,7 +4160,7 @@ function imports(ns){
 		 * @param {Object} obj 要附加的对象。
 		 * @param {Number} listType = 1 说明如何复制到 DomList 实例。
 		 * @param {Number} docType 说明如何复制到 Document 实例。
-		 * @return {Element} this
+		 * @return this
 		 */
 		implementIf: function(obj, listType) {
 			return this.implement(obj, listType, true);
@@ -3888,6 +4273,24 @@ function imports(ns){
 		 * @param {Element/String} elem=document.body 节点、Dom 对象或节点的 id 字符串。
 		 * @return this 
 		 * this.appendTo(parent) 相当于 parent.append(this) 。 
+		 * <desc>把所有匹配的元素追加到文档中。</desc>
+        <longdesc>实际上，使用这个方法是颠倒了常规的Dom.query(A).append(B)的操作，即不是把B追加到A中，而是把A追加到B中。</longdesc>
+        <example>
+          <desc>把所有段落追加到ID值为foo的元素中。</desc>
+          <html>&lt;p&gt;I would like to say: &lt;/p&gt;&lt;div id="foo"&gt;&lt;/div&gt;</html>
+          <code>Dom.query("p").appendTo();</code>
+        </example>
+        <desc>把所有匹配的元素追加到另一个、指定的元素元素集合中。</desc>
+        <longdesc>实际上，使用这个方法是颠倒了常规的Dom.query(A).append(B)的操作，即不是把B追加到A中，而是把A追加到B中。</longdesc>
+        <params name="content" type="String">
+          <desc>用于被追加的内容</desc>
+        </params>
+        <example>
+          <desc>把所有段落追加到ID值为foo的元素中。</desc>
+          <html>&lt;p&gt;I would like to say: &lt;/p&gt;&lt;div id="foo"&gt;&lt;/div&gt;</html>
+          <code>Dom.query("p").appendTo("foo");</code>
+          <result>&lt;div id="foo"&gt;&lt;p&gt;I would like to say: &lt;/p&gt;&lt;/div&gt;</result>
+        </example>
 		 */
 		appendTo: function(parent) {
 		
@@ -3902,6 +4305,23 @@ function imports(ns){
 		 * 删除元素子节点或本身。
 		 * @param {Dom} childControl 子Dom 对象。
 		 * @return {Dom} this
+		 * <desc>从DOM中删除所有匹配的元素。</desc>
+        <longdesc>这个方法不会把匹配的元素从JPlus对象中删除，因而可以在将来再使用这些匹配的元素。但除了这个元素本身得以保留之外，其他的比如绑定的事件，附加的数据等都会被移除。</longdesc>
+        <params name="child" type="String" optional="true">
+          <desc>删除的子节点。</desc>
+        </params>
+        <example>
+          <desc>从DOM中把所有段落删除</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt; how are &lt;p&gt;you?&lt;/p&gt;</html>
+          <code>Dom.query("p").remove();</code>
+          <result>how are</result>
+        </example>
+        <example>
+          <desc>从DOM中把带有hello类的段落删除</desc>
+          <html>&lt;p class="hello"&gt;Hello&lt;/p&gt; how are &lt;p&gt;you?&lt;/p&gt;</html>
+          <code>Dom.query("p").remove(".hello");</code>
+          <result>how are &lt;p&gt;you?&lt;/p&gt;</result>
+        </example>
 		 */
 		remove: function(childControl) {
 	
@@ -3917,7 +4337,14 @@ function imports(ns){
 	
 		/**
 	 	 * 删除一个节点的所有子节点。
-		 * @return {Element} this
+		 * @return this
+		 * <desc>删除匹配的元素集合中所有的子节点。</desc>
+        <example>
+          <desc>把所有段落的子元素（包括文本节点）删除</desc>
+          <html>&lt;p&gt;Hello, &lt;span&gt;Person&lt;/span&gt; &lt;a href="#"&gt;and person&lt;/a&gt;&lt;/p&gt;</html>
+          <code>Dom.query("p").empty();</code>
+          <result>&lt;p&gt;&lt;/p&gt;</result>
+        </example>
 		 */
 		empty: function() {
 			var elem = this.dom;
@@ -3930,6 +4357,22 @@ function imports(ns){
 	
 		/**
 		 * 释放节点所有资源。
+		 * <desc>从DOM中删除所有匹配的元素。</desc>
+        <longdesc>这个方法不会把匹配的元素从JPlus对象中删除，因而可以在将来再使用这些匹配的元素。与remove()不同的是，所有绑定的事件、附加的数据等都会保留下来。</longdesc>
+        <params name="expr" type="String" optional="true">
+          <desc>用于筛选元素的JPlus表达式</desc>
+        </params>
+        <example>
+          <desc>从DOM中把所有段落删除</desc>
+          <html>&lt;p&gt;dispose&lt;/p&gt; how are &lt;p&gt;you?&lt;/p&gt;</html>
+          <code>Dom.query("p").detach();</code>
+          <result>how are</result>
+        </example>
+        <example>
+          <desc>从DOM中把带有hello类的段落删除</desc>
+          <html>&lt;p class="hello"&gt;Hello&lt;/p&gt; how are &lt;p&gt;you?&lt;/p&gt;</html>
+          <code>Dom.query("p").dispose(".hello");</code>
+        </example>
 		 */
 		dispose: function() {
 			if(this.dom.nodeType == 1){
@@ -3944,7 +4387,19 @@ function imports(ns){
 		 * 设置一个样式属性的值。
 		 * @param {String} name CSS 属性名或 CSS 字符串。
 		 * @param {String/Number} [value] CSS属性值， 数字如果不加单位，则函数会自动追为像素。
-		 * @return {Element} this
+		 * @return this
+		 * <desc>把一个“名/值对”对象设置为所有匹配元素的样式属性。</desc>
+        <longdesc>这是一种在所有匹配的元素上设置大量样式属性的最佳方式。</longdesc>
+        <params name="key" type="String">
+          <desc>属性名称</desc>
+        </params>
+        <params name="value" type="Object">
+          <desc>属性值</desc>
+        </params>
+        <example>
+          <desc>将所有段落的字体颜色设为红色并且背景为蓝色。</desc>
+          <code>Dom.query("p").setStyle('color', "#ff0011");</code>
+        </example>
 		 */
 		setStyle: function(name, value) {
 		
@@ -3985,7 +4440,7 @@ function imports(ns){
 		/**
 		 * 设置连接的透明度。
 		 * @param {Number} value 透明度， 0 - 1 。
-		 * @return {Element} this
+		 * @return this
 		 */
 		setOpacity: 'opacity' in div.style ? function(value) {
 		
@@ -4042,7 +4497,7 @@ function imports(ns){
 		 * @param {Number} duration=500 时间。
 		 * @param {Function} [callBack] 回调。
 		 * @param {String} [type] 方式。
-		 * @return {Element} this
+		 * @return this
 		 */
 		show: function(duration, callBack) {
 			Dom.show(this.dom);
@@ -4055,7 +4510,7 @@ function imports(ns){
 		 * @param {Number} duration=500 时间。
 		 * @param {Function} [callBack] 回调。
 		 * @param {String} [type] 方式。
-		 * @return {Element} this
+		 * @return this
 		 */
 		hide: function(duration, callBack) {
 			Dom.hide(this.dom);
@@ -4068,7 +4523,7 @@ function imports(ns){
 		 * @param {Number} duration=500 时间。
 		 * @param {Function} [callBack] 回调。
 		 * @param {String} [type] 方式。
-		 * @return {Element} this
+		 * @return this
 		 */
 		toggle: function(duration, onShow, onHide, type, flag) {
 			flag = (flag === undefined ? Dom.isHidden(this.dom): flag);
@@ -4113,10 +4568,23 @@ function imports(ns){
 		}, 
 		
 		/**
-		 * 设置节点属性。
-		 * @param {String} name 名字。
-		 * @param {String} value 值。
-		 * @return {Element} this
+		 * 设置一个属性值。
+		 * @param {String} name 要设置的属性名称。
+		 * @param {String} value 要设置的属性值。当设置为 null 时，删除属性。
+		 * @return this
+        <example>
+          <desc>为所有图像设置src属性。</desc>
+          <html>&lt;img/&gt;
+&lt;img/&gt;</html>
+          <code>Dom.query("img").setAttr("src","test.jpg");</code>
+          <result>[ &lt;img src= "test.jpg" /&gt; , &lt;img src= "test.jpg" /&gt; ]</result>
+        </example>
+        <example>
+          <desc>将文档中图像的src属性删除</desc>
+          <html>&lt;img src="test.jpg"/&gt;</html>
+          <code>Dom.query("img").setAttr("src");</code>
+          <result>[ &lt;img /&gt; ]</result>
+        </example>
 		 */
 		setAttr: function(name, value) {
 			var elem = this.dom;
@@ -4166,10 +4634,24 @@ function imports(ns){
 		},
 	
 		/**
-		 * 快速设置节点全部属性和样式。
-		 * @param {String/Object} name 名字。
-		 * @param {Object} [value] 值。
-		 * @return {Element} this
+		 * 快速设置一个元素的样式、属性或事件。
+		 * @param {String/Object} name 属性名。可以是一个 css 属性名或 html 属性名。如果属性名是on开头的，则被认为是绑定事件。 - 或 - 属性值，表示 属性名/属性值 的 JSON 对象。
+		 * @param {Object} [value] 属性值。
+		 * @return this
+		 * @remark
+		 * 此函数相当于调用 setStyle 或 setAttr 。数字将自动转化为像素值。
+        <example>
+          <desc>将所有段落字体设为红色、设置 class 属性、绑定 click 事件。</desc>
+          <code>Dom.query("p").set("color","red").set("class","cls-red").set("onclick", function(){alert('clicked')});</code>
+        </example>
+        <example>
+          <desc>将所有段落字体设为红色、设置 class 属性、绑定 click 事件。</desc>
+          <code>Dom.query("p").set({
+  "color":"red",
+  "class":"cls-red",
+  "onclick": function(){alert('clicked')}
+});</code>
+        </example>
 		 */
 		set: function(name, value) {
 			var me = this;
@@ -4202,9 +4684,21 @@ function imports(ns){
 		},
 	
 		/**
-		 * 增加类名。
-		 * @param {String} className 类名。
-		 * @return {Element} this
+		 * 为元素添加指定的类名。
+		 * @param {String} className 一个或多个要添加到元素中的CSS类名，用空格分开。
+		 * @return this
+        <example>
+          <desc>为匹配的元素加上 'selected' 类</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;</html>
+          <code>Dom.query("p").addClass("selected");</code>
+          <result>[ &lt;p class="selected"&gt;Hello&lt;/p&gt; ]</result>
+        </example>
+        <example>
+          <desc>为匹配的元素加上 selected highlight 类</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;</html>
+          <code>Dom.query("p").addClass("selected highlight");</code>
+          <result>[ &lt;p class="selected highlight"&gt;Hello&lt;/p&gt; ]</result>
+        </example>
 		 */
 		addClass: function(className) {
 			assert.isString(className, "Dom.prototype.addClass(className): {className} ~");
@@ -4230,9 +4724,17 @@ function imports(ns){
 		},
 	
 		/**
-		 * 移除CSS类名。
-		 * @param {String} [className] 类名。
-		 */
+		 * 从元素中删除全部或者指定的类。
+		 * @param {String} [className] 一个或多个要删除的CSS类名，用空格分开。如果不提供此参数，将清空 className 。
+		 * @return this
+		 * 
+        <example>
+          <desc>从匹配的元素中删除 'selected' 类</desc>
+          <html>&lt;p class="selected first"&gt;Hello&lt;/p&gt;</html>
+          <code>Dom.query("p").removeClass("selected");</code>
+          <result>[ &lt;p class="first"&gt;Hello&lt;/p&gt; ]</result>
+        </example>
+		 * */
 		removeClass: function(className) {
 			assert(!className || className.split, "Dom.prototype.removeClass(className): {className} ~");
 		
@@ -4255,19 +4757,31 @@ function imports(ns){
 		},
 	
 		/**
-		 * 切换类名。
-		 * @param {String} className 类名。
+		 * 如果存在（不存在）就删除（添加）一个类。
+		 * @param {String} className CSS类名。
 		 * @param {Boolean} [toggle] 自定义切换的方式。如果为 true， 则加上类名，否则删除。
-		 * @return {Element} this
+		 * @return this
+        <example>
+          <desc>为匹配的元素切换 'selected' 类</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;p class="selected"&gt;Hello Again&lt;/p&gt;</html>
+          <code>Dom.query("p").toggleClass("selected");</code>
+          <result>[ &lt;p class="selected"&gt;Hello&lt;/p&gt;, &lt;p&gt;Hello Again&lt;/p&gt; ]</result>
+        </example>
 		 */
 		toggleClass: function(className, stateVal) {
 			return (stateVal !== undefined ? !stateVal: this.hasClass(className)) ? this.removeClass(className): this.addClass(className);
 		},
 	
 		/**
-		 * 设置Dom 对象对应的文本值。
-		 * @param {String/Boolean} 值。
-		 * @return {Element} this
+		 * 设置元素的文本内容。对于输入框则设置其输入的值。
+		 * @param {String} 用于设置元素内容的文本。
+		 * @return this
+		 * @remark 与 {@link #setHtml} 类似, 但将编码 HTML (将 "&lt;" 和 "&gt;" 替换成相应的HTML实体)。
+        <example>
+          <desc>设定文本框的值</desc>
+          <html>&lt;input type="text"/&gt;</html>
+          <code>Dom.query("input").setText("hello world!");</code>
+        </example>
 		 */
 		setText: function(value) {
 			var elem = this.dom;
@@ -4276,9 +4790,15 @@ function imports(ns){
 		},
 	
 		/**
-		 * 设置当前Dom 对象的内部 HTML 字符串。
-		 * @param {String} value 设置的新值。
-		 * @return {Element} this
+		 * 设置元素的html内容。
+		 * @param {String} value 用于设定HTML内容的值。
+		 * @return this
+        <example>
+          <desc>设置一个节点的内部 html </desc>
+          <html>&lt;div id="a"&gt;&lt;p/&gt;&lt;/div&gt;</html>
+          <code>Dom.get("a").setHtml("&lt;a/&gt;");</code>
+          <result>&lt;div id="a"&gt;&lt;a/&gt;&lt;/div&gt;</result>
+        </example>
 		 */
 		setHtml: function(value) {
 			var elem = this.dom,
@@ -4314,7 +4834,17 @@ function imports(ns){
 		 * 改变大小。
 		 * @param {Number} x 坐标。
 		 * @param {Number} y 坐标。
-		 * @return {Element} this
+		 * @return this
+		 *  <desc>设置元素实际占用大小（包括内边距和边框，但不包括滚动区域之外的大小）。</desc>
+        <longdesc>此方法对可见和隐藏元素均有效。</longdesc>
+        <params name="coordinates" type="Object{width,height}, function(index, coords) ">
+          <desc>一个对象，包含x和y属性，作为元素的新宽度和高度。函数接受两个参数，第一个参数是元素在原先集合中的索引位置，第二个参数为原先的宽度。</desc>
+        </params>
+        <example>
+          <desc>设置第一段落的大小。</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;2nd Paragraph&lt;/p&gt;</html>
+          <code>Dom.query("p:first").setSize({x:200,y:100});</code>
+        </example>
 		 */
 		setSize: function(x, y) {
 			var me = this,
@@ -4330,7 +4860,16 @@ function imports(ns){
 		/**
 		 * 获取元素自身大小（不带滚动条）。
 		 * @param {Number} value 值。
-		 * @return {Element} this
+		 * @return this
+		 *  <desc>为元素设置CSS宽度(width)属性的值。</desc>
+        <longdesc>如果没有明确指定单位（如：em或%），使用px。</longdesc>
+        <params name="val" type="String, Number, Function">
+          <desc>设定 CSS 'width' 的属性值，可以是字符串或者数字，还可以是一个函数，返回要设置的数值。函数接受两个参数，第一个参数是元素在原先集合中的索引位置，第二个参数为原先的宽度。</desc>
+        </params>
+        <example>
+          <desc>将所有段落的宽设为 20:</desc>
+          <code>Dom.query("p").setWidth(20);</code>
+        </example>
 		 */
 		setWidth: function(value) {
 		
@@ -4341,7 +4880,16 @@ function imports(ns){
 		/**
 		 * 获取元素自身大小（不带滚动条）。
 		 * @param {Number} value 值。
-		 * @return {Element} this
+		 * @return this
+		 * <desc>为元素设置CSS高度(hidth)属性的值。如果没有明确指定单位（如：em或%），使用px。</desc>
+        <longdesc>如果没有明确指定单位（如：em或%），使用px。</longdesc>
+        <params name="val" type="String, Number, Function">
+          <desc>设定CSS中 'height' 的值，可以是字符串或者数字，还可以是一个函数，返回要设置的数值。函数接受两个参数，第一个参数是元素在原先集合中的索引位置，第二个参数为原先的高度。</desc>
+        </params>
+        <example>
+          <desc>把所有段落的高设为 20:</desc>
+          <code>Dom.query("p").setHeight(20);</code>
+        </example>
 		 */
 		setHeight: function(value) {
 	
@@ -4352,7 +4900,20 @@ function imports(ns){
 		/**
 		 * 设置元素的相对位置。
 		 * @param {Point} System
-		 * @return {Element} this
+		 * @return this
+		 * <desc>设置置元素相对父元素的偏移。</desc>
+        <longdesc>setOffset()方法可以让我们重新设置元素的位置。这个元素的位置是相对于低级对象的。如果对象原先的position样式属性是static的话，会被改成relative来实现重定位。</longdesc>
+        <params name="coordinates" type="Object{top,left}, function(index, coords) ">
+          <desc>一个对象，必须包含x和y属性，作为元素的新坐标。这个参数也可以是一个返回一对坐标的函数，函数的第一个参数是元素的索引，第二个参数是当前的坐标。</desc>
+        </params>
+        <example>
+          <desc>设置第一段的偏移</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;2nd Paragraph&lt;/p&gt;</html>
+          <code>
+            Dom.query("p:first").setOffset({ x: 10, y: 30 });
+          </code>
+          <result>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;left: 15, top: 15&lt;/p&gt;</result>
+        </example>
 		 */
 		setOffset: function(offsetPoint) {
 		
@@ -4371,7 +4932,30 @@ function imports(ns){
 		 * 设置元素的固定位置。
 		 * @param {Number} x 坐标。
 		 * @param {Number} y 坐标。
-		 * @return {Element} this
+		 * @return this
+		 * <desc>获取匹配元素在当前视口的相对偏移。</desc>
+        <longdesc>返回的对象包含两个整型属性：x 和 y。此方法只对可见元素有效。</longdesc>
+        <example>
+          <desc>获取第二段的偏移</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;2nd Paragraph&lt;/p&gt;</html>
+          <code>
+            var p = Dom.query("p:last");
+            var position = p.getPosition();
+            p.html( "left: " + position.x + ", top: " + position.y );
+          </code>
+          <result>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;left: 0, top: 35&lt;/p&gt;</result>
+        </example>
+        
+         <desc>设置匹配元素相对于document对象的坐标。</desc>
+        <longdesc>setPosition()方法可以让我们重新设置元素的位置。这个元素的位置是相对于document对象的。如果对象原先的position样式属性是static的话，会被改成relative来实现重定位。</longdesc>
+        <params name="coordinates" type="Object{top,left}, function(index, coords) ">
+          <desc>一个对象，必须包含x和y属性，作为元素的新坐标。这个参数也可以是一个返回一对坐标的函数，函数的第一个参数是元素的索引，第二个参数是当前的坐标。</desc>
+        </params>
+        <example>
+          <desc>设置第二段的偏移</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;2nd Paragraph&lt;/p&gt;</html>
+          <code>Dom.query("p:last").setPosition({ x: 10, y: 30 });</code>
+        </example>
 		 */
 		setPosition: function(x, y) {
 			var me = this,
@@ -4394,7 +4978,7 @@ function imports(ns){
 		 * @param {Element} dom
 		 * @param {Number} x 坐标。
 		 * @param {Number} y 坐标。
-		 * @return {Element} this
+		 * @return this
 		 */
 		setScroll: function(x, y) {
 			var elem = this.dom,
@@ -4427,6 +5011,14 @@ function imports(ns){
 		 * 获取节点样式。
 		 * @param {String} name 键。
 		 * @return {String} 样式。 getStyle() 不被支持，需要使用 name 来获取样式。
+		 * <desc>访问元素的样式属性。</desc>
+        <params name="name" type="String">
+          <desc>要访问的属性名称</desc>
+        </params>
+        <example>
+          <desc>取得第一个段落的color样式属性的值。</desc>
+          <code>Dom.query("p").getStyle("color");</code>
+        </example>
 		 */
 		getStyle: function(name) {
 		
@@ -4463,34 +5055,68 @@ function imports(ns){
 		/// #endif
 		
 		/**
-		 * 获取一个节点属性。
-		 * @param {String} name 名字。
-		 * @return {String} 属性。
+		 * 获取元素的属性值。
+		 * @param {String} name 要获取的属性名称。
+		 * @return {String} 返回属性值。如果元素没有相应属性，则返回 null 。
+	 	 * @static
+        <example>
+          <desc>返回文档中第一个图像的src属性值。</desc>
+          <html>&lt;img id="img" src="test.jpg"/&gt;</html>
+          <code>Dom.get("img").getAttr("src");</code>
+          <result>test.jpg</result>
+        </example>
 		 */
 		getAttr: function(name) {
 			return Dom.getAttr(this.dom, name);
 		},
 	
 		/**
-		 * 检查是否含指定类名。
-		 * @param {String} className
-		 * @return {Boolean} 如果存在返回 true。
+		 * 检查当前的元素是否含有某个特定的类。
+		 * @param {String} className 要判断的类名。只允许一个类名。
+		 * @return {Boolean} 如果存在则返回 true。
+        <example>
+          <desc>给包含有某个类的元素进行一个动画。</desc>
+          <html>&lt;div class="protected"&gt;&lt;/div&gt;&lt;div&gt;&lt;/div&gt;</html>
+          <code>Dom.query("div").on('click', function(){
+            if ( Dom.query(this).hasClass("protected") )
+            Dom.query(this)
+            .animate({ left: -10 })
+            .animate({ left: 10 })
+            .animate({ left: -10 })
+            .animate({ left: 10 })
+            .animate({ left: 0 });
+            });</code>
+        </example>
 		 */
 		hasClass: function(className) {
 			return Dom.hasClass(this.dom, className);
 		},
 	
 		/**
-		 * 获取值。
-		 * @return {Object/String} 值。对普通节点返回 text 属性。
+		 * 取得元素的内容。对于输入框则获取其输入的值。
+		 * @return {String} 文本内容。对普通节点返回 textContent 属性, 对输入框返回 value 属性， 对普通节点返回 nodeValue 属性。
+		 * @remark 
+		 * 结果是由所有匹配元素包含的文本内容组合起来的文本。这个方法对HTML和XML文档都有效。
+		 *  <example>
+          <desc>获取文本框中的值</desc>
+          <html>&lt;input type="text" value="some text"/&gt;</html>
+          <code>Dom.query("input").getText();</code>
+          <result>["some text"]</result>
+        </example>
 		 */
 		getText: function() {
 			return Dom.getText(this.dom);
 		},
 	
 		/**
-		 * 获取当前Dom 对象的内部 HTML 字符串。
+		 * 取得元素的html内容。
 		 * @return {String} HTML 字符串。
+        <example>
+          <desc>获取一个节点的内部 html </desc>
+          <html>&lt;div id="a"&gt;&lt;p/&gt;&lt;/div&gt;</html>
+          <code>$Dom.query("a").getHtml();</code>
+          <result>"&lt;p/&gt;"</result>
+        </example>
 		 */
 		getHtml: function() {
 			assert(this.dom.nodeType === 1, "Dom.prototype.getHtml(): 仅当 dom.nodeType === 1 时才能使用此函数。"); 
@@ -4500,6 +5126,14 @@ function imports(ns){
 		/**
 		 * 获取元素可视区域大小。包括 border 大小。
 		 * @return {Point} 位置。
+		 * <desc>获取元素实际占用大小（包括内边距和边框）。</desc>
+        <longdesc>此方法对可见和隐藏元素均有效。</longdesc>
+        <example>
+          <desc>获取第一段落实际大小。</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;2nd Paragraph&lt;/p&gt;</html>
+          <code>Dom.query("p:first").getSize();</code>
+          <result>{x=200,y=100}</result>
+        </example>
 		 */
 		getSize: function() {
 			var elem = this.dom;
@@ -4510,6 +5144,20 @@ function imports(ns){
 		/**
 		 * 获取元素自身大小（不带滚动条）。
 		 * @return {Point} 位置。
+		 * <desc>取得元素当前计算的宽度值（px）。</desc>
+        <longdesc>在 JPlus 1.2 以后可以用来获取 window 和 document 的宽</longdesc>
+        <example>
+          <desc>获取第一段的宽</desc>
+          <code>Dom.query("p").getWidth();</code>
+        </example>
+        <example>
+          <desc>获取当前浏览器窗口的宽度</desc>
+          <code>Dom.query(window).getWidth();</code>
+        </example>
+        <example>
+          <desc>获取当前HTML文档宽度</desc>
+          <code>Dom.query(document).getWidth();</code>
+        </example>
 		 */
 		getWidth: function() {
 			return styleNumber(this.dom, 'width');
@@ -4518,6 +5166,20 @@ function imports(ns){
 		/**
 		 * 获取元素自身大小（不带滚动条）。
 		 * @return {Point} 位置。
+		 *   <desc>取得元素当前计算的高度值（px）。</desc>
+        <longdesc>在 JPlus 1.2 以后可以用来获取 window 和 document 的高</longdesc>
+        <example>
+          <desc>获取第一段的高</desc>
+          <code>Dom.query("p").getHeight();</code>
+        </example>
+        <example>
+          <desc>获取当前浏览器窗口的高度</desc>
+          <code>Dom.query(window).getHeight();</code>
+        </example>
+        <example>
+          <desc>获取当前HTML文档高度</desc>
+          <code>Dom.query(document).getHeight();</code>
+        </example>
 		 */
 		getHeight: function() {
 			return styleNumber(this.dom, 'height');
@@ -4526,6 +5188,14 @@ function imports(ns){
 		/**
 		 * 获取滚动区域大小。
 		 * @return {Point} 位置。
+		 * <desc>获取元素实际大小宽度（包括整个滚动区域）。</desc>
+        <longdesc>此方法对可见和隐藏元素均有效。</longdesc>
+        <example>
+          <desc>获取第一段落外部宽度。</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;2nd Paragraph&lt;/p&gt;</html>
+          <code>Dom.query("p:first")。getScrollSize();</code>
+          <result>{x=220,y=120}</result>
+        </example>
 		 */
 		getScrollSize: function() {
 			var elem = this.dom;
@@ -4536,6 +5206,18 @@ function imports(ns){
 		/**
 		 * 获取元素的相对位置。
 		 * @return {Point} 位置。
+		 * <desc>获取匹配元素相对父元素的偏移。</desc>
+        <longdesc>返回的对象包含两个整型属性：x 和 y。为精确计算结果，请在补白、边框和填充属性上使用像素单位。此方法只对可见元素有效。</longdesc>
+        <example>
+          <desc>获取第一段的偏移</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;2nd Paragraph&lt;/p&gt;</html>
+          <code>
+            var p = Dom.query("p:first");
+            var offset = p.getOffset();
+            Dom.query("p:last").html( "left: " + offset.x + ", top: " + offset.y );
+          </code>
+          <result>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;left: 15, top: 15&lt;/p&gt;</result>
+        </example>
 		 */
 		getOffset: function() {
 			// 如果设置过 left top ，这是非常轻松的事。
@@ -4568,6 +5250,18 @@ function imports(ns){
 		/**
 		 * 获取距父元素的偏差。
 		 * @return {Point} 位置。
+		 * <desc>获取匹配元素在当前视口的相对偏移。</desc>
+        <longdesc>返回的对象包含两个整型属性：x 和 y。此方法只对可见元素有效。</longdesc>
+        <example>
+          <desc>获取第二段的偏移</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;2nd Paragraph&lt;/p&gt;</html>
+          <code>
+            var p = Dom.query("p:last");
+            var position = p.getPosition();
+            p.html( "left: " + position.x + ", top: " + position.y );
+          </code>
+          <result>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;left: 0, top: 35&lt;/p&gt;</result>
+        </example>
 		 */
 		getPosition: div.getBoundingClientRect ? function() {
 			var elem = this.dom, 
@@ -4627,6 +5321,17 @@ function imports(ns){
 		/**
 		 * 获取滚动条已滚动的大小。
 		 * @return {Point} 位置。
+		 * <desc>获取匹配元素相对滚动条顶部的偏移。</desc>
+        <longdesc>此方法对可见和隐藏元素均有效。</longdesc>
+        <example>
+          <desc>获取第一段相对滚动条顶部的偏移</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;2nd Paragraph&lt;/p&gt;</html>
+          <code>
+            var p = Dom.query("p:first");
+            Dom.query("p:last").text( "scrollTop:" + p.getScroll() );
+          </code>
+          <result>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;scrollTop: 0&lt;/p&gt;</result>
+        </example>
 		 */
 		getScroll: getScroll
 
@@ -4635,21 +5340,104 @@ function imports(ns){
 	.implement({
 		
 		// 父节点。
+		/**
+		 *  <desc>取得一个包含着所有匹配元素的祖先元素。可以通过一个可选的表达式进行筛选。</desc>
+        <params name="filter" type="Integer/String/Function/Boolean" optional="true">
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+        </params>
+        <example>
+          <desc>找到每个span元素的所有祖先元素。</desc>
+          <html>&lt;html&gt;&lt;body&gt;&lt;div&gt;&lt;p&gt;&lt;span&gt;Hello&lt;/span&gt;&lt;/p&gt;&lt;span&gt;Hello Again&lt;/span&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;</html>
+          <code>Dom.query("span").getParent()</code>
+        </example>
+		 */
 		parent: createTreeWalker('parentNode'),
 
-		// 第一个节点。
+		/**
+		 * 获取第一个子元素。
+		 *  <params name="filter" type="Integer/String/Function/Boolean" optional="true">
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+        </params>
+        <example>
+          <desc>获取匹配的第二个元素</desc>
+          <html>&lt;p&gt; This is just a test.&lt;/p&gt; &lt;p&gt; So is this&lt;/p&gt;</html>
+          <code>Dom.query("p").getChild(1)</code>
+          <result>[ &lt;p&gt; So is this&lt;/p&gt; ]</result>
+        </example>
+		 */
 		first: createTreeWalker('nextSibling', 'firstChild'),
 
-		// 最后的节点。
+		/**
+		 * <desc>获取最后一个子元素</desc>
+        <params name="index" type="Integer/String/Function/Boolean" optional="true">
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+        </params>
+        <example>
+          <desc>获取匹配的第二个元素</desc>
+          <html>&lt;p&gt; This is just a test.&lt;/p&gt; &lt;p&gt; So is this&lt;/p&gt;</html>
+          <code>Dom.query("p").getChild(1)</code>
+          <result>[ &lt;p&gt; So is this&lt;/p&gt; ]</result>
+        </example>
+		 */
 		last: createTreeWalker('previousSibling', 'lastChild'),
 
-		// 后面的节点。
+		/**
+		 * <desc>取得一个包含匹配的元素集合中每一个元素紧邻的后面同辈元素的元素集合。</desc>
+        <longdesc>这个函数只返回后面那个紧邻的同辈元素，而不是后面所有的同辈元素（可以使用nextAll）。可以用一个可选的表达式进行筛选。</longdesc>
+        <params name="filter" type="Integer/String/Function/Boolean" optional="true">
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+        </params>
+        <example>
+          <desc>找到每个段落的后面紧邻的同辈元素。</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;Hello Again&lt;/p&gt;&lt;div&gt;&lt;span&gt;And Again&lt;/span&gt;&lt;/div&gt;</html>
+          <code>Dom.query("p").getNext()</code>
+          <result>[ &lt;p&gt;Hello Again&lt;/p&gt;, &lt;div&gt;&lt;span&gt;And Again&lt;/span&gt;&lt;/div&gt; ]</result>
+        </example>
+		 */
 		next: createTreeWalker('nextSibling'),
 
 		// 前面的节点。
+		/**
+		 *  <desc>取得一个包含匹配的元素集合中每一个元素紧邻的前一个同辈元素的元素集合。</desc>
+        <longdesc>可以用一个可选的表达式进行筛选。只有紧邻的同辈元素会被匹配到，而不是前面所有的同辈元素。</longdesc>
+        <params name="filter" type="Integer/String/Function/Boolean" optional="true">
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+        </params>
+        <example>
+          <desc>找到每个段落紧邻的前一个同辈元素。</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;div&gt;&lt;span&gt;Hello Again&lt;/span&gt;&lt;/div&gt;&lt;p&gt;And Again&lt;/p&gt;</html>
+          <code>Dom.query("p").getPrevious()</code>
+          <result>[ &lt;div&gt;&lt;span&gt;Hello Again&lt;/span&gt;&lt;/div&gt; ]</result>
+        </example>
+        <example>
+          <desc>找到每个段落紧邻的前一个同辈元素中类名为selected的元素。</desc>
+          <html>&lt;div&gt;&lt;span&gt;Hello&lt;/span&gt;&lt;/div&gt;&lt;p class="selected"&gt;Hello Again&lt;/p&gt;&lt;p&gt;And Again&lt;/p&gt;</html>
+          <code>Dom.query("p").getPrevious("div")</code>
+          <result>[ &lt;p class="selected"&gt;Hello Again&lt;/p&gt; ]</result>
+        </example>
+		 */
 		prev: createTreeWalker('previousSibling'),
 
 		// 全部子节点。
+		/**
+		 * desc>取得一个包含所有子元素的元素集合。</desc>
+        <longdesc>可以通过可选的表达式来过滤所匹配的子元素。注意：parents()将查找所有祖辈元素，而children()只考虑子元素而不考虑所有后代元素。</longdesc>
+        <params name="filter" type="Integer/String/Function/Boolean" optional="true">
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+        </params>
+        <example>
+          <desc>查找DIV中的每个子元素。</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;div&gt;&lt;span&gt;Hello Again&lt;/span&gt;&lt;/div&gt;&lt;p&gt;And Again&lt;/p&gt;</html>
+          <code>Dom.query("div").getChildren()</code>
+          <result>[ &lt;span&gt;Hello Again&lt;/span&gt; ]</result>
+        </example>
+        <example>
+          <desc>在每个div中查找 div。</desc>
+          <html>&lt;div&gt;&lt;span&gt;Hello&lt;/span&gt;&lt;p class="selected"&gt;Hello Again&lt;/p&gt;&lt;p&gt;And Again&lt;/p&gt;&lt;/div&gt;</html>
+          <code>Dom.query("div").getChildren("div")</code>
+          <result>[ &lt;p class="selected"&gt;Hello Again&lt;/p&gt; ]</result>
+        </example>
+		 */
 		children: function(args){
 			return dir(this.dom.firstChild, 'nextSibling', args);
 		},
@@ -4692,9 +5480,15 @@ function imports(ns){
 		},
 
 		/**
-		 * 执行一个简单的选择器。
-		 * @param {String} selecter 选择器。 如 h2 .cls attr=value 。
-		 * @return {Element/undefined} 节点。
+		 * 搜索所有与指定CSS表达式匹配的第一个元素。
+		 * @param {String} selecter 用于查找的表达式。
+		 * @return {Dom} 返回元素的 Dom 包装。如果找不到元素，则返回 null。
+        <example>
+          <desc>从所有的段落开始，进一步搜索下面的span元素。与Dom.query("p span")相同。</desc>
+          <html>&lt;p&gt;&lt;span&gt;Hello&lt;/span&gt;, how are you?&lt;/p&gt;</html>
+          <code>Dom.query("p").find("span")</code>
+          <result>[ &lt;span&gt;Hello&lt;/span&gt; ]</result>
+        </example>
 		 */
 		find: function(selector){
 			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
@@ -4722,10 +5516,15 @@ function imports(ns){
 		},
 		
 		/**
-		 * 执行选择器。
-		 * @method
-		 * @param {String} selecter 选择器。 如 h2 .cls attr=value 。
-		 * @return {Element/undefined} 节点。
+		 * 搜索所有与指定表达式匹配的元素。
+		 * @param {String} 用于查找的表达式。
+		 * @return {NodeList} 节点。
+        <example>
+          <desc>从所有的段落开始，进一步搜索下面的span元素。与Dom.query("p span")相同。</desc>
+          <html>&lt;p&gt;&lt;span&gt;Hello&lt;/span&gt;, how are you?&lt;/p&gt;</html>
+          <code>Dom.query("p").query("span")</code>
+          <result>[ &lt;span&gt;Hello&lt;/span&gt; ]</result>
+        </example>
 		 */
 		query: function(selector){
 			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
@@ -4769,6 +5568,20 @@ function imports(ns){
 		 * @param {String} [where] 插入地点。 beforeBegin 节点外 beforeEnd 节点里
 		 *            afterBegin 节点外 afterEnd 节点里
 		 * @return {Element} 插入的节点。
+		 * <desc>向每个匹配的元素内部前置内容。</desc>
+        <longdesc>这是向所有匹配元素内部的开始处插入内容的最佳方式。</longdesc>
+        <params name="where" type="String">
+          <desc>可以是 beforeBegin; beforeEnd; afterBegin; afterEnd 之一，表示插入的位置。</desc>
+        </params>
+        <params name="content" type="String, Element, Control">
+          <desc>要插入到目标元素内部前端的内容</desc>
+        </params>
+        <example>
+          <desc>向所有段落中前置一些HTML标记代码。</desc>
+          <html>&lt;p&gt;I would like to say: &lt;/p&gt;</html>
+          <code>Dom.query("p").insert("afterBegin","&lt;b&gt;Hello&lt;/b&gt;");</code>
+          <result>[ &lt;p&gt;&lt;b&gt;Hello&lt;/b&gt;I would like to say: &lt;/p&gt; ]</result>
+        </example>
 		 */
 		insert: function(where, html) {
 		
@@ -4816,6 +5629,32 @@ function imports(ns){
 		 * 将一个节点用另一个节点替换。
 		 * @param {Element/String} html 内容。
 		 * @return {Element} 替换之后的新元素。
+		 * <desc>将所有匹配的元素替换成指定的HTML或DOM元素。</desc>
+        <params name="content" type="String, Element, JPlus, Function">
+          <desc>用于将匹配元素替换掉的内容。如果这里传递一个函数进来的话，函数返回值必须是HTML字符串。</desc>
+        </params>
+        <example>
+          <desc>把所有的段落标记替换成加粗的标记。</desc>
+          <html>&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;cruel&lt;/p&gt;&lt;p&gt;World&lt;/p&gt;</html>
+          <code>Dom.query("p").replaceWith("&lt;b&gt;Paragraph. &lt;/b&gt;");</code>
+          <result>&lt;b&gt;Paragraph. &lt;/b&gt;&lt;b&gt;Paragraph. &lt;/b&gt;&lt;b&gt;Paragraph. &lt;/b&gt;</result>
+        </example>
+        <example>
+          <desc>用第一段替换第三段，你可以发现他是移动到目标位置来替换，而不是复制一份来替换。</desc>
+          <html>
+            &lt;div class=&quot;container&quot;&gt;
+            &lt;div class=&quot;inner first&quot;&gt;Hello&lt;/div&gt;
+            &lt;div class=&quot;inner second&quot;&gt;And&lt;/div&gt;
+            &lt;div class=&quot;inner third&quot;&gt;Goodbye&lt;/div&gt;
+            &lt;/div&gt;
+          </html>
+          <code>Dom.query('.third').replaceWith(Dom.query('.first'));</code>
+          <result>
+            &lt;div class=&quot;container&quot;&gt;
+            &lt;div class=&quot;inner second&quot;&gt;And&lt;/div&gt;
+            &lt;div class=&quot;inner first&quot;&gt;Hello&lt;/div&gt;
+            &lt;/div&gt;
+          </result>
 		 */
 		replaceWith: function(html) {
 			var elem;
@@ -4834,6 +5673,28 @@ function imports(ns){
 		 * @param {Boolean} contents=true 是否复制子元素。
 		 * @param {Boolean} keepId=false 是否复制 id 。
 		 * @return {Dom} 新的Dom 对象。
+		 *  <desc>克隆匹配的DOM元素并且选中这些克隆的副本。</desc>
+        <longdesc>在想把DOM文档中元素的副本添加到其他位置时这个函数非常有用。</longdesc>
+        <example>
+          <desc>克隆所有b元素（并选中这些克隆的副本），然后将它们前置到所有段落中。</desc>
+          <html>&lt;b&gt;Hello&lt;/b&gt;&lt;p&gt;, how are you?&lt;/p&gt;</html>
+          <code>Dom.query("b").clone().prependTo("p");</code>
+          <result>&lt;b&gt;Hello&lt;/b&gt;&lt;p&gt;&lt;b&gt;Hello&lt;/b&gt;, how are you?&lt;/p&gt;</result>
+        </example>
+        <desc>元素以及其所有的事件处理并且选中这些克隆的副本</desc>
+        <longdesc>在想把DOM文档中元素的副本添加到其他位置时这个函数非常有用。</longdesc>
+        <params name="true" type="Boolean">
+          <desc>设置为true以便复制元素的所有事件处理</desc>
+        </params>
+        <example>
+          <desc>创建一个按钮，他可以复制自己，并且他的副本也有同样功能。</desc>
+          <html>&lt;button&gt;Clone Me!&lt;/button&gt;</html>
+          <code>
+            Dom.query("button").click(function(){
+            Dom.query(this).clone(true).insertAfter(this);
+            });
+          </code>
+        </example>
 		 */
 		clone: function(cloneEvent, contents, keepId) {
 		
@@ -4855,6 +5716,19 @@ function imports(ns){
 
 	.implement({
 		
+		/**
+		 *  <desc>用一个表达式来检查当前选择的元素集合，如果其中至少有一个元素符合这个给定的表达式就返回true。</desc>
+        <longdesc>如果没有元素符合，或者表达式无效，都返回  false 。</longdesc>
+        <params name="expr" type="String">
+          <desc>用于筛选的表达式</desc>
+        </params>
+        <example>
+          <desc>由于input元素的父元素是一个表单元素，所以返回true。</desc>
+          <html>&lt;form&gt;&lt;input type="checkbox" /&gt;&lt;/form&gt;</html>
+          <code>Dom.query("input[type='checkbox']").match("input")</code>
+          <result>true</result>
+        </example>
+		 */
 		match: function (selector) {
 			return Dom.match(this.dom, selector);
 		},
@@ -4867,6 +5741,11 @@ function imports(ns){
 		 * 判断一个节点是否有子节点。
 		 * @param {Element} [Dom] 子节点。
 		 * @return {Boolean} 有返回true 。
+		 *  <desc>判断当前节点是否包含指定子节点。</desc>
+        <longdesc>如果没有元素符合，或者表达式无效，都返回'false'。</longdesc>
+        <params name="expr" type="String">
+          <desc>用于判断的子节点。</desc>
+        </params>
 		 */
 		hasChild: function(dom, allowSelf) {
 			var elem = this.dom;
@@ -4897,6 +5776,17 @@ function imports(ns){
 		 * 插入一个HTML 。
 		 * @param {String/Dom} html 内容。
 		 * @return {Element} 元素。
+		 * <desc>向每个匹配的元素内部追加内容。</desc>
+        <longdesc>这个操作与对指定的元素执行appendChild方法，将它们添加到文档中的情况类似。</longdesc>
+        <params name="content" type="String, Element, Control">
+          <desc>要追加到目标中的内容</desc>
+        </params>
+        <example>
+          <desc>向所有段落中追加一些HTML标记。</desc>
+          <html>&lt;p&gt;I would like to say: &lt;/p&gt;</html>
+          <code>Dom.query("p").append("&lt;b&gt;Hello&lt;/b&gt;");</code>
+          <result>[ &lt;p&gt;I would like to say: &lt;b&gt;Hello&lt;/b&gt;&lt;/p&gt; ]</result>
+        </example>
 		 */
 		append: function(html) {
 			return new Dom(this.body).append(html);
@@ -4989,6 +5879,15 @@ function imports(ns){
 		 * @param {Number} x 坐标。
 		 * @param {Number} y 坐标。
 		 * @return {Document} this 。
+		 * <desc>传递参数值时，设置垂直滚动条顶部偏移为该值。</desc>
+        <longdesc>此方法对可见和隐藏元素均有效。</longdesc>
+        <params name="val" type="String, Number">
+          <desc>设定垂直滚动条值</desc>
+        </params>
+        <example>
+          <desc>设置相对滚动条顶部的偏移</desc>
+          <code>Dom.query("div.demo").setScroll(300);</code>
+        </example>
 		 */
 		setScroll: function(x, y) {
 			var doc = this, offsetPoint = formatPoint(x, y);
@@ -5178,15 +6077,32 @@ function imports(ns){
 	/// #endif
 
 	/**
-	 * 页面加载时执行。
-	 * @param {Functon} fn 执行的函数。
+	 * 设置在页面加载(不包含图片)完成时执行函数。
+	 * @param {Functon} fn 当DOM加载完成后要执行的函数。
 	 * @member Dom.ready
+	 * @remark
+	 * 允许你绑定一个在DOM文档载入完成后执行的函数。需要把页面中所有需要在 DOM 加载完成时执行的Dom.ready()操作符都包装到其中来。
+	 * 
+        <example>
+          <desc>当DOM加载完成后，执行其中的函数。</desc>
+          <code>Dom.ready(function(){
+  // 文档就绪
+});</code>
+        </example>
 	 */
 
 	/**
-	 * 在文档载入的时候执行函数。
+	 * 设置在页面加载(包含图片)完成时执行函数。
 	 * @param {Functon} fn 执行的函数。
 	 * @member Dom.load
+	 * @remark
+	 * 允许你绑定一个在DOM文档载入完成后执行的函数。需要把页面中所有需要在 DOM 加载完成时执行的Dom.load()操作符都包装到其中来。
+        <example>
+          <desc>当DOM加载完成后，执行其中的函数。</desc>
+          <code>Dom.load(function(){
+  // 文档和引用的资源文件加载完成
+});</code>
+        </example>
 	 */
 
 	Dom.addEvent('domready domload', {});
