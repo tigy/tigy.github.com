@@ -98,7 +98,7 @@
 			
 			/**
 			 * 获取当前类对应的数据字段。
-			 * @proteced override
+			 * @protected override
 			 * @return {Object} 一个可存储数据的对象。
 			 * @remark
 			 * 此函数会在原生节点上创建一个 $data 属性以存储数据。
@@ -1612,10 +1612,10 @@
 	
 		/**
 		 * 彻底删除当前 DOM 对象。释放占用的所有资源。
-		 * @see remove
+		 * @see #remove
 		 * @remark 这个方法会同时删除节点绑定的事件以及所有的数据。
 		 * @example
-		 * 从DOM中把所有段落删除
+		 * 从DOM中把所有段落删除。
 		 * #####HTML:
 		 * <pre lang="htm" format="none">&lt;p&gt;dispose&lt;/p&gt; how are &lt;p&gt;you?&lt;/p&gt;</pre>
 		 * #####JavaScript:
@@ -1623,7 +1623,7 @@
 		 * #####结果:
 		 * <pre lang="htm" format="none">how are</pre>
 		 * 
-		 * 从DOM中把带有hello类的段落删除
+		 * 从DOM中把带有hello类的段落删除。
 		 * #####HTML:
 		 * <pre lang="htm" format="none">&lt;p class="hello"&gt;Hello&lt;/p&gt; how are &lt;p&gt;you?&lt;/p&gt;</pre>
 		 * #####JavaScript:
@@ -2768,12 +2768,14 @@
 		/**
 		 * 获取全部满足要求的节点的集合。
 		 * @param {String} direction 遍历的方向方向，可以是以下值之一:
+		 * 
 		 * - **child**: 遍历当前全部子节点。如果是此关键字时，args 只能是 节点标签名。
 		 * - **prev**: 遍历当前节点以前的节点。
 		 * - **next**: 遍历当前节点以后的节点。
 		 * - **parent**: 遍历当前节点的父节点。
 		 * - **sibling**: 遍历当前节点的兄弟节点。
-		 * @param {Integer/String/Function/Boolean} [args] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
+		 * 
+		 * @param {Number/String/Function/Boolean} [args] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
 		 * @return {NodeList} 返回满足要求的节点的列表。
 		 */
 		getAll: function(direction, args){
@@ -3081,7 +3083,7 @@
 		
 		/**
 		 * 获取当前类对应的数据字段。
-		 * @proteced override
+		 * @protected override
 		 * @return {Object} 一个可存储数据的对象。
 		 * @remark
 		 * 此函数会在原生节点上创建一个 $data 属性以存储数据。
