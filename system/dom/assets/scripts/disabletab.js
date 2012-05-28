@@ -8,11 +8,14 @@ using("System.Dom.Selection");
 
 
 /**
- * 禁止使用 tab 失去焦点，改输入 '\t'
- * @param {Object} id
+ * @class Dom
  */
 Dom.implement({
-
+	
+	/**
+	 * 禁止使用 tab 失去焦点，改输入 '\t'
+	 * @param {Object} id
+	 */
 	disableTab: function(insertTab){
 		
 	}	
