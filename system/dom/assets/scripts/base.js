@@ -998,6 +998,13 @@
 		 */
 		styleNumber: styleNumber,
 
+		initToggleArgs: function (args) {
+			if(typeof args[0] === 'string')
+				return args;
+			ap.unshift.call(args, 'opacity');
+			return args;
+		},
+
 		/**
 		 * 清空元素的 display 属性。
 		 * @param {Element} elem 元素。
@@ -1472,9 +1479,10 @@
 		 * @param {String} [type] 方式。
 		 * @return {Element} this
 		 */
-		show: function(duration, callBack) {
+		show: function () {
+			var args = Dom.initToggleArgs(arguments);
 			Dom.show(this.dom);
-			if (callBack) setTimeout(callBack, 0);
+			if (args = args[2]) setTimeout(args, 0);
 			return this;
 		},
 	
@@ -1485,9 +1493,10 @@
 		 * @param {String} [type] 方式。
 		 * @return {Element} this
 		 */
-		hide: function(duration, callBack) {
+		hide: function (duration, callback) {
+			var args = Dom.initToggleArgs(arguments);
 			Dom.hide(this.dom);
-			if (callBack) setTimeout(callBack, 0);
+			if (args = args[2]) setTimeout(args, 0);
 			return this;
 		},
 	
@@ -1498,9 +1507,9 @@
 		 * @param {String} [type] 方式。
 		 * @return {Element} this
 		 */
-		toggle: function(duration, onShow, onHide, type, flag) {
-			flag = (flag === undefined ? Dom.isHidden(this.dom): flag);
-			return this[flag ? 'show': 'hide'](duration, flag ? onShow : onHide, type);
+		toggle: function () {
+			var args = Dom.initToggleArgs(arguments);
+			return this[(args[4] === undefined ? Dom.isHidden(this.dom) : args[4]) ? 'show' : 'hide'].apply(this, args);
 		},
 	
 		/**
