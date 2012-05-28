@@ -310,7 +310,8 @@ using("System.Dom.Base");
 	
 		ep = Dom.prototype,
 		show = ep.show,
-		hide = ep.hide;
+		hide = ep.hide,
+		toggle = ep.toggle;
 		
 	Fx.toggleTypes = {};
 		
@@ -406,32 +407,26 @@ using("System.Dom.Base");
 		 * @param {String} [type] 方式。
 		 * @return {Element} this
 		 */
-		show: function(duration, callback, link){
-			var me = this,
-				type = 'opacity';
+		show: function(){
+			var me = this;
 			
 			// 肯能是同步的请求。
-			if(!duration){
-				Dom.show(me.dom);
-				return me;
+			if (!duration) {
+				return show.apply(me, arguments);
 			}
-			
-			if(typeof duration === 'string'){
-				type = duration;
-				duration = callback;
-				callback = link;
-				link = arguments[3];
-			}
+
+			var args = Dom.initToggleArgs(arguments),
+				callback = args[2];
 		
 			me.fx().run({
 				target: this,
-				duration: duration,
+				duration: args[1],
 				start: function (options) {
 					
 					var elem = this.target.dom;
 						
 					if(!Dom.isHidden(elem)){
-						if(callback)
+						if (callback)
 							callback.call(this.target, true, true);
 						return false;
 					}
@@ -440,7 +435,7 @@ using("System.Dom.Base");
 					
 					this.orignal = {};
 					
-					var from = Fx.toggleTypes[type](this, elem, false);
+					var from = Fx.toggleTypes[args[0]](this, elem, false);
 					
 					if(from){
 						this.from = from;
@@ -458,10 +453,10 @@ using("System.Dom.Base");
 				complete:  function(){
 					Object.extend(this.target.dom.style, this.orignal);
 				
-					if(callback)
+					if (callback)
 						callback.call(this.target, true);
 				}
-			}, link);
+			}, args[3]);
 		
 			return me;
 		},
@@ -474,24 +469,18 @@ using("System.Dom.Base");
 		 * @return {Element} this
 		 */
 		hide: function (duration, callback, link) {
-			var me = this,
-				type = 'opacity';
+			var me = this;
 			
 			// 肯能是同步的请求。
-			if(!duration){
-				Dom.hide(me.dom);
-				return me;
+			if (!duration) {
+				return hide.apply(me, arguments);
 			}
-			
-			if(typeof duration === 'string'){
-				type = duration;
-				duration = callback;
-				callback = link;
-				link = arguments[3];
-			}
+
+			var args = Dom.initToggleArgs(arguments),
+				callback = args[2];
 		
 			me.fx().run({
-				duration: duration,
+				duration: args[1],
 				start: function () {
 					
 					var elem = this.target.dom;
@@ -504,7 +493,7 @@ using("System.Dom.Base");
 					
 					this.orignal = {};
 					
-					var to = Fx.toggleTypes[type](this, elem, true);
+					var to = Fx.toggleTypes[args[0]](this, elem, true);
 					
 					if(to){
 						this.from = null;
@@ -523,17 +512,18 @@ using("System.Dom.Base");
 					if (callback)
 						callback.call(this.target, false);
 				}
-			});
+			}, args[3]);
 			
 			return this;
 		},
 	
 		toggle: function(){
-			var args = arguments;
-			this.fx().then(function(){
-				this.target[Dom.isHidden(this.target.dom) ? 'show' : 'hide'].apply(this.target, args);
+			this.fx().then(function (args) {
+				toggle.apply(this, args);
 				return false;
-			});
+			}, arguments);
+
+			return this;
 		},
 		
 		/**
