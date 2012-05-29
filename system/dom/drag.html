@@ -56,7 +56,7 @@
 			});
 			
 			var d5 = $('d5').draggable(true).on('drag', function(e){
-				var container = this.getParent(1);
+				var container = this.parent(1);
 				e.draggable.limit(container.getPosition(), container.getSize()) ;
 			});
 			

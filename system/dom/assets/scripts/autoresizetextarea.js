@@ -1,1 +1,2 @@
-﻿/** * @author  */using("System.Dom.Base");Dom.autoResizeTextArea = function (dom) {	dom = Dom.get(dom);	dom.setStyle('overflow', 'hidden')		.on('keyup', autoResize);			autoResize.call(dom);				function autoResize() {		this.setHeight('auto');		this.setHeight(this.getScrollSize().y);	}};
+﻿/** * @author  */using("System.Dom.Base");/** * 
+ */Dom.autoResizeTextArea = function (dom) {	dom = Dom.get(dom);	dom.setStyle('overflow', 'hidden')		.on('keyup', autoResize);			autoResize.call(dom);				function autoResize() {		this.setHeight('auto');		this.setHeight(this.getScrollSize().y);	}};
