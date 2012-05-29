@@ -124,7 +124,7 @@ Request.param = function (obj, name) {
 };
 
 Request.combineUrl = function (url, param) {
-	return url + (url.indexOf('?') >= 0 ? '&' : '?') + param;
+	return param ? url + (url.indexOf('?') >= 0 ? '&' : '?') + param : url;
 };
 
 

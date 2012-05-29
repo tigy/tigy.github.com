@@ -411,7 +411,7 @@ using("System.Dom.Base");
 			var me = this;
 			
 			// 肯能是同步的请求。
-			if (!duration) {
+			if (!arguments[0]) {
 				return show.apply(me, arguments);
 			}
 
@@ -468,11 +468,11 @@ using("System.Dom.Base");
 		 * @param {String} [type] 方式。
 		 * @return {Element} this
 		 */
-		hide: function (duration, callback, link) {
+		hide: function () {
 			var me = this;
 			
 			// 肯能是同步的请求。
-			if (!duration) {
+			if (!arguments[0]) {
 				return hide.apply(me, arguments);
 			}
 
