@@ -262,7 +262,7 @@ var DplBuilder = {
 	
 	save: function(build){
 		System.submit(DplBuilder.buildFiles,  {
-			build: build,
+			build: build || "",
 			data: BuildFiles,
 			action: 'save',
 			url: build ? location.href : '../../build.html'

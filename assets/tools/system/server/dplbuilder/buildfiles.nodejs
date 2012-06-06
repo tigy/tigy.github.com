@@ -22,7 +22,7 @@ var data = JSON.parse(content["data"]),
 		url = data.url || "",
 		build = data.build,
 		data = data.data;
-
+		
 switch(action){
 	case 'save':
 		DplBuilder.BuildFiles = data;
