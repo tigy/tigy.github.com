@@ -73,7 +73,6 @@ var BuildFile = function(name, options) {
 	
 	this.oninit();
 	this.compile();
-
 };
 
 BuildFile.prototype = {
@@ -428,13 +427,13 @@ BuildFile.prototype = {
 				value = value.trim();
 				var t = DplBuilder.getBuildFile(value, this.name);
 				
-				t.css.forEach(function(value){
-					usedCssKeys[value.name] = t.name;
-				});
+				for(var value in t.data.css){
+					usedCssKeys[t.data.css[value].name] = t.name;
+				}
 				
-				t.js.forEach(function(value){
-					usedCssKeys[value.name] = t.name;
-				});
+				for(var value in t.data.js){
+					usedJsKeys[t.data.js[value].name] = t.name;
+				}
 				
 				t.writeRequires(usedCssKeys, usedJsKeys, processed);
 			}, this);

@@ -1793,14 +1793,16 @@ function assert(value, message) {
     	var args = arguments;
 
     	switch (args.length) {
-    		case 0:
-    			message = "断言失败";
     		case 1:
+    			message = "断言失败";
+    		case 2:
     			break;
+    		case 0:
+    			return true;
     		default:
     			var i = 2;
     			message = message.replace(/\{([\w\.\(\)]*?)\}/g, function (match, argsName) {
-    				return "参数 " + (args.length <= i ? match : argsName + " = " + ellipsis(trace.inspect(args[i++]), 200));
+    				return "参数 " + (args.length <= i ? match : argsName + " = " + trace.ellipsis(trace.inspect(args[i++]), 200));
     			});
 		}
 
@@ -1820,15 +1822,11 @@ function assert(value, message) {
             }
 
         	if (args)
-        		message += "\r\n--------------------------------------------------------------------\r\n" + ellipsis(trace.decodeUTF8(args.toString()), 600);
+        		message += "\r\n--------------------------------------------------------------------\r\n" + trace.ellipsis(trace.decodeUTF8(args.toString()), 600);
 
         }
 
-    	trace.error(message);
-
-    	function ellipsis(value, length) {
-    		return value.length > length ? value.substr(0, length - 3) + "..." : value;
-    	}
+    	window.trace.error(message);
 
 	}
 
@@ -1917,6 +1915,20 @@ function imports(namespace) {
 		 * @config {Boolean}
 		 */
 		enable: true,
+        
+		/**
+		 * 将字符串限定在指定长度内，超出部分用 ... 代替。
+		 * @param {String} value 要处理的字符串。
+		 * @param {Number} length 需要的最大长度。
+		 * @example 
+		 * <pre>
+	     * String.ellipsis("1234567", 6); //   "123..."
+	     * String.ellipsis("1234567", 9); //   "1234567"
+	     * </pre>
+		 */
+    	ellipsis: function (value, length) {
+    		return value.length > length ? value.substr(0, length - 3) + "..." : value;
+    	},
 
         /**
          * 将字符串从 utf-8 字符串转义。
