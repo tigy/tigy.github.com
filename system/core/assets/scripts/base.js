@@ -121,7 +121,7 @@
 		 */
 	    implement: function(members) {
 
-		    assert(members && this.prototype, "Class.implement(members): 无法扩展类，因为 {members} 或 this.prototype 为空。", members);
+	    	assert(this.prototype, "System.Base.implement(members): 无法扩展当前类，因为当前类的 prototype 为空。");
             
             // 复制到原型 。
 		    Object.extend(this.prototype, members);
@@ -135,9 +135,9 @@
 		 * @return this
 		 * @see #implement
 		 */
-	    implementIf: function(members) {
+	    implementIf: function (members) {
 
-		    assert(members && this.prototype, "Class.implementIf(members): 无法扩展类，因为 {members} 或 this.prototype 为空。", members);
+	    	assert(this.prototype, "System.Base.implementIf(members): 无法扩展当前类，因为当前类的 prototype 为空。");
 
 		    Object.extendIf(this.prototype, members);
 
@@ -297,7 +297,7 @@
 		    };
 
 		    // 代理类 。
-		     emptyFn.prototype = (subClass.base = this).prototype;
+			emptyFn.prototype = (subClass.base = this).prototype;
 
 		    // 指定成员 。
 		    subClass.prototype = Object.extend(new  emptyFn, members);
@@ -411,7 +411,7 @@
 	    each: function(iterable, fn, bind) {
 
 		    assert(!Object.isFunction(iterable), "Object.each(iterable, fn, bind): {iterable} 不能是函数。 ", iterable);
-		    assert(Object.isFunction(fn), "Object.each(iterable, fn, bind): {fn} 必须是函数。 ", fn);
+		    assert(Object.isFunction(fn), "Object.each(iterable, fn, bind): {fn} 必须是函数。", fn);
 
 		    // 如果 iterable 是 null， 无需遍历 。
 		    if (iterable != null) {
@@ -565,7 +565,7 @@
 		 */
 	    set: function(obj, options) {
 		
-			assert.notNull(obj, "Object.set(obj, options): {obj}~");
+			assert.notNull(obj, "Object.set(obj, options): {obj} ~");
 
 		    for ( var key in options) {
 
@@ -642,63 +642,39 @@
 		}
 		
 	});
-	
-	/**
-	 * @static class String
-	 */
-	extend(String, {
 			
-	    /**
-		 * 格式化指定的字符串。
-		 * @param {String} formatString 字符。
-		 * @param {Object} ... 格式化用的参数。
-		 * @return {String} 格式化后的字符串。
-		 * @remark 格式化的字符串{}不允许包含空格。
-	     *  不要出现{{{ 和 }}} 这样将获得不可预知的结果。
-		 * @example <pre>
-	     *  String.format("{0}转换", 1); //  "1转换"
-	     *  String.format("{1}翻译",0,1); // "1翻译"
-	     *  String.format("{a}翻译",{a:"也可以"}); // 也可以翻译
-	     *  String.format("{{0}}不转换, {0}转换", 1); //  "{0}不转换1转换"
-	     * </pre>
-		 */
-		format: function(formatString, args) {
-	
-		    assert(!formatString || formatString.replace, 'String.format(formatString, args): {formatString} 必须是字符串。', formatString);
-	
-		    // 支持参数2为数组或对象的直接格式化。
-		    var toString = this;
-	
-		    args = arguments.length === 2 && Object.isObject(args) ? args : ap.slice.call(arguments, 1);
-	
-		    // 通过格式化返回
-		    return formatString ? formatString.replace(/\{+?(\S*?)\}+/g, function(match, name) {
-			    var start = match.charAt(1) == '{', end = match.charAt(match.length - 2) == '}';
-			    if (start || end)
-				    return match.slice(start, match.length - end);
-			    // LOG : {0, 2;yyyy} 为了支持这个格式, 必须在这里处理
-			    // match , 同时为了代码简短, 故去该功能。
-			    return name in args ? toString(args[name]) : "";
-		    }) : "";
-	  	},
-		  	
-	    /**
-		 * 将字符串限定在指定长度内，超出部分用 ... 代替。
-		 * @param {String} value 要处理的字符串。
-		 * @param {Number} length 需要的最大长度。
-		 * @example 
-		 * <pre>
-	     * String.ellipsis("1234567", 6); //   "123..."
-	     * String.ellipsis("1234567", 9); //   "1234567"
-	     * </pre>
-		 */
-	  	ellipsis: function(value, length) {
-		    assert.isString(value, "String.ellipsis(value, length): 参数  {value} ~");
-		    assert.isNumber(length, "String.ellipsis(value, length): 参数  {length} ~");
-		    return value.length > length ? value.substr(0, length - 3) + "..." : value;
-		}
-		
-	});
+	/**
+	 * 格式化指定的字符串。
+	 * @param {String} formatString 字符。
+	 * @param {Object} ... 格式化用的参数。
+	 * @return {String} 格式化后的字符串。
+  	 * @remark 格式化的字符串{}不允许包含空格。
+	 *  不要出现{{{ 和 }}} 这样将获得不可预知的结果。
+	 * @memberOf String
+	 * @example <pre>
+	 *  String.format("{0}转换", 1); //  "1转换"
+	 *  String.format("{1}翻译",0,1); // "1翻译"
+	 *  String.format("{a}翻译",{a:"也可以"}); // 也可以翻译
+	 *  String.format("{{0}}不转换, {0}转换", 1); //  "{0}不转换1转换"
+	 * </pre>
+	 */
+	String.format = function (formatString, args) {
+
+		assert(!formatString || formatString.replace, 'String.format(formatString, args): {formatString} 必须是字符串。', formatString);
+
+		// 支持参数2为数组或对象的直接格式化。
+		var toString = this;
+
+		args = arguments.length === 2 && Object.isObject(args) ? args : ap.slice.call(arguments, 1);
+
+		// 通过格式化返回
+		return formatString ? formatString.replace(/\{+?(\S*?)\}+/g, function (match, name) {
+			var start = match.charAt(1) == '{', end = match.charAt(match.length - 2) == '}';
+			if (start || end)
+				return match.slice(start, match.length - end);
+			return name in args ? toString(args[name]) : "";
+		}) : "";
+	};
 
     /**
 	 * 将一个伪数组对象转为原生数组。
@@ -733,8 +709,7 @@
 	    // return r;
 	    // }
 
-	    assert(!iterable || toString.call(iterable) !== '[object HTMLCollection]' || typeof iterable.length !== 'number',
-	            'Array.create(iterable, startIndex): {iterable} 不支持 DomCollection 。', iterable);
+	    assert(!iterable || toString.call(iterable) !== '[object HTMLCollection]' || typeof iterable.length !== 'number', 'Array.create(iterable, startIndex): {iterable} 不允许是 NodeList 。', iterable);
 
 	    // 调用 slice 实现。
 	    return iterable ? ap.slice.call(iterable, startIndex) : [];
@@ -808,7 +783,9 @@
 		 * execScript('alert("hello")');
 		 * </pre>
 		 */
-		window.execScript = function(statements) {
+		window.execScript = function (statements) {
+
+			assert.isString(statements, "execScript(statements): {statements} ~");
 
 			// 如果正常浏览器，使用 window.eval 。
 			window["eval"].call( window, statements );
@@ -1472,7 +1449,7 @@
 	     * </pre>
 		 */
 	    insert: function(index, value) {
-		    assert.isNumber(index, "Array.prototype.insert(index, value): 参数 index ~");
+		    assert.isNumber(index, "Array.prototype.insert(index, value): {index} ~");
 		    var me = this, tmp;
 		    if(index < 0 || index >= me.length){
 		    	me[index = me.length++] = value;
@@ -1489,7 +1466,7 @@
 	    /**
 		 * 对当前数组的每个元素调用其指定属性名的函数，并将返回值放入新的数组返回。
 		 * @param {String} fnName 要调用的函数名。
-		 * @param {Array} args 调用时的参数数组。
+		 * @param {Array} [args] 调用时的参数数组。
 		 * @return {Array} 返回包含执行结果的数组。
 		 * @example 
 		 * <pre>
@@ -1497,11 +1474,11 @@
 	     * </pre>
 		 */
 	    invoke: function(fnName, args) {
-		    assert(args && typeof args.length === 'number', "Array.prototype.invoke(fnName, args): {args} 必须是数组, 无法省略。", args);
+		    assert(!args || typeof args.length === 'number', "Array.prototype.invoke(fnName, args): {args} 必须是参数数组。", args);
 		    var r = [];
 		    ap.forEach.call(this, function(value) {
 			    assert(value != null && value[fnName] && value[fnName].apply, "Array.prototype.invoke(fnName, args): {value} 不包含函数 {fnName}。", value, fnName);
-			    r.push(value[fnName].apply(value, args));
+			    r.push(value[fnName].apply(value, args || []));
 		    });
 
 		    return r;
@@ -1518,12 +1495,12 @@
 	    unique: function() {
 
 		    // 删除从 i + 1 之后的当前元素。
-		    for ( var i = 0, t, v; i < this.length;) {
-			    v = this[i];
-			    t = ++i;
+		    for ( var i = 0, j, value; i < this.length;) {
+		    	value = this[i];
+			    j = ++i;
 			    do {
-				    t = ap.remove.call(this, v, t);
-			    } while (t >= 0);
+			    	j = ap.remove.call(this, value, j);
+			    } while (j >= 0);
 		    }
 
 		    return this;
@@ -1617,13 +1594,14 @@
 	     * </pre>
 		 */
 	    filter: function(fn, bind) {
-		    var r = [];
+	    	assert.isFunction(fn, "Array.prototype.filter(fn, bind): {fn} ~");
+	    	var r = [];
 		    ap.forEach.call(this, function(value, i, array) {
 
 			    // 过滤布存在的成员。
-			    if (fn.call(this, value, i, array))
+		    	if (fn.call(bind, value, i, array))
 				    r.push(value);
-		    }, bind);
+		    });
 
 		    return r;
 
@@ -1768,96 +1746,116 @@ System.Base.prototype.toString = function(){
  * @param {Object} ... 要输出的变量。
  */
 function trace() {
-    if (trace.enable) {
-        
-        if(window.console && console.debug && console.debug.apply) {
-        	return console.debug.apply(console, arguments);
-        }
 
-        var hasConsole = window.console && console.debug, data;
+	// 无参数的话，自动补充一个参数。
+	if (arguments.length === 0) {
+		if (!trace.$count)
+			trace.$count = 0;
+		return trace('(trace: ' + (trace.$count++) + ')');
+	}
+
+
+	if (trace.enable) {
+
+		var hasConsole = window.console, data;
         
-        if(arguments.length === 0) {
-        	data = '(traced)';
-        // 如果存在控制台，则优先使用控制台。
-        } else if (hasConsole && console.log.apply) {
+		// 优先使用 console.debug
+		if (hasConsole && console.debug && console.debug.apply) {
+        	return console.debug.apply(console, arguments);
+		}
+        
+		// 然后使用 console.log
+		if (hasConsole && console.log && console.log.apply) {
         	return console.log.apply(console, arguments);
-        } else {
-        	data = trace.inspect(arguments);
-        }
+		} 
+
+		// 最后使用 trace.inspect
+        data = trace.inspect(arguments);
     	
-    	return hasConsole ? console.log(data) : alert(data);
+		return hasConsole && console.log ? console.log(data) : alert(data);
     }
 }
 
 /**
- * 确认一个值正确。
- * @param {Object} bValue 值。
- * @param {String} msg="断言失败" 错误后的提示。
- * @return {Boolean} 返回 bValue 。
+ * 确认一个值是 **true**，否则向用户显示一个警告。
+ * @param {Object} value 要用于判断的值。它会被自动转为布尔型之后再作判断。
+ * @param {String} message="断言失败" 如果 *value* 为 **false**, 则显示的错误提示。
+ * @param {Object} ... 用于格式化 message 中被 {} 包围的参数名的具体值。
+ * @return {Boolean} 返回 *value* 的等效布尔值。
  * @example <pre>
- * assert(true, "{value} 错误。", value);
+ * var value = 1;
+ * assert(value > 0, "{value} 应该大于 0。", value);
  * </pre>
  */
-function assert(bValue, msg) {
-    if (!bValue) {
+function assert(value, message) {
+	if (!value) {
 
-        var val = arguments;
+    	var args = arguments;
 
-        // 如果启用 [参数] 功能
-        if (val.length > 2) {
-            var i = 2;
-            msg = msg.replace(/\{([\w\.\(\)]*?)\}/g, function (s, x) {
-                return "参数 " + (val.length <= i ? s : x + " = " + String.ellipsis(trace.inspect(val[i++]), 200));
-            });
-        } else {
-            msg = msg || "断言失败";
-        }
+    	switch (args.length) {
+    		case 0:
+    			message = "断言失败";
+    		case 1:
+    			break;
+    		default:
+    			var i = 2;
+    			message = message.replace(/\{([\w\.\(\)]*?)\}/g, function (match, argsName) {
+    				return "参数 " + (args.length <= i ? match : argsName + " = " + ellipsis(trace.inspect(args[i++]), 200));
+    			});
+		}
 
-        // 错误源
-        val = val.callee.caller;
+		// 显示调用堆栈。
+    	if (assert.stackTrace) {
 
-        if (assert.stackTrace) {
+    		// 函数调用源。
+    		args = args.callee.caller;
 
-            while (val && val.debugStepThrough)
-                val = val.caller;
+			// 跳过 assert 函数。
+        	while (args && args.debugStepThrough)
+        		args = args.caller;
 
-            if (val && val.caller) {
-                val = val.caller;
+        	// 找到原调用者。
+        	if (args && args.caller) {
+        		args = args.caller;
             }
 
-            if (val)
-                msg += "\r\n--------------------------------------------------------------------\r\n" + String.ellipsis(trace.decodeUTF8(val.toString()), 600);
+        	if (args)
+        		message += "\r\n--------------------------------------------------------------------\r\n" + ellipsis(trace.decodeUTF8(args.toString()), 600);
 
         }
 
-        trace.error(msg);
+    	trace.error(message);
 
-    }
+    	function ellipsis(value, length) {
+    		return value.length > length ? value.substr(0, length - 3) + "..." : value;
+    	}
 
-    return !!bValue;
+	}
+
+	return !!value;
 }
 
 /**
  * 使用一个名空间。
- * @param {String} ns 名字空间。
+ * @param {String} namespace 名字空间。
  * @example <pre>
  * using("System.Dom.Keys");
  * </pre>
  */
-function using(ns, isStyle) {
+function using(namespace, isStyle) {
 
-    assert.isString(ns, "using(ns): {ns} 不是合法的名字空间。");
+	assert.isString(namespace, "using(ns): {ns} 不是合法的名字空间。");
     
     var cache = using[isStyle ? 'styles' : 'scripts'];
 	
 	for(var i = 0; i < cache.length; i++){
-		if(cache[i] === ns)
+		if (cache[i] === namespace)
 			return;
 	}
         
-    cache.push(ns);
+	cache.push(namespace);
 
-    ns = using.resolve(ns.toLowerCase(), isStyle);
+	namespace = using.resolve(namespace.toLowerCase(), isStyle);
 
     var tagName, 
     	type,
@@ -1883,7 +1881,7 @@ function using(ns, isStyle) {
     // 如果在节点找到符合的就返回，找不到，调用 callback 进行真正的 加载处理。
     
 	var doms = 	document.getElementsByTagName(tagName),
-		path = ns.replace(/^[\.\/\\]+/, "");
+		path = namespace.replace(/^[\.\/\\]+/, "");
 	
 	for(var i = 0; doms[i]; i++){
 		var url = ((document.constructor ? doms[i][type] : doms[i].getAttribute(type, 4)) || '').toLowerCase();
@@ -1894,15 +1892,15 @@ function using(ns, isStyle) {
 		}
 	}
     
-    callback(using.rootPath + ns + exts[0]);
+	callback(using.rootPath + namespace + exts[0]);
 }
 
 /**
  * 导入指定名字空间表示的样式文件。
- * @param {String} ns 名字空间。
+ * @param {String} namespace 名字空间。
  */
-function imports(ns){
-    return using(ns, true);
+function imports(namespace) {
+	return using(namespace, true);
 }
 
 (function(){
@@ -2495,144 +2493,120 @@ function imports(ns){
 		 */
     	stackTrace: true,
 
-        /**
-         * 确认一个值为函数变量。
-         * @param {Object} bValue 值。
-         * @param {String} msg="断言失败" 错误后的提示。
-         * @return {Boolean} 返回 bValue 。
+    	debugStepThrough: true,
+
+    	/**
+         * 确认一个值为函数。
+		 * @param {Object} value 要用于判断的值。它会被自动转为布尔型之后再作判断。
+		 * @param {String} message="断言失败" 如果 *value* 为 **false**, 则显示的错误提示。可以用 ~ 代替默认的错误提示信息。
+		 * @return {Boolean} 返回 *value* 的等效布尔值。
          * @example <pre>
          * assert.isFunction(a, "a ~");
          * </pre>
          */
-        isFunction: function(value, msg) {
-            return assertInternal(typeof value == 'function', msg, value, "必须是函数。");
-        },
+    	isFunction: createAssertFunc(function (value) {
+    		return typeof value == 'function';
+    	}, "必须是函数。"),
 
-        /**
+    	/**
          * 确认一个值为数组。
-         * @param {Object} bValue 值。
-         * @param {String} msg="断言失败" 错误后的提示。
-         * @return {Boolean} 返回 bValue 。
+		 * @param {Object} value 要用于判断的值。它会被自动转为布尔型之后再作判断。
+		 * @param {String} message="断言失败" 如果 *value* 为 **false**, 则显示的错误提示。可以用 ~ 代替默认的错误提示信息。
+		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
-        isArray: function(value, msg) {
-            return assertInternal(typeof value.length == 'number', msg, value, "必须是数组。");
-        },
+    	isArray: createAssertFunc(function (value) {
+    		return typeof value.length == 'number';
+    	}, "必须是数组。"),
 
-        /**
-         * 确认一个值为函数变量。
-         * @param {Object} bValue 值。
-         * @param {String} msg="断言失败" 错误后的提示。
-         * @return {Boolean} 返回 bValue 。
-         */
-        isObject: function(value, msg) {
-            return assertInternal( value && (typeof value === "object" || typeof value === "function" || value.nodeType), msg, value, "必须是引用的对象。", arguments);
-        },
-
-        /**
+    	/**
          * 确认一个值为数字。
-         * @param {Object} bValue 值。
-         * @param {String} msg="断言失败" 错误后的提示。
-         * @return {Boolean} 返回 bValue 。
+		 * @param {Object} value 要用于判断的值。它会被自动转为布尔型之后再作判断。
+		 * @param {String} message="断言失败" 如果 *value* 为 **false**, 则显示的错误提示。可以用 ~ 代替默认的错误提示信息。
+		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
-        isNumber: function(value, msg) {
-            return assertInternal(typeof value == 'number' || value instanceof Number, msg, value, "必须是数字。");
-        },
+    	isNumber: createAssertFunc(function (value) {
+    		return value && (typeof value === "number" || value instanceof Number);
+    	}, "必须是数字。"),
 
-        /**
-         * 确认一个值为节点。
-         * @param {Object} bValue 值。
-         * @param {String} msg="断言失败" 错误后的提示。
-         * @return {Boolean} 返回 bValue 。
-         */
-        isNode: function(value, msg) {
-            return assertInternal(value && (value.nodeType || value.setTimeout), msg, value, "必须是 DOM 节点。");
-        },
-
-        /**
-         * 确认一个值为节点。
-         * @param {Object} bValue 值。
-         * @param {String} msg="断言失败" 错误后的提示。
-         * @return {Boolean} 返回 bValue 。
-         */
-        isElement: function(value, msg) {
-            return assertInternal(value && value.style, msg, value, "必须是 Element 对象。");
-        },
-
-        /**
+    	/**
          * 确认一个值是字符串。
-         * @param {Object} bValue 值。
-         * @param {String} msg="断言失败" 错误后的提示。
-         * @return {Boolean} 返回 bValue 。
+		 * @param {Object} value 要用于判断的值。它会被自动转为布尔型之后再作判断。
+		 * @param {String} message="断言失败" 如果 *value* 为 **false**, 则显示的错误提示。可以用 ~ 代替默认的错误提示信息。
+		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
-        isString: function(value, msg) {
-            return assertInternal(typeof value == 'string' || value instanceof String, msg, value, "必须是字符串。");
-        },
+    	isString: createAssertFunc(function (value) {
+    		return value && (typeof value === "string" || value instanceof String);
+    	}, "必须是字符串。"),
 
-        /**
+    	/**
          * 确认一个值是日期。
-         * @param {Object} bValue 值。
-         * @param {String} msg="断言失败" 错误后的提示。
-         * @return {Boolean} 返回 bValue 。
+		 * @param {Object} value 要用于判断的值。它会被自动转为布尔型之后再作判断。
+		 * @param {String} message="断言失败" 如果 *value* 为 **false**, 则显示的错误提示。可以用 ~ 代替默认的错误提示信息。
+		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
-        isDate: function(value, msg) {
-            return assertInternal( value instanceof Date, msg, value, "必须是日期。");
-        },
+    	isDate: createAssertFunc(function (value) {
+    		return value && value instanceof Date;
+    	}, "必须是日期对象。"),
 
-        /**
+    	/**
          * 确认一个值是正则表达式。
-         * @param {Object} bValue 值。
-         * @param {String} msg="断言失败" 错误后的提示。
-         * @return {Boolean} 返回 bValue 。
+		 * @param {Object} value 要用于判断的值。它会被自动转为布尔型之后再作判断。
+		 * @param {String} message="断言失败" 如果 *value* 为 **false**, 则显示的错误提示。可以用 ~ 代替默认的错误提示信息。
+		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
-        isRegExp: function(value, msg) {
-            return assertInternal( value instanceof RegExp, msg, value, "必须是正则表达式。");
-        },
+    	isRegExp: createAssertFunc(function (value) {
+    		return value && value instanceof RegExp;
+    	}, "必须是正则表达式。"),
 
-        /**
+    	/**
+         * 确认一个值为函数变量。
+		 * @param {Object} value 要用于判断的值。它会被自动转为布尔型之后再作判断。
+		 * @param {String} message="断言失败" 如果 *value* 为 **false**, 则显示的错误提示。可以用 ~ 代替默认的错误提示信息。
+		 * @return {Boolean} 返回 *value* 的等效布尔值。
+         */
+    	isObject: createAssertFunc(function (value) {
+    		return value && (typeof value === "object" || typeof value === "function" || typeof value.nodeType === "number");
+    	}, "必须是一个引用对象。"),
+
+    	/**
+         * 确认一个值为节点。
+		 * @param {Object} value 要用于判断的值。它会被自动转为布尔型之后再作判断。
+		 * @param {String} message="断言失败" 如果 *value* 为 **false**, 则显示的错误提示。可以用 ~ 代替默认的错误提示信息。
+		 * @return {Boolean} 返回 *value* 的等效布尔值。
+         */
+    	isNode: createAssertFunc(function (value) {
+    		return value && (typeof value.nodeType === "number" || value.setTimeout);
+    	}, "必须是 DOM 节点。"),
+
+    	/**
+         * 确认一个值为节点。
+		 * @param {Object} value 要用于判断的值。它会被自动转为布尔型之后再作判断。
+		 * @param {String} message="断言失败" 如果 *value* 为 **false**, 则显示的错误提示。可以用 ~ 代替默认的错误提示信息。
+		 * @return {Boolean} 返回 *value* 的等效布尔值。
+         */
+    	isElement: createAssertFunc(function (value) {
+    		return value && typeof value.nodeType === "number" && value.style;
+    	}, "必须是 DOM 元素。"),
+
+    	/**
          * 确认一个值非空。
-         * @param {Object} value 值。
-         * @param {String} argsName 变量的名字字符串。
-         * @return {Boolean} 返回 assert 是否成功 。
+		 * @param {Object} value 要用于判断的值。它会被自动转为布尔型之后再作判断。
+		 * @param {String} message="断言失败" 如果 *value* 为 **false**, 则显示的错误提示。可以用 ~ 代替默认的错误提示信息。
+		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
-        notNull: function(value, msg) {
-            return assertInternal(value != null, msg, value, "不可为空。");
-        },
+    	notNull: createAssertFunc(function (value) {
+    		return value != null;
+    	}, "不可为空。")
 
-        /**
-         * 确认一个值在 min ， max 间。
-         * @param {Number} value 判断的值。
-         * @param {Number} min 最小值。
-         * @param {Number} max 最大值。
-         * @param {String} argsName 变量的米各庄。
-         * @return {Boolean} 返回 assert 是否成功 。
-         */
-        between: function(value, min, max, msg) {
-            return assertInternal(value >= min && !(value >= max), msg, value, "超出索引, 它必须在 [" + min + ", " + (max === undefined ? "+∞" : max) + ") 间。");
-        },
+	});
 
-        /**
-         * 确认一个值非空。
-         * @param {Object} value 值。
-         * @param {String} argsName 变量的参数名。
-         * @return {Boolean} 返回 assert 是否成功 。
-         */
-        notEmpty: function(value, msg) {
-            return assertInternal(value && value.length, msg, value, "不能为空。");
-        }
-
-    });
-	
-    function assertInternal(asserts, msg, value, dftMsg) {
-        return assert(asserts, msg ? msg.replace('~', dftMsg) : dftMsg, value);
-    }
-
-	// 追加 debugStepThrough 防止被认为是 assert 错误源堆栈。
-
-    assertInternal.debugStepThrough = assert.debugStepThrough = true;
-
-    for ( var fn in assert) {
-        window.assert[fn].debugStepThrough = true;
-    }
+	function createAssertFunc(assertFunction, defaultMessage) {
+		var fn = function (value, message) {
+			return assert(assertFunction(value), (message || "断言失败。").replace('~', defaultMessage), value)
+		};
+		fn.debugStepThrough = true;
+		return fn;
+	}
 
     /// #endregion
 

@@ -2,7 +2,23 @@
 //  字符串     
 //===========================================
 
-
+,
+		  	
+/**
+		 * 将字符串限定在指定长度内，超出部分用 ... 代替。
+		 * @param {String} value 要处理的字符串。
+		 * @param {Number} length 需要的最大长度。
+		 * @example 
+		 * <pre>
+	     * String.ellipsis("1234567", 6); //   "123..."
+	     * String.ellipsis("1234567", 9); //   "1234567"
+	     * </pre>
+		 */
+ellipsis: function(value, length) {
+	assert.isString(value, "String.ellipsis(value, length): 参数  {value} ~");
+	assert.isNumber(length, "String.ellipsis(value, length): 参数  {length} ~");
+	return value.length > length ? value.substr(0, length - 3) + "..." : value;
+}
 
 /**
  * @class String

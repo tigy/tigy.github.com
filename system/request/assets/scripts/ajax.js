@@ -2,11 +2,11 @@
  * @fileOverview 提供底层的 Ajax 支持。
  */
 
-using("System.Request.Base");
-using("System.Request.Text");
-using("System.Request.JSONP");
-using("System.Request.JSON");
-using("System.Request.XML");
+//using("System.Request.Base");
+//using("System.Request.Text");
+//using("System.Request.JSONP");
+//using("System.Request.JSON");
+//using("System.Request.XML");
 
 var Ajax = Ajax || {};
 
@@ -52,7 +52,8 @@ Object.each({
 	
 	var type = value === "Text" ? key.toUpperCase() : null;
 	
-	Ajax[key] = function(url, data, onsuccess, onerror, oncomplete, timeouts) {
+	Ajax[key] = function (url, data, onsuccess, onerror, oncomplete, timeouts) {
+		assert(value in Request, "未载入 System.Request." + value + " 模块。");
 		assert.isString(url, "Ajax." + key + "(url, data, onsuccess, onerror, timeouts, ontimeout, oncomplete): 参数{url} 必须是一个地址。如果需要提交至本页，使用 location.href。");
 		if(typeof data == 'function'){
 			timeouts = oncomplete;

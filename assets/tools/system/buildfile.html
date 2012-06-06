@@ -13,134 +13,16 @@
     <body>
     
         <div class="x-tabbable x-tabbable-left" id="tabbable">
-   
-            <ul class="x-tabbable-container">
-                <li class="x-tabbable-content x-tabbable-actived"><a href="#">✚ 新增合成方案</a></li>
-                <li class="x-tabbable-content"><a href="#">assets/build.js</a></li>
-              </ul>
                 
         </div>
     
         <div id="content">
             
-            <div class="x-formfield">
-                <label class="x-formfield-label">
-                目标 CSS 文件: 
-                </label>
-                <div class="x-formfield-container">
-                    <input type="text" class="x-textbox large" placeholder="输入合成后生成的 Javascript 文件位置。如 assets/share.js">
-                </div>
-            </div>
-            
-            <div class="x-formfield">
-                <label class="x-formfield-label">
-                目标 JS 文件: 
-                </label>
-                <div class="x-formfield-container">
-                    <input type="text" class="x-textbox large" placeholder="输入合成后生成的 CSS 文件位置。如 assets/share.css">
-                </div>
-            </div>
-            
-            <div class="x-formfield">
-                <label class="x-formfield-label">
-                目标图片位置: 
-                </label>
-                <div class="x-formfield-container">
-                    <input type="text" class="x-textbox large" placeholder="输入合成后图片文件夹相对CSS文件的位置。如 ../images/">
-                </div>
-            </div>
-            
-            <div class="x-formfield">
-                <label class="x-formfield-label">
-                其他选项: 
-                </label>
-                <div class="x-formfield-container">
-                    <label><input type="checkbox" class="x-checkbox">压缩代码</label>
-                    <label><input type="checkbox" class="x-checkbox">添加代码来源</label>
-                    <label><input type="checkbox" class="x-checkbox">添加using前缀</label>
-                </div>
-            </div>
-            
-            <div class="x-formfield">
-                <label class="x-formfield-label">
-               		
-                </label>
-                <div class="x-formfield-container">
-                    <span class="x-hint">注意：所有文件位置都是相对于项目跟目录(jplus-milk 目录)的相对位置。</span>
-                </div>
-            </div>
-            
-            <hr>
-            
-            <h3>组件列表</h3>
-            
-            <div id="namespaces">
-            
-            <div class="namespace">
-            	<a href="javascript://查看当前模块对应的源文件" class="link" onclick="DplBuilder.viewSourceFile(this)">[样式]System.Dom.Base</a> - <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(this)">删除</a>
-           	</div>
-            
-            <div class="namespace">
-            	<a href="" class="link">System.Dom.Base</a> - <a href="" class="x-linkbutton">源文件</a> - <a href="" class="x-linkbutton">查看引用</a> <a href="" class="x-linkbutton">删除</a>
-            	
-            	<ul class="source x-bubble">
-            		<li><a href="" class="x-hint">/system/dom/assets/scripts/base.js</a></li>
-            		<li><a href="" class="x-hint">/system/dom/assets/styles/element.css</a></li>
-            	</ul>
-            	
-            	<ul class="refs">
-            		<li>
-						<div class="namespace">
-			            	<a href="" class="link">[样式]System.Dom.Base</a> - <a href="" class="x-linkbutton">查看引用</a>
-			           	</div>
-					</li>
-            		<li>
-						 <div class="namespace">
-			            	<a href="" class="link">System.Dom.Base</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this)">源文件</a> - <a href="" class="x-linkbutton">查看引用</a> <a href="" class="x-linkbutton">删除</a>
-			            	
-			            	<ul class="source x-bubble">
-			            		<li>
-									<a href="" class="x-hint">/system/dom/assets/scripts/elemen
-			            		</li>
-			            		<li><a href="" class="x-hint">/system/dom/assets/styles/element.css</a></li>
-			            	</ul>
-			            	
-			            	<ul class="refs">
-			            		<li>
-									<div>
-						            	<a href="" class="link">[样式]System.Dom.Base</a> - <a href="" class="x-linkbutton">查看引用</a>
-						           	</div>
-								</li>
-			            		<li><a href="" class="link">/system/dom/assets/styles/element.css</a></li>
-			            	</ul>
-			            
-			            </div>
-					</li>
-            	</ul>
-            
-            </div>
-            
-            <div class="namespace">
-            	<select class="x-textbox">
-                        <option title="完全引入一个组件及其依赖项">全部</option>
-                        <option title="仅引入一个组件的样式及其依赖样式">仅样式</option>
-                    </select>
-                  
-                      <input type="text" class="x-textbox control-namespace" placeholder="输入组件的名字空间" />
-                   <a href="" class="x-button">添加</a>
-            
-            </div>
-            
-            
-            </div>
-            
         </div>
         
         <script>
         	
-        	Demo.onLoad(function(){
-        		DplBuilder.initNavBar();
-        	});
+            Demo.onLoad(DplBuilder.initNavBar);
         
         </script>
         

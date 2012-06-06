@@ -22,10 +22,10 @@ var Dpl = {
 			"type" : "libs",
 			"title" : "业务逻辑组件"
 		},
-		"Test" : {
-			"summary" : "测试",
+		"Libs" : {
+			"summary" : "框架",
 			"type" : "libs",
-			"title" : "代码测试和演示"
+			"title" : "第三方框架、代码测试和演示"
 		},
 		"Docs" : {
 			"summary" : "文档",
@@ -40,11 +40,21 @@ var Dpl = {
 	},
 	"res" : {
 		"Docs" : {
-			"常用手册" : {
+			"常用手册": {
+				"J+ API 文档": {
+					"summary": "docs/api/index.html",
+					"status": "",
+					"attribute": "^"
+				},
 				"J+ 核心 API" : {
-					"summary" : "docs/api/jplus-core-api.xml",
+					"summary": "docs/cookbooks/jplus-core-api.xml",
 					"status" : "+",
 					"attribute" : "^"
+				},
+				"特殊字符" : {
+					"summary": "docs/cookbooks/specialcharacters.html",
+					"status" : "+",
+					"attribute" : ""
 				},
 				"CSS 选择器浏览器兼容" : {
 					"summary" : "http://labs.qianduan.net/css-selector/",
@@ -52,12 +62,49 @@ var Dpl = {
 					"attribute" : "^"
 				},
 				"CSS Hack 速查" : {
-					"summary" : "docs/api/cssfix.html",
+					"summary": "docs/cookbooks/cssfix.html",
 					"status" : "+",
 					"attribute" : ""
+				},
+				"[CHM]jQuery API": {
+					"summary": "docs/cookbooks/jQueryAPI-100202.chm",
+					"status": "+",
+					"attribute": ""
 				}
 			},
-			"组件库" : {
+			"规范": {
+				"Html 编码规范": {
+					"summary": "docs/specification/html.html",
+					"status": "",
+					"attribute": ""
+				},
+				"Css 编码规范": {
+					"summary": "docs/specification/css.html",
+					"status": "",
+					"attribute": ""
+				},
+				"JavaScript 编码规范": {
+					"summary": "docs/specification/javascript.html",
+					"status": "+",
+					"attribute": ""
+				},
+				"组件编码规范": {
+					"summary": "docs/specification/control.html",
+					"status": "+",
+					"attribute": ""
+				},
+				"文档注释规范": {
+					"summary": "docs/specification/doccomment.html",
+					"status": "+",
+					"attribute": ""
+				}
+			},
+			"组件库": {
+				"首页": {
+					"summary": "index.html",
+					"status": "+",
+					"attribute": ""
+				},
 				"概念" : {
 					"summary" : "docs/library/introduction.html",
 					"status" : "+",
@@ -84,29 +131,7 @@ var Dpl = {
 					"attribute" : ""
 				}
 			},
-			"开发" : {
-				"首页" : {
-					"summary" : "index.html",
-					"status" : "+",
-					"attribute" : ""
-				},
-				"Javascript 编码规范" : {
-					"summary" : "docs/coder/javascript-specification.html",
-					"status" : "+",
-					"attribute" : ""
-				},
-				"组件编码规范" : {
-					"summary" : "docs/coder/control-specification.html",
-					"status" : "+",
-					"attribute" : ""
-				},
-				"文档注释规范" : {
-					"summary" : "docs/coder/doccomment.html",
-					"status" : "+",
-					"attribute" : ""
-				}
-			},
-			"J+" : {
+			"J+ Library" : {
 				"概述" : {
 					"summary" : "docs/jplus/introduction.html",
 					"status" : "+",
@@ -127,7 +152,7 @@ var Dpl = {
 					"status" : "+",
 					"attribute" : ""
 				},
-				"J+ 技术亮点" : {
+				"J+ 特性" : {
 					"summary" : "docs/jplus/features.html",
 					"status" : "+",
 					"attribute" : ""
@@ -174,7 +199,7 @@ var Dpl = {
 					"status" : "+",
 					"attribute" : ""
 				},
-				"ECMA-262" : {
+				"[PDF]ECMA-262" : {
 					"summary" : "docs/javascript/ECMA-262, 3rd edition, December 1999[1].pdf",
 					"status" : "+",
 					"attribute" : ""
@@ -232,7 +257,7 @@ var Dpl = {
 		},
 		"Assets" : {
 			"组件" : {
-				"合成方案" : {
+				"组件合成" : {
 					"summary" : "assets/tools/system/build.html",
 					"status" : "+",
 					"attribute" : ""
@@ -242,20 +267,15 @@ var Dpl = {
 					"status" : "+",
 					"attribute" : ""
 				},
-				"合成方案编辑" : {
+				"合成方案" : {
 					"summary" : "assets/tools/system/buildfile.html",
 					"status" : "+",
 					"attribute" : "~"
 				}
 			},
 			"工具" : {
-				"代码处理" : {
+				"代码处理": {
 					"summary" : "assets/tools/system/codehelper.html",
-					"status" : "+",
-					"attribute" : ""
-				},
-				"特殊字符" : {
-					"summary" : "assets/tools/system/specialcharacters.html",
 					"status" : "+",
 					"attribute" : ""
 				},
@@ -1371,13 +1391,6 @@ var Dpl = {
 					"status" : "+",
 					"attribute" : ""
 				}
-			},
-			"Test" : {
-				"Vertical-Align" : {
-					"summary" : "垂直居中",
-					"status" : "+",
-					"attribute" : "$"
-				}
 			}
 		},
 		"Modules" : {
@@ -1399,37 +1412,83 @@ var Dpl = {
 				}
 			}
 		},
-		"Test" : {
-			"Lib" : {
-				"jQuery-Core" : {
+		"Libs" : {
+			"jQuery": {
+				"Core" : {
 					"summary" : "",
 					"status" : "+",
 					"attribute" : "$"
 				},
-				"jQuery-Offset" : {
+				"Offset" : {
 					"summary" : "",
 					"status" : "+",
 					"attribute" : "$"
+				}
+			},
+			"jQuery-Adapter": {
+				"Core": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
 				},
-				"Mootools-Core" : {
-					"summary" : "",
-					"status" : "+",
-					"attribute" : "$"
+				"Attributes": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
 				},
-				"jQuery-Adapter-Core" : {
-					"summary" : "",
-					"status" : "+",
-					"attribute" : "$"
+				"Offset": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
 				},
-				"jQuery-Adapter-Attributes" : {
-					"summary" : "",
-					"status" : "+",
-					"attribute" : "$"
+				"jQuery-Style": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				}
+			},
+			"Mootools": {
+				"Core": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				}
+			},
+			"PrettifyPrint": {
+				"Core": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
 				},
-				"jQuery-Adapter-Offset" : {
-					"summary" : "",
-					"status" : "+",
-					"attribute" : "$"
+				"Test-Base": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				},
+				"Test-All": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				},
+				"Test-Other": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				},
+				"Test-Styles": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				},
+				"Test-Large": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
+				},
+				"IE-Newline-Copy-Paste": {
+					"summary": "",
+					"status": "+",
+					"attribute": "$"
 				}
 			},
 			"UnitTest" : {
@@ -1482,6 +1541,13 @@ var Dpl = {
 					"summary" : "",
 					"status" : "+",
 					"attribute" : "$"
+				}
+			},
+			"UI": {
+				"Vertical-Align": {
+					"summary": "垂直居中",
+					"status": "+",
+					"attribute": "$"
 				}
 			},
 			"Issues" : {

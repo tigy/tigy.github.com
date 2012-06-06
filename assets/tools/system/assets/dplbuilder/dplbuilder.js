@@ -40,7 +40,7 @@ var DplBuilder = {
 		
 		var html = Tpl.parse('<table class="x-table x-row"><tr>\
         		<th>生成方案</th>\
-        		<th width="208">操作</th>\
+        		<th width="259">操作</th>\
         	</tr>\
         	{for(var buildfile in $data)}\
         	<tr>\
@@ -49,6 +49,7 @@ var DplBuilder = {
         			<a href="buildfile.html#{buildfile}" class="x-button">编辑</a>\
         			<a href="javascript://删除解决方案" class="x-button" onclick="DplBuilder.deleteFile(\'{buildfile}\')">删除</a>\
         			<a href="javascript://删除解决方案" class="x-button" onclick="DplBuilder.preview(\'container-t\', \'{buildfile}\')">预览</a>\
+        			<a href="buildfile.html?base={buildfile}#" class="x-button">复制</a>\
         			<a href="javascript://重新生成此解决方案" class="x-button x-button-info" onclick="DplBuilder.buildFile(\'{buildfile}\')">生成</a>\
         		</td>\
         	</tr>\
@@ -64,7 +65,7 @@ var DplBuilder = {
 		
 		var html = Tpl.parse('<ul class="x-tabbable-container">\
 		{for item in $data}<li class="x-tabbable-content" data-name="{$index}"><a href="#{$index}">{$index}</a></li>{end}\
-		<li class="x-tabbable-content" data-name=""><a href="#">✚ 新建合成方案</a></li>\
+		<li class="x-tabbable-content" data-name=""><a href="buildfile.html#">✚ 新建合成方案</a></li>\
 		<li class="x-tabbable-content" data-name="$bak"><a href="build.html">←返回组件列表</a></li>\
 		</ul>\
 		', BuildFiles);
@@ -82,18 +83,24 @@ var DplBuilder = {
 			DplBuilder.showView(hash);
 		});	
 	},
+
+	createNewFile: function () {
+		if (DplBuilder.addFile)
+			return DplBuilder.addFile;
+		var base = decodeURIComponent((/[?&]base=(.*?)([?&#]|$)/.exec(location.href) || ["", ""])[1]);
+		return DplBuilder.addFile = Object.extend({
+			
+		}, BuildFiles[base]);
+	},
 	
-	showView: function(buildFileName){
-		
+	showView: function (buildFileName) {
 		DplBuilder.write();
 		
 		Dom.get('tabbable').query('.x-tabbable-actived').removeClass('x-tabbable-actived');
 		Dom.get('tabbable').query('[data-name="' + buildFileName + '"]').addClass('x-tabbable-actived');
 		
 		DplBuilder.currentBuildFileName = buildFileName;
-		DplBuilder.currentBuildFile = BuildFiles[buildFileName] || DplBuilder.addFile || ( DplBuilder.addFile = {
-			
-		});
+		DplBuilder.currentBuildFile = BuildFiles[buildFileName] || DplBuilder.createNewFile();
 		
 		var html = Tpl.parse('<div class="x-formfield">\
                 <label class="x-formfield-label">\
@@ -372,7 +379,7 @@ var DplBuilder = {
 		var arr = DplBuilder.currentBuildFile[  type ];
 		
 		arr.remove(name);
-		   DplBuilder.showView(DplBuilder.currentBuildFileName);
+		DplBuilder.showView(DplBuilder.currentBuildFileName);
 		
 	},
 	
