@@ -5,7 +5,7 @@
 
 
 /**********************************************
- * System.Core.Base
+ * JPlus.Core.Base
  **********************************************/
 /**
  * J+ Library, 3.0
@@ -63,7 +63,7 @@
 		 * 包含系统有关的函数。
 		 * @type Object
 		 */
-		System = window.System || (window.System = {});
+		JPlus = window.JPlus || (window.JPlus = {});
 		
 	/// #endregion
 
@@ -71,9 +71,9 @@
 	
 	/**
 	 * 包含系统有关的函数。
-	 * @namespace System
+	 * @namespace JPlus
 	 */
-	extend(System, {
+	extend(JPlus, {
 
 		/**
 		 * 所有类的基类。
@@ -99,9 +99,9 @@
 		 * id种子 。
 		 * @type Number
 		 * @defaultValue 1
-		 * @example 下例演示了 System.id 的用处。
+		 * @example 下例演示了 JPlus.id 的用处。
 		 * <pre>
-		 *		var uid = System.id++;  // 每次使用之后执行 ++， 保证页面内的 id 是唯一的。
+		 *		var uid = JPlus.id++;  // 每次使用之后执行 ++， 保证页面内的 id 是唯一的。
 		 * </pre>
 		 */
 		id: 1
@@ -109,7 +109,7 @@
 	});
 
 	/**
-	 * @static class System.Base
+	 * @static class JPlus.Base
 	 */
 	extend(Base, {
 
@@ -269,9 +269,9 @@
 		 * 
 		 * 这个函数实现的是 单继承。如果子类有定义构造函数，则仅调用子类的构造函数，否则调用父类的构造函数。
 		 * 
-		 * 要想在子类的构造函数调用父类的构造函数，可以使用 {@link System.Base#base} 调用。
+		 * 要想在子类的构造函数调用父类的构造函数，可以使用 {@link JPlus.Base#base} 调用。
 		 * 
-		 * 这个函数返回的类实际是一个函数，但它被 {@link System.Native} 修饰过。
+		 * 这个函数返回的类实际是一个函数，但它被 {@link JPlus.Native} 修饰过。
 		 * 
 		 * 由于原型链的关系， 肯能存在共享的引用。 如: 类 A ， A.prototype.c = []; 那么，A的实例 b ,
 		 * d 都有 c 成员， 但它们共享一个 A.prototype.c 成员。 这显然是不正确的。所以你应该把 参数 quick
@@ -318,7 +318,7 @@
 		    emptyFn.prototype = null;
 
 		    // 指定Class内容 。
-		    return System.Native(subClass);
+		    return JPlus.Native(subClass);
 
 	    }
 
@@ -350,14 +350,14 @@
 		    })
 			    return extend;
 
-		    System.enumerables = "toString hasOwnProperty valueOf constructor isPrototypeOf".split(' ');
+		    JPlus.enumerables = "toString hasOwnProperty valueOf constructor isPrototypeOf".split(' ');
 		    // IE6 不会遍历系统对象需要复制，所以强制去测试，如果改写就复制 。
 		    return function(dest, src) {
 			    if (src) {
 				    assert(dest != null, "Object.extend(dest, src): {dest} 不可为空。", dest);
 
-				    for ( var i = System.enumerables.length, value; i--;)
-					    if (hasOwnProperty.call(src, value = System.enumerables[i]))
+				    for ( var i = JPlus.enumerables.length, value; i--;)
+					    if (hasOwnProperty.call(src, value = JPlus.enumerables[i]))
 						    dest[value] = src[value];
 				    extend(dest, src);
 			    }
@@ -782,8 +782,8 @@
 	 * 创建一个类。
 	 * @param {Object/Function} [methods] 类成员列表对象或类构造函数。
 	 * @return {Function} 返回创建的类。
-	 * @see System.Base
-	 * @see System.Base.extend
+	 * @see JPlus.Base
+	 * @see JPlus.Base.extend
 	 * @example 以下代码演示了如何创建一个类:
 	 * <pre>
 	 * var MyCls = Class({
@@ -979,11 +979,11 @@
 	/// #region Methods
 	
 	// 把所有内建对象本地化 。
-	each.call([String, Array, Function, Date], System.Native);
+	each.call([String, Array, Function, Date], JPlus.Native);
 	
 	/**
 	 * 所有由 new Class 创建的类的基类。
-	 * @class System.Base
+	 * @class JPlus.Base
 	 */
     Base.implement({
     	
@@ -1320,7 +1320,7 @@
 
 	/**
 	 * 系统原生的字符串对象。
-	 * @system
+	 * @JPlus
 	 * @class String
 	 */
 	String.implementIf({
@@ -1376,7 +1376,7 @@
 
 	/**
 	 * 系统原生的函数对象。
-	 * @system
+	 * @JPlus
 	 * @class Function
 	 */
 	Function.implementIf({
@@ -1407,7 +1407,7 @@
 	
 	/**
 	 * 系统原生的数组对象。
-	 * @system
+	 * @JPlus
 	 * @class Array
 	 */
 	Array.implementIf({
@@ -1759,7 +1759,7 @@
 
 
 
-System.Base.prototype.toString = function(){
+JPlus.Base.prototype.toString = function(){
 	for(var item in window){
 		if(window[item] === this.constructor)
 			return item;	
@@ -2091,7 +2091,7 @@ function imports(ns){
                 },
 
                 getBaseClassDescription: function(obj) {
-                    if (obj && obj.base && obj.base !== System.Object) {
+                    if (obj && obj.base && obj.base !== JPlus.Object) {
                         var extObj = this.getTypeName(obj.base, window, "", 3);
                         return " 类" + (extObj && extObj != "System.Object" ? "(继承于 " + extObj + " 类)" : "");
                     }
@@ -2294,7 +2294,7 @@ function imports(ns){
                     for ( var name in window) {
 					
 						try{
-							if (isUpper(name, 0) || System[name] === window[name])
+							if (isUpper(name, 0) || JPlus[name] === window[name])
 								r.push(getDescription(window, name));
 						} catch(e){
 						
@@ -2655,7 +2655,7 @@ function imports(ns){
          * 同步载入代码。
          * @param {String} uri 地址。
          * @example <pre>
-         * System.loadScript('./v.js');
+         * JPlus.loadScript('./v.js');
          * </pre>
          */
         loadScript: function(url) {
@@ -2671,7 +2671,7 @@ function imports(ns){
          * 异步载入样式。
          * @param {String} uri 地址。
          * @example <pre>
-         * System.loadStyle('./v.css');
+         * JPlus.loadStyle('./v.css');
          * </pre>
          */
         loadStyle: function(url) {
@@ -2712,7 +2712,7 @@ function imports(ns){
          * @param {Function} [callback] 对返回值的处理函数。
          * @return {String} 载入的值。 因为同步，所以无法跨站。
          * @example <pre>
-         * trace(  System.loadText('./v.html')  );
+         * trace(  JPlus.loadText('./v.html')  );
          * </pre>
          */
         loadText: function(url, callback) {
@@ -2778,7 +2778,7 @@ function imports(ns){
         scripts: [],
 
         /**
-         * System 安装的根目录, 可以为相对目录。
+         * JPlus 安装的根目录, 可以为相对目录。
          * @config {String}
          */
         rootPath: (function(){
@@ -2800,7 +2800,7 @@ function imports(ns){
                 return "";
             }
 
-        })().replace("system/core/assets/scripts/", ""),
+        })().replace("System/core/assets/scripts/", ""),
 
         /**
          * 将指定的名字空间转为路径。
@@ -2838,11 +2838,11 @@ function imports(ns){
 
 
 /**********************************************
- * System.Dom.Base
+ * JPlus.Dom.Base
  **********************************************/
 ﻿/**
  * @fileOverview 提供最底层的 DOM 辅助函数。
- * @pragma defaultExtends System.Base
+ * @pragma defaultExtends JPlus.Base
  */
 
 // Core - 核心部分
@@ -2858,7 +2858,7 @@ function imports(ns){
 
 (function(window) {
 	
-	assert(!window.Dom || window.$ != window.Dom.get, "重复引入 System.Dom.Base 模块。");
+	assert(!window.Dom || window.$ != window.Dom.get, "重复引入 JPlus.Dom.Base 模块。");
 
 	/**
 	 * document 简写。
@@ -2891,10 +2891,10 @@ function imports(ns){
 		map = Object.map,
 
 		/**
-		 * System 简写。
+		 * JPlus 简写。
 		 * @type Object
 		 */
-		System = window.System,
+		JPlus = window.JPlus,
 	
 		/**
 		 * 指示当前浏览器是否为标签浏览器。
@@ -3144,7 +3144,7 @@ function imports(ns){
 
 			/**
 			 * 将当前值减去 *p*。
-			 * @param {Point} System 值。
+			 * @param {Point} JPlus 值。
 			 * @return {Point} this
 			 */
 			sub: function(p) {
@@ -3936,9 +3936,9 @@ function imports(ns){
 			input: function(elem){ return /^(input|select|textarea|button)$/i.test(elem.nodeName); },
 			
 			"nth-child": function(args, oldResult, result){
-				var System = Dom.pseudos;
-				if(System[args]){
-					System[args](null, oldResult, result);	
+				var JPlus = Dom.pseudos;
+				if(JPlus[args]){
+					JPlus[args](null, oldResult, result);	
 				} else if(args = oldResult[args - 1])
 					result.push(args);
 			},
@@ -4083,7 +4083,7 @@ function imports(ns){
 		 * @param {Element} elem 元素。
 		 * @param {String} type 输入。 一个 type
 		 *            由多个句子用,连接，一个句子由多个词语用+连接，一个词语由两个字组成， 第一个字可以是下列字符之一:
-		 *            m b System t l r b h w 第二个字可以是下列字符之一: x y l t b r
+		 *            m b JPlus t l r b h w 第二个字可以是下列字符之一: x y l t b r
 		 *            b。词语也可以是: outer inner 。
 		 * @return {Number} 计算值。 mx+sx -> 外大小。 mx-sx -> 内大小。
 	 	 * @static
@@ -4351,7 +4351,7 @@ function imports(ns){
 		 * @remark 因为 IE6/7 不存在这些对象, 文档对象是对原生 HTMLDocument 对象的补充。 扩展
 		 *        Document 也会扩展 HTMLDocument。
 		 */
-		Document: System.Native(document.constructor || {
+		Document: JPlus.Native(document.constructor || {
 			prototype: document
 		})
 
@@ -4988,11 +4988,11 @@ function imports(ns){
 		 */
 		setSize: function(x, y) {
 			var me = this,
-			System = formatPoint(x, y);
+			JPlus = formatPoint(x, y);
 		
-			if (System.x != null) me.setWidth(System.x - Dom.calc(me.dom, 'bx+px'));
+			if (JPlus.x != null) me.setWidth(JPlus.x - Dom.calc(me.dom, 'bx+px'));
 		
-			if (System.y != null) me.setHeight(System.y - Dom.calc(me.dom, 'by+py'));
+			if (JPlus.y != null) me.setHeight(JPlus.y - Dom.calc(me.dom, 'by+py'));
 		
 			return me;
 		},
@@ -5047,7 +5047,7 @@ function imports(ns){
 		 */
 		setOffset: function(offsetPoint) {
 		
-			assert(Object.isObject(offsetPoint), "Dom.prototype.setOffset(System): {System} 必须有 'x' 和 'y' 属性。", System);
+			assert(Object.isObject(offsetPoint), "Dom.prototype.setOffset(JPlus): {JPlus} 必须有 'x' 和 'y' 属性。", JPlus);
 			var s = this.dom.style;
 			
 			if(offsetPoint.y != null)
@@ -5413,21 +5413,21 @@ function imports(ns){
 				htmlScroll = doc.getScroll();
 			return new Point(bound.left + htmlScroll.x - html.clientLeft, bound.top + htmlScroll.y - html.clientTop);
 		}: function() {
-			var elem = this.dom, System = new Point(0, 0), t = elem.parentNode;
+			var elem = this.dom, JPlus = new Point(0, 0), t = elem.parentNode;
 		
 			if(styleString(elem, 'position') === 'fixed')
 				return new Point(elem.offsetLeft, elem.offsetTop).add(document.getScroll());
 		
 			while(t && !rBody.test(t.nodeName)) {
-				System.x -= t.scrollLeft;
-				System.y -= t.scrollTop;
+				JPlus.x -= t.scrollLeft;
+				JPlus.y -= t.scrollTop;
 				t = t.parentNode;
 			}
 			t = elem;
 		
 			while(elem && !rBody.test(elem.nodeName)) {
-				System.x += elem.offsetLeft;
-				System.y += elem.offsetTop;
+				JPlus.x += elem.offsetLeft;
+				JPlus.y += elem.offsetTop;
 				if(navigator.isFirefox) {
 					if(styleString(elem, 'MozBoxSizing') !== 'border-box') {
 						add(elem);
@@ -5441,22 +5441,22 @@ function imports(ns){
 				}
 		
 				if(styleString(elem, 'position') === 'fixed') {
-					System = System.add(document.getScroll());
+					JPlus = JPlus.add(document.getScroll());
 					break;
 				}
 				elem = elem.offsetParent;
 			}
 			if(navigator.isFirefox && styleString(t, 'MozBoxSizing') !== 'border-box') {
-				System.x -= styleNumber(t, 'borderLeftWidth');
-				System.y -= styleNumber(t, 'borderTopWidth');
+				JPlus.x -= styleNumber(t, 'borderLeftWidth');
+				JPlus.y -= styleNumber(t, 'borderTopWidth');
 			}
 		
 			function add(elem) {
-				System.x += styleNumber(elem, 'borderLeftWidth');
-				System.y += styleNumber(elem, 'borderTopWidth');
+				JPlus.x += styleNumber(elem, 'borderLeftWidth');
+				JPlus.y += styleNumber(elem, 'borderTopWidth');
 			}
 		
-			return System;
+			return JPlus;
 
 		},
 	
@@ -6904,7 +6904,7 @@ function imports(ns){
  * Controls.Core.Base
  **********************************************/
 /** * @author  */	/** * 所有控件基类。 * @class Control * @abstract * 控件的周期：  * constructor - 创建控件对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。  * create - 创建本身的 dom 节点。 可重写 - 默认使用 this.tpl 创建。 * init - 初始化控件本身。 可重写 - 默认为无操作。  * attach - 渲染控件到文档。不建议重写，如果你希望额外操作渲染事件，则重写。  * detach - 删除控件。不建议重写，如果一个控件用到多个 dom 内容需重写。 */var Control = Dom.extend({	/**	 * 存储当前控件的默认配置。	 * @getter {Object} options	 * @protected	 * @virtual	 */	/**	 * 存储当前控件的默认模板字符串。	 * @getter {String} tpl	 * @protected	 * @virtual	 */	/**	 * 当被子类重写时，生成当前控件。	 * @param {Object} options 选项。	 * @protected	 * @virtual	 */	create: function() {		assert(this.tpl, "Control.prototype.create(): 当前类不存在 tpl 属性。Control.prototype.create 会调用 tpl 属性，根据这个属性中的 HTML 代码动态地生成节点并返回。子类必须定义 tpl 属性或重写 Control.prototype.create 方法返回节点。");		// 转为对 tpl解析。		return Dom.parseNode(this.tpl);	},		/**	 * 当被子类重写时，渲染控件。	 * @method	 * @param {Object} options 配置。	 * @protected virtual	 */	init: Function.empty,	/**	 * 初始化一个新的控件。	 * @param {String/Element/Control/Object} [options] 对象的 id 或对象或各个配置。	 */	constructor: function(options) {		// 这是所有控件共用的构造函数。		var me = this,			// 临时的配置对象。			opt = Object.extend({}, me.options),			// 当前实际的节点。			dom;		// 如果存在配置。		if(options) {						// 如果 options 是纯配置。			if(!options.nodeType && options.constructor === Object) {				dom = options.dom || options;				apply(opt, options);				delete opt.dom;			} else {				dom = options;			}						if(typeof dom === "string") {				dom = document.getElementById(dom);			} else if(!dom.nodeType){				dom = dom.dom;			}					}		// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。		me.dom = dom || me.create(opt);		assert(me.dom && me.dom.nodeType, "Control.prototype.constructor(options): 当前实例的 dom 属性为空，或此属性不是 DOM 对象。(检查 options.dom 是否是合法的节点或ID(ID不存在?) 或当前实例的 create 方法是否正确返回一个节点)\r\n当前控件: {dom} {xtype}", me.dom, me.xtype);		// 调用 init 初始化控件。		me.init(opt);		// 如果指定的节点已经在 DOM 树上，且重写了 attach 方法，则调用之。		if(me.dom.parentNode && this.attach !== Control.prototype.attach) {			this.attach(me.dom.parentNode, me.dom.nextSibling);		}		// 复制各个选项。		Object.set(me, opt);	},	/**	 * xtype 。	 * @virtual	 */	xtype: "control"	});/**********************************************
- * System.Data.Collection
+ * JPlus.Data.Collection
  **********************************************/
 /**
  * @fileOverview 集合的基类。
@@ -7299,7 +7299,7 @@ var ListControl = ScrollableControl.extend({
 
 
 /**********************************************
- * System.Utils.JSON
+ * JPlus.Utils.JSON
  **********************************************/
 
 
@@ -7361,10 +7361,10 @@ Object.extendIf(JSON, {
 
 
 /**********************************************
- * System.Browser.Base
+ * JPlus.Browser.Base
  **********************************************/
 /** * @author  */var Browser = Browser || {};/**********************************************
- * System.Browser.Cookie
+ * JPlus.Browser.Cookie
  **********************************************/
 
 
@@ -7418,13 +7418,13 @@ Browser.setCookie = function (name, value, expires, props) {
 
 
 /**********************************************
- * System.Browser.LocalStorage
+ * JPlus.Browser.LocalStorage
  **********************************************/
 /** * @author  */Object.extend(Browser, {		setData: window.localStorage ? function(name, value){		localStorage[name] = value;	} : Browser.setCookie,		getData: window.localStorage ? function (name) {		return localStorage[name];	} : Browser.getCookie,		setJSON: function (name, value) {		Browser.setData(name, JSON.encode(value));	},		getJSON: function (name) {		name = Browser.getData(name);		if(name)			try{				return JSON.decode(name);			}catch(e){}							return null;	}	});/**********************************************
- * System.Dom.HashChange
+ * JPlus.Dom.HashChange
  **********************************************/
 /** * @author xuld *//** * Convert certain characters (&, <, >, and ") to their HTML character equivalents for literal display in web pages. * @param {String} value The string to encode * @return {String} The encoded text * @method */String.htmlEncode = (function() {    var entities = {        '&': '&amp;',        '>': '&gt;',        '<': '&lt;',        '"': '&quot;'    };        function match(match, capture){    	return entities[capture];    }        return function(value) {        return value ? value.replace(/[&><"]/g, match) : '';    };})();location.getHash = function() {	var href = location.href,	i = href.indexOf("#");	return i >= 0 ? href.substr(i + 1) : '';};(function() {	var hashchange = 'hashchange',		document = window.document,		win = Dom.window,		getHash = location.getHash;	/**	 * 当 hashchange 事件发生时，执行函数。	 */	Dom[hashchange] = function(fn) {		fn ? win.on(hashchange, fn) && fn.call(win) : win.trigger(hashchange);	};		// 并不是所有浏览器都支持 hashchange 事件，	// 当浏览器不支持的时候，使用自定义的监视器，每隔50ms监听当前hash是否被修改。	if ('on' + hashchange in window && !(document.documentMode < 8)) return;	var currentHash, 			timer, 				onChange = function() {			win.trigger(hashchange);		},				poll = function() {			var newToken = getHash();				if (currentHash !== newToken) {				currentHash = newToken;				onChange();			}			timer = setTimeout(poll, 50);			},				start = function() {			currentHash = getHash();			timer = setTimeout(poll, 50);		},				stop = function() {			clearTimeout(timer);		};			// 如果是 IE6/7，使用 iframe 模拟成历史记录。	if (navigator.isQuirks) {		var iframe;		// 初始化的时候，同时创建 iframe		start = function() {			if (!iframe) {				Dom.ready(function(){					iframe = Dom.parse('<iframe style="display: none" height="0" width="0" tabindex="-1" title="empty"/>');					iframe.once('load', function() {												// 绑定当 iframe 内容被重写后处理。						this.on("load", function() {							// iframe 的 load 载入有 2 个原因：							//	1. hashchange 重写 iframe							//	2. 用户点击后退按钮														// 获取当前保存的 hash							var newHash = iframe.contentWindow.document.body.innerText,								oldHash = getHash();																					// 如果是用户点击后退按钮导致的iframe load， 则 oldHash !== newHash							if (oldHash != newHash) {																// 将当前的 hash 更新为旧的 newHash								location.hash = currentHash = newHash;																// 手动触发 hashchange 事件。								win.trigger(hashchange);							}													});												// 首次执行，先保存状态。						currentHash = getHash();						poll();					});										iframe = iframe.dom;					document.dom.appendChild(iframe);									});			} else {								// 开始监听。				currentHash = getHash();				poll();			}		};		// iframe: onChange 时，保存状态到 iframe 。		onChange = function() {			var hash = getHash();						// 将历史记录存到 iframe 。			var html = "<html><body>" + String.htmlEncode(hash) + "</body></html>";			try {				var doc = iframe.contentWindow.document;				doc.open();				doc.write(html);				doc.close();			} catch(e) {}			win.trigger(hashchange);		};			}	Dom.addEvent('hashchange', {		add: start,		remove: stop	});})();/**********************************************
- * System.Dom.Drag
+ * JPlus.Dom.Drag
  **********************************************/
 //===========================================
 //  拖动 
@@ -7653,7 +7653,7 @@ Dom.implement({
 		if(handle !== false) {
 			if (handle === true) handle = null;
 			if(draggable) {
-				assert(!handle || draggable.handle.target === handle.target, "Dom.prototype.draggable(handle): 无法重复设置 {handle}, 如果希望重新设置handle，使用以下代码：dom.draggable(false);System.removeData(dom, 'draggable');dom.draggable(handle) 。", handle);
+				assert(!handle || draggable.handle.target === handle.target, "Dom.prototype.draggable(handle): 无法重复设置 {handle}, 如果希望重新设置handle，使用以下代码：dom.draggable(false);JPlus.removeData(dom, 'draggable');dom.draggable(handle) 。", handle);
 				draggable.draggable();
 			} else  {
 				Dom.movable(this.dom);
@@ -7685,7 +7685,7 @@ Dom.implement({
  * Controls.Core.ContentControl
  **********************************************/
 /** * @fileOverview 表示一个包含文本内容的控件。 * @author xuld *//** * 表示一个有内置呈现的控件。 * @abstract * @class ContentControl * @extends Control * <p> * ContentControl 控件把 content 属性作为自己的内容主体。 * ContentControl 控件的大小将由 content 决定。 * 当执行 appendChild/setWidth/setHtml 等操作时，都转到对 content 的操作。  * 这个类的应用如: dom 是用于显示视觉效果的辅助层， content 是实际内容的控件。 * 默认 content 和  dom 相同。子类应该重写 init ，并重新赋值  content 。 * </p> *  * <p> * 这个控件同时允许在子控件上显示一个图标。 * </p> *  * <p> * ContentControl 的外元素是一个根据内容自动改变大小的元素。它自身没有设置大小，全部的大小依赖子元素而自动决定。 * 因此，外元素必须满足下列条件的任何一个: *  <ul> * 		<li>外元素的 position 是 absolute<li> * 		<li>外元素的 float 是 left或 right <li> * 		<li>外元素的 display 是  inline-block (在 IE6 下，使用 inline + zoom模拟) <li> *  </ul> * </p> */var ContentControl = Control.extend({		/**	 * 当前正文。	 * @type Element/Control	 * @property container	 * @proected	 */		/**	 * 当被子类改写时，实现创建添加和返回一个图标节点。	 * @protected	 * @virtual	 */	createIcon: function(){		return  Dom.create('span', 'x-icon');	},		insertIcon: function(icon){		if(icon)			this.container.insert('afterBegin', icon);	},		init: function(){		this.container = new Dom(this.dom);	},		/**	 * 获取当前显示的图标。	 * @name icon	 * @type {Element}	 */		/**	 * 设置图标。	 * @param {String} icon 图标。	 * @return {Panel} this	 */	setIcon: function(icon) {				if(icon === null){			if(this.icon) {				this.icon.remove();				this.icon = null;			}						return this;						}				if(!this.icon || !this.icon.parent()) {						this.insertIcon(this.icon = this.createIcon());		}				this.icon.dom.className = "x-icon x-icon-" + icon;				return this;	},		setText: function(value){		this.container.setText(value);		this.insertIcon(this.icon);				return this;	},		setHtml: function(value){		this.container.setHtml(value);		this.insertIcon(this.icon);				return this;	}	});Dom.define(ContentControl, 'container', 'setWidth setHeight empty', 'insertBefore removeChild contains append getHtml getText getWidth getHeight');/**********************************************
- * System.Dom.Align
+ * JPlus.Dom.Align
  **********************************************/
 ﻿/**
  * @author xuld 
@@ -7871,8 +7871,8 @@ Dom.implement((function(){
 /**********************************************
  * Controls.Button.Menu-Alt
  **********************************************/
-/** * @author  */var MenuItem = ContentControl.extend({		xtype: 'menuitem',		tpl: '<a class="x-menuitem"><span class="x-icon x-icon-none"></span></a>',		subMenu: null,		/**	 * 	 */	init: function(){		this.base('init');		this.unselectable();		this.on('mouseover', this.onMouseEnter);		this.on('mouseout', this.onMouseLeave);				var subMenu = this.find('.x-menu');		if(subMenu){			this.setSubMenu(new Menu(subMenu));		}	},		setSubMenu: function(menu){		if (menu) {			this.subMenu = menu.hide();			menu.floating = false;			this.addClass('x-menuitem-menu');			this.on('mouseup', this._cancelHideMenu);		} else {			menu.floating = true;			this.removeClass('x-menuitem-menu');			this.un('mouseup', this._cancelHideMenu);		}	},		_cancelHideMenu: function(e){		e.stopPropagation();	},		toggleIcon: function(icon, val){		this.icon.toggleClass(icon, val);		return this;	},		onMouseEnter: function(){				// 使用父菜单打开本菜单，显示子菜单。		this.parentControl && this.parentControl.showSub(this);	},		_hideTargetMenu: function(e){		var tg = e.relatedTarget;		while(tg && tg.className != 'x-menu') {			tg = tg.parentNode;		}				if (tg) {   			var dt = System.data(tg, 'menu');									tg.hideSub();		}			},		onMouseLeave: function(e){				// 没子菜单，需要自取消激活。		// 否则，由父菜单取消当前菜单的状态。		// 因为如果有子菜单，必须在子菜单关闭后才能关闭激活。				if(!this.subMenu)			 this.setSelected(false);			 	},		setSelected: function(value){		this.parent().toggleClass('x-menuitem-selected', value);		this.toggleClass('x-menuitem-selected', value);		return this;	},		getSelected: function(){		return this.hasClass('x-menuitem x-menuitem-selected');	},		setChecked: function(value){		this.find('.x-icon').dom.className = 'x-icon x-icon-' + (value === false ? 'unchecked' : value !== null ? 'checked' : 'none');		return this;	},		getChecked: function(){		return this.hasClass('x-menuitem x-menuitem-checked');	},		setDisabled: function(value){		this.parent().toggleClass('x-menuitem-disabled', value);		this.toggleClass('x-menuitem-disabled', value);		return this;	},		getDisabled: function(){		return this.hasClass('x-menuitem x-menuitem-disabled');	}});var MenuSeperator = Control.extend({		tpl: '<div class="x-menu-seperator"></div>',		init: Function.empty	});var Menu = ListControl.extend({		xtype: 'menu',		initChild: function (item) {		if(item instanceof MenuItem || item instanceof MenuSeperator){			return item;		}		if(item === '-'){			return new 	MenuSeperator();		}				if(item instanceof Control && item.hasClass('x-menuitem')){			return new MenuItem(item);		}				var menu = new MenuItem();		menu.append(item);		return menu;	},		init: function(){		var me = this;		me.base('init');				// 绑定节点和控件，方便发生事件后，根据事件源得到控件。		this.dataField().menu = this;	},		showMenu: function(){		this.show();		this.onShow();	},		hideMenu: function(){		this.hide();		this.onHide();	},		/**	 * 当前菜单依靠某个控件显示。	 * @param {Control} ctrl 方向。	 */	showAt: function(x, y){				if(!this.parent('body')){			this.appendTo();		}				// 显示节点。		this.showMenu();				this.setPosition(x, y);				return this;	},		/**	 * 当前菜单依靠某个控件显示。	 * @param {Control} ctrl 方向。	 */	showBy: function(ctrl, pos, offsetX, offsetY, enableReset){				if(!this.parent('body')){			this.appendTo(ctrl.parent());		}				// 显示节点。		this.showMenu();				this.align(ctrl, pos || 'rt', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);				return this;	},		onShow: function(){		this.floating = true;		document.once('mouseup', this.hideMenu, this);		this.trigger('show');	},		/**	 * 关闭本菜单。	 */	onHide: function(){				// 先关闭子菜单。		this.hideSub();		this.trigger('hide');	},		/**	 * 打开本菜单子菜单。	 * @protected	 */	showSub: function(item){				// 如果不是右键的菜单，在打开子菜单后监听点击，并关闭此子菜单。		if(!this.floating)			document.once('mouseup', this.hideSub, this);				// 隐藏当前项子菜单。		this.hideSub();				// 激活本项。		item.setSelected(true);				if (item.subMenu) {						// 设置当前激活的项。			this.currentSubMenu = item;						// 显示子菜单。			item.subMenu.showBy(item);					}	},		/**	 * 关闭本菜单打开的子菜单。	 * @protected	 */	hideSub: function(){				// 如果有子菜单，就隐藏。		if(this.currentSubMenu) {						// 关闭子菜单。			this.currentSubMenu.subMenu.hide();						// 取消激活菜单。			this.currentSubMenu.setSelected(false);			this.currentSubMenu = null;		}	}	});/**********************************************
- * System.Utils.Deferrable
+/** * @author  */var MenuItem = ContentControl.extend({		xtype: 'menuitem',		tpl: '<a class="x-menuitem"><span class="x-icon x-icon-none"></span></a>',		subMenu: null,		/**	 * 	 */	init: function(){		this.base('init');		this.unselectable();		this.on('mouseover', this.onMouseEnter);		this.on('mouseout', this.onMouseLeave);				var subMenu = this.find('.x-menu');		if(subMenu){			this.setSubMenu(new Menu(subMenu));		}	},		setSubMenu: function(menu){		if (menu) {			this.subMenu = menu.hide();			menu.floating = false;			this.addClass('x-menuitem-menu');			this.on('mouseup', this._cancelHideMenu);		} else {			menu.floating = true;			this.removeClass('x-menuitem-menu');			this.un('mouseup', this._cancelHideMenu);		}	},		_cancelHideMenu: function(e){		e.stopPropagation();	},		toggleIcon: function(icon, val){		this.icon.toggleClass(icon, val);		return this;	},		onMouseEnter: function(){				// 使用父菜单打开本菜单，显示子菜单。		this.parentControl && this.parentControl.showSub(this);	},		_hideTargetMenu: function(e){		var tg = e.relatedTarget;		while(tg && tg.className != 'x-menu') {			tg = tg.parentNode;		}				if (tg) {   			var dt = JPlus.data(tg, 'menu');									tg.hideSub();		}			},		onMouseLeave: function(e){				// 没子菜单，需要自取消激活。		// 否则，由父菜单取消当前菜单的状态。		// 因为如果有子菜单，必须在子菜单关闭后才能关闭激活。				if(!this.subMenu)			 this.setSelected(false);			 	},		setSelected: function(value){		this.parent().toggleClass('x-menuitem-selected', value);		this.toggleClass('x-menuitem-selected', value);		return this;	},		getSelected: function(){		return this.hasClass('x-menuitem x-menuitem-selected');	},		setChecked: function(value){		this.find('.x-icon').dom.className = 'x-icon x-icon-' + (value === false ? 'unchecked' : value !== null ? 'checked' : 'none');		return this;	},		getChecked: function(){		return this.hasClass('x-menuitem x-menuitem-checked');	},		setDisabled: function(value){		this.parent().toggleClass('x-menuitem-disabled', value);		this.toggleClass('x-menuitem-disabled', value);		return this;	},		getDisabled: function(){		return this.hasClass('x-menuitem x-menuitem-disabled');	}});var MenuSeperator = Control.extend({		tpl: '<div class="x-menu-seperator"></div>',		init: Function.empty	});var Menu = ListControl.extend({		xtype: 'menu',		initChild: function (item) {		if(item instanceof MenuItem || item instanceof MenuSeperator){			return item;		}		if(item === '-'){			return new 	MenuSeperator();		}				if(item instanceof Control && item.hasClass('x-menuitem')){			return new MenuItem(item);		}				var menu = new MenuItem();		menu.append(item);		return menu;	},		init: function(){		var me = this;		me.base('init');				// 绑定节点和控件，方便发生事件后，根据事件源得到控件。		this.dataField().menu = this;	},		showMenu: function(){		this.show();		this.onShow();	},		hideMenu: function(){		this.hide();		this.onHide();	},		/**	 * 当前菜单依靠某个控件显示。	 * @param {Control} ctrl 方向。	 */	showAt: function(x, y){				if(!this.parent('body')){			this.appendTo();		}				// 显示节点。		this.showMenu();				this.setPosition(x, y);				return this;	},		/**	 * 当前菜单依靠某个控件显示。	 * @param {Control} ctrl 方向。	 */	showBy: function(ctrl, pos, offsetX, offsetY, enableReset){				if(!this.parent('body')){			this.appendTo(ctrl.parent());		}				// 显示节点。		this.showMenu();				this.align(ctrl, pos || 'rt', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);				return this;	},		onShow: function(){		this.floating = true;		document.once('mouseup', this.hideMenu, this);		this.trigger('show');	},		/**	 * 关闭本菜单。	 */	onHide: function(){				// 先关闭子菜单。		this.hideSub();		this.trigger('hide');	},		/**	 * 打开本菜单子菜单。	 * @protected	 */	showSub: function(item){				// 如果不是右键的菜单，在打开子菜单后监听点击，并关闭此子菜单。		if(!this.floating)			document.once('mouseup', this.hideSub, this);				// 隐藏当前项子菜单。		this.hideSub();				// 激活本项。		item.setSelected(true);				if (item.subMenu) {						// 设置当前激活的项。			this.currentSubMenu = item;						// 显示子菜单。			item.subMenu.showBy(item);					}	},		/**	 * 关闭本菜单打开的子菜单。	 * @protected	 */	hideSub: function(){				// 如果有子菜单，就隐藏。		if(this.currentSubMenu) {						// 关闭子菜单。			this.currentSubMenu.subMenu.hide();						// 取消激活菜单。			this.currentSubMenu.setSelected(false);			this.currentSubMenu = null;		}	}	});/**********************************************
+ * JPlus.Utils.Deferrable
  **********************************************/
 /**
  * @author
@@ -7990,7 +7990,7 @@ var Deferrable = Class({
 
 });
 /**********************************************
- * System.Fx.Base
+ * JPlus.Fx.Base
  **********************************************/
 /**
  * @fileOverview 提供底层的 特效算法支持。
@@ -8190,7 +8190,7 @@ Fx.Base = (function(){
 Fx.compute = function(from, to, delta){
 	return (to - from) * delta + from;
 };/**********************************************
- * System.Fx.Animate
+ * JPlus.Fx.Animate
  **********************************************/
 /**
  * @fileOverview 通过改变CSS实现的变换。
@@ -8782,7 +8782,7 @@ Fx.compute = function(from, to, delta){
  * Controls.DataView.Table
  **********************************************/
 /** * @author  *//**********************************************
- * System.Request.Base
+ * JPlus.Request.Base
  **********************************************/
 /**
  * @fileOverview 提供最底层的请求底层辅助函数。
@@ -8912,7 +8912,7 @@ Request.combineUrl = function (url, param) {
 
 
 /**********************************************
- * System.Request.Jsonp
+ * JPlus.Request.Jsonp
  **********************************************/
 /**
  * @fileOverview 请求处理JSON-P数据。
@@ -9015,7 +9015,7 @@ Request.JSONP = Request.Base.extend({
     }
 });
 /**********************************************
- * System.Utils.Tpl
+ * JPlus.Utils.Tpl
  **********************************************/
 //===========================================
 //  模板引擎

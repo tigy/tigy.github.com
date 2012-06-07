@@ -1,8 +1,8 @@
 
 
-var System = System || {};
+var JPlus = JPlus || {};
 
-System.getJSONP = function (path, data, onSuccess) {
+JPlus.getJSONP = function (path, data, onSuccess) {
 	Ajax.getJSONP(Dpl.configs.host + ':' + Dpl.configs.port + '/' + path, data, onSuccess, 1000, function(){
 		var r = 'assets/bin/startserver.bat';
 		if(navigator.platform.indexOf("Win") === -1) {
@@ -12,7 +12,7 @@ System.getJSONP = function (path, data, onSuccess) {
 	});
 };
 
-System.submit = function (path, data) {
+JPlus.submit = function (path, data) {
 	var form = Dom.create('form');
 	form.setAttr('action', Dpl.configs.host + ':' + Dpl.configs.port + '/' + path);
 	form.setAttr('method', 'post');
@@ -25,14 +25,14 @@ System.submit = function (path, data) {
 /**
  * 在网页里显示的跟地址。
  */
-System.rootUrl = '../../../';
+JPlus.rootUrl = '../../../';
 
 
 var DplBuilder = {
 	
-	buildFiles: 'assets/tools/system/server/dplbuilder/buildfiles.nodejs',
+	buildFiles: 'assets/tools/JPlus/server/dplbuilder/buildfiles.nodejs',
 	
-	dataFile: 'assets/tools/system/server/dplbuilder/data.nodejs',
+	dataFile: 'assets/tools/JPlus/server/dplbuilder/data.nodejs',
 	
 	// 列表页
 	
@@ -190,32 +190,32 @@ var DplBuilder = {
             <div id="namespaces">\
             	{for c in $data.top}\
             	<div class="namespace">\
-	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[置顶]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'top\')">删除</a>\
+	            	<a href="{JPlus.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[置顶]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'top\')">删除</a>\
 	           	</div>\
 	           	{end}\
             	{for c in $data.using}\
             	<div class="namespace">\
-	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'using\')">删除</a>\
+	            	<a href="{JPlus.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'using\')">删除</a>\
 	           	</div>\
 	           	{end}\
             	{for c in $data.imports}\
             	<div class="namespace">\
-	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[样式]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', true)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'imports\')">删除</a>\
+	            	<a href="{JPlus.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[样式]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', true)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'imports\')">删除</a>\
 	           	</div>\
 	           	{end}\
             	{for c in $data.excludeJs}\
             	<div class="namespace">\
-	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank"><del>[排除]{c}</del></a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'excludeJs\')">删除</a>\
+	            	<a href="{JPlus.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank"><del>[排除]{c}</del></a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'excludeJs\')">删除</a>\
 	           	</div>\
 	           	{end}\
             	{for c in $data.excludeCss}\
             	<div class="namespace">\
-	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank"><del>[无样式]{c}</del></a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', true)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'excludeCss\')">删除</a>\
+	            	<a href="{JPlus.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank"><del>[无样式]{c}</del></a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', true)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'excludeCss\')">删除</a>\
 	           	</div>\
 	           	{end}\
             	{for c in $data.bottom}\
             	<div class="namespace">\
-	            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[置底]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'bottom\')">删除</a>\
+	            	<a href="{JPlus.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[置底]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a> <a href="javascript://删除对当前模块的引用;" class="x-linkbutton" onclick="DplBuilder.deleteControl(\'{c}\', \'bottom\')">删除</a>\
 	           	</div>\
 	           	{end}\
 	           	\
@@ -253,7 +253,7 @@ var DplBuilder = {
 			return false;	
 		}	
 		if(namespace.indexOf('.') === -1 || namespace.indexOf('.') === namespace.lastIndexOf('.') || /\.$/.test(namespace)) {
-			alert('组件名字空间格式如下：组件库.分类.组件名。  如  System.Dom.Base ');	
+			alert('组件名字空间格式如下：组件库.分类.组件名。  如  JPlus.Dom.Base ');	
 			return  false;
 		}
 	},
@@ -261,7 +261,7 @@ var DplBuilder = {
 	// 解决方案
 	
 	save: function(build){
-		System.submit(DplBuilder.buildFiles,  {
+		JPlus.submit(DplBuilder.buildFiles,  {
 			build: build || "",
 			data: BuildFiles,
 			action: 'save',
@@ -270,7 +270,7 @@ var DplBuilder = {
 	},
 	
 	buildFile: function(buildFileName){
-		System.submit(DplBuilder.buildFiles, {
+		JPlus.submit(DplBuilder.buildFiles, {
 			build: buildFileName,
 			action: 'build',
 			url: location.href
@@ -278,7 +278,7 @@ var DplBuilder = {
 	},
 	
 	buildAllFiles: function(){
-		System.submit(DplBuilder.buildFiles, {
+		JPlus.submit(DplBuilder.buildFiles, {
 			action: 'rebuild',
 			url: '../../build.html'
 		});
@@ -384,7 +384,7 @@ var DplBuilder = {
 	},
 	
 	getData: function(type, ns, isStyle, callback){
-		System.getJSONP(DplBuilder.dataFile, {
+		JPlus.getJSONP(DplBuilder.dataFile, {
 			type: type,
 			namespace: ns,
 			isStyle: isStyle
@@ -406,7 +406,7 @@ var DplBuilder = {
 			var html = Tpl.parse('<ul class="source x-bubble">\
 				{for d in $data}\
 	    		<li>\
-					<a href="{System.rootUrl}{d}" class="x-hint" target="_blank">{d}\
+					<a href="{JPlus.rootUrl}{d}" class="x-hint" target="_blank">{d}\
 	    		</li>\
 	    		{end}\
 	    	</ul>', data);
@@ -437,14 +437,14 @@ var DplBuilder = {
     			{for c in js}\
 	    		<li>\
 					<div class="namespace">\
-		            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a>\
+		            	<a href="{JPlus.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', false)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', false)">查看引用</a>\
 		           	</div>\
 				</li>\
     			{end}\
     			{for c in css}\
 	    		<li>\
 					<div class="namespace">\
-		            	<a href="{System.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[样式]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', true)">查看引用</a>\
+		            	<a href="{JPlus.rootUrl}{c.toLowerCase().replace(/\\./g, "/")}.html" class="link" target="_blank">[样式]{c}</a> - <a href="javascript://查看关联的源文件" class="x-linkbutton" onclick="DplBuilder.viewSources(this, \'{c}\', true)">源文件</a> <a href="javascript://查看当前模块引用的项" class="x-linkbutton" onclick="DplBuilder.viewRefs(this, \'{c}\', true)">查看引用</a>\
 		           	</div>\
 				</li>\
     			{end}\
@@ -459,7 +459,7 @@ var DplBuilder = {
 	},
 
 	preview: function(container, name){
-		System.getJSONP(DplBuilder.dataFile, {
+		JPlus.getJSONP(DplBuilder.dataFile, {
 			type: 'preview',
 			name: name
 		}, function (data) {
@@ -523,7 +523,7 @@ var DplBuilder = {
 	    	</ul>', {
 	    		data: data,
 	    		author: function(c){
-	    			return '<a href="' + System.rootUrl + c.name.toLowerCase().replace(/\./g, "/") + '.html" class="link" target="_blank">' + (c.isStyle ? '[css]' : '[js]') + c.name + '</a>';
+	    			return '<a href="' + JPlus.rootUrl + c.name.toLowerCase().replace(/\./g, "/") + '.html" class="link" target="_blank">' + (c.isStyle ? '[css]' : '[js]') + c.name + '</a>';
 	    		}
 	    	});
 	    	

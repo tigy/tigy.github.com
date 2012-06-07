@@ -68,7 +68,7 @@ var MenuItem = ContentControl.extend({
 		}
 		
 		if (tg) {   
-			var dt = System.data(tg, 'menu');
+			var dt = JPlus.data(tg, 'menu');
 			
 			
 			tg.hideSub();

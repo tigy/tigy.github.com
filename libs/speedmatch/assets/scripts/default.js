@@ -23,7 +23,7 @@ var current = null,
 		rootPath: '',   // the directoy of test case file.
 		html: 'testcase.html',    //  the default html.
 		eclipseLength: 100,  //  If the length of code is greater than eclipseLength, it will be trimed.
-		timeout: 1000    // If .js file is not loaded, system will wait for timeout * 10(times) ms.
+		timeout: 1000    // If .js file is not loaded, JPlus will wait for timeout * 10(times) ms.
 	};
 
 if(location.search){

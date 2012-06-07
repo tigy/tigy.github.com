@@ -41,7 +41,7 @@
 			'setprotoent setpwent setservent setsockopt shift shmctl shmget shmread ' + 
 			'shmwrite shutdown sin sleep socket socketpair sort splice split sprintf ' + 
 			'sqrt srand stat study substr symlink syscall sysopen sysread sysseek ' + 
-			'system syswrite tell telldir time times tr truncate uc ucfirst umask ' + 
+			'System syswrite tell telldir time times tr truncate uc ucfirst umask ' + 
 			'undef unlink unpack unshift utime values vec wait waitpid warn write';
     
 		var keywords =  

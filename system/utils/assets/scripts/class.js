@@ -2,7 +2,7 @@
 //  类扩展   class.js  A
 //===========================================
 
-Object.extend(System.Base, {
+Object.extend(JPlus.Base, {
 	
 	/**
 	 * 扩充类的静态成员。
@@ -29,7 +29,7 @@ Object.extend(System.Base, {
 });
 
 
-[String, Array, Function, Date, Element, Number].forEach(System.Native);
+[String, Array, Function, Date, Element, Number].forEach(JPlus.Native);
 
 			
 			

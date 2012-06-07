@@ -1,4 +1,6 @@
-﻿/** * @author  */
+﻿/**
+ * @author 
+ */
 
 
 using("System.Algorithm.MD5");
@@ -105,7 +107,8 @@ using("System.Algorithm.MD5");
 
 
 
-// base64HmacMd5
+// base64HmacMd5
+
 /**
  * 计算一个字符串的 MD5值。
  * @param {String} s 字符串。

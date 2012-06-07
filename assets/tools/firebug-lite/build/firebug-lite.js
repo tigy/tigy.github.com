@@ -132,7 +132,7 @@ var backDir=/^((?:\.\.\/)+)(.*)/.exec(src);
 var reLastDir=/^(.*\/)[^\/]+\/$/;
 path=rePath.exec(location.href)[1];
 if(backDir){var j=backDir[1].length/3;
-var System;
+var JPlus;
 while(j-->0){path=reLastDir.exec(path)[1]
 }path+=backDir[2]
 }else{if(src.indexOf("/")!=-1){if(/^\.\/./.test(src)){path+=src.substring(2)
@@ -459,11 +459,11 @@ win;
 win=win.parent){if(!win.parent||win==win.parent||!this.instanceOf(win.parent,"Window")){return win
 }}return null
 };
-this.getClientOffset=function(elt){var addOffset=function addOffset(elt,coords,view){var System=elt.offsetParent;
+this.getClientOffset=function(elt){var addOffset=function addOffset(elt,coords,view){var JPlus=elt.offsetParent;
 var chrome=Firebug.chrome;
 if(elt.offsetLeft){coords.x+=elt.offsetLeft+chrome.getMeasurementInPixels(elt,"borderLeft")
 }if(elt.offsetTop){coords.y+=elt.offsetTop+chrome.getMeasurementInPixels(elt,"borderTop")
-}if(System){if(System.nodeType==1){addOffset(System,coords,view)
+}if(JPlus){if(JPlus.nodeType==1){addOffset(JPlus,coords,view)
 }}else{var otherView=isIE?elt.ownerDocument.parentWindow:elt.ownerDocument.defaultView;
 if(!otherView.opener&&otherView.frameElement){addOffset(otherView.frameElement,coords,otherView)
 }}};
@@ -473,24 +473,24 @@ if(elt){var view=isIE?elt.ownerDocument.parentWindow:elt.ownerDocument.defaultVi
 addOffset(elt,coords,view)
 }return coords
 };
-this.getViewOffset=function(elt,singleFrame){function addOffset(elt,coords,view){var System=elt.offsetParent;
-coords.x+=elt.offsetLeft-(System?System.scrollLeft:0);
-coords.y+=elt.offsetTop-(System?System.scrollTop:0);
-if(System){if(System.nodeType==1){var parentStyle=view.getComputedStyle(System,"");
+this.getViewOffset=function(elt,singleFrame){function addOffset(elt,coords,view){var JPlus=elt.offsetParent;
+coords.x+=elt.offsetLeft-(JPlus?JPlus.scrollLeft:0);
+coords.y+=elt.offsetTop-(JPlus?JPlus.scrollTop:0);
+if(JPlus){if(JPlus.nodeType==1){var parentStyle=view.getComputedStyle(JPlus,"");
 if(parentStyle.position!="static"){coords.x+=parseInt(parentStyle.borderLeftWidth);
 coords.y+=parseInt(parentStyle.borderTopWidth);
-if(System.localName=="TABLE"){coords.x+=parseInt(parentStyle.paddingLeft);
+if(JPlus.localName=="TABLE"){coords.x+=parseInt(parentStyle.paddingLeft);
 coords.y+=parseInt(parentStyle.paddingTop)
-}else{if(System.localName=="BODY"){var style=view.getComputedStyle(elt,"");
+}else{if(JPlus.localName=="BODY"){var style=view.getComputedStyle(elt,"");
 coords.x+=parseInt(style.marginLeft);
 coords.y+=parseInt(style.marginTop)
-}}}else{if(System.localName=="BODY"){coords.x+=parseInt(parentStyle.borderLeftWidth);
+}}}else{if(JPlus.localName=="BODY"){coords.x+=parseInt(parentStyle.borderLeftWidth);
 coords.y+=parseInt(parentStyle.borderTopWidth)
 }}var parent=elt.parentNode;
-while(System!=parent){coords.x-=parent.scrollLeft;
+while(JPlus!=parent){coords.x-=parent.scrollLeft;
 coords.y-=parent.scrollTop;
 parent=parent.parentNode
-}addOffset(System,coords,view)
+}addOffset(JPlus,coords,view)
 }}else{if(elt.localName=="BODY"){var style=view.getComputedStyle(elt,"");
 coords.x+=parseInt(style.borderLeftWidth);
 coords.y+=parseInt(style.borderTopWidth);
@@ -606,10 +606,10 @@ var colors=this.cssKeywords.color;
 for(var i=0;
 i<colors.length;
 ++i){cssColorNames.push(colors[i].toLowerCase())
-}var systemColors=this.cssKeywords.systemColor;
+}var JPlusColors=this.cssKeywords.JPlusColor;
 for(var i=0;
-i<systemColors.length;
-++i){cssColorNames.push(systemColors[i].toLowerCase())
+i<JPlusColors.length;
+++i){cssColorNames.push(JPlusColors[i].toLowerCase())
 }}return cssColorNames.indexOf?cssColorNames.indexOf(keyword.toLowerCase())!=-1:(" "+cssColorNames.join(" ")+" ").indexOf(" "+keyword.toLowerCase()+" ")!=-1
 };
 this.isImageRule=function(rule){if(!imageRules){imageRules=[];
@@ -659,7 +659,7 @@ this.getURLForStyleSheet=function(styleSheet){return(styleSheet.href?styleSheet.
 this.getDocumentForStyleSheet=function(styleSheet){while(styleSheet.parentStyleSheet&&!styleSheet.ownerNode){styleSheet=styleSheet.parentStyleSheet
 }if(styleSheet.ownerNode){return styleSheet.ownerNode.ownerDocument
 }};
-this.getInstanceForStyleSheet=function(styleSheet,ownerDocument){if(FBL.isSystemStyleSheet(styleSheet)){return 0
+this.getInstanceForStyleSheet=function(styleSheet,ownerDocument){if(FBL.isJPlusStyleSheet(styleSheet)){return 0
 }if(FBTrace.DBG_CSS){FBTrace.sysout("getInstanceForStyleSheet: "+styleSheet.href+" "+styleSheet.media.mediaText+" "+(styleSheet.ownerNode&&FBL.getElementXPath(styleSheet.ownerNode)),ownerDocument)
 }ownerDocument=ownerDocument||FBL.getDocumentForStyleSheet(styleSheet);
 var ret=0,styleSheets=ownerDocument.styleSheets,href=styleSheet.href;
@@ -1048,7 +1048,7 @@ if(queryString!=-1){url=url.substr(0,queryString)
 }var lastDot=url.lastIndexOf(".");
 return url.substr(lastDot+1)
 };
-this.isSystemURL=function(url){if(!url){return true
+this.isJPlusURL=function(url){if(!url){return true
 }if(url.length==0){return true
 }if(url[0]=="h"){return false
 }if(url.substr(0,9)=="resource:"){return true
@@ -1058,15 +1058,15 @@ this.isSystemURL=function(url){if(!url){return true
 }else{if(url.indexOf("firebug-service.js")!=-1){return true
 }else{return false
 }}}}}};
-this.isSystemPage=function(win){try{var doc=win.document;
+this.isJPlusPage=function(win){try{var doc=win.document;
 if(!doc){return false
 }if((doc.styleSheets.length&&doc.styleSheets[0].href=="chrome://global/content/xml/XMLPrettyPrint.css")||(doc.styleSheets.length>1&&doc.styleSheets[1].href=="chrome://browser/skin/feeds/subscribe.css")){return true
-}return FBL.isSystemURL(win.location.href)
-}catch(exc){ERROR("tabWatcher.isSystemPage document not ready:"+exc);
+}return FBL.isJPlusURL(win.location.href)
+}catch(exc){ERROR("tabWatcher.isJPlusPage document not ready:"+exc);
 return false
 }};
-this.isSystemStyleSheet=function(sheet){var href=sheet&&sheet.href;
-return href&&FBL.isSystemURL(href)
+this.isJPlusStyleSheet=function(sheet){var href=sheet&&sheet.href;
+return href&&FBL.isJPlusURL(href)
 };
 this.getURIHost=function(uri){try{if(uri){return uri.host
 }else{return""
@@ -1343,9 +1343,9 @@ domMemberMap.Text=extendArray(domMemberMap.Node,["data","length","appendData","d
 domMemberMap.Attr=extendArray(domMemberMap.Node,["name","value","specified","ownerElement"]);
 domMemberMap.Event=["type","target","currentTarget","originalTarget","explicitOriginalTarget","relatedTarget","rangeParent","rangeOffset","view","keyCode","charCode","screenX","screenY","clientX","clientY","layerX","layerY","pageX","pageY","detail","button","which","ctrlKey","shiftKey","altKey","metaKey","eventPhase","timeStamp","bubbles","cancelable","cancelBubble","isTrusted","isChar","getPreventDefault","initEvent","initMouseEvent","initKeyEvent","initUIEvent","preventBubble","preventCapture","preventDefault","stopPropagation"];
 this.domConstantMap={ELEMENT_NODE:1,ATTRIBUTE_NODE:1,TEXT_NODE:1,CDATA_SECTION_NODE:1,ENTITY_REFERENCE_NODE:1,ENTITY_NODE:1,PROCESSING_INSTRUCTION_NODE:1,COMMENT_NODE:1,DOCUMENT_NODE:1,DOCUMENT_TYPE_NODE:1,DOCUMENT_FRAGMENT_NODE:1,NOTATION_NODE:1,DOCUMENT_POSITION_DISCONNECTED:1,DOCUMENT_POSITION_PRECEDING:1,DOCUMENT_POSITION_FOLLOWING:1,DOCUMENT_POSITION_CONTAINS:1,DOCUMENT_POSITION_CONTAINED_BY:1,DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC:1,UNKNOWN_RULE:1,STYLE_RULE:1,CHARSET_RULE:1,IMPORT_RULE:1,MEDIA_RULE:1,FONT_FACE_RULE:1,PAGE_RULE:1,CAPTURING_PHASE:1,AT_TARGET:1,BUBBLING_PHASE:1,SCROLL_PAGE_UP:1,SCROLL_PAGE_DOWN:1,MOUSEUP:1,MOUSEDOWN:1,MOUSEOVER:1,MOUSEOUT:1,MOUSEMOVE:1,MOUSEDRAG:1,CLICK:1,DBLCLICK:1,KEYDOWN:1,KEYUP:1,KEYPRESS:1,DRAGDROP:1,FOCUS:1,BLUR:1,SELECT:1,CHANGE:1,RESET:1,SUBMIT:1,SCROLL:1,LOAD:1,UNLOAD:1,XFER_DONE:1,ABORT:1,ERROR:1,LOCATE:1,MOVE:1,RESIZE:1,FORWARD:1,HELP:1,BACK:1,TEXT:1,ALT_MASK:1,CONTROL_MASK:1,SHIFT_MASK:1,META_MASK:1,DOM_VK_TAB:1,DOM_VK_PAGE_UP:1,DOM_VK_PAGE_DOWN:1,DOM_VK_UP:1,DOM_VK_DOWN:1,DOM_VK_LEFT:1,DOM_VK_RIGHT:1,DOM_VK_CANCEL:1,DOM_VK_HELP:1,DOM_VK_BACK_SPACE:1,DOM_VK_CLEAR:1,DOM_VK_RETURN:1,DOM_VK_ENTER:1,DOM_VK_SHIFT:1,DOM_VK_CONTROL:1,DOM_VK_ALT:1,DOM_VK_PAUSE:1,DOM_VK_CAPS_LOCK:1,DOM_VK_ESCAPE:1,DOM_VK_SPACE:1,DOM_VK_END:1,DOM_VK_HOME:1,DOM_VK_PRINTSCREEN:1,DOM_VK_INSERT:1,DOM_VK_DELETE:1,DOM_VK_0:1,DOM_VK_1:1,DOM_VK_2:1,DOM_VK_3:1,DOM_VK_4:1,DOM_VK_5:1,DOM_VK_6:1,DOM_VK_7:1,DOM_VK_8:1,DOM_VK_9:1,DOM_VK_SEMICOLON:1,DOM_VK_EQUALS:1,DOM_VK_A:1,DOM_VK_B:1,DOM_VK_C:1,DOM_VK_D:1,DOM_VK_E:1,DOM_VK_F:1,DOM_VK_G:1,DOM_VK_H:1,DOM_VK_I:1,DOM_VK_J:1,DOM_VK_K:1,DOM_VK_L:1,DOM_VK_M:1,DOM_VK_N:1,DOM_VK_O:1,DOM_VK_P:1,DOM_VK_Q:1,DOM_VK_R:1,DOM_VK_S:1,DOM_VK_T:1,DOM_VK_U:1,DOM_VK_V:1,DOM_VK_W:1,DOM_VK_X:1,DOM_VK_Y:1,DOM_VK_Z:1,DOM_VK_CONTEXT_MENU:1,DOM_VK_NUMPAD0:1,DOM_VK_NUMPAD1:1,DOM_VK_NUMPAD2:1,DOM_VK_NUMPAD3:1,DOM_VK_NUMPAD4:1,DOM_VK_NUMPAD5:1,DOM_VK_NUMPAD6:1,DOM_VK_NUMPAD7:1,DOM_VK_NUMPAD8:1,DOM_VK_NUMPAD9:1,DOM_VK_MULTIPLY:1,DOM_VK_ADD:1,DOM_VK_SEPARATOR:1,DOM_VK_SUBTRACT:1,DOM_VK_DECIMAL:1,DOM_VK_DIVIDE:1,DOM_VK_F1:1,DOM_VK_F2:1,DOM_VK_F3:1,DOM_VK_F4:1,DOM_VK_F5:1,DOM_VK_F6:1,DOM_VK_F7:1,DOM_VK_F8:1,DOM_VK_F9:1,DOM_VK_F10:1,DOM_VK_F11:1,DOM_VK_F12:1,DOM_VK_F13:1,DOM_VK_F14:1,DOM_VK_F15:1,DOM_VK_F16:1,DOM_VK_F17:1,DOM_VK_F18:1,DOM_VK_F19:1,DOM_VK_F20:1,DOM_VK_F21:1,DOM_VK_F22:1,DOM_VK_F23:1,DOM_VK_F24:1,DOM_VK_NUM_LOCK:1,DOM_VK_SCROLL_LOCK:1,DOM_VK_COMMA:1,DOM_VK_PERIOD:1,DOM_VK_SLASH:1,DOM_VK_BACK_QUOTE:1,DOM_VK_OPEN_BRACKET:1,DOM_VK_BACK_SLASH:1,DOM_VK_CLOSE_BRACKET:1,DOM_VK_QUOTE:1,DOM_VK_META:1,SVG_ZOOMANDPAN_DISABLE:1,SVG_ZOOMANDPAN_MAGNIFY:1,SVG_ZOOMANDPAN_UNKNOWN:1};
-this.cssInfo={background:["bgRepeat","bgAttachment","bgPosition","color","systemColor","none"],"background-attachment":["bgAttachment"],"background-color":["color","systemColor"],"background-image":["none"],"background-position":["bgPosition"],"background-repeat":["bgRepeat"],border:["borderStyle","thickness","color","systemColor","none"],"border-top":["borderStyle","borderCollapse","color","systemColor","none"],"border-right":["borderStyle","borderCollapse","color","systemColor","none"],"border-bottom":["borderStyle","borderCollapse","color","systemColor","none"],"border-left":["borderStyle","borderCollapse","color","systemColor","none"],"border-collapse":["borderCollapse"],"border-color":["color","systemColor"],"border-top-color":["color","systemColor"],"border-right-color":["color","systemColor"],"border-bottom-color":["color","systemColor"],"border-left-color":["color","systemColor"],"border-spacing":[],"border-style":["borderStyle"],"border-top-style":["borderStyle"],"border-right-style":["borderStyle"],"border-bottom-style":["borderStyle"],"border-left-style":["borderStyle"],"border-width":["thickness"],"border-top-width":["thickness"],"border-right-width":["thickness"],"border-bottom-width":["thickness"],"border-left-width":["thickness"],bottom:["auto"],"caption-side":["captionSide"],clear:["clear","none"],clip:["auto"],color:["color","systemColor"],content:["content"],"counter-increment":["none"],"counter-reset":["none"],cursor:["cursor","none"],direction:["direction"],display:["display","none"],"empty-cells":[],"float":["float","none"],font:["fontStyle","fontVariant","fontWeight","fontFamily"],"font-family":["fontFamily"],"font-size":["fontSize"],"font-size-adjust":[],"font-stretch":[],"font-style":["fontStyle"],"font-variant":["fontVariant"],"font-weight":["fontWeight"],height:["auto"],left:["auto"],"letter-spacing":[],"line-height":[],"list-style":["listStyleType","listStylePosition","none"],"list-style-image":["none"],"list-style-position":["listStylePosition"],"list-style-type":["listStyleType","none"],margin:[],"margin-top":[],"margin-right":[],"margin-bottom":[],"margin-left":[],"marker-offset":["auto"],"min-height":["none"],"max-height":["none"],"min-width":["none"],"max-width":["none"],outline:["borderStyle","color","systemColor","none"],"outline-color":["color","systemColor"],"outline-style":["borderStyle"],"outline-width":[],overflow:["overflow","auto"],"overflow-x":["overflow","auto"],"overflow-y":["overflow","auto"],padding:[],"padding-top":[],"padding-right":[],"padding-bottom":[],"padding-left":[],position:["position"],quotes:["none"],right:["auto"],"table-layout":["tableLayout","auto"],"text-align":["textAlign"],"text-decoration":["textDecoration","none"],"text-indent":[],"text-shadow":[],"text-transform":["textTransform","none"],top:["auto"],"unicode-bidi":[],"vertical-align":["verticalAlign"],"white-space":["whiteSpace"],width:["auto"],"word-spacing":[],"z-index":[],"-moz-appearance":["mozAppearance"],"-moz-border-radius":[],"-moz-border-radius-bottomleft":[],"-moz-border-radius-bottomright":[],"-moz-border-radius-topleft":[],"-moz-border-radius-topright":[],"-moz-border-top-colors":["color","systemColor"],"-moz-border-right-colors":["color","systemColor"],"-moz-border-bottom-colors":["color","systemColor"],"-moz-border-left-colors":["color","systemColor"],"-moz-box-align":["mozBoxAlign"],"-moz-box-direction":["mozBoxDirection"],"-moz-box-flex":[],"-moz-box-ordinal-group":[],"-moz-box-orient":["mozBoxOrient"],"-moz-box-pack":["mozBoxPack"],"-moz-box-sizing":["mozBoxSizing"],"-moz-opacity":[],"-moz-user-focus":["userFocus","none"],"-moz-user-input":["userInput"],"-moz-user-modify":[],"-moz-user-select":["userSelect","none"],"-moz-background-clip":[],"-moz-background-inline-policy":[],"-moz-background-origin":[],"-moz-binding":[],"-moz-column-count":[],"-moz-column-gap":[],"-moz-column-width":[],"-moz-image-region":[]};
+this.cssInfo={background:["bgRepeat","bgAttachment","bgPosition","color","SystemColor","none"],"background-attachment":["bgAttachment"],"background-color":["color","SystemColor"],"background-image":["none"],"background-position":["bgPosition"],"background-repeat":["bgRepeat"],border:["borderStyle","thickness","color","SystemColor","none"],"border-top":["borderStyle","borderCollapse","color","SystemColor","none"],"border-right":["borderStyle","borderCollapse","color","SystemColor","none"],"border-bottom":["borderStyle","borderCollapse","color","SystemColor","none"],"border-left":["borderStyle","borderCollapse","color","SystemColor","none"],"border-collapse":["borderCollapse"],"border-color":["color","SystemColor"],"border-top-color":["color","SystemColor"],"border-right-color":["color","SystemColor"],"border-bottom-color":["color","SystemColor"],"border-left-color":["color","SystemColor"],"border-spacing":[],"border-style":["borderStyle"],"border-top-style":["borderStyle"],"border-right-style":["borderStyle"],"border-bottom-style":["borderStyle"],"border-left-style":["borderStyle"],"border-width":["thickness"],"border-top-width":["thickness"],"border-right-width":["thickness"],"border-bottom-width":["thickness"],"border-left-width":["thickness"],bottom:["auto"],"caption-side":["captionSide"],clear:["clear","none"],clip:["auto"],color:["color","SystemColor"],content:["content"],"counter-increment":["none"],"counter-reset":["none"],cursor:["cursor","none"],direction:["direction"],display:["display","none"],"empty-cells":[],"float":["float","none"],font:["fontStyle","fontVariant","fontWeight","fontFamily"],"font-family":["fontFamily"],"font-size":["fontSize"],"font-size-adjust":[],"font-stretch":[],"font-style":["fontStyle"],"font-variant":["fontVariant"],"font-weight":["fontWeight"],height:["auto"],left:["auto"],"letter-spacing":[],"line-height":[],"list-style":["listStyleType","listStylePosition","none"],"list-style-image":["none"],"list-style-position":["listStylePosition"],"list-style-type":["listStyleType","none"],margin:[],"margin-top":[],"margin-right":[],"margin-bottom":[],"margin-left":[],"marker-offset":["auto"],"min-height":["none"],"max-height":["none"],"min-width":["none"],"max-width":["none"],outline:["borderStyle","color","SystemColor","none"],"outline-color":["color","SystemColor"],"outline-style":["borderStyle"],"outline-width":[],overflow:["overflow","auto"],"overflow-x":["overflow","auto"],"overflow-y":["overflow","auto"],padding:[],"padding-top":[],"padding-right":[],"padding-bottom":[],"padding-left":[],position:["position"],quotes:["none"],right:["auto"],"table-layout":["tableLayout","auto"],"text-align":["textAlign"],"text-decoration":["textDecoration","none"],"text-indent":[],"text-shadow":[],"text-transform":["textTransform","none"],top:["auto"],"unicode-bidi":[],"vertical-align":["verticalAlign"],"white-space":["whiteSpace"],width:["auto"],"word-spacing":[],"z-index":[],"-moz-appearance":["mozAppearance"],"-moz-border-radius":[],"-moz-border-radius-bottomleft":[],"-moz-border-radius-bottomright":[],"-moz-border-radius-topleft":[],"-moz-border-radius-topright":[],"-moz-border-top-colors":["color","SystemColor"],"-moz-border-right-colors":["color","SystemColor"],"-moz-border-bottom-colors":["color","SystemColor"],"-moz-border-left-colors":["color","SystemColor"],"-moz-box-align":["mozBoxAlign"],"-moz-box-direction":["mozBoxDirection"],"-moz-box-flex":[],"-moz-box-ordinal-group":[],"-moz-box-orient":["mozBoxOrient"],"-moz-box-pack":["mozBoxPack"],"-moz-box-sizing":["mozBoxSizing"],"-moz-opacity":[],"-moz-user-focus":["userFocus","none"],"-moz-user-input":["userInput"],"-moz-user-modify":[],"-moz-user-select":["userSelect","none"],"-moz-background-clip":[],"-moz-background-inline-policy":[],"-moz-background-origin":[],"-moz-binding":[],"-moz-column-count":[],"-moz-column-gap":[],"-moz-column-width":[],"-moz-image-region":[]};
 this.inheritedStyleNames={"border-collapse":1,"border-spacing":1,"border-style":1,"caption-side":1,color:1,cursor:1,direction:1,"empty-cells":1,font:1,"font-family":1,"font-size-adjust":1,"font-size":1,"font-style":1,"font-variant":1,"font-weight":1,"letter-spacing":1,"line-height":1,"list-style":1,"list-style-image":1,"list-style-position":1,"list-style-type":1,quotes:1,"text-align":1,"text-decoration":1,"text-indent":1,"text-shadow":1,"text-transform":1,"white-space":1,"word-spacing":1};
-this.cssKeywords={appearance:["button","button-small","checkbox","checkbox-container","checkbox-small","dialog","listbox","menuitem","menulist","menulist-button","menulist-textfield","menupopup","progressbar","radio","radio-container","radio-small","resizer","scrollbar","scrollbarbutton-down","scrollbarbutton-left","scrollbarbutton-right","scrollbarbutton-up","scrollbartrack-horizontal","scrollbartrack-vertical","separator","statusbar","tab","tab-left-edge","tabpanels","textfield","toolbar","toolbarbutton","toolbox","tooltip","treeheadercell","treeheadersortarrow","treeitem","treetwisty","treetwistyopen","treeview","window"],systemColor:["ActiveBorder","ActiveCaption","AppWorkspace","Background","ButtonFace","ButtonHighlight","ButtonShadow","ButtonText","CaptionText","GrayText","Highlight","HighlightText","InactiveBorder","InactiveCaption","InactiveCaptionText","InfoBackground","InfoText","Menu","MenuText","Scrollbar","ThreeDDarkShadow","ThreeDFace","ThreeDHighlight","ThreeDLightShadow","ThreeDShadow","Window","WindowFrame","WindowText","-moz-field","-moz-fieldtext","-moz-workspace","-moz-visitedhyperlinktext","-moz-use-text-color"],color:["AliceBlue","AntiqueWhite","Aqua","Aquamarine","Azure","Beige","Bisque","Black","BlanchedAlmond","Blue","BlueViolet","Brown","BurlyWood","CadetBlue","Chartreuse","Chocolate","Coral","CornflowerBlue","Cornsilk","Crimson","Cyan","DarkBlue","DarkCyan","DarkGoldenRod","DarkGray","DarkGreen","DarkKhaki","DarkMagenta","DarkOliveGreen","DarkOrange","DarkOrchid","DarkRed","DarkSalmon","DarkSeaGreen","DarkSlateBlue","DarkSlateGray","DarkTurquoise","DarkViolet","DeepPink","DarkSkyBlue","DimGray","DodgerBlue","Feldspar","FireBrick","FloralWhite","ForestGreen","Fuchsia","Gainsboro","GhostWhite","Gold","GoldenRod","Gray","Green","GreenYellow","HoneyDew","HotPink","IndianRed","Indigo","Ivory","Khaki","Lavender","LavenderBlush","LawnGreen","LemonChiffon","LightBlue","LightCoral","LightCyan","LightGoldenRodYellow","LightGrey","LightGreen","LightPink","LightSalmon","LightSeaGreen","LightSkyBlue","LightSlateBlue","LightSlateGray","LightSteelBlue","LightYellow","Lime","LimeGreen","Linen","Magenta","Maroon","MediumAquaMarine","MediumBlue","MediumOrchid","MediumPurple","MediumSeaGreen","MediumSlateBlue","MediumSpringGreen","MediumTurquoise","MediumVioletRed","MidnightBlue","MintCream","MistyRose","Moccasin","NavajoWhite","Navy","OldLace","Olive","OliveDrab","Orange","OrangeRed","Orchid","PaleGoldenRod","PaleGreen","PaleTurquoise","PaleVioletRed","PapayaWhip","PeachPuff","Peru","Pink","Plum","PowderBlue","Purple","Red","RosyBrown","RoyalBlue","SaddleBrown","Salmon","SandyBrown","SeaGreen","SeaShell","Sienna","Silver","SkyBlue","SlateBlue","SlateGray","Snow","SpringGreen","SteelBlue","Tan","Teal","Thistle","Tomato","Turquoise","Violet","VioletRed","Wheat","White","WhiteSmoke","Yellow","YellowGreen","transparent","invert"],auto:["auto"],none:["none"],captionSide:["top","bottom","left","right"],clear:["left","right","both"],cursor:["auto","cell","context-menu","crosshair","default","help","pointer","progress","move","e-resize","all-scroll","ne-resize","nw-resize","n-resize","se-resize","sw-resize","s-resize","w-resize","ew-resize","ns-resize","nesw-resize","nwse-resize","col-resize","row-resize","text","vertical-text","wait","alias","copy","move","no-drop","not-allowed","-moz-alias","-moz-cell","-moz-copy","-moz-grab","-moz-grabbing","-moz-contextmenu","-moz-zoom-in","-moz-zoom-out","-moz-spinning"],direction:["ltr","rtl"],bgAttachment:["scroll","fixed"],bgPosition:["top","center","bottom","left","right"],bgRepeat:["repeat","repeat-x","repeat-y","no-repeat"],borderStyle:["hidden","dotted","dashed","solid","double","groove","ridge","inset","outset","-moz-bg-inset","-moz-bg-outset","-moz-bg-solid"],borderCollapse:["collapse","separate"],overflow:["visible","hidden","scroll","-moz-scrollbars-horizontal","-moz-scrollbars-none","-moz-scrollbars-vertical"],listStyleType:["disc","circle","square","decimal","decimal-leading-zero","lower-roman","upper-roman","lower-greek","lower-alpha","lower-latin","upper-alpha","upper-latin","hebrew","armenian","georgian","cjk-ideographic","hiragana","katakana","hiragana-iroha","katakana-iroha","inherit"],listStylePosition:["inside","outside"],content:["open-quote","close-quote","no-open-quote","no-close-quote","inherit"],fontStyle:["normal","italic","oblique","inherit"],fontVariant:["normal","small-caps","inherit"],fontWeight:["normal","bold","bolder","lighter","inherit"],fontSize:["xx-small","x-small","small","medium","large","x-large","xx-large","smaller","larger"],fontFamily:["Arial","Comic Sans MS","Georgia","Tahoma","Verdana","Times New Roman","Trebuchet MS","Lucida Grande","Helvetica","serif","sans-serif","cursive","fantasy","monospace","caption","icon","menu","message-box","small-caption","status-bar","inherit"],display:["block","inline","inline-block","list-item","marker","run-in","compact","table","inline-table","table-row-group","table-column","table-column-group","table-header-group","table-footer-group","table-row","table-cell","table-caption","-moz-box","-moz-compact","-moz-deck","-moz-grid","-moz-grid-group","-moz-grid-line","-moz-groupbox","-moz-inline-block","-moz-inline-box","-moz-inline-grid","-moz-inline-stack","-moz-inline-table","-moz-marker","-moz-popup","-moz-runin","-moz-stack"],position:["static","relative","absolute","fixed","inherit"],"float":["left","right"],textAlign:["left","right","center","justify"],tableLayout:["fixed"],textDecoration:["underline","overline","line-through","blink"],textTransform:["capitalize","lowercase","uppercase","inherit"],unicodeBidi:["normal","embed","bidi-override"],whiteSpace:["normal","pre","nowrap"],verticalAlign:["baseline","sub","super","top","text-top","middle","bottom","text-bottom","inherit"],thickness:["thin","medium","thick"],userFocus:["ignore","normal"],userInput:["disabled","enabled"],userSelect:["normal"],mozBoxSizing:["content-box","padding-box","border-box"],mozBoxAlign:["start","center","end","baseline","stretch"],mozBoxDirection:["normal","reverse"],mozBoxOrient:["horizontal","vertical"],mozBoxPack:["start","center","end"]};
+this.cssKeywords={appearance:["button","button-small","checkbox","checkbox-container","checkbox-small","dialog","listbox","menuitem","menulist","menulist-button","menulist-textfield","menupopup","progressbar","radio","radio-container","radio-small","resizer","scrollbar","scrollbarbutton-down","scrollbarbutton-left","scrollbarbutton-right","scrollbarbutton-up","scrollbartrack-horizontal","scrollbartrack-vertical","separator","statusbar","tab","tab-left-edge","tabpanels","textfield","toolbar","toolbarbutton","toolbox","tooltip","treeheadercell","treeheadersortarrow","treeitem","treetwisty","treetwistyopen","treeview","window"],JPlusColor:["ActiveBorder","ActiveCaption","AppWorkspace","Background","ButtonFace","ButtonHighlight","ButtonShadow","ButtonText","CaptionText","GrayText","Highlight","HighlightText","InactiveBorder","InactiveCaption","InactiveCaptionText","InfoBackground","InfoText","Menu","MenuText","Scrollbar","ThreeDDarkShadow","ThreeDFace","ThreeDHighlight","ThreeDLightShadow","ThreeDShadow","Window","WindowFrame","WindowText","-moz-field","-moz-fieldtext","-moz-workspace","-moz-visitedhyperlinktext","-moz-use-text-color"],color:["AliceBlue","AntiqueWhite","Aqua","Aquamarine","Azure","Beige","Bisque","Black","BlanchedAlmond","Blue","BlueViolet","Brown","BurlyWood","CadetBlue","Chartreuse","Chocolate","Coral","CornflowerBlue","Cornsilk","Crimson","Cyan","DarkBlue","DarkCyan","DarkGoldenRod","DarkGray","DarkGreen","DarkKhaki","DarkMagenta","DarkOliveGreen","DarkOrange","DarkOrchid","DarkRed","DarkSalmon","DarkSeaGreen","DarkSlateBlue","DarkSlateGray","DarkTurquoise","DarkViolet","DeepPink","DarkSkyBlue","DimGray","DodgerBlue","Feldspar","FireBrick","FloralWhite","ForestGreen","Fuchsia","Gainsboro","GhostWhite","Gold","GoldenRod","Gray","Green","GreenYellow","HoneyDew","HotPink","IndianRed","Indigo","Ivory","Khaki","Lavender","LavenderBlush","LawnGreen","LemonChiffon","LightBlue","LightCoral","LightCyan","LightGoldenRodYellow","LightGrey","LightGreen","LightPink","LightSalmon","LightSeaGreen","LightSkyBlue","LightSlateBlue","LightSlateGray","LightSteelBlue","LightYellow","Lime","LimeGreen","Linen","Magenta","Maroon","MediumAquaMarine","MediumBlue","MediumOrchid","MediumPurple","MediumSeaGreen","MediumSlateBlue","MediumSpringGreen","MediumTurquoise","MediumVioletRed","MidnightBlue","MintCream","MistyRose","Moccasin","NavajoWhite","Navy","OldLace","Olive","OliveDrab","Orange","OrangeRed","Orchid","PaleGoldenRod","PaleGreen","PaleTurquoise","PaleVioletRed","PapayaWhip","PeachPuff","Peru","Pink","Plum","PowderBlue","Purple","Red","RosyBrown","RoyalBlue","SaddleBrown","Salmon","SandyBrown","SeaGreen","SeaShell","Sienna","Silver","SkyBlue","SlateBlue","SlateGray","Snow","SpringGreen","SteelBlue","Tan","Teal","Thistle","Tomato","Turquoise","Violet","VioletRed","Wheat","White","WhiteSmoke","Yellow","YellowGreen","transparent","invert"],auto:["auto"],none:["none"],captionSide:["top","bottom","left","right"],clear:["left","right","both"],cursor:["auto","cell","context-menu","crosshair","default","help","pointer","progress","move","e-resize","all-scroll","ne-resize","nw-resize","n-resize","se-resize","sw-resize","s-resize","w-resize","ew-resize","ns-resize","nesw-resize","nwse-resize","col-resize","row-resize","text","vertical-text","wait","alias","copy","move","no-drop","not-allowed","-moz-alias","-moz-cell","-moz-copy","-moz-grab","-moz-grabbing","-moz-contextmenu","-moz-zoom-in","-moz-zoom-out","-moz-spinning"],direction:["ltr","rtl"],bgAttachment:["scroll","fixed"],bgPosition:["top","center","bottom","left","right"],bgRepeat:["repeat","repeat-x","repeat-y","no-repeat"],borderStyle:["hidden","dotted","dashed","solid","double","groove","ridge","inset","outset","-moz-bg-inset","-moz-bg-outset","-moz-bg-solid"],borderCollapse:["collapse","separate"],overflow:["visible","hidden","scroll","-moz-scrollbars-horizontal","-moz-scrollbars-none","-moz-scrollbars-vertical"],listStyleType:["disc","circle","square","decimal","decimal-leading-zero","lower-roman","upper-roman","lower-greek","lower-alpha","lower-latin","upper-alpha","upper-latin","hebrew","armenian","georgian","cjk-ideographic","hiragana","katakana","hiragana-iroha","katakana-iroha","inherit"],listStylePosition:["inside","outside"],content:["open-quote","close-quote","no-open-quote","no-close-quote","inherit"],fontStyle:["normal","italic","oblique","inherit"],fontVariant:["normal","small-caps","inherit"],fontWeight:["normal","bold","bolder","lighter","inherit"],fontSize:["xx-small","x-small","small","medium","large","x-large","xx-large","smaller","larger"],fontFamily:["Arial","Comic Sans MS","Georgia","Tahoma","Verdana","Times New Roman","Trebuchet MS","Lucida Grande","Helvetica","serif","sans-serif","cursive","fantasy","monospace","caption","icon","menu","message-box","small-caption","status-bar","inherit"],display:["block","inline","inline-block","list-item","marker","run-in","compact","table","inline-table","table-row-group","table-column","table-column-group","table-header-group","table-footer-group","table-row","table-cell","table-caption","-moz-box","-moz-compact","-moz-deck","-moz-grid","-moz-grid-group","-moz-grid-line","-moz-groupbox","-moz-inline-block","-moz-inline-box","-moz-inline-grid","-moz-inline-stack","-moz-inline-table","-moz-marker","-moz-popup","-moz-runin","-moz-stack"],position:["static","relative","absolute","fixed","inherit"],"float":["left","right"],textAlign:["left","right","center","justify"],tableLayout:["fixed"],textDecoration:["underline","overline","line-through","blink"],textTransform:["capitalize","lowercase","uppercase","inherit"],unicodeBidi:["normal","embed","bidi-override"],whiteSpace:["normal","pre","nowrap"],verticalAlign:["baseline","sub","super","top","text-top","middle","bottom","text-bottom","inherit"],thickness:["thin","medium","thick"],userFocus:["ignore","normal"],userInput:["disabled","enabled"],userSelect:["normal"],mozBoxSizing:["content-box","padding-box","border-box"],mozBoxAlign:["start","center","end","baseline","stretch"],mozBoxDirection:["normal","reverse"],mozBoxOrient:["horizontal","vertical"],mozBoxPack:["start","center","end"]};
 this.nonEditableTags={HTML:1,HEAD:1,html:1,head:1};
 this.innerEditableTags={BODY:1,body:1};
 this.selfClosingTags={meta:1,link:1,area:1,base:1,col:1,input:1,img:1,br:1,hr:1,param:1,embed:1};
@@ -1805,9 +1805,9 @@ if(ownerPanel){ownerPanel.sidePanelBarNode=createElement("span");
 ownerPanel.sidePanelBarNode.style.display="none";
 ownerPanel.sidePanelBarBoxNode.appendChild(ownerPanel.sidePanelBarNode)
 }var panels=Firebug.panelTypes;
-for(var i=0,System;
-System=panels[i];
-i++){if(!ownerPanel&&!System.prototype.parentPanel||ownerPanel&&System.prototype.parentPanel&&ownerPanel.name==System.prototype.parentPanel){this.addPanel(System.prototype.name)
+for(var i=0,JPlus;
+JPlus=panels[i];
+i++){if(!ownerPanel&&!JPlus.prototype.parentPanel||ownerPanel&&JPlus.prototype.parentPanel&&ownerPanel.name==JPlus.prototype.parentPanel){this.addPanel(JPlus.prototype.name)
 }}},destroy:function(){PanelBar.shutdown.call(this);
 for(var name in this.panelMap){this.removePanel(name);
 var panel=this.panelMap[name];
@@ -2194,7 +2194,7 @@ sufix=sufixes[i];
 i++){result[i]=this.getMeasurementInPixels(el,name+sufix)
 }}return{top:result[0],left:result[1],bottom:result[2],right:result[3]}
 },getCSSAutoMarginBox:function(el){if(isIE&&" meta title input script link a ".indexOf(" "+el.nodeName.toLowerCase()+" ")!=-1){return{top:0,left:0,bottom:0,right:0}
-}if(isIE&&" h1 h2 h3 h4 h5 h6 h7 ul System ".indexOf(" "+el.nodeName.toLowerCase()+" ")==-1){return{top:0,left:0,bottom:0,right:0}
+}if(isIE&&" h1 h2 h3 h4 h5 h6 h7 ul JPlus ".indexOf(" "+el.nodeName.toLowerCase()+" ")==-1){return{top:0,left:0,bottom:0,right:0}
 }var offsetTop=0;
 if(false&&isIEStantandMode){var scrollSize=Firebug.browser.getWindowScrollSize();
 offsetTop=scrollSize.height
@@ -2398,7 +2398,7 @@ this.shutdown()
 },focusCommandLine:function(){Firebug.chrome.focusCommandLine()
 },visitWebsite:function(){this.visit("http://getfirebug.com/lite.html")
 },visitDiscussionGroup:function(){this.visit("http://groups.google.com/group/firebug")
-},visitIssueTracker:function(){this.visit("http://code.google.com/System/fbug/issues/list")
+},visitIssueTracker:function(){this.visit("http://code.google.com/JPlus/fbug/issues/list")
 },visit:function(url){window.open(url)
 }});
 var firebugOptionsMenu={id:"fbFirebugOptionsMenu",getItems:function(){var cookiesDisabled=!Firebug.saveCookies;
@@ -2949,7 +2949,7 @@ script.src=jsonpURL;
 if(doc.documentElement){doc.documentElement.appendChild(script)
 }},YQL:function(url,callback){var yql="http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22"+encodeURIComponent(url)+"%22&format=xml";
 this.loadJSONP(yql,function(data){var source=data.results[0];
-var match=/<body>\s+<System>([\s\S]+)<\/System>\s+<\/body>$/.exec(source);
+var match=/<body>\s+<JPlus>([\s\S]+)<\/JPlus>\s+<\/body>$/.exec(source);
 if(match){source=match[1]
 }console.log(source)
 })
@@ -3419,7 +3419,7 @@ if(div.firstChild&&typeof div.firstChild.getAttribute!=="undefined"&&div.firstCh
 }div=null
 })();
 if(document.querySelectorAll){(function(){var oldSizzle=Sizzle,div=document.createElement("div");
-div.innerHTML="<System class='TEST'></System>";
+div.innerHTML="<JPlus class='TEST'></JPlus>";
 if(div.querySelectorAll&&div.querySelectorAll(".TEST").length===0){return
 }Sizzle=function(query,context,extra,seed){context=context||document;
 if(!seed&&context.nodeType===9&&!isXML(context)){try{return makeArray(context.querySelectorAll(query),extra)
@@ -6188,7 +6188,7 @@ row.scrollIntoView()
 }function getComponentsStackDump(){var frame=Components.stack;
 var userURL=win.location.href.toString();
 if(FBTrace.DBG_CONSOLE){FBTrace.sysout("consoleInjector.getComponentsStackDump initial stack for userURL "+userURL,frame)
-}while(frame&&FBL.isSystemURL(frame.filename)){frame=frame.caller
+}while(frame&&FBL.isJPlusURL(frame.filename)){frame=frame.caller
 }if(frame){frame=frame.caller
 }if(frame){frame=frame.caller
 }if(FBTrace.DBG_CONSOLE){FBTrace.sysout("consoleInjector.getComponentsStackDump final stack for userURL "+userURL,frame)
@@ -6323,7 +6323,7 @@ break
 autoCompleteExpr=valBegin+commandBegin+(objName?objName+".":"");
 autoCompletePosition=-1;
 buffer=autoCompleteBuffer=isIE?_completion[objName||"window"]||[]:[];
-for(var System in obj){buffer.push(System)
+for(var JPlus in obj){buffer.push(JPlus)
 }}}else{buffer=autoCompleteBuffer
 }if(buffer){prefix=autoCompletePrefix;
 var diff=reverse?-1:1;
@@ -7057,7 +7057,7 @@ Firebug.SourceBoxPanel=Firebug.Panel;
 var reSelectorTag=/(^|\s)(?:\w+)/g;
 var domUtils=null;
 var textContent=isIE?"innerText":"textContent";
-var CSSDomplateBase={isEditable:function(rule){return !rule.isSystemSheet
+var CSSDomplateBase={isEditable:function(rule){return !rule.isJPlusSheet
 },isSelectorEditable:function(rule){return rule.isSelectorEditable&&this.isEditable(rule)
 }};
 var CSSPropTag=domplate(CSSDomplateBase,{tag:DIV({"class":"cssProp focusRow",$disabledStyle:"$prop.disabled",$editGroup:"$rule|isEditable",$cssOverridden:"$prop.overridden",role:"option"},A({"class":"cssPropDisable"},"&nbsp;&nbsp;"),SPAN({"class":"cssPropName",$editable:"$rule|isEditable"},"$prop.name"),SPAN({"class":"cssColon"},":"),SPAN({"class":"cssPropValue",$editable:"$rule|isEditable"},"$prop.value$prop.important"),SPAN({"class":"cssSemi"},";"))});
@@ -7129,7 +7129,7 @@ if(ruleLine>=line){return rule
 }}}},highlightRule:function(rule){var ruleElement=Firebug.getElementByRepObject(this.panelNode.firstChild,rule);
 if(ruleElement){scrollIntoCenterView(ruleElement,this.panelNode);
 setClassTimed(ruleElement,"jumpHighlight",this.context)
-}},getStyleSheetRules:function(context,styleSheet){var isSystemSheet=isSystemStyleSheet(styleSheet);
+}},getStyleSheetRules:function(context,styleSheet){var isJPlusSheet=isJPlusStyleSheet(styleSheet);
 function appendRules(cssRules){for(var i=0;
 i<cssRules.length;
 ++i){var rule=cssRules[i];
@@ -7139,7 +7139,7 @@ var selector=rule.selectorText;
 if(isIE){selector=selector.replace(reSelectorTag,function(s){return s.toLowerCase()
 })
 }var ruleId=rule.selectorText+"/"+line;
-rules.push({tag:CSSStyleRuleTag.tag,rule:rule,id:ruleId,selector:selector,props:props,isSystemSheet:isSystemSheet,isSelectorEditable:true})
+rules.push({tag:CSSStyleRuleTag.tag,rule:rule,id:ruleId,selector:selector,props:props,isJPlusSheet:isJPlusSheet,isSelectorEditable:true})
 }else{if(instanceOf(rule,"CSSImportRule")){rules.push({tag:CSSImportRuleTag.tag,rule:rule})
 }else{if(instanceOf(rule,"CSSMediaRule")){appendRules.apply(this,[rule.cssRules])
 }else{if(FBTrace.DBG_ERRORS||FBTrace.DBG_CSS){FBTrace.sysout("css getStyleSheetRules failed to classify a rule ",rule)
@@ -7320,7 +7320,7 @@ return styleSheets
 if(this.infoTipType=="color"){items.push({label:"CopyColor",command:bindFixed(copyToClipboard,FBL,this.infoTipObject)})
 }else{if(this.infoTipType=="image"){items.push({label:"CopyImageLocation",command:bindFixed(copyToClipboard,FBL,this.infoTipObject)},{label:"OpenImageInNewTab",command:bindFixed(openNewTab,FBL,this.infoTipObject)})
 }}if(isElement(this.selection)){items.push({label:"EditStyle",command:bindFixed(this.editElementStyle,this)})
-}else{if(!isSystemStyleSheet(this.selection)){items.push({label:"NewRule",command:bindFixed(this.insertRule,this,target)})
+}else{if(!isJPlusStyleSheet(this.selection)){items.push({label:"NewRule",command:bindFixed(this.insertRule,this,target)})
 }}var cssRule=getAncestorByClass(target,"cssRule");
 if(cssRule&&hasClass(cssRule,"cssEditableRule")){items.push("-",{label:"NewProp",command:bindFixed(this.insertPropertyRow,this,target)});
 var propRow=getAncestorByClass(target,"cssProp");
@@ -7361,7 +7361,7 @@ delete this.infoTipObject
 }return this.editor
 }},getDefaultLocation:function(){try{var styleSheets=this.context.window.document.styleSheets;
 if(styleSheets.length){var sheet=styleSheets[0];
-return(Firebug.filterSystemURLs&&isSystemURL(getURLForStyleSheet(sheet)))?null:sheet
+return(Firebug.filterJPlusURLs&&isJPlusURL(getURLForStyleSheet(sheet)))?null:sheet
 }}catch(exc){if(FBTrace.DBG_LOCATIONS){FBTrace.sysout("css.getDefaultLocation FAILS "+exc,exc)
 }}},getObjectDescription:function(styleSheet){var url=getURLForStyleSheet(styleSheet);
 var instance=getInstanceForStyleSheet(styleSheet);
@@ -7424,8 +7424,8 @@ var ssid=ruleData.styleSheetId;
 var parentStyleSheet=StyleSheetCache.get(ssid);
 var href=parentStyleSheet.externalURL?parentStyleSheet.externalURL:parentStyleSheet.href;
 var instance=null;
-var isSystemSheet=false;
-if(!Firebug.showUserAgentCSS&&isSystemSheet){continue
+var isJPlusSheet=false;
+if(!Firebug.showUserAgentCSS&&isJPlusSheet){continue
 }if(!href){href=element.ownerDocument.location.href
 }var props=this.getRuleProperties(this.context,rule,inheritMode);
 if(inheritMode&&!props.length){continue
@@ -7433,7 +7433,7 @@ if(inheritMode&&!props.length){continue
 var ruleId=rule.selectorText+"/"+line;
 var sourceLink=new SourceLink(href,line,"css",rule,instance);
 this.markOverridenProps(props,usedProps,inheritMode);
-rules.splice(0,0,{rule:rule,id:ruleId,selector:ruleData.selector,sourceLink:sourceLink,props:props,inherited:inheritMode,isSystemSheet:isSystemSheet})
+rules.splice(0,0,{rule:rule,id:ruleId,selector:ruleData.selector,sourceLink:sourceLink,props:props,inherited:inheritMode,isJPlusSheet:isJPlusSheet})
 }}if(element.style){this.getStyleProperties(element,rules,usedProps,inheritMode)
 }if(FBTrace.DBG_CSS){FBTrace.sysout("getElementRules "+rules.length+" rules for "+getElementXPath(element),rules)
 }},markOverridenProps:function(props,usedProps,inheritMode){for(var i=0;
@@ -7754,7 +7754,7 @@ var backDir=/^((?:\.\.\/)+)(.*)/.exec(src);
 var reLastDir=/^(.*\/)[^\/]+\/$/;
 path=rePath.exec(doc.location.href)[1];
 if(backDir){var j=backDir[1].length/3;
-var System;
+var JPlus;
 while(j-->0){path=reLastDir.exec(path)[1]
 }path+=backDir[2]
 }else{if(src.indexOf("/")!=-1){if(/^\.\/./.test(src)){path+=src.substring(2)

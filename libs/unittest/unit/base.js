@@ -7,7 +7,7 @@ test("基本的坏境需求", function () {
 	ok(document.getElementById, "getElementById");
 	ok(document.getElementsByTagName, "getElementsByTagName");
 	ok(RegExp, "RegExp");
-	ok(System, "System");
+	ok(JPlus, "System");
 });
 
 test( "execScript", function() {

@@ -1081,7 +1081,7 @@
 	                case 'TK_CONTENT':
 	                    hasContent = true;
 	                    if (me.tokenText !== '') {
-	                    	if(/^\<(title|textarea|System|a|span|button|li)\b/.test(me.lastText)){
+	                    	if(/^\<(title|textarea|JPlus|a|span|button|li)\b/.test(me.lastText)){
 	                    		hasContent = false;
 	                    	} else {
 		                        me.printNewline(false, me.output);

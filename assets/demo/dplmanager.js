@@ -1,5 +1,5 @@
 
-var rootPath = Demo.rootPath + 'assets/tools/system/assets/';
+var rootPath = Demo.rootPath + 'assets/tools/JPlus/assets/';
 
 document.write('<link href="' + rootPath + 'lib/base.css" rel="stylesheet" type="text/css">');
 document.write('<link href="' + rootPath + 'dplmanager/dplmanager.css" rel="stylesheet" type="text/css">');
@@ -7,7 +7,7 @@ document.write('<script src="' + rootPath + 'lib/base.js" type="text/javascript"
 document.write('<script src="' + rootPath + 'dplmanager/dplmanager.js" type="text/javascript"></script>');
 
 Demo.onLoad(function(){
-	System.rootUrl = Demo.rootPath;
+	JPlus.rootUrl = Demo.rootPath;
     
 	var module = Demo.module;
 	var body = document.getElementById('demo-body');

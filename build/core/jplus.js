@@ -5,7 +5,7 @@
 
 
 /**********************************************
- * System.Core.Base
+ * JPlus.Core.Base
  **********************************************/
 /**
  * J+ Library, 3.0
@@ -63,7 +63,7 @@
 		 * 包含系统有关的函数。
 		 * @type Object
 		 */
-		System = window.System || (window.System = {});
+		JPlus = window.JPlus || (window.JPlus = {});
 		
 	/// #endregion
 
@@ -71,9 +71,9 @@
 	
 	/**
 	 * 包含系统有关的函数。
-	 * @namespace System
+	 * @namespace JPlus
 	 */
-	extend(System, {
+	extend(JPlus, {
 
 		/**
 		 * 所有类的基类。
@@ -99,9 +99,9 @@
 		 * id种子 。
 		 * @type Number
 		 * @defaultValue 1
-		 * @example 下例演示了 System.id 的用处。
+		 * @example 下例演示了 JPlus.id 的用处。
 		 * <pre>
-		 *		var uid = System.id++;  // 每次使用之后执行 ++， 保证页面内的 id 是唯一的。
+		 *		var uid = JPlus.id++;  // 每次使用之后执行 ++， 保证页面内的 id 是唯一的。
 		 * </pre>
 		 */
 		id: 1
@@ -109,7 +109,7 @@
 	});
 
 	/**
-	 * @static class System.Base
+	 * @static class JPlus.Base
 	 */
 	extend(Base, {
 
@@ -269,9 +269,9 @@
 		 * 
 		 * 这个函数实现的是 单继承。如果子类有定义构造函数，则仅调用子类的构造函数，否则调用父类的构造函数。
 		 * 
-		 * 要想在子类的构造函数调用父类的构造函数，可以使用 {@link System.Base#base} 调用。
+		 * 要想在子类的构造函数调用父类的构造函数，可以使用 {@link JPlus.Base#base} 调用。
 		 * 
-		 * 这个函数返回的类实际是一个函数，但它被 {@link System.Native} 修饰过。
+		 * 这个函数返回的类实际是一个函数，但它被 {@link JPlus.Native} 修饰过。
 		 * 
 		 * 由于原型链的关系， 肯能存在共享的引用。 如: 类 A ， A.prototype.c = []; 那么，A的实例 b ,
 		 * d 都有 c 成员， 但它们共享一个 A.prototype.c 成员。 这显然是不正确的。所以你应该把 参数 quick
@@ -318,7 +318,7 @@
 		    emptyFn.prototype = null;
 
 		    // 指定Class内容 。
-		    return System.Native(subClass);
+		    return JPlus.Native(subClass);
 
 	    }
 
@@ -350,14 +350,14 @@
 		    })
 			    return extend;
 
-		    System.enumerables = "toString hasOwnProperty valueOf constructor isPrototypeOf".split(' ');
+		    JPlus.enumerables = "toString hasOwnProperty valueOf constructor isPrototypeOf".split(' ');
 		    // IE6 不会遍历系统对象需要复制，所以强制去测试，如果改写就复制 。
 		    return function(dest, src) {
 			    if (src) {
 				    assert(dest != null, "Object.extend(dest, src): {dest} 不可为空。", dest);
 
-				    for ( var i = System.enumerables.length, value; i--;)
-					    if (hasOwnProperty.call(src, value = System.enumerables[i]))
+				    for ( var i = JPlus.enumerables.length, value; i--;)
+					    if (hasOwnProperty.call(src, value = JPlus.enumerables[i]))
 						    dest[value] = src[value];
 				    extend(dest, src);
 			    }
@@ -757,8 +757,8 @@
 	 * 创建一个类。
 	 * @param {Object/Function} [methods] 类成员列表对象或类构造函数。
 	 * @return {Function} 返回创建的类。
-	 * @see System.Base
-	 * @see System.Base.extend
+	 * @see JPlus.Base
+	 * @see JPlus.Base.extend
 	 * @example 以下代码演示了如何创建一个类:
 	 * <pre>
 	 * var MyCls = Class({
@@ -956,11 +956,11 @@
 	/// #region Methods
 	
 	// 把所有内建对象本地化 。
-	each.call([String, Array, Function, Date], System.Native);
+	each.call([String, Array, Function, Date], JPlus.Native);
 	
 	/**
 	 * 所有由 new Class 创建的类的基类。
-	 * @class System.Base
+	 * @class JPlus.Base
 	 */
     Base.implement({
     	
@@ -1297,7 +1297,7 @@
 
 	/**
 	 * 系统原生的字符串对象。
-	 * @system
+	 * @JPlus
 	 * @class String
 	 */
 	String.implementIf({
@@ -1353,7 +1353,7 @@
 
 	/**
 	 * 系统原生的函数对象。
-	 * @system
+	 * @JPlus
 	 * @class Function
 	 */
 	Function.implementIf({
@@ -1384,7 +1384,7 @@
 	
 	/**
 	 * 系统原生的数组对象。
-	 * @system
+	 * @JPlus
 	 * @class Array
 	 */
 	Array.implementIf({
@@ -1737,7 +1737,7 @@
 
 
 
-System.Base.prototype.toString = function(){
+JPlus.Base.prototype.toString = function(){
 	for(var item in window){
 		if(window[item] === this.constructor)
 			return item;	
@@ -2088,7 +2088,7 @@ function imports(namespace) {
                 },
 
                 getBaseClassDescription: function(obj) {
-                    if (obj && obj.base && obj.base !== System.Object) {
+                    if (obj && obj.base && obj.base !== JPlus.Object) {
                         var extObj = this.getTypeName(obj.base, window, "", 3);
                         return " 类" + (extObj && extObj != "System.Object" ? "(继承于 " + extObj + " 类)" : "");
                     }
@@ -2291,7 +2291,7 @@ function imports(namespace) {
                     for ( var name in window) {
 					
 						try{
-							if (isUpper(name, 0) || System[name] === window[name])
+							if (isUpper(name, 0) || JPlus[name] === window[name])
 								r.push(getDescription(window, name));
 						} catch(e){
 						
@@ -2628,7 +2628,7 @@ function imports(namespace) {
          * 同步载入代码。
          * @param {String} uri 地址。
          * @example <pre>
-         * System.loadScript('./v.js');
+         * JPlus.loadScript('./v.js');
          * </pre>
          */
         loadScript: function(url) {
@@ -2644,7 +2644,7 @@ function imports(namespace) {
          * 异步载入样式。
          * @param {String} uri 地址。
          * @example <pre>
-         * System.loadStyle('./v.css');
+         * JPlus.loadStyle('./v.css');
          * </pre>
          */
         loadStyle: function(url) {
@@ -2685,7 +2685,7 @@ function imports(namespace) {
          * @param {Function} [callback] 对返回值的处理函数。
          * @return {String} 载入的值。 因为同步，所以无法跨站。
          * @example <pre>
-         * trace(  System.loadText('./v.html')  );
+         * trace(  JPlus.loadText('./v.html')  );
          * </pre>
          */
         loadText: function(url, callback) {
@@ -2751,7 +2751,7 @@ function imports(namespace) {
         scripts: [],
 
         /**
-         * System 安装的根目录, 可以为相对目录。
+         * JPlus 安装的根目录, 可以为相对目录。
          * @config {String}
          */
         rootPath: (function(){
@@ -2773,7 +2773,7 @@ function imports(namespace) {
                 return "";
             }
 
-        })().replace("system/core/assets/scripts/", ""),
+        })().replace("System/core/assets/scripts/", ""),
 
         /**
          * 将指定的名字空间转为路径。
@@ -2811,11 +2811,11 @@ function imports(namespace) {
 
 
 /**********************************************
- * System.Dom.Base
+ * JPlus.Dom.Base
  **********************************************/
 ﻿/**
  * @fileOverview 提供最底层的 DOM 辅助函数。
- * @pragma defaultExtends System.Base
+ * @pragma defaultExtends JPlus.Base
  */
 
 // Core - 核心部分
@@ -2831,7 +2831,7 @@ function imports(namespace) {
 
 (function(window) {
 	
-	assert(!window.Dom || window.$ != window.Dom.get, "重复引入 System.Dom.Base 模块。");
+	assert(!window.Dom || window.$ != window.Dom.get, "重复引入 JPlus.Dom.Base 模块。");
 
 	/**
 	 * document 简写。
@@ -2864,10 +2864,10 @@ function imports(namespace) {
 		map = Object.map,
 
 		/**
-		 * System 简写。
+		 * JPlus 简写。
 		 * @type Object
 		 */
-		System = window.System,
+		JPlus = window.JPlus,
 	
 		/**
 		 * 指示当前浏览器是否为标签浏览器。
@@ -3117,7 +3117,7 @@ function imports(namespace) {
 
 			/**
 			 * 将当前值减去 *p*。
-			 * @param {Point} System 值。
+			 * @param {Point} JPlus 值。
 			 * @return {Point} this
 			 */
 			sub: function(p) {
@@ -3909,9 +3909,9 @@ function imports(namespace) {
 			input: function(elem){ return /^(input|select|textarea|button)$/i.test(elem.nodeName); },
 			
 			"nth-child": function(args, oldResult, result){
-				var System = Dom.pseudos;
-				if(System[args]){
-					System[args](null, oldResult, result);	
+				var JPlus = Dom.pseudos;
+				if(JPlus[args]){
+					JPlus[args](null, oldResult, result);	
 				} else if(args = oldResult[args - 1])
 					result.push(args);
 			},
@@ -4056,7 +4056,7 @@ function imports(namespace) {
 		 * @param {Element} elem 元素。
 		 * @param {String} type 输入。 一个 type
 		 *            由多个句子用,连接，一个句子由多个词语用+连接，一个词语由两个字组成， 第一个字可以是下列字符之一:
-		 *            m b System t l r b h w 第二个字可以是下列字符之一: x y l t b r
+		 *            m b JPlus t l r b h w 第二个字可以是下列字符之一: x y l t b r
 		 *            b。词语也可以是: outer inner 。
 		 * @return {Number} 计算值。 mx+sx -> 外大小。 mx-sx -> 内大小。
 	 	 * @static
@@ -4324,7 +4324,7 @@ function imports(namespace) {
 		 * @remark 因为 IE6/7 不存在这些对象, 文档对象是对原生 HTMLDocument 对象的补充。 扩展
 		 *        Document 也会扩展 HTMLDocument。
 		 */
-		Document: System.Native(document.constructor || {
+		Document: JPlus.Native(document.constructor || {
 			prototype: document
 		})
 
@@ -4961,11 +4961,11 @@ function imports(namespace) {
 		 */
 		setSize: function(x, y) {
 			var me = this,
-			System = formatPoint(x, y);
+			JPlus = formatPoint(x, y);
 		
-			if (System.x != null) me.setWidth(System.x - Dom.calc(me.dom, 'bx+px'));
+			if (JPlus.x != null) me.setWidth(JPlus.x - Dom.calc(me.dom, 'bx+px'));
 		
-			if (System.y != null) me.setHeight(System.y - Dom.calc(me.dom, 'by+py'));
+			if (JPlus.y != null) me.setHeight(JPlus.y - Dom.calc(me.dom, 'by+py'));
 		
 			return me;
 		},
@@ -5020,7 +5020,7 @@ function imports(namespace) {
 		 */
 		setOffset: function(offsetPoint) {
 		
-			assert(Object.isObject(offsetPoint), "Dom.prototype.setOffset(System): {System} 必须有 'x' 和 'y' 属性。", System);
+			assert(Object.isObject(offsetPoint), "Dom.prototype.setOffset(JPlus): {JPlus} 必须有 'x' 和 'y' 属性。", JPlus);
 			var s = this.dom.style;
 			
 			if(offsetPoint.y != null)
@@ -5386,21 +5386,21 @@ function imports(namespace) {
 				htmlScroll = doc.getScroll();
 			return new Point(bound.left + htmlScroll.x - html.clientLeft, bound.top + htmlScroll.y - html.clientTop);
 		}: function() {
-			var elem = this.dom, System = new Point(0, 0), t = elem.parentNode;
+			var elem = this.dom, JPlus = new Point(0, 0), t = elem.parentNode;
 		
 			if(styleString(elem, 'position') === 'fixed')
 				return new Point(elem.offsetLeft, elem.offsetTop).add(document.getScroll());
 		
 			while(t && !rBody.test(t.nodeName)) {
-				System.x -= t.scrollLeft;
-				System.y -= t.scrollTop;
+				JPlus.x -= t.scrollLeft;
+				JPlus.y -= t.scrollTop;
 				t = t.parentNode;
 			}
 			t = elem;
 		
 			while(elem && !rBody.test(elem.nodeName)) {
-				System.x += elem.offsetLeft;
-				System.y += elem.offsetTop;
+				JPlus.x += elem.offsetLeft;
+				JPlus.y += elem.offsetTop;
 				if(navigator.isFirefox) {
 					if(styleString(elem, 'MozBoxSizing') !== 'border-box') {
 						add(elem);
@@ -5414,22 +5414,22 @@ function imports(namespace) {
 				}
 		
 				if(styleString(elem, 'position') === 'fixed') {
-					System = System.add(document.getScroll());
+					JPlus = JPlus.add(document.getScroll());
 					break;
 				}
 				elem = elem.offsetParent;
 			}
 			if(navigator.isFirefox && styleString(t, 'MozBoxSizing') !== 'border-box') {
-				System.x -= styleNumber(t, 'borderLeftWidth');
-				System.y -= styleNumber(t, 'borderTopWidth');
+				JPlus.x -= styleNumber(t, 'borderLeftWidth');
+				JPlus.y -= styleNumber(t, 'borderTopWidth');
 			}
 		
 			function add(elem) {
-				System.x += styleNumber(elem, 'borderLeftWidth');
-				System.y += styleNumber(elem, 'borderTopWidth');
+				JPlus.x += styleNumber(elem, 'borderLeftWidth');
+				JPlus.y += styleNumber(elem, 'borderTopWidth');
 			}
 		
-			return System;
+			return JPlus;
 
 		},
 	
@@ -6877,7 +6877,7 @@ function imports(namespace) {
  * Controls.Core.Base
  **********************************************/
 /** * @author  */	/** * 所有控件基类。 * @class Control * @abstract * 控件的周期：  * constructor - 创建控件对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。  * create - 创建本身的 dom 节点。 可重写 - 默认使用 this.tpl 创建。 * init - 初始化控件本身。 可重写 - 默认为无操作。  * attach - 渲染控件到文档。不建议重写，如果你希望额外操作渲染事件，则重写。  * detach - 删除控件。不建议重写，如果一个控件用到多个 dom 内容需重写。 */var Control = Dom.extend({	/**	 * 存储当前控件的默认配置。	 * @getter {Object} options	 * @protected	 * @virtual	 */	/**	 * 存储当前控件的默认模板字符串。	 * @getter {String} tpl	 * @protected	 * @virtual	 */	/**	 * 当被子类重写时，生成当前控件。	 * @param {Object} options 选项。	 * @protected	 * @virtual	 */	create: function() {		assert(this.tpl, "Control.prototype.create(): 当前类不存在 tpl 属性。Control.prototype.create 会调用 tpl 属性，根据这个属性中的 HTML 代码动态地生成节点并返回。子类必须定义 tpl 属性或重写 Control.prototype.create 方法返回节点。");		// 转为对 tpl解析。		return Dom.parseNode(this.tpl);	},		/**	 * 当被子类重写时，渲染控件。	 * @method	 * @param {Object} options 配置。	 * @protected virtual	 */	init: Function.empty,	/**	 * 初始化一个新的控件。	 * @param {String/Element/Control/Object} [options] 对象的 id 或对象或各个配置。	 */	constructor: function(options) {		// 这是所有控件共用的构造函数。		var me = this,			// 临时的配置对象。			opt = Object.extend({}, me.options),			// 当前实际的节点。			dom;		// 如果存在配置。		if(options) {						// 如果 options 是纯配置。			if(!options.nodeType && options.constructor === Object) {				dom = options.dom || options;				apply(opt, options);				delete opt.dom;			} else {				dom = options;			}						if(typeof dom === "string") {				dom = document.getElementById(dom);			} else if(!dom.nodeType){				dom = dom.dom;			}					}		// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。		me.dom = dom || me.create(opt);		assert(me.dom && me.dom.nodeType, "Control.prototype.constructor(options): 当前实例的 dom 属性为空，或此属性不是 DOM 对象。(检查 options.dom 是否是合法的节点或ID(ID不存在?) 或当前实例的 create 方法是否正确返回一个节点)\r\n当前控件: {dom} {xtype}", me.dom, me.xtype);		// 调用 init 初始化控件。		me.init(opt);		// 如果指定的节点已经在 DOM 树上，且重写了 attach 方法，则调用之。		if(me.dom.parentNode && this.attach !== Control.prototype.attach) {			this.attach(me.dom.parentNode, me.dom.nextSibling);		}		// 复制各个选项。		Object.set(me, opt);	},	/**	 * xtype 。	 * @virtual	 */	xtype: "control"	});/**********************************************
- * System.Utils.Deferrable
+ * JPlus.Utils.Deferrable
  **********************************************/
 /**
  * @author
@@ -6995,7 +6995,7 @@ var Deferrable = Class({
 
 });
 /**********************************************
- * System.Fx.Base
+ * JPlus.Fx.Base
  **********************************************/
 /**
  * @fileOverview 提供底层的 特效算法支持。
@@ -7195,7 +7195,7 @@ Fx.Base = (function(){
 Fx.compute = function(from, to, delta){
 	return (to - from) * delta + from;
 };/**********************************************
- * System.Fx.Animate
+ * JPlus.Fx.Animate
  **********************************************/
 /**
  * @fileOverview 通过改变CSS实现的变换。
@@ -7765,7 +7765,7 @@ Fx.compute = function(from, to, delta){
 	
 })();
 /**********************************************
- * System.Request.Base
+ * JPlus.Request.Base
  **********************************************/
 /**
  * @fileOverview 提供最底层的请求底层辅助函数。
@@ -7895,7 +7895,7 @@ Request.combineUrl = function (url, param) {
 
 
 /**********************************************
- * System.Request.Jsonp
+ * JPlus.Request.Jsonp
  **********************************************/
 /**
  * @fileOverview 请求处理JSON-P数据。
@@ -7998,7 +7998,7 @@ Request.JSONP = Request.Base.extend({
     }
 });
 /**********************************************
- * System.Request.Ajax
+ * JPlus.Request.Ajax
  **********************************************/
 /**
  * @fileOverview 提供底层的 Ajax 支持。
@@ -8055,7 +8055,7 @@ Object.each({
 	var type = value === "Text" ? key.toUpperCase() : null;
 	
 	Ajax[key] = function (url, data, onsuccess, onerror, oncomplete, timeouts) {
-		assert(value in Request, "未载入 System.Request." + value + " 模块。");
+		assert(value in Request, "未载入 JPlus.Request." + value + " 模块。");
 		assert.isString(url, "Ajax." + key + "(url, data, onsuccess, onerror, timeouts, ontimeout, oncomplete): 参数{url} 必须是一个地址。如果需要提交至本页，使用 location.href。");
 		if(typeof data == 'function'){
 			timeouts = oncomplete;

@@ -69,7 +69,7 @@
 						'rename rewind scanf setbuf setvbuf sprintf sscanf tmpfile tmpnam ' +
 						'ungetc vfprintf vprintf vsprintf abort abs atexit atof atoi atol ' +
 						'bsearch calloc div exit free getenv labs ldiv malloc mblen mbstowcs ' +
-						'mbtowc qsort rand realloc srand strtod strtol strtoul system ' +
+						'mbtowc qsort rand realloc srand strtod strtol strtoul JPlus ' +
 						'wcstombs wctomb memchr memcmp memcpy memmove memset strcat strchr ' +
 						'strcmp strcoll strcpy strcspn strerror strlen strncat strncmp ' +
 						'strncpy strpbrk strrchr strspn strstr strtok strxfrm asctime ' +

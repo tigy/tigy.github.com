@@ -23,7 +23,7 @@
 	{
 		var funcs	=	'abs avg case cast coalesce convert count current_timestamp ' +
 						'current_user day isnull left lower month nullif replace right ' +
-						'session_user space substring sum system_user upper user year';
+						'session_user space substring sum JPlus_user upper user year';
 
 		var keywords =	'absolute action add after alter as asc at authorization begin bigint ' +
 						'binary bit by cascade char character check checkpoint close collate ' +

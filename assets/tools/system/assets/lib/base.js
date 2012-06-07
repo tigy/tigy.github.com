@@ -4,7 +4,7 @@
 
 
 /************************************
- * System.Core.Base
+ * JPlus.Core.Base
  ************************************/
 (function(window, undefined) {
 
@@ -47,10 +47,10 @@
 		emptyObj = {},
 	
 		/**
-		 * System 全局静态对象。包含系统有关的函数。
+		 * JPlus 全局静态对象。包含系统有关的函数。
 		 * @type Object
 		 */
-		System = window.System || (window.System = {});
+		JPlus = window.JPlus || (window.JPlus = {});
 		
 	/// #endregion
 
@@ -58,9 +58,9 @@
 	
 	/**
 	 * 系统有关对象。
-	 * @namespace System
+	 * @namespace JPlus
 	 */
-	extend(System, {
+	extend(JPlus, {
 
 		/**
 		 * 所有类的基类。
@@ -84,8 +84,8 @@
 		/**
 		 * id种子 。
 		 * @type Number
-		 * @example 下例演示了 System.id 的用处。<pre>
-		 *		var uid = System.id++;  // 每次使用之后执行 ++， 保证页面内的 id 是唯一的。
+		 * @example 下例演示了 JPlus.id 的用处。<pre>
+		 *		var uid = JPlus.id++;  // 每次使用之后执行 ++， 保证页面内的 id 是唯一的。
 		 * </pre>
 		 */
 		id: 1
@@ -93,7 +93,7 @@
 	});
 
 	/**
-	 * @namespace System.Base
+	 * @namespace JPlus.Base
 	 */
 	extend(Base, {
 
@@ -252,10 +252,10 @@
 		 *         这个函数实现的是 单继承。如果子类有定义构造函数，则仅调用子类的构造函数，否则调用父类的构造函数。
 		 *         </p>
 		 *         <p>
-		 *         要想在子类的构造函数调用父类的构造函数，可以使用 {@link System.Object.prototype.base} 。
+		 *         要想在子类的构造函数调用父类的构造函数，可以使用 {@link JPlus.Object.prototype.base} 。
 		 *         </p>
 		 *         <p>
-		 *         这个函数返回的类实际是一个函数，但它被使用 System.Object 修饰过。
+		 *         这个函数返回的类实际是一个函数，但它被使用 JPlus.Object 修饰过。
 		 *         </p>
 		 *         <p>
 		 *         由于原型链的关系， 肯能存在共享的引用。 如: 类 A ， A.prototype.c = []; 那么，A的实例 b ,
@@ -303,7 +303,7 @@
 		    emptyFn.prototype = null;
 
 		    // 指定Class内容 。
-		    return System.Native(subClass);
+		    return JPlus.Native(subClass);
 
 	    }
 
@@ -334,14 +334,14 @@
 		    })
 			    return extend;
 
-		    System.enumerables = "toString hasOwnProperty valueOf constructor isPrototypeOf".split(' ');
+		    JPlus.enumerables = "toString hasOwnProperty valueOf constructor isPrototypeOf".split(' ');
 		    // IE6 不会遍历系统对象需要复制，所以强制去测试，如果改写就复制 。
 		    return function(dest, src) {
 			    if (src) {
 				    assert(dest != null, "Object.extend(dest, src): {dest} 不可为空。", dest);
 
-				    for ( var i = System.enumerables.length, value; i--;)
-					    if (hasOwnProperty.call(src, value = System.enumerables[i]))
+				    for ( var i = JPlus.enumerables.length, value; i--;)
+					    if (hasOwnProperty.call(src, value = JPlus.enumerables[i]))
 						    dest[value] = src[value];
 				    extend(dest, src);
 			    }
@@ -711,7 +711,7 @@
 	 * 创建一个类。
 	 * @param {Object/Function} [methods] 类成员列表对象或类构造函数。
 	 * @return {Class} 返回创建的类。
-	 * @see System.Object.extend
+	 * @see JPlus.Object.extend
 	 * @memberOf window
 	 * @example 以下代码演示了如何创建一个类:
 	 * <pre>
@@ -854,10 +854,10 @@
 	/// #region Methods
 	
 	// 把所有内建对象本地化 。
-	each.call([String, Array, Function, Date], System.Native);
+	each.call([String, Array, Function, Date], JPlus.Native);
 	
 	/**
-	 * @class System.Base
+	 * @class JPlus.Base
 	 */
     Base.implement({
     	
@@ -1473,7 +1473,7 @@
 
 /// #if !Publish
 
-System.Base.prototype.toString = function(){
+JPlus.Base.prototype.toString = function(){
 	for(var item in window){
 		if(window[item] === this.constructor)
 			return item;	
@@ -1807,7 +1807,7 @@ function imports(ns){
                 },
 
                 getBaseClassDescription: function(obj) {
-                    if (obj && obj.base && obj.base !== System.Object) {
+                    if (obj && obj.base && obj.base !== JPlus.Object) {
                         var extObj = this.getTypeName(obj.base, window, "", 3);
                         return " 类" + (extObj && extObj != "System.Object" ? "(继承于 " + extObj + " 类)" : "");
                     }
@@ -2010,7 +2010,7 @@ function imports(ns){
                     for ( var name in window) {
 					
 						try{
-							if (isUpper(name, 0) || System[name] === window[name])
+							if (isUpper(name, 0) || JPlus[name] === window[name])
 								r.push(getDescription(window, name));
 						} catch(e){
 						
@@ -2373,7 +2373,7 @@ function imports(ns){
          * 同步载入代码。
          * @param {String} uri 地址。
          * @example <pre>
-         * System.loadScript('./v.js');
+         * JPlus.loadScript('./v.js');
          * </pre>
          */
         loadScript: function(url) {
@@ -2389,7 +2389,7 @@ function imports(ns){
          * 异步载入样式。
          * @param {String} uri 地址。
          * @example <pre>
-         * System.loadStyle('./v.css');
+         * JPlus.loadStyle('./v.css');
          * </pre>
          */
         loadStyle: function(url) {
@@ -2430,7 +2430,7 @@ function imports(ns){
          * @param {Function} [callback] 对返回值的处理函数。
          * @return {String} 载入的值。 因为同步，所以无法跨站。
          * @example <pre>
-         * trace(  System.loadText('./v.html')  );
+         * trace(  JPlus.loadText('./v.html')  );
          * </pre>
          */
         loadText: function(url, callback) {
@@ -2497,7 +2497,7 @@ function imports(ns){
         scripts: [],
 
         /**
-         * System 安装的根目录, 可以为相对目录。
+         * JPlus 安装的根目录, 可以为相对目录。
          * @config {String}
          */
         rootPath: (function(){
@@ -2519,7 +2519,7 @@ function imports(ns){
                 return "";
             }
 
-        })().replace("system/core/assets/scripts/", ""),
+        })().replace("System/core/assets/scripts/", ""),
 
         /**
          * 将指定的名字空间转为路径。
@@ -2557,11 +2557,11 @@ function imports(ns){
 /// #endif
 
 /************************************
- * System.Dom.Base
+ * JPlus.Dom.Base
  ************************************/
 (function(window) {
 	
-	assert(!window.Dom || window.$ != window.Dom.get, "重复引入 System.Dom.Base 模块。");
+	assert(!window.Dom || window.$ != window.Dom.get, "重复引入 JPlus.Dom.Base 模块。");
 
 	/**
 	 * document 简写。
@@ -2594,10 +2594,10 @@ function imports(ns){
 		map = Object.map,
 
 		/**
-		 * System 简写。
+		 * JPlus 简写。
 		 * @type Object
 		 */
-		System = window.System,
+		JPlus = window.JPlus,
 	
 		/**
 		 * 指示当前浏览器是否为标签浏览器。
@@ -2778,7 +2778,7 @@ function imports(ns){
 			
 			/**
 			 * 将 (x, y) 增值。
-			 * @param {Point} System 值。
+			 * @param {Point} JPlus 值。
 			 * @return {Point} this
 			 */
 			add: function(p) {
@@ -2788,7 +2788,7 @@ function imports(ns){
 
 			/**
 			 * 将一个点坐标减到当前值。
-			 * @param {Point} System 值。
+			 * @param {Point} JPlus 值。
 			 * @return {Point} this
 			 */
 			sub: function(p) {
@@ -3439,9 +3439,9 @@ function imports(ns){
 			input: function(elem){ return /^(input|select|textarea|button)$/i.test(elem.nodeName); },
 			
 			"nth-child": function(args, oldResult, result){
-				var System = Dom.pseudos;
-				if(System[args]){
-					System[args](null, oldResult, result);	
+				var JPlus = Dom.pseudos;
+				if(JPlus[args]){
+					JPlus[args](null, oldResult, result);	
 				} else if(args = oldResult[args - 1])
 					result.push(args);
 			},
@@ -3572,7 +3572,7 @@ function imports(ns){
 		 * @param {Element} elem 元素。
 		 * @param {String} type 输入。 一个 type
 		 *            由多个句子用,连接，一个句子由多个词语用+连接，一个词语由两个字组成， 第一个字可以是下列字符之一:
-		 *            m b System t l r b h w 第二个字可以是下列字符之一: x y l t b r
+		 *            m b JPlus t l r b h w 第二个字可以是下列字符之一: x y l t b r
 		 *            b。词语也可以是: outer inner 。
 		 * @return {Number} 计算值。 mx+sx -> 外大小。 mx-sx -> 内大小。
 	 	 * @static
@@ -3839,7 +3839,7 @@ function imports(ns){
 		 * @remark 因为 IE6/7 不存在这些对象, 文档对象是对原生 HTMLDocument 对象的补充。 扩展
 		 *        Document 也会扩展 HTMLDocument。
 		 */
-		Document: System.Native(document.constructor || {
+		Document: JPlus.Native(document.constructor || {
 			prototype: document
 		})
 
@@ -4282,11 +4282,11 @@ function imports(ns){
 		 */
 		setSize: function(x, y) {
 			var me = this,
-			System = formatPoint(x, y);
+			JPlus = formatPoint(x, y);
 		
-			if (System.x != null) me.setWidth(System.x - Dom.calc(me.dom, 'bx+px'));
+			if (JPlus.x != null) me.setWidth(JPlus.x - Dom.calc(me.dom, 'bx+px'));
 		
-			if (System.y != null) me.setHeight(System.y - Dom.calc(me.dom, 'by+py'));
+			if (JPlus.y != null) me.setHeight(JPlus.y - Dom.calc(me.dom, 'by+py'));
 		
 			return me;
 		},
@@ -4315,12 +4315,12 @@ function imports(ns){
 	
 		/**
 		 * 设置元素的相对位置。
-		 * @param {Point} System
+		 * @param {Point} JPlus
 		 * @return {Element} this
 		 */
 		setOffset: function(offsetPoint) {
 		
-			assert(Object.isObject(offsetPoint), "Dom.prototype.setOffset(System): {System} 必须有 'x' 和 'y' 属性。", System);
+			assert(Object.isObject(offsetPoint), "Dom.prototype.setOffset(JPlus): {JPlus} 必须有 'x' 和 'y' 属性。", JPlus);
 			var s = this.dom.style;
 			
 			if(offsetPoint.y != null)
@@ -4541,21 +4541,21 @@ function imports(ns){
 				htmlScroll = doc.getScroll();
 			return new Point(bound.left + htmlScroll.x - html.clientLeft, bound.top + htmlScroll.y - html.clientTop);
 		}: function() {
-			var elem = this.dom, System = new Point(0, 0), t = elem.parentNode;
+			var elem = this.dom, JPlus = new Point(0, 0), t = elem.parentNode;
 		
 			if(styleString(elem, 'position') === 'fixed')
 				return new Point(elem.offsetLeft, elem.offsetTop).add(document.getScroll());
 		
 			while(t && !rBody.test(t.nodeName)) {
-				System.x -= t.scrollLeft;
-				System.y -= t.scrollTop;
+				JPlus.x -= t.scrollLeft;
+				JPlus.y -= t.scrollTop;
 				t = t.parentNode;
 			}
 			t = elem;
 		
 			while(elem && !rBody.test(elem.nodeName)) {
-				System.x += elem.offsetLeft;
-				System.y += elem.offsetTop;
+				JPlus.x += elem.offsetLeft;
+				JPlus.y += elem.offsetTop;
 				if(navigator.isFirefox) {
 					if(styleString(elem, 'MozBoxSizing') !== 'border-box') {
 						add(elem);
@@ -4569,22 +4569,22 @@ function imports(ns){
 				}
 		
 				if(styleString(elem, 'position') === 'fixed') {
-					System = System.add(document.getScroll());
+					JPlus = JPlus.add(document.getScroll());
 					break;
 				}
 				elem = elem.offsetParent;
 			}
 			if(navigator.isFirefox && styleString(t, 'MozBoxSizing') !== 'border-box') {
-				System.x -= styleNumber(t, 'borderLeftWidth');
-				System.y -= styleNumber(t, 'borderTopWidth');
+				JPlus.x -= styleNumber(t, 'borderLeftWidth');
+				JPlus.y -= styleNumber(t, 'borderTopWidth');
 			}
 		
 			function add(elem) {
-				System.x += styleNumber(elem, 'borderLeftWidth');
-				System.y += styleNumber(elem, 'borderTopWidth');
+				JPlus.x += styleNumber(elem, 'borderLeftWidth');
+				JPlus.y += styleNumber(elem, 'borderTopWidth');
 			}
 		
-			return System;
+			return JPlus;
 
 		},
 	
@@ -5787,7 +5787,7 @@ function imports(ns){
 	
 })(this);
 /************************************
- * System.Utils.Deferrable
+ * JPlus.Utils.Deferrable
  ************************************/
 var Deferrable = Class({
 
@@ -5898,7 +5898,7 @@ var Deferrable = Class({
 
 });
 /************************************
- * System.Request.Base
+ * JPlus.Request.Base
  ************************************/
 var Request = Request || {};
 
@@ -6024,7 +6024,7 @@ Request.combineUrl = function (url, param) {
 
 
 /************************************
- * System.Request.JSONP
+ * JPlus.Request.JSONP
  ************************************/
 Request.JSONP = Request.Base.extend({
 
@@ -6122,7 +6122,7 @@ Request.JSONP = Request.Base.extend({
     }
 });
 /************************************
- * System.Request.Ajax
+ * JPlus.Request.Ajax
  ************************************/
 var Ajax = Ajax || {};
 
@@ -6188,7 +6188,7 @@ Object.each({
 	};
 });
 /************************************
- * System.Utils.JSON
+ * JPlus.Utils.JSON
  ************************************/
 var JSON = JSON || {};
 	
@@ -6245,7 +6245,7 @@ Object.extendIf(JSON, {
 
 
 /************************************
- * System.Dom.Align
+ * JPlus.Dom.Align
  ************************************/
 Dom.implement((function(){
 	
@@ -6420,7 +6420,7 @@ Dom.implement((function(){
 })());
 
 /************************************
- * System.Utils.Tpl
+ * JPlus.Utils.Tpl
  ************************************/
 var Tpl = {
 	
@@ -6528,7 +6528,7 @@ var Tpl = {
 	
 };
 /************************************
- * System.Data.Collection
+ * JPlus.Data.Collection
  ************************************/
 var Collection = Class({
 	
@@ -6634,7 +6634,7 @@ Object.map("indexOf forEach each invoke lastIndexOf item filter", function(value
 }, Collection.prototype);
 
 /************************************
- * System.Dom.HashChange
+ * JPlus.Dom.HashChange
  ************************************/
 String.htmlEncode = (function() {
     var entities = {

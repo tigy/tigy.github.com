@@ -79,7 +79,7 @@ djConfig = {
 	isDebug: false,
 	// debugAtAllCosts: Boolean
 	//		Defaults to `false`. If set to `true`, this triggers an alternate
-	//		mode of the package system in which dependencies are detected and
+	//		mode of the package JPlus in which dependencies are detected and
 	//		only then are resources evaluated in dependency order via
 	//		`<script>` tag inclusion. This may double-request resources and
 	//		cause problems with scripts which expect `dojo.require()` to
@@ -406,11 +406,11 @@ dojo.global = {
 
 	dojo._getProp = function(/*Array*/parts, /*Boolean*/create, /*Object*/context){
 		var obj=context || d.global;
-		for(var i=0, System; obj && (System=parts[i]); i++){
-			if(i == 0 && d._scopeMap[System]){
-				System = d._scopeMap[System];
+		for(var i=0, JPlus; obj && (JPlus=parts[i]); i++){
+			if(i == 0 && d._scopeMap[JPlus]){
+				JPlus = d._scopeMap[JPlus];
 			}
-			obj = (System in obj ? obj[System] : (create ? obj[System]={} : undefined));
+			obj = (JPlus in obj ? obj[JPlus] : (create ? obj[JPlus]={} : undefined));
 		}
 		return obj; // mixed
 	}
@@ -441,8 +441,8 @@ dojo.global = {
 		//	|	obj.parent.child.prop = "some value";
 		//		wheras with `dojo.setObject`, we can shorten that to:
 		//	|	dojo.setObject("parent.child.prop", "some value", obj);
-		var parts=name.split("."), System=parts.pop(), obj=d._getProp(parts, true, context);
-		return obj && System ? (obj[System]=value) : undefined; // Object
+		var parts=name.split("."), JPlus=parts.pop(), obj=d._getProp(parts, true, context);
+		return obj && JPlus ? (obj[JPlus]=value) : undefined; // Object
 	}
 
 	dojo.getObject = function(/*String*/name, /*Boolean?*/create, /*Object?*/context){
@@ -989,7 +989,7 @@ dojo.global = {
 
 	dojo.provide = function(/*String*/ resourceName){
 		//	summary:
-		//		Register a resource with the package system. Works in conjunction with `dojo.require`
+		//		Register a resource with the package JPlus. Works in conjunction with `dojo.require`
 		//
 		//	description:
 		//		Each javascript source file is called a resource.  When a
@@ -1076,7 +1076,7 @@ dojo.global = {
 		//	|	dojo.requireIf(dojo.isBrowser, "my.special.Module");
 		
 		if(condition === true){
-			// FIXME: why do we support chained require()'s here? does the build system?
+			// FIXME: why do we support chained require()'s here? does the build JPlus?
 			var args = [];
 			for(var i = 1; i < arguments.length; i++){ 
 				args.push(arguments[i]);
@@ -1328,7 +1328,7 @@ dojo.global = {
 		//		the `acme.widget` and `acme.util` directories may be located
 		//		under different roots (see `dojo.registerModulePath`) but the
 		//		the modules which reference them can be unaware of their
-		//		relative locations on the filesystem:
+		//		relative locations on the fileJPlus:
 		//	|	// somewhere in a configuration block
 		//	|	dojo.registerModulePath("acme.widget", "../../acme/widget");
 		//	|	dojo.registerModulePath("acme.util", "../../util");
@@ -2556,7 +2556,7 @@ dojo.provide("dojo._base.declare");
 		meta = this.constructor._meta;
 		bases = meta.bases;
 
-		pos = cache.System;
+		pos = cache.JPlus;
 		if(name != cname){
 			// method
 			if(cache.c !== caller){
@@ -2634,7 +2634,7 @@ dojo.provide("dojo._base.declare");
 
 		// cache the found super method
 		cache.c = f;
-		cache.System = pos;
+		cache.JPlus = pos;
 
 		// now we have the result
 		if(f){
@@ -5963,13 +5963,13 @@ if(dojo.isIE || dojo.isOpera){
 		//		directly, and will use the ...box... functions instead.
 		var 
 			s = computedStyle||gcs(n),
-			System = d._getPadExtents(n, s),
+			JPlus = d._getPadExtents(n, s),
 			b = d._getBorderExtents(n, s);
 		return {
-			l: System.l + b.l,
-			t: System.t + b.t,
-			w: System.w + b.w,
-			h: System.h + b.h
+			l: JPlus.l + b.l,
+			t: JPlus.t + b.t,
+			w: JPlus.w + b.w,
+			h: JPlus.h + b.h
 		};
 	}
 
@@ -6028,7 +6028,7 @@ if(dojo.isIE || dojo.isOpera){
 		//		returns an object that encodes the width, height, left and top
 		//		positions of the node's margin box.
 		var s = computedStyle || gcs(node), me = d._getMarginExtents(node, s);
-		var l = node.offsetLeft - me.l, t = node.offsetTop - me.t, System = node.parentNode;
+		var l = node.offsetLeft - me.l, t = node.offsetTop - me.t, JPlus = node.parentNode;
 				if(d.isMoz){
 			// Mozilla:
 			// If offsetParent has a computed overflow != visible, the offsetLeft is decreased
@@ -6041,18 +6041,18 @@ if(dojo.isIE || dojo.isOpera){
 			}else{
 				// If child's computed left/top are not parseable as a number (e.g. "auto"), we
 				// have no choice but to examine the parent's computed style.
-				if(System && System.style){
-					var pcs = gcs(System);
+				if(JPlus && JPlus.style){
+					var pcs = gcs(JPlus);
 					if(pcs.overflow != "visible"){
-						var be = d._getBorderExtents(System, pcs);
+						var be = d._getBorderExtents(JPlus, pcs);
 						l += be.l, t += be.t;
 					}
 				}
 			}
 		}else if(d.isOpera || (d.isIE > 7 && !d.isQuirks)){
 			// On Opera and IE 8, offsetLeft/Top includes the parent's border
-			if(System){
-				be = d._getBorderExtents(System);
+			if(JPlus){
+				be = d._getBorderExtents(JPlus);
 				l -= be.l;
 				t -= be.t;
 			}
@@ -6790,7 +6790,7 @@ if(dojo.isIE || dojo.isOpera){
 		//
 		// example:
 		//	Create a DIV with content:
-		//	|	var n = dojo.create("div", { innerHTML:"<System>hi</System>" });
+		//	|	var n = dojo.create("div", { innerHTML:"<JPlus>hi</JPlus>" });
 		//
 		// example:
 		//	Place a new DIV in the BODY, with no attributes set
@@ -7213,9 +7213,9 @@ dojo.provide("dojo._base.NodeList");
 	var orphan = function(node){
 		//	summary:
 		//		function to orphan nodes
-		var System = node.parentNode;
-		if(System){
-			System.removeChild(node);
+		var JPlus = node.parentNode;
+		if(JPlus){
+			JPlus.removeChild(node);
 		}
 	};
 	// FIXME: should we move orphan() to dojo.html?
@@ -7879,12 +7879,12 @@ dojo.provide("dojo._base.NodeList");
 			//	example:
 			//		assume a DOM created by this markup:
 			//	|	<div id="foo">
-			//	|		<System>
+			//	|		<JPlus>
 			//	|			bacon is tasty, <span>dontcha think?</span>
-			//	|		</System>
+			//	|		</JPlus>
 			//	|	</div>
 			//	|	<div id="bar">
-			//	|		<System>great commedians may not be funny <span>in person</span></System>
+			//	|		<JPlus>great commedians may not be funny <span>in person</span></JPlus>
 			//	|	</div>
 			//		If we are presented with the following defintion for a NodeList:
 			//	|	var l = new dojo.NodeList(dojo.byId("foo"), dojo.byId("bar"));
@@ -7976,7 +7976,7 @@ dojo.provide("dojo._base.NodeList");
 			// 		or an offset in the childNodes property
 			//	example:
 			//		appends content to the end if the position is ommitted
-			//	|	dojo.query("h3 > System").addContent("hey there!");
+			//	|	dojo.query("h3 > JPlus").addContent("hey there!");
 			//	example:
 			//		add something to the front of each element that has a
 			//		"thinger" property:
@@ -8109,7 +8109,7 @@ if(typeof dojo != "undefined"){
 				- native (FF3.1+, Safari 3.1+, IE 8+)
 			3.) tokenize and convert to executable "query dispatcher"
 				- this is where the lion's share of the complexity in the
-				  system lies. In the DOM version, the query dispatcher is
+				  JPlus lies. In the DOM version, the query dispatcher is
 				  assembled as a chain of "yes/no" test functions pertaining to
 				  a section of a simple query statement (".blah:nth-child(odd)"
 				  but not "div div", which is 2 simple statements). Individual
@@ -8133,9 +8133,9 @@ if(typeof dojo != "undefined"){
 	// Toolkit aliases
 	////////////////////////////////////////////////////////////////////////
 
-	// if you are extracing dojo.query for use in your own system, you will
+	// if you are extracing dojo.query for use in your own JPlus, you will
 	// need to provide these methods and properties. No other porting should be
-	// necessary, save for configuring the system to use a class other than
+	// necessary, save for configuring the JPlus to use a class other than
 	// dojo.NodeList as the return instance instantiator
 	var trim = 			d.trim;
 	var each = 			d.forEach;
@@ -8285,7 +8285,7 @@ if(typeof dojo != "undefined"){
 			// hint to the selector engine to tell it whether or not it
 			// needs to do any iteration. Many simple selectors don't, and
 			// we can avoid significant construction-time work by advising
-			// the system to skip them
+			// the JPlus to skip them
 			currentPart.loops = (	
 					currentPart.pseudos.length || 
 					currentPart.attrs.length || 
@@ -8294,10 +8294,10 @@ if(typeof dojo != "undefined"){
 			currentPart.oquery = currentPart.query = ts(pStart, x); // save the full expression as a string
 
 
-			// otag/tag are hints to suggest to the system whether or not
+			// otag/tag are hints to suggest to the JPlus whether or not
 			// it's an operator or a tag. We save a copy of otag since the
 			// tag name is cast to upper-case in regular HTML matches. The
-			// system has a global switch to figure out if the current
+			// JPlus has a global switch to figure out if the current
 			// expression needs to be case sensitive or not and it will use
 			// otag or tag accordingly
 			currentPart.otag = currentPart.tag = (currentPart["oper"]) ? null : (currentPart.tag || "*");
@@ -8480,7 +8480,7 @@ if(typeof dojo != "undefined"){
 	////////////////////////////////////////////////////////////////////////
 
 	var agree = function(first, second){
-		// the basic building block of the yes/no chaining system. agree(f1,
+		// the basic building block of the yes/no chaining JPlus. agree(f1,
 		// f2) generates a new function which returns the boolean results of
 		// both of the passed functions to a single logical-anded result. If
 		// either are not possed, the other is used exclusively.
@@ -8688,15 +8688,15 @@ if(typeof dojo != "undefined"){
 			}
 		},
 		"not": function(name, condition){
-			var System = getQueryParts(condition)[0];
+			var JPlus = getQueryParts(condition)[0];
 			var ignores = { el: 1 }; 
-			if(System.tag != "*"){
+			if(JPlus.tag != "*"){
 				ignores.tag = 1;
 			}
-			if(!System.classes.length){
+			if(!JPlus.classes.length){
 				ignores.classes = 1;
 			}
-			var ntf = getSimpleFilterFunc(System, ignores);
+			var ntf = getSimpleFilterFunc(JPlus, ignores);
 			return function(elem){
 				return (!ntf(elem));
 			}
@@ -8765,7 +8765,7 @@ if(typeof dojo != "undefined"){
 		// generates a node tester function based on the passed query part. The
 		// query part is one of the structures generatd by the query parser
 		// when it creates the query AST. The "ignores" object specifies which
-		// (if any) tests to skip, allowing the system to avoid duplicating
+		// (if any) tests to skip, allowing the JPlus to avoid duplicating
 		// work where it may have already been taken into account by other
 		// factors such as how the nodes to test were fetched in the first
 		// place
@@ -9086,7 +9086,7 @@ if(typeof dojo != "undefined"){
 
 	var filterDown = function(root, queryParts){
 		// NOTE:
-		//		this is the guts of the DOM query system. It takes a list of
+		//		this is the guts of the DOM query JPlus. It takes a list of
 		//		parsed query parts and a root and finds children which match
 		//		the selector represented by the parts
 		var candidates = getArr(root), qp, x, te, qpl = queryParts.length, bag, ret;
@@ -9098,7 +9098,7 @@ if(typeof dojo != "undefined"){
 			if(x > 0){
 				// if we have more than one root at this level, provide a new
 				// hash to use for checking group membership but tell the
-				// system not to post-filter us since we will already have been
+				// JPlus not to post-filter us since we will already have been
 				// gauranteed to be unique
 				bag = {};
 				ret.nozip = true;
@@ -9269,7 +9269,7 @@ if(typeof dojo != "undefined"){
 						(query + " *") : query;
 			return _queryFuncCacheQSA[query] = function(root){
 				try{
-					// the QSA system contains an egregious spec bug which
+					// the QSA JPlus contains an egregious spec bug which
 					// limits us, effectively, to only running QSA queries over
 					// entire documents.  See:
 					//		http://ejohn.org/blog/thoughts-on-queryselectorall/
@@ -9491,7 +9491,7 @@ if(typeof dojo != "undefined"){
 		//		these elements will match:
 		//	|	<span class="foo"></span>
 		//	|	<span class="foo bar"></span>
-		//	|	<System class="thud foo"></System>
+		//	|	<JPlus class="thud foo"></JPlus>
 		//	example:
 		//		search the entire document for elements with the classes "foo" *and* "bar":
 		//	|	dojo.query(".foo.bar");
@@ -9499,17 +9499,17 @@ if(typeof dojo != "undefined"){
 		//	|	<span class="foo bar"></span>
 		//		while these will not:
 		//	|	<span class="foo"></span>
-		//	|	<System class="thud foo"></System>
+		//	|	<JPlus class="thud foo"></JPlus>
 		//	example:
 		//		find `<span>` elements which are descendants of paragraphs and
 		//		which have a "highlighted" class:
 		//	|	dojo.query("System span.highlighted");
 		//		the innermost span in this fragment matches:
-		//	|	<System class="foo">
+		//	|	<JPlus class="foo">
 		//	|		<span>...
 		//	|			<span class="highlighted foo bar">...</span>
 		//	|		</span>
-		//	|	</System>
+		//	|	</JPlus>
 		//	example:
 		//		set an "odd" class on all odd table rows inside of the table
 		//		`#tabular_data`, using the `>` (direct child) selector to avoid
@@ -9893,9 +9893,9 @@ dojo.provide("dojo._base.xhr");
 				//so be sure to test dojo.io.iframe if making changes below.
 				var ms = function(n){ return "MSXML" + n + ".DOMDocument"; }
 				var dp = ["Microsoft.XMLDOM", ms(6), ms(4), ms(3), ms(2)];
-				_d.some(dp, function(System){
+				_d.some(dp, function(JPlus){
 					try{
-						var dom = new ActiveXObject(System);
+						var dom = new ActiveXObject(JPlus);
 						dom.async = false;
 						dom.loadXML(xhr.responseText);
 						result = dom;
@@ -10970,8 +10970,8 @@ dojo.provide("dojo._base.fx");
 		// particular, the "getValue" function handles getting interpolated
 		// values between start and end for a particular CSS value.
 		this._properties = properties;
-		for(var System in properties){
-			var prop = properties[System];
+		for(var JPlus in properties){
+			var prop = properties[JPlus];
 			if(prop.start instanceof d.Color){
 				// create a reusable temp color object to keep intermediate results
 				prop.tempColor = new d.Color();
@@ -10981,13 +10981,13 @@ dojo.provide("dojo._base.fx");
 
 	PropLine.prototype.getValue = function(r){
 		var ret = {};
-		for(var System in this._properties){
-			var prop = this._properties[System],
+		for(var JPlus in this._properties){
+			var prop = this._properties[JPlus],
 				start = prop.start;
 			if(start instanceof d.Color){
-				ret[System] = d.blendColors(start, prop.end, r, prop.tempColor).toCss();
+				ret[JPlus] = d.blendColors(start, prop.end, r, prop.tempColor).toCss();
 			}else if(!d.isArray(start)){
-				ret[System] = ((prop.end - start) * r) + start + (System != "opacity" ? prop.units || "px" : 0);
+				ret[JPlus] = ((prop.end - start) * r) + start + (JPlus != "opacity" ? prop.units || "px" : 0);
 			}
 		}
 		return ret;
@@ -11099,19 +11099,19 @@ dojo.provide("dojo._base.fx");
 		var anim = new d.Animation(args);
 		d.connect(anim, "beforeBegin", anim, function(){
 			var pm = {};
-			for(var System in this.properties){
+			for(var JPlus in this.properties){
 				// Make shallow copy of properties into pm because we overwrite
 				// some values below. In particular if start/end are functions
 				// we don't want to overwrite them or the functions won't be
 				// called if the animation is reused.
-				if(System == "width" || System == "height"){
+				if(JPlus == "width" || JPlus == "height"){
 					this.node.display = "block";
 				}
-				var prop = this.properties[System];
+				var prop = this.properties[JPlus];
 				if(d.isFunction(prop)){
 					prop = prop(n);
 				}
-				prop = pm[System] = _mixin({}, (d.isObject(prop) ? prop: { end: prop }));
+				prop = pm[JPlus] = _mixin({}, (d.isObject(prop) ? prop: { end: prop }));
 
 				if(d.isFunction(prop.start)){
 					prop.start = prop.start(n);
@@ -11119,25 +11119,25 @@ dojo.provide("dojo._base.fx");
 				if(d.isFunction(prop.end)){
 					prop.end = prop.end(n);
 				}
-				var isColor = (System.toLowerCase().indexOf("color") >= 0);
-				function getStyle(node, System){
+				var isColor = (JPlus.toLowerCase().indexOf("color") >= 0);
+				function getStyle(node, JPlus){
 					// dojo.style(node, "height") can return "auto" or "" on IE; this is more reliable:
-					var v = { height: node.offsetHeight, width: node.offsetWidth }[System];
+					var v = { height: node.offsetHeight, width: node.offsetWidth }[JPlus];
 					if(v !== undefined){ return v; }
-					v = d.style(node, System);
-					return (System == "opacity") ? +v : (isColor ? v : parseFloat(v));
+					v = d.style(node, JPlus);
+					return (JPlus == "opacity") ? +v : (isColor ? v : parseFloat(v));
 				}
 				if(!("end" in prop)){
-					prop.end = getStyle(n, System);
+					prop.end = getStyle(n, JPlus);
 				}else if(!("start" in prop)){
-					prop.start = getStyle(n, System);
+					prop.start = getStyle(n, JPlus);
 				}
 
 				if(isColor){
 					prop.start = new d.Color(prop.start);
 					prop.end = new d.Color(prop.end);
 				}else{
-					prop.start = (System == "opacity") ? +prop.start : parseFloat(prop.start);
+					prop.start = (JPlus == "opacity") ? +prop.start : parseFloat(prop.start);
 				}
 			}
 			this.curve = new PropLine(pm);
@@ -11216,7 +11216,7 @@ dojo.provide("dojo._base.browser");
 
 
 //Need this to be the last code segment in base, so do not place any
-//dojo.requireIf calls in this file. Otherwise, due to how the build system
+//dojo.requireIf calls in this file. Otherwise, due to how the build JPlus
 //puts all requireIf dependencies after the current file, the require calls
 //could be called before all of base is defined.
 dojo.forEach(dojo.config.require, function(i){

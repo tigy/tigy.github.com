@@ -1050,7 +1050,7 @@ less.Parser = function Parser(env) {
             //
             // Depending on our environemnt, importing is done differently:
             // In the browser, it's an XHR request, in Node, it would be a
-            // file-system operation. The function used for importing is
+            // file-JPlus operation. The function used for importing is
             // stored in `import`, which we pass to the Import constructor.
             //
             "import": function () {

@@ -1,5 +1,7 @@
 
-using('System.Dom.Base')
+
+
+using('System.Dom.Base')
 
 
 Dom.implement({

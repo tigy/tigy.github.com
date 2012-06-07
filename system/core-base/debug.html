@@ -49,11 +49,11 @@
 				
                 'Using': '-',
                 'using': {
-                    '~("System.Core.Base")': function (value, assert) {
-                        assert.isTrue(window.System)
+                    '~("JPlus.Core.Base")': function (value, assert) {
+                        assert.isTrue(window.JPlus)
                     }
                 },
-                'imports': '~("System.Request.Ajax")',
+                'imports': '~("JPlus.Request.Ajax")',
                 'using.checkStatusCode': {
                     '~(200)': true,
                     '~(500)': false

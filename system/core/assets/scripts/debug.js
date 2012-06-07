@@ -346,7 +346,7 @@ function imports(namespace) {
 				},
 
 				getBaseClassDescription: function (obj) {
-					if (obj && obj.base && obj.base !== System.Object) {
+					if (obj && obj.base && obj.base !== JPlus.Object) {
 						var extObj = this.getTypeName(obj.base, window, "", 3);
 						return " 类" + (extObj && extObj != "System.Object" ? "(继承于 " + extObj + " 类)" : "");
 					}
@@ -549,7 +549,7 @@ function imports(namespace) {
 					for (var name in window) {
 
 						try {
-							if (isUpper(name, 0) || System[name] === window[name])
+							if (isUpper(name, 0) || JPlus[name] === window[name])
 								r.push(getDescription(window, name));
 						} catch (e) {
 
@@ -888,7 +888,7 @@ function imports(namespace) {
          * 同步载入代码。
          * @param {String} uri 地址。
          * @example <pre>
-         * System.loadScript('./v.js');
+         * JPlus.loadScript('./v.js');
          * </pre>
          */
 		loadScript: function (url) {
@@ -904,7 +904,7 @@ function imports(namespace) {
          * 异步载入样式。
          * @param {String} uri 地址。
          * @example <pre>
-         * System.loadStyle('./v.css');
+         * JPlus.loadStyle('./v.css');
          * </pre>
          */
 		loadStyle: function (url) {
@@ -945,7 +945,7 @@ function imports(namespace) {
          * @param {Function} [callback] 对返回值的处理函数。
          * @return {String} 载入的值。 因为同步，所以无法跨站。
          * @example <pre>
-         * trace(  System.loadText('./v.html')  );
+         * trace(  JPlus.loadText('./v.html')  );
          * </pre>
          */
 		loadText: function (url, callback) {
@@ -1012,7 +1012,7 @@ function imports(namespace) {
 		scripts: [],
 
 		/**
-         * System 安装的根目录, 可以为相对目录。
+         * JPlus 安装的根目录, 可以为相对目录。
          * @config {String}
          */
 		rootPath: (function () {
@@ -1034,7 +1034,7 @@ function imports(namespace) {
 				return "";
 			}
 
-		})().replace("system/core/assets/scripts/", ""),
+		})().replace("System/core/assets/scripts/", ""),
 
 		/**
          * 将指定的名字空间转为路径。

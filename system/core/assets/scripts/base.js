@@ -53,54 +53,55 @@
 		/**
 		 * 包含系统有关的函数。
 		 * @type Object
+		 * @namespace JPlus
 		 */
-		System = window.System || (window.System = {});
+		JPlus = window.JPlus = {
+
+			/**
+			 * 所有类的基类。
+			 * @constructor
+			 */
+			Base: Base,
+
+			/**
+			 * 将一个原生的 Javascript 函数对象转换为一个类。
+			 * @param {Function/Class} constructor 用于转换的对象，将修改此对象，让它看上去和普通的类一样。
+			 * @return {Function} 返回生成的类。
+			 * @remark 转换后的类将有继承、扩展等功能。
+			 */
+			Native: function (constructor) {
+
+				// 简单拷贝 Object 的成员，即拥有类的特性。
+				// 在 JavaScript， 一切函数都可作为类，故此函数存在。
+				// Object 的成员一般对当前类构造函数原型辅助。
+				return extend(constructor, Base);
+			},
+
+			/**
+			 * id种子 。
+			 * @type Number
+			 * @defaultValue 1
+			 * @example 下例演示了 JPlus.id 的用处。
+			 * <pre>
+			 *		var uid = JPlus.id++;  // 每次使用之后执行 ++， 保证页面内的 id 是唯一的。
+			 * </pre>
+			 */
+			id: 1,
+
+			/**
+			 * 获取当前框架的版本号。
+			 * @getter
+			 */
+			version: 3.1
+
+		};
 		
 	/// #endregion
 
 	/// #region Functions
-	
-	/**
-	 * 包含系统有关的函数。
-	 * @namespace System
-	 */
-	extend(System, {
-
-		/**
-		 * 所有类的基类。
-		 * @constructor
-		 */
-		Base:  Base,
-
-		/**
-		 * 将一个原生的 Javascript 函数对象转换为一个类。
-		 * @param {Function/Class} constructor 用于转换的对象，将修改此对象，让它看上去和普通的类一样。
-		 * @return {Function} 返回生成的类。
-		 * @remark 转换后的类将有继承、扩展等功能。
-		 */
-		Native: function(constructor) {
-
-			// 简单拷贝 Object 的成员，即拥有类的特性。
-			// 在 JavaScript， 一切函数都可作为类，故此函数存在。
-			// Object 的成员一般对当前类构造函数原型辅助。
-			return extend(constructor, Base);
-		},
-
-		/**
-		 * id种子 。
-		 * @type Number
-		 * @defaultValue 1
-		 * @example 下例演示了 System.id 的用处。
-		 * <pre>
-		 *		var uid = System.id++;  // 每次使用之后执行 ++， 保证页面内的 id 是唯一的。
-		 * </pre>
-		 */
-		id: 1
-
-	});
 
 	/**
-	 * @static class System.Base
+	 * @static class JPlus.Base
 	 */
 	extend(Base, {
 
@@ -260,9 +261,9 @@
 		 * 
 		 * 这个函数实现的是 单继承。如果子类有定义构造函数，则仅调用子类的构造函数，否则调用父类的构造函数。
 		 * 
-		 * 要想在子类的构造函数调用父类的构造函数，可以使用 {@link System.Base#base} 调用。
+		 * 要想在子类的构造函数调用父类的构造函数，可以使用 {@link JPlus.Base#base} 调用。
 		 * 
-		 * 这个函数返回的类实际是一个函数，但它被 {@link System.Native} 修饰过。
+		 * 这个函数返回的类实际是一个函数，但它被 {@link JPlus.Native} 修饰过。
 		 * 
 		 * 由于原型链的关系， 肯能存在共享的引用。 如: 类 A ， A.prototype.c = []; 那么，A的实例 b ,
 		 * d 都有 c 成员， 但它们共享一个 A.prototype.c 成员。 这显然是不正确的。所以你应该把 参数 quick
@@ -309,7 +310,7 @@
 		    emptyFn.prototype = null;
 
 		    // 指定Class内容 。
-		    return System.Native(subClass);
+		    return JPlus.Native(subClass);
 
 	    }
 
@@ -341,14 +342,14 @@
 		    })
 			    return extend;
 
-		    System.enumerables = "toString hasOwnProperty valueOf constructor isPrototypeOf".split(' ');
+		    JPlus.enumerables = "toString hasOwnProperty valueOf constructor isPrototypeOf".split(' ');
 		    // IE6 不会遍历系统对象需要复制，所以强制去测试，如果改写就复制 。
 		    return function(dest, src) {
 			    if (src) {
 				    assert(dest != null, "Object.extend(dest, src): {dest} 不可为空。", dest);
 
-				    for ( var i = System.enumerables.length, value; i--;)
-					    if (hasOwnProperty.call(src, value = System.enumerables[i]))
+				    for ( var i = JPlus.enumerables.length, value; i--;)
+					    if (hasOwnProperty.call(src, value = JPlus.enumerables[i]))
 						    dest[value] = src[value];
 				    extend(dest, src);
 			    }
@@ -748,8 +749,8 @@
 	 * 创建一个类。
 	 * @param {Object/Function} [methods] 类成员列表对象或类构造函数。
 	 * @return {Function} 返回创建的类。
-	 * @see System.Base
-	 * @see System.Base.extend
+	 * @see JPlus.Base
+	 * @see JPlus.Base.extend
 	 * @example 以下代码演示了如何创建一个类:
 	 * <pre>
 	 * var MyCls = Class({
@@ -947,11 +948,11 @@
 	/// #region Methods
 	
 	// 把所有内建对象本地化 。
-	each.call([String, Array, Function, Date], System.Native);
+	each.call([String, Array, Function, Date], JPlus.Native);
 	
 	/**
 	 * 所有由 new Class 创建的类的基类。
-	 * @class System.Base
+	 * @class JPlus.Base
 	 */
     Base.implement({
     	
@@ -1288,7 +1289,7 @@
 
 	/**
 	 * 系统原生的字符串对象。
-	 * @system
+	 * @JPlus
 	 * @class String
 	 */
 	String.implementIf({
@@ -1344,7 +1345,7 @@
 
 	/**
 	 * 系统原生的函数对象。
-	 * @system
+	 * @JPlus
 	 * @class Function
 	 */
 	Function.implementIf({
@@ -1375,7 +1376,7 @@
 	
 	/**
 	 * 系统原生的数组对象。
-	 * @system
+	 * @JPlus
 	 * @class Array
 	 */
 	Array.implementIf({
@@ -1728,7 +1729,7 @@
 
 /// #if !Publish
 
-System.Base.prototype.toString = function(){
+JPlus.Base.prototype.toString = function(){
 	for(var item in window){
 		if(window[item] === this.constructor)
 			return item;	
@@ -2094,7 +2095,7 @@ function imports(namespace) {
                 },
 
                 getBaseClassDescription: function(obj) {
-                    if (obj && obj.base && obj.base !== System.Object) {
+                    if (obj && obj.base && obj.base !== JPlus.Object) {
                         var extObj = this.getTypeName(obj.base, window, "", 3);
                         return " 类" + (extObj && extObj != "System.Object" ? "(继承于 " + extObj + " 类)" : "");
                     }
@@ -2297,7 +2298,7 @@ function imports(namespace) {
                     for ( var name in window) {
 					
 						try{
-							if (isUpper(name, 0) || System[name] === window[name])
+							if (isUpper(name, 0) || JPlus[name] === window[name])
 								r.push(getDescription(window, name));
 						} catch(e){
 						
@@ -2636,7 +2637,7 @@ function imports(namespace) {
          * 同步载入代码。
          * @param {String} uri 地址。
          * @example <pre>
-         * System.loadScript('./v.js');
+         * JPlus.loadScript('./v.js');
          * </pre>
          */
         loadScript: function(url) {
@@ -2652,7 +2653,7 @@ function imports(namespace) {
          * 异步载入样式。
          * @param {String} uri 地址。
          * @example <pre>
-         * System.loadStyle('./v.css');
+         * JPlus.loadStyle('./v.css');
          * </pre>
          */
         loadStyle: function(url) {
@@ -2693,7 +2694,7 @@ function imports(namespace) {
          * @param {Function} [callback] 对返回值的处理函数。
          * @return {String} 载入的值。 因为同步，所以无法跨站。
          * @example <pre>
-         * trace(  System.loadText('./v.html')  );
+         * trace(  JPlus.loadText('./v.html')  );
          * </pre>
          */
         loadText: function(url, callback) {
@@ -2760,7 +2761,7 @@ function imports(namespace) {
         scripts: [],
 
         /**
-         * System 安装的根目录, 可以为相对目录。
+         * JPlus 安装的根目录, 可以为相对目录。
          * @config {String}
          */
         rootPath: (function(){
@@ -2782,7 +2783,7 @@ function imports(namespace) {
                 return "";
             }
 
-        })().replace("system/core/assets/scripts/", ""),
+        })().replace("System/core/assets/scripts/", ""),
 
         /**
          * 将指定的名字空间转为路径。

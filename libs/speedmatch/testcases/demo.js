@@ -19,7 +19,7 @@ var options = {
 	//  If the length of code is greater than eclipseLength, it will be trimed.
 	eclipseLength: 100,  
 	
-	// If .js file is not loaded, system will wait for timeout * 10(times) ms.
+	// If .js file is not loaded, JPlus will wait for timeout * 10(times) ms.
 	timeout: 1000    
 };
 

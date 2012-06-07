@@ -5,7 +5,7 @@
 using("System.Fx.Base");
 
 
-namespace(".TaskRunner", System.Fx.Base.extend({
+namespace(".TaskRunner", JPlus.Fx.Base.extend({
 	
 	tasks: null,
 	

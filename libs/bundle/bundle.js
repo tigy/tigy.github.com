@@ -269,8 +269,8 @@ for (var i = arguments.length; i >= -1 && !resolvedAbsolute; i--) {
 // handle relative paths to be safe (might happen when process.cwd() fails)
 
 // Normalize the path
-resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(System) {
-    return !!System;
+resolvedPath = normalizeArray(filter(resolvedPath.split('/'), function(JPlus) {
+    return !!JPlus;
   }), !resolvedAbsolute).join('/');
 
   return ((resolvedAbsolute ? '/' : '') + resolvedPath) || '.';
@@ -283,8 +283,8 @@ var isAbsolute = path.charAt(0) === '/',
     trailingSlash = path.slice(-1) === '/';
 
 // Normalize the path
-path = normalizeArray(filter(path.split('/'), function(System) {
-    return !!System;
+path = normalizeArray(filter(path.split('/'), function(JPlus) {
+    return !!JPlus;
   }), !isAbsolute).join('/');
 
   if (!path && !isAbsolute) {
@@ -301,8 +301,8 @@ path = normalizeArray(filter(path.split('/'), function(System) {
 // posix version
 exports.join = function() {
   var paths = Array.prototype.slice.call(arguments, 0);
-  return exports.normalize(filter(paths, function(System, index) {
-    return System && typeof System === 'string';
+  return exports.normalize(filter(paths, function(JPlus, index) {
+    return JPlus && typeof JPlus === 'string';
   }).join('/'));
 };
 
@@ -394,10 +394,10 @@ util.extend(PrettyCSS.prototype, {
 });
 
 exports.parse = function (str, options) {
-	var System = new PrettyCSS(options);
+	var JPlus = new PrettyCSS(options);
 	var t = tokenizer.tokenize(str, options);
-	System.parse(t);
-	return System;
+	JPlus.parse(t);
+	return JPlus;
 };
 
 exports.parseFile = function (filename, callback, options) {
@@ -405,9 +405,9 @@ exports.parseFile = function (filename, callback, options) {
 		if (err) {
 			callback(err);
 		} else {
-			System = new PrettyCSS(options);
-			System.parse(t);
-			callback(err, System);
+			JPlus = new PrettyCSS(options);
+			JPlus.parse(t);
+			callback(err, JPlus);
 		}
 	}, options);
 };
@@ -874,12 +874,12 @@ exports.extend = (function (undefined) {
 var subPat = /{([a-z][a-z0-9_]*)}/ig;
 exports.expandIntoRegExpPattern = function (pattern, expansion) {
 	while (subPat.test(pattern)) {
-		pattern = pattern.replace(subPat, function (str, System) {
-			if (expansion[System]) {
-				return "(" + expansion[System] + ")";
+		pattern = pattern.replace(subPat, function (str, JPlus) {
+			if (expansion[JPlus]) {
+				return "(" + expansion[JPlus] + ")";
 			}
 
-			throw "Invalid pattern referenced: " + System;
+			throw "Invalid pattern referenced: " + JPlus;
 		});
 	}
 
@@ -7182,7 +7182,7 @@ require.define("/css/values/minmax.js", function (require, module, exports, __di
 /* <minmax>
  *
  * Used by <col-width>
- * minmax( WS? System WS? , WS? q WS? )
+ * minmax( WS? JPlus WS? , WS? q WS? )
  */
 
 "use strict";
@@ -7208,14 +7208,14 @@ exports.parse = function (unparsed, bucket, container) {
 		return null;
 	}
 
-	var System = minmax.list[1];
+	var JPlus = minmax.list[1];
 	var Q = minmax.list[2];
 
-	if (System.name && System.name == 'length' && Q.name && Q.name == 'length') {
-		// CSS spec says if System > Q, assume minmax(System,System)
+	if (JPlus.name && JPlus.name == 'length' && Q.name && Q.name == 'length') {
+		// CSS spec says if JPlus > Q, assume minmax(JPlus,JPlus)
 		// TODO:  Find a way to compare across units
-		if (System.getUnit() == Q.getUnit() && System.getValue() > Q.getValue()) {
-			minmax.addWarning('minmax-System-q', minmax.firstToken());
+		if (JPlus.getUnit() == Q.getUnit() && JPlus.getValue() > Q.getValue()) {
+			minmax.addWarning('minmax-JPlus-q', minmax.firstToken());
 		}
 	}
 

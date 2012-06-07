@@ -4355,7 +4355,7 @@ script: Form.Validator.js
 
 name: Form.Validator
 
-description: A css-class based form validation system.
+description: A css-class based form validation JPlus.
 
 license: MIT-style license
 

@@ -227,7 +227,7 @@ Dom.implement({
 		if(handle !== false) {
 			if (handle === true) handle = null;
 			if(draggable) {
-				assert(!handle || draggable.handle.target === handle.target, "Dom.prototype.draggable(handle): 无法重复设置 {handle}, 如果希望重新设置handle，使用以下代码：dom.draggable(false);System.removeData(dom, 'draggable');dom.draggable(handle) 。", handle);
+				assert(!handle || draggable.handle.target === handle.target, "Dom.prototype.draggable(handle): 无法重复设置 {handle}, 如果希望重新设置handle，使用以下代码：dom.draggable(false);JPlus.removeData(dom, 'draggable');dom.draggable(handle) 。", handle);
 				draggable.draggable();
 			} else  {
 				Dom.movable(this.dom);

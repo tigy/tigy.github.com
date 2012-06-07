@@ -1,4 +1,8 @@
-﻿/** *   @author  */var Sorter = Sorter || {};
+﻿/**
+ *   @author 
+ */
+
+var Sorter = Sorter || {};
 
 /**
  *   默认比较的函数。
@@ -48,15 +52,17 @@ Sorter.bubble = Sorter._createFn(function (iteratable, compareFn, start, end) {
 			}
 
 	return iteratable;
-}),
+}),
+
 /**
  *  对集合进行希尔排序。
  *  @param {Object} iteratable 集合。
  *  @param {Number} start 开始排序的位置。
  *  @param {Number} end 结束排序的位置。
  *  @param {Function} compareFn 比较函数。
- *  @memberOf System.Sorter
- */Sorter.shell = Sorter._createFn(function (iteratable, compareFn, start, end) {
+ *  @memberOf JPlus.Sorter
+ */
+Sorter.shell = Sorter._createFn(function (iteratable, compareFn, start, end) {
 
 	for (var gap = (end - start) >> 1; gap > 0; gap = gap >> 1) {
 		for (var i = gap + start; i < end; i++) {
@@ -69,13 +75,14 @@ Sorter.bubble = Sorter._createFn(function (iteratable, compareFn, start, end) {
 
 	return iteratable;
 }),
-/**
+
+/**
  *  对集合进行快速排序。
  *  @param {Object} iteratable 集合。
  *  @param {Number} start 开始排序的位置。
  *  @param {Number} end 结束排序的位置。
  *  @param {Function} compareFn 比较函数。
- *  @memberOf System.Sorter
+ *  @memberOf JPlus.Sorter
 */
 Sorter.quick = Sorter._createFn(function (iteratable, compareFn, start, end) {
 

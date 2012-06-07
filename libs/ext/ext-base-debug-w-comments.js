@@ -40,8 +40,8 @@ Ext.apply = function(o, c, defaults){
         Ext.apply(o, defaults);
     }
     if(o && c && typeof c == 'object'){
-        for(var System in c){
-            o[System] = c[System];
+        for(var JPlus in c){
+            o[JPlus] = c[JPlus];
         }
     }
     return o;
@@ -149,9 +149,9 @@ Ext.apply = function(o, c, defaults){
          */
         applyIf : function(o, c){
             if(o){
-                for(var System in c){
-                    if(!Ext.isDefined(o[System])){
-                        o[System] = c[System];
+                for(var JPlus in c){
+                    if(!Ext.isDefined(o[JPlus])){
+                        o[JPlus] = c[JPlus];
                     }
                 }
             }
@@ -173,8 +173,8 @@ Ext.apply = function(o, c, defaults){
         },
 
         /**
-         * <System>Extends one class to create a subclass and optionally overrides members with the passed literal. This method
-         * also adds the function "override()" to the subclass that can be used to override members of the class.</System>
+         * <JPlus>Extends one class to create a subclass and optionally overrides members with the passed literal. This method
+         * also adds the function "override()" to the subclass that can be used to override members of the class.</JPlus>
          * For example, to create a subclass of Ext GridPanel:
          * <pre><code>
 MyGridPanel = Ext.extend(Ext.grid.GridPanel, {
@@ -202,8 +202,8 @@ MyGridPanel = Ext.extend(Ext.grid.GridPanel, {
 });
 </code></pre>
          *
-         * <System>This function also supports a 3-argument call in which the subclass's constructor is
-         * passed as an argument. In this form, the parameters are as follows:</System>
+         * <JPlus>This function also supports a 3-argument call in which the subclass's constructor is
+         * passed as an argument. In this form, the parameters are as follows:</JPlus>
          * <div class="mdetail-params"><ul>
          * <li><code>subclass</code> : Function <div class="sub-desc">The subclass constructor.</div></li>
          * <li><code>superclass</code> : Function <div class="sub-desc">The constructor of class being extended</div></li>
@@ -212,13 +212,13 @@ MyGridPanel = Ext.extend(Ext.grid.GridPanel, {
          * </ul></div>
          *
          * @param {Function} superclass The constructor of class being extended.
-         * @param {Object} overrides <System>A literal with members which are copied into the subclass's
-         * prototype, and are therefore shared between all instances of the new class.</System>
-         * <System>This may contain a special member named <tt><b>constructor</b></tt>. This is used
+         * @param {Object} overrides <JPlus>A literal with members which are copied into the subclass's
+         * prototype, and are therefore shared between all instances of the new class.</JPlus>
+         * <JPlus>This may contain a special member named <tt><b>constructor</b></tt>. This is used
          * to define the constructor of the new class, and is returned. If this property is
          * <i>not</i> specified, a constructor is generated and returned which just calls the
-         * superclass's constructor passing on its parameters.</System>
-         * <System><b>It is essential that you call the superclass constructor in any provided constructor. See example code.</b></System>
+         * superclass's constructor passing on its parameters.</JPlus>
+         * <JPlus><b>It is essential that you call the superclass constructor in any provided constructor. See example code.</b></JPlus>
          * @return {Function} The subclass constructor from the <code>overrides</code> parameter, or a generated one if not provided.
          */
         extend : function(){
@@ -279,10 +279,10 @@ Ext.override(MyClass, {
          */
         override : function(origclass, overrides){
             if(overrides){
-                var System = origclass.prototype;
-                Ext.apply(System, overrides);
+                var JPlus = origclass.prototype;
+                Ext.apply(JPlus, overrides);
                 if(Ext.isIE && overrides.hasOwnProperty('toString')){
-                    System.toString = overrides.toString;
+                    JPlus.toString = overrides.toString;
                 }
             }
         },
@@ -550,10 +550,10 @@ function(el){
          * Removes a DOM node from the document.
          */
         /**
-         * <System>Removes this element from the document, removes all DOM event listeners, and deletes the cache reference.
+         * <JPlus>Removes this element from the document, removes all DOM event listeners, and deletes the cache reference.
          * All DOM event listeners are removed from this element. If {@link Ext#enableNestedListenerRemoval} is
          * <code>true</code>, then DOM event listeners are also removed from all child nodes. The body node
-         * will be ignored if passed in.</System>
+         * will be ignored if passed in.</JPlus>
          * @param {HTMLElement} node The node to remove
          */
         removeNode : isIE && !isIE8 ? function(){
@@ -576,8 +576,8 @@ function(el){
         },
 
         /**
-         * <System>Returns true if the passed value is empty.</System>
-         * <System>The value is deemed to be empty if it is<div class="mdetail-params"><ul>
+         * <JPlus>Returns true if the passed value is empty.</JPlus>
+         * <JPlus>The value is deemed to be empty if it is<div class="mdetail-params"><ul>
          * <li>null</li>
          * <li>undefined</li>
          * <li>an empty array</li>
@@ -851,7 +851,7 @@ sayHiToFriend('Brian'); // alerts "Hi, Brian"
      * Will create a function that is bound to those 2 args. <b>If a specific scope is required in the
      * callback, use {@link #createDelegate} instead.</b> The function returned by createCallback always
      * executes in the window scope.
-     * <System>This method is required when you want to pass arguments to a callback function.  If no arguments
+     * <JPlus>This method is required when you want to pass arguments to a callback function.  If no arguments
      * are needed, you can simply pass a reference to the function as a callback (e.g., callback: myFn).
      * However, if you tried to pass a function with arguments (e.g., callback: myFn(arg1, arg2)) the function
      * would simply execute immediately when the code is parsed. Example usage:
@@ -1083,8 +1083,8 @@ Ext.apply(Ext, function(){
         },
 
         /**
-         * <System>Utility method for returning a default value if the passed value is empty.</System>
-         * <System>The value is deemed to be empty if it is<div class="mdetail-params"><ul>
+         * <JPlus>Utility method for returning a default value if the passed value is empty.</JPlus>
+         * <JPlus>The value is deemed to be empty if it is<div class="mdetail-params"><ul>
          * <li>null</li>
          * <li>undefined</li>
          * <li>an empty array</li>
@@ -1155,7 +1155,7 @@ Ext.addBehaviors({
 
         /**
          * Utility method for getting the width of the browser scrollbar. This can differ depending on
-         * operating system settings, such as the theme or font size.
+         * operating JPlus settings, such as the theme or font size.
          * @param {Boolean} force (optional) true to force a recalculation of the value.
          * @return {Number} The width of the scrollbar.
          */
@@ -1197,7 +1197,7 @@ Ext.addBehaviors({
 
         /**
          * Copies a set of named properties fom the source object to the destination object.
-         * <System>example:<pre><code>
+         * <JPlus>example:<pre><code>
 ImageComponent = Ext.extend(Ext.BoxComponent, {
     initComponent: function() {
         this.autoEl = { tag: 'img' };
@@ -1443,7 +1443,7 @@ Ext.pluck(Ext.query("System"), "className"); // [el1.className, el2.className, .
         },
 
         /**
-         * <System>Zips N sets together.</System>
+         * <JPlus>Zips N sets together.</JPlus>
          * <pre><code>
 // Example 1:
 Ext.zip([1,2,3],[4,5,6]); // [[1,4],[2,5],[3,6]]
@@ -1732,7 +1732,7 @@ Ext.TaskMgr.start({
 });
 
  * </code></pre>
- * <System>See the {@link #start} method for details about how to configure a task object.</System>
+ * <JPlus>See the {@link #start} method for details about how to configure a task object.</JPlus>
  * Also see {@link Ext.util.DelayedTask}. 
  * 
  * @constructor
@@ -1804,12 +1804,12 @@ Ext.util.TaskRunner = function(interval){
     /**
      * Starts a new task.
      * @method start
-     * @param {Object} task <System>A config object that supports the following properties:<ul>
-     * <li><code>run</code> : Function<div class="sub-desc"><System>The function to execute each time the task is invoked. The
+     * @param {Object} task <JPlus>A config object that supports the following properties:<ul>
+     * <li><code>run</code> : Function<div class="sub-desc"><JPlus>The function to execute each time the task is invoked. The
      * function will be called at each interval and passed the <code>args</code> argument if specified, and the
-     * current invocation count if not.</System>
-     * <System>If a particular scope (<code>this</code> reference) is required, be sure to specify it using the <code>scope</code> argument.</System>
-     * <System>Return <code>false</code> from this function to terminate the task.</System></div></li>
+     * current invocation count if not.</JPlus>
+     * <JPlus>If a particular scope (<code>this</code> reference) is required, be sure to specify it using the <code>scope</code> argument.</JPlus>
+     * <JPlus>Return <code>false</code> from this function to terminate the task.</JPlus></div></li>
      * <li><code>interval</code> : Number<div class="sub-desc">The frequency in milliseconds with which the task
      * should be invoked.</div></li>
      * <li><code>args</code> : Array<div class="sub-desc">(optional) An array of arguments to be passed to the function
@@ -1820,9 +1820,9 @@ Ext.util.TaskRunner = function(interval){
      * the task before stopping automatically (defaults to indefinite).</div></li>
      * <li><code>repeat</code> : Number<div class="sub-desc">(optional) The number of times to invoke the task before
      * stopping automatically (defaults to indefinite).</div></li>
-     * </ul></System>
-     * <System>Before each invocation, Ext injects the property <code>taskRunCount</code> into the task object so
-     * that calculations based on the repeat count can be performed.</System>
+     * </ul></JPlus>
+     * <JPlus>Before each invocation, Ext injects the property <code>taskRunCount</code> into the task object so
+     * that calculations based on the repeat count can be performed.</JPlus>
      * @return {Object} The task
      */
     this.start = function(task){
@@ -1876,7 +1876,7 @@ var task = {
 }
 Ext.TaskMgr.start(task);
 </code></pre>
- * <System>See the {@link #start} method for details about how to configure a task object.</System>
+ * <JPlus>See the {@link #start} method for details about how to configure a task object.</JPlus>
  * @singleton
  */
 Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
@@ -1898,19 +1898,19 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
 		PARSEINT = parseInt;
 		
 	Ext.lib.Dom = {
-	    isAncestor : function(System, c) {
+	    isAncestor : function(JPlus, c) {
 		    var ret = false;
 			
-			System = Ext.getDom(System);
+			JPlus = Ext.getDom(JPlus);
 			c = Ext.getDom(c);
-			if (System && c) {
-				if (System.contains) {
-					return System.contains(c);
-				} else if (System.compareDocumentPosition) {
-					return !!(System.compareDocumentPosition(c) & 16);
+			if (JPlus && c) {
+				if (JPlus.contains) {
+					return JPlus.contains(c);
+				} else if (JPlus.compareDocumentPosition) {
+					return !!(JPlus.compareDocumentPosition(c) & 16);
 				} else {
 					while (c = c.parentNode) {
-						ret = c == System || ret;	        			
+						ret = c == JPlus || ret;	        			
 					}
 				}	            
 			}	
@@ -1953,7 +1953,7 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
         },
 
         getXY : function(el) {
-            var System, 
+            var JPlus, 
             	pe, 
             	b,
             	bt, 
@@ -1974,13 +1974,13 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
 	                scroll = fly(document).getScroll();
 	                ret = [ROUND(b.left + scroll.left), ROUND(b.top + scroll.top)];
 	            } else {  
-		            System = el;		
+		            JPlus = el;		
 		            hasAbsolute = fly(el).isStyle("position", "absolute");
 		
-		            while (System) {
-			            pe = fly(System);		
-		                x += System.offsetLeft;
-		                y += System.offsetTop;
+		            while (JPlus) {
+			            pe = fly(JPlus);		
+		                x += JPlus.offsetLeft;
+		                y += JPlus.offsetTop;
 		
 		                hasAbsolute = hasAbsolute || pe.isStyle("position", "absolute");
 		                		
@@ -1988,12 +1988,12 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
 		                    y += bt = PARSEINT(pe.getStyle("borderTopWidth"), 10) || 0;
 		                    x += bl = PARSEINT(pe.getStyle("borderLeftWidth"), 10) || 0;	
 		
-		                    if (System != el && !pe.isStyle('overflow','visible')) {
+		                    if (JPlus != el && !pe.isStyle('overflow','visible')) {
 		                        x += bl;
 		                        y += bt;
 		                    }
 		                }
-		                System = System.offsetParent;
+		                JPlus = JPlus.offsetParent;
 		            }
 		
 		            if (Ext.isSafari && hasAbsolute) {
@@ -2007,13 +2007,13 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
 		                y += PARSEINT(dbd.getStyle("borderTopWidth"), 10) || 0;
 		            }
 		
-		            System = el.parentNode;
-		            while (System && System != bd) {
-		                if (!Ext.isOpera || (System.tagName != 'TR' && !fly(System).isStyle("display", "inline"))) {
-		                    x -= System.scrollLeft;
-		                    y -= System.scrollTop;
+		            JPlus = el.parentNode;
+		            while (JPlus && JPlus != bd) {
+		                if (!Ext.isOpera || (JPlus.tagName != 'TR' && !fly(JPlus).isStyle("display", "inline"))) {
+		                    x -= JPlus.scrollLeft;
+		                    y -= JPlus.scrollTop;
 		                }
-		                System = System.parentNode;
+		                JPlus = JPlus.parentNode;
 		            }
 		            ret = [x,y];
 	            }
@@ -2835,11 +2835,11 @@ Ext.lib.Ajax = function() {
     };
 
     Ext.lib.Region.getRegion = function(el) {
-        var System = Ext.lib.Dom.getXY(el),
-        	t = System[1],
-        	r = System[0] + el.offsetWidth,
-        	b = System[1] + el.offsetHeight,
-        	l = System[0];
+        var JPlus = Ext.lib.Dom.getXY(el),
+        	t = JPlus[1],
+        	r = JPlus[0] + el.offsetWidth,
+        	b = JPlus[1] + el.offsetHeight,
+        	l = JPlus[0];
 
         return new Ext.lib.Region(t, r, b, l);
     };	Ext.lib.Point = function(x, y) {
@@ -3350,59 +3350,59 @@ Ext.lib.Ajax = function() {
             return ((t /= d / 2) < 1)  ?  c / 2 * t * t * t * t + b  :  -c / 2 * ((t -= 2) * t * t * t - 2) + b;
         },
 
-        elasticIn: function (t, b, c, d, a, System) {
+        elasticIn: function (t, b, c, d, a, JPlus) {
             if (t == 0 || (t /= d) == 1) {
                 return t == 0 ? b : b + c;
             }
-            System = System || (d * .3);
+            JPlus = JPlus || (d * .3);
 
             var s;
             if (a >= abs(c)) {
-                s = System / (2 * pi) * asin(c / a);
+                s = JPlus / (2 * pi) * asin(c / a);
             } else {
                 a = c;
-                s = System / 4;
+                s = JPlus / 4;
             }
 
-            return -(a * pow(2, 10 * (t -= 1)) * sin((t * d - s) * (2 * pi) / System)) + b;
+            return -(a * pow(2, 10 * (t -= 1)) * sin((t * d - s) * (2 * pi) / JPlus)) + b;
 
         },
 
-        elasticOut: function (t, b, c, d, a, System) {
+        elasticOut: function (t, b, c, d, a, JPlus) {
             if (t == 0 || (t /= d) == 1) {
                 return t == 0 ? b : b + c;
             }
-            System = System || (d * .3);
+            JPlus = JPlus || (d * .3);
 
             var s;
             if (a >= abs(c)) {
-                s = System / (2 * pi) * asin(c / a);
+                s = JPlus / (2 * pi) * asin(c / a);
             } else {
                 a = c;
-                s = System / 4;
+                s = JPlus / 4;
             }
 
-            return a * pow(2, -10 * t) * sin((t * d - s) * (2 * pi) / System) + c + b;
+            return a * pow(2, -10 * t) * sin((t * d - s) * (2 * pi) / JPlus) + c + b;
         },
 
-        elasticBoth: function (t, b, c, d, a, System) {
+        elasticBoth: function (t, b, c, d, a, JPlus) {
             if (t == 0 || (t /= d / 2) == 2) {
                 return t == 0 ? b : b + c;
             }
 
-            System = System || (d * (.3 * 1.5));
+            JPlus = JPlus || (d * (.3 * 1.5));
 
             var s;
             if (a >= abs(c)) {
-                s = System / (2 * pi) * asin(c / a);
+                s = JPlus / (2 * pi) * asin(c / a);
             } else {
                 a = c;
-                s = System / 4;
+                s = JPlus / 4;
             }
 
             return t < 1 ?
-                    -.5 * (a * pow(2, 10 * (t -= 1)) * sin((t * d - s) * (2 * pi) / System)) + b :
-                    a * pow(2, -10 * (t -= 1)) * sin((t * d - s) * (2 * pi) / System) * .5 + c + b;
+                    -.5 * (a * pow(2, 10 * (t -= 1)) * sin((t * d - s) * (2 * pi) / JPlus)) + b :
+                    a * pow(2, -10 * (t -= 1)) * sin((t * d - s) * (2 * pi) / JPlus) * .5 + c + b;
         },
 
         backIn: function (t, b, c, d, s) {
@@ -3623,12 +3623,12 @@ Ext.lib.Ajax = function() {
 })();	
 	if(Ext.isIE) {
         function fnCleanUp() {
-            var System = Function.prototype;
-            delete System.createSequence;
-            delete System.defer;
-            delete System.createDelegate;
-            delete System.createCallback;
-            delete System.createInterceptor;
+            var JPlus = Function.prototype;
+            delete JPlus.createSequence;
+            delete JPlus.defer;
+            delete JPlus.createDelegate;
+            delete JPlus.createCallback;
+            delete JPlus.createInterceptor;
 
             window.detachEvent("onunload", fnCleanUp);
         }

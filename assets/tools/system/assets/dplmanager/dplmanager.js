@@ -1,8 +1,8 @@
 
 
-var System = System || {};
+var JPlus = JPlus || {};
 
-System.getJSONP = function (path, data, onSuccess) {
+JPlus.getJSONP = function (path, data, onSuccess) {
 	Ajax.getJSONP(Dpl.configs.host + ':' + Dpl.configs.port + '/' + path, data, onSuccess, function(){
 		var r = 'assets/bin/startserver.bat';
 		if(navigator.platform.indexOf("Win") === -1) {
@@ -12,7 +12,7 @@ System.getJSONP = function (path, data, onSuccess) {
 	}, null, 1000);
 };
 
-System.submit = function (path, data) {
+JPlus.submit = function (path, data) {
 	var form = Dom.create('form');
 	form.setAttr('action', Dpl.configs.host + ':' + Dpl.configs.port + '/' + path);
 	form.setAttr('method', 'post');
@@ -25,7 +25,7 @@ System.submit = function (path, data) {
 /**
  * 在网页里显示的跟地址。
  */
-System.rootUrl = '../../../';
+JPlus.rootUrl = '../../../';
 
 var DplManager = {
 
@@ -234,12 +234,12 @@ var DplManager = {
 	
 	LibsView: {
 		
-		server: 'assets/tools/system/server/dplmanager/libs.nodejs',
+		server: 'assets/tools/JPlus/server/dplmanager/libs.nodejs',
 		
 		name: 'libs',
 		
 		getUrl: function(module, category, name){
-			return System.rootUrl + (module + '/' + category + '/' + name.replace(/\./g, "/")).toLowerCase() + '.html';
+			return JPlus.rootUrl + (module + '/' + category + '/' + name.replace(/\./g, "/")).toLowerCase() + '.html';
 		},
 		
 		initRow: function(module, category, name){
@@ -315,7 +315,7 @@ var DplManager = {
 				return;
 			}
 			
-			System.getJSONP(this.server, {
+			JPlus.getJSONP(this.server, {
 				action:'delete',
 				module: info[0],
 				category: info[1],
@@ -346,7 +346,7 @@ var DplManager = {
 			
 			var me = this;
 			
-			System.getJSONP(this.server, arg, function(){
+			JPlus.getJSONP(this.server, arg, function(){
 				DplManager.ViewData.updateList(me.name, arg.module, arg.category, arg.name, arg.summary, arg.status, arg.attribute);
 				DplManager.reload();
 				DplManager.ViewData.currentTr = 0;
@@ -452,7 +452,7 @@ var DplManager = {
 	
 	ResView:  {
 		
-		server: 'assets/tools/system/server/dplmanager/res.nodejs',
+		server: 'assets/tools/JPlus/server/dplmanager/res.nodejs',
 		
 		name: 'res',
 		
@@ -460,7 +460,7 @@ var DplManager = {
 			var url = Dpl.res[module][category][name].summary;
 			
 			if(url.indexOf(':') === -1){
-				url = 	System.rootUrl + url;
+				url = 	JPlus.rootUrl + url;
 			}
 			
 			return url;
@@ -526,7 +526,7 @@ var DplManager = {
 				return;
 			}
 			
-			System.getJSONP(this.server, {
+			JPlus.getJSONP(this.server, {
 				action:'delete',
 				module: info[0],
 				category: info[1],
@@ -569,7 +569,7 @@ var DplManager = {
 			
 			DplManager.ViewData.updateList(this.name, arg.module, arg.category, arg.name, arg.summary, arg.status, arg.attribute);
 			
-			System.getJSONP(this.server, arg, DplManager.reload);
+			JPlus.getJSONP(this.server, arg, DplManager.reload);
 			
 			DplManager.ViewData.currentTr = 0;
 			
