@@ -63,7 +63,7 @@ var Marquee = Dom.extend({
 	 * 更新节点状态。
 	 */
 	update: function(){
-		var children = this.container.getChildren();
+		var children = this.container.children();
 		this.childCount = children.length;
 		var size = this._getTotalSize();
 		var xy = /^[lr]/.test(this.direction) ? 'Width' : 'Height';

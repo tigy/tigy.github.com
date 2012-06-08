@@ -1034,7 +1034,7 @@ function imports(namespace) {
 				return "";
 			}
 
-		})().replace("System/core/assets/scripts/", ""),
+		})().replace("system/core/assets/scripts/", ""),
 
 		/**
          * 将指定的名字空间转为路径。

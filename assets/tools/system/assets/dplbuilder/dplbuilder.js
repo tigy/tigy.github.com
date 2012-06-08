@@ -30,9 +30,9 @@ JPlus.rootUrl = '../../../';
 
 var DplBuilder = {
 	
-	buildFiles: 'assets/tools/JPlus/server/dplbuilder/buildfiles.nodejs',
+	buildFiles: 'assets/tools/system/server/dplbuilder/buildfiles.nodejs',
 	
-	dataFile: 'assets/tools/JPlus/server/dplbuilder/data.nodejs',
+	dataFile: 'assets/tools/system/server/dplbuilder/data.nodejs',
 	
 	// 列表页
 	

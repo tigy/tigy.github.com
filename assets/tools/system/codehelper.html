@@ -45,6 +45,23 @@
 			  </div>
 			  
 	        <span class="x-splitbutton x-buttongroup">
+			  <button class="x-button" onclick="CodeHelper.packer()">
+			    压缩
+			  </button>
+			  <button class="x-button">
+			    <span class="x-button-menu x-button-menu-down">
+			    </span>
+			  </button>
+			</span>
+			  
+			  <div class="button-menu">
+				<input type="checkbox" id="packer-base62" class="x-checkbox"><label for="packer-base62">Base62 编码</label>
+	        	<div class="x-blank"></div>
+	        	<input type="checkbox" checked="checked" id="packer-shrink" class="x-checkbox"><label for="packer-shrink">压缩变量</label>
+	        	
+			  </div>
+			  
+	        <span class="x-splitbutton x-buttongroup">
 			  <button class="x-button" onclick="CodeHelper.obfuscator()">
 			    加密
 			  </button>
@@ -68,23 +85,6 @@
 				<input type="checkbox" checked="checked" id="obfuscator-fast-decode" class="x-checkbox"><label for="obfuscator-fast-decode">快速解码</label>
 	        	<div class="x-blank"></div>
 	        	<input type="checkbox" checked="checked" id="obfuscator-special-chars" class="x-checkbox"><label for="obfuscator-special-chars">特殊字符</label>
-	        	
-			  </div>
-			  
-	        <span class="x-splitbutton x-buttongroup">
-			  <button class="x-button" onclick="CodeHelper.packer()">
-			    压缩
-			  </button>
-			  <button class="x-button">
-			    <span class="x-button-menu x-button-menu-down">
-			    </span>
-			  </button>
-			</span>
-			  
-			  <div class="button-menu">
-				<input type="checkbox" id="packer-base62" class="x-checkbox"><label for="packer-base62">Base62 编码</label>
-	        	<div class="x-blank"></div>
-	        	<input type="checkbox" checked="checked" id="packer-shrink" class="x-checkbox"><label for="packer-shrink">压缩变量</label>
 	        	
 			  </div>
 			  

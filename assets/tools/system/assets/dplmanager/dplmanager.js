@@ -234,7 +234,7 @@ var DplManager = {
 	
 	LibsView: {
 		
-		server: 'assets/tools/JPlus/server/dplmanager/libs.nodejs',
+		server: 'assets/tools/system/server/dplmanager/libs.nodejs',
 		
 		name: 'libs',
 		
@@ -452,7 +452,7 @@ var DplManager = {
 	
 	ResView:  {
 		
-		server: 'assets/tools/JPlus/server/dplmanager/res.nodejs',
+		server: 'assets/tools/system/server/dplmanager/res.nodejs',
 		
 		name: 'res',
 		
