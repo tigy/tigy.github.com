@@ -8,8 +8,9 @@ using("System.Utils.Deferrable");
 var Fx = Fx || {};
 
 /**
- * 实现特效。
+ * 特效算法基类。
  * @class Fx.Base
+ * @extends Deferrable
  * @abstract
  */
 Fx.Base = (function(){
@@ -30,9 +31,6 @@ Fx.Base = (function(){
 	
 	/// #endregion
 		
-	/**
-	 * @namespace Fx
-	 */
 	return Deferrable.extend({
 	
 		/**
@@ -42,16 +40,10 @@ Fx.Base = (function(){
 		fps: 50,
 		
 		/**
-		 * 总运行时间。 (单位:  毫秒)
+		 * 特效执行毫秒数。
 		 * @type {Number}
 		 */
 		duration: 500,
-		
-		/**
-		 * xtype
-		 * @type {String}
-		 */
-		xtype: 'fx',
 		
 		/**
 		 * 当被子类重写时，实现生成当前变化所进行的初始状态。
@@ -74,9 +66,13 @@ Fx.Base = (function(){
 		set: Function.empty,
 		
 		/**
-		 * 实现变化。
-		 * @param {Object} p 值。
-		 * @return {Object} p 变化值。
+		 * 用于实现渐变曲线的计算函数。函数的参数为：
+		 *
+		 * - @param {Object} p 转换前的数值，0-1 之间。
+		 *
+		 * 返回值是一个数字，表示转换后的值，0-1 之间。
+		 * @field
+		 * @type Function
 		 */
 		transition: function(p) {
 			return -(Math.cos(Math.PI * p) - 1) / 2;
