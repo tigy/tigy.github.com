@@ -385,7 +385,7 @@ using("System.Dom.Base");
 		 */
 		animate: function (params, duration, callback, link) {
 			if(params.to){
-				link = duration;
+				link = params.link;
 			} else {
 				params = {
 					target: this,

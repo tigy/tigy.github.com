@@ -5,19 +5,37 @@
 using("System.Fx.Animate");
 using("System.Dom.Base");
 
-var Marquee = Dom.extend({
+var Marquee = Class({
 	
-	direction: 'left',
-	
+	/**
+	 * 每次滚动的效果时间。
+	 */
 	duration:-1,
 	
+	/**
+	 * 自动滚动的延时时间。
+	 */
 	delay: 3000,
+
+	/**
+	 * 移动的方向。
+	 * @config
+	 */
+	direction: 'left',
+
+	/**
+	 * 每次移动的张数。
+	 * @config
+	 */
+	delta: 1,
+
+	/**
+	 * 是否循环播放。
+	 * @config
+	 */
+	loop: true,
 	
 	_currentIndex: 0,
-	
-	getCurrentIndex: function(){
-		return this._currentIndex;
-	},
 	
 	/**
 	 * 是否循环。
@@ -25,154 +43,209 @@ var Marquee = Dom.extend({
 	 */
 	
 	_getWidthBefore: function(ctrl, xy){
-		
-		ctrl = ctrl.getPrevious();
-		
-		if(ctrl) {
-			return Dom.calc(ctrl.dom, xy) + this._getWidthBefore(ctrl, xy);
-		}
-		
-		return 0;
+		return ctrl && (ctrl = ctrl.prev()) ? Dom.calc(ctrl.dom, xy) + this._getWidthBefore(ctrl, xy) : 0;
 	},
 	
-	_getScrollByIndex: function(value){
-		return this._getWidthBefore(this.container.getChild(value), /^[lr]/.test(this.direction) ? 'mx+sx' : 'my+sy')   ;
+	_getScrollByIndex: function (value) {
+		return this._getWidthBefore(this.target.first(value), this._horizonal ? 'mx+sx' : 'my+sy');
 	},
 	
 	_getTotalSize: function(){
 		var size = 0;
-		
-		var xy = /^[lr]/.test(this.direction) ? "mx+sx" : "my+sy";
-		
-		this.container.getChildren().each(function(child){
+		var xy = this._horizonal ? "mx+sx" : "my+sy";
+		this.target.children().each(function (child) {
 			size += Dom.calc(child, xy);
 		});
-		
 		return size;
 	},
-	
-	onChanging: function(newIndex){
-		return !this.disabled && this.trigger('changing', newIndex);
-	},
-	
-	onChange: function(oldIndex, newIndex){
-		this.trigger('change', oldIndex);
-	},
-	
-	/**
-	 * 更新节点状态。
-	 */
-	update: function(){
-		var children = this.container.children();
-		this.childCount = children.length;
-		var size = this._getTotalSize();
-		var xy = /^[lr]/.test(this.direction) ? 'Width' : 'Height';
-		
-		this.disabled = this['get' + xy]() >= size;
-		
-		if(!this.disabled && this.loop && !this.cloned){
-			children.clone().appendTo(this.container);
-			children.clone().appendTo(this.container);
-			size = this._getTotalSize();
-			this.cloned = true;
-		}
-		
-		this.container['set' + xy](size);
-		this._currentIndex = 0;
-	},
-	
-	init: function(options){
-		this.container = this.find('ul');
-		this.setStyle('overflow', 'hidden');
-		
-		
-		if(options.loop !== false && this.loop !== false){
-			this.loop = true;
-			delete options.loop;
-		}
-		
-		this.update();
-	},
-	
-	restart: function(){
-		if(!this.timer && this.step)
-			this.timer = setInterval(this.step, this.delay);
-	},
-	
-	moveTo: function(index){
-		clearInterval(this.timer);
-		this.timer = 0;
-		this.once('change', this.restart);
-		this.moveToInternal(index % (this.loop ? this.childCount * 3 : this.childCount));
-		return this;
-	},
-	
-	setCurrentIndex: function(index){
-		this.container.setStyle(/^[lr]/.test(this.direction) ? 'marginLeft' : 'marginTop', -this._getScrollByIndex(index));
-	},
-	
+
 	/**
 	 * 内部实现移动到指定位置的效果。
 	 */
-	moveToInternal: function(index){
-		
-		var actualNewIndex, resetIndex, newIndex = index % this.childCount;
-		
-		if(newIndex < 0)
-			newIndex += this.childCount;
-		
-		if(this.onChanging(actualNewIndex = newIndex)) {
+	_animateToWithoutLoop: function (index, lt) {
+
+		var me = this,
+			oldIndex = me._fixIndex(me._currentIndex),
+			obj;
+
+		if (me.onChanging(index, oldIndex) !== false) {
+
+			// 暂停自动播放，防止出现抢资源问题。
+			me.pause();
+
+			// 记录当前正在转向的目标索引。
+			me._currentIndex = index;
+
+			// 计算滚动坐标。
+
+			obj = {};
+			obj[me._horizonal ? 'marginLeft' : 'marginTop'] = -me._getScrollByIndex(index);
+			me.target.animate(obj, me.duration, function () {
+
+				// 滚动完成后触发事件。
+				me.onChanged(index, oldIndex);
+
+				// 如果本来正在自动播放中，这里恢复自动播放。
+				if (me.step)
+					me.resume();
+			}, 'abort');
+		}
+
+	},
+
+	/**
+	 * 内部实现移动到指定位置的效果。
+	 */
+	_animateToWithLoop: function (index, lt) {
+
+		var me = this,
+			oldIndex = me._fixIndex(me._currentIndex),
+			obj;
+
+		if (me.onChanging(index, oldIndex) !== false) {
+
+			// 暂停自动播放，防止出现抢资源问题。
+			me.pause();
+
+			// 计算滚动坐标。
+
+			obj = {
+				from: {},
+				to: {},
+				duration: me.duration,
+				start: function () {
+
+					// 实际所滚动的区域。
+					var actualIndex = index + me.length,
+						prop = me._horizonal ? 'marginLeft' : 'marginTop',
+						from = Dom.styleNumber(me.target.dom, prop),
+						to = -me._getScrollByIndex(actualIndex);
+
+					// 如果是往上、左方向滚。
+					if (lt) {
+						
+						// 确保 from > to
+						if (from > to) {
+							from -= me._size;
+						}
+
+					} else {
+
+						// 确保 from < to
+						if (from < to) {
+							from += me._size;
+						}
+					}
+
+					obj.from[prop] = from;
+					obj.to[prop] = to;
+
+					// 记录当前正在转向的目标索引。
+					me._currentIndex = index;
+				},
+				complete: function () {
+
+					// 效果结束。
+					me._animatingTargetIndex = null;
+
+					// 滚动完成后触发事件。
+					me.onChanged(index, oldIndex);
+
+					// 如果本来正在自动播放中，这里恢复自动播放。
+					if (me.step)
+						me.resume();
+				},
+				link: 'abort'
+			};
+
 			
-			// 如果是循环的，则需要保证变化是平滑的。	
-			if(this.loop){
-				
-				// 循环表示，有三层，中间这层的索引是显示值。
-				actualNewIndex = index + this.childCount;
-				
-				// 当前位置。
-				//index = this._currentIndex;
-				
-				// 如果是正向变化。则应该保证 newIndex > index。
-				// 否则，应该保证 newIndex < index 。
-				// if(/^[lt]/.test(this.direction)){
-// 					
-					// if(newIndex <= index) {
-						// resetIndex = newIndex;
-					// }
-// 					
-				// } else if(newIndex >= index) {
-					// resetIndex = newIndex;
-				//}
-				if(actualNewIndex <= this.childCount || actualNewIndex >= (this.childCount + this.childCount))
-					resetIndex = newIndex;
-				
-			}
-			
-			var me = this;
-			var oldIndex = me._currentIndex;
-			me.container.animate(/^[lr]/.test(this.direction) ? 'marginLeft' : 'marginTop', -me._getScrollByIndex(actualNewIndex), me.duration, function(){
-				if(resetIndex != null){
-					me.setCurrentIndex(resetIndex + me.childCount);
-				}
-				me.onChange(oldIndex, newIndex);
-			}, function(){
-				me._currentIndex = newIndex;
-			}, 'reset');
+			me.target.animate(obj);
 		}
 		return this;
+
+	},
+
+	_fixIndex: function (index) {
+		return index = index >= 0 ? index % this.length : index + this.length;
+	},
+	
+	onChanging: function (newIndex, oldIndex) {
+		return !this.disabled && this.trigger('changing', {
+			from: oldIndex,
+			to: newIndex
+		});
+	},
+	
+	onChanged: function(newIndex, oldIndex){
+		this.trigger('changed', {
+			from: oldIndex,
+			to: newIndex
+		});
+	},
+
+	/**
+	 * 更新节点状态。
+	 */
+	update: function () {
+		var children = this.target.children(),
+			size,
+			xy = this._horizonal ? 'Width' : 'Height';
 		
+		if (!this.cloned) {
+
+			// 设置大小。
+			this.length = children.length;
+
+			// 如果不需要滚动，自动设为 disabled 属性。
+			this.disabled = this.target.parent()['get' + xy]() >= size;
+			//  this.disabled = this.target.getScrollSize()[this._horizonal ? 'x' : 'y'] > size;
+
+			if (!this.disabled && this.loop) {
+				children.clone().appendTo(this.target);
+				children.clone().appendTo(this.target);
+				this.cloned = true;
+			}
+
+			this.set(this._currentIndex);
+		}
+
+		size = this._getTotalSize();
+		this._size = this.cloned ? size / 3 : size;
+
+		this.target['set' + xy](size);
 	},
-	
-	moveBy: function(index){
-		return this.moveTo(this._currentIndex + index);
+
+	pause: function () {
+		if (this.timer) {
+			clearTimeout(this.timer);
+			this.timer = 0;
+		}
+
 	},
-	
-	prev: function(){
-		return this.moveBy(-1);
+
+	resume: function () {
+		if (!this.timer) {
+			this.timer = setTimeout(this.step, this.delay);
+		}
 	},
-	
-	next: function(){
-		return this.moveBy(1);
+
+	constructor: function (dom, direction, loop, deferUpdate) {
+		dom = Dom.get(dom);
+		this.target = dom.find('ul') || dom;
+		this.target.parent().setStyle('overflow', 'hidden');
+
+		if (loop === false) {
+			this.loop = false;
+		}
+
+		this.setDirection(direction || this.direction);
+
+		this.update();
+
+		// Chrome 无法直接获取图片大小。
+		if (deferUpdate !== false && !Dom.isLoaded) {
+			Dom.load(this.update.bind(this));
+		}
 	},
 	
 	/**
@@ -185,24 +258,68 @@ var Marquee = Dom.extend({
 		this.step = null;
 		return this;
 	},
+
+	setDirection: function (direction) {
+		this.direction = direction;
+		this._lt = /^[rb]/.test(direction);
+		this._horizonal = /^[lr]/.test(direction);
+	},
 	
 	/**
 	 * (重新)开始滚动
 	 * @method start
 	 */
-	start: function(delta, direction) {
-		delta = delta || 1;
+	start: function (delta) {
 		var me = this.stop();
-		if(direction)
-			this.direction = direction;
-		if(/^[rb]/.test(this.direction))
-			delta *= -1;
-		me.set(me._currentIndex + (this.loop ? this.childCount : 0));
-		me.timer = setInterval(me.step = function(){
-			me.moveToInternal(me._currentIndex + delta);
-		}, me.delay);
+		delta = delta || me.delta;
+		if (delta < 0) {
+			me._lt = !me._lt;
+			delta = -delta;
+		}
+
+		if (me._lt) {
+			delta = -delta;
+		}
+
+		// 设置单步的执行函数。
+		me.step = function () {
+			me.moveTo(me._currentIndex + delta);
+			me.timer = setTimeout(me.step, me.delay)
+		};
+
+		// 正式开始。
+		me.resume();
 		
 		return me;
+	},
+
+	set: function (index) {
+		index = this._fixIndex(index);
+		if (this.loop) {
+			index += this.length;
+		}
+		this.target.setStyle(this._horizonal ? 'marginLeft' : 'marginTop', -this._getScrollByIndex(index));
+		this.onChanged(index, this._currentIndex);
+		this._currentIndex = index;
+		return this;
+	},
+
+	moveTo: function (index, lt) {
+		index = this._fixIndex(index);
+		this[this.loop ? '_animateToWithLoop' : '_animateToWithoutLoop'](index, lt === undefined ? this._lt : lt);
+		return this;
+	},
+
+	moveBy: function (index) {
+		return this.moveTo(this._currentIndex + index % this.length, index < 0);
+	},
+
+	prev: function () {
+		return this.moveTo(this._currentIndex - 1, false);
+	},
+
+	next: function () {
+		return this.moveTo(this._currentIndex + 1, true);
 	}
 	
 });
