@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html><head>
-<script src="../src/prettify.js"></script>
-<script src="../src/lang-css.js"></script>
+<script src="assets/scripts/prettify.js"></script>
+<script src="assets/scripts/lang/css.js"></script>
 <style>
 body { margin: 0; padding: 0 }
 pre { margin: 0 }
@@ -26,6 +26,11 @@ function adjustHeightInParent() {
   }
 }
 
+
+function prettyPrint() {
+    Prettify.print();
+}
+
 // Load the necessary CSS
 (function () {
   document.title = 'Theme ' + themeName;
@@ -34,14 +39,14 @@ function adjustHeightInParent() {
   link.rel = 'stylesheet';
   link.type = 'text/css';
   link.href = themeName === 'default'
-      ? '../src/prettify.css' : themeName + '.css';
+      ? 'assets/styles/prettify.css' : themeName + '.css';
   document.getElementsByTagName('head')[0].appendChild(link);
 })();
 </script>
 
 <body onload="prettyPrint(); adjustHeightInParent()">
 <div style="width: 40em; display: inline-block">
-<pre class="prettyprint lang-html linenums">
+<pre class="prettyprint lang-html">
 &lt;script type="text/javascript"&gt;
 // Say hello world until the user starts questioning
 // the meaningfulness of their existence.
@@ -49,6 +54,7 @@ function helloWorld(world) {
   for (var i = 42; --i &gt;= 0;) {
     alert('Hello ' + String(world));
   }
+    <a href="asdasd">aa</a>
 }
 &lt;/script&gt;
 &lt;style&gt;

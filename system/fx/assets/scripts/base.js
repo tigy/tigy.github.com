@@ -73,6 +73,7 @@ Fx.Base = (function(){
 		 * 返回值是一个数字，表示转换后的值，0-1 之间。
 		 * @field
 		 * @type Function
+		 * @remark 
 		 */
 		transition: function(p) {
 			return -(Math.cos(Math.PI * p) - 1) / 2;

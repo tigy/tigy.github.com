@@ -496,10 +496,10 @@ var Prettify = (function() {
 				// Text
 				var text = node.nodeValue;
 				if (text.length) {
-					if (!isPreformatted) {
-						text = text.replace(/[ \t\r\n]+/g, ' ');
-					} else {
+					if (isPreformatted) {
 						text = text.replace(/\r\n?/g, '\n'); // Normalize newlines.
+					} else {
+						text = text.replace(/[ \t\r\n]+/g, ' ');
 					}
 					// TODO: handle tabs here?
 					chunks[k] = text;
@@ -690,7 +690,7 @@ var Prettify = (function() {
 							}
 						}
 
-						isEmbedded = style.length >= 5 && 'lang-' === style.substring(0, 5);
+						isEmbedded = style && style.length >= 5 && 'lang-' === style.substring(0, 5);
 						if (isEmbedded && !(match && typeof match[1] === 'string')) {
 							isEmbedded = false;
 							style = PR_SOURCE;
@@ -1266,7 +1266,7 @@ var Prettify = (function() {
 	function applyDecorator(job) {
 		var opt_langExtension = job.langExtension;
 
-		try {
+	//	try {
 			// Extract tags, and convert the source code to plain text.
 			var sourceAndSpans = extractSourceSpans(job.sourceNode);
 			/** Plain text. @type {string} */
@@ -1281,11 +1281,11 @@ var Prettify = (function() {
 			// Integrate the decorations and tags back into the source code,
 			// modifying the sourceNode in place.
 			recombineTagsAndDecorations(job);
-		} catch (e) {
-			if ('console' in window) {
-				console['log'](e && e['stack'] ? e['stack'] : e);
-			}
-		}
+		//} catch (e) {
+		//	if ('console' in window) {
+		//		console['log'](e && e['stack'] ? e['stack'] : e);
+		//	}
+		//}
 	}
 
 	/**
@@ -1436,6 +1436,8 @@ var Prettify = (function() {
 		 * If set to {@code false}, {@code prettyPrint()} is synchronous.
 		 */
 		useContinuation: true,
+
+		langHandlerRegistry: langHandlerRegistry,
 
 		'createSimpleLexer': createSimpleLexer,
 		'registerLangHandler': registerLangHandler,

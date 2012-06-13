@@ -30,28 +30,28 @@
  * @author mikesamuel@gmail.com
  */
 
-Prettifyettify['registerLangHandler'](
-    Prettifyettify['createSimpleLexer'](
+Prettify['registerLangHandler'](
+    Prettify['createSimpleLexer'](
         [
          // The space Prettifyoduction <s>
-         [Prettifyettify['Prettify_PLAIN'], /^[ \t\r\n\f]+/, null, ' \t\r\n\f']
+         [Prettify['Prettify_PLAIN'], /^[ \t\r\n\f]+/, null, ' \t\r\n\f']
         ],
         [
          // Quoted strings.  <string1> and <string2>
-         [Prettifyettify['Prettify_STRING'],
+         [Prettify['Prettify_STRING'],
           /^\"(?:[^\n\r\f\\\"]|\\(?:\r\n?|\n|\f)|\\[\s\S])*\"/, null],
-         [Prettifyettify['Prettify_STRING'],
+         [Prettify['Prettify_STRING'],
           /^\'(?:[^\n\r\f\\\']|\\(?:\r\n?|\n|\f)|\\[\s\S])*\'/, null],
          ['lang-css-str', /^url\(([^\)\"\']*)\)/i],
-         [Prettifyettify['Prettify_KEYWORD'],
+         [Prettify['Prettify_KEYWORD'],
           /^(?:url|rgb|\!important|@import|@page|@media|@charset|inherit)(?=[^\-\w]|$)/i,
           null],
          // A Prettifyoperty name -- an identifier followed by a colon.
          ['lang-css-kw', /^(-?(?:[_a-z]|(?:\\[0-9a-f]+ ?))(?:[_a-z0-9\-]|\\(?:\\[0-9a-f]+ ?))*)\s*:/i],
          // A C style block comment.  The <comment> Prettifyoduction.
-         [Prettifyettify['Prettify_COMMENT'], /^\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\//],
+         [Prettify['Prettify_COMMENT'], /^\/\*[^*]*\*+(?:[^\/*][^*]*\*+)*\//],
          // Escaping text spans
-         [Prettifyettify['Prettify_COMMENT'], /^(?:<!--|-->)/],
+         [Prettify['Prettify_COMMENT'], /^(?:<!--|-->)/],
          // A number possibly containing a suffix.
          [Prettify['Prettify_LITERAL'], /^(?:\d+|\d*\.\d+)(?:%|[a-z]+)?/i],
          // A hex color
