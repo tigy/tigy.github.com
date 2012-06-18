@@ -220,46 +220,22 @@ address,
 cite {
   font-style: normal;
 }
-code,
-pre {
-  padding: 0 3px 2px;
-  font-family: "Courier New", Menlo, Monaco, monospace;
-  color: #333333;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-}
 code {
   padding: 0 4px;
   color: #1e347b;
   background-color: #f7f7f9;
   border: 1px solid #e1e1e8;
-}
-pre {
-  display: block;
-  padding: 8.5px;
-  margin: 9px 0;
-  background-color: whitesmoke;
-  border: 1px solid #cccccc;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-  white-space: pre;
-  white-space: pre-wrap;
-  word-break: break-all;
-  box-shadow: 40px 0 0 #fbfbfc inset, 41px 0 0 #ececf0 inset;
-  -moz-box-shadow: 40px 0 0 #fbfbfc inset, 41px 0 0 #ececf0 inset;
-}
-pre ol {
-  margin: 0 0 0 33px;
-}
-pre li {
-  padding-left: 12px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  font-family: "Courier New", Menlo, Monaco, monospace;
 }
 pre code {
   padding: 0;
+  border: 0;
   background-color: transparent;
+  color: inherit;
+  font-family: inherit;
 }
 blockquote {
   padding: 0 0 0 15px;

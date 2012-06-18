@@ -5758,7 +5758,7 @@ target=getAncestorByClass(target,"logGroupLabel");
 var groupRow=target.parentNode;
 if(hasClass(groupRow,"opened")){removeClass(groupRow,"opened");
 target.setAttribute("aria-expanded","false")
-}else{setClass(groupRow,"opened");
+} else {setClass(groupRow, "opened");
 target.setAttribute("aria-expanded","true")
 }}})
 },appendCloseGroup:function(object,row,rep){if(this.groups){this.groups.pop()
@@ -6259,7 +6259,8 @@ this.clearButton.initialize()
 }else{this.isMultiLine=false;
 this.element=fbCommandLine;
 if(!fbCommandLine){return
-}addEvent(this.element,"keydown",this.onKeyDown)
+} if (FBL.isIE6) addEvent(this.element, "keypress", this.onKeyDown);
+addEvent(this.element, "keydown", this.onKeyDown);
 }if(isOpera){fixOperaTabKey(this.element)
 }if(this.lastValue){this.element.value=this.lastValue
 }this.isActive=true
@@ -6270,7 +6271,9 @@ if(this.isMultiLine){removeEvent(this.element,"keydown",this.onMultiLineKeyDown)
 removeEvent($("fbSmallCommandLineIcon"),"click",Firebug.chrome.hideLargeCommandLine);
 this.runButton.destroy();
 this.clearButton.destroy()
-}else{removeEvent(this.element,"keydown",this.onKeyDown)
+} else {
+	removeEvent(this.element, "keydown", this.onKeyDown);
+	if (FBL.isIE6) removeEvent(this.element, "keypress", this.onKeyDown);
 }this.element=null;
 delete this.element;
 fbCommandLine=null;
@@ -6340,8 +6343,9 @@ break
 var lastSlash=href.lastIndexOf("/");
 var fileName=lastSlash==-1?href:href.substr(lastSlash+1);
 var html=['<span class="errorMessage">',msg,"</span>",'<div class="objectBox-sourceLink">',fileName," (line ",lineNo,")</div>"]
-},onKeyDown:function(e){e=e||event;
-var code=e.keyCode;
+}, onKeyDown: function (e) {
+	e = e || event; 
+	var code = e.keyCode;
 if(code!=9&&code!=16&&code!=17&&code!=18){isAutoCompleting=false
 }if(code==13){this.enter();
 this.clear()

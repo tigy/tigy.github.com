@@ -79,6 +79,7 @@ hr.demo {
     -moz-border-left-colors: none;
     -moz-border-right-colors: none;
     -moz-border-top-colors: none;
+    border-color: #E5E5E5;
     border-color: #E5E5E5 -moz-use-text-color -moz-use-text-color;
     border-right: 0 none;
     border-style: solid none none;
@@ -92,7 +93,7 @@ hr.demo {
     margin: 12px 0;
 }
 
-System.demo {
+p.demo {
   margin: 8px 0 16px;
   text-indent: 2em;
   font-size: 12px;
@@ -142,47 +143,12 @@ textarea.demo {
 	height: 136px;	
 }
 
-pre.demo, code.demo {
-	padding: 0 3px 2px;
+code.demo {
 	font-family: "Courier New", Menlo, Monaco, monospace;
-	color: #333333;
 	-webkit-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-}
-
-pre.demo  {
-	display: block;
-	padding: 8.5px;
-	margin: 9px 0;
-	background-color: whitesmoke;
-	border: 1px solid #cccccc;
-	border: 1px solid rgba(0, 0, 0, 0.15);
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
-	white-space: pre;
-	white-space: pre-wrap;
-	word-break: break-all;
-	box-shadow: 40px 0 0 #fbfbfc inset, 41px 0 0 #ececf0 inset;
-	-moz-box-shadow: 40px 0 0 #fbfbfc inset, 41px 0 0 #ececf0 inset;
-}
-
-pre.demo ol {
-  margin: 0 0 0 33px;
-}
-
-pre.demo li {
-  padding-left: 12px;
-}
-
-pre.demo code {
-  padding: 0;
-  background-color: transparent;
-}
-
-code.demo {
-	padding: 0 4px;
+    padding: 0 4px;
 	color: #1e347b;
 	background-color: #f7f7f9;
 	border: 1px solid #e1e1e8;
@@ -204,78 +170,6 @@ blockquote.demo {
 	border: 2px solid #ddd;
     padding: 10px;
     margin: 10px;
-}
-
-/*********************************** 页面 *******************************************/
-
-.demo-tip, .demo-tip-error, .demo-tip-warning, .demo-tip-success {
-	padding: 2px 10px;
-	margin: 2px 0;
-	line-height:16px;
-	border: 2px solid transparent;
-	*border: 2px solid #F9F9F9;
-	clear: both;
-}
-
-.demo-tip-error {
-	background:#FBE3E4;
-	color:#8a1f11;
-	border-color:#FBC2C4;
-}
-
-.demo-tip-error a.demo {
-	color:#8a1f11;
-}
-
-.demo-tip-warning{
-	background:#FFF6BF;
-	color:#514721;
-	border-color:#FFD324;
-}
-
-.demo-tip-warning a.demo {
-	color:#514721;
-}
-
-.demo-tip-success {
-	background:#E6EFC2;
-	color:#264409;
-	border-color:#C6D880;
-}
-
-.demo-tip-success a.demo {
-	color:#264409;
-}
-
-.demo-tip .demo-control-toolbar {
-	display: none;
-}
-
-.demo-tip-selected {
-	background: #eee;	
-}
-
-.demo-tip-selected .demo-control-toolbar {
-	display: block;
-}
-
-.demo-control-toolbar {
-	float: right;
-	font-size: 12px;
-}
-
-.demo-control-viewsource {
-	margin-bottom: 20px;
-}
-
-.demo-control-viewsource pre.demo {
-	margin-bottom: 30px;
-}
-
-.demo-control-arrow {
-	font-size: 20px;
-	float: left;
-	line-height: 16px;
 }
 
 /*********************************** 工具 *******************************************/
@@ -386,7 +280,7 @@ blockquote.demo {
 	color: #FF6600;	
 }
 
-.demo-white {
+.demo-white, .demo-c0 {
 	background-color: #ffffff;
 	color: #000000;
 }
@@ -396,37 +290,37 @@ blockquote.demo {
 	color: #000000;
 }
 
-.demo-yellow {
+.demo-yellow, .demo-c3 {
 	background-color: #ffc40d;
 }
 
-.demo-orange {
+.demo-orange, .demo-c2 {
 	background-color: #f89406;
 	color: #000000;
 }
 
-.demo-red {
+.demo-red, .demo-c1 {
 	background-color: #9d261d;
 }
 
-.demo-green {
+.demo-green, .demo-c4 {
 	background-color: #B4B900;
 }
 
-.demo-indigo {
+.demo-indigo, .demo-c5 {
 	background-color: #90D9E8;
 	color: #000000;
 }
 
-.demo-blue {
+.demo-blue, .demo-c6 {
 	background-color: #285A8F;
 }
 
-.demo-purple {
+.demo-purple, .demo-c7 {
 	background-color: #B05A89;
 }
 
-.demo-black {
+.demo-black, .demo-c8 {
 	background-color: #000000;
 }
 
@@ -454,88 +348,23 @@ blockquote.demo {
 	text-decoration: line-through!important;
 }
 
+.demo-current {
+	text-shadow: 0 0 1px #D26000;
+	font-weight: bold;
+}
+
 .demo-plain {
 	margin: 0;
 	padding: 0;	
 }
 
-.demo-test {
-	position:relative;	
-}
-
-/*********************************** 功能 *******************************************/
-
-#demo-questions input{
-	vertical-align: -3px;
-}
-
-#demo-questions menu {
-	padding-left: 15px;
-	margin: 0;
-}
-
-#demo-testcases h2{
-	border-bottom: 1px solid #DDDDDD;
-	margin: 13px 2px 2px;
-	text-indent: 15px;
-	font-size: 20px;
-}
-
-
-/************************* Prettify ********************/
-
-pre.demo .com { color: #93a1a1; }
-pre.demo .lit { color: #195f91; }
-pre.demo .pun, pre.demo .opn,pre.demo .clo { color: #93a1a1; }
-pre.demo .fun { color: #dc322f; }
-pre.demo .str, pre.demo .atv { color: #D14; }
-pre.demo .kwd, pre.demo .tag { color: #1e347b; }
-pre.demo .typ,pre.demo .atn, pre.demo .dec,pre.demo .var { color: teal; }
-pre.demo .pln { color: #48484c; }
-
-pre.demo .prettyprint {
-  padding: 8px;
-  background-color: #f7f7f9;
-  border: 1px solid #e1e1e8;
-}
-pre.demo .prettyprint.linenums {
-  -webkit-box-shadow: inset 40px 0 0 #fbfbfc, inset 41px 0 0 #ececf0;
-     -moz-box-shadow: inset 40px 0 0 #fbfbfc, inset 41px 0 0 #ececf0;
-          box-shadow: inset 40px 0 0 #fbfbfc, inset 41px 0 0 #ececf0;
-}
-
-/* Specify class=linenums on a pre to get line numbering */
-pre.demo ol.linenums {
-  margin: 0 0 0 33px; /* IE indents via margin-left */
- padding-left: 0;
-} 
-pre.demo ol.linenums li {
-  padding-left: 12px;
-  color: #bebec5;
-  line-height: 18px;
-  text-shadow: 0 1px 0 #fff;
-}
-
-
-
-/*********************************** 文档 *******************************************/
-
-
-.demo-doc System.demo, .demo-doc li.demo, .demo-doc table.demo, .demo-doc dd.demo, .demo-doc code.demo{
-	font-size: 14px;
-	line-height: 20px;
-	color: #555555;
-}
-
-.demo-doc #demo-body a.demo {
-	font-size: 14px;
-	line-height: 20px;
-	text-decoration: underline;
-}
+/************************* 语法高亮 ********************/
+/* 全局 */
+.demo-sh, .demo-sh-linenumbers  {	-webkit-border-radius: 4px;	-moz-border-radius: 4px;	border-radius: 4px;}.demo-sh {    border: 1px solid #e1e1e8;	display: block;	margin: 9px 0;	white-space: pre;    background-color: #F5F5F5;	word-break: break-all;}.demo-sh-sourcecode, .demo-sh-textarea {    display: inline-block;    padding: 5px;    margin:  0;    background-color: #F5F5F5;    font: inherit;}.demo-sh-textarea {    resize: none;    overflow: hidden;    border: none;}.demo-sh-linenumbers {    float: left;    margin: 0;    padding: 5px 0 5px 40px;    background-color: #fbfbfc;    border-right: 1px solid #ececf0;    width: 0;}.demo-sh-linenumbers li  {    list-style-type: decimal;    color: #bebec5;    text-shadow: 0 1px 0 #fff;}/* 语法 */.demo-sh-comment {    color: #93a1a1;}.demo-sh-literal {    color: #195f91;}.demo-sh-punctuation, .demo-sh-leftbracket, .demo-sh-rightbracket {    color: #93a1a1;}.demo-sh-function {    color: #dc322f;}.demo-sh-string, .demo-sh-attrvalue {    color: #D14;}.demo-sh-keyword, .demo-sh-tagname {    color: #1e347b;}.demo-sh-type, .demo-sh-attrname, .demo-sh-declaration, .demo-sh-var {    color: teal;}.demo-sh-plain {    color: #48484c;}
 
 /*********************************** 风格 *******************************************/
 
-a.demo {
+/*a.demo {
 	color: #4975BB;	
 }
 
@@ -554,7 +383,7 @@ h2.demo, h3.demo {
 h1.demo small{
 	color: #999;
 	font-weight: normal;
-}
+}*/
 
 /*********************************** 风格 *******************************************/
 
@@ -566,7 +395,7 @@ a.demo:hover {
 	color: #F4C369;
 }
 
-System.demo {
+p.demo {
 	color: #555555;
 }
 
@@ -586,7 +415,6 @@ h4.demo, h5.demo {
 h2.demo, h3.demo {
 	color: #E27B00;
 }
-
 
 /*********************************** 网页 *******************************************/
 
@@ -625,7 +453,7 @@ body {
 	font-family: '隶书';
 }
 
-#demo-header, #demo-sidebar, #demo-footer, #demo-testcases {
+#demo-header, #demo-sidebar, #demo-footer, .demo-control-testcases {
 	font-family: 'Microsoft YaHei';	
 }
 
@@ -699,11 +527,6 @@ body {
 	margin: 0;
 }
 
-.demo-page-current {
-	text-shadow: 0 0 1px #D26000;
-	font-weight: bold;
-}
-
 #demo-body {
 	display: block;
 	width: 750px;
@@ -714,6 +537,15 @@ body {
 
 #demo-main.demo-page-clean {
 	width: auto;	
+}
+
+#demo-footer {
+	border-top: 1px solid #DDDDDD;
+	text-align: center;
+	padding: 10px;
+	clear: both;
+	color: #555555;
+	font-size: 12px;
 }
 
 .demo-page-clean #demo-header, .demo-page-clean #demo-sidebar, .demo-page-clean #demo-footer,
@@ -730,19 +562,118 @@ body {
 	float: none;
 }
 
-#demo-footer {
-	border-top: 1px solid #DDDDDD;
-	text-align: center;
-	padding: 10px;
-	clear: both;
-	color: #555555;
-	font-size: 12px;
-}
-
 .demo-page-loading ~ * {
 	visibility: hidden;
 }
 
 .demo-page-loading .demo-control-toolbar {
 	display: none;	
+}
+
+/*********************************** 功能 *******************************************/
+
+/* 工具条 */
+
+.demo-control-toolbar {
+	float: right;
+	font-size: 12px;
+}
+
+.demo-control-viewsource {
+	margin-bottom: 20px;
+}
+
+.demo-control-viewsource pre.demo {
+	margin-bottom: 30px;
+}
+
+.demo-control-arrow {
+	font-size: 20px;
+	float: left;
+	line-height: 16px;
+}
+
+/* 提示 */
+
+.demo-tip, .demo-tip-error, .demo-tip-warning, .demo-tip-success {
+	padding: 2px 10px;
+	margin: 2px 0;
+	line-height:16px;
+	border: 2px solid transparent;
+	*border: 2px solid #F9F9F9;
+	clear: both;
+}
+
+.demo-tip-error {
+	background:#FBE3E4;
+	color:#8a1f11;
+	border-color:#FBC2C4;
+}
+
+.demo-tip-error a.demo {
+	color:#8a1f11;
+}
+
+.demo-tip-warning{
+	background:#FFF6BF;
+	color:#514721;
+	border-color:#FFD324;
+}
+
+.demo-tip-warning a.demo {
+	color:#514721;
+}
+
+.demo-tip-success {
+	background:#E6EFC2;
+	color:#264409;
+	border-color:#C6D880;
+}
+
+.demo-tip-success a.demo {
+	color:#264409;
+}
+
+.demo-tip .demo-control-toolbar {
+	display: none;
+}
+
+.demo-tip-selected {
+	background: #eee;	
+}
+
+.demo-tip-selected .demo-control-toolbar {
+	display: block;
+}
+
+/* 其它 */
+
+.demo-question input{
+	vertical-align: -3px;
+}
+
+.demo-questions menu {
+	padding-left: 15px;
+	margin: 0;
+}
+
+h2.demo-testcase {
+	border-bottom: 1px solid #DDDDDD;
+	margin: 13px 2px 2px;
+	text-indent: 15px;
+	font-size: 20px;
+}
+
+/*********************************** 文档 *******************************************/
+
+.demo-doc p.demo, .demo-doc li.demo, .demo-doc table.demo, .demo-doc dd.demo, .demo-doc code.demo{
+	font-size: 14px;
+	line-height: 20px;
+	color: #555555;
+}
+
+.demo-doc #demo-body a.demo {
+	font-size: 14px;
+	line-height: 20px;
+	text-decoration: underline;
 }

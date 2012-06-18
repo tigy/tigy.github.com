@@ -138,14 +138,14 @@
             var testcases = {
                 '类': function () {
 
-                    Demo.assert.clearLog();
+                    Demo.assert.reset();
                     var obj = new MyClass1("p1");
                     Demo.assert.logged("1");
 
                     return obj;
                 },
                 '继承': function () {
-                    Demo.assert.clearLog();
+                    Demo.assert.reset();
                     var obj = new MyClass6("p6");
                     Demo.assert.logged("123333");
 
@@ -154,7 +154,7 @@
                 '重载': function () {
                     var obj = new MyClass6("p6");
 
-                    Demo.assert.clearLog();
+                    Demo.assert.reset();
                     obj.a();
                     Demo.assert.logged("456");
 
@@ -164,11 +164,11 @@
 
                     var obj = new MyClass6("p6");
 
-                    Demo.assert.clearLog();
+                    Demo.assert.reset();
                     obj.on("click", function () { });
                     Demo.assert.logged("bind");
 
-                    Demo.assert.clearLog();
+                    Demo.assert.reset();
 
                     obj.un("click");
                     Demo.assert.logged("unbind");

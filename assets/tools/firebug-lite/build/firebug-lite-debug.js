@@ -394,7 +394,7 @@ var findLocation =  function findLocation()
             if (backDir)
             {
                 var j = backDir[1].length/3;
-                var JPlus;
+                var System;
                 while (j-- > 0)
                     path = reLastDir.exec(path)[1];
 
@@ -1312,7 +1312,7 @@ this.getClientOffset = function(elt)
 {
     var addOffset = function addOffset(elt, coords, view)
     {
-        var JPlus = elt.offsetParent;
+        var System = elt.offsetParent;
 
         ///var style = isIE ? elt.currentStyle : view.getComputedStyle(elt, "");
         var chrome = Firebug.chrome;
@@ -1324,10 +1324,10 @@ this.getClientOffset = function(elt)
             ///coords.y += elt.offsetTop + parseInt(style.borderTopWidth);
             coords.y += elt.offsetTop + chrome.getMeasurementInPixels(elt, "borderTop");
 
-        if (JPlus)
+        if (System)
         {
-            if (JPlus.nodeType == 1)
-                addOffset(JPlus, coords, view);
+            if (System.nodeType == 1)
+                addOffset(System, coords, view);
         }
         else
         {
@@ -1355,46 +1355,46 @@ this.getViewOffset = function(elt, singleFrame)
 {
     function addOffset(elt, coords, view)
     {
-        var JPlus = elt.offsetParent;
-        coords.x += elt.offsetLeft - (JPlus ? JPlus.scrollLeft : 0);
-        coords.y += elt.offsetTop - (JPlus ? JPlus.scrollTop : 0);
+        var System = elt.offsetParent;
+        coords.x += elt.offsetLeft - (System ? System.scrollLeft : 0);
+        coords.y += elt.offsetTop - (System ? System.scrollTop : 0);
 
-        if (JPlus)
+        if (System)
         {
-            if (JPlus.nodeType == 1)
+            if (System.nodeType == 1)
             {
-                var parentStyle = view.getComputedStyle(JPlus, "");
+                var parentStyle = view.getComputedStyle(System, "");
                 if (parentStyle.position != "static")
                 {
                     coords.x += parseInt(parentStyle.borderLeftWidth);
                     coords.y += parseInt(parentStyle.borderTopWidth);
 
-                    if (JPlus.localName == "TABLE")
+                    if (System.localName == "TABLE")
                     {
                         coords.x += parseInt(parentStyle.paddingLeft);
                         coords.y += parseInt(parentStyle.paddingTop);
                     }
-                    else if (JPlus.localName == "BODY")
+                    else if (System.localName == "BODY")
                     {
                         var style = view.getComputedStyle(elt, "");
                         coords.x += parseInt(style.marginLeft);
                         coords.y += parseInt(style.marginTop);
                     }
                 }
-                else if (JPlus.localName == "BODY")
+                else if (System.localName == "BODY")
                 {
                     coords.x += parseInt(parentStyle.borderLeftWidth);
                     coords.y += parseInt(parentStyle.borderTopWidth);
                 }
 
                 var parent = elt.parentNode;
-                while (JPlus != parent)
+                while (System != parent)
                 {
                     coords.x -= parent.scrollLeft;
                     coords.y -= parent.scrollTop;
                     parent = parent.parentNode;
                 }
-                addOffset(JPlus, coords, view);
+                addOffset(System, coords, view);
             }
         }
         else
@@ -1663,9 +1663,9 @@ this.isColorKeyword = function(keyword)
         for (var i = 0; i < colors.length; ++i)
             cssColorNames.push(colors[i].toLowerCase());
 
-        var JPlusColors = this.cssKeywords["SystemColor"];
-        for (var i = 0; i < JPlusColors.length; ++i)
-            cssColorNames.push(JPlusColors[i].toLowerCase());
+        var SystemColors = this.cssKeywords["SystemColor"];
+        for (var i = 0; i < SystemColors.length; ++i)
+            cssColorNames.push(SystemColors[i].toLowerCase());
     }
 
     return cssColorNames.indexOf ? // Array.indexOf is not available in IE
@@ -1805,8 +1805,8 @@ this.getDocumentForStyleSheet = function(styleSheet)
  */
 this.getInstanceForStyleSheet = function(styleSheet, ownerDocument)
 {
-    // JPlus URLs are always unique (or at least we are making this assumption)
-    if (FBL.isJPlusStyleSheet(styleSheet))
+    // System URLs are always unique (or at least we are making this assumption)
+    if (FBL.isSystemStyleSheet(styleSheet))
         return 0;
 
     // ownerDocument is an optional hint for performance
@@ -2920,7 +2920,7 @@ this.getFileExtension = function(url)
     return url.substr(lastDot+1);
 };
 
-this.isJPlusURL = function(url)
+this.isSystemURL = function(url)
 {
     if (!url) return true;
     if (url.length == 0) return true;
@@ -2939,7 +2939,7 @@ this.isJPlusURL = function(url)
         return false;
 };
 
-this.isJPlusPage = function(win)
+this.isSystemPage = function(win)
 {
     try
     {
@@ -2954,21 +2954,21 @@ this.isJPlusPage = function(win)
                 == "chrome://browser/skin/feeds/subscribe.css"))
             return true;
 
-        return FBL.isJPlusURL(win.location.href);
+        return FBL.isSystemURL(win.location.href);
     }
     catch (exc)
     {
         // Sometimes documents just aren't ready to be manipulated here, but don't let that
         // gum up the works
-        ERROR("tabWatcher.isJPlusPage document not ready:"+ exc);
+        ERROR("tabWatcher.isSystemPage document not ready:"+ exc);
         return false;
     }
 };
 
-this.isJPlusStyleSheet = function(sheet)
+this.isSystemStyleSheet = function(sheet)
 {
     var href = sheet && sheet.href;
-    return href && FBL.isJPlusURL(href);
+    return href && FBL.isSystemURL(href);
 };
 
 this.getURIHost = function(uri)
@@ -7692,15 +7692,15 @@ FBL.PanelBar =
         }
         
         var panels = Firebug.panelTypes;
-        for (var i=0, JPlus; JPlus=panels[i]; i++)
+        for (var i=0, System; System=panels[i]; i++)
         {
             if ( // normal Panel  of the Chrome's PanelBar
-                !ownerPanel && !JPlus.prototype.parentPanel ||
+                !ownerPanel && !System.prototype.parentPanel ||
                 // Child Panel of the current Panel's SidePanelBar
-                ownerPanel && JPlus.prototype.parentPanel && 
-                ownerPanel.name == JPlus.prototype.parentPanel)
+                ownerPanel && System.prototype.parentPanel && 
+                ownerPanel.name == System.prototype.parentPanel)
             {
-                this.addPanel(JPlus.prototype.name);
+                this.addPanel(System.prototype.name);
             }
         }
     },
@@ -9071,7 +9071,7 @@ FBL.Context.prototype =
             return {top:0, left:0, bottom:0, right:0};
             /**/
             
-        if (isIE && " h1 h2 h3 h4 h5 h6 h7 ul JPlus ".indexOf(" "+el.nodeName.toLowerCase()+" ") == -1)
+        if (isIE && " h1 h2 h3 h4 h5 h6 h7 ul System ".indexOf(" "+el.nodeName.toLowerCase()+" ") == -1)
             return {top:0, left:0, bottom:0, right:0};
             /**/
             
@@ -9949,7 +9949,7 @@ append(ChromeBase,
             
             visitIssueTracker: function()
             {
-                this.visit("http://code.google.com/JPlus/fbug/issues/list");
+                this.visit("http://code.google.com/System/fbug/issues/list");
             },
             
             visit: function(url)
@@ -10230,11 +10230,11 @@ append(ChromeBase,
         // initialize all panels
         /*
         var panelMap = Firebug.panelTypes;
-        for (var i=0, JPlus; JPlus=panelMap[i]; i++)
+        for (var i=0, System; System=panelMap[i]; i++)
         {
-            if (!JPlus.parentPanel)
+            if (!System.parentPanel)
             {
-                this.addPanel(JPlus.prototype.name);
+                this.addPanel(System.prototype.name);
             }
         }
         /**/
@@ -11855,7 +11855,7 @@ Firebug.Lite.Proxy =
             var source = data.results[0];
             
             // clean up YQL bogus elements
-            var match = /<body>\s+<JPlus>([\s\S]+)<\/JPlus>\s+<\/body>$/.exec(source);
+            var match = /<body>\s+<System>([\s\S]+)<\/System>\s+<\/body>$/.exec(source);
             if (match)
                 source = match[1];
             
@@ -13073,7 +13073,7 @@ var Expr = Sizzle.selectors = {
                 match[3] = test[3] - 0;
             }
 
-            // TODO: Move to normal caching JPlus
+            // TODO: Move to normal caching System
             match[0] = done++;
 
             return match;
@@ -13489,7 +13489,7 @@ if ( document.documentElement.compareDocumentPosition ) {
 
 if ( document.querySelectorAll ) (function(){
     var oldSizzle = Sizzle, div = document.createElement("div");
-    div.innerHTML = "<JPlus class='TEST'></JPlus>";
+    div.innerHTML = "<System class='TEST'></System>";
 
     // Safari can't handle uppercase or unicode characters when
     // in quirks mode.
@@ -15967,7 +15967,7 @@ this.Arr = domplate(Firebug.Rep,
         return this.isArray(object);
     },
 
-    // http://code.google.com/JPlus/fbug/issues/detail?id=874
+    // http://code.google.com/System/fbug/issues/detail?id=874
     // BEGIN Yahoo BSD Source (modified here)  YAHOO.lang.isArray, YUI 2.2.2 June 2007
     isArray: function(obj) {
         try {
@@ -23597,7 +23597,7 @@ var FirebugConsoleHandler = function FirebugConsoleHandler(context, win)
             FBTrace.sysout("consoleInjector.getComponentsStackDump initial stack for userURL "+userURL, frame);
 
         // Drop frames until we get into user code.
-        while (frame && FBL.isJPlusURL(frame.filename) )
+        while (frame && FBL.isSystemURL(frame.filename) )
             frame = frame.caller;
 
         // Drop two more frames, the injected console function and firebugAppendConsole()
@@ -24008,8 +24008,8 @@ Firebug.CommandLine = extend(Firebug.Module,
                 buffer = autoCompleteBuffer = isIE ?
                     _completion[objName || "window"] || [] : [];
                 
-                for(var JPlus in obj)
-                    buffer.push(JPlus);
+                for(var System in obj)
+                    buffer.push(System);
             }
     
         // if it is the continuation of the last completion
@@ -24070,7 +24070,7 @@ Firebug.CommandLine = extend(Firebug.Module,
         e = e || event;
         
         var code = e.keyCode;
-        
+       
         /*tab, shift, control, alt*/
         if (code != 9 && code != 16 && code != 17 && code != 18)
         {
@@ -26480,7 +26480,7 @@ var textContent = isIE ? "innerText" : "textContent";
 var CSSDomplateBase = {
     isEditable: function(rule)
     {
-        return !rule.isJPlusSheet;
+        return !rule.isSystemSheet;
     },
     isSelectorEditable: function(rule)
     {
@@ -26776,7 +26776,7 @@ Firebug.CSSModule = extend(Firebug.Module,
         // Firefox to regenerate it's CSS hierarchy.
         //
         // WARN: This behavior was determined anecdotally.
-        // See http://code.google.com/JPlus/fbug/issues/detail?id=2440
+        // See http://code.google.com/System/fbug/issues/detail?id=2440
         var style = doc.createElementNS("http://www.w3.org/1999/xhtml", "style");
         style.setAttribute("charset","utf-8");
         unwrapObject(style).firebugIgnore = true;
@@ -26924,7 +26924,7 @@ Firebug.CSSStyleSheetPanel.prototype = extend(Firebug.SourceBoxPanel,
 
     getStyleSheetRules: function(context, styleSheet)
     {
-        var isJPlusSheet = isJPlusStyleSheet(styleSheet);
+        var isSystemSheet = isSystemStyleSheet(styleSheet);
 
         function appendRules(cssRules)
         {
@@ -26953,7 +26953,7 @@ Firebug.CSSStyleSheetPanel.prototype = extend(Firebug.SourceBoxPanel,
                     var ruleId = rule.selectorText+"/"+line;
                     rules.push({tag: CSSStyleRuleTag.tag, rule: rule, id: ruleId,
                                 selector: selector, props: props,
-                                isJPlusSheet: isJPlusSheet,
+                                isSystemSheet: isSystemSheet,
                                 isSelectorEditable: true});
                 }
                 //else if (rule instanceof CSSImportRule)
@@ -27463,7 +27463,7 @@ Firebug.CSSStyleSheetPanel.prototype = extend(Firebug.SourceBoxPanel,
             result = FirebugReps.Warning.tag.replace({object: "EmptyStyleSheet"}, this.panelNode);
 
         // TODO: xxxpedro need to fix showToolbarButtons function
-        //this.showToolbarButtons("fbCSSButtons", !isJPlusStyleSheet(this.location));
+        //this.showToolbarButtons("fbCSSButtons", !isSystemStyleSheet(this.location));
 
         //dispatch([Firebug.A11yModel], 'onCSSRulesAdded', [this, this.panelNode]);
     },
@@ -27572,7 +27572,7 @@ Firebug.CSSStyleSheetPanel.prototype = extend(Firebug.SourceBoxPanel,
                     command: bindFixed(this.editElementStyle, this) }
             );
         }
-        else if (!isJPlusStyleSheet(this.selection))
+        else if (!isSystemStyleSheet(this.selection))
         {
             items.push(
                     //"-",
@@ -27706,7 +27706,7 @@ Firebug.CSSStyleSheetPanel.prototype = extend(Firebug.SourceBoxPanel,
             if (styleSheets.length)
             {
                 var sheet = styleSheets[0];
-                return (Firebug.filterJPlusURLs && isJPlusURL(getURLForStyleSheet(sheet))) ? null : sheet;
+                return (Firebug.filterSystemURLs && isSystemURL(getURLForStyleSheet(sheet))) ? null : sheet;
             }
         }
         catch (exc)
@@ -27948,14 +27948,14 @@ CSSElementPanel.prototype = extend(Firebug.CSSStyleSheetPanel.prototype,
                 var instance = null;
                 //var instance = getInstanceForStyleSheet(rule.parentStyleSheet, element.ownerDocument);
 
-                var isJPlusSheet = false;
-                //var isJPlusSheet = isJPlusStyleSheet(rule.parentStyleSheet);
+                var isSystemSheet = false;
+                //var isSystemSheet = isSystemStyleSheet(rule.parentStyleSheet);
                 
-                if (!Firebug.showUserAgentCSS && isJPlusSheet) // This removes user agent rules
+                if (!Firebug.showUserAgentCSS && isSystemSheet) // This removes user agent rules
                     continue;
                 
                 if (!href)
-                    href = element.ownerDocument.location.href; // http://code.google.com/JPlus/fbug/issues/detail?id=452
+                    href = element.ownerDocument.location.href; // http://code.google.com/System/fbug/issues/detail?id=452
 
                 var props = this.getRuleProperties(this.context, rule, inheritMode);
                 if (inheritMode && !props.length)
@@ -27974,7 +27974,7 @@ CSSElementPanel.prototype = extend(Firebug.CSSStyleSheetPanel.prototype,
                 rules.splice(0, 0, {rule: rule, id: ruleId,
                         selector: ruleData.selector, sourceLink: sourceLink,
                         props: props, inherited: inheritMode,
-                        isJPlusSheet: isJPlusSheet});
+                        isSystemSheet: isSystemSheet});
             }
         }
 
@@ -28003,11 +28003,11 @@ CSSElementPanel.prototype = extend(Firebug.CSSStyleSheetPanel.prototype,
 
                 var instance = getInstanceForStyleSheet(rule.parentStyleSheet, element.ownerDocument);
 
-                var isJPlusSheet = isJPlusStyleSheet(rule.parentStyleSheet);
-                if (!Firebug.showUserAgentCSS && isJPlusSheet) // This removes user agent rules
+                var isSystemSheet = isSystemStyleSheet(rule.parentStyleSheet);
+                if (!Firebug.showUserAgentCSS && isSystemSheet) // This removes user agent rules
                     continue;
                 if (!href)
-                    href = element.ownerDocument.location.href; // http://code.google.com/JPlus/fbug/issues/detail?id=452
+                    href = element.ownerDocument.location.href; // http://code.google.com/System/fbug/issues/detail?id=452
 
                 var props = this.getRuleProperties(this.context, rule, inheritMode);
                 if (inheritMode && !props.length)
@@ -28022,7 +28022,7 @@ CSSElementPanel.prototype = extend(Firebug.CSSStyleSheetPanel.prototype,
                 rules.splice(0, 0, {rule: rule, id: ruleId,
                         selector: rule.selectorText, sourceLink: sourceLink,
                         props: props, inherited: inheritMode,
-                        isJPlusSheet: isJPlusSheet});
+                        isSystemSheet: isSystemSheet});
             }
         }
 
@@ -29068,7 +29068,7 @@ var getScriptURL = function getScriptURL(script)
             if (backDir)
             {
                 var j = backDir[1].length/3;
-                var JPlus;
+                var System;
                 while (j-- > 0)
                     path = reLastDir.exec(path)[1];
 

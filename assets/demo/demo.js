@@ -84,6 +84,18 @@ Demo.extend(Demo, {
 
 	},
 
+
+	/**
+ 	 * 将字符串从 utf-8 字符串转义。
+	 * @param {String} s 字符串。
+	 * @return {String} 返回的字符串。
+	 */
+	decodeUTF8: function (s) {
+		return s.replace(/\\u([0-9a-f]{3})([0-9a-f])/gi, function (a, b, c) {
+			return String.fromCharCode((parseInt(b, 16) * 16 + parseInt(c, 16)))
+		})
+	},
+
 	formatHTML: (function () {
 
 		function HtmlFormater() {
@@ -1935,8 +1947,8 @@ Demo.extend(Demo, {
 					sourceAndSpans;
 
 				// 补齐 sh
-				if (!/\bsh\b/.test(className)) {
-					elem.className += ' sh';
+				if (!/\bdemo-sh\b/.test(className)) {
+					elem.className += ' demo-sh';
 				}
 
 				// 确保是 <pre><code></code><pre> 结构。
@@ -1962,7 +1974,7 @@ Demo.extend(Demo, {
 
 				// 自动决定 language 和 lineNumbers
 				if (!language) {
-					language = (className.match(/\bsh-(\w+)(?!\S)/i) || [0, null])[1] || SH.guessLanguage(sourceAndSpans.sourceCode);
+					language = (className.replace(/\bdemo-sh-line\b/, "").match(/\bdemo-sh-(\w+)(?!\S)/i) || [0, null])[1] || SH.guessLanguage(sourceAndSpans.sourceCode);
 				}
 
 				// Apply the appropriate language handler
@@ -1970,11 +1982,11 @@ Demo.extend(Demo, {
 				// modifying the sourceNode in place.
 				recombineTagsAndDecorations(sourceAndSpans, SH.findBrush(language)(sourceAndSpans.sourceCode, 0));
 
-				if (lineNumberStart != undefined ? lineNumberStart !== false : +/\bsh-line?\b/i.test(className)) {
+				if (lineNumberStart != undefined ? lineNumberStart !== false : +/\bdemo-sh-line?\b/i.test(className)) {
 					createLineNumbers(elem, sourceAndSpans.sourceCode, +lineNumberStart);
 				}
 
-				elem.className = 'sh-sourcecode sh-' + language;
+				elem.className = 'demo-sh-sourcecode demo-sh-' + language;
 				elem.ondblclick = handlerDblclick;
 			}
 
@@ -2260,16 +2272,17 @@ Demo.extend(Demo, {
 		}
 
 		function createLineNumbers(elem, sourceCode, lineNumberStart) {
-			var r = ['<li class="sh-linenumber0"></li>'],
+			var space = document.constructor ? '' : '&nbsp;',
+				r = ['<li class="demo-sh-linenumber0">' + space + '</li>'],
 				i = -1,
 				line = 1,
 				ol;
 			while ((i = sourceCode.indexOf('\n', i + 1)) >= 0) {
-				r.push('<li class="sh-linenumber' + (line++ % 10) + '"></li>');
+				r.push('<li class="demo-sh-linenumber' + (line++ % 10) + '">' + space + '</li>');
 			}
 
 			ol = document.createElement('ol');
-			ol.className = 'sh-linenumbers';
+			ol.className = 'demo-sh-linenumbers';
 			ol.innerHTML = r.join('');
 
 			if (!isNaN(lineNumberStart)) ol.start = lineNumberStart;
@@ -2277,14 +2290,14 @@ Demo.extend(Demo, {
 		}
 
 		function handlerDblclick() {
-			var elem = this.parentNode,
+			var elem = this,
 				textarea = document.createElement('textarea');
 
-			textarea.className = 'sh sh-textarea';
+			textarea.className = 'demo-sh-textarea';
 			textarea.value = elem.textContent || elem.innerText;
 			textarea.readOnly = true;
-			textarea.style.width = elem.offsetWidth - 12 + 'px';
-			textarea.style.height = elem.offsetHeight - 12 + 'px';
+			textarea.style.width = elem.offsetWidth + 'px';
+			textarea.style.height = elem.offsetHeight - 10 + 'px';
 
 			textarea.onblur = function () {
 				textarea.parentNode.replaceChild(elem, textarea);
@@ -2454,7 +2467,7 @@ Demo.extend(Demo, {
 					textNode.nodeValue = styledText;
 					var document = textNode.ownerDocument;
 					var span = document.createElement('SPAN');
-					span.className = 'sh-' + decorations[decorationIndex + 1];
+					span.className = 'demo-sh-' + decorations[decorationIndex + 1];
 					var parentNode = textNode.parentNode;
 					parentNode.replaceChild(span, textNode);
 					span.appendChild(textNode);
@@ -2821,35 +2834,34 @@ Demo.extend(Demo, {
 			['punctuation', /^[^\s\w\'\"]+/]
 		]);
 
-		return function (elem, language) {
-			SH.one(elem, language);
-		};
+		return SH.one;
 	})(),
 
 	// 节点访问
 
-	prev: function (node) {
-		do {
-			node = node.previousSibling;
-		} while (node && node.nodeType !== 1);
+	walk: function(node, next, first){
+		node = node[first || next];
+		while(node && node.nodeType !== 1){
+			node = node[next];
+		}
 
 		return node;
+	},
+
+	prev: function (node) {
+		return Demo.walk(node, 'previousSibling');
 	},
 
 	next: function (node) {
-		do {
-			node = node.nextSibling;
-		} while (node && node.nodeType !== 1);
-
-		return node;
+		return Demo.walk(node, 'nextSibling');
 	},
 
 	first: function (node) {
-		return (node = node.firstChild) && Demo.next(node);
+		return Demo.walk(node, 'nextSibling', 'firstChild');
 	},
 
 	last: function (node) {
-		return (node = node.lastChild) && Demo.prev(node);
+		return Demo.walk(node, 'previousSibling', 'previousSibling');
 	},
 
 	byClass: document.getElementsByClassName ? function (className) {
@@ -2867,9 +2879,10 @@ Demo.extend(Demo, {
 		return r;
 	},
 
-	setDisplay: function (elems, newValue) {
+	toggleVisible: function (elems, value) {
+		value = value ? '' : 'none';
 		for (var i = 0; elems[i]; i++) {
-			elems[i].style.display = newValue;
+			elems[i].style.display = value;
 		}
 	},
 
@@ -2893,56 +2906,201 @@ Demo.extend(Demo, {
 	// 页面
 
 	/**
-	 * 初始化页面上的全部源码。
+	 * 高亮页面上的所有源码。
 	 */
-	initSources: function(){
+	highlightAllCodes: function () {
+		var nodes, node;
+
+		// 处理 SCRIPT 标签。
+		nodes = document.getElementsByTagName('SCRIPT');
+		for (var i = 0; node = nodes[i]; i++) {
+
+			if (node.className === 'demo') {
+				node.parentNode.replaceChild(Demo.createCode(node.innerHTML, node.type), node);
+			}
+		}
+
+		// 处理 PRE 标签。
+		nodes = document.getElementsByTagName('PRE');
+		for (var i = 0; node = nodes[i]; i++) {
+
+			if (node.className.indexOf('demo') !== -1) {
+				Demo.syntaxHighlight(node);
+			}
+		}
 
 	},
 
-	toggleSource: function(sourceElem, value){
-		value = value === undefined ? sourceElem.style.display === 'none' : value;
-		sourceElem.style.display = value ? '' : 'none';
+	initControls: function () {
+		for (var nodes = Demo.byClass('demo-doc'), i = 0, j, c; nodes[i]; i++) {
+			c = nodes[i].getElementsByTagName('*');
+			for (j = 0; c[j]; j++) {
+				c[j].className += ' demo';
+			}
+		}
+
+		Demo.highlightAllCodes();
+	},
+
+	createCode: function (sourceCode, type) {
+		sourceCode = sourceCode.replace(/<\\\/script>/g, "</script>");
+		if (type === 'text/html') {
+			sourceCode = Demo.formatHTML(sourceCode);
+			type = 'htm';
+		} else if (!type || type === 'text/javascript' || type === 'text/js') {
+			sourceCode = Demo.formatJS(sourceCode);
+			type = 'js';
+		} else if (type === 'text/css') {
+			type = 'css';
+		} else {
+			type = '';
+		}
+
+		var pre = document.createElement('pre');
+		pre.className = 'demo-sh demo-sh-line demo-sh-' + type;
+		pre.innerText = pre.textContent = sourceCode;
+
+		return pre;
+	},
+
+	initSource: function (node) {
+
+
+		if (node.className.indexOf('demo-control-viewsource-simple') >= 0) {
+			node = node.parentNode.parentNode;
+			var testcase = Demo.globalTestCases[/\d+/.exec(node.id)[0]];
+			var text = [];
+
+			for (var i = 0; i < testcase.data.length; i++) {
+				text.push(testcase.data[i].text);
+			}
+
+			text = text.join('\r\n\r\n');
+
+			code = Demo.createCode(text, 'text/js');
+			node.parentNode.insertBefore(code, node.nextSibling);
+		} else {
+
+			var code = Demo.next(node);
+
+			// 如果跟了一个 <script type="text/html">
+			if (!code || code.type !== 'text/html') {
+				code = Demo.prev(node);
+			}
+			
+			code = Demo.createCode(code.innerHTML, 'text/html');
+			node.appendChild(code);
+		}
+
+		Demo.syntaxHighlight(code);
+
+
+		return code;
+	},
+
+	/**
+	 * 切换单一的一个源码的显示位置。
+	 */
+	expandSource: function (node, value) {
+
+		var code = node.$code;
+		
+		if(!code){
+			node.$code = code = Demo.initSource(node);
+			value = true;
+		}
+
+		value = value === undefined ? code.style.display === 'none' : value;
+		
+		code.style.display = value ? '' : 'none';
+
+		if (node.className.indexOf('demo-control-viewsource-full') >= 0) {
+			Demo.first(node).firstChild.innerHTML = value ? '▾' : '▸';
+		}
+	},
+
+	/**
+	 * 初始化页面上的全部查看源码链接。
+	 */
+	initViewSources: function () {
+
+		// 处理 ASIDE 标签。
+		var nodes = document.getElementsByTagName('ASIDE');
+		for (var i = 0, len = nodes.length; i < len; i++) {
+			var node = nodes[i];
+			if (node.className === 'demo') {
+				var viewSource = document.createElement('div');
+				viewSource.className = 'demo-control-viewsource demo-control-viewsource-full';
+				viewSource.innerHTML = '<a class="demo" href="javascript://查看用于创建上文组件的所有源码" onclick="Demo.expandSource(this.parentNode)"><span class="demo-control-arrow">▸</span>查看源码</a>';
+				node.parentNode.insertBefore(viewSource, node.nextSibling);
+			}
+		}
+	},
+
+	/**
+	 * 初始化页面上的全部源码。
+	 */
+	toggleViewSources: function (value) {
+
+		// 如果目前没有显示查看源码按钮，则先显示。
+		if (Demo.sourceState === undefined) {
+			Demo.initViewSources();
+		}
+
+		value = Demo.sourceState = value === undefined ? !Demo.sourceState : value;
+		Demo.setData('demo_source', value ? 'true' : 'false');
+		Demo.toggleVisible(Demo.byClass('demo-control-viewsource-full'), value);
+
+		var viewSource = document.getElementById('demo-toggleviewsource');
+		if (viewSource)
+			viewSource.innerHTML = value ? '♦ 开发模式' : '♢ 浏览模式';
 	},
 
 	/**
 	 * 切换显示页面上的全部源码。
 	 */
-	toggleSources: function () {
+	expandAllSources: function (value) {
 
-		// 首先初始化全部源码。
-		Demo.initSources();
+		// 如果目前没有显示查看源码按钮，则先显示。
+		if (Demo.sourceState !== true && value !== false) {
+			Demo.toggleViewSources(true);
+		}
 
-		var sources = Demo.byClass('demo-system-source'),
-			allOpened = true;
-
-		for (var i = 0; sources[i]; i++) {
-			if (sources[i].style.display === 'none') {
-				allOpened = false;
-				break;
+		// 获取所有查看源码的按钮。
+		var sources = Demo.byClass('demo-control-viewsource');
+		if (value === undefined) {
+			value = true;
+			for (var i = 0; sources[i]; i++) {
+				if (!sources[i].$code || sources[i].$code.style.display === 'none') {
+					value = false;
+					break;
+				}
 			}
+			value = !value;
 		}
-
-		allOpened = !allOpened;
 
 		for (var i = 0; sources[i]; i++) {
-			Demo.toggleSource(sources[i], allOpened);
+			Demo.expandSource(sources[i], value);
 		}
-	},
 
+		var viewSource = document.getElementById('demo-expandallsources');
+		if (viewSource)
+			viewSource.innerHTML = value ? '－ 折叠源码' : '＋ 展开源码';
+	},
+	
+	/**
+	 * 切换视图。
+	 */
 	toggleView: function (value) {
 		var main = document.getElementById('demo-main');
 		value = value === undefined ? main.className.indexOf('demo-page-clean') >= 0 : value;
 		main.className = value ? main.className.replace('demo-page-clean', '') : (main.className + ' demo-page-clean');
-		Demo.setData('demo_view', value ? 'false' : 'true');
+		Demo.setData('demo_view', value ? 'true' : 'false');
 
 		// 更新
 		main = document.getElementById('demo-toggleview');
 		if (main)
 			main.innerHTML = value ? '❒ 全屏视图' : '❑ 标准视图';
-		//var viewSource = document.createElement('div');
-		//viewSource.className = 'demo-control-viewsource';
-		//viewSource.innerHTML = '<a class="demo" href="javascript://查看用于创建上文组件的所有源码" onclick="Demo.toggleSource(this)"><span class="demo-control-arrow">▸</span>查看源码</a>';
-		//return viewSource;
 	},
 
 	writePage: function (project) {
@@ -2958,7 +3116,7 @@ Demo.extend(Demo, {
 
 		// 载入文件。
 		document.write('<link type="text/css" rel="stylesheet" href="' + root + 'assets/demo/demo.css" />');
-		if (!window.console || !window.console.groupEnd) document.write('<script type="text/javascript" src="' + root + 'assets/tools/firebug-lite/build/firebug-lite.js"></script>');
+		if (!window.console) document.write('<script type="text/javascript" src="' + root + 'assets/tools/firebug-lite/build/firebug-lite.js"></script>');
 		document.write('<script type="text/javascript" src="' + root + project + '"></script>');
 
 		// 载入页面。
@@ -2983,13 +3141,13 @@ Demo.extend(Demo, {
 			<div id="demo-footer"></div>\
 		</div>');
 
-			Demo.forEach('article section header footer nav aside details summary menu'.split(' '), function (tagName) {
+			'article section header footer nav aside details summary menu'.replace(/\w+/g, function (tagName) {
 				document.createElement(tagName);
 			});
 		}
 
 		// 初始化控件。
-	//	Demo.onLoad(Demo.initControls);
+		Demo.onLoad(Demo.initControls);
 
 		// 初始化控件。
 		Demo.onLoad(function () {
@@ -3014,7 +3172,7 @@ Demo.extend(Demo, {
 					var type = Dpl.projects[nav].type;
 					isLib = Demo.isLib = type === 'libs';
 					data = Dpl[type][nav];
-					clazz = ' demo-page-current';
+					clazz = ' demo-current';
 					module = Demo.module = nav;
 				}
 
@@ -3144,7 +3302,7 @@ Demo.extend(Demo, {
 						Demo.category = category;
 						Demo.name = name;
 						currentInfo = isLib ? [tda.summary || name, module + '.' + category + '.' + name, category] : [name, category, category];
-						t.push('<li class="demo-page-current">');
+						t.push('<li class="demo-current">');
 					} else {
 						t.push('<li>');
 					}
@@ -3191,20 +3349,7 @@ Demo.extend(Demo, {
 
 				if (isLib) {
 
-					//var tt = ['♢ 显示源码', '❒ 全屏视图'];
-
-					//if (Demo.getData('demo_source') !== 'false') {
-					//	tt[0] = '♦ 隐藏源码';
-					//	Demo.initViewSource(document);
-					//	Demo.viewSourceState = true;
-					//}
-
-					//if (Demo.getData('demo_view') === 'true') {
-					//	main.className = 'demo-page-clean';
-					//	tt[1] = '❑ 标准视图';
-					//}
-
-					t.push('<div class="demo-control-toolbar"><a href="javascript://显示或隐藏显示源码链接" class="demo" onclick="Demo.toggleViewSource()" id="demo-toggleviewsource">♢ 显示源码</a>&nbsp;&nbsp;&nbsp;<a href="javascript://展开或折叠所有源码" class="demo" onclick="Demo.toggleAllSource()" id="demo-togglesource">+ 全部展开</a>&nbsp;&nbsp;&nbsp;<a href="javascript://显示或外围导航菜单" class="demo" onclick="Demo.toggleView()" id="demo-toggleview">❒ 全屏视图</a></div>');
+					t.push('<div class="demo-control-toolbar"><a href="javascript://切换组件开发和浏览状态。浏览状态下会显示 查看源码 按钮" class="demo" onclick="Demo.toggleViewSources()" id="demo-toggleviewsource">♢ 浏览模式</a>&nbsp;&nbsp;&nbsp;<a href="javascript://展开或折叠所有源码" class="demo" onclick="Demo.expandAllSources()" id="demo-expandallsources">＋ 展开源码</a>&nbsp;&nbsp;&nbsp;<a href="javascript://显示或外围导航菜单" class="demo" onclick="Demo.toggleView()" id="demo-toggleview">❒ 全屏视图</a></div>');
 				}
 
 				// 生成标题
@@ -3217,9 +3362,341 @@ Demo.extend(Demo, {
 			}
 
 
-			Demo.toggleView(Demo.getData('demo_view') === 'false');
+			// 初始化值
+			//----------------------------
+
+			if (Demo.getData('demo_view') === 'false')
+				Demo.toggleView(false);
+
+			if (Demo.getData('demo_source') !== 'false')
+				Demo.toggleViewSources(true);
 
 		});
+	},
+
+	// 测试用例
+
+	createFunction: function ($statements) { 
+		try{
+			return function (assert) {
+				return eval($statements);
+			};
+		}catch(e){
+			return function(){
+				throw e;
+			};
+		}
+	},
+
+	getFunctionSource: function(fn){
+		return Demo.decodeUTF8(fn.toString()).replace(/^function\s*\(.*?\)\s*\{/, "").replace(/\}\s*$/, "");
+	},
+
+	createAssertFn: function(ret){
+		return function(value, assert){
+			return assert.areEqual(value, ret);
+		};
+	},
+
+	TestCase: function (id, name, data) {
+
+		this.name = name;
+		this.data = [];
+
+		switch (typeof data) {
+			case 'string':
+
+				if(data === '-'){
+					data = '';
+				}
+
+				data = data.replace(/~/g, getName);
+				this.data.push({
+					fn: Demo.createFunction(data),
+					text: data
+				});
+				break;
+
+			case 'function':
+				this.data.push({
+					fn: data,
+					text: Demo.getFunctionSource(data)
+				});
+				break;
+
+			case 'object':
+				var key,
+					value,
+					assertFn;
+				for(key in data){
+					value = data[key];
+					key = key.replace(/~/g, getName);
+					
+					switch(typeof value){
+
+						case 'function':
+							assertFn = value;
+							break;
+
+						case 'string':
+
+							if(value === '-'){
+								assertFn = null;
+								break;
+
+								continue;
+							}
+
+						default:
+							assertFn = Demo.createAssertFn(value);
+
+
+					}
+
+					this.data.push({
+						text: key,
+						fn: Demo.createFunction(key),
+						assertFn: assertFn
+					});
+
+				}
+				break;
+
+		}
+		
+		function getName() {
+			return name.replace(/^[$\w]+\.prototype\./, "");
+		}
+
+	},
+	
+	/**
+	 * 输出测试用例。
+	 */
+	writeTestCases: function (testcases, dftOptions) {
+
+		document.write('<div class="demo-control-testcases demo-clear">');
+
+		var globalTestCases = Demo.globalTestCases;
+
+		// 如果第一次使用测试。则写入全部测试和效率。
+		if (!globalTestCases) {
+			Demo.globalTestCases = globalTestCases =  [];
+			document.write('<div class="demo-right demo-small"><a class="demo" href="javascript://按顺序执行全部函数;" onclick="Demo.runTestAll();">全部执行</a> | <a class="demo" href="javascript:;" onclick="Demo.speedTestAll();">全部效率</a></div>');
+		}
+
+		for (var name in testcases) {
+			var id = globalTestCases.length, testcase = testcases[name];
+
+			if (testcase === '-') {
+				document.write('<h2>' + Demo.encodeHTML(name) + '</h2>');
+				continue;
+			}
+			globalTestCases.push(testcase = new Demo.TestCase(id, name, testcase));
+
+			var text = [];
+
+			for (var i = 0; i < testcase.data.length; i++) {
+				text.push(testcase.data[i].text);
+			}
+
+			text = Demo.encodeHTML(text.join('\r\n'));
+
+			document.write(['<div id="demo-testcase-', id, '" class="demo-tip" onmouseover="this.className += \' demo-tip-selected\'" onmouseout="this.className = this.className.replace(\' demo-tip-selected\', \'\');" title="', text, '">\
+						<span class="demo-control-toolbar">\
+							<a class="demo" href="javascript://执行函数" onclick="Demo.runTest(', id, '); return false;">执行</a> | \
+							<a class="demo" href="javascript://测试函数执行的速度" onclick="Demo.speedTest(', id, '); return false;">效率</a> | \
+							<a class="demo demo-control-viewsource demo-control-viewsource-simple" href="javascript://查看函数源码" onclick="Demo.expandSource(this); return false;">查看源码</a>\
+						</span>\
+						<a class="demo" href="javascript://', text, '" onclick="Demo.runTest(', id, '); return false;">', Demo.encodeHTML(name), '</a>\
+						</div>'].join(''));
+
+		}
+
+		document.write('</div>');
+	},
+
+	runTestAll: function () {
+		for (var i = 0, len = Demo.globalTestCases.length; i < len; i++) {
+			Demo.runTest(i);
+		}
+	},
+
+	speedTestAll: function () {
+		for (var i = 0, len = Demo.globalTestCases.length; i < len; i++) {
+			Demo.speedTest(i);
+		}
+	},
+
+	reportError: function (text, e) {
+		console.error(text, " => ", e);
+	},
+
+	runTest: function (id) {
+		var data = Demo.globalTestCases[id],
+			i,
+			value,
+			ret;
+
+		if (console.group)
+			console.group(data.name);
+		else
+			console.info(data.name);
+
+		for (i = 0 ; i < data.data.length; i++) {
+			value = data.data[i];
+
+			Demo.assert.reset();
+
+			try {
+				ret = value.fn.call(window, Demo.assert);
+			} catch (e) {
+				document.getElementById('demo-testcase-' + id).className = 'demo-tip demo-tip-error';
+				Demo.reportError(value.text, e);
+				continue;
+			}
+
+			if (value.assertFn) {
+				try{
+					value.assertFn(ret, Demo.assert);
+				} catch (e) {
+					document.getElementById('demo-testcase-' + id).className = 'demo-tip demo-tip-warning';
+					Demo.reportError(value.text, e);
+					continue;
+				}
+			}
+
+			console.log(value.text, " => ", ret);
+			document.getElementById('demo-testcase-' + id).className = Demo.assert.hasError ? 'demo-tip demo-tip-error' : 'demo-tip demo-tip-success';
+		}
+
+		if(console.groupEnd)
+			console.groupEnd();
+	},
+
+	speedTest: function (id) {
+		var data = Demo.globalTestCases[id],
+			i,
+			arr = data.data;
+
+		if (window.trace) {
+			window.trace.enable = false;
+		}
+
+		var time = 0,
+			currentTime = 0,
+			start = +new Date(),
+			past;
+			
+		try{
+
+			do {
+
+				time += 100;
+
+				currentTime = 100;
+				while (--currentTime > 0) {
+					for (i = 0 ; i < arr.length; i++) {
+						arr[i].fn.call(window, Demo.assert);
+					}
+				}
+
+				past = +new Date() - start;
+
+			} while (past < 200);
+
+		} catch (e) {
+			document.getElementById('demo-testcase-' + id).className = 'demo-tip demo-tip-error';
+			Demo.reportError(value.text, e);
+		}
+
+		console.info('[' + data.name + '] ', past / time, 'ms');
+
+		if (window.trace) {
+			window.trace.enable = true;
+		}
+
+
+
+	},
+
+	assert: function (value) {
+		if (!value) {
+			Demo.assert.hasError = true;
+			if (console.error.apply) {
+				console.error.apply(console, [].slice.call(arguments, 1));
+			} else {
+				console.error([].slice.call(arguments, 1).join('     '));
+			}
+		}
+	}
+
+});
+
+Demo.extend(Demo.assert, {
+
+	/**
+	 * 确认 2 个值是一致的。
+	 */
+	areEqual: (function(){
+		
+		function areEqual(value1, value2) {
+			if (value1 === value2) return true;
+
+			if (value1 && typeof value1 === 'object' && value2 && typeof value2 === 'object') {
+
+				if (value1.length === value2.length && typeof value1.length === 'number') {
+					for (var i = value1.length; i--;) {
+						if (!areEqual(value1[i], value2[i])) return false;
+					}
+
+					return true;
+				}
+
+				for (var i in value1) {
+					if (!areEqual(value1[i], value2[i])) return false;
+				}
+
+				for (var i in value2) {
+					if (!areEqual(value2[i], value1[i])) return false;
+				}
+
+				return true;
+
+			}
+
+			return false;
+		}
+
+		return function (value1, value2) {
+			return Demo.assert(areEqual(value1, value2), "断言失败。应该返回 ", value2, ", 现在返回", value1);
+		};
+		
+	})(),
+
+	isTrue: function (value, msg) {
+		return Demo.assert(value, msg || "断言失败。");
+	},
+
+	isFalse: function (value, msg) {
+		return Demo.assert(!value, msg || "断言失败。");
+	},
+
+	inRangeOf: function (value, left, right) {
+		return Demo.assert(value >= left && value < right, "断言失败。应该在值", left, "和", right, "之间，现在返回", value);
+	},
+
+	log: function (value) {
+		return Demo.assert._log += value;
+	},
+
+	reset: function () {
+		Demo.assert._log = '';
+		Demo.assert.hasError = false;
+	},
+
+	logged: function (value) {
+		return Demo.assert(value === Demo.assert._log, "断言失败。应该输出 ", value, ", 现在是", Demo.assert._log);
 	}
 
 });
@@ -3242,165 +3719,6 @@ Demo.addEvent(window, 'load', function () {
 		// } : function(value){
 		// return value.replace(/^\s+|\s+$/g, "");
 		// },
-
-		initViewSource: function (parentNode) {
-			var nodes = parentNode.getElementsByTagName('aside');
-			for (var i = 0, len = nodes.length; i < len; i++) {
-				var aside = nodes[i];
-				if (aside.className === 'demo') {
-					var n = Demo.getNextElement(aside);
-					if (n && n.tagName === 'SCRIPT' && n.type === 'text/html') {
-						n.className = 'demo';
-						n.processed = true;
-						aside = n;
-					}
-					aside.parentNode.insertBefore(Demo.createViewSource(), aside.nextSibling);
-				}
-			}
-
-			nodes = parentNode.getElementsByTagName('SCRIPT');
-			for (var i = 0, len = nodes.length; i < len; i++) {
-				var script = nodes[i];
-				if (script.className.indexOf('demo') !== -1 && !script.processed) {
-					script.parentNode.insertBefore(Demo.getCode(script.innerHTML, script.type), script.nextSibling);
-				}
-			}
-
-		},
-
-		toggleViewSource: function (targetNode) {
-			if (Demo.viewSourceState === undefined) {
-				Demo.initViewSource(document);
-				Demo.viewSourceState = false;
-			}
-
-			var newValue = Demo.viewSourceState = !Demo.viewSourceState;
-			document.getElementById('demo-toggleviewsource').innerHTML = newValue ? '♦ 隐藏源码' : '♢ 显示源码';
-			Demo.setData('demo_source', newValue ? 'true' : 'false');
-			newValue = newValue ? '' : 'none';
-
-			Demo.setDisplay(Demo.byClass('demo-control-viewsource'), newValue);
-
-			if (Demo.hashTestCases) {
-				Demo.setDisplay(Demo.byClass('demo-control-viewsource2'), newValue);
-			}
-
-		},
-
-		getCode: function (sourceCode, type) {
-			sourceCode = sourceCode.replace(/<\\\/script>/g, "</script>");
-			if (type === 'text/html') {
-				sourceCode = Demo.formatHTML(sourceCode);
-				type = 'html';
-			} else if (!type || type === 'text/javascript' || type === 'text/js') {
-				sourceCode = Demo.formatJS(sourceCode);
-				type = 'js';
-			} else if (type === 'text/css') {
-				type = 'css';
-			} else {
-				type = '';
-			}
-
-			var code = document.createElement('pre');
-			code.className = 'demo';
-			code.innerText = code.textContent = sourceCode;
-			code.ondblclick = function () {
-				Demo.copyCode(code.innerText || code.textContent, type);
-				return false;
-			};
-			code.innerHTML = window.prettyPrintOne && prettyPrintOne(code.innerHTML, type, 1);
-
-			return code;
-		},
-
-		initSource: function (targetNode) {
-			targetNode = targetNode.parentNode;
-			var sourceNode = Demo.getPreviousElement(targetNode);
-			if (sourceNode.className === 'demo') {
-				targetNode.appendChild(Demo.getCode(sourceNode.innerHTML || '', sourceNode.type || 'text/html'));
-			}
-
-		},
-
-		toggleSource: function (targetNode) {
-			var nextNode = Demo.getNextElement(targetNode),
-				newValue;
-
-			if (nextNode) {
-				newValue = nextNode.style.display === 'none';
-				nextNode.style.display = newValue ? '' : 'none';
-			} else {
-				newValue = true;
-				this.initSource(targetNode);
-			}
-
-			targetNode.firstChild.innerHTML = newValue ? '▾' : '▸';
-		},
-
-		toggleAllSource: function (targetNode) {
-			var nodes = Demo.byClass('demo-control-viewsource'),
-				state = [],
-				allClosed = true;
-
-			for (var i = 0, len = nodes.length; i < len; i++) {
-				var pre = Demo.getLastElement(nodes[i]);
-				if (state[i] = pre.tagName !== 'A' && pre.style.display !== 'none') {
-					allClosed = false;
-				}
-
-			}
-
-			for (i = 0; i < len; i++) {
-
-				if (allClosed !== state[i]) {
-					Demo.toggleSource(Demo.getFirstElement(nodes[i]));
-				}
-
-			}
-
-			if (Demo.hashTestCases) {
-				for (var name in testcases) {
-					Demo.viewSource(name);
-				}
-			}
-
-		},
-
-		/**
-		 * 初始化测试用例。
-		 */
-		writeTestCases: function (testcases, dftOptions) {
-			Demo.hashTestCases = true;
-			document.write('<div id="demo-testcases" class="demo-clear">');
-
-			document.write('<div class="demo-right demo-small"><a class="demo" href="javascript://按顺序执行全部函数;" onclick="Demo.runTestAll();">全部测试</a> | <a class="demo" href="javascript:;" onclick="Demo.speedTestAll();">全部效率</a></div>');
-
-			apply.testCases = testcases;
-
-			for (var name in testcases) {
-				var testcase = testcases[name];
-
-				if (testcase === '-') {
-					delete testcases[name];
-					document.write('<h2>' + Demo.encodeHTML(name) + '</h2>');
-					continue;
-				}
-
-				var encodedName = Demo.encodeHTML(name);
-
-				document.write(['<div title="', encodedName, '" id="demo-testcases-', encodedName, '" class="demo-tip" onmouseover="this.className += \' demo-tip-selected\'" onmouseout="this.className = this.className.replace(\' demo-tip-selected\', \'\');">\
-					<span class="demo-control-toolbar">\
-						<a class="demo" href="javascript://执行函数" onclick="Demo.runTestCase(\'', encodedName, '\');">测试</a> | \
-						<a class="demo" href="javascript://测试函数执行的速度" onclick="Demo.speedTest(\'', encodedName, '\');">效率</a> | \
-						<a class="demo" href="javascript://查看函数源码" onclick="Demo.viewSource(\'', encodedName, '\');">查看源码</a>\
-					</span>\
-				    <a class="demo" href="javascript://', typeof testcase === 'object' ? '单元测试: ' + encodedName : Demo.encodeHTML(testcase.toString()), '" onclick="Demo.runTestCase(\'', encodedName, '\')">', encodedName, '</a>\
-				    </div>'].join(''));
-
-			}
-
-			document.write('</div>');
-		},
 
 		/**
 		 * 执行一个单元测试。
@@ -3500,17 +3818,6 @@ Demo.addEvent(window, 'load', function () {
 
 		},
 
-		/**
-		 * 将字符串从 utf-8 字符串转义。
-		 * @param {String} s 字符串。
-		 * @return {String} 返回的字符串。
-		 */
-		decodeUTF8: function (s) {
-			return s.replace(/\\u([0-9a-f]{3})([0-9a-f])/gi, function (a, b, c) {
-				return String.fromCharCode((parseInt(b, 16) * 16 + parseInt(c, 16)))
-			})
-		},
-
 		viewSource: function (name) {
 			var info = apply.testCases[name];
 
@@ -3553,123 +3860,9 @@ Demo.addEvent(window, 'load', function () {
 
 				//  return console.info('[' + name + ']', info);
 			}
-		},
-
-		runTestAll: function () {
-			for (var name in apply.testCases) {
-				this.runTestCase(name);
-			}
-		},
-
-		speedTestAll: function () {
-			for (var name in apply.testCases) {
-				this.speedTest(name);
-			}
-		},
-
-		assert: assert,
-
-		forEach: function (array, fn, bind) {
-			for (var i = 0; i < array.length; i++) {
-				fn.call(bind, array[i], i, array);
-			}
-		},
-
-		initControls: function () {
-			Demo.forEach(Demo.getElementsByClassName('demo-doc'), function (node) {
-				Demo.forEach(node.getElementsByTagName('*'), function (node) {
-					node.className += ' demo';
-				});
-			});
-
-			Demo.Pretty.print();
-		},
-
-	});
-
-	Demo.extend(assert, {
-
-		/**
-		 * 确认 2 个值是一致的。
-		 */
-		areEqual: function (value1, value2) {
-			return assert(areEqual(value1, value2), "断言失败。应该返回 ", value2, ", 现在返回", value1);
-		},
-
-		notEqual: function (value1, value2) {
-			return assert(!areEqual(value1, value2), "断言失败。不应该返回 ", value2);
-		},
-
-		isTrue: function (value, msg) {
-			return assert(value, "断言失败。 ", msg || "");
-		},
-
-		isFalse: function (value, msg) {
-			return assert(!value, "断言失败。", msg || "");
-		},
-
-		inRangeOf: function (value, left, right) {
-			return assert(value >= left && value < right, "断言失败。应该在值", left, "和", right, "之间，现在返回", value);
-		},
-
-		log: function (value) {
-			return assert._log += value;
-		},
-
-		reset: function () {
-			assert.hasError = null;
-		},
-
-		clearLog: function () {
-			assert._log = '';
-		},
-
-		logged: function (value) {
-			return assert(areEqual(value, assert._log), "断言失败。应该输出 ", value, ", 现在是", assert._log);
 		}
 
 	});
-
-	function assert(bValue, msg) {
-		if (!bValue) {
-			assert.hasError = true;
-			if (console.error.apply) {
-				console.error.apply(console, [].slice.call(arguments, 1));
-			} else {
-				console.error([].slice.call(arguments, 1).join('     '));
-			}
-		} else {
-			assert.hasError = false;
-		}
-	}
-
-	function areEqual(value1, value2) {
-		if (value1 === value2) return true;
-
-		if (value1 && typeof value1 === 'object' && value2 && typeof value2 === 'object') {
-
-			if (value1.length === value2.length && typeof value1.length === 'number') {
-				for (var i = value1.length; i--;) {
-					if (!areEqual(value1[i], value2[i])) return false;
-				}
-
-				return true;
-			}
-
-			for (var i in value1) {
-				if (!areEqual(value1[i], value2[i])) return false;
-			}
-
-			for (var i in value2) {
-				if (!areEqual(value2[i], value1[i])) return false;
-			}
-
-			return true;
-
-		}
-
-		return false;
-	}
 
 	function complieTestCase(info, name) {
 		var ret = ['var assert=Demo.assert;'];
@@ -3685,7 +3878,7 @@ Demo.addEvent(window, 'load', function () {
 		var $ret;
 
 		for (var $test in $info) {
-			assert.clearLog();
+			assert.reset();
 
 			var $value = $info[$test];
 

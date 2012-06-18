@@ -1829,7 +1829,7 @@
 			assert(!target || (target.dom && target.dom.style), "Dom.prototype.bringToFront(elem): {elem} 必须为 空或允许使用样式 Dom 对象。", target);
 		
 			var elem = this.dom, 
-				targetZIndex = targetControl&& (parseInt(styleString(target.dom, 'zIndex')) + 1) || (Dom.zIndex ? Dom.zIndex++ : (Dom.zIndex = 10000));
+				targetZIndex = target && (parseInt(styleString(target.dom, 'zIndex')) + 1) || (Dom.zIndex ? Dom.zIndex++ : (Dom.zIndex = 10000));
 		
 			// 如果当前元素的 z-index 未超过目标值，则设置
 			if(!(styleString(elem, 'zIndex') > targetZIndex))

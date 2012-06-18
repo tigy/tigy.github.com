@@ -1241,6 +1241,10 @@ h1.groupHeader {
     display: block;
 }
 
+.logGroup.opened .logGroupBody {
+    _display: block;
+}
+
 /*****************************************************************************************/
 
 .logRow-command > .objectBox-text {
