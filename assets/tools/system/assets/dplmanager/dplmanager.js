@@ -1,8 +1,8 @@
 
 
-var JPlus = JPlus || {};
+var System = System || {};
 
-JPlus.getJSONP = function (path, data, onSuccess) {
+System.getJSONP = function (path, data, onSuccess) {
 	Ajax.getJSONP(Dpl.configs.host + ':' + Dpl.configs.port + '/' + path, data, onSuccess, function(){
 		var r = 'assets/bin/startserver.bat';
 		if(navigator.platform.indexOf("Win") === -1) {
@@ -12,7 +12,7 @@ JPlus.getJSONP = function (path, data, onSuccess) {
 	}, null, 1000);
 };
 
-JPlus.submit = function (path, data) {
+System.submit = function (path, data) {
 	var form = Dom.create('form');
 	form.setAttr('action', Dpl.configs.host + ':' + Dpl.configs.port + '/' + path);
 	form.setAttr('method', 'post');
@@ -25,7 +25,7 @@ JPlus.submit = function (path, data) {
 /**
  * 在网页里显示的跟地址。
  */
-JPlus.rootUrl = '../../../';
+System.rootUrl = '../';
 
 var DplManager = {
 
@@ -239,7 +239,7 @@ var DplManager = {
 		name: 'libs',
 		
 		getUrl: function(module, category, name){
-			return JPlus.rootUrl + (module + '/' + category + '/' + name.replace(/\./g, "/")).toLowerCase() + '.html';
+			return System.rootUrl + (module + '/' + category + '/' + name.replace(/\./g, "/")).toLowerCase() + '.html';
 		},
 		
 		initRow: function(module, category, name){
@@ -268,7 +268,7 @@ var DplManager = {
 					<td><input type="text" class="x-textbox libs-summary" placeholder="(可选)输入组件描述"></td>\
 					<td>'+DplManager.ViewData.getStatusSelect('')+'</td>\
 					<td>'+DplManager.ViewData.getAttrSelect('')+'</td>\
-					<td><button class="x-button x-button-info" onclick="DplManager.LibsView.saveControl(this)">添加</button></td>';
+					<td><button class="x-button" onclick="DplManager.LibsView.saveControl(this)">添加</button> <button class="x-button x-button-info" onclick="DplManager.LibsView.saveControl(this, true)">转到</button></td>';
 		},
 		
 		editRow: function(module, category, name){
@@ -315,7 +315,7 @@ var DplManager = {
 				return;
 			}
 			
-			JPlus.getJSONP(this.server, {
+			System.getJSONP(this.server, {
 				action:'delete',
 				module: info[0],
 				category: info[1],
@@ -326,7 +326,7 @@ var DplManager = {
 		
 		},
 		
-		saveControl: function(anchor){
+		saveControl: function(anchor, go){
 		
 			var me = Dom.get(anchor);
 			var tr = me.parent(1);
@@ -346,10 +346,13 @@ var DplManager = {
 			
 			var me = this;
 			
-			JPlus.getJSONP(this.server, arg, function(){
+			System.getJSONP(this.server, arg, function(){
 				DplManager.ViewData.updateList(me.name, arg.module, arg.category, arg.name, arg.summary, arg.status, arg.attribute);
 				DplManager.reload();
 				DplManager.ViewData.currentTr = 0;
+				if (go) {
+					location.href = DplManager.LibsView.getUrl(arg.module, arg.category, arg.name);;
+				}
 			});
 			
 			
@@ -460,7 +463,7 @@ var DplManager = {
 			var url = Dpl.res[module][category][name].summary;
 			
 			if(url.indexOf(':') === -1){
-				url = 	JPlus.rootUrl + url;
+				url = 	System.rootUrl + url;
 			}
 			
 			return url;
@@ -492,7 +495,7 @@ var DplManager = {
 					<td><input type="text" class="x-textbox res-summary" placeholder="输入资源地址"></td>\
 					<td>'+DplManager.ViewData.getStatusSelect('')+'</td>\
 					<td>'+DplManager.ViewData.getAttrSelect('')+'</td>\
-					<td><button class="x-button x-button-info" onclick="DplManager.ResView.saveControl(this)">添加</button></td>';
+					<td><button class="x-button x-button-info" onclick="DplManager.ResView.saveControl(this)">添加</button> <button class="x-button x-button-info" onclick="DplManager.LibsView.saveControl(this, true)">转到</button></td>';
 		},
 		
 		editRow: function(module, category, name){
@@ -526,7 +529,7 @@ var DplManager = {
 				return;
 			}
 			
-			JPlus.getJSONP(this.server, {
+			System.getJSONP(this.server, {
 				action:'delete',
 				module: info[0],
 				category: info[1],
@@ -537,7 +540,7 @@ var DplManager = {
 		
 		},
 		
-		saveControl: function(anchor){
+		saveControl: function(anchor, go){
 		
 			var me = Dom.get(anchor);
 			var tr = me.parent(1);
@@ -569,7 +572,12 @@ var DplManager = {
 			
 			DplManager.ViewData.updateList(this.name, arg.module, arg.category, arg.name, arg.summary, arg.status, arg.attribute);
 			
-			JPlus.getJSONP(this.server, arg, DplManager.reload);
+			System.getJSONP(this.server, arg, function () {
+				DplManager.reload();
+				if (go) {
+					location.href = DplManager.ResView.getUrl(arg.module, arg.category, arg.name);;
+				}
+			});
 			
 			DplManager.ViewData.currentTr = 0;
 			
