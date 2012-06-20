@@ -370,7 +370,7 @@ Demo.extend(Demo, {
 					if (typeof tempToken !== 'string') {
 						return tempToken;
 					}
-					token = js_beautify(tempToken, {
+					token = Demo.formatJS(tempToken, {
 						indent_size: this.indentSize,
 						indent_char: this.indentCharacter,
 						indent_level: this.indent_level
