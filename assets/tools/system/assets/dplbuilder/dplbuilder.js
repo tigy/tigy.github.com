@@ -69,8 +69,6 @@ var DplBuilder = {
 		<li class="x-tabbable-content" data-name="$bak"><a href="build.html">←返回组件列表</a></li>\
 		</ul>\
 		', BuildFiles);
-		
-		
 		Dom.get('tabbable').setHtml(html);
 		
 		Dom.hashchange(function(){
