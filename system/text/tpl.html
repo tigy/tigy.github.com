@@ -11,9 +11,12 @@
 	<body>
 		<script>
 			
-			
 			var testcases = {
-				'Tpl.parse': '~("{for p in path}{p}{end}", {path: [1,2,3]} => "123"; "{if a}abc{else if b.c}def{end}", {a:0 , b: {c: 4}} => "def")'
+			    'Tpl.parse': {
+			        '~("{for p in path}{p}{end}", {path: [1,2,3]})': "123",
+			        '~("{if a}abc{else if b.c}def{end}", {a:0, b: {c: 4}})': "def",
+			        '~("{var aa = 4}{aa}", {a:0, b: {c: 4}})': "4"
+			    }
 			};
 			
 			Demo.writeTestCases(testcases);

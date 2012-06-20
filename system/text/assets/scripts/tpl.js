@@ -18,7 +18,7 @@
  * 2.3 for: {for a in data} for用来遍历对象或数组。  语句 {for} 必须使用 {end} 关闭。
  * 2.4 eval: eval 后可以跟任何 Javascript 代码。 比如 {eval nativeFn(1)}
  * 2.5 其它数据，将被处理为静态数据。
- * 3 如果需要在模板内输出 { 或 }，使用 {{} 和 {}} 。
+ * 3 如果需要在模板内输出 { 或 }，使用 {{} 和 {}} 。 或者使用 \{ 和 \}
  * 4 特殊变量，模板解析过程中将生成4个特殊变量，这些变量将可以方便操作模板
  * 4.1 $output 模板最后将编译成函数，这个函数返回最后的内容， $output表示这个函数的组成代码。
  * 4.2 $data 表示  Tpl.parse 的第2个参数。
@@ -32,48 +32,47 @@ var Tpl = {
 	encodeJs: function(input){
 		return input.replace(/[\r\n]/g, '\\n').replace(/"/g, '\\"');
 	},
+
+	processStatement: function(text, empty){
+		return 'try{with($data){$tmp=' + text + ';}}catch(e){$tmp=' + empty + '}';
+	},
 	
 	processCommand: function(command, blockStack){
-		var c = command.match(/^(if|for|end|else|eval|var|\$|\W+)(\b[\s\S]*)?$/);
-		if(c) {
-			command = c[2];
-			switch(c[1]) {
-				case "end":
-					return this._blockStack.pop() === "foreach" ? "});" : "}";
-				case 'if':
-					this._blockStack.push('if');
-					assert(command, "Tpl.processCommand(command): 无法处理命令{if " + command + " } (if 命名的格式为 {if condition}");
-					return "try{$tpl_tmp=" + command + ";if(Array.isArray($tpl_tmp))$tpl_tmp=$tpl_tmp.length}catch(e){$tpl_tmp=''}if($tpl_tmp) {";
-				case 'eval':
-					return command;
-				case 'else':
-					return /^\s*if ([\s\S]*)$/.exec(command) ? '} else if(' + RegExp.$1 + ') {' : '} else {';
-				case 'for':
-					if(/^\s*\(/.test(command)) {
-						this._blockStack.push('for');
-						return "for " + command + "{";
-					}
+		var head = (command.match(/^\w+\b/) || [''])[0],
+			text = command.replace(head, "");
+
+		switch(head) {
+			case "end":
+				return blockStack.pop() === true ? "},this);" : "}";
+			case 'if':
+			case 'while':
+				blockStack.push(false);
+				assert(text, "Tpl.processCommand(command): 无法处理命令{" + head + " " + text + " } (" + head + " 命名的格式为 {" + head + " condition}");
+				return Tpl.processStatement(text, "\"\"") + head + "(Object.isArray($tmp)?$tmp.length:$tmp){";
+			case 'for':
+				command = text.split(/\s+in\s+/);
+				if (command.length !== 2) {
+					blockStack.push(false);
+					return "for(" + text.replace(/^\(|\)$/g, "") + "){";
+				}
 					
-					// if(command.indexOf(';') >= 0) {
-						// this._blockStack.push('for');
-						// return "for (" + command + "){";
-					// }
-					
-					this._blockStack.push('foreach');
-					command = command.split(/\s*\bin\b\s*/);
-					assert(command.length === 2 && command[0] && command[1], "Tpl.processCommand(command): 无法处理命令{for " + c[2] + " } (for 命名的格式为 {for var_name in obj}");
-					return 'try{$tpl_tmp=' + command[1] + '}catch(e){$tpl_tmp=null};Object.each($tpl_tmp, function(' + command[0].replace('var ', '') + ', $index, $value){';
-				case 'var':
-					return 'var ' + c[0] + ';';
-				case '$':
-					command = '$' + command;
-					break;
-				default:
-					return '$tpl+="' + this.encodeJs(c[0]) + '";';
-			}
+				blockStack.push(true);
+				assert(command[0] && command[1], "Tpl.processCommand(command): 无法处理命令{for " + text + " } (for 命名的格式为 {for var_name in obj}");
+				return Tpl.processStatement(command[1], "null") + 'Object.each($tmp, function(' + command[0].replace('var ', '') + ', $index, $value){';
+			case 'else':
+				text = text.trim();
+				if (/^if\b/.exec(text)) {
+					blockStack.pop();
+					return '}else ' + Tpl.processCommand(text, blockStack);
+				}
+				return '}else{';
+			case 'var':
+				return command + ';';
+			case 'eval':
+				return text;
+			default:
+				return Tpl.processStatement(command || "\"\"", "\"\"") + 'if($tmp!=undefined){$output+=$tmp;}';
 		}
-			
-		return command ? 'try{$tpl_tmp=' + command + ';if($tpl_tmp!=undefined) $tpl += $tpl_tmp;}catch(e){}' : '';
 	},
 	
 	/**
@@ -83,40 +82,62 @@ var Tpl = {
 	 */
 	compile: function(tpl){
 		
-		var output = 'var $output="",$tpl_tmp;with($data){',
+		var output = 'var $output="",$tmp;',
 			
 			// 块的开始位置。
 			blockStart = -1,
 			
 			// 块的结束位置。
-			blockEnd,
+			blockEnd = 0,
 			
 			blockStack = [];
 		
-		while((blockStart = tpl.indexOf('{', blockStart + 1)) >= 0) {
-			output += '$output+="' + Tpl.encodeJs(tpl.substring(blockEnd + 1, blockStart)) + '";';
-			
+		while ((blockStart = tpl.indexOf('{', blockStart + 1)) >= 0) {
+
+			output += '$output+="' + Tpl.encodeJs(tpl.substring(blockEnd + 1, blockStart)).replace(/\}\}/g, "}") + '";';
+
 			// 从  blockStart 处搜索 }
 			blockEnd = blockStart;
-			
-			// 找到第一个前面不是 \ 的  } 字符。
+
+			// 如果 { 后面是 { , 忽略之。
+			if (tpl.charAt(blockStart + 1) === '{') {
+				blockStart++;
+				continue;
+			}
+
+			// 找到第一个后面不是 } 的  } 字符。
 			do {
 				blockEnd = tpl.indexOf('}', blockEnd + 1);
-			} while(tpl.charAt(blockEnd - 1) === '\\');
-			
-			if(blockEnd == -1) {
+
+				if (tpl.charAt(blockEnd + 1) !== '}') {
+					break;
+				}
+
+				blockEnd++;
+			} while (true);
+
+			if (blockEnd == -1) {
 				blockEnd = blockStart++;
 				assert(false, "Tpl.compile(tpl): {tpl} 出现了未关闭的标签。", tpl);
 			} else {
-				output += Tpl.processCommand(tpl.substring(blockStart + 1, blockStart = blockEnd).trim(), blockStack);
+				output += Tpl.processCommand(tpl.substring(blockStart + 1, blockStart = blockEnd).trim().replace(/\}\}/g, "}"), blockStack);
 			}
+
 		}
 		
-		output += '$output+="' + Tpl.encodeJs(tpl.substring(blockEnd + 1, tpl.length)) + '";}return $output';
+		output += '$output+="' + Tpl.encodeJs(tpl.substring(blockEnd + 1, tpl.length)) + '";return $output';
 
 		assert(blockStack.length === 0, "Tpl.compile(tpl): {tpl} 中 if/for 和 end 数量不匹配。");
 		
-		return new Function("$data", output);
+		try{
+		
+			return new Function("$data", output);
+
+		} catch (e) {
+			trace.error(output + ": " + e.message);
+
+			return Function.from(tpl);
+		}
 	},
 	
 	/**
@@ -126,7 +147,7 @@ var Tpl = {
 	 * @return {String} 处理后的字符串。 
 	 */
 	parse: function(tpl, data) {
-		return (Tpl.cache[tpl] || (Tpl.cache[tpl] = Tpl.compile(tpl)))(data);
+		return (Tpl.cache[tpl] || (Tpl.cache[tpl] = Tpl.compile(tpl))).call(data, data);
 	}
 	
 };
