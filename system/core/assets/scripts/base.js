@@ -2538,7 +2538,7 @@ function imports(namespace) {
 		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
     	isNumber: createAssertFunc(function (value) {
-    		return value && (typeof value === "number" || value instanceof Number);
+    		return typeof value === "number" || value instanceof Number;
     	}, "必须是数字。"),
 
     	/**
@@ -2548,7 +2548,7 @@ function imports(namespace) {
 		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
     	isString: createAssertFunc(function (value) {
-    		return value && (typeof value === "string" || value instanceof String);
+    		return typeof value === "string" || value instanceof String;
     	}, "必须是字符串。"),
 
     	/**
