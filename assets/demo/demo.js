@@ -1951,6 +1951,9 @@ Demo.extend(Demo, {
 					elem.className += ' demo-sh';
 				}
 
+				// 绑定双击事件
+				elem.ondblclick = handlerDblclick;
+
 				// 确保是 <pre><code></code><pre> 结构。
 				if (elem.tagName === 'PRE') {
 
@@ -1987,7 +1990,6 @@ Demo.extend(Demo, {
 				}
 
 				elem.className = 'demo-sh-sourcecode demo-sh-' + language;
-				elem.ondblclick = handlerDblclick;
 			}
 
 		};
@@ -2290,12 +2292,16 @@ Demo.extend(Demo, {
 		}
 
 		function handlerDblclick() {
-			var elem = this,
+			var elem = Demo.last(this),
 				textarea = document.createElement('textarea');
+
+			if (elem.tagName === 'TEXTAREA') {
+				elem.select();
+				return;
+			}
 
 			textarea.className = 'demo-sh-textarea';
 			textarea.value = elem.textContent || elem.innerText;
-			textarea.readOnly = true;
 			textarea.style.width = elem.offsetWidth + 'px';
 			textarea.style.height = elem.offsetHeight - 10 + 'px';
 
@@ -2861,7 +2867,7 @@ Demo.extend(Demo, {
 	},
 
 	last: function (node) {
-		return Demo.walk(node, 'previousSibling', 'previousSibling');
+		return Demo.walk(node, 'previousSibling', 'lastChild');
 	},
 
 	byClass: document.getElementsByClassName ? function (className) {
@@ -2909,24 +2915,35 @@ Demo.extend(Demo, {
 	 * 高亮页面上的所有源码。
 	 */
 	highlightAllCodes: function () {
-		var nodes, node;
+		var nodes, node, i, r = [];
 
 		// 处理 SCRIPT 标签。
 		nodes = document.getElementsByTagName('SCRIPT');
-		for (var i = 0; node = nodes[i]; i++) {
-
+		
+		for (i = 0; node = nodes[i]; i++) {
 			if (node.className === 'demo') {
-				node.parentNode.replaceChild(Demo.createCode(node.innerHTML, node.type), node);
+				r.push(node);
 			}
 		}
 
+		for (i = 0; i < r.length; i++) {
+			node = r[i];
+			node.parentNode.replaceChild(Demo.createCode(node.innerHTML, node.type), node);
+		}
+
+		r.length = 0;
+
 		// 处理 PRE 标签。
 		nodes = document.getElementsByTagName('PRE');
-		for (var i = 0; node = nodes[i]; i++) {
+		for (i = 0; node = nodes[i]; i++) {
 
 			if (node.className.indexOf('demo') !== -1) {
-				Demo.syntaxHighlight(node);
+				r.push(node);
 			}
+		}
+
+		for (i = 0; i < r.length; i++) {
+			Demo.syntaxHighlight(r[i]);
 		}
 
 	},
@@ -3500,7 +3517,7 @@ Demo.extend(Demo, {
 				text.push(testcase.data[i].text);
 			}
 
-			text = Demo.encodeHTML(text.join('\r\n'));
+			text = Demo.encodeHTML(text.join('\r\n').replace(/^\s+/gm, ""));
 
 			document.write(['<div id="demo-testcase-', id, '" class="demo-tip" onmouseover="this.className += \' demo-tip-selected\'" onmouseout="this.className = this.className.replace(\' demo-tip-selected\', \'\');" title="', text, '">\
 						<span class="demo-control-toolbar">\
@@ -3584,7 +3601,7 @@ Demo.extend(Demo, {
 		}
 
 		var time = 0,
-			currentTime = 0,
+			currentTime,
 			start = +new Date(),
 			past;
 			
@@ -3592,9 +3609,9 @@ Demo.extend(Demo, {
 
 			do {
 
-				time += 100;
+				time += 10;
 
-				currentTime = 100;
+				currentTime = 10;
 				while (--currentTime > 0) {
 					for (i = 0 ; i < arr.length; i++) {
 						arr[i].fn.call(window, Demo.assert);
@@ -3603,8 +3620,8 @@ Demo.extend(Demo, {
 
 				past = +new Date() - start;
 
-			} while (past < 200);
-
+			} while (past < 100);
+			
 		} catch (e) {
 			document.getElementById('demo-testcase-' + id).className = 'demo-tip demo-tip-error';
 			Demo.reportError(value.text, e);
@@ -3709,212 +3726,5 @@ Demo.addEvent(window, 'load', function () {
 
 	delete Demo.readyList;
 });
-
-(function () {
-	return;
-	Demo.extend(Demo, {
-
-		// trim: ''.trim ? function(value){
-		// return value.trim();
-		// } : function(value){
-		// return value.replace(/^\s+|\s+$/g, "");
-		// },
-
-		/**
-		 * 执行一个单元测试。
-		 */
-		runTestCase: function ($name) {
-
-			var $info = apply.testCases[$name];
-
-			if ($info) {
-
-				assert.reset();
-
-				var $ret, $displayName, $isTestCase;
-
-				switch (typeof $info) {
-
-					// 字符串: 转函数。
-					case 'string':
-						$displayName = $info.replace(/~/g, $name);
-						$info = function () {
-							return eval($displayName);
-						};
-
-						// fall through
-						// 函数: 直接执行。
-					case 'function':
-						try {
-							$ret = $info();
-						} catch (e) {
-							if ($info) reportError($name, e.message, $displayName || $info.toString());
-							break;
-						}
-
-						console.info('[' + $name + '] ', $displayName || $info.toString(), ' =>', $ret);
-						break;
-
-						// 测试用例: 先处理。
-					case 'object':
-						$isTestCase = true;
-						runTestCase($info, $name);
-				}
-
-				document.getElementById('demo-testcases-' + $name).className = assert.hasError === true ? 'demo-tip demo-tip-error' : !$isTestCase ? 'demo-tip' : assert.hasError === false ? 'demo-tip demo-tip-success' : 'demo-tip demo-tip-warning';
-
-			}
-		},
-
-		speedTest: function (name) {
-			var info = apply.testCases[name];
-
-			if (info) {
-
-				switch (typeof info) {
-
-					// 字符串: 转函数。
-					case 'string':
-						info = new Function(info.replace(/~/g, name));
-						break;
-
-						// 测试用例: 先处理。
-					case 'object':
-						info = complieTestCase(info, name);
-						break;
-				}
-
-				if (window.trace) {
-					window.trace.enable = false;
-				}
-
-				var time = 0,
-					maxTime = 0,
-					base = 100,
-					start = +new Date(),
-					past;
-
-				do {
-
-					maxTime += base;
-
-					while (time++ < maxTime) {
-						info();
-					}
-
-					past = +new Date() - start;
-
-					base *= 2;
-
-				} while (past < 200);
-
-				start = past * 1000 / time;
-				console.info('[' + name + '] ', start, 'ms/k');
-
-				if (window.trace) {
-					window.trace.enable = true;
-				}
-			}
-
-		},
-
-		viewSource: function (name) {
-			var info = apply.testCases[name];
-
-			if (info) {
-
-				switch (typeof info) {
-
-					// 字符串: 转函数。
-					case 'string':
-						info = info.replace(/~/g, name);
-						break;
-
-					case 'object':
-						var ret = []
-						for (var test in info) {
-							ret.push(test.replace(/~/g, name));
-						}
-						info = ret.join(';\r\n\r\n');
-
-						// fall through
-						// 函数: 直接执行。
-					case 'function':
-						info = info.toString();
-						info = Demo.decodeUTF8(info);
-						break;
-
-				}
-
-
-				var div = document.getElementById('demo-testcases-' + Demo.encodeHTML(name));
-
-
-				var nextNode = Demo.getNextElement(div);
-				if (nextNode && nextNode.tagName === 'PRE') {
-					newValue = nextNode.style.display === 'none';
-					nextNode.style.display = newValue ? '' : 'none';
-				} else {
-					div.parentNode.insertBefore(Demo.getCode(info, 'text/js'), div.nextSibling).className += ' demo-control-viewsource2';
-				}
-
-				//  return console.info('[' + name + ']', info);
-			}
-		}
-
-	});
-
-	function complieTestCase(info, name) {
-		var ret = ['var assert=Demo.assert;'];
-
-		for (var test in info) {
-			ret.push(test.replace(/~/g, name));
-		}
-
-		return new Function(ret.join(';\r\n\r\n'));
-	}
-
-	function runTestCase($info, $name) {
-		var $ret;
-
-		for (var $test in $info) {
-			assert.reset();
-
-			var $value = $info[$test];
-
-			$test = $test.replace(/~/g, $name);
-
-			try {
-				$ret = eval($test);
-			} catch (e) {
-				reportError($name, e.message, $test);
-				continue;
-			}
-
-			console.group($name);
-			console.log($test, ' =>', $ret);
-			console.groupEnd($name);
-			//  console.info('[' + $name + '] ', $test, ' =>', $ret);
-			if ($value !== '-') {
-				if (typeof $value !== 'function') {
-					assert.areEqual($ret, $value);
-				} else if (($value = $value.call($ret, $ret, assert)) === false) {
-					assert.hasError = true;
-				} else if ($value === true) {
-					assert.hasError = !!assert.hasError;
-				}
-			}
-
-		}
-	}
-
-	function reportError(name, message, debugInfo) {
-		assert.hasError = true;
-
-		console.error('[' + name + '] ', debugInfo, '=>', message);
-	}
-
-
-})();
 
 Demo.writePage('assets/data/project.js');

@@ -9,7 +9,15 @@
 	</head>
 	<body>
 		
-		<p class="demo">面向对象的机制实现是底层的重要组成部分。</p>
+		<p class="demo">J+ 模拟了一份使用简单、功能完整的类实现方式。</p>
+		
+		<p class="demo">
+            它支持<u>类的创建</u>、<u>继承</u>和<u>多态</u>。同时还模拟了接口、事件概念，让 JavaScript 可以更方便地应用面向对象的思想。
+		</p>
+
+        <p class="demo">
+           通过面向对象的编程思想来完成整个类库是本库的一个特色。
+        </p>
 
         <h3 class="demo">创建一个类</h3>
 		
@@ -17,6 +25,8 @@
 
 		    // 创建一个类。
 		    var MyClass1 = new Class({
+
+                // 类的一个字段。
 		        xtype: "MyClass1",
 
 		        // 构造函数。
@@ -52,7 +62,11 @@
 					console.log("MyClass2->" + args);
 					Demo.assert.log("2");
 				}
-			});
+            });
+
+		</script>
+		
+		<script class="demo">
 			
 			var MyClass3 = MyClass2.extend({
 				xtype: "MyClass3",
@@ -63,7 +77,11 @@
 					console.log("MyClass3->" + args);
 					Demo.assert.log("3");
 				}
-			});
+            });
+
+		</script>
+		
+		<script class="demo">
 			
 			var MyClass4 = MyClass3.extend({
 				
@@ -73,7 +91,11 @@
 					console.log("MyClass4.a->", a);
 					Demo.assert.log("4");
 				}
-			});
+            });
+
+		</script>
+		
+		<script class="demo">
 			
 			var MyClass5 = MyClass4.extend({
 				
@@ -87,7 +109,11 @@
 					Demo.assert.log("5");
 				}
 				
-			});
+            });
+
+		</script>
+		
+		<script class="demo">
 			
 			var MyClass6 = MyClass5.extend({
 				
@@ -99,6 +125,26 @@
 					Demo.assert.log("6");
 				}
             });
+
+		</script>
+
+        <h3 class="demo">接口（扩展类）</h3>
+		
+		<script class="demo">
+
+            // 定义一个接口变量。
+		    var IMyInterface = {
+
+
+		        field: 'value'
+
+            };
+
+            // 让类拥有一个事件的全部函数。
+		    MyClass6.implement(IMyInterface);
+
+		    // 让类拥有一个事件的全部函数，但不覆盖已有的字段。
+		    MyClass5.implementIf(IMyInterface);
 
 		</script>
 
@@ -135,7 +181,7 @@
 
         <script>
 
-            var testcases = {
+            Demo.writeTestCases({
                 '类': function () {
 
                     Demo.assert.reset();
@@ -186,9 +232,7 @@
 
                     return SimpleClass;
                 }
-            };
-
-            Demo.writeTestCases(testcases);
+            });
 
         </script>
 	</body>

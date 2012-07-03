@@ -12,59 +12,57 @@
 		<p>调试用的函数。</p>
 		<script>
 			
-			var testcases = {
+			Demo.writeTestCases({
 			    
-				'Trace': '-',
-				'trace': '~()',
-				'trace.clear': '~()',
-				'trace.api': '~',
-				'trace.dir': '~([])',
-				'trace.inspect': {
-					'~([2,2,3,4])': "[2, 2, 3, 4]",
-					'~({a:"2"})': '-',
-					'~(null)': "null",
-					'~(undefined)': "undefined",
-					'~(true)': "true"
-				},
-				'trace.log': '~("log")',
-				'trace.error': '~("error")',
-				'trace.warn': '~("warn")',
-				'trace.info': '~("info")',
-				'trace.eval': '~(function(){ console.log("debug") })',
-				'trace.time': '~(function(){})',
+			    'Trace': '-',
+			    'trace': '~()',
+			    'trace.clear': '~()',
+			    'trace.api': '~',
+			    'trace.dir': '~([])',
+			    'trace.inspect': {
+			        '~([2,2,3,4])': "[2, 2, 3, 4]",
+			        '~({a:"2"})': '-',
+			        '~(null)': "null",
+			        '~(undefined)': "undefined",
+			        '~(true)': "true"
+			    },
+			    'trace.log': '~("log")',
+			    'trace.error': '~("error")',
+			    'trace.warn': '~("warn")',
+			    'trace.info': '~("info")',
+			    'trace.eval': '~(function(){ console.log("debug") })',
+			    'trace.time': '~(function(){})',
 				
-				'Assert': '-',
-				'assert': 'window.~(true)',
-				//'assert.between': 'window.~(1,-2,5,"sss")',
-				//'assert.instanceOf': '5, "number"',
-				'assert.isArray': 'window.~([])',
-				'assert.isDate': 'window.~(new Date())',
-				'assert.isElement': 'window.~(document.body)',
-				'assert.isFunction': 'window.~(function(){})',
-				'assert.isNode': 'window.~(document)',
-				'assert.isNumber': 'window.~(1)',
-				'assert.isObject': 'window.~({})',
-				'assert.isRegExp': 'window.~(/z/)',
-				'assert.isString': 'window.~("bhnb")',
+			    'Assert': '-',
+			    'assert': 'window.~(true)',
+			    //'assert.between': 'window.~(1,-2,5,"sss")',
+			    //'assert.instanceOf': '5, "number"',
+			    'assert.isArray': 'window.~([])',
+			    'assert.isDate': 'window.~(new Date())',
+			    'assert.isElement': 'window.~(document.body)',
+			    'assert.isFunction': 'window.~(function(){})',
+			    'assert.isNode': 'window.~(document)',
+			    'assert.isNumber': 'window.~(1)',
+			    'assert.isObject': 'window.~({})',
+			    'assert.isRegExp': 'window.~(/z/)',
+			    'assert.isString': 'window.~("bhnb")',
 				
-                'Using': '-',
-                'using': {
-                    '~("JPlus.Core.Base")': function (value, assert) {
-                        assert.isTrue(window.JPlus)
-                    }
-                },
-                'imports': '~("JPlus.Request.Ajax")',
-                'using.checkStatusCode': {
-                    '~(200)': true,
-                    '~(500)': false
-                },
-                'using.loadStyle': '~("../../assets/styles/default.css")',
-                'using.loadScript': '~("../request/assets/scripts/ajax.js")',
-                'using.loadText': '~("debug.html")',
-                'using.rootPath': '~'
-			};
-			
-			Demo.writeTestCases(testcases);
+			    'Using': '-',
+			    'using': {
+			        '~("System.Core.Base")': function (value, assert) {
+			            assert.isTrue(window.JPlus)
+			        }
+			    },
+			    'imports': '~("System.Request.Ajax")',
+			    'using.checkStatusCode': {
+			        '~(200)': true,
+			        '~(500)': false
+			    },
+			    'using.loadStyle': '~("../../assets/styles/default.css")',
+			    'using.loadScript': '~("../request/assets/scripts/ajax.js")',
+			    'using.loadText': '~("debug.html")',
+			    'using.rootPath': '~'
+			});
 			
 		</script>
 	</body>
