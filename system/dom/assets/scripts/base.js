@@ -3286,9 +3286,27 @@
 
 		if (div.onmouseenter !== null) {
 
-			Dom.addEvent('mouseenter mouseleave', {
-				initEvent: function (e) {
-					return this !== e.relatedTarget && !Dom.hasChild(this.dom, e.relatedTarget);
+			var checkMouseEnter = function (e) {
+				return this !== e.relatedTarget && !Dom.hasChild(this.dom, e.relatedTarget);
+			};
+
+			Dom.addEvent('mouseenter', {
+				initEvent: checkMouseEnter,
+				add: function (ctrl, type, fn) {
+					eventObj.add(ctrl, 'mouseover', fn);
+				},
+				remove: function (ctrl, type, fn) {
+					eventObj.remove(ctrl, 'mouseover', fn);
+				}
+			});
+
+			Dom.addEvent('mouseleave', {
+				initEvent: checkMouseEnter,
+				add: function (ctrl, type, fn) {
+					eventObj.add(ctrl, 'mouseout', fn);
+				},
+				remove: function (ctrl, type, fn) {
+					eventObj.remove(ctrl, 'mouseout', fn);
 				}
 			});
 

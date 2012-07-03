@@ -183,6 +183,20 @@ function imports(namespace) {
 		enable: true,
 
 		/**
+		 * 将字符串限定在指定长度内，超出部分用 ... 代替。
+		 * @param {String} value 要处理的字符串。
+		 * @param {Number} length 需要的最大长度。
+		 * @example
+		 * <pre>
+	     * String.ellipsis("1234567", 6); //   "123..."
+	     * String.ellipsis("1234567", 9); //   "1234567"
+	     * </pre>
+		 */
+		ellipsis: function (value, length) {
+			return value.length > length ? value.substr(0, length - 3) + "..." : value;
+		},
+
+		/**
          * 将字符串从 utf-8 字符串转义。
          * @param {String} s 字符串。
          * @return {String} 返回的字符串。
@@ -789,7 +803,7 @@ function imports(namespace) {
 		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
 		isNumber: createAssertFunc(function (value) {
-			return value && (typeof value === "number" || value instanceof Number);
+			return typeof value === "number" || value instanceof Number;
 		}, "必须是数字。"),
 
 		/**
@@ -799,7 +813,7 @@ function imports(namespace) {
 		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
 		isString: createAssertFunc(function (value) {
-			return value && (typeof value === "string" || value instanceof String);
+			return typeof value === "string" || value instanceof String;
 		}, "必须是字符串。"),
 
 		/**
@@ -839,7 +853,7 @@ function imports(namespace) {
 		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
 		isNode: createAssertFunc(function (value) {
-			return value && (typeof value.nodeType === "number" || value.setTimeout);
+			return value ? typeof value.nodeType === "number" || value.setTimeout : value === null;
 		}, "必须是 DOM 节点。"),
 
 		/**
@@ -849,7 +863,7 @@ function imports(namespace) {
 		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
 		isElement: createAssertFunc(function (value) {
-			return value && typeof value.nodeType === "number" && value.style;
+			return value ? typeof value.nodeType === "number" && value.style : value === null;
 		}, "必须是 DOM 元素。"),
 
 		/**

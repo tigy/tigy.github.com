@@ -2588,7 +2588,7 @@ function imports(namespace) {
 		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
     	isNode: createAssertFunc(function (value) {
-    		return value && (typeof value.nodeType === "number" || value.setTimeout);
+    		return value ? typeof value.nodeType === "number" || value.setTimeout : value === null;
     	}, "必须是 DOM 节点。"),
 
     	/**
@@ -2598,7 +2598,7 @@ function imports(namespace) {
 		 * @return {Boolean} 返回 *value* 的等效布尔值。
          */
     	isElement: createAssertFunc(function (value) {
-    		return value && typeof value.nodeType === "number" && value.style;
+    		return value ? typeof value.nodeType === "number" && value.style : value === null;
     	}, "必须是 DOM 元素。"),
 
     	/**
