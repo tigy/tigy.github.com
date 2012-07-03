@@ -747,13 +747,31 @@ function imports(namespace) {
          * @param {Function} fn 函数。
          * @param {Number} times=1000 运行次数。
          */
-		time: function (fn, times) {
-			times = times || 1000;
-			var d = new Date();
-			while (times-- > 0)
-				fn();
-			times = new Date() - d;
-			window.trace("[时间] " + times);
+		time: function (fn) {
+			var time = 0,
+				currentTime,
+				start = +new Date(),
+				past;
+
+			try {
+
+				do {
+
+					time += 10;
+
+					currentTime = 10;
+					while (--currentTime > 0) {
+						fn();
+					}
+
+					past = +new Date() - start;
+
+				} while (past < 100);
+
+			} catch (e) {
+
+			}
+			window.trace("[时间] " + past / time);
 		}
 
 	});

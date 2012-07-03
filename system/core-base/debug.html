@@ -10,6 +10,9 @@
 	<body>
 		
 		<p>调试用的函数。</p>
+
+        <p>普通调试输出，都使用 <code class="demo">trace</code> 来代替 <code class="demo">alert</code> 和 <code class="demo">console.log</code></p>
+
 		<script>
 			
 			Demo.writeTestCases({
@@ -30,7 +33,10 @@
 			    'trace.error': '~("error")',
 			    'trace.warn': '~("warn")',
 			    'trace.info': '~("info")',
-			    'trace.eval': '~(function(){ console.log("debug") })',
+			    'trace.eval': {
+			        '~(function(){ console.log("debug") })': '-',
+			        '~("console.log(\'debug\')")': '-'
+			    },
 			    'trace.time': '~(function(){})',
 				
 			    'Assert': '-',
