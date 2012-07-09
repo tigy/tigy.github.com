@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html id="html">
 <head>
 	<meta charset="UTF-8" />
 	<title>单元测试</title>
@@ -15,7 +15,7 @@
 	<!-- 测试文件   -->
 	<script type="text/javascript" src="unit/traversing.js"></script>
 </head>
-<body>
+<body id="body">
 	<h1 id="qunit-header">核心部分单元测试 - QUnit 测试驱动</h1>
 	<h2 id="qunit-banner"></h2>
 	<div id="qunit-testrunner-toolbar"></div>
@@ -99,7 +99,7 @@
 			<select name="select5" id="select5">
 				<option id="option5a" value="3">1</option>
 				<option id="option5b" value="2">2</option>
-				<option id="option5c" value="1">3</option>
+				<option id="option5c" value="1" data-attr="">3</option>
 			</select>
 
 			<object id="object1" codebase="stupid">

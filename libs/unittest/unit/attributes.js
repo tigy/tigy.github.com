@@ -73,7 +73,7 @@ test("Dom.prototype.getAttr", function() {
 	ok( !!~Dom.get("foo").setAttr("style", "position:absolute;").getAttr("style").indexOf("position"), "Check style setter" );
 
 	// Check value on button element (#1954)
-	var $button = Dom.get("button").insert( "afterEnd", "<button value='foobar'>text</button>");
+	var $button = Dom.get("button").after("<button value='foobar'>text</button>");
 	
 	equal( $button.getAttr("value"), "foobar", "Value retrieval on a button does not return innerHTML" );
 	equal( $button.setAttr("value", "baz").getHtml(), "text", "Setting the value does not change innerHTML" );

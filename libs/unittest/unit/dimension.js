@@ -17,12 +17,12 @@ test("Dom.prototype.getWidth", function() {
 	$div.setStyle("border", "2px solid #fff");
 	equal($div.getWidth(), 30, "Test border specified with pixels");
 
-	Dom.setStyles($div.dom, { display: "", border: "", padding: "" });
+	Object.extend($div.dom.style, { display: "", border: "", padding: "" });
 
-	Dom.setStyles(Dom.get("nothiddendivchild").dom, { width: '20px', padding: "3px", border: "2px solid #fff" });
+	Object.extend(Dom.get("nothiddendivchild").dom.style, { width: '20px', padding: "3px", border: "2px solid #fff" });
 	equal(Dom.get("nothiddendivchild").getWidth(), 20, "Test child width with border and padding");
-	Dom.setStyles(Dom.get("nothiddendiv").dom, { border: "", padding: "", width: "" });
-	Dom.setStyles(Dom.get("nothiddendivchild").dom, { border: "", padding: "", width: "" });
+	Object.extend(Dom.get("nothiddendiv").dom.style, { border: "", padding: "", width: "" });
+	Object.extend(Dom.get("nothiddendivchild").dom.style, { border: "", padding: "", width: "" });
 	
 	$div.dom.style.$display = null;
 });
@@ -45,12 +45,12 @@ test("Dom.prototype.getHeight", function() {
 	$div.setStyle("border", "2px solid #fff");
 	equal($div.getHeight(), 30, "Test border specified with pixels");
 
-	Dom.setStyles($div.dom, { display: "", border: "", padding: "", height: "1px" });
+	Object.extend($div.dom.style, { display: "", border: "", padding: "", height: "1px" });
 
-	Dom.setStyles(Dom.get("nothiddendivchild").dom, { height: '20px', padding: "3px", border: "2px solid #fff" });
+	Object.extend(Dom.get("nothiddendivchild").dom.style, { height: '20px', padding: "3px", border: "2px solid #fff" });
 	equal(Dom.get("nothiddendivchild").getHeight(), 20, "Test child height with border and padding");
-	Dom.setStyles(Dom.get("nothiddendiv").dom, { border: "", padding: "", height: "" });
-	Dom.setStyles(Dom.get("nothiddendivchild").dom, { border: "", padding: "", height: "" });
+	Object.extend(Dom.get("nothiddendiv").dom.style, { border: "", padding: "", height: "" });
+	Object.extend(Dom.get("nothiddendivchild").dom.style, { border: "", padding: "", height: "" });
 
 	$div.dom.style.$display = null;
 });

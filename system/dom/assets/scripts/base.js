@@ -16,7 +16,7 @@
 
 (function(window) {
 	
-	assert(!window.Dom || window.$ != window.Dom.get, "重复引入 System.Dom.Base 模块。");
+	assert(!window.Dom || window.$ !== window.Dom.get, "重复引入 System.Dom.Base 模块。");
 
 	/**
 	 * document 简写。
@@ -243,8 +243,8 @@
 			 * @return this
 			 */
 			concat: function() {
-				for(var args = arguments, i = 0; i < args.length; i++){
-					var value = args[i], j = -1;
+				for (var args = arguments, i = 0, value; i < args.length; i++) {
+					value = args[i], j = -1;
 					if(value){
 						if(typeof value.length !== 'number')
 							value = [value];
@@ -255,6 +255,12 @@
 				}
 	
 				return this;
+			},
+
+			filter: function(expression) {
+				return new DomList(ap.filter.call(this, typeof expression === 'string' ? function(value){
+					return Dom.match(value, expression);
+				} : expression));
 			},
 	
 			on: createEnumerator('on'),
@@ -622,8 +628,10 @@
 					id.nodeType ? 
 						new Dom(id) :
 						id.dom ? 
-							id : 
-							Dom.get(id[0]) : 
+							id :
+							id.document ?
+								new Dom(id) :
+								Dom.get(id[0]) : 
 					null;
 			
 		},
@@ -1359,7 +1367,7 @@
 		
 				var i = this.length;
 				while(i--) {
-					var cls = this[i].prototype;
+					var cls = this[i];
 					if(!copyIf || !cls[func]) {
 		
 						if(!i) {
@@ -1399,7 +1407,7 @@
 					}
 				}
 		
-			}, [DomList, Dom.Document, Dom]);
+			}, [DomList.prototype, document, Dom.prototype]);
 		
 			return this;
 
@@ -1500,17 +1508,6 @@
 				assert(this.target, "Dom.Event.prototype.getTarget(): 当前事件不支持 getTarget 操作");
 				return new Dom(this.target.nodeType === 3 ? this.target.parentNode: this.target);
 			}
-		}),
-
-		/**
-		 * 文档对象。
-		 * @constructor Dom.Document 
-		 * @extends Dom
-		 * @remark 因为 IE6/7 不存在这些对象, 文档对象是对原生 HTMLDocument 对象的补充。 扩展
-		 *        Document 也会扩展 HTMLDocument。
-		 */
-		Document: JPlus.Native(document.constructor || {
-			prototype: document
 		})
 
 	})
@@ -2645,8 +2642,9 @@
 		 */
 		parent: createTreeWalker('parentNode'),
 
-		closest: function(selector){
-			return this.match(selector) ? this : this.parent(selector);
+		closest: function(selector, context) {
+			selector = this.match(selector) ? this : this.parent(selector);
+			return selector && (!context || Dom.get(context).hasChild(selector)) ? selector : null;
 		},
 
 		/**
@@ -2748,7 +2746,7 @@
 		parentAll: createTreeDir('parentNode'),
 
 		siblings: function(args) {
-			return this.prevAll().concat(this.nextAll());
+			return this.prevAll(args).concat(this.nextAll(args));
 		},
 
 		getElements: function(args) {
@@ -2759,12 +2757,10 @@
 		 * 获取当前 Dom 对象的在原节点的位置。
 		 * @return {Number} 位置。从 0 开始。
 		 */
-		index: 'nodeIndex' in div ? function(){
-			return this.dom.nodeIndex;
-		} : function() {
+		index: function(args) {
 			var i = 0, elem = this.dom;
 			while( elem = elem.previousSibling)
-				if(elem.nodeType === 1)
+				if (elem.nodeType === 1 || args === true)
 					i++;
 			return i;
 		},
@@ -3025,7 +3021,7 @@
 			return html;
 		};
 
-		Dom.Document.prototype[key] = function(html) {
+		document[key] = function(html) {
 			return new Dom(this.body)[key](html);
 		};
 
@@ -3043,12 +3039,23 @@
 
 	});
 	
-	/// #region Dom.Document
+	/// #region document
 	
 	/**
-	 * @class Dom.Document
+	 * @class document
 	 */
-	Dom.Document.implement({
+	Object.extend(document, {
+
+		dom: document.documentElement,
+
+		// document 函数。
+		once: Dom.prototype.once,
+
+		dataField: Dom.prototype.dataField,
+
+		getElements: function(args) {
+			return new DomList(this.getElementsByTagName(args || '*'));
+		},
 		
 		/**
 		 * 插入一个HTML 。
@@ -3171,13 +3178,15 @@
 	
 	// 初始化事件对象。
 	Dom.addEvent('$default', eventObj);
-	
+
 	// Dom 函数。
 	Dom.define(Dom, 'dom', 'scrollIntoView focus blur select click submit reset');
-	
-	// Dom.Document 函数。
-	map('on un trigger once dataField', function (name) {
-		Dom.Document.prototype[name] = Dom.prototype[name];
+
+	// document 函数。
+	map('on un trigger', function (name) {
+		document[name] = function(){
+			return Dom.document[name].apply(Dom.document, arguments);
+		};
 	});
 	
 	// DomList 函数。
@@ -3185,7 +3194,7 @@
 	map("shift pop unshift push include indexOf each forEach", function (value) {
 		t[value] = ap[value];
 	});
-	map("filter slice splice reverse unique", function(value) {
+	map("slice splice reverse unique", function(value) {
 		t[value] = function() {
 			return new DomList(ap[value].apply(this, arguments));
 		};
@@ -3194,7 +3203,6 @@
 	// 其它对象。
 	pep = Dom.Event.prototype;
 	Point.format = formatPoint;
-	document.dom = document.documentElement;
 
 	/// #if CompactMode
 

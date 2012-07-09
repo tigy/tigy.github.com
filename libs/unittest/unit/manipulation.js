@@ -73,7 +73,7 @@ test("Dom.prototype.getText", function() {
 
 	//   checks.remove();
 
-	var button = Dom.get("button").insert("afterEnd", "<button value='foobar'>text</button>");
+	var button = Dom.get("button").after("<button value='foobar'>text</button>");
 	equal( button.getText(), "text", "Value retrieval on a button does not return innerHTML" );
 	equal( button.setText("baz").getHtml(), "baz", "Setting the value does not change innerHTML" );
 
@@ -320,7 +320,7 @@ test("Dom.prototype.append", function() {
 
 	QUnit.reset();
 	var radio = document.find("input[type='radio'][name='R1']"),
-		radioNot = Dom.parse("<input type='radio' name='R1' checked='checked'/>").appendTo(radio.parent()).insert("afterEnd", radio);
+		radioNot = Dom.parse("<input type='radio' name='R1' checked='checked'/>").appendTo(radio.parent()).after(radio);
 	radio.trigger('click');
 	radioNot.checked = false;
 	
@@ -498,80 +498,80 @@ test("Dom.prototype.appendTo", function() {
 	QUnit.reset();
 });
 
-test("Dom.prototype.insert('afterBegin', html)", function() {
+test("Dom.prototype.prepend(html)", function() {
 	var defaultText = "Try them out:"
 	var result = Dom.get("first");
-	result.insert( 'afterBegin', "<b>buga</b>");
+	result.prepend("<b>buga</b>");
 	equal( result.getText(), "buga" + defaultText, "Check if text prepending works" );
-	equal( Dom.get("select3").insert( 'afterBegin', "<option value='prependTest'>Prepend Test</option>" ).getAttr("value"), "prependTest", "Prepending html options to select element");
+	equal( Dom.get("select3").prepend("<option value='prependTest'>Prepend Test</option>" ).getAttr("value"), "prependTest", "Prepending html options to select element");
 
 	QUnit.reset();
 	var expected = "Try them out:This link has class=\"blog\": Simon Willison's Weblog";
-	Dom.get("sap").insert('afterBegin', document.getElementById("first"));
+	Dom.get("sap").prepend(document.getElementById("first"));
 	equal( Dom.get("sap").getText().replace(/[\r\n]/g, "").replace("hasclass", "has class"), expected, "Check for prepending of element" );
 
 	QUnit.reset();
 	expected = "YahooThis link has class=\"blog\": Simon Willison's Weblog";
-	Dom.get("sap").insert( 'afterBegin', Dom.get("yahoo") );
+	Dom.get("sap").prepend(Dom.get("yahoo") );
 	equal( Dom.get("sap").getText().replace(/[\r\n]/g, "").replace("hasclass", "has class"), expected, "Check for prepending of Dom.parse object" );
 });
 
-test("Dom.prototype.insert('beforeBegin', html)", function() {
+test("Dom.prototype.before(html)", function() {
 	var expected = "This is a normal link: bugaYahoo";
-	Dom.get("yahoo").insert('beforeBegin', "<b>buga</b>");
+	Dom.get("yahoo").before("<b>buga</b>");
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, ""), expected, "Insert String before" );
 
 	QUnit.reset();
 	expected = "This is a normal link: Try them out:Yahoo";
-	Dom.get("yahoo").insert( 'beforeBegin' , document.getElementById("first"));
+	Dom.get("yahoo").before(document.getElementById("first"));
 	
 	// !Safari
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, "").replace("link:T", "link: T"), expected, "Insert element before" );
 
 	QUnit.reset();
 	expected = "This is a normal link: diveintomarkYahoo";
-	Dom.get("yahoo").insert('beforeBegin', Dom.get("mark"));
+	Dom.get("yahoo").before(Dom.get("mark"));
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, ""), expected, "Insert Dom.parse before" );
 
-	// var set = Dom.parse("<div/>").insert("<span>test</span>", 'beforeBegin');
+	// var set = Dom.parse("<div/>").before("<span>test</span>");
 	// equal( set.nodeName.toLowerCase(), "span", "Insert the element before the disconnected node." );
 });
 
-test("Dom.prototype.insert('afterEnd', html)", function() {
+test("Dom.prototype.after(html)", function() {
 	var expected = "This is a normal link: Yahoobuga";
-	Dom.get("yahoo").insert( 'afterEnd',  "<b>buga</b>" );
+	Dom.get("yahoo").after("<b>buga</b>" );
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, ""), expected, "Insert String after" );
 
 	QUnit.reset();
 	expected = "This is a normal link: YahooTry them out:";
-	Dom.get("yahoo").insert(  'afterEnd',  document.getElementById("first")  );
+	Dom.get("yahoo").after(document.getElementById("first")  );
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, ""), expected, "Insert element after" );
 
 	QUnit.reset();
 	expected = "This is a normal link: Yahoodiveintomark";
-	Dom.get("yahoo").insert( 'afterEnd',  Dom.get("mark"));
+	Dom.get("yahoo").after(Dom.get("mark"));
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, ""), expected, "Insert Dom.parse after" );
 
-	// var set = Dom.parse("<div/>").insert("<span>test</span>"   , 'afterEnd');
+	// var set = Dom.parse("<div/>").after("<span>test</span>");
 	// equal( set.nodeName.toLowerCase(), "span", "Insert the element after the disconnected node." );
 });
 
-test("Dom.prototype.insert('beforeEnd', html)", function() {
+test("Dom.prototype.append(html)", function() {
 	var expected = "This is a normal link: Yahoobuga";
-	Dom.get("yahoo").insert( 'beforeEnd', "<b>buga</b>" );
+	Dom.get("yahoo").append("<b>buga</b>" );
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, ""), expected, "Insert String after" );
 
 	QUnit.reset();
 	expected = "This is a normal link: YahooTry them out:";
-	Dom.get("yahoo").insert(   'beforeEnd', document.getElementById("first")  );
+	Dom.get("yahoo").append(document.getElementById("first")  );
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, ""), expected, "Insert element after" );
 
 	QUnit.reset();
 	expected = "This is a normal link: Yahoodiveintomark";
-	Dom.get("yahoo").insert('beforeEnd', Dom.get("mark"));
+	Dom.get("yahoo").append(Dom.get("mark"));
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, ""), expected, "Insert Dom.parse after" );
 
-	var set = Dom.parse("<div/>").insert('beforeEnd', "<span>test</span>");
+	var set = Dom.parse("<div/>").append(   "<span>test</span>");
 	equal( set.dom.nodeName.toLowerCase(), "span", "Insert the element after the disconnected node." );
 });
 
