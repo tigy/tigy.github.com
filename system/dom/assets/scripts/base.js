@@ -16,7 +16,7 @@
 
 (function(window) {
 	
-	assert(!window.Dom || window.$ != window.Dom.get, "重复引入 JPlus.Dom.Base 模块。");
+	assert(!window.Dom || window.$ != window.Dom.get, "重复引入 System.Dom.Base 模块。");
 
 	/**
 	 * document 简写。
@@ -47,12 +47,6 @@
 		 * @type Object
 		 */
 		map = Object.map,
-
-		/**
-		 * JPlus 简写。
-		 * @type Object
-		 */
-		JPlus = window.JPlus,
 	
 		/**
 		 * 指示当前浏览器是否为标签浏览器。
@@ -261,8 +255,21 @@
 				}
 	
 				return this;
-			}
+			},
 	
+			on: createEnumerator('on'),
+			
+			un: createEnumerator('un'),
+			
+			trigger: function(type, e){
+				for(var i = 0, r = true; i < this.length; i++){
+					if(!new Dom(this[o]).trigger(type, e))
+						r = false;
+				}
+				
+				return r;
+			}
+			
 		}),
 	
 		/**
@@ -1094,9 +1101,9 @@
 			input: function(elem){ return /^(input|select|textarea|button)$/i.test(elem.nodeName); },
 			
 			"nth-child": function(args, oldResult, result){
-				var JPlus = Dom.pseudos;
-				if(JPlus[args]){
-					JPlus[args](null, oldResult, result);	
+				var t = Dom.pseudos;
+				if(t[args]){
+					t[args](null, oldResult, result);	
 				} else if(args = oldResult[args - 1])
 					result.push(args);
 			},
@@ -1241,7 +1248,7 @@
 		 * @param {Element} elem 元素。
 		 * @param {String} type 输入。 一个 type
 		 *            由多个句子用,连接，一个句子由多个词语用+连接，一个词语由两个字组成， 第一个字可以是下列字符之一:
-		 *            m b JPlus t l r b h w 第二个字可以是下列字符之一: x y l t b r
+		 *            m b p t l r b h w 第二个字可以是下列字符之一: x y l t b r
 		 *            b。词语也可以是: outer inner 。
 		 * @return {Number} 计算值。 mx+sx -> 外大小。 mx-sx -> 内大小。
 	 	 * @static
@@ -1384,14 +1391,7 @@
 									break;
 								default:
 									// return this
-									value = function() {
-										var len = this.length, i = -1, target;
-										while(++i < len) {
-											target = new Dom(this[i]);
-											target[func].apply(target, arguments);
-										}
-										return this;
-									};
+									value = createEnumerator(func);
 							}
 						}
 		
@@ -1635,7 +1635,7 @@
 				clean(this.dom);
 			}
 			
-			this.remove();
+			return this.remove();
 		},
 	
 		/**
@@ -1818,26 +1818,6 @@
 			this.dom.style.MozUserSelect = value !== false ? 'none': '';
 			return this;
 		},
-	
-		/**
-		 * 将当前 Dom 对象置于指定 Dom 对象的上层。
-		 * @param {Dom} [target] 如果指定了参 Dom 对象， Dom 对象将位于指定 Dom 对象之上。
-		 * @return this
-		 * @remark 此函数是通过设置 css的 z-index 属性实现的。
-		 */
-		bringToFront: function(target) {
-			assert(!target || (target.dom && target.dom.style), "Dom.prototype.bringToFront(elem): {elem} 必须为 空或允许使用样式 Dom 对象。", target);
-		
-			var elem = this.dom, 
-				targetZIndex = target && (parseInt(styleString(target.dom, 'zIndex')) + 1) || (Dom.zIndex ? Dom.zIndex++ : (Dom.zIndex = 10000));
-		
-			// 如果当前元素的 z-index 未超过目标值，则设置
-			if(!(styleString(elem, 'zIndex') > targetZIndex))
-				elem.style.zIndex = targetZIndex;
-		
-			return this;
-
-		}, 
 		
 		/**
 		 * 设置或删除一个属性值。
@@ -2063,7 +2043,7 @@
 		 * <pre lang="htm" format="none">[ &lt;p class="selected"&gt;Hello&lt;/p&gt;, &lt;p&gt;Hello Again&lt;/p&gt; ]</pre>
 		 */
 		toggleClass: function(className, stateVal) {
-			return (stateVal !== undefined ? !stateVal: this.hasClass(className)) ? this.removeClass(className): this.addClass(className);
+			return this[(stateVal == undefined ? this.hasClass(className) : !stateVal) ? 'removeClass' : 'addClass'](className);
 		},
 	
 		/**
@@ -2146,11 +2126,11 @@
 		 */
 		setSize: function(x, y) {
 			var me = this,
-			JPlus = formatPoint(x, y);
+				p = formatPoint(x, y);
 		
-			if (JPlus.x != null) me.setWidth(JPlus.x - Dom.calc(me.dom, 'bx+px'));
+			if (p.x != null) me.setWidth(p.x - Dom.calc(me.dom, 'bx+px'));
 		
-			if (JPlus.y != null) me.setHeight(JPlus.y - Dom.calc(me.dom, 'by+py'));
+			if (p.y != null) me.setHeight(p.y - Dom.calc(me.dom, 'by+py'));
 		
 			return me;
 		},
@@ -2205,14 +2185,14 @@
 		 */
 		setOffset: function(offsetPoint) {
 		
-			assert(Object.isObject(offsetPoint), "Dom.prototype.setOffset(JPlus): {JPlus} 必须有 'x' 和 'y' 属性。", JPlus);
-			var s = this.dom.style;
+			assert(Object.isObject(offsetPoint), "Dom.prototype.setOffset(offsetPoint): {offsetPoint} 必须有 'x' 和 'y' 属性。", offsetPoint);
+			var style = this.dom.style;
 			
 			if(offsetPoint.y != null)
-				s.top = offsetPoint.y + 'px';
+				style.top = offsetPoint.y + 'px';
 				
 			if(offsetPoint.x != null)
-				s.left = offsetPoint.x + 'px';
+				style.left = offsetPoint.x + 'px';
 			return this;
 		},
 	
@@ -2238,15 +2218,15 @@
 			var me = this,
 				offset = me.getOffset().sub(me.getPosition()),
 				offsetPoint = formatPoint(x, y);
-		
-			if (offsetPoint.y != null) offset.y += offsetPoint.y; 
+
+			if (offsetPoint.y != null) offset.y += offsetPoint.y;
 			else offset.y = null;
-		
-			if (offsetPoint.x != null) offset.x += offsetPoint.x; 
+
+			if (offsetPoint.x != null) offset.x += offsetPoint.x;
 			else offset.x = null;
-		
+
 			Dom.movable(me.dom);
-		
+
 			return me.setOffset(offset);
 		},
 	
@@ -2259,11 +2239,11 @@
 		setScroll: function(x, y) {
 			var elem = this.dom,
 				offsetPoint = formatPoint(x, y);
-		
+
 			if (offsetPoint.x != null) elem.scrollLeft = offsetPoint.x;
 			if (offsetPoint.y != null) elem.scrollTop = offsetPoint.y;
 			return this;
-	
+
 		},
 		
 		/**
@@ -2571,21 +2551,21 @@
 				htmlScroll = doc.getScroll();
 			return new Point(bound.left + htmlScroll.x - html.clientLeft, bound.top + htmlScroll.y - html.clientTop);
 		}: function() {
-			var elem = this.dom, JPlus = new Point(0, 0), t = elem.parentNode;
+			var elem = this.dom, p = new Point(0, 0), t = elem.parentNode;
 		
 			if(styleString(elem, 'position') === 'fixed')
 				return new Point(elem.offsetLeft, elem.offsetTop).add(document.getScroll());
 		
 			while(t && !rBody.test(t.nodeName)) {
-				JPlus.x -= t.scrollLeft;
-				JPlus.y -= t.scrollTop;
+				p.x -= t.scrollLeft;
+				p.y -= t.scrollTop;
 				t = t.parentNode;
 			}
 			t = elem;
 		
 			while(elem && !rBody.test(elem.nodeName)) {
-				JPlus.x += elem.offsetLeft;
-				JPlus.y += elem.offsetTop;
+				p.x += elem.offsetLeft;
+				p.y += elem.offsetTop;
 				if(navigator.isFirefox) {
 					if(styleString(elem, 'MozBoxSizing') !== 'border-box') {
 						add(elem);
@@ -2599,22 +2579,22 @@
 				}
 		
 				if(styleString(elem, 'position') === 'fixed') {
-					JPlus = JPlus.add(document.getScroll());
+					p = p.add(document.getScroll());
 					break;
 				}
 				elem = elem.offsetParent;
 			}
 			if(navigator.isFirefox && styleString(t, 'MozBoxSizing') !== 'border-box') {
-				JPlus.x -= styleNumber(t, 'borderLeftWidth');
-				JPlus.y -= styleNumber(t, 'borderTopWidth');
+				p.x -= styleNumber(t, 'borderLeftWidth');
+				p.y -= styleNumber(t, 'borderTopWidth');
 			}
 		
 			function add(elem) {
-				JPlus.x += styleNumber(elem, 'borderLeftWidth');
-				JPlus.y += styleNumber(elem, 'borderTopWidth');
+				p.x += styleNumber(elem, 'borderLeftWidth');
+				p.y += styleNumber(elem, 'borderTopWidth');
 			}
 		
-			return JPlus;
+			return p;
 
 		},
 	
@@ -2643,6 +2623,14 @@
 	}, 2)
 
 	.implement({
+
+		child: function(args){
+			if (~args >= 0) {
+				return this.last(~args);
+			}
+
+			return this.first(args);
+		},
 		
 		/**
 		 * 获取当前 Dom 对象的父节点对象。
@@ -2656,6 +2644,10 @@
 		 * <pre>Dom.find("span").parent()</pre>
 		 */
 		parent: createTreeWalker('parentNode'),
+
+		closest: function(selector){
+			return this.match(selector) ? this : this.parent(selector);
+		},
 
 		/**
 		 * 获取当前 Dom 对象的第一个子节点对象。
@@ -2747,8 +2739,20 @@
 		 * #####结果:
 		 * <pre lang="htm" format="none">[ &lt;p class="selected"&gt;Hello Again&lt;/p&gt; ]</pre>
 		 */
-		children: function(args){
-			return dir(this.dom.firstChild, 'nextSibling', args);
+		children: createTreeDir('nextSibling', 'firstChild'),
+
+		nextAll: createTreeDir('nextSibling'),
+
+		prevAll: createTreeDir('previousSibling'),
+
+		parentAll: createTreeDir('parentNode'),
+
+		siblings: function(args) {
+			return this.prevAll().concat(this.nextAll());
+		},
+
+		getElements: function(args) {
+			return new DomList(this.dom.getElementsByTagName(args || '*'));
 		},
 		
 		/**
@@ -2778,24 +2782,6 @@
 		 * @param {Number/String/Function/Boolean} [args] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
 		 * @return {NodeList} 返回满足要求的节点的列表。
 		 */
-		getAll: function(direction, args){
-			switch(direction) {
-				case 'child':
-					return new DomList(this.dom.getElementsByTagName(args || '*'));
-				case 'next':
-					direction += 'Sibling';
-					break;
-				case 'prev':
-					direction += 'iousSibling';
-					break;
-				case 'parent':
-					direction += 'Node';
-					break;
-				case 'sibling':
-					return this.getAll('prev').concat(this.getAll('next'));
-			}
-			return dir(this.dom[direction], direction, args);
-		},
 
 		/**
 		 * 搜索所有与指定CSS表达式匹配的第一个元素。
@@ -2811,7 +2797,7 @@
 		 * <pre lang="htm" format="none">[ &lt;span&gt;Hello&lt;/span&gt; ]</pre>
 		 */
 		find: function(selector){
-			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
+			assert.isString(selector, "Dom.prototype.find(selector): selector ~");
 			var elem = this.dom, result;
 			if(elem.nodeType !== 1) {
 				return document.find.call(this, selector)
@@ -2886,112 +2872,6 @@
 			while(( me = me.offsetParent) && !rBody.test(me.nodeName) && styleString(me, "position") === "static");
 			return new Dom(me || getDocument(this.dom).body);
 		},
-	 
-		/**
-		 * 在某个位置插入一个HTML 。
-		 * @param {String} where 插入地点。 
-		 * 
-		 * - **beforeBegin**: 节点外。 
-		 * - **beforeEnd** 节点里。
-		 * - **afterBegin** 节点外。
-		 * - **afterEnd** 节点里。
-		 * 
-		 * @param {String/Node/Dom} html 要插入的内容。
-		 * @return {Dom} 返回插入的新节点对象。
-		 * 向每个匹配的元素内部前置内容。
-		 * @example
-		 * 向所有段落中前置一些HTML标记代码。
-		 * #####HTML:
-		 * <pre lang="htm" format="none">&lt;p&gt;I would like to say: &lt;/p&gt;</pre>
-		 * #####JavaScript:
-		 * <pre>Dom.query("p").insert("afterBegin","&lt;b&gt;Hello&lt;/b&gt;");</pre>
-		 * #####结果:
-		 * <pre lang="htm" format="none">[ &lt;p&gt;&lt;b&gt;Hello&lt;/b&gt;I would like to say: &lt;/p&gt; ]</pre>
-		 */
-		insert: function(where, html) {
-		
-			assert(' afterEnd beforeBegin afterBegin beforeEnd '.indexOf(' ' + where + ' ') >= 0, "Dom.prototype.insert(where, html): {where} 必须是 beforeBegin、beforeEnd、afterBegin 或 afterEnd 。", where);
-		
-			var me = this,
-				parentControl = me,
-				refChild = me;
-				
-			html = Dom.parse(html, me.dom);
-		
-			switch (where) {
-				case "afterEnd":
-					refChild = me.next(true);
-				
-					// 继续。
-				case "beforeBegin":
-					parentControl = me.parent();
-					assert(parentControl, "Dom.prototype.insert(where, html): 节点无父节点时无法执行 insert({where})。", where);
-					break;
-				case "afterBegin":
-					refChild = me.first(true);
-					break;
-				default:
-					refChild = null;
-					break;
-			}
-		
-			parentControl.insertBefore(html, refChild);
-			return html;
-		},
-	
-		/**
-		 * 插入一个HTML 到末尾。
-		 * @param {String/Node/Dom} html 要插入的内容。
-		 * @return {Dom} 返回插入的新节点对象。
-		 */
-		append: function(html) {
-			html = Dom.parse(html, this);
-			this.insertBefore(html, null);
-			return html;
-		},
-		
-		/**
-		 * 将一个节点用另一个节点替换。
-		 * @param {String/Node/Dom} html 用于将匹配元素替换掉的内容。
-		 * @return {Element} 替换之后的新元素。
-		 * 将所有匹配的元素替换成指定的HTML或DOM元素。
-		 * @example
-		 * 把所有的段落标记替换成加粗的标记。
-		 * #####HTML:
-		 * <pre lang="htm" format="none">&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;cruel&lt;/p&gt;&lt;p&gt;World&lt;/p&gt;</pre>
-		 * #####JavaScript:
-		 * <pre>Dom.query("p").replaceWith("&lt;b&gt;Paragraph. &lt;/b&gt;");</pre>
-		 * #####结果:
-		 * <pre lang="htm" format="none">&lt;b&gt;Paragraph. &lt;/b&gt;&lt;b&gt;Paragraph. &lt;/b&gt;&lt;b&gt;Paragraph. &lt;/b&gt;</pre>
-		 *
-		 * 用第一段替换第三段，可以发现他是移动到目标位置来替换，而不是复制一份来替换。
-		 * #####HTML:<pre lang="htm" format="none">
-		 * &lt;div class=&quot;container&quot;&gt;
-		 * &lt;div class=&quot;inner first&quot;&gt;Hello&lt;/div&gt;
-		 * &lt;div class=&quot;inner second&quot;&gt;And&lt;/div&gt;
-		 * &lt;div class=&quot;inner third&quot;&gt;Goodbye&lt;/div&gt;
-		 * &lt;/div&gt;
-		 * </pre>
-		 * #####JavaScript:
-		 * <pre>Dom.find('.third').replaceWith(Dom.find('.first'));</pre>
-		 * #####结果:
-		 * <pre lang="htm" format="none">
-		 * &lt;div class=&quot;container&quot;&gt;
-		 * &lt;div class=&quot;inner second&quot;&gt;And&lt;/div&gt;
-		 * &lt;div class=&quot;inner first&quot;&gt;Hello&lt;/div&gt;
-		 * &lt;/div&gt;
-		 * </pre>
-		 */
-		replaceWith: function(html) {
-			var elem;
-			html = Dom.parse(html, this.dom);
-			if (elem = this.parent()) {
-				elem.insertBefore(html, this);
-				elem.removeChild(this);
-			}
-			
-			return html;
-		},
 	
 		/**
 		 * 创建并返回当前 Dom 对象的副本。
@@ -3022,7 +2902,7 @@
 				cleanClone(elem, clone, cloneEvent, keepId);
 			}
 		
-			return this.constructor === Dom ? new Dom(clone) : new this.constructor(clone);
+			return new this.constructor(clone);
 		}
 	 
 	}, 3)
@@ -3073,6 +2953,95 @@
 	}, 4);
 	
 	/// #endif
+
+	Object.each({
+
+		/**
+		 * 插入一个HTML 到末尾。
+		 * @param {String/Node/Dom} html 要插入的内容。
+		 * @return {Dom} 返回插入的新节点对象。
+		 */
+		append: function(ctrl, node) {
+			ctrl.insertBefore(node, null);
+		},
+
+		prepend: function(ctrl, node) {
+			ctrl.insertBefore(node, ctrl.first(true));
+		},
+
+		before: function(ctrl, node) {
+			ctrl.parent().insertBefore(node, ctrl);
+		},
+
+		after: function(ctrl, node) {
+			ctrl.parent().insertBefore(node, ctrl.next(true));
+		},
+
+		/**
+		 * 将一个节点用另一个节点替换。
+		 * @param {String/Node/Dom} html 用于将匹配元素替换掉的内容。
+		 * @return {Element} 替换之后的新元素。
+		 * 将所有匹配的元素替换成指定的HTML或DOM元素。
+		 * @example
+		 * 把所有的段落标记替换成加粗的标记。
+		 * #####HTML:
+		 * <pre lang="htm" format="none">&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;cruel&lt;/p&gt;&lt;p&gt;World&lt;/p&gt;</pre>
+		 * #####JavaScript:
+		 * <pre>Dom.query("p").replaceWith("&lt;b&gt;Paragraph. &lt;/b&gt;");</pre>
+		 * #####结果:
+		 * <pre lang="htm" format="none">&lt;b&gt;Paragraph. &lt;/b&gt;&lt;b&gt;Paragraph. &lt;/b&gt;&lt;b&gt;Paragraph. &lt;/b&gt;</pre>
+		 *
+		 * 用第一段替换第三段，可以发现他是移动到目标位置来替换，而不是复制一份来替换。
+		 * #####HTML:<pre lang="htm" format="none">
+		 * &lt;div class=&quot;container&quot;&gt;
+		 * &lt;div class=&quot;inner first&quot;&gt;Hello&lt;/div&gt;
+		 * &lt;div class=&quot;inner second&quot;&gt;And&lt;/div&gt;
+		 * &lt;div class=&quot;inner third&quot;&gt;Goodbye&lt;/div&gt;
+		 * &lt;/div&gt;
+		 * </pre>
+		 * #####JavaScript:
+		 * <pre>Dom.find('.third').replaceWith(Dom.find('.first'));</pre>
+		 * #####结果:
+		 * <pre lang="htm" format="none">
+		 * &lt;div class=&quot;container&quot;&gt;
+		 * &lt;div class=&quot;inner second&quot;&gt;And&lt;/div&gt;
+		 * &lt;div class=&quot;inner first&quot;&gt;Hello&lt;/div&gt;
+		 * &lt;/div&gt;
+		 * </pre>
+		 */
+		replaceWith: function(ctrl, node) {
+			var elem;
+			if (elem = ctrl.parent()) {
+				elem.insertBefore(node, ctrl);
+				elem.removeChild(ctrl);
+			}
+
+		}
+
+	}, function(value, key) {
+		Dom.prototype[key] = function(html) {
+			html = Dom.parse(html, this);
+			value(this, html);
+			return html;
+		};
+
+		Dom.Document.prototype[key] = function(html) {
+			return new Dom(this.body)[key](html);
+		};
+
+		DomList.prototype[key] = function(html) {
+			if (typeof html === 'string') {
+				this.invoke(key, [html]);
+			} else {
+				html = Dom.get(html);
+				this.forEach(function(value) {
+					Dom.get(value)[key](html.clone());
+				});
+			}
+			return this;
+		};
+
+	});
 	
 	/// #region Dom.Document
 	
@@ -3080,46 +3049,6 @@
 	 * @class Dom.Document
 	 */
 	Dom.Document.implement({
-		
-		/**
-		 * 获取当前类对应的数据字段。
-		 * @protected override
-		 * @return {Object} 一个可存储数据的对象。
-		 * @remark
-		 * 此函数会在原生节点上创建一个 $data 属性以存储数据。
-		 */
-		dataField: function(){
-			return this.$data;
-		},
-		
-		/**
-		 * 插入一个HTML 。
-		 * @param {String/Dom} html 内容。
-		 * @return {Node} 元素。
-		 * 向每个匹配的元素内部追加内容。
-        <longdesc>这个操作与对指定的元素执行appendChild方法，将它们添加到文档中的情况类似。</longdesc>
-        <params name="content" type="String, Element, Control">
-          要追加到目标中的内容
-        </params>
-        @example
-          向所有段落中追加一些HTML标记。
-          #####HTML:<pre lang="htm" format="none">&lt;p&gt;I would like to say: &lt;/p&gt;</pre>
-          #####JavaScript:<pre>Dom.query("p").append("&lt;b&gt;Hello&lt;/b&gt;");</pre>
-          #####结果:<pre lang="htm" format="none">[ &lt;p&gt;I would like to say: &lt;b&gt;Hello&lt;/b&gt;&lt;/p&gt; ]</pre>
-        
-		 */
-		append: function(html) {
-			return new Dom(this.body).append(html);
-		},
-		
-		/**
-		 * 插入一个HTML 。
-		 * @param {String/Dom} html 内容。
-		 * @return {Element} 元素。
-		 */
-		insert: function(where, html) {
-			return new Dom(this.body).insert(where, html);
-		},
 		
 		/**
 		 * 插入一个HTML 。
@@ -3133,7 +3062,7 @@
 		},
 		
 		find: function(selector){
-			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
+			assert.isString(selector, "Dom.prototype.find(selector): selector ~");
 			var result;
 			try{
 				result = this.querySelector(selector);
@@ -3226,51 +3155,45 @@
 	
 	// 变量初始化。
 
-	// 初始化 tagFix
+	// 初始化 tagFix。
 	tagFix.optgroup = tagFix.option;
 	tagFix.tbody = tagFix.tfoot = tagFix.colgroup = tagFix.caption = tagFix.thead;
 	tagFix.th = tagFix.td;
 
-	// 下列属性应该直接使用。
+	// 初始化 attrFix。
 	map("checked selected disabled value innerHTML textContent className autofocus autoplay async controls hidden loop open required scoped compact nowrap ismap declare noshade multiple noresize defer readOnly tabIndex defaultValue accessKey defaultChecked cellPadding cellSpacing rowSpan colSpan frameBorder maxLength useMap contentEditable", function (value) {
 		attrFix[value.toLowerCase()] = attrFix[value] = value;
 	});
-
-	textFix.INPUT = textFix.SELECT = textFix.TEXTAREA = 'value';
-
-	textFix['#text'] = textFix['#comment'] = 'nodeValue';
-
-	pep = Dom.Event.prototype;
-
-	Dom.define(Dom, 'dom', 'scrollIntoView focus blur select click submit reset');
-	Dom.addEvent('$default', eventObj);
-	t = {};
-	Dom.implement(map('on un trigger', function (name) {
-		t[name] = function () {
-			Dom.document[name].apply(Dom.document, arguments);
-			return this;
-		};
-
-		return Dom.prototype[name];
-	}, {}));
 	
-	t.once = Dom.prototype.once;
-	Dom.Document.implement(t);
-
+	// 初始化 textFix。
+	textFix.INPUT = textFix.SELECT = textFix.TEXTAREA = 'value';
+	textFix['#text'] = textFix['#comment'] = 'nodeValue';
+	
+	// 初始化事件对象。
+	Dom.addEvent('$default', eventObj);
+	
+	// Dom 函数。
+	Dom.define(Dom, 'dom', 'scrollIntoView focus blur select click submit reset');
+	
+	// Dom.Document 函数。
+	map('on un trigger once dataField', function (name) {
+		Dom.Document.prototype[name] = Dom.prototype[name];
+	});
+	
+	// DomList 函数。
 	t = DomList.prototype;
-
 	map("shift pop unshift push include indexOf each forEach", function (value) {
 		t[value] = ap[value];
 	});
-
 	map("filter slice splice reverse unique", function(value) {
 		t[value] = function() {
 			return new DomList(ap[value].apply(this, arguments));
 		};
 	});
-
-	Point.format = formatPoint;
 	
+	// 其它对象。
+	pep = Dom.Event.prototype;
+	Point.format = formatPoint;
 	document.dom = document.documentElement;
 
 	/// #if CompactMode
@@ -3565,8 +3488,6 @@
 
 		Dom: Dom,
 
-		Dom: Dom,
-
 		Point: Point,
 		
 		DomList: DomList
@@ -3590,6 +3511,17 @@
 	function getDocument(elem) {
 		assert(elem && (elem.nodeType || elem.setInterval), 'Dom.getDocument(elem): {elem} 必须是节点。', elem);
 		return elem.ownerDocument || elem.document || elem;
+	}
+	
+	function createEnumerator(func){
+		return  function () {
+			var len = this.length, i = -1, target;
+			while(++i < len) {
+				target = new Dom(this[i]);
+				target[func].apply(target, arguments);
+			}
+			return this;
+		};
 	}
 
 	/**
@@ -3618,22 +3550,26 @@
 			return null;
 		};
 	}
-	
-	function dir(node, next, args){
-			
-		// 如果存在 args 编译为函数。
-		if(args){
-			args = getFilter(args);
+
+	function createTreeDir(next, first) {
+		first = first || next;
+		return function(args) {
+			var node = this.dom[first],
+				r = new DomList;
+
+			// 如果存在 args 编译为函数。
+			if (args) {
+				args = getFilter(args);
+			}
+
+			while (node) {
+				if (args ? args.call(this, node) : node.nodeType === 1)
+					r.push(node);
+				node = node[next];
+			}
+
+			return r;
 		}
-		
-		var r = new DomList;
-		while(node){
-			if(args ? args.call(this, node) : node.nodeType === 1)
-				r.push(node);	
-			node = node[next];
-		}
-		
-		return r;
 	}
 	
 	/**
@@ -3671,7 +3607,7 @@
 			
 		}
 
-		assert.isFunction(args, "Dom.prototype.getAll(direction, args): {args} 必须是一个函数、空、数字或字符串。", args);
+		assert.isFunction(args, "Dom.prototype.xxxAll(args): {args} 必须是一个函数、空、数字或字符串。", args);
 		
 		return args;
 	}
@@ -3884,7 +3820,7 @@
 							
 						// ‘*’ ‘tagName’
 						default:
-							result = result.getAll('child', m[2].replace(rBackslash, ""));
+							result = result.getElements(m[2].replace(rBackslash, ""));
 							break;
 								
 					}
@@ -3895,7 +3831,7 @@
 					
 				// 无法加速，等待第四步进行过滤。
 				} else {
-					result = result.getAll('child');
+					result = result.getElements();
 				}
 			
 			// 解析的第二步: 解析父子关系操作符(比如子节点筛选)
@@ -3908,7 +3844,7 @@
 				
 				switch(m[1]){
 					case ' ':
-						result = result.getAll('child', value);
+						result = result.getElements(value);
 						break;
 						
 					case '>':
@@ -3920,11 +3856,11 @@
 						break;
 						
 					case '~':
-						result = result.getAll('next', value);
+						result = result.nextAll(value);
 						break;
 						
 					case '<':
-						result = result.getAll('parent', value);
+						result = result.parentAll( value);
 						break;
 						
 					default:
@@ -3937,7 +3873,7 @@
 
 			// 解析的第三步: 解析剩余的选择器:获取所有子节点。第四步再一一筛选。
 			} else {
-				result = result.getAll('child');
+				result = result.getElements();
 			}
 			
 			// 解析的第四步: 筛选以上三步返回的结果。

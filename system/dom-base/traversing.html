@@ -50,6 +50,7 @@
 			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o'), abcd = new DomList($('all').dom.getElementsByTagName("div"));
 
 			var testcases = {
+                'CSS 选择器': '-',
 				'Dom.prototype.find' : {
 					'a.find("div")' : b,
 					'a.find(".b")' : b,
@@ -69,6 +70,17 @@
 				'Dom.prototype.match' : {
 					'a.match("div")' : true,
 					'a.match(".b")' : false
+                },
+				'Dom.prototype.closest': {
+				    'b.closest("div")': function(value, assert) {
+				        assert.areEqual(value.dom, b.dom);
+				    }
+				},
+				'关系节点': '-',
+				'Dom.prototype.parent': {
+				    'b.parent()': function(value, assert) {
+				        assert.areEqual(value.dom, a.dom);
+				    }
 				},
 				'Dom.prototype.prev' : {
 					'b.prev()' : null
@@ -77,15 +89,18 @@
 					'b.next()' : function(value, assert) {
 						assert.areEqual(value.dom, d.dom);
 					}
+                },
+				'Dom.prototype.child': {
+				    'b.child(0)': function(value, assert) {
+				        assert.areEqual(value.dom, c.dom);
+                    },
+				    'b.child(-1)': function(value, assert) {
+				        assert.areEqual(value.dom, c.dom);
+				    }
 				},
 				'Dom.prototype.first' : {
 					'b.first()' : function(value, assert) {
 						assert.areEqual(value.dom, c.dom);
-					}
-				},
-				'Dom.prototype.parent' : {
-					'b.parent()' : function(value, assert) {
-						assert.areEqual(value.dom, a.dom);
 					}
 				},
 				'Dom.prototype.last' : {
@@ -93,35 +108,35 @@
 						assert.areEqual(value.dom, c.dom);
 					}
 				},
-                'Dom.prototype.children' : {
-                    'b.children()' : function(value, assert) {
-                        assert.areEqual(1, value.length);
+                'Dom.prototype.parentAll': {
+                    'b.parentAll()': function(value, assert) {
+                        assert.areEqual(value[0], a.dom);
                     }
                 },
-                'Dom.prototype.getAll("child")' : {
-                    'b.getAll("child")' : function(value, assert) {
-                        assert.areEqual(value[0], c.dom);
+                'Dom.prototype.prevAll': {
+                    'b.prevAll()': function(value, assert) {
+                        assert.areEqual(value[0], undefined);
                     }
                 },
-                'Dom.prototype.getAll("sibling")' : {
-                    'b.getAll("sibling")' : function(value, assert) {
+                'Dom.prototype.nextAll': {
+                    'b.nextAll()': function(value, assert) {
                         assert.areEqual(value[0], d.dom);
                     }
                 },
-				'Dom.prototype.getAll("parent")' : {
-					'b.getAll("parent")' : function(value, assert) {
-						assert.areEqual(value[0], a.dom);
-					}
-				},
-				'Dom.prototype.getAll("prev")' : {
-					'b.getAll("prev")' : function(value, assert) {
-						assert.areEqual(value[0], undefined);
-					}
-				},
-				'Dom.prototype.getAll("next")' : {
-					'b.getAll("next")' : function(value, assert) {
-						assert.areEqual(value[0], d.dom);
-					}
+                'Dom.prototype.siblings': {
+                    'b.siblings()': function(value, assert) {
+                        assert.areEqual(value[0], d.dom);
+                    }
+                },
+                'Dom.prototype.children': {
+                    'b.children()': function(value, assert) {
+                        assert.areEqual(1, value.length);
+                    }
+                },
+                'Dom.prototype.getElements': {
+                    'b.getElements()': function(value, assert) {
+                        assert.areEqual(value[0], c.dom);
+                    }
                 }
 			};
 

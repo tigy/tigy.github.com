@@ -65,12 +65,17 @@
 				'Dom': '-',
 				'Dom.get': {
 				    '~(o)': function(value, assert){
-				        assert.isTrue(value.a);
+				        assert.isTrue(value.dom);
+				    }
+                },
+				'Dom.find': {
+				    '~("#o")': function (value, assert) {
+				        assert.areEqual(value.dom, o.dom);
 				    }
 				},
 				'Dom.query': {
-                    '~("#o")': function(value, assert){
-                       assert.isTrue(value[0]);
+				    '~("#o")': function (value, assert) {
+				        assert.areEqual(value[0], o.dom);
                     }
                 },
 				'Dom.create': {
@@ -97,6 +102,11 @@
 				'DomList.prototype.length': {
                     'abcd.length': 4
                 },
+				'DomList.prototype.forEach': {
+				    'abcd.forEach(function(value){ assert.log(value.id)})': function (value, assert) {
+				        assert.logged("abcd");
+				    }
+				},
 				'DomList.prototype.each': {
                     'abcd.each(function(value){ assert.log(value.id)})': function(value, assert){
                        assert.logged("abcd");
