@@ -23,7 +23,7 @@ Request.JSONP = Request.Base.extend({
             script.parentNode.removeChild(script);
             
     		// 删除回调。
-			delete window[me.callback];
+			window[me.callback] = undefined;
             
             me.script = null;
             
@@ -75,7 +75,7 @@ Request.JSONP = Request.Base.extend({
         	me.start(data, me.script);
         
         window[callback] = function(){
-        	delete window[callback];
+        	window[callback] = undefined;
 
         	return me.success.apply(me, arguments);
         };

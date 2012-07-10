@@ -38,30 +38,10 @@
 		<object id="o"></object>
 		
 		<script>
-			
-			
-			//  Element Class
-			
-			
-			Dom.implement({
-				a: function(){return 1;}
-			});
-			
-			Dom.implement({
-				b: function(){return 1;}
-			}, 2);
-			
-			Dom.implement({
-				c: function(){return this;}
-			}, 3);
-			
-			Dom.implement({
-				d: function(){return  new DomList([this]);}
-			}, 3);
 		
 			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o'), abcd = new DomList($('all').dom.getElementsByTagName("div"));
 			
-			var testcases = {
+			Demo.writeTestCases({
 				'Dom': '-',
 				'Dom.get': {
 				    '~(o)': function(value, assert){
@@ -128,7 +108,8 @@
                     'abcd.indexOf(d.dom)': 3,
                     'abcd.indexOf(o.dom)': -1
                 },
-                'DomList 扩展': {
+				'Dom 扩展': {
+				    'extendDom()': '-',
                     'abcd.a()': abcd,
                     'abcd.b()': [1,1,1,1],
                     'abcd.c()': function(value, assert){
@@ -138,9 +119,26 @@
                       assert.areEqual(value, [a.dom, b.dom,c.dom, d.dom]);
                     }
                 }
-			};
-			
-			Demo.writeTestCases(testcases);
+            });
+
+
+			function extendDom() {
+			    Dom.implement({
+			        a: function() { return 1; }
+			    });
+
+			    Dom.implement({
+			        b: function() { return 1; }
+			    }, 2);
+
+			    Dom.implement({
+			        c: function() { return this; }
+			    }, 3);
+
+			    Dom.implement({
+			        d: function() { return new DomList([this]); }
+			    }, 3);
+			}
 
 		</script>
 	</body>

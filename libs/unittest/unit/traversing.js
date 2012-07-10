@@ -68,7 +68,7 @@ test("Dom.prototype.closest()", function() {
 	deepEqual(Dom.find("body").closest("div"), null, "closest(div)");
 	deepEqual(Dom.find("#qunit-fixture").closest("span,#html"), Dom.find("html"), "closest(span,#html)");
 
-	deepEqual(Dom.find("div:nth-child(2)").closest("div:first-child"), null, "closest(div:first-child)");
+	deepEqual(Dom.find("#qunit-fixture div:nth-child(2)").closest("div:first-child"), null, "closest(div:first-child)");
 	deepEqual(Dom.find("div").closest("body:first-child div:last-child"), Dom.find("fx-tests"), "closest(body:first-child div:last-child)");
 
 	// Test .closest() limited by the context
@@ -94,7 +94,7 @@ test("Dom.prototype.siblings()", function() {
 	deepEqual(Dom.query("#sndp").siblings(":has(code)"), q("sap"), "Check for filtered siblings (has code child element)");
 	deepEqual(Dom.query("#sndp").siblings(":has(a)"), q("en", "sap"), "Check for filtered siblings (has anchor child element)");
 	deepEqual(Dom.query("#foo").siblings("form, b"), q("form", "floatTest", "lengthtest", "name-tests", "testForm"), "Check for multiple filters");
-	var set = q("en", "sap", "sndp");
+	var set = navigator.isQuirks ? q("sndp", "sap", "en") :  q("en", "sap", "sndp");
 	deepEqual(Dom.query("#en, #sndp").siblings(), set, "Check for unique results from siblings");
 	deepEqual(Dom.query("#option5a").siblings("option[data-attr]"), q("option5c"), "Has attribute selector in siblings (#9261)");
 	equal(Dom.parse("<a/>").siblings().length, 0, "Detached elements have no siblings (#11370)");

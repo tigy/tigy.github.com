@@ -5,6 +5,7 @@ var functionReturningObj = function(value) { return (function() { return value; 
 
 
 test("Dom.prototype.getAttr", function() {
+	expect(41);
 
 	equal( Dom.get("text1").getAttr("type"), "text", "Check for type attribute" );
 	equal( Dom.get("radio1").getAttr("type"), "radio", "Check for type attribute" );
@@ -89,10 +90,13 @@ test("Dom.prototype.getAttr", function() {
 	equal( $a.getAttr("onclick"), "something()", "Retrieve ^on attribute without anonymous function wrapper." );
 
 	ok( Dom.parse("<div/>").getAttr("doesntexist") === null, "Make sure null is returned when no attribute is found." );
-	ok( Dom.parse("<div/>").getAttr("title") === null, "Make sure null is returned when no attribute is found." );
+	ok(Dom.parse("<div/>").getAttr("title") === null, "Make sure null is returned when no attribute is found.");
 	equal( Dom.parse("<div/>").setAttr("title", "something").getAttr("title"), "something", "Set the title attribute." );
 	equal( Dom.parse("<div/>").getAttr("value"), null, "An unset value on a div returns undefined." );
-	equal( Dom.parse("<input/>").getAttr("value"), "", "An unset value on an input returns current value." );
+	equal(Dom.parse("<input/>").getAttr("value"), "", "An unset value on an input returns current value.");
+
+	$form = Dom.find("#form").setAttr("enctype", "multipart/form-data");
+	equal($form.getAttr("enctype"), "multipart/form-data", "Set the enctype of a form (encoding in IE6/7 #6743)");
 });
 
 test("Dom.prototype.setAttr", function() {

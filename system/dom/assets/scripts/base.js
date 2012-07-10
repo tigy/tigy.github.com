@@ -1000,7 +1000,7 @@
 			fix = elem.getAttributeNode(name);
 
 			// 如果不存在节点， name 为 null ，如果不存在节点值， 返回 null。
-			return fix && (fix.value || null);
+			return fix ? fix.value || (fix.specified ? "" : null) : null;
 
 		},
 		
@@ -3769,9 +3769,8 @@
 		try{
 			r = dom.parentNode.querySelectorAll(selector);
 		} catch(e){
-			r = query(selector, new Dom(dom.parentNode));
+			return query(selector, new Dom(dom.parentNode)).indexOf(dom) >= 0 || query(selector, Dom.document).indexOf(dom) >= 0;
 		}
-		
 		while(r[++i])
 			if(r[i] === dom)
 				return true;
