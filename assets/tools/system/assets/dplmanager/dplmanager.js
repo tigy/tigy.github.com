@@ -495,7 +495,7 @@ var DplManager = {
 					<td><input type="text" class="x-textbox res-summary" placeholder="输入资源地址"></td>\
 					<td>'+DplManager.ViewData.getStatusSelect('')+'</td>\
 					<td>'+DplManager.ViewData.getAttrSelect('')+'</td>\
-					<td><button class="x-button x-button-info" onclick="DplManager.ResView.saveControl(this)">添加</button> <button class="x-button x-button-info" onclick="DplManager.LibsView.saveControl(this, true)">转到</button></td>';
+					<td><button class="x-button" onclick="DplManager.ResView.saveControl(this)">添加</button> <button class="x-button x-button-info" onclick="DplManager.LibsView.saveControl(this, true)">转到</button></td>';
 		},
 		
 		editRow: function(module, category, name){
