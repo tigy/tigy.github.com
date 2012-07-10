@@ -258,16 +258,33 @@
 				return this;
 			},
 
+			/**
+			 * 使用指定的 CSS 选择器或函数过滤当前集合，并返回满足要求的元素的新 DomList 对象。
+			 * @param {String/Function} expression 用于过滤的 CSS 选择器或自定义函数，具体格式参考 {@link Array#filter}。
+			 * @return {DomList} 满足要求的元素的新 DomList 对象。
+			 */
 			filter: function(expression) {
 				return new DomList(ap.filter.call(this, typeof expression === 'string' ? function(value){
 					return Dom.match(value, expression);
 				} : expression));
 			},
-	
+			
+			/**
+			 * 为每个元素绑定事件。
+			 * @remark 见 {@link JPlus.Base#on}
+			 */
 			on: createEnumerator('on'),
-			
+
+			/**
+			 * 为每个元素删除绑定事件。
+			 * @remark 见 {@link JPlus.Base#un}
+			 */
 			un: createEnumerator('un'),
-			
+
+			/**
+			 * 触发每个元素事件。
+			 * @remark 见 {@link JPlus.Base#trigger}
+			 */
 			trigger: function(type, e){
 				for(var i = 0, r = true; i < this.length; i++){
 					if(!new Dom(this[o]).trigger(type, e))
@@ -336,13 +353,6 @@
 		 * @type Object
 		 */
 		cache = {},
-		
-		/**
-		 * 样式表。
-		 * @static
-		 * @type Object
-		 */
-		sizeMap = {},
 		
 		/**
 		 * 默认事件。
@@ -1014,7 +1024,7 @@
 		
 		/**
 		 * 检查是否含指定类名。
-		 * @param {Element} elem 元素。
+		 * @param {Element} elem 要测试的元素。
 		 * @param {String} className 类名。
 		 * @return {Boolean} 如果存在返回 true。
 	 	 * @static
@@ -1024,10 +1034,15 @@
 			assert(className && (!className.indexOf || !/[\s\r\n]/.test(className)), "Dom.hasClass(elem, className): {className} 不能空，且不允许有空格和换行。");
 			return (" " + elem.className + " ").indexOf(" " + className + " ") >= 0;
 		},
-			
-		dataField: function(elem){
-			return Dom.prototype.dataField.call({dom: elem});
-		},
+
+		///**
+		// * 获取一个节点对应的数据字段。
+		// * @param {Element} elem 需要获取属性的节点。
+		// * @return {Object} 一个用于存储数据的对象，该对象和指定节点绑定。
+		// */
+		//dataField: function(elem){
+		//	return Dom.prototype.dataField.call({dom: elem});
+		//},
 		
 		/**
 		 * 特殊属性集合。
@@ -1078,7 +1093,12 @@
 				var doc = getDocument(elem).defaultView;
 				return nameOrId === (doc.defaultView || doc.parentWindow).location.hash.slice(1)
 			},
-			
+
+			/**
+			 * 判断一个节点是否有元素节点或文本节点。
+			 * @param {Element} elem 要测试的元素。
+			 * @return {Boolean} 如果存在子节点，则返回 true，否则返回 false 。
+			 */
 			empty: Dom.isEmpty = function(elem) {
 				for( elem = elem.firstChild; elem; elem = elem.nextSibling )
 					if( elem.nodeType === 1 || elem.nodeType === 3 ) 
@@ -1091,8 +1111,8 @@
 			},
 			
 			/**
-			 * 判断一个节点是否隐藏。
-			 * @return {Boolean} 隐藏返回 true 。
+			 * 判断一个节点是否不可见。
+			 * @return {Boolean} 如果元素不可见，则返回 true 。
 			 */
 			hidden: Dom.isHidden = function(elem) {
 				return (elem.style.display || getStyle(elem, 'display')) === 'none';
@@ -1169,31 +1189,28 @@
 		 */
 		
 		/**
-		 * 
+		 * 获取 window 对象的 Dom 对象封装示例。
 	 	 * @static
 		 */
 		window: new Dom(window),
 		
 		/**
-		 * 
+		 * 获取 document 对象的 Dom 对象封装示例。
 	 	 * @static
 		 */
 		document: new Dom(document),
 
 		/**
 		 * 获取元素的计算样式。
-		 * @param {Element} dom 节点。
-		 * @param {String} name 名字。
+		 * @param {Element} elem 元素。
+		 * @param {String} name  要访问的属性名称。
 		 * @return {String} 样式。
 	 	 * @static
-	 	 *  访问元素的样式属性。
-        <params name="name" type="String">
-          要访问的属性名称
-        </params>
-        @example
-          取得第一个段落的color样式属性的值。
-          #####JavaScript:<pre>Dom.query("p").getStyle("color");</pre>
-        
+	 	 * 访问元素的样式属性。
+		 * @example
+		 * 取得第一个段落的color样式属性的值。
+		 * #####JavaScript:
+		 * <pre>Dom.getStyle(document.getElementById("id"), "color");</pre>
 		 */
 		getStyle: getStyle,
 
@@ -1215,6 +1232,12 @@
 		 */
 		styleNumber: styleNumber,
 
+		/**
+		 * 初始化 toggle 函数的参数。
+		 * @param {Argument} args 参数对象。
+		 * @return {Array/Argument} 处理后的参数对象。
+		 * @ignore
+		 */
 		initToggleArgs: function (args) {
 			if(typeof args[0] === 'string')
 				return args;
@@ -1223,7 +1246,7 @@
 		},
 
 		/**
-		 * 清空元素的 display 属性。
+		 * 通过设置 display 属性来显示元素。
 		 * @param {Element} elem 元素。
 	 	 * @static
 		 */
@@ -1239,7 +1262,7 @@
 		},
 		
 		/**
-		 * 赋予元素的 display 属性 none。
+		 * 通过设置 display 属性来隐藏元素。
 		 * @param {Element} elem 元素。
 	 	 * @static
 		 */
@@ -1255,32 +1278,36 @@
 		/**
 		 * 根据不同的内容进行计算。
 		 * @param {Element} elem 元素。
-		 * @param {String} type 输入。 一个 type
-		 *            由多个句子用,连接，一个句子由多个词语用+连接，一个词语由两个字组成， 第一个字可以是下列字符之一:
-		 *            m b p t l r b h w 第二个字可以是下列字符之一: x y l t b r
-		 *            b。词语也可以是: outer inner 。
-		 * @return {Number} 计算值。 mx+sx -> 外大小。 mx-sx -> 内大小。
+		 * @param {String} type 要计算的值。一个 type 是一个 js 表达式，它有一些内置的变量来表示元素的相关计算值。预定义的变量有：
+		 *
+		 *		- ml: marginLeft (同理有 r=right, t=top, b=bottom，x=left+right,y=top+bottom 下同)
+		 *		- bl: borderLeftWidth
+		 *		- pl: paddingLeft
+		 *		- sx: bl + pl + height (同理有 y)
+		 *		- css 样式: 如 height, left
+		 *
+		 * @return {Number} 计算值。
 	 	 * @static
 		 */
 		calc: (function() {
 
-			var borders = {
-				m: 'margin#',
-				b: 'border#Width',
-				p: 'padding#'
-			}, map = {
-				t: 'Top',
-				r: 'Right',
-				b: 'Bottom',
-				l: 'Left'
-			}, init, tpl;
+			/**
+			 * 样式表。
+			 * @static
+			 * @type Object
+			 */
+			var cache = {},
+
+				init, 
+				
+				tpl;
 
 			if(window.getComputedStyle) {
 				init = 'var c=e.ownerDocument.defaultView.getComputedStyle(e,null);return ';
-				tpl = '(parseFloat(c["#"]) || 0)';
+				tpl = '(parseFloat(c["#"])||0)';
 			} else {
 				init = 'return ';
-				tpl = '(parseFloat(Dom.getStyle(e, "#")) || 0)';
+				tpl = '(parseFloat(Dom.getStyle(e, "#"))||0)';
 			}
 
 			/**
@@ -1289,43 +1316,45 @@
 			 * @return {String} 处理后的字符串。
 			 */
 			function format(type) {
-				var t, f = type.charAt(0);
-				switch (type.length) {
 
-					case 2:
-						t = type.charAt(1);
-						assert( f in borders || f === 's', "Dom.calc(e, type): {type} 中的 " + type + " 不合法", type);
-						if( t in map) {
-							t = borders[f].replace('#', map[t]);
+				// 如果长度为 2，则处理为简写。
+				if (type.length === 2) {
+					var t = type.charAt(0),
+						d = type.charAt(1),
+						ns1 = {
+							m: 'margin#',
+							b: 'border#Width',
+							p: 'padding#'
+						},
+						ns2 = {
+							t: 'Top',
+							r: 'Right',
+							b: 'Bottom',
+							l: 'Left'
+						};
+					if (t in ns1) {
+						t = ns1[t];
+						if (d == 'x') {
+							type = '(' + t.replace('#', ns2.l) + '+' + t.replace('#', ns2.r) + ')';
+						} else if (d == 'y') {
+							type = '(' + t.replace('#', ns2.t) + '+' + t.replace('#', ns2.b) + ')';
 						} else {
-							return f === 's' ? 'e.offset' + (t === 'x' ? 'Width': 'Height'): '(' + format(f + (t !== 'y' ? 'l': 't')) + '+' + format(f + (t === 'x' ? 'r': 'b')) + ')';
+							type = t.replace('#', ns2[d]);
 						}
-
-						break;
-
-					case 1:
-						if( f in map) {
-							t = map[f].toLowerCase();
-						} else if(f !== 'x' && f !== 'y') {
-							assert(f === 'h' || f === 'w', "Dom.calc(e, type): {type} 中的 " + type + " 不合法", type);
-							return 'Dom.styleNumber(e,"' + (f === 'h' ? 'height': 'width') + '")';
-						} else {
-							return f;
-						}
-
-						break;
-
-					default:
-						t = type;
+					} else if (t == 's') {
+						return d == 'x' ? 'e.offsetWidth' : 'e.offsetHeight';
+					}
+				} else if (type == 'width' || type == 'height') {
+					return 'Dom.styleNumber(e,"' + type + '")';
 				}
 
-				return tpl.replace('#', t);
+				return tpl.replace('#', type);
 			}
 
 			return function(elem, type) {
 				assert.isElement(elem, "Dom.calc(elem, type): {elem} ~");
 				assert.isString(type, "Dom.calc(elem, type): {type} ~");
-				return (sizeMap[type] || (sizeMap[type] = new Function("e", init + type.replace(/\w+/g, format))))(elem);
+				return (cache[type] || (cache[type] = new Function("e", init + type.replace(/\w+/g, format))))(elem);
 			}
 		})(),
 
@@ -2622,17 +2651,24 @@
 
 	.implement({
 
+		/**
+		 * 获取当前 Dom 对象的指定位置的直接子节点。
+		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。如果 args 是小于 0 的数字，则从末尾开始计算。
+		 * @return {Dom} 返回一个节点对象。如果不存在，则返回 null 。
+		 * @example
+		 * 获取第1个子节点。
+		 * #####HTML:
+		 * <pre lang="htm" format="none">&lt;html&gt;&lt;body&gt;&lt;div&gt;&lt;p&gt;&lt;span&gt;Hello&lt;/span&gt;&lt;/p&gt;&lt;span&gt;Hello Again&lt;/span&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;</pre>
+		 * #####JavaScript:
+		 * <pre>Dom.find("span").child(1)</pre>
+		 */
 		child: function(args){
-			if (~args >= 0) {
-				return this.last(~args);
-			}
-
-			return this.first(args);
+			return ~args >= 0 ? this.last(~args) : this.first(args);
 		},
 		
 		/**
 		 * 获取当前 Dom 对象的父节点对象。
-		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
+		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在 Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
 		 * @return {Dom} 返回一个节点对象。如果不存在，则返回 null 。
 		 * @example
 		 * 找到每个span元素的所有祖先元素。
@@ -2643,8 +2679,16 @@
 		 */
 		parent: createTreeWalker('parentNode'),
 
+		/**
+		 * 编辑当前 Dom 对象及父节点对象，找到第一个满足指定 CSS 选择器或函数的节点。
+		 * @param {String/Function} [filter] 用于判断的元素的 CSS 选择器 或者 用于筛选元素的过滤函数。
+		 * @param {Dom/String} [context=document] 只在指定的节点内搜索此元素。
+		 * @return {Dom} 如果当前节点满足要求，则返回当前节点，否则返回一个匹配的父节点对象。如果不存在，则返回 null 。
+		 * @remark
+		 * closest 和 parent 最大区别就是 closest 会测试当前的元素。
+		 */
 		closest: function(selector, context) {
-			selector = this.match(selector) ? this : this.parent(selector);
+			selector = typeof selector === 'function' ? selector(this, this.dom) : this.match(selector) ? this : this.parent(selector);
 			return selector && (!context || Dom.get(context).hasChild(selector)) ? selector : null;
 		},
 
@@ -2679,7 +2723,7 @@
 		last: createTreeWalker('previousSibling', 'lastChild'),
 
 		/**
-		 * 获取当前 Dom 对象的下一个相邻节点对象。取得一个包含匹配的元素集合中每一个元素紧邻的后面同辈元素的元素集合。
+		 * 获取当前 Dom 对象的下一个相邻节点对象。
 		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
 		 * @return {Dom} 返回一个节点对象。如果不存在，则返回 null 。
 		 * @example
@@ -2740,22 +2784,48 @@
 		 */
 		children: createTreeDir('nextSibling', 'firstChild'),
 
+		/**
+		 * 获取当前 Dom 对象以后的全部相邻节点对象。
+		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
+		 * @return {DomList} 返回一个 DomList 对象。
+		 */
 		nextAll: createTreeDir('nextSibling'),
 
+		/**
+		 * 获取当前 Dom 对象以前的全部相邻节点对象。
+		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
+		 * @return {DomList} 返回一个 DomList 对象。
+		 */
 		prevAll: createTreeDir('previousSibling'),
 
+		/**
+		 * 获取当前 Dom 对象以上的全部相邻节点对象。
+		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
+		 * @return {DomList} 返回一个 DomList 对象。
+		 */
 		parentAll: createTreeDir('parentNode'),
 
+		/**
+		 * 获取当前 Dom 对象的全部兄弟节点对象。
+		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
+		 * @return {DomList} 返回一个 DomList 对象。
+		 */
 		siblings: function(args) {
 			return this.prevAll(args).concat(this.nextAll(args));
 		},
 
+		/**
+		 * 获取当前节点内的全部子节点。
+		 * @param {String} args="*" 要查找的节点的标签名。 * 表示返回全部节点。
+		 * @return {DomList} 返回一个 DomList 对象。
+		 */
 		getElements: function(args) {
 			return new DomList(this.dom.getElementsByTagName(args || '*'));
 		},
 		
 		/**
 		 * 获取当前 Dom 对象的在原节点的位置。
+		 * @param {Boolean} args=true 如果 args 为 true ，则计算文本节点。
 		 * @return {Number} 位置。从 0 开始。
 		 */
 		index: function(args) {
@@ -2962,14 +3032,29 @@
 			ctrl.insertBefore(node, null);
 		},
 
+		/**
+		 * 插入一个HTML 到顶部。
+		 * @param {String/Node/Dom} html 要插入的内容。
+		 * @return {Dom} 返回插入的新节点对象。
+		 */
 		prepend: function(ctrl, node) {
 			ctrl.insertBefore(node, ctrl.first(true));
 		},
 
+		/**
+		 * 插入一个HTML 到前面。
+		 * @param {String/Node/Dom} html 要插入的内容。
+		 * @return {Dom} 返回插入的新节点对象。
+		 */
 		before: function(ctrl, node) {
 			ctrl.parent().insertBefore(node, ctrl);
 		},
 
+		/**
+		 * 插入一个HTML 到后面。
+		 * @param {String/Node/Dom} html 要插入的内容。
+		 * @return {Dom} 返回插入的新节点对象。
+		 */
 		after: function(ctrl, node) {
 			ctrl.parent().insertBefore(node, ctrl.next(true));
 		},
@@ -3043,7 +3128,8 @@
 	/// #region document
 	
 	/**
-	 * @class document
+	 * @namespace document
+	 * @ignore
 	 */
 	Object.extend(document, {
 
@@ -3058,11 +3144,6 @@
 			return new DomList(this.getElementsByTagName(args || '*'));
 		},
 		
-		/**
-		 * 插入一个HTML 。
-		 * @param {String/Dom} html 内容。
-@return {Element} 元素。
-		 */
 		remove: function() {
 			var body = new Dom(this.body);
 			body.remove.apply(body, arguments);
@@ -3099,7 +3180,6 @@
 		
 		/**
 		 * 获取元素可视区域大小。包括 padding 和 border 大小。
-		 * @method getSize
 		 * @return {Point} 位置。
 		 */
 		getSize: function() {
