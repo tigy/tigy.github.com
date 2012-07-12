@@ -2678,7 +2678,7 @@ function imports(namespace) {
 			// 在顶部插入一个css，但这样肯能导致css没加载就执行 js 。所以，要保证样式加载后才能继续执行计算。
 			return document.getElementsByTagName("HEAD")[0].appendChild(extend(document.createElement('link'), {
 				href: url,
-				rel: trace.useLess ? 'stylesheet/less' : 'stylesheet',
+				rel: using.useLess ? 'stylesheet/less' : 'stylesheet',
 				type: 'text/css'
 			}));
 		},

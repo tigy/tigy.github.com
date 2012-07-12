@@ -96,7 +96,7 @@ var Marquee = Class({
 	/**
 	 * 内部实现移动到指定位置的效果。
 	 */
-	_animateToWithLoop: function (index, lt) {
+	_animateToWithLoop: function (index, lt, allowBack) {
 
 		var me = this,
 			oldIndex = me._fixIndex(me._currentIndex),
@@ -121,20 +121,24 @@ var Marquee = Class({
 						from = Dom.styleNumber(me.target.dom, prop),
 						to = -me._getScrollByIndex(actualIndex);
 
-					// 如果是往上、左方向滚。
-					if (lt) {
-						
-						// 确保 from > to
-						if (from > to) {
-							from -= me._size;
+					if (!allowBack) {
+
+						// 如果是往上、左方向滚。
+						if (lt) {
+
+							// 确保 from > to
+							if (from > to) {
+								from -= me._size;
+							}
+
+						} else {
+
+							// 确保 from < to
+							if (from < to) {
+								from += me._size;
+							}
 						}
 
-					} else {
-
-						// 确保 from < to
-						if (from < to) {
-							from += me._size;
-						}
 					}
 
 					obj.from[prop] = from;
@@ -205,14 +209,13 @@ var Marquee = Class({
 				children.clone().appendTo(this.target);
 				this.cloned = true;
 			}
-
-			this.set(this._currentIndex);
 		}
 
 		size = this._getTotalSize();
 		this._size = this.cloned ? size / 3 : size;
-
+		
 		this.target['set' + xy](size);
+		this.set(this._currentIndex);
 	},
 
 	pause: function () {
@@ -282,8 +285,10 @@ var Marquee = Class({
 		}
 
 		// 设置单步的执行函数。
-		me.step = function () {
-			me.moveTo(me._currentIndex + delta);
+		me.step = function() {
+			var index = me._currentIndex + delta;
+			index = me._fixIndex(index);
+			me[me.loop ? '_animateToWithLoop' : '_animateToWithoutLoop'](index, me._lt);
 			me.timer = setTimeout(me.step, me.delay)
 		};
 
@@ -306,7 +311,7 @@ var Marquee = Class({
 
 	moveTo: function (index, lt) {
 		index = this._fixIndex(index);
-		this[this.loop ? '_animateToWithLoop' : '_animateToWithoutLoop'](index, lt === undefined ? this._lt : lt);
+		this[this.loop ? '_animateToWithLoop' : '_animateToWithoutLoop'](index, lt === undefined ? this._lt : lt, true);
 		return this;
 	},
 

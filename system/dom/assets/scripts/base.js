@@ -1346,6 +1346,8 @@
 					}
 				} else if (type == 'width' || type == 'height') {
 					return 'Dom.styleNumber(e,"' + type + '")';
+				} else if (type.length < 2) {
+					return type;
 				}
 
 				return tpl.replace('#', type);
@@ -3238,7 +3240,7 @@
 		}
 		
 	});
-
+	
 	/// #endif
 	
 	// 变量初始化。
