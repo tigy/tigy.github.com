@@ -1,5 +1,5 @@
 /**********************************************
- * This file is created by a tool at 2012/7/12 11:38
+ * This file is created by a tool at 2012/7/12 11:40
  **********************************************/
 
 
@@ -6950,1046 +6950,1197 @@ function imports(namespace) {
 	
 })(this);
 /**********************************************
- * Controls.Core.Base
+ * System.Utils.Deferrable
  **********************************************/
 /**
  * @author
- */
-
-
-
-
-/**
- * 所有控件基类。
- * @class Control
- * @abstract
- * 控件的周期：
- * constructor - 创建控件对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。
- * create - 创建本身的 dom 节点。 可重写 - 默认使用 this.tpl 创建。
- * init - 初始化控件本身。 可重写 - 默认为无操作。
- * attach - 渲染控件到文档。不建议重写，如果你希望额外操作渲染事件，则重写。
- * detach - 删除控件。不建议重写，如果一个控件用到多个 dom 内容需重写。
  */
-var Control = Dom.extend({
 
-	/**
-	 * 存储当前控件的默认配置。
-	 * @getter {Object} options
-	 * @protected
-	 * @virtual
-	 */
-
-	/**
-	 * 存储当前控件的默认模板字符串。
-	 * @getter {String} tpl
-	 * @protected
-	 * @virtual
-	 */
-
-	/**
-	 * 当被子类重写时，生成当前控件。
-	 * @param {Object} options 选项。
-	 * @protected
-	 * @virtual
-	 */
-	create: function () {
-
-		assert(this.tpl || this instanceof Dom, "Control.prototype.create(): 当前类不存在 tpl 属性。Control.prototype.create 会调用 tpl 属性，根据这个属性中的 HTML 代码动态地生成节点并返回。子类必须定义 tpl 属性或重写 Control.prototype.create 方法返回节点。");
-
-		// 转为对 tpl解析。
-		return Dom.parseNode(this.tpl);
-	},
-
-	/**
-	 * 当被子类重写时，渲染控件。
-	 * @method
-	 * @param {Object} options 配置。
-	 * @protected virtual
-	 */
-	init: Function.empty,
-
-	/**
-	 * 初始化一个新的控件。
-	 * @param {String/Element/Control/Object} [options] 对象的 id 或对象或各个配置。
-	 */
-	constructor: function (options) {
-
-		// 这是所有控件共用的构造函数。
-		var me = this,
-
-			// 临时的配置对象。
-			opt = Object.extend({}, me.options),
-
-			// 当前实际的节点。
-			dom;
-
-		// 如果存在配置。
-		if (options) {
-
-			// 如果 options 是纯配置。
-			if (!options.nodeType && options.constructor === Object) {
-				dom = options.dom || options;
-				Object.extend(opt, options);
-				delete opt.dom;
-			} else {
-				dom = options;
-			}
-
-			if (typeof dom === "string") {
-				dom = document.getElementById(dom);
-			} else if (!dom.nodeType) {
-				dom = dom.dom;
-			}
-
-		}
-
-		// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。
-		me.dom = dom || me.create(opt);
-
-		assert.isNode(me.dom, "Dom.prototype.constructor(options): Dom 对象的 {dom} 为空。");
-
-		// 调用 init 初始化控件。
-		me.init(opt);
-
-		// 如果指定的节点已经在 DOM 树上，且重写了 attach 方法，则调用之。
-		if (me.dom.parentNode && this.attach !== Control.prototype.attach) {
-			this.attach(me.dom.parentNode, me.dom.nextSibling);
-		}
-
-		// 复制各个选项。
-		Object.set(me, opt);
-	},
-
-	/**
-	 * xtype 。
-	 * @virtual
-	 */
-	xtype: "control"
-
-});/**********************************************
- * Controls.Core.Common
- **********************************************/
-/** * @author  *//**********************************************
- * Controls.Display.Thumbnail
- **********************************************/
-/** * @author  *//**********************************************
- * Controls.Display.Icon
- **********************************************/
-/** * @author  *//**********************************************
- * Controls.Display.List
- **********************************************/
-/** * @author  *//**********************************************
- * Controls.Display.Arrow
- **********************************************/
-/** * @author  *//**********************************************
- * System.Data.Collection
- **********************************************/
 /**
- * @fileOverview 集合的基类。
- * @author xuld
- */	
-	
-/**
- * 集合。
- * @class Collection
+ * 用于异步执行任务时保证任务是串行的。
  */
-var Collection = Class({
-	
-	/**
-	 * 获取当前的项数目。
-	 */
-	length: 0,
-	
-	/**
-	 * 对项初始化。
-	 * @protected
-	 * @virtual
-	 */
-	initItem: function (item) {
-		return item;
-	},
-	
-	onAdd: function(item){
-		this.onInsert(item, this.length);
+var Deferrable = Class({
+
+	chain: function (deferrable, args) {
+		var lastTask = [deferrable, args];
+
+		if (this._firstTask) {
+			this._lastTask[2] = lastTask;
+		} else {
+			this._firstTask = lastTask;
+		}
+		this._lastTask = lastTask;
 	},
 
-	onInsert: Function.empty,
-	
-	onRemove: Function.empty,
-	
-	onBeforeSet: Function.empty,
-	
-	onAfterSet: Function.empty,
-	
-	add: function(item){
-		assert.notNull(item, "Collection.prototype.add(item): 参数 {item} ~。");
-		Array.prototype.push.call(this, item = this.initItem(item));
-		this.onAdd(item);
-		return item;
-	},
-	
-	addRange: function(args){
-		return Array.prototype.forEach.call(args && typeof args.length === 'number' ? args : arguments, this.add, this);
-	},
-	
-	insert: function(index, item){
-		assert.notNull(item, "Collection.prototype.insert(item): 参数 {item} ~。");
-		index = Array.prototype.insert.call(this, index, item = this.initItem(item));
-		this.onInsert(item, index + 1);
-		return item;
-	},
-	
-	clear: function(){
-		var me = this;
-		me.onBeforeSet();
-		while (me.length) {
-			var item = me[--me.length];
-			delete me[me.length];
-			me.onRemove(item, me.length);
-		}
-		me.onAfterSet();
-		return me;
-	},
-	
-	remove: function(item){
-		assert.notNull(item, "Collection.prototype.remove(item): 参数 {item} ~。");
-		var index = this.indexOf(item);
-		this.removeAt(index);
-		return index;
-	},
-	
-	removeAt: function(index){
-		var item = this[index];
-		if(item){
-			Array.prototype.splice.call(this, index, 1);
-			delete this[this.length];
-			this.onRemove(item, index);
-		}
+	progress: function () {
+
+		var firstTask = this._firstTask;
+		this.isRunning = false;
+
+		if (firstTask) {
+			this._firstTask = firstTask[2];
 			
-		return item;
-	},
-		
-	set: function(index, item){
-		var me = this;
-		me.onBeforeSet();
-		
-		if(typeof index === 'number'){
-			item = this.initItem(item);
-			assert.notNull(item, "Collection.prototype.set(item): 参数 {item} ~。");
-			assert(index >= 0 && index < me.length, 'Collection.prototype.set(index, item): 设置的 {index} 超出范围。请确保  0 <= index < ' + this.length, index);
-			item = me.onInsert(item, index);
-			me.onRemove(me[index], index);
-			me[index] = item;
-		} else{
-			if(me.length)
-				me.clear();
-			index.forEach(me.add, me);
+			firstTask[0].run(firstTask[1]);
 		}
-		
-		me.onAfterSet();
-		return me;
-	}
-	
-});
 
-Object.map("indexOf forEach each invoke lastIndexOf item filter", function(value){
-	return Array.prototype[value];
-}, Collection.prototype);
-
-/**********************************************
- * Controls.Core.ScrollableControl
- **********************************************/
-/** * @author  xuld *//** * 表示一个含有滚动区域的控件。 * @class ScrollableControl * @extends Control * @abstract * @see ScrollableControl.ControlCollection * @see ListControl * @see ContainerControl * <p> * {@link ScrollableControl} 提供了完整的子控件管理功能。 * {@link ScrollableControl} 通过 {@link ScrollableControl.ControlCollection} 来管理子控件。 * 通过 {@link#controls} 属性可以获取其实例对象。 * </p> *  * <p> * 通过 {@link ScrollableControl.ControlCollection#add}  * 来增加一个子控件，该方法间接调用 {@link ScrollableControl.ControlCollection#onControlAdded}，以 * 让 {@link ScrollableControl} 有能力自定义组件的添加方式。 * </p> *  * <p> * 如果需要创建一个含子控件的控件，则可以 继承 {@link ScrollableControl} 类创建。 * 子类需要重写 {@link #initChildControl} 方法用于对子控件初始化。 * 重写 {@link #onControlAdded}实现子控件的添加方式（默认使用 appendChild 到跟节点）。 * 重写 {@link #onControlRemoved}实现子控件的删除方式。 * 重写 {@link #createChildCollection} 实现创建自定义的容器对象。 * </p> *  * <p> * 最典型的 {@link ScrollableControl} 的子类为 {@link ListControl} 和 {@link ContainerControl} 提供抽象基类。 * </p> */var ScrollableControl = Control.extend({	/**	 * 当新控件被添加时执行。	 * @param {Object} childControl 新添加的元素。	 * @param {Number} index 元素被添加的位置。	 * @protected virtual	 */	onControlAdded: function(childControl, index){		index = this.controls[index];		assert(childControl && childControl.attach, "Control.prototype.onControlAdded(childControl, index): {childControl} \u5FC5\u987B\u662F\u63A7\u4EF6\u3002", childControl);		childControl.attach(this.container.dom, index ? index.dom : null);	},		/**	 * 当新控件被移除时执行。	 * @param {Object} childControl 新添加的元素。	 * @param {Number} index 元素被添加的位置。	 * @protected virtual	 */	onControlRemoved: function(childControl, index){		assert(childControl && childControl.detach, "Control.prototype.onControlRemoved(childControl, index): {childControl} \u5FC5\u987B\u662F\u63A7\u4EF6\u3002", childControl);		childControl.detach(this.container.dom);	},	/**	 * 当被子类重新时，实现创建一个子控件列表。	 * @return {ScrollableControl.ControlCollection} 子控件列表。	 * @protected virtual	 */	createControlsInstance: function(){		return new ScrollableControl.ControlCollection(this);	},		// /**	 // * 获取当前控件用于存放子节点的容器控件。	 // * @protected virtual	 // */	// getContainer: function(){		// return this;	// },		/**	 * 从 DOM 树更新 controls 属性。	 * @protected virtual	 */	init: function(){		this.container = Dom.get(this.container.dom);		this.controls.addRange(this.container.children(true));	},		/**	 * 根据用户的输入创建一个新的子控件。	 * @param {Object} item 新添加的元素。	 * @return {Control} 一个控件，根据用户的输入决定。	 * @protected virtual	 * 默认地，如果输入字符串和DOM节点，将转为对应的控件。	 */	initChild: Dom.parse,		removeChild: function (childControl) {		return this.controls.remove(childControl);	},		insertBefore: function (newControl, childControl) {		return childControl === null ? this.controls.add(newControl) : this.controls.insert(this.controls.indexOf(childControl), newControl);	},		/**	 * 获取目前所有子控件。	 * @type {Control.ControlCollection}	 * @name controls	 */	constructor: function(){		this.container = this;		this.controls = this.createControlsInstance();		//   this.loadControls();		Control.prototype.constructor.apply(this, arguments);	},		empty: function(){		this.controls.clear();		return this;	}});/** * 存储控件的集合。 * @class * @extends Collection */ScrollableControl.ControlCollection = Collection.extend({		/**	 * 初始化 Control.ControlCollection 的新实例。	 * @constructor	 * @param {ScrollableControl} owner 当前集合的所属控件。	 */	constructor: function(owner){		this.owner = owner;	},		/**	 * 当被子类重写时，初始化子元素。	 * @param {Object} item 添加的元素。	 * @return {Object} 初始化完成后的元素。	 */	initItem: function(item){		return this.owner.initChild(item);	},		/**	 * 通知子类一个新的元素被添加。	 * @param {Object} childControl 新添加的元素。	 * @param {Number} index 元素被添加的位置。	 */	onInsert: function(childControl, index){				// 如果控件已经有父控件。		if(childControl.parentControl) {			childControl.parentControl.controls.remove(childControl);		}		childControl.parentControl = this.owner;				// 执行控件添加函数。		this.owner.onControlAdded(childControl, index);	},		/**	 * 通知子类一个元素被移除。	 * @param {Object} childControl 新添加的元素。	 * @param {Number} index 元素被添加的位置。	 */	onRemove: function(childControl, index){		this.owner.onControlRemoved(childControl, index);		childControl.parentControl = null;	}	});/**********************************************
- * Controls.Core.ListControl
- **********************************************/
-/**
- * @author  xuld
- */
-
-
-
-/**
- * 表示所有管理多个有序列的子控件的控件基类。
- * @class ListControl
- * @extends ScrollableControl
- * ListControl 封装了使用  &lt;ul&gt; 创建列表控件一系列方法。
- */
-var ListControl = ScrollableControl.extend({
-	
-	xtype: 'listcontrol',
-	
-	tpl: '<div></div>',
-	
-	onControlAdded: function(childControl, index){
-		var t = childControl;
-		if(childControl.dom.tagName !== 'LI') {
-			childControl = Dom.create('li', 'x-' + this.xtype + '-content');
-			childControl.append(t);
-		}
-		
-		index = this.controls[index];
-		this.container.insertBefore(childControl, index && index.parent());
-		
-		// 更新选中项。
-		if(this.baseGetSelected(childControl)){
-			this.setSelectedItem(t);
-		}
+		return this;
 		
 	},
-	
-	onControlRemoved: function(childControl, index){
-		var t = childControl;
-		if(childControl.dom.tagName !== 'LI'){
-			childControl = childControl.parent();
-			childControl.removeChild(t);
-		}
-		
-		this.container.removeChild(childControl);
-		
-		// 更新选中项。
-		if(this.getSelectedItem() == t){
-			this.selectedItem = null;
-			this.setSelectedIndex(index);
-		}
-	},
-	
+
 	/**
-	 * 获取指定子控件的最外层 <li>元素。
+	 * 多个请求同时发生后的处理方法。
+	 * wait - 等待上个操作完成。
+	 * ignore - 忽略当前操作。
+	 * stop - 正常中断上个操作，上个操作的回调被立即执行，然后执行当前操作。
+	 * abort - 非法停止上个操作，上个操作的回调被忽略，然后执行当前操作。
+	 * replace - 替换上个操作为新的操作，上个操作的回调将被复制。
 	 */
-	getContainerOf: function(childControl){
-		return childControl.dom.tagName === 'LI' ? childControl : childControl.parent('li');
-	},
-	
-	/**
-	 * 获取包含指定节点的子控件。
-	 */
-	getItemOf: function(node){
-		var me = this.controls, ul = this.container.dom;
-		while(node){
-			if(node.parentNode === ul){
-				for(var i = me.length; i--;){
-					if((ul = me[i].dom) && (ul === node || ul.parentNode === node)){
-						return me[i];
-					}
-				}
+	defer: function (args, link) {
+
+		var isRunning = this.isRunning;
+		this.isRunning = true;
+
+		if (!isRunning)
+			return false;
+
+		switch (link) {
+			case undefined:
 				break;
-			}
-			node = node.parentNode;
-		}
-		
-		return null;
-	},
-	
-	init: function(options){
-		this.items = this.controls;
-		var classNamePreFix = 'x-' + this.xtype;
-		this.addClass(classNamePreFix);
-		
-		// 获取容器。
-		var container = this.container = this.first('ul');
-		if(container) {
-			// 已经存在了一个 UL 标签，转换为 items 属性。
-			this.controls.addRange(container.query('>li').addClass(classNamePreFix + '-content'));
-		} else {
-			container = this.container = Dom.create('ul', '');
-			this.dom.appendChild(container.dom);
-		}
-		container.addClass(classNamePreFix + '-container');
-	},
-	
-	// 选择功能
-	
-	/**
-	 * 当前的选中项。
-	 */
-	selectedItem: null,
-	
-	/**
-	 * 底层获取某项的选中状态。该函数仅仅检查元素的 class。
-	 */
-	baseGetSelected: function (itemContainerLi) {
-		return itemContainerLi.hasClass('x-' + this.xtype + '-selected');
-	},
-	
-	/**
-	 * 底层设置某项的选中状态。该函数仅仅设置元素的 class。
-	 */
-	baseSetSelected: function (itemContainerLi, value) {
-		itemContainerLi.toggleClass('x-' + this.xtype + '-selected', value);
-	},
-	
-	onOverFlowY: function(max){
-		this.setHeight(max);
-	},
-	
-	/**
-	 * 当选中的项被更新后触发。
-	 */
-	onChange: function (old, item){
-		return this.trigger('change', old);
-	},
-	
-	/**
-	 * 当某项被选择时触发。如果返回 false， 则事件会被阻止。
-	 */
-	onSelect: function (item){
-		return this.trigger('select', item);
-	},
-	
-	/**
-	 * 获取当前选中项的索引。如果没有向被选中，则返回 -1 。
-	 */
-	getSelectedIndex: function () {
-		return this.controls.indexOf(this.getSelectedItem());
-	},
-	
-	/**
-	 * 设置当前选中项的索引。
-	 */
-	setSelectedIndex: function (value) {
-		return this.setSelectedItem(this.controls[value]);
-	},
-	
-	/**
-	 * 获取当前选中的项。如果不存在选中的项，则返回 null 。
-	 */
-	getSelectedItem: function () {
-		return this.selectedItem;
-	},
-	
-	/**
-	 * 设置某一项为选中状态。对于单选框，该函数会同时清除已有的选择项。
-	 */
-	setSelectedItem: function(item){
-		
-		// 先反选当前选择项。
-		var old = this.getSelectedItem();
-		if(old && (old = this.getContainerOf(old)))
-			this.baseSetSelected(old, false);
-	
-		if(this.onSelect(item)){
-		
-			// 更新选择项。
-			this.selectedItem = item;
-			
-			if(item != null){
-				item = this.getContainerOf(item);
-			//	if(!navigator.isQuirks)
-			//		item.scrollIntoView();
-				this.baseSetSelected(item, true);
-				
-			}
-			
-		}
-			
-		if(old !== item)
-			this.onChange(old, item);
-			
-		return this;
-	},
-	
-	/**
-	 * 获取选中项的文本内容。
-	 */
-	getText: function () {
-		var selectedItem = this.getSelectedItem();
-		return selectedItem ? selectedItem.getText() : '';
-	},
-	
-	/**
-	 * 查找并选中指定文本内容的项。如果没有项的文本和当前项相同，则清空选择状态。
-	 */
-	setText: function (value) {
-		var t = null;
-		this.controls.each(function(item){
-			if(item.getText() === value){
-				t = item;
+			case "abort":
+			case "stop":
+				this[link]();
+				this.isRunning = true;
 				return false;
-			}
-		}, this);
-		
-		return this.setSelectedItem(t);
-	},
-	
-	/**
-	 * 切换某一项的选择状态。
-	 */
-	toggleItem: function(item){
-		
-		// 如果当前项已选中，则表示反选当前的项。
-		return  this.setSelectedItem(item === this.getSelectedItem() ? null : item);
-	},
-	
-	/**
-	 * 确保当前有至少一项被选择。
-	 */
-	select: function () {
-		if(!this.selectedItem) {
-			this.setSelectedIndex(0);
+			case "ignore":
+				return true;
+			default:
+				assert(!link || link === 'wait', "Deferred.prototype.defer(args, link): 成员 {link} 必须是 wait、cancel、ignore 之一。", link);
 		}
-		
+
+		this.chain(this, args);
+		return true;
+	},
+
+	/**
+	 * 让当前队列等待指定的 deferred 全部执行完毕后执行。
+	 */
+	wait: function (deferred) {
+		if (this.isRunning) {
+			this.stop();
+		}
+
+		this.defer = deferred.defer.bind(deferred);
+		this.progress = deferred.progress.bind(deferred);
 		return this;
 	},
-	
-	/**
-	 * 选择当前选择项的下一项。
-	 */
-	selectNext: function(up){
-		var oldIndex = this.getSelectedIndex(), newIndex, maxIndex = this.controls.length - 1;
-		if(oldIndex != -1) {
-			newIndex = oldIndex + ( up !== false ? 1 : -1);
-			if(newIndex < 0) newIndex = maxIndex;
-			else if(newIndex > maxIndex) newIndex = 0;
+
+	then: function (callback, args) {
+		if (this.isRunning) {
+			this.chain({
+				owner: this,
+				run: function (args) {
+					if(callback.call(this.owner, args) !== false)
+						this.owner.progress();
+				}
+			}, args);
 		} else {
-			newIndex = up !== false ? 0 : maxIndex;
+			callback.call(this, args);
 		}
-		return this.setSelectedIndex(newIndex);
-	},
-	
-	/**
-	 * 选择当前选择项的上一项。
-	 */
-	selectPrevious: function(){
-		return this.selectNext(false);
-	},
-	
-	/**
-	 * 设置某个事件发生之后，自动选择元素。
-	 */
-	bindSelector: function(eventName){
-		this.on(eventName, function(e){
-			var item = this.getItemOf(e.target);
-			if(item){
-				this.setSelectedItem(item);
-			}
-		}, this);
 		return this;
-	}
+	},
 	
-}).addEvent('select change');
+	skip: function(){
+		this.pause();
+		this.progress();
+		return this;
+	},
+	
+	abort: function(){
+		this.pause();
+		this._firstTask = this._lastTask = null;
+		this.isRunning = false;
+		return this;
+	},
 
+	stop: function () {
+		return this.abort();
+	}
 
+});
 /**********************************************
- * Controls.Container.Tabbable
+ * System.Fx.Base
  **********************************************/
-/** * @author  */var Tabbable = ListControl.extend({		xtype: 'tabbable',		init: function(){		this.base('init');				this.bindSelector('click');	}});/**********************************************
- * Controls.DataView.Table
- **********************************************/
-/** * @author  *//**********************************************
- * Controls.Core.ICollapsable
- **********************************************/
-/** * @author  *//** * 表示一个可折叠的控件。 * @interface ICollapsable */var ICollapsable = {		/**	 * 获取目前是否折叠。	 * @virtual	 * @return {Boolean} 获取一个值，该值指示当前面板是否折叠。	 */	isCollapsed: function() {		return !this.container || Dom.isHidden(this.container.dom);	},		collapseDuration: -1,		onToggleCollapse: function(value){			},		onCollapsing: function(duration){		return this.trigger('collapse', duration);	},		onExpanding: function(duration){		return this.trigger('expanding', duration);	},		onCollapse: function(){		this.trigger('collapse');		this.onToggleCollapse(true);	},		onExpand: function(){		this.trigger('expand');		this.onToggleCollapse(false);	},		collapse: function(duration){		var me = this;		if(me.onCollapsing(duration) && me.container)			me.container.hide('height', duration === undefined ? me.collapseDuration : duration, function(){			me.addClass('x-' + me.xtype + '-collapsed');			me.onCollapse();		});		return this;	},		expand: function(duration){		if(this.onExpanding(duration)  ) {			this.removeClass('x-' + this.xtype + '-collapsed');			this.container && this.container.show('height', duration === undefined ? this.collapseDuration : duration, this.onExpand.bind(this));		}		return this;	},		/**	 * 切换面板的折叠。	 * @method toggleCollapse	 * @param {Number} collapseDuration 时间。	 */	toggleCollapse: function(duration) {		return this.isCollapsed() ? this.expand(duration) : this.collapse(duration);	}	};/**********************************************
- * Controls.DataView.TreeView
- **********************************************/
-/** * @author  */var TreeNode = ScrollableControl.extend(ICollapsable).implement({		/**	 * 更新节点前面的占位符状态。	 */	_updateSpan: function(){				var span = this.getSpan(0), current = this;				while((current = current.parentControl) && (span = span.prev())){						span.dom.className = current.isLastNode() ? 'x-treenode-space x-treenode-none' : 'x-treenode-space';				}				this.updateNodeType();	},		/**	 * 更新一个节点前面指定的占位符的类名。	 */	_setSpan: function(depth, className){				this.nodes.each(function(node){			var first = node.first(depth).dom;			if(first.tagName == 'SPAN')				first.className = className;			node._setSpan(depth, className);		});			},		_markAsLastNode: function(){		this.addClass('x-treenode-last');		this._setSpan(this.depth - 1, 'x-treenode-space x-treenode-none');	},		_clearMarkAsLastNode: function(){		this.removeClass('x-treenode-last');		this._setSpan(this.depth - 1, 'x-treenode-space');	},		_initContainer: function(childControl){		var me = this, li = Dom.create('li', 'x-treeview-content');		li.append(childControl);				// 如果 子节点有子节点，那么插入子节点的子节点。		if(childControl.container){			li.append(childControl.container);		}				if(childControl.duration === -1){			childControl.duration = me.duration;		}				return li;	},		updateNodeType: function(){		this.setNodeType(this.nodes.length === 0 ? 'normal' : this.isCollapsed() ? 'plus' : 'minus');	},		xtype: 'treenode',		   	depth: 0,		create: function(){		var a = document.createElement('a');		a.href = 'javascript:;';		a.className = 'x-' + this.xtype;		a.innerHTML = '<span></span>';		return a;	},		onDblClick: function(e){		this.toggleCollapse();		e.stop();	},		init: function(options){		this.content = this.last();		this.unselectable();		this.on('dblclick', this.onDblClick, this);		this.nodes = this.controls;		this.container = null;		this.dataField().treenode = this;	},		initChild: function(childControl){		if(!(childControl instanceof TreeNode)) {			var t = childControl;			childControl = new TreeNode();			if(typeof t === 'string')				childControl.setText(t);			else				Dom.get(childControl).append(t);		}		return childControl;	},		onControlAdded: function(childControl, index){		var me = this,			t = this.initContainer(childControl),			re = this.controls[index];				this.container.insertBefore(t, re && re.parent());				// 只有 已经更新过 才去更新。		if(this.depth || this instanceof TreeView){			childControl.setDepth(this.depth + 1);		}				me.update();	},		onControlRemoved: function(childControl, index){		this.container.removeChild(childControl.parent());		this.update();	},		initContainer: function(childControl){				// 第一次执行创建容器。		this.container = Dom.create('ul', 'x-treeview-container');				if(this instanceof TreeView){			this.dom.appendChild(this.container.dom);			} else if(this.dom.parentNode){			this.dom.parentNode.appendChild(this.container.dom);			}				this.initContainer = this._initContainer;				return this.initContainer (childControl);			},		// 由于子节点的改变刷新本节点和子节点状态。	update: function(){				// 更新图标。		this.updateNodeType();				// 更新 lastNode		if(this.nodes.length){			var currentLastNode = this.nodes[this.nodes.length - 1],				lastNode = this.lastNode;			if (lastNode !== currentLastNode) {				currentLastNode._markAsLastNode();				this.lastNode = currentLastNode;				if (lastNode) lastNode._clearMarkAsLastNode();			}		}			},		setNodeType: function(type){		var handle = this.getSpan(0);		if(handle) {			handle.dom.className = 'x-treenode-space x-treenode-' + type;		}		return this;	},		expandAll: function(duration, maxDepth){		if (this.container && maxDepth !== 0) {			this.expand(duration);			this.nodes.invoke('expandAll', [duration, --maxDepth]);		}		return this;	},		collapseAll: function(duration, maxDepth){		if (this.container && maxDepth !== 0) {			this.nodes.invoke('collapseAll', [duration, --maxDepth]);			this.collapse(duration);		}		return this;	},		isLastNode: function(){		return this.parentControl &&  this.parentControl.lastNode === this;	},		onToggleCollapse: function(value){		this.setNodeType(this.nodes.length === 0 ? 'normal' : value ? 'plus' : 'minus');		if(!value && (value = this.next('ul'))){			value.dom.style.height = 'auto';		}	},		setSelected: function(value){		this.toggleClass('x-treenode-selected', value);	},		// 获取当前节点的占位 span 。 最靠近右的是 index == 0	getSpan: function(index){		return this.content.prev(index);	},	// 设置当前节点的深度。	setDepth: function(value){				var me = this;			var currentDepth = this.depth, span, elem = this.dom;				assert(value >= 0, "value 非法。 value = {0}", value);				// 删除已经存在的占位符。				while(currentDepth > value){			elem.removeChild(elem.firstChild);			currentDepth--;		}			// 重新生成占位符。			while(currentDepth < value){			span = document.createElement('span');			span.className ='x-treenode-space';			elem.insertBefore(span, elem.firstChild);			currentDepth++;		}				if(elem.lastChild.previousSibling)			elem.lastChild.previousSibling.onclick = function(){				me.toggleCollapse();				return !(/\bx-treenode-(minus|plus|loading|uninit)\b/.test(this.className));			};				// 更新深度。				this.depth = value;				this._updateSpan();				// 对子节点设置深度+1		this.nodes.invoke('setDepth', [value + 1]);	},		setHref: function(value){		this.setAttr('href', value);		return this;	},		getTreeView: function(){		var n = this;		while(n && !(n instanceof TreeView))			n = n.parentControl;							return  n;	},		ensureVisible: function(duration){		duration = duration === undefined ? 0 : duration;		var n = this;		while(n = n.parentControl) {			n.expand(duration);		}		this.scrollIntoView();	},		/**	 * 展开当前节点，但折叠指定深度以后的节点。	 */	collapseTo: function(depth, duration){		duration = duration === undefined ? 0 : duration;		depth = depth === undefined ? 1 : depth;				if(depth > 0){			this.expand(duration);		} else {			this.collapse(duration);		}				this.nodes.invoke('collapseTo', [--depth, duration]);	},		toString: function(){		return String.format("{0}#{1}", this.getText(), this.depth);	}});Dom.define	(TreeNode, 'content', 'setHtml setText')	(TreeNode, 'content', 'getHtml getText', true);var TreeView = TreeNode.extend({		xtype: 'treeview',		create: function(){		var div = document.createElement('div');		div.className = 'x-' + this.xtype;		div.innerHTML = '<a href="javascript:;"></a>';		return div;	},		/**	 * 当用户点击一项时触发。	 */	onNodeClick: function (node) {		return this.trigger('nodeclick', node);	},		init: function(){		this.base('init');		this.on('click', this.onClick);	},		/**	 * 当一个选项被选中时触发。	 */	onSelect: function(node){		return this.trigger('select', node);	},		/**	 * 点击时触发。	 */	onClick: function (e) {				var target = e.target;				//if(/\bx-treenode-(minus|plus|loading)\b/.test(target.className))		//	return;				while(target && !Dom.hasClass(target, 'x-treenode')) {			target = target.parentNode;		}				if(target){			target = new Dom(target).dataField().treenode;						if(target && !this.clickNode(target)){				e.stop();			}		}					},		/**	 * 当选中的项被更新后触发。	 */	onChange: function (old, item){		return this.trigger('change', old);	},		/**	 * 模拟点击一项。	 */	clickNode: function(node){		if(this.onNodeClick(node)){			this.setSelectedNode(node);			return true;		}				return false;	},		setSelectedNode: function(node){				// 先反选当前选择项。		var old = this.getSelectedNode();		if(old)			old.setSelected(false);			if(this.onSelect(node)){					// 更新选择项。			this.selectedNode = node;						if(node != null){				node.setSelected(true);			}					}					if(old !== node)			this.onChange(old, node);					return this;	},		getSelectedNode: function(){		return this.selectedNode;	}	});/**********************************************
- * Controls.Page.Scaffolding
- **********************************************/
-/** * @author  *//**********************************************
- * Controls.Page.Grid
- **********************************************/
-/** * @author  *//**********************************************
- * Controls.Core.ContentControl
- **********************************************/
-/** * @fileOverview 表示一个包含文本内容的控件。 * @author xuld *//** * 表示一个有内置呈现的控件。 * @abstract * @class ContentControl * @extends Control * <p> * ContentControl 控件把 content 属性作为自己的内容主体。 * ContentControl 控件的大小将由 content 决定。 * 当执行 appendChild/setWidth/setHtml 等操作时，都转到对 content 的操作。  * 这个类的应用如: dom 是用于显示视觉效果的辅助层， content 是实际内容的控件。 * 默认 content 和  dom 相同。子类应该重写 init ，并重新赋值  content 。 * </p> *  * <p> * 这个控件同时允许在子控件上显示一个图标。 * </p> *  * <p> * ContentControl 的外元素是一个根据内容自动改变大小的元素。它自身没有设置大小，全部的大小依赖子元素而自动决定。 * 因此，外元素必须满足下列条件的任何一个: *  <ul> * 		<li>外元素的 position 是 absolute<li> * 		<li>外元素的 float 是 left或 right <li> * 		<li>外元素的 display 是  inline-block (在 IE6 下，使用 inline + zoom模拟) <li> *  </ul> * </p> */var ContentControl = Control.extend({		/**	 * 当前正文。	 * @type Element/Control	 * @property container	 * @proected	 */		/**	 * 当被子类改写时，实现创建添加和返回一个图标节点。	 * @protected	 * @virtual	 */	createIcon: function(){		return  Dom.create('span', 'x-icon');	},		insertIcon: function(icon){		if(icon)			this.container.prepend(icon);	},		init: function(){		this.container = new Dom(this.dom);	},		/**	 * 获取当前显示的图标。	 * @name icon	 * @type {Element}	 */		/**	 * 设置图标。	 * @param {String} icon 图标。	 * @return {Panel} this	 */	setIcon: function(icon) {				if(icon === null){			if(this.icon) {				this.icon.remove();				this.icon = null;			}						return this;						}				if(!this.icon || !this.icon.parent()) {						this.insertIcon(this.icon = this.createIcon());		}				this.icon.dom.className = "x-icon x-icon-" + icon;				return this;	},		setText: function(value){		this.container.setText(value);		this.insertIcon(this.icon);				return this;	},		setHtml: function(value){		this.container.setHtml(value);		this.insertIcon(this.icon);				return this;	}	});Dom.define(ContentControl, 'container', 'setWidth setHeight empty', 'insertBefore removeChild contains append getHtml getText getWidth getHeight');/**********************************************
- * System.Dom.Align
- **********************************************/
-﻿/**
- * @author xuld 
+/**
+ * @fileOverview 提供底层的 特效算法支持。
+ * @author xuld
  */
 
+var Fx = Fx || {};
 
 /**
- * 为控件提供按控件定位的方法。
- * @interface
+ * 特效算法基类。
+ * @class Fx.Base
+ * @extends Deferrable
+ * @abstract
  */
-Dom.implement((function(){
+Fx.Base = (function(){
 	
-	var aligns = {
-		
-		ol: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var x = targetPosition.x - ctrlSize.x - offset;
-			if(enableReset && x <= documentPosition.x) {
-				x = aligns.or(ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, 1);
-			}
-			
-			return x;
-		},
-		
-		or: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var x = targetPosition.x + targetSize.x + offset;
-			if(enableReset && x + ctrlSize.x >= documentPosition.x + documentSize.x) {
-				if(ctrl.onOverflowX){
-					ctrl.onOverflowX(documentSize.x);  
-				}
-				x = aligns[enableReset === 1 ? 'xc' : 'ol'](ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, true);
-			}
-			
-			return x;
-		},
-		
-		xc: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl) {
-			return targetPosition.x + (targetSize.x - ctrlSize.x) / 2 + offset;
-		},
-		
-		il: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var x = targetPosition.x + offset;
-			if(enableReset && x <= x + ctrlSize.x >= documentPosition.x + documentSize.x) {
-				x = aligns.ir(ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, true);
-			}
-			
-			return x;
-		},
-		
-		ir: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var x = targetPosition.x + targetSize.x - ctrlSize.x - offset;
-			if(enableReset && x <= documentPosition.x) {
-				x = aligns.il(ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl);
-			}
-			
-			return x;
-		},
-		
-		ot: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var y = targetPosition.y - ctrlSize.y - offset;
-			if(enableReset && y <= documentPosition.y) {
-				y = aligns.ob(ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, 1);
-			}
-			
-			return y;
-		},
-		
-		ob: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var y = targetPosition.y + targetSize.y + offset;
-			if(enableReset && y + ctrlSize.x >= documentPosition.y + documentSize.y) {
-				if(ctrl.onOverflowY){
-					ctrl.onOverflowY(documentSize.y);  
-				}
-				y = aligns[enableReset === 1 ? 'yc' : 'ot'](ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, true);
-			}
-			
-			return y;
-		},
-		
-		yc: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl) {
-			return targetPosition.y + (targetSize.y - ctrlSize.y) / 2 + offset;
-		},
-		
-		it: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var y = targetPosition.y + offset;
-			if(enableReset && y + ctrlSize.x >= documentPosition.y + documentSize.y) {
-				y = aligns.ib(ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, true);
-			}
-			
-			return y;
-		},
-		
-		ib: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var y = targetPosition.y + targetSize.y - ctrlSize.y - offset;
-			if(enableReset && y <= documentPosition.y) {
-				y = aligns.it(ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl);
-			}
-			
-			return y;
-		}
-		
-	},
 	
-	setter = Object.map({
-		bl: 'il ob',
-		rt: 'or it',
-		rb: 'or ib',
-		lt: 'ol it',
-		lb: 'ol ib',
-		br: 'ir ob',
-		tr: 'ir ot',
-		tl: 'il ot',
-		rc: 'or yc',
-		bc: 'xc ob',
-		tc: 'xc ot',
-		lc: 'ol yc',
-		cc: 'xc yc',
+	/// #region interval
+	
+	var cache = {};
+	
+	/**
+	 * 定时执行的函数。
+	 */
+	function interval(){
+		var i = this.length;
+		while(--i >= 0)
+			this[i].step();
+	}
+	
+	/// #endregion
 		
-		'lb-': 'il ib',
-		'rt-': 'ir it',
-		'rb-': 'ir ib',
-		'lt-': 'il it',
-		'rc-': 'ir yc',
-		'bc-': 'xc ib',
-		'tc-': 'xc it',
-		'lc-': 'il yc',
-		
-		'lb^': 'ol ob',
-		'rt^': 'or ot',
-		'rb^': 'or ob',
-		'lt^': 'ol ot'
-		
-	}, function(value){
-		value = value.split(' ');
-		value[0] = aligns[value[0]];
-		value[1] = aligns[value[1]];
-		return value;
-	}, {});
-		
-		/*
-		 *      tl   tc   tr
-		 *      ------------
-		 *   lt |          | rt
-		 *      |          |
-		 *   lc |    cc    | rc
-		 *      |          |
-		 *   lb |          | rb
-		 *      ------------
-		 *      bl   bc   br
+	return Deferrable.extend({
+	
+		/**
+		 * 每秒的运行帧次。
+		 * @type {Number}
 		 */
-	
-	return {
+		fps: 50,
 		
 		/**
-		 * 基于某个控件，设置当前控件的位置。改函数让控件显示都目标的右侧。
-		 * @param {Controls} ctrl 目标的控件。
-		 * @param {String} align 设置的位置。如 lt rt 。完整的说明见备注。
-		 * @param {Number} offsetX 偏移的X大小。
-		 * @param {Number} offsetY 偏移的y大小。
-		 * @memberOf Control
+		 * 特效执行毫秒数。
+		 * @type {Number}
 		 */
-		align: function (ctrl, position,  offsetX, offsetY, enableReset) {
-			var ctrlSize = this.getSize(),
-				targetSize = ctrl.getSize(),
-				targetPosition = ctrl.getPosition(),
-				documentSize = document.getSize(),
-				documentPosition = document.getPosition();
+		duration: 500,
+		
+		/**
+		 * 当被子类重写时，实现生成当前变化所进行的初始状态。
+		 * @param {Object} from 开始位置。
+		 * @param {Object} to 结束位置。
+		 * @return {Base} this
+		 */
+		init: Function.empty,
+		
+		/**
+		 * @event step 当进度改变时触发。
+		 * @param {Number} value 当前进度值。
+		 */
+		
+		/**
+		 * 根据指定变化量设置值。
+		 * @param {Number} delta 变化量。 0 - 1 。
+		 * @abstract
+		 */
+		set: Function.empty,
+		
+		/**
+		 * 用于实现渐变曲线的计算函数。函数的参数为：
+		 *
+		 * - @param {Object} p 转换前的数值，0-1 之间。
+		 *
+		 * 返回值是一个数字，表示转换后的值，0-1 之间。
+		 * @field
+		 * @type Function
+		 * @remark 
+		 */
+		transition: function(p) {
+			return -(Math.cos(Math.PI * p) - 1) / 2;
+		},
+		
+		/**
+		 * 进入变换的下步。
+		 */
+		step: function() {
+			var me = this, time = Date.now() - me.time;
+			if (time < me.duration) {
+				me.set(me.transition(time / me.duration));
+			}  else {
+				me.done();
+			}
+		},
+		
+		/**
+		 * 开始运行特效。
+		 * @param {Object} from 开始位置。
+		 * @param {Object} to 结束位置。
+		 * @param {Number} duration=-1 变化的时间。
+		 * @param {Function} [onStop] 停止回调。
+		 * @param {Function} [onStart] 开始回调。
+		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 restart 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
+		 * @return {Base} this
+		 */
+		run: function (options, link) {
+			var me = this;
+            if (me.defer(options, link))
+                return me;
+			
+            var duration = me.duration;
+			Object.extend(me, options);
+			
+			// 防止 duration 覆盖了值。
+			if (me.duration == undefined)
+				me.duration = duration;
+			else if (me.duration < 0)
+				me.duration = duration / -me.duration;
+
+			if (me.start && me.start(options) === false) {
+				return me.progress();
+			}
+		
+			me.init(options);
+			me.set(0);
+			me.time = 0;
+			
+			me.resume();
+			return me;
+		},
+		
+		done: function(){
+			this.pause();
+			this.set(1);
+			if(this.complete){
+				this.complete();
+			}
+			return this.progress();
+		},
+		
+		/**
+		 * 中断当前效果。
+		 */
+		stop: function() {
+			this.abort();
+			this.done();
+			return this;
+		},
+		
+		/**
+		 * 暂停当前效果。
+		 */
+		pause: function() {
+			var me = this;
+			if (me.timer) {
+				me.time = Date.now() - me.time;
+				var fps = me.fps, value = cache[fps];
+				value.remove(me);
+				if (value.length === 0) {
+					clearInterval(me.timer);
+					delete cache[fps];
+				}
+				me.timer = 0;
+			}
+			return me;
+		},
+		
+		/**
+		 * 恢复当前效果。
+		 */
+		resume: function() {
+			var me = this;
+			if (!me.timer) {
+				me.time = Date.now() - me.time;
+				var fps = me.fps, value = cache[fps];
+				if(value){
+					value.push(me);
+					me.timer = value[0].timer;
+				} else {
+					me.timer = setInterval(interval.bind(cache[fps] = [me]), Math.round(1000 / fps ));
+				}
+			}
+			return me;
+		}
+		
+	});
+	
+
+})();
+
+/**
+ * 常用计算。
+ * @param {Object} from 开始。
+ * @param {Object} to 结束。
+ * @param {Object} delta 变化。
+ */
+Fx.compute = function(from, to, delta){
+	return (to - from) * delta + from;
+};/**********************************************
+ * System.Fx.Animate
+ **********************************************/
+/**
+ * @fileOverview 通过改变CSS实现的变换。
+ * @author xuld
+ */
+
+
+
+
+(function(){
+	
+	
+	/// #region 字符串扩展
+	
+	/**
+	 * @namespace String
+	 */
+	Object.extend(String, {
+		
+		/**
+		 * 把十六进制颜色转为 RGB 数组。
+		 * @param {String} hex 十六进制色。
+		 * @return {Array} rgb RGB 数组。
+		 */
+		hexToArray: function(hex){
+			assert.isString(hex, "String.hexToArray(hex): 参数 {hex} ~。");
+			if(hex == 'transparent')
+				return [255, 255, 255];
+			var m = hex.match(/^#([\da-f]{1,2})([\da-f]{1,2})([\da-f]{1,2})$/i);
+			if(!m)return null;
+			var i = 0, r = [];
+			while (++i <= 3) {
+				var bit = m[i];
+				r.push(parseInt(bit.length == 1 ? bit + bit : bit, 16));
+			}
+			return r;
+		},
+		
+		/**
+		 * 把 RGB 数组转为数组颜色。
+		 * @param {Array} rgb RGB 数组。
+		 * @return {Array} rgb RGB 数组。
+		 */
+		rgbToArray: function(rgb){
+			assert.isString(rgb, "String.rgbToArray(rgb): 参数 {rgb} ~。");
+			var m = rgb.match(/(\d+),\s*(\d+),\s*(\d+)/);
+			if(!m) return null;
+			var i = 0, r = [];
+			while (++i <= 3) {
+				r.push(parseInt(m[i]));
+			}
+			return r;
+		},
+		
+		/**
+		 * 把 RGB 数组转为十六进制色。
+		 * @param {Array} rgb RGB 数组。
+		 * @return {String} hex 十六进制色。
+		 */
+		arrayToHex: function(rgb){
+			assert.isArray(rgb, "String.arrayToHex(rgb): 参数 {rgb} ~。");
+			var i = -1, r = [];
+			while(++i < 3) {
+				var bit = rgb[i].toString(16);
+				r.push((bit.length == 1) ? '0' + bit : bit);
+			}
+			return '#' + r.join('');
+		}
+	});
+	
+	/// #endregion
+	
+	/**
+	 * compute 简写。
+	 * @param {Object} from 从。
+	 * @param {Object} to 到。
+	 * @param {Object} delta 变化。
+	 * @return {Object} 结果。
+	 */
+	var compute = Fx.compute,
+	
+		Dom = window.Dom,
+
+		emptyObj = {},
+	
+		/**
+		 * @class Animate
+		 * @extends Fx.Base
+		 */
+		Animate = Fx.Animate = Fx.Base.extend({
+			
+			/**
+			 * 当前绑定的节点。
+			 * @type Dom
+			 * @protected
+			 */
+			target: null,
+			
+			/**
+			 * 当前的状态存储。
+			 * @type Object
+			 * @protected
+			 */
+			current: null,
+			
+			/**
+			 * 初始化当前特效。
+			 * @param {Object} options 选项。
+			 * @param {Object} key 键。
+			 * @param {Number} duration 变化时间。
+			 */
+			constructor: function(target){
+				this.target = target;
+			},
+			
+			/**
+			 * 根据指定变化量设置值。
+			 * @param {Number} delta 变化量。 0 - 1 。
+			 * @override
+			 */
+			set: function(delta){
+				var me = this,
+					key,
+					target = me.target,
+					value;
+				for(key in me.current){
+					value = me.current[key];
+					value.parser.set(target, key, value.from, value.to, delta);
+				}
+			},
+			
+			/**
+			 * 生成当前变化所进行的初始状态。
+			 * @param {Object} from 开始。
+			 * @param {Object} to 结束。
+			 */
+			init: function (options) {
+			//	assert.notNull(from, "Fx.Animate.prototype.run(from, to, duration, callback, link): 参数 {from} ~。");
+			//	assert.notNull(to, "Fx.Animate.prototype.run(from, to, duration, callback, link): 参数 {to} ~。");
 					
-			assert(!position || position in setter, "Control.prototype.align(ctrl, position,  offsetX, offsetY): {position} 必须是 l r c 和 t b c 的组合。如 lt", position);
+				// 对每个设置属性
+				var me = this,
+					form,
+					to,
+					key;
+					
+				// 生成新的 current 对象。
+				me.current = {};
+
+				from = this.from || emptyObj;
+				to = this.to;
 				
-			position = setter[position] || setter.lb;
-			enableReset = enableReset !== false;
+				for (key in to) {
+					
+					var parsed = undefined,
+						fromValue = from[key],
+						toValue = to[key],
+						parser = cache[key = key.toCamelCase()];
+					
+					// 已经编译过，直接使用， 否则找到合适的解析器。
+					if (!parser) {
+						
+						if(key in Dom.styleNumbers) {
+							cache[key] = numberParser;
+						} else {
+							
+							// 尝试使用每个转换器
+							for (parser in Animate.parsers) {
+								
+								// 获取转换器
+								parser = Animate.parsers[parser];
+								parsed = parser.parse(toValue, key);
+								
+								// 如果转换后结果合格，证明这个转换器符合此属性。
+								if (parsed || parsed === 0) {
+									// 缓存，下次直接使用。
+									cache[key] = parser;
+									break;
+								}
+							}
+							
+						}
+					}
+					
+					// 找到合适转换器
+					if (parser) {
+						me.current[key] = {
+							from: parser.parse((fromValue ? fromValue === 'auto' : fromValue !== 0) ? parser.get(me.target, key) : fromValue),
+							to: parsed === undefined ? parser.parse(toValue, key) : parsed,
+							parser: parser
+						};
+						
+						assert(me.current[key].from !== null && me.current[key].to !== null, "Animate.prototype.init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, me.current[key].from, me.current[key].to);
+					}
+					
+				}
+				
+				return me;
+			}
+		
+		}),
+
+		/**
+		 * 缓存已解析的属性名。
+		 */
+		cache = Animate.props = {
+			opacity: {
+				set: function (target, name, from, to, delta) {
+					target.setOpacity(compute(from, to, delta));
+				},
+				parse: self,
+				get: function (target) {
+					return target.getOpacity();
+				}
+			},
+
+			scrollTop: {
+				set: function (target, name, from, to, delta) {
+					target.setScroll(null, compute(from, to, delta));
+				},
+				parse: self,
+				get: function (target) {
+					return target.getScroll().y;
+				}
+			},
+
+			scrollLeft: {
+				set: function (target, name, from, to, delta) {
+					target.setScroll(compute(from, to, delta));
+				},
+				parse: self,
+				get: function (target) {
+					return target.getScroll().x;
+				}
+			}
+
+		},
+		
+		numberParser = {
+			set: function(target, name, from, to, delta){
+				target.dom.style[name] = compute(from, to, delta);
+			},
+			parse: function(value){
+				return typeof value == "number" ? value : parseFloat(value);
+			},
+			get: function(target, name){
+				return Dom.styleNumber(target.dom, name);
+			}
+		};
+	
+	Animate.parsers = {
+		
+		/**
+		 * 数字。
+		 */
+		length: {
 			
-			this.setPosition(
-				position[0](ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offsetX || 0, this, enableReset),
-				position[1](ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offsetY || 0, this, enableReset)
-			);
+			set: navigator.isStd ? function (target, name, from, to, delta) {
+				
+				target.dom.style[name] = compute(from, to, delta) + 'px';
+			} : function(target, name, from, to, delta){
+				try {
+					
+					// ie 对某些负属性内容报错
+					target.dom.style[name] = compute(from, to, delta);
+				}catch(e){}
+			},
+			
+			parse: numberParser.parse,
+			
+			get: numberParser.get
+			
+		},
+		
+		/**
+		 * 颜色。
+		 */
+		color: {
+			
+			set: function set(target, name, from, to, delta){
+				target.dom.style[name] = String.arrayToHex([
+					Math.round(compute(from[0], to[0], delta)),
+					Math.round(compute(from[1], to[1], delta)),
+					Math.round(compute(from[2], to[2], delta))
+				]);
+			},
+			
+			parse: function(value){
+				return String.hexToArray(value) || String.rgbToArray(value);
+			},
+			
+			get: function(target, name){
+				return Dom.getStyle(target.dom, name);
+			}
+	
 		}
 		
 	};
 	
-})());
+	function self(v){
+		return v;
+	}
+	
+	/// #region Dom
+	
+	var height = 'height marginTop paddingTop marginBottom paddingBottom',
+		
+		return0 = Function.from(0),
+	
+		ep = Dom.prototype,
+		show = ep.show,
+		hide = ep.hide,
+		toggle = ep.toggle;
+		
+	Fx.toggleTypes = {};
+		
+	Fx.toggleTypes.opacity = Function.from({opacity: 0});
+
+	Object.each({
+		all: height + ' opacity width',
+		height: height,
+		width: 'width marginLeft paddingLeft marginRight paddingRight'
+	}, function(value, key){
+		value = Object.map(value, return0, {});
+		Fx.toggleTypes[key] = function(animate, elem){
+			animate.orignal.overflow = elem.style.overflow;
+			elem.style.overflow = 'hidden';
+			
+			return value;
+		};
+	});
+	
+	Object.map('left right top bottom', function(key, index){
+		Fx.toggleTypes[key] = function(animate, elem, show){
+			
+			var from = animate.from = {},
+				to = animate.to = {};
+			
+			if(show) {
+				to = from;
+				from = animate.to;
+			}
+			
+			elem.parentNode.style.overflow = 'hidden';
+			if(index <= 1){
+				from[key] = -elem.offsetWidth;
+				var margin2 = index === 0 ? 'marginRight' : 'marginLeft';
+				from[margin2] = elem.offsetWidth;
+				to[key] = to[margin2] = 0;
+			} else {
+				from[key] = -elem.offsetHeight;
+				to[key] = 0;
+			}
+		
+		};
+		
+		key = 'margin' + key.capitalize();
+	});
+
+	Dom.implement({
+		
+		/**
+		 * 获取和当前节点有关的 Animate 实例。
+		 * @return {Animate} 一个 Animate 的实例。
+		 */
+		fx: function(){
+			var data = this.dataField();
+			return data.$fx || (data.$fx = new Fx.Animate(this));
+		}
+		
+	}, 2)
+	
+	.implement({
+		
+		/**
+		 * 变化到某值。
+		 * @param {String/Object} [name] 变化的名字或变化的末值或变化的初值。
+		 * @param {Object} value 变化的值或变化的末值。
+		 * @param {Number} duration=-1 变化的时间。
+		 * @param {Function} [oncomplete] 停止回调。
+		 * @param {Function} [onStart] 开始回调。
+		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 rerun 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
+		 * @return this
+		 */
+		animate: function (params, duration, callback, link) {
+			if(params.to){
+				link = params.link;
+			} else {
+				params = {
+					target: this,
+					to: params,
+					duration: duration,
+					complete: callback
+				};
+			}
+			
+			this.fx().run(params, link);
+			
+			return this;
+		},
+		
+		/**
+		 * 显示当前元素。
+		 * @param {Number} duration=500 时间。
+		 * @param {Function} [callback] 回调。
+		 * @param {String} [type] 方式。
+		 * @return {Element} this
+		 */
+		show: function(){
+			var me = this;
+			
+			// 肯能是同步的请求。
+			if (!arguments[0]) {
+				return show.apply(me, arguments);
+			}
+
+			var args = Dom.initToggleArgs(arguments),
+				callback = args[2];
+		
+			me.fx().run({
+				target: this,
+				duration: args[1],
+				start: function (options) {
+					
+					var elem = this.target.dom;
+						
+					if(!Dom.isHidden(elem)){
+						if (callback)
+							callback.call(this.target, true, true);
+						return false;
+					}
+					
+					Dom.show(elem);
+					
+					this.orignal = {};
+					
+					var from = Fx.toggleTypes[args[0]](this, elem, false);
+					
+					if(from){
+						this.from = from;
+						this.to = {};	
+							
+						for(from in this.from) {
+							this.to[from] = Dom.styleNumber(elem, from);
+						}
+					}
+					
+					for(from in this.to){
+						this.orignal[from] = elem.style[from];
+					}
+				},
+				complete:  function(){
+					Object.extend(this.target.dom.style, this.orignal);
+				
+					if (callback)
+						callback.call(this.target, true);
+				}
+			}, args[3]);
+		
+			return me;
+		},
+		
+		/**
+		 * 隐藏当前元素。
+		 * @param {Number} duration=500 时间。
+		 * @param {Function} [callback] 回调。
+		 * @param {String} [type] 方式。
+		 * @return {Element} this
+		 */
+		hide: function () {
+			var me = this;
+			
+			// 肯能是同步的请求。
+			if (!arguments[0]) {
+				return hide.apply(me, arguments);
+			}
+
+			var args = Dom.initToggleArgs(arguments),
+				callback = args[2];
+		
+			me.fx().run({
+				duration: args[1],
+				start: function () {
+					
+					var elem = this.target.dom;
+						
+					if(Dom.isHidden(elem)){
+						if(callback)
+							callback.call(this.target, false, true);
+						return false;
+					}
+					
+					this.orignal = {};
+					
+					var to = Fx.toggleTypes[args[0]](this, elem, true);
+					
+					if(to){
+						this.from = null;
+						this.to = to;
+					}
+					
+					for(var i in this.to){
+						this.orignal[i] = elem.style[i];
+					}
+				},
+				complete: function () {
+					
+					var elem = this.target.dom;
+					Object.extend(elem.style, this.orignal);
+					Dom.hide(elem);
+					if (callback)
+						callback.call(this.target, false);
+				}
+			}, args[3]);
+			
+			return this;
+		},
+	
+		toggle: function(){
+			this.fx().then(function (args) {
+				toggle.apply(this, args);
+				return false;
+			}, arguments);
+
+			return this;
+		},
+		
+		/**
+		 * 高亮元素。
+		 * @param {String} color 颜色。
+		 * @param {Function} [callback] 回调。
+		 * @param {Number} duration=500 时间。
+		 * @return this
+		 */
+		highlight: function(color, duration, callback){
+			assert(!callback || Object.isFunction(callback), "Dom.prototype.highlight(color, duration, callback): 参数 {callback} 不是可执行的函数。", callback);
+			var from = {},
+				to = {
+					backgroundColor: color || '#ffff88'
+				},
+				fx = this.fx();
+			
+			fx.run({
+				target: this,
+				from: from,
+				to: to,
+				duration: duration,
+				start: function(){
+					this.from.backgroundColor = Dom.getStyle(this.target.dom, 'backgroundColor');
+				}
+			}).run({
+				target: this,
+				from: to,
+				to: from,
+				duration: duration,
+				stop: callback
+			});
+			
+			return this;
+		}
+	
+	});
+	
+				
+
+	/// #endregion
+	
+})();
+/**********************************************
+ * System.Request.Base
+ **********************************************/
+/**
+ * @fileOverview 提供最底层的请求底层辅助函数。
+ */
+
+var Request = Request || {};
+
+// errorNo
+//  0 - 无错误
+//  1 - 服务器响应错误 (404, 500, etc)
+//  2 - 客户端出现异常
+//  -1 - 服务器超时
+//  -2 - 用户主动结束请求
+
+/**
+ * 提供一个请求的基本功能。
+ * @class Request.Base
+ * @abstract
+ */
+Request.Base = Deferrable.extend({
+	
+	/**
+	 * 当前 AJAX 发送的地址。
+	 * @field url
+	 */
+	
+	/**
+	 * 超时的时间大小。 (单位: 毫秒)
+	 * @property timeouts
+	 * @type Number
+	 */
+
+	url: null,
+
+	/**
+	 * 是否允许缓存。
+	 * @type Boolean
+	 */
+	cache: true,
+
+	data: null,
+
+	timeout: -1,
+
+	start: null,
+
+	success: null,
+
+	error: null,
+
+	complete: null,
+
+	initData: function (data) {
+		return !data ? null : typeof data === 'string' ? data : Request.param(data);
+	},
+
+	initUrl: function (url) {
+		assert.notNull(url, "Request.Base.prototype.initUrl(url): {url} ~。", url);
+		url = url.replace(/#.*$/, '');
+
+		// 禁止缓存，为地址加上随机数。
+		return this.cache ? url : Request.combineUrl(url, '_=' + Date.now());
+	},
+
+	constructor: function (options) {
+		Object.extend(this, options);
+	},
+
+	/**
+	 * @param options
+	 * url - 请求的地址。
+	 * data - 请求的数据。
+	 * cache - 是否允许缓存。默认为 true 。
+	 * start - 请求开始时的回调。参数是 data, xhr
+	 * error - 请求失败时的回调。参数是 errorNo, message, xhr
+	 * success - 请求成功时的回调。参数是 content, message, xhr
+	 * complete - 请求完成时的回调。参数是 xhr, message, errorNo
+	 * timeout - 请求超时时间。单位毫秒。默认为 -1 无超时 。
+	 */
+	run: function(options, link){
+    	if(this.defer(options, link)){
+    		return this;
+		}
+
+    	this.constructor(options);
+    	return this.send();
+	},
+
+	/**
+	 * 停止当前的请求。
+	 * @return this
+	 */
+	pause: function () {
+		this.onStateChange(-2);
+		return this;
+	}
+	
+});
+
+/**
+ * 返回变量的地址形式。
+ * @param { Base} obj 变量。
+ * @return {String} 字符串。
+ * @example <code>
+ * Request.param({a: 4, g: 7}); //  a=4&g=7
+ * </code>
+ */
+Request.param = function (obj, name) {
+
+	var s;
+	if (Object.isObject(obj)) {
+		s = [];
+		Object.each(obj, function (value, key) {
+			s.push(Request.param(value, name ? name + "[" + key + "]" : key));
+		});
+		s = s.join('&');
+	} else {
+		s = encodeURIComponent(name) + "=" + encodeURIComponent(obj);
+	}
+
+	return s.replace(/%20/g, '+');
+};
+
+Request.combineUrl = function (url, param) {
+	return param ? url + (url.indexOf('?') >= 0 ? '&' : '?') + param : url;
+};
+
 
 /**********************************************
- * Controls.Button.Menu
+ * System.Request.Jsonp
  **********************************************/
 /**
- * @author 
- */
+ * @fileOverview 请求处理JSON-P数据。
+ * @author xuld
+ */
 
+Request.JSONP = Request.Base.extend({
 
-var MenuItem = ContentControl.extend({
-	
-	xtype: 'menuitem',
-	
-	tpl: '<a class="x-menuitem"></a>',
-	
-	subMenu: null,
-	
-	/**
-	 * 
-	 */
-	init: function(){
-		this.base('init');
-		this.unselectable();
-		this.on('mouseover', this.onMouseEnter);
-		this.on('mouseout', this.onMouseLeave);
-		
-		var subMenu = this.find('.x-menu');
-		if(subMenu){
-			this.setSubMenu(new Menu(subMenu));
-		}
-	},
-	
-	setSubMenu: function(menu){
-		if (menu) {
-			this.subMenu = menu.hide();
-			menu.floating = false;
-			this.addClass('x-menuitem-menu');
-			this.on('mouseup', this._cancelHideMenu);
-		} else {
-			menu.floating = true;
-			this.removeClass('x-menuitem-menu');
-			this.un('mouseup', this._cancelHideMenu);
-		}
-	},
-	
-	_cancelHideMenu: function(e){
-		e.stopPropagation();
-	},
-	
-	toggleIcon: function(icon, val){
-		this.icon.toggleClass(icon, val);
-		return this;
-	},
-	
-	onMouseEnter: function(){
-		
-		// 使用父菜单打开本菜单，显示子菜单。
-		this.parentControl && this.parentControl.showSub(this);
+	jsonp: 'callback',
 
-	},
-	
-	_hideTargetMenu: function(e){
-		var tg = e.relatedTarget;
-		while(tg && tg.className != 'x-menu') {
-			tg = tg.parentNode;
-		}
-		
-		if (tg) {   
-			var dt = JPlus.data(tg, 'menu');
-			
-			
-			tg.hideSub();
-		}
-		
-	},
-	
-	onMouseLeave: function(e){
-		
-		// 没子菜单，需要自取消激活。
-		// 否则，由父菜单取消当前菜单的状态。
-		// 因为如果有子菜单，必须在子菜单关闭后才能关闭激活。
-		
-		if(!this.subMenu)
-			 this.setSelected(false);
-			 
-	}
+	success: Function.empty,
 
+    onStateChange: function(errorNo, message){
+    	var me = this, script = me.script;
+    	if (script && (errorNo || !script.readyState || !/in/.test(script.readyState))) {
+        
+            // 删除全部绑定的函数。
+            script.onerror = script.onload = script.onreadystatechange = null;
+            
+            // 删除当前脚本。
+            script.parentNode.removeChild(script);
+            
+    		// 删除回调。
+			window[me.callback] = undefined;
+            
+            me.script = null;
+            
+            try {
+            
+            	if (errorNo && me.error) {
+					me.error(errorNo, message, script);
+				}
+                
+            	if (me.complete) {
+            		me.complete(script, message, errorNo);
+            	}
+                
+            } finally {
+            
+                script = null;
+
+				me.progress();
+            }
+        }
+    },
+    
+    send: function(){
+    	
+    	var me = this,
+			url = me.initUrl(me.url),
+			data = me.initData(me.data),
+			script,
+			t;
+        
+    	url = Request.combineUrl(url, data);
+
+    	// 处理 callback=?
+    	var callback = me.callback || ('jsonp' + Date.now());
+
+    	if (me.jsonp) {
+
+    		if (url.indexOf(me.jsonp + '=?') >= 0) {
+    			url = url.replace(me.jsonp + '=?', me.jsonp + '=' + callback);
+    		} else {
+    			url = Request.combineUrl(url, me.jsonp + "=" + callback);
+    		}
+
+    	}
+        
+        script = me.script = document.createElement("script");
+
+        if (me.start)
+        	me.start(data, me.script);
+        
+        window[callback] = function(){
+        	window[callback] = undefined;
+
+        	return me.success.apply(me, arguments);
+        };
+        
+        script.src = url;
+        script.type = "text/javascript";
+
+        script.onload = script.onreadystatechange = function () {
+        	me.onStateChange();
+        };
+        
+        script.onerror = function(){
+        	me.onStateChange(1);
+        };
+        
+        if (me.timeouts > 0) {
+        	setTimeout(function () {
+        		me.onStateChange(-1);
+			}, me.timeouts);
+        }
+
+        t = document.getElementsByTagName("script")[0];
+        t.parentNode.insertBefore(script, t);
+    }
 });
-
-Object.map("Selected Checked Disabled", function(key){
-	var p = MenuItem.prototype, c = 'x-menuitem-' + key.toLowerCase();
-	p['set' + key] = function(value){
-		return this.toggleClass(c, value);
-	};
-	
-	p['get' + key] = function(){
-		return this.hasClass(c);
-	};
-});
-
-var MenuSeperator = Control.extend({
-	
-	tpl: '<div class="x-menu-seperator"></div>',
-	
-	init: Function.empty
-	
-});
-
-var Menu = ListControl.extend({
-	
-	xtype: 'menu',
-	
-	initChild: function (item) {
-		if(item instanceof MenuItem || item instanceof MenuSeperator){
-			return item;
-		}
-		if(item === '-'){
-			return new 	MenuSeperator();
-		}
-		
-		if(item instanceof Control && item.hasClass('x-menuitem')){
-			return new MenuItem(item);
-		}
-		
-		var menu = new MenuItem();
-		menu.append(item);
-		return menu;
-	},
-	
-	init: function(){
-		var me = this;
-		me.base('init');
-		
-		// 绑定节点和控件，方便发生事件后，根据事件源得到控件。
-		this.dataField().menu = this;
-	},
-	
-	showMenu: function(){
-		this.show();
-		this.onShow();
-	},
-	
-	hideMenu: function(){
-		this.hide();
-		this.onHide();
-	},
-	
-	/**
-	 * 当前菜单依靠某个控件显示。
-	 * @param {Control} ctrl 方向。
-	 */
-	showAt: function(x, y){
-		
-		if(!this.parent('body')){
-			this.appendTo();
-		}
-		
-		// 显示节点。
-		this.showMenu();
-		
-		this.setPosition(x, y);
-		
-		return this;
-	},
-	
-	/**
-	 * 当前菜单依靠某个控件显示。
-	 * @param {Control} ctrl 方向。
-	 */
-	showBy: function(ctrl, pos, offsetX, offsetY, enableReset){
-		
-		if(!this.parent('body')){
-			this.appendTo(ctrl.parent());
-		}
-		
-		// 显示节点。
-		this.showMenu();
-		
-		this.align(ctrl, pos || 'rt', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);
-		
-		return this;
-	},
-	
-	onShow: function(){
-		this.floating = true;
-		document.once('mouseup', this.hideMenu, this);
-		this.trigger('show');
-	},
-	
-	/**
-	 * 关闭本菜单。
-	 */
-	onHide: function(){
-		
-		// 先关闭子菜单。
-		this.hideSub();
-		this.trigger('hide');
-	},
-	
-	/**
-	 * 打开本菜单子菜单。
-	 * @protected
-	 */
-	showSub: function(item){
-		
-		// 如果不是右键的菜单，在打开子菜单后监听点击，并关闭此子菜单。
-		if(!this.floating)
-			document.once('mouseup', this.hideSub, this);
-		
-		// 隐藏当前项子菜单。
-		this.hideSub();
-		
-		// 激活本项。
-		item.setSelected(true);
-		
-		if (item.subMenu) {
-			
-			// 设置当前激活的项。
-			this.currentSubMenu = item;
-			
-			// 显示子菜单。
-			item.subMenu.showBy(item);
-			
-		}
-	},
-	
-	/**
-	 * 关闭本菜单打开的子菜单。
-	 * @protected
-	 */
-	hideSub: function(){
-		
-		// 如果有子菜单，就隐藏。
-		if(this.currentSubMenu) {
-			
-			// 关闭子菜单。
-			this.currentSubMenu.subMenu.hide();
-			
-			// 取消激活菜单。
-			this.currentSubMenu.setSelected(false);
-			this.currentSubMenu = null;
-		}
-	}
-	
-});
-
-
-
 /**********************************************
- * Controls.Button.Button
+ * System.Request.Ajax
  **********************************************/
-/** * @author  xuld */var Button = ContentControl.extend({		options: {		type: 'button'	},		tpl: '<button class="x-button" type="button"></button>',		create: function(options){		var type = options.type;		delete options.type;		return Dom.parseNode(this.tpl.replace('"button"', '"' + type + '"'));	},		getActived: function(){		return this.hasClass('x-button-actived');	},		setActived: function(value){		this.toggleClass('x-button-actived', value);	},		getDisabled: function(){		return this.container.getAttr('disabled') !== false ;	},		setDisabled: function(value){		value = value !== false;		this.toggleClass('x-button-disabled', value);		this.container.setAttr('disabled', value);	}	});/**********************************************
- * Controls.Core.IDropDownMenuContainer
- **********************************************/
-/** * @author xuld *//** * 所有支持下拉菜单的组件实现的接口。 */var IDropDownMenuContainer = {		/**	 * 获取当前控件的下拉菜单。	 * @type Control	 * @property dropDownMenu	 */		dropDownMenuWidth: 'auto',		onDropDownMenuOpen: function(){		this.trigger('dropdownmenuopen');	},		onDropDownMenuClose: function(){		this.trigger('dropdownmenuclose');	},	setDropDownMenu: function(control){				control = Dom.get(control);				// 设置下拉菜单。		this.dropDownMenu = control.addClass('x-dropdownmenu').hide();				// 如果当前节点已经添加到 DOM 树，则同时添加 control 。		if(!control.parent('body')){						var tagName = this.dom.tagName;						// 给 div 和 span 更多关心。			if(tagName === 'DIV' || tagName === 'SPAN'){				Dom.movable(this.dom);				control.appendTo(this);			} else {				control.appendTo(this.parent());			}						if(navigator.isQuirks && control.parent().getStyle('z-index') === 0)				control.parent().setStyle('z-index', 1);		}			},		realignDropDownMenu: function (offsetX, offsetY) {		this.dropDownMenu.align(this, 'bl', offsetX, offsetY);	},		toggleDropDownMenu: function(e){		if(e) this._dropDownMenuTrigger = e.target;		return this._dropDownMenuVisible ? this.hideDropDownMenu() : this.showDropDownMenu();	},		showDropDownMenu: function(){				if(this._dropDownMenuVisible){			this.realignDropDownMenu(0, -1);			return ;			}				this._dropDownMenuVisible = true;		this.dropDownMenu.show();		this.realignDropDownMenu(0, -1);				var size = this.dropDownMenuWidth;		if(size === 'auto') {			size = this.getSize().x;			if(size < Dom.styleNumber(this.dropDownMenu.dom, 'min-width'))				size = -1;		}				if(size !== -1) {			this.dropDownMenu.setSize(size);		}				this.onDropDownMenuOpen();				document.on('mouseup', this.dropDownMenuMouseUpHandler = this.hideDropDownMenu.bind(this));	},		hideDropDownMenu: function (e) {				// 如果是来自事件的关闭，则检测是否需要关闭菜单。		if(e){			e = e.target;			if([this._dropDownMenuTrigger, this.dropDownMenu.dom, this.dom].indexOf(e) >= 0 || Dom.hasChild(this.dropDownMenu.dom, e) || Dom.hasChild(this.dom, e)) 				return;		}				this.onDropDownMenuClose();		this.dropDownMenu.hide();		document.un('mouseup', this.dropDownMenuMouseUpHandler);				this._dropDownMenuVisible = false;	}	};/**********************************************
- * Controls.Button.MenuButton
- **********************************************/
-/** * @author  */var MenuButton = Button.extend(IDropDownMenuContainer).implement({		xtype: 'menubutton',		tpl: '<button class="x-button"><span class="x-button-menu x-button-menu-down"></span></button>',		init: function () {		this.base('init');		this.addClass('x-' + this.xtype);		this.menuButton = this.find('.x-button-menu');		this.on('click', this.toggleDropDownMenu);		this.setDropDownMenu(new Menu());		this.items = this.controls = this.dropDownMenu.controls;		this.dropDownMenu.on('click', this.onSelectItem, this);	},		onDropDownMenuOpen: function(){		this.setActived(true);		this.trigger('dropdownmenuopen');	},		onDropDownMenuClose: function(){		this.trigger('dropdownmenuclose');		this.setActived(false);	},		onSelectItem: function(){		this.hideDropDownMenu();		return false;	},		setText: function () {		this.base('setText');		this.append(this.menuButton);		return this;	},		setHtml: function () {		this.base('setHtml');		this.append(this.menuButton);		return this;	}	});/**********************************************
- * Controls.Button.SplitButton
- **********************************************/
-/** * @author  */var SplitButton = MenuButton.extend({		xtype: 'splitbutton',		tpl: '<span class="x-splitbutton x-buttongroup">\				<button class="x-button">&nbsp;</button>\				<button class="x-button"><span class="x-button-menu x-button-menu-down"></span></button>\			</span>',		init: function () {		this.container = this.find('.x-button');		this.menuButton = this.find('.x-button:last-child');		this.menuButton.on('click', this.toggleDropDownMenu, this);		this.setDropDownMenu(new Menu().appendTo(this.dom));		this.menuButton.appendTo(this.dom);		this.items = this.controls = this.dropDownMenu.controls;		this.dropDownMenu.on('click', this.onSelectItem, this);	},		setText: ContentControl.prototype.setText,		setHtml: ContentControl.prototype.setHtml	});/**********************************************
- * Controls.Button.CloseButton
- **********************************************/
-/** * @author  *//**********************************************
- * System.Browser.Base
- **********************************************/
-/** * @author  */var Browser = Browser || {};/**********************************************
- * System.Browser.Cookie
- **********************************************/
-
-
-
 /**
- * 获取 Cookies 。
- * @param {String} name 名字。
- * @param {String} 值。
+ * @fileOverview 提供底层的 Ajax 支持。
  */
-Browser.getCookie = function (name) {
-		
-	assert.isString(name, "Browser.getCookie(name): 参数 {name} ~");
-		
-	name = encodeURIComponent(name);
-		
-	var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([-.*+?^${}()|[\]\/\\])/g, '\\$1') + "=([^;]*)"));
-	return matches ? decodeURIComponent(matches[1]) : undefined;
+
+//using("System.Request.Base");
+//using("System.Request.Text");
+//using("System.Request.JSONP");
+//using("System.Request.JSON");
+//using("System.Request.XML");
+
+var Ajax = Ajax || {};
+
+Ajax.dataTypes  ={
+	'text': 'Text',
+	'jsonp': 'JSONP',
+	'json': 'JSON',
+	'xml': 'XML'
 };
+
+Ajax.send = function (options) {
+	return new Request[Ajax.dataTypes[options.dataType] || 'Text']().run(options);
+};
+
+Object.each({
+	get: 'Text',
+	post: 'Text',
+	getJSONP: 'JSONP',
+	getJSON: 'JSON'
+}, function(value, key) {
+
+	/**
+	 * 快速请求一个地址。
+	 * @param {String} url 地址。
+	 * @param {String/Object} data 数据。
+	 * @param {Function} [onsuccess] 成功回调函数。
+	 * @param {Function} [onerror] 错误回调函数。
+	 * @param {Object} timeouts=-1 超时时间， -1 表示不限。
+	 * @param {Function} [ontimeout] 超时回调函数。
+	 * @method Ajax.get
+	 */
 	
-/**
- * 设置 Cookies 。
- * @param {String} name 名字。
- * @param {String} value 值。
- * @param {Number} expires 有效天数。天。-1表示无限。
- * @param {Object} props 其它属性。如 domain, path, secure    。
- */
-Browser.setCookie = function (name, value, expires, props) {
-	var e = encodeURIComponent,
-		    updatedCookie = e(name) + "=" + e(value),
-		    t;
-
-	assert(updatedCookie.length < 4096, "Browser.setCookie(name, value, expires, props): 参数  value 内容过长(大于 4096)，操作失败。");
-
-	if (expires == undefined)
-		expires = value === null ? -1 : 1000;
-
-	if (expires) {
-		t = new Date();
-		t.setHours(t.getHours() + expires * 24);
-		updatedCookie += '; expires=' + t.toGMTString();
-	}
-
-	for (t in props) {
-		updatedCookie = String.concat(updatedCookie, "; " + t, "=", e(props[t]));
-	}
-
-	document.cookie = updatedCookie;
-
-	return Browser;
-};
-
-
+	/**
+	 * 快速请求一个地址。
+	 * @param {String} url 地址。
+	 * @param {String/Object} data 数据。
+	 * @param {Function} [onsuccess] 成功回调函数。
+	 * @param {Function} [onerror] 错误回调函数。
+	 * @param {Object} timeouts=-1 超时时间， -1 表示不限。
+	 * @param {Function} [ontimeout] 超时回调函数。
+	 * @method Ajax.post
+	 */
+	
+	var type = value === "Text" ? key.toUpperCase() : null;
+	
+	Ajax[key] = function (url, data, onsuccess, onerror, oncomplete, timeouts) {
+		assert(value in Request, "未载入 JPlus.Request." + value + " 模块。");
+		assert.isString(url, "Ajax." + key + "(url, data, onsuccess, onerror, timeouts, ontimeout, oncomplete): 参数{url} 必须是一个地址。如果需要提交至本页，使用 location.href。");
+		if(typeof data == 'function'){
+			timeouts = oncomplete;
+			oncomplete = onerror;
+			onerror = data;
+			data = null;
+		}
+		return new Request[value]().run({
+			url: url,
+			type: type,
+			data: data,
+			success: onsuccess,
+			error: onerror,
+			complete: oncomplete,
+			timeouts: timeouts
+		});
+	};
+});

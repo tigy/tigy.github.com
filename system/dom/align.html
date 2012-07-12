@@ -12,7 +12,7 @@
 	</head>
 	<body>
 		
-		对齐方式:  <select id="position">
+		对齐方式:  <select id="position" onchange="realign()" onkeyup="realign()">
 			<option value="rt">rt</option>
 			<option value="rb">rb</option>
 			<option value="lt">lt</option>
@@ -51,18 +51,17 @@
 		<div id="a" class="demo-box-large demo-purple" style="left: 400px; position: absolute; top: 50px;"></div>
 		
 		
-		<script>
+		<script class="demo">
 			
 			
 			var a = Dom.get('a');
 			
 			Dom.get('target').unselectable().draggable().on('dragend', realign);
 			
-			Dom.get('position').on('change', realign);
-			
-			
-			function realign(){
-				a.align(Dom.get('target'), Dom.get('position').getText(), 0, 0);
+			function realign() {
+
+                // 真正的对齐函数。
+			    a.align('target', Dom.get('position').getText(), 0, 0);
 			}
 			
 		

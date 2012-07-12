@@ -28,37 +28,57 @@
 			<div id="d5" class="demo-box demo-indigo">限制位置</div>
 			<div id="d6" class="demo-box demo-blue">自动刷屏</div>
 		</div>
-		<script>
-			
-		
-		
-		
-			
-			var d1 = $('d1').draggable(true).on('dragstart', function(e){
-				this.text = this.getHtml();
+		<script class="demo">
+
+            // 一行代码即可实现基本的拖动效果。
+		    var d1 = $('d1').draggable();
+		    
+            // 绑定拖动事件，实现更多自定义功能。
+		    d1.on('dragstart', function(e){
+				this.$text = this.getHtml();
 			}).on('drag', function(e){
 			   	this.setHtml(e.draggable.to.x + "," + e.draggable.to.y);
 			}).on('dragend', function(e){
-				this.setHtml(this.text);
-			});
+			    this.setHtml(this.$text);
+            });
+
+		</script>
+
+		<script class="demo">
 			
 			var d2 = $('d2').draggable(true).on('dragend', function (e) {
 				e.draggable.revert();
-			});
+            });
+
+		</script>
+
+		<script class="demo">
 			
-			var d3 = $('d3').draggable($('d3').find('button'));
+		    var d3 = $('d3').draggable($('d3').find('button'));
+
+		</script>
+
+		<script class="demo">
 			
 			var d4 = $('d4').draggable(true).on('drag', function(e){
 				
 				var STHREH = 60;
 				e.draggable.setStep('x', STHREH);
 				e.draggable.setStep('y', STHREH);
-			});
+            });
+
+		</script>
+
+		<script class="demo">
 			
 			var d5 = $('d5').draggable(true).on('drag', function(e){
 				var container = this.parent(1);
 				e.draggable.limit(container.getPosition(), container.getSize()) ;
-			});
+            });
+
+		</script>
+
+		<script class="demo">
 			
 			var d6 = $('d6').draggable(true).on('drag', function(e){
 				e.draggable.autoScroll(document);
