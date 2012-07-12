@@ -3,7 +3,7 @@
 
 using("System.Dom.Base");
 
-Dom.resize = (function(){
+Dom.resize = (function() {
 	
 	var timer;
 
@@ -18,7 +18,7 @@ Dom.resize = (function(){
 		}
 
 	});
-		
+	
 	function resizeProxy(e){
 		if(timer)
 			clearTimeout(timer);

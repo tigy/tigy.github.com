@@ -3347,7 +3347,7 @@ Demo.extend(Demo, {
 				t.push('<h6>' + allFinished + '/' + allTotal + (allSkipped ? '+<del>' + allSkipped + '</del>' : '') + '</h6>');
 			}
 
-			sidebar.innerHTML = t.join('\r\n');
+			sidebar.innerHTML = t.join('');
 
 			// 如果有匹配相应的数据，则显示数据。
 			//----------------------------
