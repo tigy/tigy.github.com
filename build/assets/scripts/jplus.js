@@ -1,5 +1,5 @@
 /**********************************************
- * This file is created by a tool at 2012/7/12 11:38
+ * This file is created by a tool at 2012/7/13 10:34
  **********************************************/
 
 
@@ -7650,9 +7650,11 @@ Dom.implement((function(){
 		 * @param {String} align 设置的位置。如 lt rt 。完整的说明见备注。
 		 * @param {Number} offsetX 偏移的X大小。
 		 * @param {Number} offsetY 偏移的y大小。
+		 * @param {Boolean} enableReset 如果元素超出屏幕范围，是否自动更新节点位置。
 		 * @memberOf Control
 		 */
-		align: function (ctrl, position,  offsetX, offsetY, enableReset) {
+		align: function(ctrl, position, offsetX, offsetY, enableReset) {
+			ctrl = Dom.get(ctrl);
 			var ctrlSize = this.getSize(),
 				targetSize = ctrl.getSize(),
 				targetPosition = ctrl.getPosition(),
