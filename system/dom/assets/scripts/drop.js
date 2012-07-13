@@ -185,7 +185,7 @@ var Droppable = (function(){
 		}
 	});
 	
-	Dom.addEvent('dragenter dragleave dragover drop', {
+	Dom.addEvents('dragenter dragleave dragover drop', {
 		add:  function(elem, type, fn){
 			Dom.$event.$default.add(elem, type, fn);
 			fn = elem.dataField().droppable;

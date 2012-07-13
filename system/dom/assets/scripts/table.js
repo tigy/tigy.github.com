@@ -163,7 +163,7 @@ namespace(".HtmlTable", JPlus.Control.extend({
 
 	attachSorts: function(attach){
 		this.detachSorts();
-		if (attach !== false) this.element.addEvent('click:relay(' + this.options.thSelector + ')', this.bound.headClick);
+		if (attach !== false) this.element.addEvents('click:relay(' + this.options.thSelector + ')', this.bound.headClick);
 	},
 
 	detachSorts: function(){

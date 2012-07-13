@@ -3260,7 +3260,7 @@
 	textFix['#text'] = textFix['#comment'] = 'nodeValue';
 	
 	// 初始化事件对象。
-	Dom.addEvent('$default', eventObj);
+	Dom.addEvents('$default', eventObj);
 
 	// Dom 函数。
 	Dom.define(Dom, 'dom', 'scrollIntoView focus blur select click submit reset');
@@ -3304,7 +3304,7 @@
 				return this !== e.relatedTarget && !Dom.hasChild(this.dom, e.relatedTarget);
 			};
 
-			Dom.addEvent('mouseenter', {
+			Dom.addEvents('mouseenter', {
 				initEvent: checkMouseEnter,
 				add: function (ctrl, type, fn) {
 					eventObj.add(ctrl, 'mouseover', fn);
@@ -3314,7 +3314,7 @@
 				}
 			});
 
-			Dom.addEvent('mouseleave', {
+			Dom.addEvents('mouseleave', {
 				initEvent: checkMouseEnter,
 				add: function (ctrl, type, fn) {
 					eventObj.add(ctrl, 'mouseout', fn);
@@ -3339,7 +3339,7 @@
 			}
 		};
 
-		Dom.addEvent("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", {
+		Dom.addEvents("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", {
 			init: function (e) {
 				if(!e.stop) {
 					eventObj.initEvent(e);
@@ -3356,7 +3356,7 @@
 			}
 		});
 
-		Dom.addEvent("keydown keypress keyup",  {
+		Dom.addEvents("keydown keypress keyup",  {
 			init: function (e) {
 				if(!e.stop) {
 					eventObj.initEvent(e);
@@ -3457,7 +3457,7 @@
         
 	 */
 
-	Dom.addEvent('domready domload', {});
+	Dom.addEvents('domready domload', {});
 
 	map('ready load', function(readyOrLoad, isLoad) {
 

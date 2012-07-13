@@ -7,7 +7,7 @@ Dom.resize = (function() {
 	
 	var timer;
 
-	Dom.addEvent('resize', {
+	Dom.addEvents('resize', {
 
 		add: function (ctrl, type, fn) {
 			Dom.$event.$default.add(ctrl, type, resizeProxy);

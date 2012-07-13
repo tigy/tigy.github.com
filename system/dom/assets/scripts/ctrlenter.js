@@ -2,7 +2,7 @@
 
 
 
-Dom.addEvent('ctrlenter', {
+Dom.addEvents('ctrlenter', {
 	
 	add: function(ctrl, type, fn){
 		Dom.$event.$default.add(ctrl, 'keypress', fn);

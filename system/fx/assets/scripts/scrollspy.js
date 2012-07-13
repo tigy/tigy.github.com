@@ -107,7 +107,7 @@ Element.implement({
 						}.bind(this);
 
 						this.store('pin:_scrollFixer', scrollFixer);
-						window.addEvent('scroll', scrollFixer);
+						window.addEvents('scroll', scrollFixer);
 					}
 					this.store('pin:_pinned', true);
 				}

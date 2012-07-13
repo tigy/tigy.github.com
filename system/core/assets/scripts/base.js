@@ -212,7 +212,7 @@
 			 * // 创建一个新的类。
 			 * var MyCls = new Class();
 			 *
-			 * MyCls.addEvent('click', {
+			 * MyCls.addEvents('click', {
 			 *
 			 * 		add:  function (elem, type, fn) {
 			 * 	   		alert("为  elem 绑定 事件 " + type );
@@ -229,7 +229,7 @@
 			 *
 			 * </pre>
 			 */
-			addEvent: function (eventName, properties) {
+			addEvents: function (eventName, properties) {
 
 				assert.isString(eventName, "System.Base.addEvents(eventName, properties): {eventName} ~");
 
