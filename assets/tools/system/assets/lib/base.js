@@ -1,5 +1,5 @@
 ﻿/*
- * This file is created by a tool at 2012/07/10 15:42:31
+ * This file is created by a tool at 2012/07/13 13:10:38
  */
 
 
@@ -70,7 +70,7 @@
 				// 简单拷贝 Object 的成员，即拥有类的特性。
 				// 在 JavaScript， 一切函数都可作为类，故此函数存在。
 				// Object 的成员一般对当前类构造函数原型辅助。
-				return extend(constructor, Base);
+				return extend(constructor, classMembers);
 			},
 
 			/**
@@ -90,227 +90,224 @@
 			 */
 			version: 3.1
 
+		},
+		
+		classMembers = {
+
+			/**
+			 * 扩展当前类的动态方法。
+			 * @param {Object} members 用于扩展的成员列表。
+			 * @return this
+			 * @see #implementIf
+			 * @example 以下示例演示了如何扩展 Number 类的成员。<pre>
+			 * Number.implement({
+			 *   sin: function () {
+			 * 	    return Math.sin(this);
+			 *  }
+			 * });
+			 *
+			 * (1).sin();  //  Math.sin(1);
+			 * </pre>
+			 */
+			implement: function (members) {
+
+				assert(this.prototype, "System.Base.implement(members): 无法扩展当前类，因为当前类的 prototype 为空。");
+
+				// 复制到原型 。
+				Object.extend(this.prototype, members);
+
+				return this;
+			},
+
+			/**
+			 * 扩展当前类的动态方法，但不覆盖已存在的成员。
+			 * @param {Object} members 成员。
+			 * @return this
+			 * @see #implement
+			 */
+			implementIf: function (members) {
+
+				assert(this.prototype, "System.Base.implementIf(members): 无法扩展当前类，因为当前类的 prototype 为空。");
+
+				Object.extendIf(this.prototype, members);
+
+				return this;
+			},
+
+			/**
+			 * 为当前类注册一个事件。
+			 * @param {String} eventName 事件名。如果多个事件使用空格隔开。
+			 * @param {Object} properties={} 事件信息。 具体见备注。
+			 * @return this
+			 * @remark
+			 * 事件信息是一个JSON对象，它表明了一个事件在绑定、删除和触发后的一些操作。
+			 *
+			 * 事件信息的原型如:
+			 * <pre>
+			 * ({
+			 *
+			 *  // 当用户执行 target.on(type, fn) 时执行下列函数:
+			 * 	add: function(target, type, fn){
+			 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。
+			 *  },
+			 *
+			 *  // 当用户执行 target.un(type, fn) 时执行下列函数:
+			 *  remove: function(target, type, fn){
+			 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。
+			 *  },
+			 *
+			 *  // 当用户执行 target.trigger(e) 时执行下列函数:
+			 *  trigger: function(target, type, fn, e){
+			 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。e 是参数。
+			 *  },
+			 *
+			 *  // 当 fn 被执行时首先执行下列函数:
+			 *  initEvent: function(e){
+			 * 		// 其中 e 是参数。
+			 *  }
+			 *
+			 * });
+			 * </pre>
+			 *
+			 * 当用户使用 obj.on('事件名', 函数) 时， 系统会判断这个事件是否已经绑定过， 如果之前未绑定事件，则会创建新的函数
+			 * evtTrigger， evtTrigger 函数将遍历并执行 evtTrigger.handlers 里的成员,
+			 * 如果其中一个函数执行后返回 false， 则中止执行，并返回 false， 否则返回 true。
+			 * evtTrigger.handlers 表示 当前这个事件的所有实际调用的函数的数组。
+			 * 然后系统会调用 add(obj, '事件名', evtTrigger) 然后把 evtTrigger 保存在 obj.dataField().$event['事件名'] 中。
+			 * 如果 之前已经绑定了这个事件，则 evtTrigger 已存在，无需创建。 这时系统只需把 函数 放到 evtTrigger.handlers 即可。
+			 *
+			 * 真正的事件触发函数是 evtTrigger， evtTrigger会执行 initEvent 和用户定义的一个事件全部函数。
+			 *
+			 * 当用户使用 obj.un('事件名', 函数) 时， 系统会找到相应 evtTrigger， 并从
+			 * evtTrigger.handlers 删除 函数。 如果 evtTrigger.handlers 是空数组， 则使用
+			 * remove(obj, '事件名', evtTrigger) 移除事件。
+			 *
+			 * 当用户使用 obj.trigger(参数) 时， 系统会找到相应 evtTrigger， 如果事件有trigger， 则使用
+			 * trigger(obj, '事件名', evtTrigger, 参数) 触发事件。 如果没有， 则直接调用
+			 * evtTrigger(参数)。
+			 *
+			 * 下面分别介绍各函数的具体内容。
+			 *
+			 * add 表示 事件被绑定时的操作。 原型为:
+			 *
+			 * <pre>
+			 * function add(elem, type, fn) {
+			 * 	   // 对于标准的 DOM 事件， 它会调用 elem.addEventListener(type, fn, false);
+			 * }
+			 * </pre>
+			 *
+			 * elem表示绑定事件的对象，即类实例。 type 是事件类型， 它就是事件名，因为多个事件的 add 函数肯能一样的，
+			 * 因此 type 是区分事件类型的关键。fn 则是绑定事件的函数。
+			 *
+			 * remove 类似 add。
+			 *
+			 * $default 是特殊的事件名，它的各个信息将会覆盖同类中其它事件未定义的信息。
+			 *
+			 * @example 下面代码演示了如何给一个类自定义事件，并创建类的实例，然后绑定触发这个事件。
+			 * <pre>
+			 * // 创建一个新的类。
+			 * var MyCls = new Class();
+			 *
+			 * MyCls.addEvent('click', {
+			 *
+			 * 		add:  function (elem, type, fn) {
+			 * 	   		alert("为  elem 绑定 事件 " + type );
+			 * 		}
+			 *
+			 * });
+			 *
+			 * var m = new MyCls;
+			 * m.on('myEvt', function () {  //  输出 为  elem 绑定 事件  myEvt
+			 * 	  alert(' 事件 触发 ');
+			 * });
+			 *
+			 * m.trigger('myEvt', 2);
+			 *
+			 * </pre>
+			 */
+			addEvent: function (eventName, properties) {
+
+				assert.isString(eventName, "System.Base.addEvents(eventName, properties): {eventName} ~");
+
+				var eventObj = this.$event || (this.$event = {});
+
+				// 更新事件对象。
+				eventName.split(' ').forEach(function (value) {
+					eventObj[value] = this;
+				}, properties ? Object.extendIf(properties, eventObj.$default) : (eventObj.$default || emptyObj));
+
+				return this;
+			},
+
+			/**
+			 * 继承当前类创建并返回子类。
+			 * @param {Object/Function} [methods] 子类的员或构造函数。
+			 * @return {Function} 返回继承出来的子类。
+			 * @remark
+			 * 在 Javascript 中，继承是依靠原型链实现的， 这个函数仅仅是对它的包装，而没有做额外的动作。
+			 *
+			 * 成员中的 constructor 成员 被认为是构造函数。
+			 *
+			 * 这个函数实现的是 单继承。如果子类有定义构造函数，则仅调用子类的构造函数，否则调用父类的构造函数。
+			 *
+			 * 要想在子类的构造函数调用父类的构造函数，可以使用 {@link JPlus.Base#base} 调用。
+			 *
+			 * 这个函数返回的类实际是一个函数，但它被 {@link JPlus.Native} 修饰过。
+			 *
+			 * 由于原型链的关系， 肯能存在共享的引用。 如: 类 A ， A.prototype.c = []; 那么，A的实例 b ,
+			 * d 都有 c 成员， 但它们共享一个 A.prototype.c 成员。 这显然是不正确的。所以你应该把 参数 quick
+			 * 置为 false ， 这样， A创建实例的时候，会自动解除共享的引用成员。 当然，这是一个比较费时的操作，因此，默认
+			 * quick 是 true 。
+			 *
+			 * 也可以把动态成员的定义放到 构造函数， 如: this.c = []; 这是最好的解决方案。
+			 *
+			 * @example 下面示例演示了如何创建一个子类。
+			 * <pre>
+			 * var MyClass = new Class(); //创建一个类。
+			 *
+			 * var Child = MyClass.extend({  // 创建一个子类。
+			 * 	  type: 'a'
+			 * });
+			 *
+			 * var obj = new Child(); // 创建子类的实例。
+			 * </pre>
+			 */
+			extend: function (members) {
+
+				// 未指定函数 使用默认构造函数(Object.prototype.constructor);
+
+				// 生成子类 。
+				var subClass = hasOwnProperty.call(members = members instanceof Function ? {
+					constructor: members
+				} : (members || {}), "constructor") ? members.constructor : function () {
+
+					// 调用父类构造函数 。
+					arguments.callee.base.apply(this, arguments);
+
+				};
+
+				// 代理类 。
+				emptyFn.prototype = (subClass.base = this).prototype;
+
+				// 指定成员 。
+				subClass.prototype = Object.extend(new emptyFn, members);
+
+				// 覆盖构造函数。
+				subClass.prototype.constructor = subClass;
+
+				// 清空临时对象。
+				emptyFn.prototype = null;
+
+				// 指定Class内容 。
+				return JPlus.Native(subClass);
+
+			}
+
 		};
 
 	/// #endregion
 
 	/// #region Functions
-
-	/**
-	 * @static class JPlus.Base
-	 */
-	extend(Base, {
-
-		/**
-		 * 扩展当前类的动态方法。
-		 * @param {Object} members 用于扩展的成员列表。
-		 * @return this
-		 * @see #implementIf
-		 * @example 以下示例演示了如何扩展 Number 类的成员。<pre>
-	     * Number.implement({
-	     *   sin: function () {
-	     * 	    return Math.sin(this);
-	     *  }
-	     * });
-	     *
-	     * (1).sin();  //  Math.sin(1);
-	     * </pre>
-		 */
-		implement: function (members) {
-
-			assert(this.prototype, "System.Base.implement(members): 无法扩展当前类，因为当前类的 prototype 为空。");
-
-			// 复制到原型 。
-			Object.extend(this.prototype, members);
-
-			return this;
-		},
-
-		/**
-		 * 扩展当前类的动态方法，但不覆盖已存在的成员。
-		 * @param {Object} members 成员。
-		 * @return this
-		 * @see #implement
-		 */
-		implementIf: function (members) {
-
-			assert(this.prototype, "System.Base.implementIf(members): 无法扩展当前类，因为当前类的 prototype 为空。");
-
-			Object.extendIf(this.prototype, members);
-
-			return this;
-		},
-
-		/**
-		 * 为当前类注册一个事件。
-		 * @param {String} eventName 事件名。如果多个事件使用空格隔开。
-		 * @param {Object} properties={} 事件信息。 具体见备注。
-		 * @return this
-		 * @remark
-		 * 事件信息是一个JSON对象，它表明了一个事件在绑定、删除和触发后的一些操作。
-		 *
-		 * 事件信息的原型如:
-		 * <pre>
-		 * ({
-		 *
-		 *  // 当用户执行 target.on(type, fn) 时执行下列函数:
-		 * 	add: function(target, type, fn){
-		 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。
-		 *  },
-		 *
-		 *  // 当用户执行 target.un(type, fn) 时执行下列函数:
-		 *  remove: function(target, type, fn){
-		 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。
-		 *  },
-		 *
-		 *  // 当用户执行 target.trigger(e) 时执行下列函数:
-		 *  trigger: function(target, type, fn, e){
-		 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。e 是参数。
-		 *  },
-		 *
-		 *  // 当 fn 被执行时首先执行下列函数:
-		 *  initEvent: function(e){
-		 * 		// 其中 e 是参数。
-		 *  }
-		 *
-		 * });
-		 * </pre>
-		 *
-		 * 当用户使用 obj.on('事件名', 函数) 时， 系统会判断这个事件是否已经绑定过， 如果之前未绑定事件，则会创建新的函数
-		 * evtTrigger， evtTrigger 函数将遍历并执行 evtTrigger.handlers 里的成员,
-		 * 如果其中一个函数执行后返回 false， 则中止执行，并返回 false， 否则返回 true。
-		 * evtTrigger.handlers 表示 当前这个事件的所有实际调用的函数的数组。
-		 * 然后系统会调用 add(obj, '事件名', evtTrigger) 然后把 evtTrigger 保存在 obj.dataField().$event['事件名'] 中。
-		 * 如果 之前已经绑定了这个事件，则 evtTrigger 已存在，无需创建。 这时系统只需把 函数 放到 evtTrigger.handlers 即可。
-		 *
-		 * 真正的事件触发函数是 evtTrigger， evtTrigger会执行 initEvent 和用户定义的一个事件全部函数。
-		 *
-		 * 当用户使用 obj.un('事件名', 函数) 时， 系统会找到相应 evtTrigger， 并从
-		 * evtTrigger.handlers 删除 函数。 如果 evtTrigger.handlers 是空数组， 则使用
-		 * remove(obj, '事件名', evtTrigger) 移除事件。
-		 *
-		 * 当用户使用 obj.trigger(参数) 时， 系统会找到相应 evtTrigger， 如果事件有trigger， 则使用
-		 * trigger(obj, '事件名', evtTrigger, 参数) 触发事件。 如果没有， 则直接调用
-		 * evtTrigger(参数)。
-		 *
-		 * 下面分别介绍各函数的具体内容。
-		 *
-		 * add 表示 事件被绑定时的操作。 原型为:
-		 *
-		 * <pre>
-	     * function add(elem, type, fn) {
-	     * 	   // 对于标准的 DOM 事件， 它会调用 elem.addEventListener(type, fn, false);
-	     * }
-	     * </pre>
-		 *
-		 * elem表示绑定事件的对象，即类实例。 type 是事件类型， 它就是事件名，因为多个事件的 add 函数肯能一样的，
-		 * 因此 type 是区分事件类型的关键。fn 则是绑定事件的函数。
-		 *
-		 * remove 类似 add。
-		 *
-		 * $default 是特殊的事件名，它的各个信息将会覆盖同类中其它事件未定义的信息。
-		 *
-		 * @example 下面代码演示了如何给一个类自定义事件，并创建类的实例，然后绑定触发这个事件。
-		 * <pre>
-	     * // 创建一个新的类。
-	     * var MyCls = new Class();
-	     *
-	     * MyCls.addEvent('click', {
-	     *
-	     * 		add:  function (elem, type, fn) {
-	     * 	   		alert("为  elem 绑定 事件 " + type );
-	     * 		}
-	     *
-	     * });
-	     *
-	     * var m = new MyCls;
-	     * m.on('myEvt', function () {  //  输出 为  elem 绑定 事件  myEvt
-	     * 	  alert(' 事件 触发 ');
-	     * });
-	     *
-	     * m.trigger('myEvt', 2);
-	     *
-	     * </pre>
-		 */
-		addEvent: function (eventName, properties) {
-
-			assert.isString(eventName, "System.Base.addEvents(eventName, properties): {eventName} ~");
-
-			var eventObj = this.$event || (this.$event = {});
-
-			// 更新事件对象。
-			eventName.split(' ').forEach(function (value) {
-				eventObj[value] = this;
-			}, properties ? Object.extendIf(properties, eventObj.$default) : (eventObj.$default || emptyObj));
-
-			return this;
-		},
-
-		/**
-		 * 继承当前类创建并返回子类。
-		 * @param {Object/Function} [methods] 子类的员或构造函数。
-		 * @return {Function} 返回继承出来的子类。
-		 * @remark
-		 * 在 Javascript 中，继承是依靠原型链实现的， 这个函数仅仅是对它的包装，而没有做额外的动作。
-		 *
-		 * 成员中的 constructor 成员 被认为是构造函数。
-		 *
-		 * 这个函数实现的是 单继承。如果子类有定义构造函数，则仅调用子类的构造函数，否则调用父类的构造函数。
-		 *
-		 * 要想在子类的构造函数调用父类的构造函数，可以使用 {@link JPlus.Base#base} 调用。
-		 *
-		 * 这个函数返回的类实际是一个函数，但它被 {@link JPlus.Native} 修饰过。
-		 *
-		 * 由于原型链的关系， 肯能存在共享的引用。 如: 类 A ， A.prototype.c = []; 那么，A的实例 b ,
-		 * d 都有 c 成员， 但它们共享一个 A.prototype.c 成员。 这显然是不正确的。所以你应该把 参数 quick
-		 * 置为 false ， 这样， A创建实例的时候，会自动解除共享的引用成员。 当然，这是一个比较费时的操作，因此，默认
-		 * quick 是 true 。
-		 *
-		 * 也可以把动态成员的定义放到 构造函数， 如: this.c = []; 这是最好的解决方案。
-		 *
-		 * @example 下面示例演示了如何创建一个子类。
-		 * <pre>
-		 * var MyClass = new Class(); //创建一个类。
-		 *
-		 * var Child = MyClass.extend({  // 创建一个子类。
-		 * 	  type: 'a'
-		 * });
-		 *
-		 * var obj = new Child(); // 创建子类的实例。
-		 * </pre>
-		 */
-		extend: function (members) {
-
-			// 未指定函数 使用默认构造函数(Object.prototype.constructor);
-
-			// 生成子类 。
-			var subClass = hasOwnProperty.call(members = members instanceof Function ? {
-				constructor: members
-			} : (members || {}), "constructor") ? members.constructor : function () {
-
-				// 调用父类构造函数 。
-				arguments.callee.base.apply(this, arguments);
-
-			};
-
-			// 代理类 。
-			emptyFn.prototype = (subClass.base = this).prototype;
-
-			// 指定成员 。
-			subClass.prototype = Object.extend(new emptyFn, members);
-
-			// 覆盖构造函数。
-			subClass.prototype.constructor = subClass;
-
-			// 清空临时对象。
-			emptyFn.prototype = null;
-
-			// 指定Class内容 。
-			return JPlus.Native(subClass);
-
-		}
-
-	});
 
 	/**
 	 * 系统原生的对象。
@@ -944,7 +941,7 @@
 	/// #region Methods
 
 	// 把所有内建对象本地化 。
-	each.call([String, Array, Function, Date], JPlus.Native);
+	each.call([String, Array, Function, Date, Base], JPlus.Native);
 
 	/**
 	 * 所有由 new Class 创建的类的基类。
@@ -2674,7 +2671,7 @@ function imports(namespace) {
 			// 在顶部插入一个css，但这样肯能导致css没加载就执行 js 。所以，要保证样式加载后才能继续执行计算。
 			return document.getElementsByTagName("HEAD")[0].appendChild(extend(document.createElement('link'), {
 				href: url,
-				rel: trace.useLess ? 'stylesheet/less' : 'stylesheet',
+				rel: using.useLess ? 'stylesheet/less' : 'stylesheet',
 				type: 'text/css'
 			}));
 		},
@@ -3079,16 +3076,33 @@ function imports(namespace) {
 				return this;
 			},
 
+			/**
+			 * 使用指定的 CSS 选择器或函数过滤当前集合，并返回满足要求的元素的新 DomList 对象。
+			 * @param {String/Function} expression 用于过滤的 CSS 选择器或自定义函数，具体格式参考 {@link Array#filter}。
+			 * @return {DomList} 满足要求的元素的新 DomList 对象。
+			 */
 			filter: function(expression) {
 				return new DomList(ap.filter.call(this, typeof expression === 'string' ? function(value){
 					return Dom.match(value, expression);
 				} : expression));
 			},
-	
+			
+			/**
+			 * 为每个元素绑定事件。
+			 * @remark 见 {@link JPlus.Base#on}
+			 */
 			on: createEnumerator('on'),
-			
+
+			/**
+			 * 为每个元素删除绑定事件。
+			 * @remark 见 {@link JPlus.Base#un}
+			 */
 			un: createEnumerator('un'),
-			
+
+			/**
+			 * 触发每个元素事件。
+			 * @remark 见 {@link JPlus.Base#trigger}
+			 */
 			trigger: function(type, e){
 				for(var i = 0, r = true; i < this.length; i++){
 					if(!new Dom(this[o]).trigger(type, e))
@@ -3157,13 +3171,6 @@ function imports(namespace) {
 		 * @type Object
 		 */
 		cache = {},
-		
-		/**
-		 * 样式表。
-		 * @static
-		 * @type Object
-		 */
-		sizeMap = {},
 		
 		/**
 		 * 默认事件。
@@ -3835,7 +3842,7 @@ function imports(namespace) {
 		
 		/**
 		 * 检查是否含指定类名。
-		 * @param {Element} elem 元素。
+		 * @param {Element} elem 要测试的元素。
 		 * @param {String} className 类名。
 		 * @return {Boolean} 如果存在返回 true。
 	 	 * @static
@@ -3845,10 +3852,15 @@ function imports(namespace) {
 			assert(className && (!className.indexOf || !/[\s\r\n]/.test(className)), "Dom.hasClass(elem, className): {className} 不能空，且不允许有空格和换行。");
 			return (" " + elem.className + " ").indexOf(" " + className + " ") >= 0;
 		},
-			
-		dataField: function(elem){
-			return Dom.prototype.dataField.call({dom: elem});
-		},
+
+		///**
+		// * 获取一个节点对应的数据字段。
+		// * @param {Element} elem 需要获取属性的节点。
+		// * @return {Object} 一个用于存储数据的对象，该对象和指定节点绑定。
+		// */
+		//dataField: function(elem){
+		//	return Dom.prototype.dataField.call({dom: elem});
+		//},
 		
 		/**
 		 * 特殊属性集合。
@@ -3899,7 +3911,12 @@ function imports(namespace) {
 				var doc = getDocument(elem).defaultView;
 				return nameOrId === (doc.defaultView || doc.parentWindow).location.hash.slice(1)
 			},
-			
+
+			/**
+			 * 判断一个节点是否有元素节点或文本节点。
+			 * @param {Element} elem 要测试的元素。
+			 * @return {Boolean} 如果存在子节点，则返回 true，否则返回 false 。
+			 */
 			empty: Dom.isEmpty = function(elem) {
 				for( elem = elem.firstChild; elem; elem = elem.nextSibling )
 					if( elem.nodeType === 1 || elem.nodeType === 3 ) 
@@ -3912,8 +3929,8 @@ function imports(namespace) {
 			},
 			
 			/**
-			 * 判断一个节点是否隐藏。
-			 * @return {Boolean} 隐藏返回 true 。
+			 * 判断一个节点是否不可见。
+			 * @return {Boolean} 如果元素不可见，则返回 true 。
 			 */
 			hidden: Dom.isHidden = function(elem) {
 				return (elem.style.display || getStyle(elem, 'display')) === 'none';
@@ -3990,31 +4007,28 @@ function imports(namespace) {
 		 */
 		
 		/**
-		 * 
+		 * 获取 window 对象的 Dom 对象封装示例。
 	 	 * @static
 		 */
 		window: new Dom(window),
 		
 		/**
-		 * 
+		 * 获取 document 对象的 Dom 对象封装示例。
 	 	 * @static
 		 */
 		document: new Dom(document),
 
 		/**
 		 * 获取元素的计算样式。
-		 * @param {Element} dom 节点。
-		 * @param {String} name 名字。
+		 * @param {Element} elem 元素。
+		 * @param {String} name  要访问的属性名称。
 		 * @return {String} 样式。
 	 	 * @static
-	 	 *  访问元素的样式属性。
-        <params name="name" type="String">
-          要访问的属性名称
-        </params>
-        @example
-          取得第一个段落的color样式属性的值。
-          #####JavaScript:<pre>Dom.query("p").getStyle("color");</pre>
-        
+	 	 * 访问元素的样式属性。
+		 * @example
+		 * 取得第一个段落的color样式属性的值。
+		 * #####JavaScript:
+		 * <pre>Dom.getStyle(document.getElementById("id"), "color");</pre>
 		 */
 		getStyle: getStyle,
 
@@ -4036,6 +4050,12 @@ function imports(namespace) {
 		 */
 		styleNumber: styleNumber,
 
+		/**
+		 * 初始化 toggle 函数的参数。
+		 * @param {Argument} args 参数对象。
+		 * @return {Array/Argument} 处理后的参数对象。
+		 * @ignore
+		 */
 		initToggleArgs: function (args) {
 			if(typeof args[0] === 'string')
 				return args;
@@ -4044,7 +4064,7 @@ function imports(namespace) {
 		},
 
 		/**
-		 * 清空元素的 display 属性。
+		 * 通过设置 display 属性来显示元素。
 		 * @param {Element} elem 元素。
 	 	 * @static
 		 */
@@ -4060,7 +4080,7 @@ function imports(namespace) {
 		},
 		
 		/**
-		 * 赋予元素的 display 属性 none。
+		 * 通过设置 display 属性来隐藏元素。
 		 * @param {Element} elem 元素。
 	 	 * @static
 		 */
@@ -4076,32 +4096,36 @@ function imports(namespace) {
 		/**
 		 * 根据不同的内容进行计算。
 		 * @param {Element} elem 元素。
-		 * @param {String} type 输入。 一个 type
-		 *            由多个句子用,连接，一个句子由多个词语用+连接，一个词语由两个字组成， 第一个字可以是下列字符之一:
-		 *            m b p t l r b h w 第二个字可以是下列字符之一: x y l t b r
-		 *            b。词语也可以是: outer inner 。
-		 * @return {Number} 计算值。 mx+sx -> 外大小。 mx-sx -> 内大小。
+		 * @param {String} type 要计算的值。一个 type 是一个 js 表达式，它有一些内置的变量来表示元素的相关计算值。预定义的变量有：
+		 *
+		 *		- ml: marginLeft (同理有 r=right, t=top, b=bottom，x=left+right,y=top+bottom 下同)
+		 *		- bl: borderLeftWidth
+		 *		- pl: paddingLeft
+		 *		- sx: bl + pl + height (同理有 y)
+		 *		- css 样式: 如 height, left
+		 *
+		 * @return {Number} 计算值。
 	 	 * @static
 		 */
 		calc: (function() {
 
-			var borders = {
-				m: 'margin#',
-				b: 'border#Width',
-				p: 'padding#'
-			}, map = {
-				t: 'Top',
-				r: 'Right',
-				b: 'Bottom',
-				l: 'Left'
-			}, init, tpl;
+			/**
+			 * 样式表。
+			 * @static
+			 * @type Object
+			 */
+			var cache = {},
+
+				init, 
+				
+				tpl;
 
 			if(window.getComputedStyle) {
 				init = 'var c=e.ownerDocument.defaultView.getComputedStyle(e,null);return ';
-				tpl = '(parseFloat(c["#"]) || 0)';
+				tpl = '(parseFloat(c["#"])||0)';
 			} else {
 				init = 'return ';
-				tpl = '(parseFloat(Dom.getStyle(e, "#")) || 0)';
+				tpl = '(parseFloat(Dom.getStyle(e, "#"))||0)';
 			}
 
 			/**
@@ -4110,43 +4134,47 @@ function imports(namespace) {
 			 * @return {String} 处理后的字符串。
 			 */
 			function format(type) {
-				var t, f = type.charAt(0);
-				switch (type.length) {
 
-					case 2:
-						t = type.charAt(1);
-						assert( f in borders || f === 's', "Dom.calc(e, type): {type} 中的 " + type + " 不合法", type);
-						if( t in map) {
-							t = borders[f].replace('#', map[t]);
+				// 如果长度为 2，则处理为简写。
+				if (type.length === 2) {
+					var t = type.charAt(0),
+						d = type.charAt(1),
+						ns1 = {
+							m: 'margin#',
+							b: 'border#Width',
+							p: 'padding#'
+						},
+						ns2 = {
+							t: 'Top',
+							r: 'Right',
+							b: 'Bottom',
+							l: 'Left'
+						};
+					if (t in ns1) {
+						t = ns1[t];
+						if (d == 'x') {
+							type = '(' + t.replace('#', ns2.l) + '+' + t.replace('#', ns2.r) + ')';
+						} else if (d == 'y') {
+							type = '(' + t.replace('#', ns2.t) + '+' + t.replace('#', ns2.b) + ')';
 						} else {
-							return f === 's' ? 'e.offset' + (t === 'x' ? 'Width': 'Height'): '(' + format(f + (t !== 'y' ? 'l': 't')) + '+' + format(f + (t === 'x' ? 'r': 'b')) + ')';
+							type = t.replace('#', ns2[d]);
 						}
-
-						break;
-
-					case 1:
-						if( f in map) {
-							t = map[f].toLowerCase();
-						} else if(f !== 'x' && f !== 'y') {
-							assert(f === 'h' || f === 'w', "Dom.calc(e, type): {type} 中的 " + type + " 不合法", type);
-							return 'Dom.styleNumber(e,"' + (f === 'h' ? 'height': 'width') + '")';
-						} else {
-							return f;
-						}
-
-						break;
-
-					default:
-						t = type;
+					} else if (t == 's') {
+						return d == 'x' ? 'e.offsetWidth' : 'e.offsetHeight';
+					}
+				} else if (type == 'width' || type == 'height') {
+					return 'Dom.styleNumber(e,"' + type + '")';
+				} else if (type.length < 2) {
+					return type;
 				}
 
-				return tpl.replace('#', t);
+				return tpl.replace('#', type);
 			}
 
 			return function(elem, type) {
 				assert.isElement(elem, "Dom.calc(elem, type): {elem} ~");
 				assert.isString(type, "Dom.calc(elem, type): {type} ~");
-				return (sizeMap[type] || (sizeMap[type] = new Function("e", init + type.replace(/\w+/g, format))))(elem);
+				return (cache[type] || (cache[type] = new Function("e", init + type.replace(/\w+/g, format))))(elem);
 			}
 		})(),
 
@@ -5443,17 +5471,24 @@ function imports(namespace) {
 
 	.implement({
 
+		/**
+		 * 获取当前 Dom 对象的指定位置的直接子节点。
+		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。如果 args 是小于 0 的数字，则从末尾开始计算。
+		 * @return {Dom} 返回一个节点对象。如果不存在，则返回 null 。
+		 * @example
+		 * 获取第1个子节点。
+		 * #####HTML:
+		 * <pre lang="htm" format="none">&lt;html&gt;&lt;body&gt;&lt;div&gt;&lt;p&gt;&lt;span&gt;Hello&lt;/span&gt;&lt;/p&gt;&lt;span&gt;Hello Again&lt;/span&gt;&lt;/div&gt;&lt;/body&gt;&lt;/html&gt;</pre>
+		 * #####JavaScript:
+		 * <pre>Dom.find("span").child(1)</pre>
+		 */
 		child: function(args){
-			if (~args >= 0) {
-				return this.last(~args);
-			}
-
-			return this.first(args);
+			return ~args >= 0 ? this.last(~args) : this.first(args);
 		},
 		
 		/**
 		 * 获取当前 Dom 对象的父节点对象。
-		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
+		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在 Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
 		 * @return {Dom} 返回一个节点对象。如果不存在，则返回 null 。
 		 * @example
 		 * 找到每个span元素的所有祖先元素。
@@ -5464,8 +5499,16 @@ function imports(namespace) {
 		 */
 		parent: createTreeWalker('parentNode'),
 
+		/**
+		 * 编辑当前 Dom 对象及父节点对象，找到第一个满足指定 CSS 选择器或函数的节点。
+		 * @param {String/Function} [filter] 用于判断的元素的 CSS 选择器 或者 用于筛选元素的过滤函数。
+		 * @param {Dom/String} [context=document] 只在指定的节点内搜索此元素。
+		 * @return {Dom} 如果当前节点满足要求，则返回当前节点，否则返回一个匹配的父节点对象。如果不存在，则返回 null 。
+		 * @remark
+		 * closest 和 parent 最大区别就是 closest 会测试当前的元素。
+		 */
 		closest: function(selector, context) {
-			selector = this.match(selector) ? this : this.parent(selector);
+			selector = typeof selector === 'function' ? selector(this, this.dom) : this.match(selector) ? this : this.parent(selector);
 			return selector && (!context || Dom.get(context).hasChild(selector)) ? selector : null;
 		},
 
@@ -5500,7 +5543,7 @@ function imports(namespace) {
 		last: createTreeWalker('previousSibling', 'lastChild'),
 
 		/**
-		 * 获取当前 Dom 对象的下一个相邻节点对象。取得一个包含匹配的元素集合中每一个元素紧邻的后面同辈元素的元素集合。
+		 * 获取当前 Dom 对象的下一个相邻节点对象。
 		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
 		 * @return {Dom} 返回一个节点对象。如果不存在，则返回 null 。
 		 * @example
@@ -5561,22 +5604,48 @@ function imports(namespace) {
 		 */
 		children: createTreeDir('nextSibling', 'firstChild'),
 
+		/**
+		 * 获取当前 Dom 对象以后的全部相邻节点对象。
+		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
+		 * @return {DomList} 返回一个 DomList 对象。
+		 */
 		nextAll: createTreeDir('nextSibling'),
 
+		/**
+		 * 获取当前 Dom 对象以前的全部相邻节点对象。
+		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
+		 * @return {DomList} 返回一个 DomList 对象。
+		 */
 		prevAll: createTreeDir('previousSibling'),
 
+		/**
+		 * 获取当前 Dom 对象以上的全部相邻节点对象。
+		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
+		 * @return {DomList} 返回一个 DomList 对象。
+		 */
 		parentAll: createTreeDir('parentNode'),
 
+		/**
+		 * 获取当前 Dom 对象的全部兄弟节点对象。
+		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。
+		 * @return {DomList} 返回一个 DomList 对象。
+		 */
 		siblings: function(args) {
 			return this.prevAll(args).concat(this.nextAll(args));
 		},
 
+		/**
+		 * 获取当前节点内的全部子节点。
+		 * @param {String} args="*" 要查找的节点的标签名。 * 表示返回全部节点。
+		 * @return {DomList} 返回一个 DomList 对象。
+		 */
 		getElements: function(args) {
 			return new DomList(this.dom.getElementsByTagName(args || '*'));
 		},
 		
 		/**
 		 * 获取当前 Dom 对象的在原节点的位置。
+		 * @param {Boolean} args=true 如果 args 为 true ，则计算文本节点。
 		 * @return {Number} 位置。从 0 开始。
 		 */
 		index: function(args) {
@@ -5783,14 +5852,29 @@ function imports(namespace) {
 			ctrl.insertBefore(node, null);
 		},
 
+		/**
+		 * 插入一个HTML 到顶部。
+		 * @param {String/Node/Dom} html 要插入的内容。
+		 * @return {Dom} 返回插入的新节点对象。
+		 */
 		prepend: function(ctrl, node) {
 			ctrl.insertBefore(node, ctrl.first(true));
 		},
 
+		/**
+		 * 插入一个HTML 到前面。
+		 * @param {String/Node/Dom} html 要插入的内容。
+		 * @return {Dom} 返回插入的新节点对象。
+		 */
 		before: function(ctrl, node) {
 			ctrl.parent().insertBefore(node, ctrl);
 		},
 
+		/**
+		 * 插入一个HTML 到后面。
+		 * @param {String/Node/Dom} html 要插入的内容。
+		 * @return {Dom} 返回插入的新节点对象。
+		 */
 		after: function(ctrl, node) {
 			ctrl.parent().insertBefore(node, ctrl.next(true));
 		},
@@ -5864,7 +5948,8 @@ function imports(namespace) {
 	/// #region document
 	
 	/**
-	 * @class document
+	 * @namespace document
+	 * @ignore
 	 */
 	Object.extend(document, {
 
@@ -5879,11 +5964,6 @@ function imports(namespace) {
 			return new DomList(this.getElementsByTagName(args || '*'));
 		},
 		
-		/**
-		 * 插入一个HTML 。
-		 * @param {String/Dom} html 内容。
-@return {Element} 元素。
-		 */
 		remove: function() {
 			var body = new Dom(this.body);
 			body.remove.apply(body, arguments);
@@ -5920,7 +6000,6 @@ function imports(namespace) {
 		
 		/**
 		 * 获取元素可视区域大小。包括 padding 和 border 大小。
-		 * @method getSize
 		 * @return {Point} 位置。
 		 */
 		getSize: function() {
@@ -5979,7 +6058,7 @@ function imports(namespace) {
 		}
 		
 	});
-
+	
 	/// #endif
 	
 	// 变量初始化。
@@ -7451,9 +7530,11 @@ Dom.implement((function(){
 		 * @param {String} align 设置的位置。如 lt rt 。完整的说明见备注。
 		 * @param {Number} offsetX 偏移的X大小。
 		 * @param {Number} offsetY 偏移的y大小。
+		 * @param {Boolean} enableReset 如果元素超出屏幕范围，是否自动更新节点位置。
 		 * @memberOf Control
 		 */
-		align: function (ctrl, position,  offsetX, offsetY, enableReset) {
+		align: function(ctrl, position, offsetX, offsetY, enableReset) {
+			ctrl = Dom.get(ctrl);
 			var ctrlSize = this.getSize(),
 				targetSize = ctrl.getSize(),
 				targetPosition = ctrl.getPosition(),
@@ -8855,7 +8936,7 @@ var ContentControl = Control.extend({
 	
 	insertIcon: function(icon){
 		if(icon)
-			this.container.insert('afterBegin', icon);
+			this.container.prepend(icon);
 	},
 	
 	init: function(){

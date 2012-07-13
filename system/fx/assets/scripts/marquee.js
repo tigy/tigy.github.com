@@ -34,6 +34,12 @@ var Marquee = Class({
 	 * @config
 	 */
 	loop: true,
+
+	/**
+	 * 是否保证平滑滚动。
+	 * @config
+	 */
+	flow: true,
 	
 	_currentIndex: 0,
 	
@@ -95,8 +101,10 @@ var Marquee = Class({
 
 	/**
 	 * 内部实现移动到指定位置的效果。
+	 * @param {Number} index 滚动的目标索引。
+	 * @param {Boolean} lt 回滚还是继续滚。
 	 */
-	_animateToWithLoop: function (index, lt, allowBack) {
+	_animateToWithLoop: function (index, lt) {
 
 		var me = this,
 			oldIndex = me._fixIndex(me._currentIndex),
@@ -121,7 +129,8 @@ var Marquee = Class({
 						from = Dom.styleNumber(me.target.dom, prop),
 						to = -me._getScrollByIndex(actualIndex);
 
-					if (!allowBack) {
+					// 如果保证是平滑滚动，则修正错误的位置。
+					if (me.flow) {
 
 						// 如果是往上、左方向滚。
 						if (lt) {
@@ -289,7 +298,7 @@ var Marquee = Class({
 			var index = me._currentIndex + delta;
 			index = me._fixIndex(index);
 			me[me.loop ? '_animateToWithLoop' : '_animateToWithoutLoop'](index, me._lt);
-			me.timer = setTimeout(me.step, me.delay)
+			me.timer = setTimeout(me.step, me.delay);
 		};
 
 		// 正式开始。
@@ -311,7 +320,7 @@ var Marquee = Class({
 
 	moveTo: function (index, lt) {
 		index = this._fixIndex(index);
-		this[this.loop ? '_animateToWithLoop' : '_animateToWithoutLoop'](index, lt === undefined ? this._lt : lt, true);
+		this[this.loop ? '_animateToWithLoop' : '_animateToWithoutLoop'](index, lt === undefined ? index < this._currentIndex : lt);
 		return this;
 	},
 
@@ -320,11 +329,11 @@ var Marquee = Class({
 	},
 
 	prev: function () {
-		return this.moveTo(this._currentIndex - 1, false);
+		return this.moveTo(this._currentIndex - 1, true);
 	},
 
 	next: function () {
-		return this.moveTo(this._currentIndex + 1, true);
+		return this.moveTo(this._currentIndex + 1, false);
 	}
 	
 });

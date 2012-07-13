@@ -487,7 +487,7 @@ Demo.extend(Demo, {
 						case 'TK_CONTENT':
 							hasContent = true;
 							if (me.tokenText !== '') {
-								if (/^\<(title|textarea|JPlus|a|span|button|li)\b/.test(me.lastText)) {
+								if (/^\<(title|textarea|p|a|span|button|li)\b/.test(me.lastText)) {
 									hasContent = false;
 								} else {
 									me.printNewline(false, me.output);
@@ -2301,7 +2301,7 @@ Demo.extend(Demo, {
 			}
 
 			textarea.className = 'demo-sh-textarea';
-			textarea.value = elem.textContent || elem.innerText;
+			textarea.value = (elem.innerText || elem.textContent).replace(/\n/g, "\r\n");
 			textarea.style.width = elem.offsetWidth + 'px';
 			textarea.style.height = elem.offsetHeight - 10 + 'px';
 
