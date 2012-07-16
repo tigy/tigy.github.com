@@ -51,7 +51,7 @@ QueryString.stringify = Request.param;
 //				if(stack.indexOf(obj) >= 0) {
 //					throw new Error("QueryString.stringify. Cyclical reference");
 //				}
-//				if (Array.isArray(obj)) {
+//				if (Object.isArray(obj)) {
 //					var s = [];
 //					name = name + '[]';
 //					for (var i = 0, l = obj.length; i < l; i++) {
