@@ -44,37 +44,37 @@
 			Demo.writeTestCases({
 				'Dom': '-',
 				'Dom.get': {
-				    '~(o)': function(value, assert){
+				    'Dom.get(o)': function(value, assert) {
 				        assert.isTrue(value.dom);
 				    }
                 },
 				'Dom.find': {
-				    '~("#o")': function (value, assert) {
+				    'Dom.find("#o")': function(value, assert) {
 				        assert.areEqual(value.dom, o.dom);
 				    }
 				},
 				'Dom.query': {
-				    '~("#o")': function (value, assert) {
+				    'Dom.query("#o")': function(value, assert) {
 				        assert.areEqual(value[0], o.dom);
                     }
                 },
 				'Dom.create': {
-                    '~("div")': function(value, assert){
+				    'Dom.create("div")': function(value, assert) {
                        assert.isTrue(value.dom.tagName === "DIV");
                     },
-                    '~("a")': function(value, assert){
+				    'Dom.create("a")': function(value, assert) {
                        assert.isTrue(value.dom.tagName === "A");
                     }
                 },
 				'Dom.parse': {
-                    '~("<div/>")': '-',
-                    '~("<div><div />a<\/div>")': '-',
-                    '~("   <div/> f <div/>")': '-',
-                    '~("<object />")': '-',
-                    '~("<input type=\'radio\' checked=\'checked\'>")': '-'
+				    'Dom.parse("<div/>")': '-',
+				    'Dom.parse("<div><div />a<\/div>")': '-',
+				    'Dom.parse("   <div/> f <div/>")': '-',
+				    'Dom.parse("<object />")': '-',
+				    'Dom.parse("<input type=\'radio\' checked=\'checked\'>")': '-'
                 },
                 'new Dom': {
-                    '~(a.dom)': function(value, assert){
+                    'new Dom(a.dom)': function(value, assert) {
                        assert.areEqual(value.dom, a.dom);
                     }
                 },

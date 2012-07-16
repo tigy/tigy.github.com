@@ -1,5 +1,5 @@
 /**********************************************
- * This file is created by a tool at 2012/7/13 10:34
+ * This file is created by a tool at 2012/7/16 13:50
  **********************************************/
 
 
@@ -83,7 +83,7 @@
 				// 简单拷贝 Object 的成员，即拥有类的特性。
 				// 在 JavaScript， 一切函数都可作为类，故此函数存在。
 				// Object 的成员一般对当前类构造函数原型辅助。
-				return extend(constructor, Base);
+				return extend(constructor, classMembers);
 			},
 
 			/**
@@ -103,227 +103,224 @@
 			 */
 			version: 3.1
 
+		},
+		
+		classMembers = {
+
+			/**
+			 * 扩展当前类的动态方法。
+			 * @param {Object} members 用于扩展的成员列表。
+			 * @return this
+			 * @see #implementIf
+			 * @example 以下示例演示了如何扩展 Number 类的成员。<pre>
+			 * Number.implement({
+			 *   sin: function () {
+			 * 	    return Math.sin(this);
+			 *  }
+			 * });
+			 *
+			 * (1).sin();  //  Math.sin(1);
+			 * </pre>
+			 */
+			implement: function (members) {
+
+				assert(this.prototype, "System.Base.implement(members): 无法扩展当前类，因为当前类的 prototype 为空。");
+
+				// 复制到原型 。
+				Object.extend(this.prototype, members);
+
+				return this;
+			},
+
+			/**
+			 * 扩展当前类的动态方法，但不覆盖已存在的成员。
+			 * @param {Object} members 成员。
+			 * @return this
+			 * @see #implement
+			 */
+			implementIf: function (members) {
+
+				assert(this.prototype, "System.Base.implementIf(members): 无法扩展当前类，因为当前类的 prototype 为空。");
+
+				Object.extendIf(this.prototype, members);
+
+				return this;
+			},
+
+			/**
+			 * 为当前类注册一个事件。
+			 * @param {String} eventName 事件名。如果多个事件使用空格隔开。
+			 * @param {Object} properties={} 事件信息。 具体见备注。
+			 * @return this
+			 * @remark
+			 * 事件信息是一个JSON对象，它表明了一个事件在绑定、删除和触发后的一些操作。
+			 *
+			 * 事件信息的原型如:
+			 * <pre>
+			 * ({
+			 *
+			 *  // 当用户执行 target.on(type, fn) 时执行下列函数:
+			 * 	add: function(target, type, fn){
+			 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。
+			 *  },
+			 *
+			 *  // 当用户执行 target.un(type, fn) 时执行下列函数:
+			 *  remove: function(target, type, fn){
+			 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。
+			 *  },
+			 *
+			 *  // 当用户执行 target.trigger(e) 时执行下列函数:
+			 *  trigger: function(target, type, fn, e){
+			 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。e 是参数。
+			 *  },
+			 *
+			 *  // 当 fn 被执行时首先执行下列函数:
+			 *  initEvent: function(e){
+			 * 		// 其中 e 是参数。
+			 *  }
+			 *
+			 * });
+			 * </pre>
+			 *
+			 * 当用户使用 obj.on('事件名', 函数) 时， 系统会判断这个事件是否已经绑定过， 如果之前未绑定事件，则会创建新的函数
+			 * evtTrigger， evtTrigger 函数将遍历并执行 evtTrigger.handlers 里的成员,
+			 * 如果其中一个函数执行后返回 false， 则中止执行，并返回 false， 否则返回 true。
+			 * evtTrigger.handlers 表示 当前这个事件的所有实际调用的函数的数组。
+			 * 然后系统会调用 add(obj, '事件名', evtTrigger) 然后把 evtTrigger 保存在 obj.dataField().$event['事件名'] 中。
+			 * 如果 之前已经绑定了这个事件，则 evtTrigger 已存在，无需创建。 这时系统只需把 函数 放到 evtTrigger.handlers 即可。
+			 *
+			 * 真正的事件触发函数是 evtTrigger， evtTrigger会执行 initEvent 和用户定义的一个事件全部函数。
+			 *
+			 * 当用户使用 obj.un('事件名', 函数) 时， 系统会找到相应 evtTrigger， 并从
+			 * evtTrigger.handlers 删除 函数。 如果 evtTrigger.handlers 是空数组， 则使用
+			 * remove(obj, '事件名', evtTrigger) 移除事件。
+			 *
+			 * 当用户使用 obj.trigger(参数) 时， 系统会找到相应 evtTrigger， 如果事件有trigger， 则使用
+			 * trigger(obj, '事件名', evtTrigger, 参数) 触发事件。 如果没有， 则直接调用
+			 * evtTrigger(参数)。
+			 *
+			 * 下面分别介绍各函数的具体内容。
+			 *
+			 * add 表示 事件被绑定时的操作。 原型为:
+			 *
+			 * <pre>
+			 * function add(elem, type, fn) {
+			 * 	   // 对于标准的 DOM 事件， 它会调用 elem.addEventListener(type, fn, false);
+			 * }
+			 * </pre>
+			 *
+			 * elem表示绑定事件的对象，即类实例。 type 是事件类型， 它就是事件名，因为多个事件的 add 函数肯能一样的，
+			 * 因此 type 是区分事件类型的关键。fn 则是绑定事件的函数。
+			 *
+			 * remove 类似 add。
+			 *
+			 * $default 是特殊的事件名，它的各个信息将会覆盖同类中其它事件未定义的信息。
+			 *
+			 * @example 下面代码演示了如何给一个类自定义事件，并创建类的实例，然后绑定触发这个事件。
+			 * <pre>
+			 * // 创建一个新的类。
+			 * var MyCls = new Class();
+			 *
+			 * MyCls.addEvents('click', {
+			 *
+			 * 		add:  function (elem, type, fn) {
+			 * 	   		alert("为  elem 绑定 事件 " + type );
+			 * 		}
+			 *
+			 * });
+			 *
+			 * var m = new MyCls;
+			 * m.on('myEvt', function () {  //  输出 为  elem 绑定 事件  myEvt
+			 * 	  alert(' 事件 触发 ');
+			 * });
+			 *
+			 * m.trigger('myEvt', 2);
+			 *
+			 * </pre>
+			 */
+			addEvents: function (eventName, properties) {
+
+				assert.isString(eventName, "System.Base.addEvents(eventName, properties): {eventName} ~");
+
+				var eventObj = this.$event || (this.$event = {});
+
+				// 更新事件对象。
+				eventName.split(' ').forEach(function (value) {
+					eventObj[value] = this;
+				}, properties ? Object.extendIf(properties, eventObj.$default) : (eventObj.$default || emptyObj));
+
+				return this;
+			},
+
+			/**
+			 * 继承当前类创建并返回子类。
+			 * @param {Object/Function} [methods] 子类的员或构造函数。
+			 * @return {Function} 返回继承出来的子类。
+			 * @remark
+			 * 在 Javascript 中，继承是依靠原型链实现的， 这个函数仅仅是对它的包装，而没有做额外的动作。
+			 *
+			 * 成员中的 constructor 成员 被认为是构造函数。
+			 *
+			 * 这个函数实现的是 单继承。如果子类有定义构造函数，则仅调用子类的构造函数，否则调用父类的构造函数。
+			 *
+			 * 要想在子类的构造函数调用父类的构造函数，可以使用 {@link JPlus.Base#base} 调用。
+			 *
+			 * 这个函数返回的类实际是一个函数，但它被 {@link JPlus.Native} 修饰过。
+			 *
+			 * 由于原型链的关系， 肯能存在共享的引用。 如: 类 A ， A.prototype.c = []; 那么，A的实例 b ,
+			 * d 都有 c 成员， 但它们共享一个 A.prototype.c 成员。 这显然是不正确的。所以你应该把 参数 quick
+			 * 置为 false ， 这样， A创建实例的时候，会自动解除共享的引用成员。 当然，这是一个比较费时的操作，因此，默认
+			 * quick 是 true 。
+			 *
+			 * 也可以把动态成员的定义放到 构造函数， 如: this.c = []; 这是最好的解决方案。
+			 *
+			 * @example 下面示例演示了如何创建一个子类。
+			 * <pre>
+			 * var MyClass = new Class(); //创建一个类。
+			 *
+			 * var Child = MyClass.extend({  // 创建一个子类。
+			 * 	  type: 'a'
+			 * });
+			 *
+			 * var obj = new Child(); // 创建子类的实例。
+			 * </pre>
+			 */
+			extend: function (members) {
+
+				// 未指定函数 使用默认构造函数(Object.prototype.constructor);
+
+				// 生成子类 。
+				var subClass = hasOwnProperty.call(members = members instanceof Function ? {
+					constructor: members
+				} : (members || {}), "constructor") ? members.constructor : function () {
+
+					// 调用父类构造函数 。
+					arguments.callee.base.apply(this, arguments);
+
+				};
+
+				// 代理类 。
+				emptyFn.prototype = (subClass.base = this).prototype;
+
+				// 指定成员 。
+				subClass.prototype = Object.extend(new emptyFn, members);
+
+				// 覆盖构造函数。
+				subClass.prototype.constructor = subClass;
+
+				// 清空临时对象。
+				emptyFn.prototype = null;
+
+				// 指定Class内容 。
+				return JPlus.Native(subClass);
+
+			}
+
 		};
 
 	/// #endregion
 
 	/// #region Functions
-
-	/**
-	 * @static class JPlus.Base
-	 */
-	extend(Base, {
-
-		/**
-		 * 扩展当前类的动态方法。
-		 * @param {Object} members 用于扩展的成员列表。
-		 * @return this
-		 * @see #implementIf
-		 * @example 以下示例演示了如何扩展 Number 类的成员。<pre>
-	     * Number.implement({
-	     *   sin: function () {
-	     * 	    return Math.sin(this);
-	     *  }
-	     * });
-	     *
-	     * (1).sin();  //  Math.sin(1);
-	     * </pre>
-		 */
-		implement: function (members) {
-
-			assert(this.prototype, "System.Base.implement(members): 无法扩展当前类，因为当前类的 prototype 为空。");
-
-			// 复制到原型 。
-			Object.extend(this.prototype, members);
-
-			return this;
-		},
-
-		/**
-		 * 扩展当前类的动态方法，但不覆盖已存在的成员。
-		 * @param {Object} members 成员。
-		 * @return this
-		 * @see #implement
-		 */
-		implementIf: function (members) {
-
-			assert(this.prototype, "System.Base.implementIf(members): 无法扩展当前类，因为当前类的 prototype 为空。");
-
-			Object.extendIf(this.prototype, members);
-
-			return this;
-		},
-
-		/**
-		 * 为当前类注册一个事件。
-		 * @param {String} eventName 事件名。如果多个事件使用空格隔开。
-		 * @param {Object} properties={} 事件信息。 具体见备注。
-		 * @return this
-		 * @remark
-		 * 事件信息是一个JSON对象，它表明了一个事件在绑定、删除和触发后的一些操作。
-		 *
-		 * 事件信息的原型如:
-		 * <pre>
-		 * ({
-		 *
-		 *  // 当用户执行 target.on(type, fn) 时执行下列函数:
-		 * 	add: function(target, type, fn){
-		 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。
-		 *  },
-		 *
-		 *  // 当用户执行 target.un(type, fn) 时执行下列函数:
-		 *  remove: function(target, type, fn){
-		 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。
-		 *  },
-		 *
-		 *  // 当用户执行 target.trigger(e) 时执行下列函数:
-		 *  trigger: function(target, type, fn, e){
-		 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。e 是参数。
-		 *  },
-		 *
-		 *  // 当 fn 被执行时首先执行下列函数:
-		 *  initEvent: function(e){
-		 * 		// 其中 e 是参数。
-		 *  }
-		 *
-		 * });
-		 * </pre>
-		 *
-		 * 当用户使用 obj.on('事件名', 函数) 时， 系统会判断这个事件是否已经绑定过， 如果之前未绑定事件，则会创建新的函数
-		 * evtTrigger， evtTrigger 函数将遍历并执行 evtTrigger.handlers 里的成员,
-		 * 如果其中一个函数执行后返回 false， 则中止执行，并返回 false， 否则返回 true。
-		 * evtTrigger.handlers 表示 当前这个事件的所有实际调用的函数的数组。
-		 * 然后系统会调用 add(obj, '事件名', evtTrigger) 然后把 evtTrigger 保存在 obj.dataField().$event['事件名'] 中。
-		 * 如果 之前已经绑定了这个事件，则 evtTrigger 已存在，无需创建。 这时系统只需把 函数 放到 evtTrigger.handlers 即可。
-		 *
-		 * 真正的事件触发函数是 evtTrigger， evtTrigger会执行 initEvent 和用户定义的一个事件全部函数。
-		 *
-		 * 当用户使用 obj.un('事件名', 函数) 时， 系统会找到相应 evtTrigger， 并从
-		 * evtTrigger.handlers 删除 函数。 如果 evtTrigger.handlers 是空数组， 则使用
-		 * remove(obj, '事件名', evtTrigger) 移除事件。
-		 *
-		 * 当用户使用 obj.trigger(参数) 时， 系统会找到相应 evtTrigger， 如果事件有trigger， 则使用
-		 * trigger(obj, '事件名', evtTrigger, 参数) 触发事件。 如果没有， 则直接调用
-		 * evtTrigger(参数)。
-		 *
-		 * 下面分别介绍各函数的具体内容。
-		 *
-		 * add 表示 事件被绑定时的操作。 原型为:
-		 *
-		 * <pre>
-	     * function add(elem, type, fn) {
-	     * 	   // 对于标准的 DOM 事件， 它会调用 elem.addEventListener(type, fn, false);
-	     * }
-	     * </pre>
-		 *
-		 * elem表示绑定事件的对象，即类实例。 type 是事件类型， 它就是事件名，因为多个事件的 add 函数肯能一样的，
-		 * 因此 type 是区分事件类型的关键。fn 则是绑定事件的函数。
-		 *
-		 * remove 类似 add。
-		 *
-		 * $default 是特殊的事件名，它的各个信息将会覆盖同类中其它事件未定义的信息。
-		 *
-		 * @example 下面代码演示了如何给一个类自定义事件，并创建类的实例，然后绑定触发这个事件。
-		 * <pre>
-	     * // 创建一个新的类。
-	     * var MyCls = new Class();
-	     *
-	     * MyCls.addEvent('click', {
-	     *
-	     * 		add:  function (elem, type, fn) {
-	     * 	   		alert("为  elem 绑定 事件 " + type );
-	     * 		}
-	     *
-	     * });
-	     *
-	     * var m = new MyCls;
-	     * m.on('myEvt', function () {  //  输出 为  elem 绑定 事件  myEvt
-	     * 	  alert(' 事件 触发 ');
-	     * });
-	     *
-	     * m.trigger('myEvt', 2);
-	     *
-	     * </pre>
-		 */
-		addEvent: function (eventName, properties) {
-
-			assert.isString(eventName, "System.Base.addEvents(eventName, properties): {eventName} ~");
-
-			var eventObj = this.$event || (this.$event = {});
-
-			// 更新事件对象。
-			eventName.split(' ').forEach(function (value) {
-				eventObj[value] = this;
-			}, properties ? Object.extendIf(properties, eventObj.$default) : (eventObj.$default || emptyObj));
-
-			return this;
-		},
-
-		/**
-		 * 继承当前类创建并返回子类。
-		 * @param {Object/Function} [methods] 子类的员或构造函数。
-		 * @return {Function} 返回继承出来的子类。
-		 * @remark
-		 * 在 Javascript 中，继承是依靠原型链实现的， 这个函数仅仅是对它的包装，而没有做额外的动作。
-		 *
-		 * 成员中的 constructor 成员 被认为是构造函数。
-		 *
-		 * 这个函数实现的是 单继承。如果子类有定义构造函数，则仅调用子类的构造函数，否则调用父类的构造函数。
-		 *
-		 * 要想在子类的构造函数调用父类的构造函数，可以使用 {@link JPlus.Base#base} 调用。
-		 *
-		 * 这个函数返回的类实际是一个函数，但它被 {@link JPlus.Native} 修饰过。
-		 *
-		 * 由于原型链的关系， 肯能存在共享的引用。 如: 类 A ， A.prototype.c = []; 那么，A的实例 b ,
-		 * d 都有 c 成员， 但它们共享一个 A.prototype.c 成员。 这显然是不正确的。所以你应该把 参数 quick
-		 * 置为 false ， 这样， A创建实例的时候，会自动解除共享的引用成员。 当然，这是一个比较费时的操作，因此，默认
-		 * quick 是 true 。
-		 *
-		 * 也可以把动态成员的定义放到 构造函数， 如: this.c = []; 这是最好的解决方案。
-		 *
-		 * @example 下面示例演示了如何创建一个子类。
-		 * <pre>
-		 * var MyClass = new Class(); //创建一个类。
-		 *
-		 * var Child = MyClass.extend({  // 创建一个子类。
-		 * 	  type: 'a'
-		 * });
-		 *
-		 * var obj = new Child(); // 创建子类的实例。
-		 * </pre>
-		 */
-		extend: function (members) {
-
-			// 未指定函数 使用默认构造函数(Object.prototype.constructor);
-
-			// 生成子类 。
-			var subClass = hasOwnProperty.call(members = members instanceof Function ? {
-				constructor: members
-			} : (members || {}), "constructor") ? members.constructor : function () {
-
-				// 调用父类构造函数 。
-				arguments.callee.base.apply(this, arguments);
-
-			};
-
-			// 代理类 。
-			emptyFn.prototype = (subClass.base = this).prototype;
-
-			// 指定成员 。
-			subClass.prototype = Object.extend(new emptyFn, members);
-
-			// 覆盖构造函数。
-			subClass.prototype.constructor = subClass;
-
-			// 清空临时对象。
-			emptyFn.prototype = null;
-
-			// 指定Class内容 。
-			return JPlus.Native(subClass);
-
-		}
-
-	});
 
 	/**
 	 * 系统原生的对象。
@@ -957,7 +954,7 @@
 	/// #region Methods
 
 	// 把所有内建对象本地化 。
-	each.call([String, Array, Function, Date], JPlus.Native);
+	each.call([String, Array, Function, Date, Base], JPlus.Native);
 
 	/**
 	 * 所有由 new Class 创建的类的基类。
@@ -6107,7 +6104,7 @@ function imports(namespace) {
 	textFix['#text'] = textFix['#comment'] = 'nodeValue';
 	
 	// 初始化事件对象。
-	Dom.addEvent('$default', eventObj);
+	Dom.addEvents('$default', eventObj);
 
 	// Dom 函数。
 	Dom.define(Dom, 'dom', 'scrollIntoView focus blur select click submit reset');
@@ -6151,7 +6148,7 @@ function imports(namespace) {
 				return this !== e.relatedTarget && !Dom.hasChild(this.dom, e.relatedTarget);
 			};
 
-			Dom.addEvent('mouseenter', {
+			Dom.addEvents('mouseenter', {
 				initEvent: checkMouseEnter,
 				add: function (ctrl, type, fn) {
 					eventObj.add(ctrl, 'mouseover', fn);
@@ -6161,7 +6158,7 @@ function imports(namespace) {
 				}
 			});
 
-			Dom.addEvent('mouseleave', {
+			Dom.addEvents('mouseleave', {
 				initEvent: checkMouseEnter,
 				add: function (ctrl, type, fn) {
 					eventObj.add(ctrl, 'mouseout', fn);
@@ -6186,7 +6183,7 @@ function imports(namespace) {
 			}
 		};
 
-		Dom.addEvent("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", {
+		Dom.addEvents("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", {
 			init: function (e) {
 				if(!e.stop) {
 					eventObj.initEvent(e);
@@ -6203,7 +6200,7 @@ function imports(namespace) {
 			}
 		});
 
-		Dom.addEvent("keydown keypress keyup",  {
+		Dom.addEvents("keydown keypress keyup",  {
 			init: function (e) {
 				if(!e.stop) {
 					eventObj.initEvent(e);
@@ -6304,7 +6301,7 @@ function imports(namespace) {
         
 	 */
 
-	Dom.addEvent('domready domload', {});
+	Dom.addEvents('domready domload', {});
 
 	map('ready load', function(readyOrLoad, isLoad) {
 
@@ -7466,7 +7463,7 @@ var ListControl = ScrollableControl.extend({
 		return this;
 	}
 	
-}).addEvent('select change');
+}).addEvents('select change');
 
 
 /**********************************************
@@ -7995,3 +7992,7 @@ Browser.setCookie = function (name, value, expires, props) {
 };
 
 
+/**********************************************
+ * Controls.Display.Bubble
+ **********************************************/
+/** * @author  */
