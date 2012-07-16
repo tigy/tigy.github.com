@@ -18,56 +18,56 @@
 			Demo.writeTestCases({
 			    
 			    'Trace': '-',
-			    'trace': '~()',
-			    'trace.clear': '~()',
-			    'trace.api': '~',
-			    'trace.dir': '~([])',
+			    'trace': 'trace()',
+			    'trace.clear': 'trace.clear()',
+			    'trace.api': 'trace.api()',
+			    'trace.dir': 'trace.dir([])',
 			    'trace.inspect': {
-			        '~([2,2,3,4])': "[2, 2, 3, 4]",
-			        '~({a:"2"})': '-',
-			        '~(null)': "null",
-			        '~(undefined)': "undefined",
-			        '~(true)': "true"
+			        'trace.inspect([2,2,3,4])': "[2, 2, 3, 4]",
+			        'trace.inspect({a:"2"})': '-',
+			        'trace.inspect(null)': "null",
+			        'trace.inspect(undefined)': "undefined",
+			        'trace.inspect(true)': "true"
 			    },
-			    'trace.log': '~("log")',
-			    'trace.error': '~("error")',
-			    'trace.warn': '~("warn")',
-			    'trace.info': '~("info")',
+			    'trace.log': 'trace.log("log")',
+			    'trace.error': 'trace.error("error")',
+			    'trace.warn': 'trace.warn("warn")',
+			    'trace.info': 'trace.info("info")',
 			    'trace.eval': {
-			        '~(function(){ console.log("debug") })': '-',
-			        '~("console.log(\'debug\')")': '-'
+			        'trace.eval(function(){ console.log("debug") })': '-',
+			        'trace.eval("console.log(\'debug\')")': '-'
 			    },
-			    'trace.time': '~(function(){})',
+			    'trace.time': 'trace.time(function(){})',
 				
 			    'Assert': '-',
-			    'assert': 'window.~(true)',
+			    'assert': 'window.assert(true)',
 			    //'assert.between': 'window.~(1,-2,5,"sss")',
 			    //'assert.instanceOf': '5, "number"',
-			    'assert.isArray': 'window.~([])',
-			    'assert.isDate': 'window.~(new Date())',
-			    'assert.isElement': 'window.~(document.body)',
-			    'assert.isFunction': 'window.~(function(){})',
-			    'assert.isNode': 'window.~(document)',
-			    'assert.isNumber': 'window.~(1)',
-			    'assert.isObject': 'window.~({})',
-			    'assert.isRegExp': 'window.~(/z/)',
-			    'assert.isString': 'window.~("bhnb")',
+			    'assert.isArray': 'window.assert.isArray([])',
+			    'assert.isDate': 'window.assert.isDate(new Date())',
+			    'assert.isElement': 'window.assert.isElement(document.body)',
+			    'assert.isFunction': 'window.assert.isFunction(function(){})',
+			    'assert.isNode': 'window.assert.isNode(document)',
+			    'assert.isNumber': 'window.assert.isNumber(1)',
+			    'assert.isObject': 'window.assert.isObject({})',
+			    'assert.isRegExp': 'window.assert.isRegExp(/z/)',
+			    'assert.isString': 'window.assert.isString("bhnb")',
 				
 			    'Using': '-',
 			    'using': {
-			        '~("System.Core.Base")': function (value, assert) {
+			        'using("System.Core.Base")': function(value, assert) {
 			            assert.isTrue(window.JPlus)
 			        }
 			    },
-			    'imports': '~("System.Request.Ajax")',
+			    'imports': 'imports("System.Request.Ajax")',
 			    'using.checkStatusCode': {
-			        '~(200)': true,
-			        '~(500)': false
+			        'using.checkStatusCode(200)': true,
+			        'using.checkStatusCode(500)': false
 			    },
-			    'using.loadStyle': '~("../../assets/styles/default.css")',
-			    'using.loadScript': '~("../request/assets/scripts/ajax.js")',
-			    'using.loadText': '~("debug.html")',
-			    'using.rootPath': '~'
+			    'using.loadStyle': 'using.loadStyle("../../assets/styles/default.css")',
+			    'using.loadScript': 'using.loadScript("../request/assets/scripts/ajax.js")',
+			    'using.loadText': 'using.loadText("debug.html")',
+			    'using.rootPath': 'using.rootPath'
 			});
 			
 		</script>

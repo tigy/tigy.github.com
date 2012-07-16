@@ -308,13 +308,13 @@ var Marquee = Class({
 	},
 
 	set: function (index) {
-		index = this._fixIndex(index);
+		var newIndex = index = this._fixIndex(index);
 		if (this.loop) {
 			index += this.length;
 		}
 		this.target.setStyle(this._horizonal ? 'marginLeft' : 'marginTop', -this._getScrollByIndex(index));
 		this.onChanged(index, this._currentIndex);
-		this._currentIndex = index;
+		this._currentIndex = newIndex;
 		return this;
 	},
 

@@ -29,11 +29,11 @@
 		</div>
 		<div style="float: right; width: 500px; text-align: right">
 			<script>
-				var width = 300, duration = 3500, fps = 100;
+				var width = 200, duration = 3500, fps = 200;
 
-				$$('v').setHeight(width);
-				$$('b').setHeight(width);
-				$$('t').setWidth(width + 20);
+				Dom.get('v').setHeight(width);
+				Dom.get('b').setHeight(width);
+				Dom.get('t').setWidth(width + 20);
 
 				var Trans = Fx.Base.extend({
 
@@ -52,24 +52,20 @@
 
 						Dom.get('f').dom.style.left = y + 'px';
 					},
-					start : function() {
-						var args = arguments;
 
-						this.base('start', args[0], args[1], args[2], args[3], function() {
-							$$('v').empty();
-							this.x = 0;
-						});
+					start: function(){
+					    Dom.get('v').empty();
+					    this.x = 0;
 					}
+
 				});
 
 				var f = new Trans();
 
-				for(var i in Transitions) {
-					if(/^ease/.test(i))
-						break;
-					document.write('<input type="button" onclick="f.transition = Transitions.' + i + ';  f.start(0, ' + width + ');" value="' + i + '">');
-					document.write('<input type="button" onclick="f.transition = Transitions.easeOut(Transitions.' + i + ');   f.start(0, ' + width + ');" value="easeOut(' + i + ')">');
-					document.write('<input type="button" onclick="f.transition = Transitions.easeInOut(Transitions.' + i + ');   f.start(0, ' + width + ');" value="easeInOut(' + i + ')">');
+				for (var i in Fx.Transitions) {
+					document.write('<input type="button" onclick="f.transition = Fx.Transitions.' + i + ';  f.run({from: 0, to:' + width + '}, \'ignore\');" value="' + i + '">');
+					document.write('<input type="button" onclick="f.transition = Fx.easeOut(Fx.Transitions.' + i + ');   f.run({from: 0, to:' + width + '}, \'ignore\');" value="easeOut(' + i + ')">');
+					document.write('<input type="button" onclick="f.transition = Fx.easeInOut(Fx.Transitions.' + i + ');   f.run({from: 0, to:' + width + '}, \'ignore\');" value="easeInOut(' + i + ')">');
 					document.write('<p />');
 				}
 			</script>

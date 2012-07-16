@@ -24,35 +24,35 @@
 			        }
 			    },
 			    'Object.isObject': {
-			        '~({})': true,
-			        '~(null)': false,
-			        '~(2)': false
+			        'Object.isObject({})': true,
+			        'Object.isObject(null)': false,
+			        'Object.isObject(2)': false
 			    },
 			    'Object.isArray': {
-			        '~([])': true,
-			        '~()': false
+			        'Object.isArray([])': true,
+			        'Object.isArray()': false
 			    },
 			    'Object.isFunction': {
-			        '~(function(){})': true,
-			        '~(new Function())': true,
-			        '~()': false
+			        'Object.isFunction(function(){})': true,
+			        'Object.isFunction(new Function())': true,
+			        'Object.isFunction()': false
 			    },
 			    'Object.each': {
-			        'var target={a:1, b:2, c:3}; ~(target, assert.log)': function (value, assert) {
+			        'var target={a:1, b:2, c:3}; Object.each(target, assert.log)': function(value, assert) {
 			            assert.logged("123");
 			            return value === true;
 			        },
-			        'var target=null; ~(target, assert.log)': true,
-			        'var target=[1,2,3]; ~(target, assert.log)': function (value, assert) {
+			        'var target=null; Object.each(target, assert.log)': true,
+			        'var target=[1,2,3]; Object.each(target, assert.log)': function(value, assert) {
 			            assert.logged("123");
 			            return value === true;
 			        }
 			    },
 			    'Object.map': {
-			        '~(["aa","aa23"], assert.log)': function(value, assert){
+			        'Object.map(["aa","aa23"], assert.log)': function(value, assert) {
 			            assert.logged("aaaa23");
 			        },
-			        '~("aa aa23", assert.log)': function(value, assert){
+			        'Object.map("aa aa23", assert.log)': function(value, assert) {
 			            assert.logged("aaaa23");
 			        }
 			    },
@@ -111,7 +111,7 @@
 			        }
 			    },
 			    'Array.create': {
-			        '~(["a","a",null,"a"], 1)': ["a",null,"a"]
+			        'Array.create(["a","a",null,"a"], 1)': ["a", null, "a"]
 			    },
 			    'Function': '-',
 			    'Function.prototype.bind': {
@@ -121,10 +121,10 @@
 			        }
 			    },
 			    'Function.empty': {
-			        '~()':  undefined
+			        'Function.empty()': undefined
 			    },
 			    'Function.from': {
-			        '~(1)':  function(value, assert){
+			        'Function.from(1)': function(value, assert) {
 			            assert.areEqual(value(), 1);
 			        }
 			    },
@@ -140,19 +140,19 @@
 			    //    '~("aba", 3)':  "aba"
 			    //},
 			    'String.format': {
-			        '~("{0} {1}", "h", "v")': "h v",
-			        '~("{a}", {a: 1})': "1"
+			        'String.format("{0} {1}", "h", "v")': "h v",
+			        'String.format("{a}", {a: 1})': "1"
 			    },
 			    'Date': '-',
 			    'Date.now': {
-			        '~()': function(value){
+			        'Date.now()': function(value) {
 			            return value > 0;
 			        }
 			    },
 			    'JPlus & Global': '-',
-			    'JPlus.id': '~++',
+			    'JPlus.id': 'JPlus.id++',
 			    'window.execScript': {
-			        '~("Demo.assert.log(false)")': function (value, assert) {
+			        'window.execScript("Demo.assert.log(false)")': function(value, assert) {
 			            assert.logged("false")
 			        }
 			    }

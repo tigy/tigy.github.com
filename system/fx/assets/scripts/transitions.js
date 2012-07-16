@@ -1,9 +1,9 @@
-//===========================================
-//  变化函数  
-//   A: xuld
-//===========================================
+/**
+ * @fileOverview 特效渐变方式。
+ * @author xuld
+ */
 
-var Transitions = {
+Fx.Transitions = {
 	
 	linear: function(p){
 		return p;
@@ -43,24 +43,24 @@ var Transitions = {
 
 	elastic: function(p, x){
 		return Math.pow(2, 10 * --p) * Math.cos(20 * p * Math.PI * (x || 1) / 3);
-	},
+	} 
 	
-	easeIn: function(transition, x){
-		return function(p){
-			return transition(p, x);
-		};
-	},
-	
-	easeOut: function(transition, x){
-		return function(p){
-			return 1 - transition(1 - p, x);
-		};
-	},
-	
-	easeInOut:  function(transition, x){
-		return function(p){
-			return (p <= 0.5) ? transition(2 * p, x) / 2 : (2 - transition(2 * (1 - p), x)) / 2;
-		};
-	}
-	
+};
+
+Fx.easeIn = function(transition, x){
+	return function(p){
+		return transition(p, x);
+	};
+};
+
+Fx.easeOut = function(transition, x){
+	return function(p){
+		return 1 - transition(1 - p, x);
+	};
+};
+
+Fx.easeInOut = function(transition, x){
+	return function(p){
+		return (p <= 0.5) ? transition(2 * p, x) / 2 : (2 - transition(2 * (1 - p), x)) / 2;
+	};
 };

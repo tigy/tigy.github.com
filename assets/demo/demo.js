@@ -3427,7 +3427,6 @@ Demo.extend(Demo, {
 					data = '';
 				}
 
-				data = data.replace(/~/g, getName);
 				this.data.push({
 					fn: Demo.createFunction(data),
 					text: data
@@ -3447,7 +3446,6 @@ Demo.extend(Demo, {
 					assertFn;
 				for(key in data){
 					value = data[key];
-					key = key.replace(/~/g, getName);
 					
 					switch(typeof value){
 
@@ -3479,10 +3477,6 @@ Demo.extend(Demo, {
 				}
 				break;
 
-		}
-		
-		function getName() {
-			return name.replace(/^[$\w]+\.prototype\./, "");
 		}
 
 	},

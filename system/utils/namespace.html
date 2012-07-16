@@ -10,21 +10,15 @@
 	</head>
 	<body>
 		<script>
-            var testcases = {
-                'JPlus.namespace': {
-                    '~("MyName.MyClass")': function (value, assert) {
-                      assert(window.MyName);
-                      assert(window.MyName.MyClass);
-                      assert(window.MyName.MyClass === value);
-                    }
-                }
-            };
-
-            Demo.writeTestCases(testcases);
+		    Demo.writeTestCases({
+		        'JPlus.namespace': {
+		            'JPlus.namespace("MyName.MyClass")': function(value, assert) {
+		                assert(window.MyName);
+		                assert(window.MyName.MyClass);
+		                assert(window.MyName.MyClass === value);
+		            }
+		        }
+		    });
 		</script>
-		
-		
-		
-		
 	</body>
 </html>

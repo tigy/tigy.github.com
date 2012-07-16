@@ -1,7 +1,12 @@
+/**
+ * @author xuld
+ */
 
+var Enum = function(data) {
+	if (!this instanceof Enum) {
+		return new Enum(data);
+	}
 
-
-var Enum = function (data){
 	return Object.extend(this, data);
 };
 
