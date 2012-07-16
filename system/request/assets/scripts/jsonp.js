@@ -57,7 +57,7 @@ Request.JSONP = Request.Base.extend({
     	url = Request.combineUrl(url, data);
 
     	// 处理 callback=?
-    	var callback = me.callback || ('jsonp' + Date.now());
+    	var callback = me.callback || ('jsonp' + Date.now() + JPlus.id++);
 
     	if (me.jsonp) {
 
