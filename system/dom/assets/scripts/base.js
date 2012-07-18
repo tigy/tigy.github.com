@@ -1660,7 +1660,7 @@
 		 */
 		dispose: function() {
 			if(this.dom.nodeType == 1){
-				Object.each(this.dom.getElementsByTagName("*"), clean)
+				Object.each(this.dom.getElementsByTagName("*"), clean);
 				clean(this.dom);
 			}
 			
@@ -3294,7 +3294,7 @@
 		/// #endif
 
 		t = window.Event.prototype;
-		t.stop = pep.stop
+		t.stop = pep.stop;
 		t.getTarget = pep.getTarget;
 		domReady = 'DOMContentLoaded';
 
