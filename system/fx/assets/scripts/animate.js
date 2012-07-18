@@ -518,12 +518,13 @@ using("System.Dom.Base");
 		},
 	
 		toggle: function(){
-			this.fx().then(function (args) {
-				toggle.apply(this, args);
+			var me = this;
+			me.fx().then(function (args) {
+				toggle.apply(me, args);
 				return false;
 			}, arguments);
 
-			return this;
+			return me;
 		},
 		
 		/**
