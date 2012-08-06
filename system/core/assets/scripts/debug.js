@@ -745,7 +745,6 @@ function imports(namespace) {
 		/**
          * 输出一个函数执行指定次使用的时间。
          * @param {Function} fn 函数。
-         * @param {Number} times=1000 运行次数。
          */
 		time: function (fn) {
 			var time = 0,
