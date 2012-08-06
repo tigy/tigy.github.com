@@ -233,12 +233,29 @@
 
 				assert.isString(eventName, "System.Base.addEvents(eventName, properties): {eventName} ~");
 
-				var eventObj = this.$event || (this.$event = {});
+				var eventObj = this.$event || (this.$event = {}),
+					defaultEvent = eventObj.$default;
+					
+				if(properties) {
+					Object.extendIf(properties, defaultEvent);
+					if(properties.base) {
+						assert(defaultEvent, "使用 base 字段功能必须预先定义 $default 事件。");
+						properties.add = function(ctrl, type, fn){
+							defaultEvent.add(ctrl, this.base, fn);
+						};
+						
+						properties.remove = function(ctrl, type, fn){
+							defaultEvent.remove(ctrl, this.base, fn);
+						};
+					}
+				} else {
+					properties = defaultEvent || emptyObj;
+				}
 
 				// 更新事件对象。
 				eventName.split(' ').forEach(function (value) {
-					eventObj[value] = this;
-				}, properties ? Object.extendIf(properties, eventObj.$default) : (eventObj.$default || emptyObj));
+					eventObj[value] = properties;
+				});
 
 				return this;
 			},

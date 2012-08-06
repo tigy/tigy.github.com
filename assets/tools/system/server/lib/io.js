@@ -80,11 +80,11 @@ function createDirectory (p, mode) {
 var IO = {
 
 	exist: function(path) {
-		return Path.existsSync(path);
+		return FS.existsSync(path);
 	},
 	
 	existDir: function(path) {
-		return Path.existsSync(Path.dirname(path));
+		return FS.existsSync(Path.dirname(path));
 	},
 	
 	ensureDir: function(path) {

@@ -3,18 +3,12 @@
 
 
 Dom.addEvents('ctrlenter', {
-	
-	add: function(ctrl, type, fn){
-		Dom.$event.$default.add(ctrl, 'keypress', fn);
-	},
-
-	remove: function(ctrl, type, fn){
-		Dom.$event.$default.remove(ctrl, 'keypress', fn);
-	},
 
 	initEvent: function(e){
 		return e.ctrlKey && (e.which == 13 || e.which == 10);
-	}
+	},
+	
+	base: 'keypress'
 	
 });
 

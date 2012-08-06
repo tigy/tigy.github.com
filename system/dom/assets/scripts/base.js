@@ -2312,13 +2312,27 @@
 			
 			assert.isFunction(handler, "Dom.prototype.delegate(selector, eventName, handler): {handler}  ~");
 			
-			this.on(eventName, function(e){
-				var target = e.getTarget();
-				if(e.getTarget().match(selector)){
-					return handler.call(this, e, target);
-				}
-			});
+			if(/mouse(enter|leave)/.test(eventName)){
+				eventName = eventName == 'mouseenter' ? 'mouseover' : 'mouseout';
+				this.on(eventName, function(e){
+					if(checkMouseEnter.call(this, e)){
+						var target = e.getTarget();
+						target = target.closest(selector);
+						if(target){
+							return handler.call(target, e, this);
+						}
+					}
+				});
+			} else {
+				this.on(eventName, function(e){
+					var target = e.getTarget().closest(selector);
+					if(target){
+						return handler.call(target, e, this);
+					}
+				});
+			}
 			
+			return this;
 		}
 
 	})
@@ -3289,6 +3303,11 @@
 
 	/// #if CompactMode
 
+	function checkMouseEnter(e) {
+		var relatedTarget = e.relatedTarget;
+		return this.dom !== relatedTarget && !Dom.hasChild(this.dom, relatedTarget);
+	};
+
 	if(isStd) {
 
 		/// #endif
@@ -3300,68 +3319,58 @@
 
 		if (div.onmouseenter !== null) {
 
-			var checkMouseEnter = function (e) {
-				return this !== e.relatedTarget && !Dom.hasChild(this.dom, e.relatedTarget);
-			};
-
 			Dom.addEvents('mouseenter', {
 				initEvent: checkMouseEnter,
-				add: function (ctrl, type, fn) {
-					eventObj.add(ctrl, 'mouseover', fn);
-				},
-				remove: function (ctrl, type, fn) {
-					eventObj.remove(ctrl, 'mouseover', fn);
-				}
+				base: 'mouseover'
 			});
 
 			Dom.addEvents('mouseleave', {
 				initEvent: checkMouseEnter,
-				add: function (ctrl, type, fn) {
-					eventObj.add(ctrl, 'mouseout', fn);
-				},
-				remove: function (ctrl, type, fn) {
-					eventObj.remove(ctrl, 'mouseout', fn);
-				}
+				base: 'mouseout'
 			});
 
 		}
 
+		// Firefox 会在右击时触发 document.onclick 。
+		if(navigator.isFirefox) {
+			Dom.addEvents('click', {
+				initEvent: function(e){
+					return e.which === 1;
+				}
+			});
+		}
 		/// #if CompactMode
 	} else {
 
 		eventObj.initEvent = function (e) {
-			if (!e.stop) {
-				e.target = e.srcElement;
-				e.stop = pep.stop;
-				e.getTarget = pep.getTarget;
-				e.stopPropagation = pep.stopPropagation;
-				e.preventDefault = pep.preventDefault;
-			}
+			e.target = e.srcElement;
+			e.stop = pep.stop;
+			e.getTarget = pep.getTarget;
+			e.stopPropagation = pep.stopPropagation;
+			e.preventDefault = pep.preventDefault;
 		};
 
 		Dom.addEvents("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", {
-			init: function (e) {
+			initEvent: function (e) {
 				if(!e.stop) {
 					eventObj.initEvent(e);
-					e.relatedTarget = e.fromElement === e.target ? e.toElement: e.fromElement;
+					e.relatedTarget = e.fromElement === e.srcElement ? e.toElement: e.fromElement;
 					var dom = getDocument(e.target).dom;
 					e.pageX = e.clientX + dom.scrollLeft;
 					e.pageY = e.clientY + dom.scrollTop;
 					e.layerX = e.x;
 					e.layerY = e.y;
 					// 1 ： 单击 2 ： 中键点击 3 ： 右击
-					e.which = (e.button & 1 ? 1: (e.button & 2 ? 3: (e.button & 4 ? 2: 0)));
+					e.which = e.button & 1 ? 1: e.button & 2 ? 3: e.button & 4 ? 2: 0;
 
 				}
 			}
 		});
 
 		Dom.addEvents("keydown keypress keyup",  {
-			init: function (e) {
-				if(!e.stop) {
-					eventObj.initEvent(e);
-					e.which = e.keyCode;
-				}
+			initEvent: function (e) {
+				eventObj.initEvent(e);
+				e.which = e.keyCode;
 			}
 		});
 		

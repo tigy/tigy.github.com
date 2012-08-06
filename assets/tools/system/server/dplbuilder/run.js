@@ -16,7 +16,7 @@ if(Program.args.length > 0){
 }
 
 function startBuild(path){
-	if(require("path").existsSync(path))
+	if(require("fs").existsSync(path))
 		DplBuilder.build(path);
 	else
 		console.log('\tFile Not Found: ' + process.cwd() + '\\' + path);
