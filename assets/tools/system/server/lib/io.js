@@ -27,7 +27,7 @@ function copyDirectory(sourceDir, newDirLocation) {
         FS.mkdirSync(newDirLocation, checkDir.mode);
     } catch (e) {
         //if the directory already exists, that's okay
-        if (e.code !== 'EEXIST') throw e;
+        if (e.code !== 'Eexists') throw e;
     }
 
     var files = FS.readdirSync(sourceDir);
@@ -60,7 +60,7 @@ function createDirectory (p, mode) {
                 createDirectory(p, mode);
                 break;
 
-            case 'EEXIST' :
+            case 'Eexists' :
                 var stat;
                 try {
                     stat = FS.statSync(p);
@@ -79,33 +79,33 @@ function createDirectory (p, mode) {
 
 var IO = {
 
-	exist: function(path) {
-		return FS.existsSync(path);
+	exists: function(path) {
+		return Path.existsSync(path);
 	},
 	
-	existDir: function(path) {
-		return FS.existsSync(Path.dirname(path));
+	existsDir: function(path) {
+		return Path.existsSync(Path.dirname(path));
 	},
 	
 	ensureDir: function(path) {
 		path = Path.dirname(path);
-		if(!IO.exist(path))
+		if(!IO.exists(path))
 			return createDirectory(path);
 	},
 	
-	copyFile: function(srcFile, destFile) {
-		if(!IO.exist(srcFile) || IO.exist(destFile))
+	copyFile: function(srcFile, destFile, overwrite) {
+		if(!IO.exists(srcFile) || IO.exists(destFile))
 			return;
 		
-		if(IO.existDir(destFile))
+		if(IO.existsDir(destFile))
 			copyFile(srcFile, destFile);
 	},
 	
 	copyFileAndOverwrite: function(srcFile, destFile) {
-		if(!IO.exist(srcFile))
+		if(!IO.exists(srcFile))
 			return;
 			
-		if(IO.exist(destFile)){
+		if(IO.exists(destFile)){
 			FS.unlinkSync(destFile);
 		} else {
 			IO.ensureDir(destFile);	
@@ -115,7 +115,7 @@ var IO = {
 	},
 	
 	copyDirectory: function(src, dest) {
-		if(!IO.exist(src) || IO.exist(dest))
+		if(!IO.exists(src) || IO.exists(dest))
 			return;
 		
 		copyDirectory(src, dest);
@@ -123,22 +123,31 @@ var IO = {
 	
 	createDirectory: createDirectory,
 	
-	readFile: function(path) {
-		return IO.exist(path) ? FS.readFileSync(path, "utf-8"): '';
+	readFile: function(path, encoding) {
+		if(IO.exists(path)) {
+			encoding = encoding || "utf-8";
+			var c = FS.readFileSync(path, encoding);
+			if(/^utf\-?8/.test(encoding)){
+				c = c.replace(/^\uFEFF/, '');
+			}
+			return c;
+		}
+		return '';
 	},
 	
-	writeFile: function(path, content) {
-		if(IO.existDir(path))
-			FS.writeFileSync(path, content, "utf-8");
+	writeFile: function(path, content, encoding) {
+		IO.ensureDir(path);
+		
+		FS.writeFileSync(path, content, encoding|| "utf-8");
 	},
 	
 	openWrite: function(path, options){
-		this.ensureDir(path);
+		IO.ensureDir(path);
 		return FS.createWriteStream(path, options);
 	},
 	
 	deleteFile: function(path) {
-		if(IO.exist(path))
+		if(IO.exists(path))
 			FS.unlinkSync(path);
 	}
 

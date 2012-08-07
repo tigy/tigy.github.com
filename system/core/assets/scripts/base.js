@@ -3,6 +3,7 @@
  * @projectDescription J+：轻便的、易扩展的UI组件库
  * @copyright 2011-2012 J+ Team
  * @fileOverview 定义最基本的工具函数。
+ * @pragma defaultExtends JPlus.Base
  */
 
 // 可用的宏
@@ -96,6 +97,10 @@
 
 		},
 		
+		/**
+		 * 类成员方法。
+		 * @type Object
+		 */
 		classMembers = {
 
 			/**

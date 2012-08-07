@@ -1,6 +1,6 @@
 /**
  * @fileOverview 提供最底层的 DOM 辅助函数。
- * @pragma defaultExtends JPlus.Base
+ * @author xuld
  */
  
  
@@ -109,7 +109,7 @@
 			 * @param {Node} dom 封装的元素。
 			 */
 			constructor: function (dom) {
-				assert.isNode(dom, "Dom.prototype.constructor(dom): {dom} 必须是 DOM 节点。");
+				assert(!dom || dom.nodeType || dom.setTimeout, "Dom.prototype.constructor(dom): {dom} 必须是 DOM 节点。");
 				this.dom = dom;
 			},
 		
@@ -436,6 +436,12 @@
 		 * @type RegExp
 		 */
 		rBody = /^(?:BODY|HTML|#document)$/i,
+
+		/**
+		 * 判断选择框的正则表达式。
+		 * @type RegExp
+		 */
+		rCheckBox = /^(?:checkbox|radio)$/,
 		
 		/**
 		 * 在 Dom.parseNode 和 setHtml 中对 HTML 字符串进行包装用的字符串。
@@ -462,8 +468,21 @@
 		 * 特殊属性的列表。
 		 * @type Object
 		 */
+		attrHooks = {
+			innerHTML: false,
+			className: false,
+			textContent: false,
+			innerText: false,
+			htmlFor: false,
+			value: false
+		},
+
+		/**
+		 * 别名属性的列表。
+		 * @type Object
+		 */
 		attrFix = {
-			innerText: 'innerText' in div ? 'innerText': 'textContent',
+			innerText: 'innerText' in div ? 'innerText' : 'textContent',
 			'for': 'htmlFor',
 			'class': 'className'
 		},
@@ -863,13 +882,13 @@
 
 		/**
 		 * 解析一个 html 字符串，返回相应的原生节点。
-		 * @param {String/Element} html 字符。
+		 * @param {String/Element} html 要解析的 HTML 字符串。如果解析的字符串是一个 HTML 字符串，则此函数会忽略字符串前后的空格。
 		 * @param {Element} context=document 生成节点使用的文档中的任何节点。
-		 * @param {Boolean} cachable=true 指示是否缓存节点。
-		 * @return {Element/TextNode/DocumentFragment} 元素。
+		 * @param {Boolean} cachable=true 指示是否缓存节点。这会加速下次的解析速度。
+		 * @return {Element/TextNode/DocumentFragment} 如果 HTML 是纯文本，返回 TextNode。如果 HTML 包含多个节点，返回 DocumentFragment 。否则返回 Element。
 	 	 * @static
 		 */
-		parseNode: function(html, context, cachable) {
+		parseNode: function(html, context, cachable, scripts) {
 
 			// 不是 html，直接返回。
 			if( typeof html === 'string') {
@@ -900,25 +919,51 @@
 
 						var wrap = tagFix[tag[1].toLowerCase()] || tagFix.$default;
 
+						// IE8- 会过滤字符串前的空格。
+						// 为了保证全部浏览器统一行为，此处删除全部首尾空格。
+
 						html.innerHTML = wrap[1] + srcHTML.trim().replace(rXhtmlTag, "<$1></$2>") + wrap[2];
+
+						// UE67: 如果节点未添加到文档。需要重置 checkbox 的 checked 属性。
+						if (navigator.isQuirks) {
+							Object.each(html.getElementsByTagName('INPUT'), function(elem) {
+								if(rCheckBox.test(elem.type)) {
+									elem.checked = elem.defaultChecked;
+								}
+							});
+						}
+
+						//// 内部使用：提取 SCRIPT 标签。
+						//if (scripts) {
+						//	Object.each(html.getElementsByTagName('SCRIPT'), function(elem) {
+						//		if (!elem.type || /\/(java|ecma)script/i.test(elem.type)) {
+						//			scripts.push(elem);
+						//			elem.parentNode.removeChild(elem);
+						//		}
+						//	});
+						//}
 
 						// 转到正确的深度。
 						// IE 肯能无法正确完成位置标签的处理。
 						for( tag = wrap[0]; tag--; )
-						html = html.lastChild;
+							html = html.lastChild;
+
+						assert.isNode(html, "Dom.parseNode(html, context, cachable): 无法根据 {html} 创建节点。", srcHTML);
 
 						// 如果解析包含了多个节点。
-						if(html.previousSibling) {
+						if (html.previousSibling) {
 							wrap = html.parentNode;
 
 							assert(context.createDocumentFragment, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
 							html = context.createDocumentFragment();
-							while(wrap.firstChild) {
+							while (wrap.firstChild) {
 								html.appendChild(wrap.firstChild);
 							}
-						}
+						} else {
 
-						assert(html, "Dom.parseNode(html, context, cachable): 无法根据 {html} 创建节点。", srcHTML);
+							// 删除用于创建节点的父 DIV 标签。
+							html.parentNode.removeChild(html);
+						}
 
 						// 一般使用最后的节点， 如果存在最后的节点，使用父节点。
 						// 如果有多节点，则复制到片段对象。
@@ -986,23 +1031,26 @@
 
 			assert.isNode(elem, "Dom.getAttr(elem, name): {elem} ~");
 
+			name = attrFix[name] || name;
+
 			// if(navigator.isSafari && name === 'selected' &&
 			// elem.parentNode) { elem.parentNode.selectIndex;
 			// if(elem.parentNode.parentNode)
 			// elem.parentNode.parentNode.selectIndex; }
-			var fix = attrFix[name];
+			var hook = attrHooks[name];
 
 			// 如果是特殊属性，直接返回Property。
-			if(fix) {
+			if (hook !== undefined) {
 
-				if(fix.get)
-					return fix.get(elem, name);
+				if (hook.get) {
+					return hook.get(elem, name);
+				} else {
 
-				assert(!elem[fix] || !elem[fix].nodeType, "Dom.getAttr(elem, name): 表单内不能存在 {name} 的元素。", name);
+					assert(!elem[hook] || !elem[hook].nodeType, "Dom.getAttr(elem, name): 表单内不能存在 {name} 的元素。", name);
 
-				// 如果 这个属性是自定义属性。
-				if( fix in elem)
-					return elem[fix];
+					return elem[name];
+				}
+
 			}
 
 			assert(elem.getAttributeNode, "Dom.getAttr(elem, name): {elem} 不支持 getAttribute。", elem);
@@ -1031,7 +1079,7 @@
 		 */
 		hasClass: function(elem, className) {
 			assert.isNode(elem, "Dom.hasClass(elem, className): {elem} ~");
-			assert(className && (!className.indexOf || !/[\s\r\n]/.test(className)), "Dom.hasClass(elem, className): {className} 不能空，且不允许有空格和换行。");
+			assert(className && (!className.indexOf || !/[\s\r\n]/.test(className)), "Dom.hasClass(elem, className): {className} 不能空，且不允许有空格和换行。如果需要判断 2 个 class 同时存在，可以调用两次本函数： if(hasClass('A') && hasClass('B')) ...");
 			return (" " + elem.className + " ").indexOf(" " + className + " ") >= 0;
 		},
 
@@ -1049,11 +1097,39 @@
 		 * @type Object 特殊的属性，在节点复制时不会被复制，因此需要额外复制这些属性内容。
 	 	 * @static
 		 */
-		propFix: {
-			INPUT: 'checked',
+		cloneFix: {
+			INPUT: function(srcElem, destElem) {
+				
+				if (rCheckBox.test(srcElem.type)) {
+
+					// IE6 必须同时设置 defaultChecked 属性。
+					destElem.defaultChecked = destElem.checked = srcElem.checked;
+
+					// IE67 无法复制 value 属性。
+					if (destElem.value !== srcElem.value) {
+						destElem.value = srcElem.value;
+					}
+				} else {
+					destElem.value = srcElem.value;
+				}
+			},
+			TEXTAREA: 'value',
 			OPTION: 'selected',
-			TEXTAREA: 'value'
+			OBJECT: function(destElem, srcElem) {
+				if (destElem.parentNode) {
+					destElem.outerHTML = srcElem.outerHTML;
+				}
+			}
 		},
+		
+		/**
+		 * 特殊属性集合。
+		 * @property
+		 * @type Object
+		 * @static
+		 * @private
+		 */
+		attrHooks: attrHooks,
 		
 		/**
 		 * 特殊属性集合。
@@ -1844,7 +1920,7 @@
 			return this;
 		}: function(value) {
 			assert.isElement(this.dom, "Dom.prototype.unselectable(value): 当前 dom 不支持此操作");
-			this.dom.style.MozUserSelect = value !== false ? 'none': '';
+			this.dom.style.MozUserSelect = value !== false ? 'none' : '';
 			return this;
 		},
 		
@@ -1875,27 +1951,30 @@
 		 */
 		setAttr: function(name, value) {
 			var elem = this.dom;
-		
-			/// #if CompactMode
 			
 			assert(name !== 'type' || elem.tagName !== "INPUT" || !elem.parentNode, "Dom.prototype.setAttr(name, type): 无法修改INPUT元素的 type 属性。");
-		
-			/// #endif
-			// 如果是节点具有的属性。
-			if( name in attrFix) {
-		
-				if(attrFix[name].set)
-					attrFix[name].set(elem, name, value);
-				else {
-		
+
+			// 处理别名问题。
+			name = attrFix[name] || name;
+
+			// 获取特殊样式设置钩子。
+			var hook = attrHooks[name];
+			// hook: 对象: 自定义的设置和获取方式
+			// hook: true:  bool 属性，需要更改为设置 true.
+
+			if (hook !== undefined) {
+				if (hook === true) {
+					elem[name] = !!value;
+				} else if (hook.set) {
+					hook.set(elem, name, value);
+				} else {
 					assert(elem.tagName !== 'FORM' || name !== 'className' || typeof elem.className === 'string', "Dom.prototype.setAttr(name, type): 表单内不能存在 name='className' 的节点。");
-		
-					elem[attrFix[name]] = value;
-		
+					elem[name] = value;
 				}
-		
+
+			// 如果是节点具有的属性。
 			} else if(value === null) {
-		
+
 				assert(elem.removeAttributeNode, "Dom.prototype.setAttr(name, type): 当前元素不存在 removeAttributeNode 方法");
 		
 				if( value = elem.getAttributeNode(name)) {
@@ -1998,7 +2077,8 @@
 			assert.isString(className, "Dom.prototype.addClass(className): {className} ~");
 		
 			var elem = this.dom, classList = className.split(/\s+/), newClass, i;
-		
+			
+			// 加速为不存在 class 的元素设置 class 。
 			if(!elem.className && classList.length <= 1) {
 				elem.className = className;
 		
@@ -2071,8 +2151,8 @@
 		 * #####结果:
 		 * <pre lang="htm" format="none">[ &lt;p class="selected"&gt;Hello&lt;/p&gt;, &lt;p&gt;Hello Again&lt;/p&gt; ]</pre>
 		 */
-		toggleClass: function(className, stateVal) {
-			return this[(stateVal == undefined ? this.hasClass(className) : !stateVal) ? 'removeClass' : 'addClass'](className);
+		toggleClass: function(className, state) {
+			return this[(state == undefined ? this.hasClass(className) : !state) ? 'removeClass' : 'addClass'](className);
 		},
 	
 		/**
@@ -2108,17 +2188,25 @@
 		 * <pre lang="htm" format="none">&lt;div id="a"&gt;&lt;a/&gt;&lt;/div&gt;</pre>
 		 */
 		setHtml: function(value) {
+
+			// 如果存在 <script> 或 <style> ，则不能使用 innerHTML 实现。
+			if (/<(?:script|style)/i.test(value)) {
+				this.empty().append(value);
+				return this;
+			}
+
 			var elem = this.dom,
 				map = tagFix.$default;
 			
-			assert(elem.nodeType === 1, "Dom.prototype.setHtml(value): 仅当 dom.nodeType === 1 时才能使用此函数。"); 
+			assert(elem.nodeType === 1, "Dom.prototype.setHtml(value): {elem} 不是元素节点(nodeType === 1), 无法执行 setHtml。", elem);
 			
 			value = (map[1] + value + map[2]).replace(rXhtmlTag, "<$1></$2>");
-			// Object.each(elem.getElementsByTagName("*"), function(node){
-			// 	node.$data = null;
-			// });
-			
 			try {
+
+				// 对每个子元素清空内存。
+				Object.each(elem.getElementsByTagName("*"), clean);
+
+				// 内部执行 innerHTML 。
 				elem.innerHTML = value;
 				
 			// 如果 innerHTML 出现错误，则直接使用节点方式操作。
@@ -2126,6 +2214,8 @@
 				this.empty().append(value);
 				return this;
 			}
+
+			// IE6 需要包装节点，此处解除包装的节点。
 			if (map[0] > 1) {
 				value = elem.lastChild;
 				elem.removeChild(elem.firstChild);
@@ -2836,7 +2926,16 @@
 		 * @return {DomList} 返回一个 DomList 对象。
 		 */
 		getElements: function(args) {
-			return new DomList(this.dom.getElementsByTagName(args || '*'));
+			args = args || "*";
+			if (this.dom.getElementsByTagName)
+				return new DomList(this.dom.getElementsByTagName(args));
+
+			var r = new DomList;
+			Object.each(this.dom.childNodes, function(node) {
+				r.concat(node.getElementsByTagName(args));
+			});
+
+			return r;
 		},
 		
 		/**
@@ -2958,8 +3057,8 @@
 	
 		/**
 		 * 创建并返回当前 Dom 对象的副本。
-		 * @param {Boolean} cloneEvent=false 是否复制事件。
-		 * @param {Boolean} contents=true 是否复制子元素。
+		 * @param {Boolean} deep=true 是否复制子元素。
+		 * @param {Boolean} cloneDataAndEvent=false 是否复制数据和事件。
 		 * @param {Boolean} keepId=false 是否复制 id 。
 		 * @return {Dom} 新 Dom 对象。
 		 *
@@ -2972,17 +3071,18 @@
 		 * #####结果:
 		 * <pre lang="htm" format="none">&lt;b&gt;Hello&lt;/b&gt;&lt;p&gt;&lt;b&gt;Hello&lt;/b&gt;, how are you?&lt;/p&gt;</pre>
 		 */
-		clone: function(cloneEvent, contents, keepId) {
+		clone: function(deep, cloneDataAndEvent, keepId) {
 		
 			var elem = this.dom,
-				clone = elem.cloneNode(contents = contents !== false);
+				clone = elem.cloneNode(deep = deep !== false);
 			
 			if(elem.nodeType === 1){
-				if (contents) 
-					for (var elemChild = elem.getElementsByTagName('*'), cloneChild = clone.getElementsByTagName('*'), i = 0; cloneChild[i]; i++) 
-						cleanClone(elemChild[i], cloneChild[i], cloneEvent, keepId);
+				if (deep) {
+					for (var elemChild = elem.getElementsByTagName('*'), cloneChild = clone.getElementsByTagName('*'), i = 0; cloneChild[i]; i++)
+						cleanClone(elemChild[i], cloneChild[i], cloneDataAndEvent, keepId);
+				}
 			
-				cleanClone(elem, clone, cloneEvent, keepId);
+				cleanClone(elem, clone, cloneDataAndEvent, keepId);
 			}
 		
 			return new this.constructor(clone);
@@ -3014,7 +3114,7 @@
 		 * @return {Boolean} 当前元素已经隐藏返回 true，否则返回  false 。
 		 */
 		isHidden: function(){
-			return Dom.isHidden(this.dom) || styleString(this.dom, 'visibility') !== 'hidden';
+			return Dom.isHidden(this.dom) && styleString(this.dom, 'visibility') !== 'hidden';
 		},
 		
 		/**
@@ -3119,7 +3219,34 @@
 	}, function(value, key) {
 		Dom.prototype[key] = function(html) {
 			html = Dom.parse(html, this);
+
+			var scripts = html.getElements('SCRIPT');
+
+			if (html.dom.tagName === 'SCRIPT') {
+				scripts.push(html.dom);
+			}
+
 			value(this, html);
+
+			scripts.forEach(function(script) {
+				if (!script.type || /\/(java|ecma)script/i.test(script.type)) {
+
+					if (script.src) {
+						assert(window.Ajax && Ajax.send, "必须载入 System.Request.Script 模块以支持动态执行 <script src=''>");
+						Ajax.send({
+							url: script.src,
+							type: "GET",
+							dataType: 'script',
+							async: false
+						});
+			           //    script.parentNode.removeChild(script);
+					} else {
+						window.execScript(script.text || script.textContent || script.innerHTML || "");
+					}
+
+				}
+			}, this);
+
 			return html;
 		};
 
@@ -3265,8 +3392,14 @@
 	tagFix.th = tagFix.td;
 
 	// 初始化 attrFix。
-	map("checked selected disabled value innerHTML textContent className autofocus autoplay async controls hidden loop open required scoped compact nowrap ismap declare noshade multiple noresize defer readOnly tabIndex defaultValue accessKey defaultChecked cellPadding cellSpacing rowSpan colSpan frameBorder maxLength useMap contentEditable", function (value) {
-		attrFix[value.toLowerCase()] = attrFix[value] = value;
+	map("readOnly tabIndex defaultValue accessKey defaultChecked cellPadding cellSpacing rowSpan colSpan frameBorder maxLength useMap contentEditable", function (value) {
+		attrFix[value.toLowerCase()] = value;
+	});
+
+
+	// 初始化 attrHooks。
+	map("checked selected disabled autofocus autoplay async controls hidden loop open required scoped compact nowrap ismap declare noshade multiple noresize defer readOnly useMap defaultChecked", function (value) {
+		attrHooks[value] = true;
 	});
 	
 	// 初始化 textFix。
@@ -3379,10 +3512,10 @@
 		if (!('opacity' in div.style)) {
 			styleFix.opacity = 'setOpacity';
 		}
-		
-		Dom.propFix.OBJECT = 'outerHTML';
 
-		attrFix.style = {
+		Dom.cloneFix.SCRIPT = 'text';
+
+		attrHooks.style = {
 
 			get: function(elem, name) {
 				return elem.style.cssText.toLowerCase();
@@ -3394,7 +3527,7 @@
 
 		if(navigator.isQuirks) {
 
-			attrFix.value = {
+			attrHooks.value = {
 
 				node: function(elem, name) {
 					assert(elem.getAttributeNode, "Dom.prototype.getAttr(name, type): 当前元素不存在 getAttributeNode 方法");
@@ -3412,7 +3545,7 @@
 				}
 			};
 
-			attrFix.href = attrFix.src = attrFix.usemap = {
+			attrHooks.href = attrHooks.src = attrHooks.usemap = {
 
 				get: function(elem, name) {
 					return elem.getAttribute(name, 2);
@@ -3716,11 +3849,12 @@
 	 * 删除由于拷贝导致的杂项。
 	 * @param {Element} srcElem 源元素。
 	 * @param {Element} destElem 目的元素。
-	 * @param {Boolean} cloneEvent=true 是否复制数据。
+	 * @param {Boolean} cloneDataAndEvent=true 是否复制数据。
 	 * @param {Boolean} keepId=false 是否留下ID。
 	 */
-	function cleanClone(srcElem, destElem, cloneEvent, keepId) {
+	function cleanClone(srcElem, destElem, cloneDataAndEvent, keepId) {
 
+		// 删除重复的 ID 属性。
 		if(!keepId && destElem.removeAttribute)
 			destElem.removeAttribute('id');
 
@@ -3742,28 +3876,36 @@
 
 		/// #endif
 
-		if(cloneEvent !== false) {
+		if (cloneDataAndEvent !== false && (cloneDataAndEvent = srcElem.$data)) {
+
+			destElem.$data = cloneDataAndEvent = Object.extend({}, cloneDataAndEvent);
 			
 		    // event 作为系统内部对象。事件的拷贝必须重新进行 on 绑定。
-		    var event = srcElem.$data && srcElem.$data.$event, dest;
+			var event = cloneDataAndEvent.$event, dest;
 
 		    if (event) {
+		    	cloneDataAndEvent.$event = null;
 		    	dest = new Dom(destElem);
-			    for (cloneEvent in event)
+		    	for (cloneDataAndEvent in event)
 
 				    // 对每种事件。
-				    event[cloneEvent].handlers.forEach(function(handler) {
+		    		event[cloneDataAndEvent].handlers.forEach(function(handler) {
 
 					    // 如果源数据的 target 是 src， 则改 dest 。
-					    dest.on(cloneEvent, handler[0], handler[1].dom === srcElem ? dest : handler[1]);
+		    			dest.on(cloneDataAndEvent, handler[0], handler[1].dom === srcElem ? dest : handler[1]);
 				    });
 			}
 			
 		}
-
+		
 		// 特殊属性复制。
-		if( keepId = Dom.propFix[srcElem.tagName])
-			destElem[keepId] = srcElem[keepId];
+		if (keepId = Dom.cloneFix[srcElem.tagName]) {
+			if (typeof keepId === 'string') {
+				destElem[keepId] = srcElem[keepId];
+			} else {
+				keepId(srcElem, destElem);
+			}
+		}
 	}
 
 	/**

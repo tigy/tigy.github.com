@@ -100,3 +100,47 @@ removeStyleSheet: function (name) {
 isStyleSheetDefined: function (name) {
 	return this.dynamicStyleMap.has(name);
 }
+
+
+
+
+
+            /**
+             * Creates a stylesheet from a text blob of rules.
+             * These rules will be wrapped in a STYLE tag and appended to the HEAD of the document.
+             * @param {window} [refWin=window] Window which will accept this stylesheet
+             * @param {String} cssText The text containing the css rules
+             * @param {String} [id] An id to add to the stylesheet for later removal
+             */
+            addStyleSheet:function (refWin, cssText, id) {
+                refWin = refWin || WINDOW;
+                if (S.isString(refWin)) {
+                    id = cssText;
+                    cssText = refWin;
+                    refWin = WINDOW;
+                }
+                refWin = DOM.get(refWin);
+                var win = DOM._getWin(refWin),
+                    doc = win.document,
+                    elem;
+
+                if (id && (id = id.replace('#', EMPTY))) {
+                    elem = DOM.get('#' + id, doc);
+                }
+
+                // 仅添加一次，不重复添加
+                if (elem) {
+                    return;
+                }
+
+                elem = DOM.create('<style>', { id:id }, doc);
+
+                // 先添加到 DOM 树中，再给 cssText 赋值，否则 css hack 会失效
+                DOM.get('head', doc).appendChild(elem);
+
+                if (elem.styleSheet) { // IE
+                    elem.styleSheet.cssText = cssText;
+                } else { // W3C
+                    elem.appendChild(doc.createTextNode(cssText));
+                }
+            },

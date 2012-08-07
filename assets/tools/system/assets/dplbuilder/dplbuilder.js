@@ -86,9 +86,14 @@ var DplBuilder = {
 		if (DplBuilder.addFile)
 			return DplBuilder.addFile;
 		var base = decodeURIComponent((/[?&]base=(.*?)([?&#]|$)/.exec(location.href) || ["", ""])[1]);
-		return DplBuilder.addFile = Object.extend({
+		
+		var newProj = Object.extend({
 			
 		}, BuildFiles[base]);
+		
+		newProj.name = null;
+		
+		return DplBuilder.addFile = newProj;
 	},
 	
 	showView: function (buildFileName) {

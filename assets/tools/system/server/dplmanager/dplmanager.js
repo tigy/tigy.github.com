@@ -44,7 +44,7 @@ if(typeof module === \'object\') {\
 		text = text.replace(/MODULE/g, module.toLowerCase()).replace(/CATEGORY/g, category.toLowerCase()).replace(/NAME/g, path);
 		
 		var r = createFolder + path + '.html';
-		if(!IO.exist(r))
+		if(!IO.exists(r))
 			IO.writeFile(r, text);
 		
 		IO.copyFile(tplFolder + "assets/styles/index.css", createFolder + "assets/styles/" + path + ".css");

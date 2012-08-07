@@ -19,7 +19,7 @@
 					这是节点
 				</div>
 				<a href="#" id="b"></a>
-				<form id="c"><input name="id"></form>
+				<form id="c"><input type="text" name="id" id="aaa"></form>
 			</div>
 			<script>
 				var node = document.getElementById('a');
@@ -48,6 +48,9 @@
 				console.log("getAttribute('id') => ",  node.getAttribute('id'));
 				console.log("getAttributeNode('id').nodeValue => ",  node.getAttributeNode('id').nodeValue);
 				 
+
+
+				var a = Dom.get('aaa'); 
 			
 			</script>
 			</p>

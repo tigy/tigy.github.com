@@ -19,6 +19,7 @@ DplBuilder.saveFile = function(BuildFiles){
 if(typeof module === \'object\') {\
 	module.exports = BuildFiles;\
 }\r\n';
+
 		IO.writeFile(configs.buildFiles, data);
 };
 

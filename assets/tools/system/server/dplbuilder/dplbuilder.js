@@ -305,10 +305,10 @@ BuildFile.prototype = {
 		files.forEach(function(file){
 			var name = file.name;
 			
+			this.log(">>> " + name);
 			if(this.header)
 				this.writeHeader(writer, name);
-			this.log(">>> " + name);
-			var content = this.read(file.path);
+			var content = IO.readFile(file.path);
 			content = this.resolveJsFile(content, file.path, name);
 			this.writeContent(writer, content);
 		}, this);
@@ -349,19 +349,19 @@ BuildFile.prototype = {
 	// INTERNAL
 	
 	read: function(path) {
-		return this.exist(path) ? FS.readFileSync(path, this.sourceEncoding) : '';
+		return IO.exists(path) ? FS.readFileSync(path, this.sourceEncoding) : '';
 	},
 	
 	write: function(path, content) {
 		return FS.wrireFileSync(path, content, this.encoding);
 	},
 	
-	exist: IO.exist,
+	exists: IO.exists,
 	
 	checkNamespace: function(namespace, isStyle){
 		var path = this.getPath(namespace, isStyle);
 		
-		return this.exist(path);
+		return this.exists(path);
 	},
 	
 	getPath: function(namespace, isStyle){

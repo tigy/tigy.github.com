@@ -41,17 +41,17 @@ var BuildConfig = {
 		if(isStyle){
 			asset = this.rootPath + namespace.replace(/^([^.]+\.[^.]+)\./, '$1.assets.styles.').replace(/\./g, '/') ;
 			
-			if(this.exist(asset+ '.less')) {
+			if(this.exists(asset+ '.less')) {
 				return asset+ '.less';
 			}
 			
-			if(this.exist(asset+ '.css')) {
+			if(this.exists(asset+ '.css')) {
 				return asset+ '.css';
 			}
 			
 			asset = this.rootPath + namespace.replace(/\./g, '/');
 			
-			if(this.exist(asset+ '.less')) {
+			if(this.exists(asset+ '.less')) {
 				return asset+ '.less';
 			}
 			
@@ -60,7 +60,7 @@ var BuildConfig = {
 		} else {
 			asset = this.rootPath + namespace.replace(/^([^.]+\.[^.]+)\./, '$1.assets.scripts.').replace(/\./g, '/') + '.js';	
 			
-			if(this.exist(asset)) {
+			if(this.exists(asset)) {
 				return asset;
 			}
 		
@@ -295,7 +295,7 @@ var BuildConfig = {
 				if(!me.images[src]) {
                     me.images[src] = true;
                     
-                    if(!me.exist(src)){
+                    if(!me.exists(src)){
                     	me.error('Can\'t Find "' + src + '". (' + path + ')');
                     	
                     	return  all;
@@ -320,10 +320,13 @@ var BuildConfig = {
 	},
 	
 	writeHeader: function(writer, name){
-		writer.write("/**********************************************" + this.lineBreak);
+		writer.write(this.lineBreak);
+		writer.write("/*********************************************************");
+		writer.write(this.lineBreak);
         writer.write(" * ");
         writer.write(name + this.lineBreak);
-        writer.write(" **********************************************/" + this.lineBreak);
+        writer.write(" *********************************************************/");
+		writer.write(this.lineBreak);
 	},
 	
 	writeContent: function(writer, content){
@@ -354,7 +357,7 @@ function initLess(builder){
     for (var i = 0; i < paths.length; i++) {
         pathname = path.join(paths[i], file);
 
-        if(builder.exist(pathname)){
+        if(builder.exists(pathname)){
         	break;
         }
     }

@@ -1,125 +1,120 @@
-﻿<!doctype html>
+<!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>J+ Library</title>
-		<script src="../../system/core/assets/scripts/base.js" type="text/javascript"></script>
-		<script src="../../system/dom/assets/scripts/base.js" type="text/javascript"></script>
-		<script src="../../assets/demo/demo.js" type="text/javascript"></script>
-	</head>
-	<body class="demo-doc">
-		<p>文/xuld</p>
-		<h3>背景</h3>
-		<p class="demo-doc">CloneNode 是 DOM 节点的一个方法，用于复制节点，但不是所有浏览器的复制行为都一致。 </p>
-		<h3>问题描述</h3>
-		<p class="demo-doc">因为 IE 下，节点属性和对象属性没有区分，所以复制的时候会一并拷贝。</p>
-		<p class="demo-doc">看一个例子：
-			<div id="ct">
-				<div id="a" myData="b" data-c="c" class="box purple" onclick="console.info('click')">
-					原始
-				</div>
-			</div>
-			<div id="ft" class="clear">
-			<select id="sel">
-				<option value="1">1</option>
-				<option value="2" selected="selected">2</option>
-				<option value="3">3</option>
-			</select>
-			<input id="rd" type="radio" checked="checked" />
-			<textarea id="tx">g</textarea>
-			</div>
-			<script>
-				var node = document.getElementById('a');
-				
-				node.addEventListener('mousedown', function(){
-					console.info('mousedown');
-				});
-		
-				node.on('click', function () {
-					alert(1);
-				});
-				
-				node.myData2  = "d";
-				
-				
-				console.log(node.innerHTML.trim() + "    --------------------");
-				console.log("myData => ",   node.getAttribute('myData'));
-				console.log("data-c => ", node.getAttribute('data-c'));
-				console.log("class => ", node.className);
-				console.log("onclick => ", node.onclick + "");
-				console.log("myData2 => ", node.myData2);
-				
-				node = document.getElementById('a').cloneNode(true);
-				node.innerHTML = '复制的';
-				console.log(node.innerHTML + "    --------------------");
-				console.log("myData => ",   node.getAttribute('myData'));
-				console.log("data-c => ", node.getAttribute('data-c'));
-				console.log("class => ", node.className);
-				console.log("onclick => ", node.onclick + "");
-				console.log("myData2 => ", node.myData2);
-				
-				document.getElementById('ct').appendChild(node);
-				
-				
-				node = document.getElementById('a').cloneNode(true);
-				node.innerHTML = '复制的修正';
-				
-				if( node.clearAttributes ) {
-					node.clearAttributes();
-					node.mergeAttributes(document.getElementById('a'));
-				}
-				
-				console.log(node.innerHTML + "    --------------------");
-				console.log("myData => ",   node.getAttribute('myData'));
-				console.log("data-c => ", node.getAttribute('data-c'));
-				console.log("class => ", node.className);
-				console.log("onclick => ", node.onclick + "");
-				console.log("myData2 => ", node.myData2);
-				
-				document.getElementById('ct').appendChild(node);
-				
-				//  IE   下无法复制  select 属性。
-				document.getElementById('ft').appendChild(document.getElementById('sel').cloneNode(true));
-				
-				//  无法复制  实时内容。
-				document.getElementById('ft').appendChild(document.getElementById('rd').cloneNode(true));
-				
-				//  文本框内容不会复制
-				document.getElementById('ft').appendChild(document.getElementById('tx').cloneNode(true));
-			
-				//  IE   下 object  参数不复制
-			</script>
-			</p>
-		<p class="demo-doc">从例子推测： IE 复制全部属性，包括事件 和 对象属性。非IE 复制全部属性，不包括事件 和 对象属性。部分表单控件无法实时复制。</p>
-		<h3>解决目标</h3>
-		<ol>
-			<li>
-				实现各个浏览器兼容的 CloneNode 事件: 复制节点
-			</li>
-			<li>
-				当复制 &lt;select&gt;等输入框时，同时复制内容。
-			</li>
-			<li>
-				支持事件复制。
-			</li>
-		</ol>
-		<h3>解决方案</h3>
-		<p class="demo-doc">定义清除的复制方式。</p>
-		<h3>测试</h3>
-		<script>
-			
-			node = $('a').clone();
-			node.innerHTML = '修复';
-			console.log(node.innerHTML + "    --------------------");
-			console.log("myData => ",   node.getAttribute('myData'));
-			console.log("data-c => ", node.getAttribute('data-c'));
-			console.log("class => ", node.className);
-			console.log("onclick => ", node.onclick + "");
-			console.log("myData2 => ", node.myData2);
-			document.getElementById('ct').appendChild(node);
+<head>
+    <meta charset="utf-8">
+    <title>J+ Library</title>
+    <script src="../../system/core/assets/scripts/base.js" type="text/javascript"></script>
+    <script src="../../system/dom/assets/scripts/base.js" type="text/javascript"></script>
+    <script src="../../libs/jquery/assets/scripts/jquery.js" type="text/javascript"></script>
+    <script src="../../assets/demo/demo.js" type="text/javascript"></script>
+</head>
+<body>
+    <div class="demo-clear" id="ct">
+        <div style="float: left; width: 170px;" id="from">
+            <div id="div" mydata="myData" class="myClass" onclick="console.info('onclick')">
+                原始节点
+            </div>
+            <br />
+            <select id="select">
+                <option value="1">1</option>
+                <option value="2" selected="selected">2</option>
+                <option value="3">3</option>
+            </select>
+            <input id="checkbox1" type="checkbox" />
+            <input id="checkbox2" type="checkbox" checked="checked" />
+            <input id="radio1" type="radio" name="radio" />
+            <input id="radio2" type="radio" name="radio" checked="checked" /><br />
+            <input type="text" value="defaultValue" style="width: 140px;" /><br />
+            <textarea id="textarea" style="width: 140px;">defaultValue</textarea>
+            <script id="script">
+                trace('script');
+            </script>
+            <object>
+            </object>
+        </div>
+    </div>
+    <script>
+        var node = document.getElementById('div');
+        node.myProp = "myProp";
 
+        Dom.get(node).setAttr('myAttr', "myAttr");
 
+        Dom.get(node).on('click', function() {
+            console.info('click');
+        });
 
-		</script>
-	</body>
+        function logData(title, node) {
+
+            node = Dom.get(node).first().dom;
+            node.innerHTML = title;
+            console.log(title + "    --------------------");
+            console.log("myData => ", node.getAttribute('myData'));
+            console.log("myProp => ", node.myProp);
+            console.log("myAttr => ", Dom.get(node).getAttr('myAttr'));
+            console.log("class => ", node.className);
+            console.log("onclick => ", node.onclick + "");
+        }
+
+        logData('原始节点', node.parentNode);
+
+    </script>
+    <div class="demo-doc">
+        <input type="button" value="复制" onclick="cloneNew()" />
+        <p>文/xuld</p>
+        <h3>背景</h3>
+        <p class="demo-doc">CloneNode 是 DOM 节点的一个方法，用于复制节点，但不是所有浏览器的复制行为都一致。 </p>
+        <h3>问题描述</h3>
+        <p class="demo-doc">因为 IE 下，节点属性和对象属性没有区分，所以复制的时候会一并拷贝。</p>
+        <p class="demo-doc">
+            看一个例子：
+            <script>
+
+                // 复制一个节点。
+                node = document.getElementById('from').cloneNode(true);
+                document.getElementById('ct').appendChild(node);
+
+                logData('复制节点', node);
+
+                // 复制一个节点。
+                node = document.getElementById('from').cloneNode(true);
+                document.getElementById('ct').appendChild(node);
+
+                if (node.firstChild.clearAttributes) {
+                    node.firstChild.clearAttributes();
+                    node.firstChild.mergeAttributes(document.getElementById('div'));
+                }
+
+                logData('复制节点简单修复', node);
+
+                //  IE   下无法复制  select 属性。
+                //  无法复制  实时内容。
+                //  文本框内容不会复制
+                //  IE   下 object  参数不复制
+            </script>
+        </p>
+        <p class="demo-doc">
+            从例子推测： IE 复制全部属性，包括事件 和 对象属性。非IE 复制全部属性，不包括事件 和 对象属性。部分表单控件无法实时复制。
+        </p>
+        <h3>解决目标</h3>
+        <ol>
+            <li>实现各个浏览器兼容的 CloneNode 事件: 复制节点 </li>
+            <li>当复制 &lt;select&gt;等输入框时，同时复制内容。 </li>
+            <li>支持事件复制。 </li>
+        </ol>
+        <h3>解决方案</h3>
+        <p class="demo-doc">定义清除的复制方式。</p>
+        <h3>测试</h3>
+        <script>
+
+            node = Dom.get('from').clone().appendTo('ct').dom;
+            logData('复制节点全部修正', node);
+
+            function cloneNew() {
+                node = Dom.get('from').clone().appendTo('ct').dom;
+                logData('新复制的', node);
+            }
+
+        </script>
+    </div>
+</body>
 </html>
