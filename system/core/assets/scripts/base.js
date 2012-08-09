@@ -93,7 +93,7 @@
 			 * 获取当前框架的版本号。
 			 * @getter
 			 */
-			version: 3.1
+			version: 3.2
 
 		},
 		
@@ -139,6 +139,38 @@
 				assert(this.prototype, "System.Base.implementIf(members): 无法扩展当前类，因为当前类的 prototype 为空。");
 
 				Object.extendIf(this.prototype, members);
+
+				return this;
+			},
+
+			/**
+			 * 添加当前类的动态方法，该方法基于某个属性的同名方法实现。
+			 * @param {String} target 要基于的属性名。
+			 * @param {String} setters 设置函数的方法名数组，用空格隔开。
+			 * @param {String} getters 获取函数的方法名数组，用空格隔开。
+			 * @static
+			 * @example <code>
+			 * MyClass.defineMethod('prop', 'fn');
+			 * </code>
+			 * 等价于 <code>
+			 * MyClass.implement({fn:  function(){ this.prop.fn();  }})
+			 * </code>
+			 */
+			defineMethod: function(targetProperty, setters, getters) {
+				
+				if (typeof getters === 'string') {
+					this.defineMethod(targetProperty, getters, true);
+					getters = 0;
+				}
+
+				this.implement(Object.map(setters, function(func) {
+					return getters ? function(args1, args2) {
+						return this[targetProperty][func](args1, args2);
+					} : function(args1, args2) {
+						this[targetProperty][func](args1, args2);
+						return this;
+					};
+				}, {}), getters ? 2 : 1);
 
 				return this;
 			},
@@ -2543,6 +2575,10 @@ function imports(namespace) {
 		stackTrace: true,
 
 		debugStepThrough: true,
+
+		deprected: function(message) {
+			trace.info(message);
+		},
 
 		/**
          * 确认一个值为函数。

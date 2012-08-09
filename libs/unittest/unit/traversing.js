@@ -14,7 +14,7 @@ function q(){
 
 test("Dom.prototype.query", function() {
 	expect(3);
-	equal( document.query("#foo").query(".blogTest").getText().join(''), "Yahoo", "Check for find" );
+	equal( document.query("#foo").query(".blogTest").getText(), "Yahoo", "Check for find" );
 
 	deepEqual(document.query("#qunit-fixture").query("> div"), q("foo", "moretests", "tabindex-tests", "liveHandlerOrder", "siblingTest"), "find child elements");
 	deepEqual(document.query("#qunit-fixture").query("> #foo > p"), q("sndp", "en", "sap"), "find child elements");
@@ -94,7 +94,7 @@ test("Dom.prototype.siblings()", function() {
 	deepEqual(Dom.query("#sndp").siblings(":has(code)"), q("sap"), "Check for filtered siblings (has code child element)");
 	deepEqual(Dom.query("#sndp").siblings(":has(a)"), q("en", "sap"), "Check for filtered siblings (has anchor child element)");
 	deepEqual(Dom.query("#foo").siblings("form, b"), q("form", "floatTest", "lengthtest", "name-tests", "testForm"), "Check for multiple filters");
-	var set = navigator.isQuirks ? q("sndp", "sap", "en") :  q("en", "sap", "sndp");
+	var set = navigator.isQuirks ? q("sap", "en") :  q("en", "sap");
 	deepEqual(Dom.query("#en, #sndp").siblings(), set, "Check for unique results from siblings");
 	deepEqual(Dom.query("#option5a").siblings("option[data-attr]"), q("option5c"), "Has attribute selector in siblings (#9261)");
 	equal(Dom.parse("<a/>").siblings().length, 0, "Detached elements have no siblings (#11370)");
@@ -109,11 +109,11 @@ test("Dom.prototype.children()", function() {
 
 test("Dom.prototype.parent()", function() {
 	expect(5);
-	equal(Dom.query("#groups").parent()[0].id, "ap", "Simple parent check");
-	equal(Dom.query("#groups").parent("p")[0].id, "ap", "Filtered parent check");
-	equal(Dom.query("#groups").parent("div2")[0], null, "Filtered parent check, no match");
-	equal(Dom.query("#groups").parent("div, p")[0].id, "ap", "Check for multiple filters");
-	deepEqual(Dom.query("#en, #sndp").parent(), q("foo"), "Check for unique results from parent");
+	equal(Dom.query("#groups").parent().dom.id, "ap", "Simple parent check");
+	equal(Dom.query("#groups").parent("p").dom.id, "ap", "Filtered parent check");
+	equal(Dom.query("#groups").parent("div2"), null, "Filtered parent check, no match");
+	equal(Dom.query("#groups").parent("div, p").dom.id, "ap", "Check for multiple filters");
+	deepEqual(Dom.query("#en, #sndp").parent().dom, q("foo")[0], "Check for unique results from parent");
 });
 
 test("Dom.prototype.parentAll", function() {
@@ -127,18 +127,18 @@ test("Dom.prototype.parentAll", function() {
 
 test("Dom.prototype.next()", function() {
 	expect(4);
-	equal(Dom.query("#ap").next()[0].id, "foo", "Simple next check");
-	equal(Dom.query("#ap").next("div")[0].id, "foo", "Filtered next check");
-	equal(Dom.query("#ap").next("p").length, 1, "Filtered next check, no match");
-	equal(Dom.query("#ap").next("div, p")[0].id, "foo", "Multiple filters");
+	equal(Dom.query("#ap").next().dom.id, "foo", "Simple next check");
+	equal(Dom.query("#ap").next("div").dom.id, "foo", "Filtered next check");
+	equal(!Dom.query("#ap").next("p"), false, "Filtered next check, no match");
+	equal(Dom.query("#ap").next("div, p").dom.id, "foo", "Multiple filters");
 });
 
 test("Dom.prototype.prev()", function() {
 	expect(4);
-	equal(Dom.query("#foo").prev()[0].id, "ap", "Simple prev check");
-	equal(Dom.query("#foo").prev("p")[0].id, "ap", "Filtered prev check");
-	equal(Dom.query("#foo").prev("div").length, 0, "Filtered prev check, no match");
-	equal(Dom.query("#foo").prev("p, div")[0].id, "ap", "Multiple filters");
+	equal(Dom.query("#foo").prev().dom.id, "ap", "Simple prev check");
+	equal(Dom.query("#foo").prev("p").dom.id, "ap", "Filtered prev check");
+	equal(Dom.query("#foo").prev("div"), null, "Filtered prev check, no match");
+	equal(Dom.query("#foo").prev("p, div").dom.id, "ap", "Multiple filters");
 });
 
 test("Dom.prototype.nextAll()", function() {

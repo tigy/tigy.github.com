@@ -13,8 +13,8 @@
 	<body>
 		
 		
-		<div class="demo-container" id="a">
-			<div class="demo-box" id="b">
+		<div class="demo-container click-target" id="a">
+			<div class="demo-box click-target" id="b">
 			</div>
 			<div class="demo-box demo-red" id="c"></div>
 		</div>
@@ -33,12 +33,15 @@
 			//$$('#a').delegate('.demo-box', 'mouseover', log);
 			
 			//document.on('mouseover', log);
-			document.delegate('#a', 'mouseenter', log);
+		  document.delegate('#a', 'mouseenter', log);
+
+		    // document.delegate('.click-target', 'click', log);
 			
 			//document.on('click', log);
 			//debugger
 			//$(document).delegate('#a', 'mouseover', log);
-			//$(document).bind('click', log);
+		    //$(document).bind('click', log);
+
 		</script>
 	</body>
 </html>

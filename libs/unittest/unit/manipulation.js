@@ -869,7 +869,7 @@ test("Dom.prototype.setHtml", function() {
 
 	Dom.get("qunit-fixture").setHtml("foo <form><script type='text/javascript'>ok( true, 'Dom.parse().getHtml().evalScripts() Evals Scripts Twice in Firefox, see #975 (2)' );</script></form>");
 
-	Dom.get("qunit-fixture").setHtml("<script>equal(Dom.parse.scriptorder++, 0, 'Script is executed in order');equal(Dom.parse('#scriptorder').length, 1,'Execute after html (even though appears before)')<\/script><span id='scriptorder'><script>equal(Dom.parse.scriptorder++, 1, 'Script (nested) is executed in order');equal(Dom.parse('#scriptorder').length, 1,'Execute after html')<\/script></span><script>equal(Dom.parse.scriptorder++, 2, 'Script (unnested) is executed in order');equal(Dom.parse('#scriptorder').length, 1,'Execute after html')<\/script>");
+	Dom.get("qunit-fixture").setHtml("<script>equal(Dom.parse.scriptorder++, 0, 'Script is executed in order');equal(Dom.query('#scriptorder').length, 1,'Execute after html (even though appears before)')<\/script><span id='scriptorder'><script>equal(Dom.parse.scriptorder++, 1, 'Script (nested) is executed in order');equal(Dom.query('#scriptorder').length, 1,'Execute after html')<\/script></span><script>equal(Dom.parse.scriptorder++, 2, 'Script (unnested) is executed in order');equal(Dom.query('#scriptorder').length, 1,'Execute after html')<\/script>");
 });
 
 test("Dom.prototype.remove", function() {
@@ -891,7 +891,7 @@ test("Dom.prototype.remove", function() {
 });
 
 test("Dom.prototype.empty", function() {
-	equal( Dom.get("ap").children().empty().getText().join('').length, 0, "Check text is removed" );
+	equal( Dom.get("ap").children().empty().getText().length, 0, "Check text is removed" );
 	equal( Dom.get("ap").children().length, 4, "Check elements are not removed" );
 
 });
