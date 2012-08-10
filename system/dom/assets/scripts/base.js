@@ -100,7 +100,9 @@
 			 */
 			dataField: function(){
 				
-				// 由于 IE 6/7 即将退出市场。此处忽略 IE 6/7 内存泄露问题。
+				// 将数据绑定在原生节点上。
+				// 这在  IE 6/7 存在内存泄露问题。
+				// 由于 IE 6/7 即将退出市场。此处忽略。
 				return this.dom.$data || (this.dom.$data = {});
 			},
 		
@@ -181,42 +183,20 @@
 			length: 0,
 
 			/**
-			 * 对当前集合的每个节点的 Dom 封装调用其指定属性名的函数，并将返回值放入新的数组返回。
-			 * @param {String} fnName 要调用的函数名。
-			 * @param {Array} args 调用时的参数数组。
-			 * @return {Array} 返回包含执行结果的数组。
-			 * @see Array#see
-			 */
-			invoke: function(fnName, args) {
-				args = args || [];
-				var r = [];
-				assert(Dom.prototype[fnName] && Dom.prototype[fnName].apply, "DomList.prototype.invoke(fnName, args): Dom 不包含方法 {fnName}。", fnName);
-				ap.forEach.call(this, function(value) {
-					value = new Dom(value);
-					r.push(value[fnName].apply(value, args));
-				});
-				return r;
-			},
-			
-			/**
 			 * 使用包含节点的数组初始化 DomList 类的新实例。
 			 * @param {Array/DomList} [nodes] 用于初始化当前集合的节点集合。
 			 * @constructor
 			 */
-			constructor: function(nodes) {
-	
-				if(nodes) {
-
-					assert(nodes.length !== undefined, 'DomList.prototype.constructor(nodes): {nodes} 必须是一个 DomList 或 Array 类型的变量。', nodes);
+			constructor: function(elemOrDoms) {
+				if(elemOrDoms) {
+					assert(typeof elemOrDoms.length === 'number', 'DomList.prototype.constructor(elemOrDoms): {elemOrDoms} 必须是一个 DomList 或 Array 类型的变量。', elemOrDoms);
+					var elemOrDom;
 					
-					var node;
-					
-					while(node = nodes[this.length]) {
-						this[this.length++] = node.dom || node;	
+					// 将参数的 elemOrDoms 拷贝到当前集合。
+					while(elemOrDom = elemOrDoms[this.length]) {
+						this[this.length++] = elemOrDom.dom || elemOrDom;	
 					}
-
 				}
-
 			},
 	
 			/**
@@ -236,6 +216,24 @@
 			item: function(index){
 				var elem = this[index < 0 ? this.length + index : index];
 				return elem ? new Dom(elem) : null;
+			},
+			
+			/**
+			 * 对当前集合的每个节点的 Dom 封装调用其指定属性名的函数，并将返回值放入新的数组返回。
+			 * @param {String} fnName 要调用的函数名。
+			 * @param {Array} args 调用时的参数数组。
+			 * @return {Array} 返回包含执行结果的数组。
+			 * @see Array#see
+			 */
+			invoke: function(fnName, args) {
+				args = args || [];
+				var r = [];
+				assert(Dom.prototype[fnName] && Dom.prototype[fnName].apply, "DomList.prototype.invoke(fnName, args): Dom 不包含方法 {fnName}。", fnName);
+				ap.forEach.call(this, function(value) {
+					value = new Dom(value);
+					r.push(value[fnName].apply(value, args));
+				});
+				return r;
 			},
 			
 			/**
@@ -273,26 +271,19 @@
 			 * 为每个元素绑定事件。
 			 * @remark 见 {@link JPlus.Base#on}
 			 */
-			on: createEnumerator('on'),
+			on: createDomListMthod('on'),
 
 			/**
 			 * 为每个元素删除绑定事件。
 			 * @remark 见 {@link JPlus.Base#un}
 			 */
-			un: createEnumerator('un'),
+			un: createDomListMthod('un'),
 
 			/**
 			 * 触发每个元素事件。
 			 * @remark 见 {@link JPlus.Base#trigger}
 			 */
-			trigger: function(type, e){
-				for(var i = 0, r = true; i < this.length; i++){
-					if(!new Dom(this[o]).trigger(type, e))
-						r = false;
-				}
-				
-				return r;
-			}
+			trigger: createDomListMthod('trigger')
 			
 		}),
 	
@@ -505,24 +496,30 @@
 			get: function(elem, name) {
 				return elem[propFix[name] || name] ? name : null;
 			},
-			set: function(elem, value, name) {
+			set: function(elem, name, value) {
 				elem[propFix[name] || name] = value;
 			}
 		},
 
 		propHook = {
 			get: function(elem, name) {
-				return elem[propFix[name] || name] || nodeHook.get(elem, name);
+				return name in elem ? elem[name] : nodeHook.get(elem, name);
 			},
-			set: boolHook.set
-		}
+			set: function(elem, name, value) {
+				if(name in elem) {
+					elem[name] = value;
+				} else {
+					nodeHook.set(elem, name, value);	
+				}
+			}
+		},
 	
 		/**
 		 * 特殊属性的列表。
 		 * @type Object
 		 */
 		attrHooks = {
-			
+			value: propHook
 		},
 
 		/**
@@ -650,13 +647,13 @@
 		 */
 		styleFloat = 'cssFloat' in div.style ? 'cssFloat': 'styleFloat',
 		
+		// IE：styleFloat Other：cssFloat
+		
 		/**
 		 * 浏览器使用的真实的 DOMContentLoaded 事件名字。
 		 * @type String
 		 */
 		domReady,
-		
-		// IE：styleFloat Other：cssFloat
 
 		t,
 
@@ -699,19 +696,17 @@
 	 	 * <pre>{&lt;p id="a1"&gt;&lt;/p&gt;}</pre>
 		 */
 		get: function(id) {
-			
 			return typeof id === "string" ?
 				(id = document.getElementById(id)) && new Dom(id) :
 				id ? 
 					id.nodeType ? 
 						new Dom(id) :
 						id.dom ? 
-				id :
+						id :
 							id.document ?
 								new Dom(id) :
 								Dom.get(id[0]) : 
 					null;
-			
 		},
 		
 		/**
@@ -754,7 +749,6 @@
 	 	 * </pre>
 		 */
 		find: function(selector){
-			
 			return typeof selector === "string" ?
 				document.find(selector) :
 				Dom.get(selector);
@@ -804,48 +798,19 @@
          * <pre>Dom.query("input[type=radio]");</pre>
 		 */
 		query: function(selector) {
-			
-			// 如果传入的是字符串，作为选择器处理。
-			// 否则作为一个节点处理。
 			return selector ? 
 				typeof selector === 'string' ? 
 					document.query(selector) :
 					typeof selector.length === 'number' ? 
 						selector instanceof DomList ?
-				selector :
+						selector :
 							selector.setTimeout ? 
 								new DomList([selector]) :
 								new DomList(selector) :
 						new DomList([Dom.get(selector)]) :
 				new DomList;
-			
 		},
 		
-		/**
-		 * 判断一个元素是否符合一个选择器。
-		 * @param {Node} elem 一个 HTML 节点。
-		 * @param {String} selector 一个 CSS 选择器。
-		 * @return {Boolean} 如果指定的元素匹配输入的选择器，则返回 true， 否则返回 false 。
-	 	 * @static
-		 */
-		match: function (elem, selector) {
-			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
-			
-			if(elem.nodeType !== 1)
-				return false;
-				
-			if(!elem.parentNode){
-				var div = document.createElement('div');
-				div.appendChild(elem);
-				try{
-					return match(elem, selector);
-				} finally {
-					div.removeChild(elem);
-				}
-			}
-			return match(elem, selector);
-		},
-
 		/**
 		 * 根据提供的原始 HTML 标记字符串，解析并动态创建一个节点，并返回这个节点的 Dom 对象包装对象。
 		 * @param {String/Node} html 用于动态创建DOM元素的HTML字符串。
@@ -879,7 +844,7 @@
 
 			return html.dom ? html: new Dom(Dom.parseNode(html, context, cachable));
 		},
-		
+
 		/**
 		 * 创建一个指定标签的节点，并返回这个节点的 Dom 对象包装对象。
 		 * @param {String} tagName 要创建的节点标签名。
@@ -901,6 +866,23 @@
 		},
 		
 		/**
+		 * 根据一个 id 获取元素。如果传入的id不是字符串，则直接返回参数。
+		 * @param {String/Node/Dom} id 要获取元素的 id 或元素本身。
+	 	 * @return {Node} 元素。
+	 	 * @static
+		 */
+		getNode: function (id) {
+			return typeof id === "string" ?
+				document.getElementById(id) :
+				id ? 
+					id.nodeType ? 
+					id :
+						id.dom || Dom.getNode(id[0]) : 
+					null;
+			
+		},
+		
+		/**
 		 * 创建一个节点。
 		 * @param {String} tagName 创建的节点的标签名。
 		 * @param {String} className 创建的节点的类名。
@@ -914,23 +896,6 @@
 		},
 		
 		/**
-		 * 根据一个 id 获取元素。如果传入的id不是字符串，则直接返回参数。
-		 * @param {String/Node/Dom} id 要获取元素的 id 或元素本身。
-	 	 * @return {Node} 元素。
-	 	 * @static
-		 */
-		getNode: function (id) {
-			return typeof id === "string" ?
-				document.getElementById(id) :
-				id ? 
-					id.nodeType ? 
-				id :
-						id.dom || Dom.getNode(id[0]) : 
-					null;
-			
-		},
-
-		/**
 		 * 解析一个 html 字符串，返回相应的原生节点。
 		 * @param {String/Element} html 要解析的 HTML 字符串。如果解析的字符串是一个 HTML 字符串，则此函数会忽略字符串前后的空格。
 		 * @param {Element} context=document 生成节点使用的文档中的任何节点。
@@ -938,7 +903,7 @@
 		 * @return {Element/TextNode/DocumentFragment} 如果 HTML 是纯文本，返回 TextNode。如果 HTML 包含多个节点，返回 DocumentFragment 。否则返回 Element。
 	 	 * @static
 		 */
-		parseNode: function(html, context, cachable, scripts) {
+		parseNode: function(html, context, cachable) {
 
 			// 不是 html，直接返回。
 			if( typeof html === 'string') {
@@ -982,16 +947,6 @@
 								}
 							});
 						}
-
-						//// 内部使用：提取 SCRIPT 标签。
-						//if (scripts) {
-						//	Object.each(html.getElementsByTagName('SCRIPT'), function(elem) {
-						//		if (!elem.type || /\/(java|ecma)script/i.test(elem.type)) {
-						//			scripts.push(elem);
-						//			elem.parentNode.removeChild(elem);
-						//		}
-						//	});
-						//}
 
 						// 转到正确的深度。
 						// IE 肯能无法正确完成位置标签的处理。
@@ -1038,6 +993,31 @@
 		},
 		
 		/**
+		 * 判断一个元素是否符合一个选择器。
+		 * @param {Node} elem 一个 HTML 节点。
+		 * @param {String} selector 一个 CSS 选择器。
+		 * @return {Boolean} 如果指定的元素匹配输入的选择器，则返回 true， 否则返回 false 。
+	 	 * @static
+		 */
+		match: function (elem, selector) {
+			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
+			
+			if(elem.nodeType !== 1)
+				return false;
+				
+			if(!elem.parentNode){
+				var div = document.createElement('div');
+				div.appendChild(elem);
+				try{
+					return match(elem, selector);
+				} finally {
+					div.removeChild(elem);
+				}
+			}
+			return match(elem, selector);
+		},
+
+		/**
 		 * 判断指定节点之后有无存在子节点。
 		 * @param {Element} elem 节点。
 		 * @param {Element} child 子节点。
@@ -1065,9 +1045,25 @@
 	 	 * @static
 		 */
 		getText: function(elem) {
-
 			assert.isNode(elem, "Dom.getText(elem, name): {elem} ~");
 			return elem[textFix[elem.nodeName] || propFix.innerText] || '';
+		},
+		
+		/**
+		 * 设置当前 Dom 对象的文本内容。对于输入框则设置其输入的值。
+		 * @param {String} 用于设置元素内容的文本。
+		 * @return this
+		 * @see #setHtml
+		 * @remark 与 {@link #setHtml} 类似, 但将编码 HTML (将 "&lt;" 和 "&gt;" 替换成相应的HTML实体)。
+		 * @example
+		 * 设定文本框的值。
+		 * #####HTML:
+		 * <pre lang="htm" format="none">&lt;input type="text"/&gt;</pre>
+		 * #####JavaScript:
+		 * <pre>Dom.query("input").setText("hello world!");</pre>
+		 */
+		setText: function(elem, value) {
+			elem[textFix[elem.nodeName] || propFix.innerText] = value;
 		},
 
 		/**
@@ -1080,33 +1076,6 @@
 		getAttr: function(elem, name) {
 			
 			assert.isNode(elem, "Dom.getAttr(elem, name): {elem} ~");
-
-			//name = propFix[name] || name;
-
-			//// if(navigator.isSafari && name === 'selected' &&
-			//// elem.parentNode) { elem.parentNode.selectIndex;
-			//// if(elem.parentNode.parentNode)
-			//// elem.parentNode.parentNode.selectIndex; }
-			//var hook = attrHooks[name];
-
-			//// 如果是特殊属性，直接返回Property。
-			//if (hook !== undefined) {
-
-			//	if (hook.get) {
-			//		return hook.get(elem, name);
-			//	} else if (hook === true) {
-			//		return elem[name] ? name : null;
-			//	} else if (name in elem) {
-
-			//		assert(!elem[hook] || !elem[hook].nodeType, "Dom.getAttr(elem, name): 表单内不能存在 {name} 的元素。", name);
-
-			//		return String(elem[name]);
-			//	}
-
-			//}
-
-			//assert(elem.getAttributeNode, "Dom.getAttr(elem, name): {elem} 不支持 getAttribute。", elem);
-
 			// Fallback to prop when attributes are not supported
 			if (!elem.getAttribute) {
 				return Dom.getProp(elem, name);
@@ -1121,6 +1090,56 @@
 			}
 
 			return elem.getAttribute(name);
+
+		},
+		
+		/**
+		 * 设置或删除一个属性值。
+		 * @param {String} name 要设置的属性名称。
+		 * @param {String} value 要设置的属性值。当设置为 null 时，删除此属性。
+		 * @return this
+		 * @example
+		 * 为所有图像设置src属性。
+		 * #####HTML:
+		 * <pre lang="htm" format="none">
+		 * &lt;img/&gt;
+		 * &lt;img/&gt;
+		 * </pre>
+		 * #####JavaScript:
+		 * <pre>Dom.query("img").setAttr("src","test.jpg");</pre>
+		 * #####结果:
+		 * <pre lang="htm" format="none">[ &lt;img src= "test.jpg" /&gt; , &lt;img src= "test.jpg" /&gt; ]</pre>
+		 *
+		 * 将文档中图像的src属性删除
+		 * #####HTML:
+		 * <pre lang="htm" format="none">&lt;img src="test.jpg"/&gt;</pre>
+		 * #####JavaScript:
+		 * <pre>Dom.query("img").setAttr("src");</pre>
+		 * #####结果:
+		 * <pre lang="htm" format="none">[ &lt;img /&gt; ]</pre>
+		 */
+		setAttr: function(elem, name, value) {
+
+			//assert(name !== 'type' || elem.tagName !== "INPUT" || !elem.parentNode, "Dom.prototype.setAttr(name, type): 无法修改INPUT元素的 type 属性。");
+
+			// 如果支持 attr, 使用 prop
+			if (!elem.setAttribute) {
+				return this.setProp(elem, name);
+			}
+
+			name = name.toLowerCase();
+
+			var hook = attrHooks[name] || nodeHook;
+
+			if (hook) {
+				hook.set(elem, name, value);
+			} else if (name === null) {
+				elem.removeAttribute(name);
+			} else {
+				elem.setAttribute(name, value);
+			}
+
+			return this;
 
 		},
 
@@ -1156,28 +1175,27 @@
 			}
 
 			return null;
-
-			//// 如果是特殊属性，直接返回Property。
-			//if (hook !== undefined) {
-
-			//	if (hook.get) {
-			//		return hook.get(elem, name);
-			//	} else if (name in elem) {
-			//	}
-
-			//}
-
-			//assert(elem.getAttributeNode, "Dom.getAttr(elem, name): {elem} 不支持 getAttribute。", elem);
-
-			//// 获取属性节点，避免 IE 返回属性。
-			//fix = elem.getAttributeNode(name);
-
-			//// 如果不存在节点， name 为 null ，如果不存在节点值， 返回 null。
-			//return fix ? fix.value || (fix.specified ? "" : null) : null;
-
-			//return Dom.getAttr(this.dom, name);
+			
 		},
 
+		setProp: function(elem, name, value) {
+
+			name = propFix[name] || name;
+
+			var hook = Dom.propHooks[name];
+
+			if (value === null) {
+
+				// 避免 IE 报错。
+				try {
+					elem[name] = undefined;
+					delete elem[name];
+				} catch (e) { }
+			} else {
+				//  assert(!elem[hook] || !elem[hook].nodeType, "Dom.getAttr(elem, name): 表单内不能存在 {name} 的元素。", name);
+				elem[name] = value;
+			}
+		},
 		
 		/**
 		 * 判断一个节点是否隐藏。
@@ -1254,11 +1272,7 @@
 		 * @static
 		 * @private
 		 */
-		propHooks: {
-			tabIndex: function(elem, name) {
-				return +Dom.getAttr(elem, name);
-			}
-		},
+		propFix: propFix,
 		
 		/**
 		 * 特殊属性集合。
@@ -1267,7 +1281,11 @@
 		 * @static
 		 * @private
 		 */
-		propFix: propFix,
+		propHooks: {
+			tabIndex: function(elem, name) {
+				return +Dom.getAttr(elem, name);
+			}
+		},
 		
 		/**
 		 * 获取文本时应使用的属性值。
@@ -1598,56 +1616,17 @@
 		 *         只要有一个返回等于 true 的值， 就返回这个值。 参数 copyIf 仅内部使用。
 		 */
 		implement: function(members, listType, copyIf) {
-			assert.notNull(members, "Dom.implement" + ( copyIf ? 'If' : '') + "(members, listType): {members} ~");
 		
-			Object.each(members, function(value, func) {
+			var classes = [DomList.prototype, document, Dom.prototype], i;
 		
-				var i = this.length;
+			for(var funcName in members){
+				i = classes.length;
 				while(i--) {
-					var cls = this[i];
-					if(!copyIf || !cls[func]) {
-		
-						if(!i) {
-							switch (listType) {
-								case 2:
-									// return value
-									value = function() {
-										if(this.length) {
-											var target = new Dom(this[0]);
-											return target[func].apply(target, arguments);
-										}
-									};
-									break;
-		
-								case 3:
-									// return DomList
-									value = function() {
-										var r = new DomList;
-										return r.concat.apply(r, this.invoke(func, arguments));
-									};
-									break;
-								case 4:
-									// return if true
-									value = function() {
-										var i = -1, r, target;
-										while (++i < this.length && !r) {
-											target = new Dom(this[i]);
-											r = target[func].apply(target, arguments);
-										}
-										return r;
-									};
-									break;
-								default:
-									// return this
-									value = createEnumerator(func);
-							}
-						}
-		
-						cls[func] = value;
+					if(!copyIf || !classes[i][funcName]) {
+						classes[i][funcName] = i ? members[funcName] : createDomListMthod(funcName, listType);
 					}
 				}
-		
-			}, [DomList.prototype, document, Dom.prototype]);
+			}
 		
 			return this;
 
@@ -1731,11 +1710,11 @@
 			}
 		})
 
-	})
+	});
 	
 	/**@class Dom*/
 	
-	.implement({
+	Dom.implement({
 
 		/**
 		 * 将当前 Dom 对象添加到其它节点或 Dom 对象中。
@@ -1764,7 +1743,7 @@
 		appendTo: function(parent) {
 
 			// parent 肯能为 true
-			parent && parent !== true ? (parent.append ? parent : Dom.get(parent)).append(this) : this.attach(document.body, null);
+			parent ? (parent.append ? parent : Dom.get(parent)).append(this) : this.attach(document.body, null);
 
 			return this;
 
@@ -2038,7 +2017,7 @@
 		},
 
 		/**
-		 * 设置或删除一个属性值。
+		 * 设置或删除一个 HTML 属性值。
 		 * @param {String} name 要设置的属性名称。
 		 * @param {String} value 要设置的属性值。当设置为 null 时，删除此属性。
 		 * @return this
@@ -2063,75 +2042,37 @@
 		 * <pre lang="htm" format="none">[ &lt;img /&gt; ]</pre>
 		 */
 		setAttr: function(name, value) {
-			var elem = this.dom;
-
-			//assert(name !== 'type' || elem.tagName !== "INPUT" || !elem.parentNode, "Dom.prototype.setAttr(name, type): 无法修改INPUT元素的 type 属性。");
-
-			// 如果支持 attr, 使用 prop
-			if (!elem.setAttribute) {
-				return this.setProp(elem, name);
-			}
-
-			name = name.toLowerCase();
-
-			var hook = attrHooks[name] || nodeHook;
-
-			if (hook) {
-				hook.set(elem, name, value);
-			} else if (name === null) {
-				elem.removeAttribute(name);
-			} else {
-				elem.setAttribute(name, value);
-			}
-
+			Dom.setAttr(this.dom, name, value);
 			return this;
-
-			//// 处理别名问题。
-			//name = propFix[name] || name;
-
-			//// 获取特殊样式设置钩子。
-			//var hook = attrHooks[name];
-			//// hook: 对象: 自定义的设置和获取方式
-			//// hook: true:  bool 属性，需要更改为设置 true.
-
-			//if (hook !== undefined) {
-			//	if (hook === true) {
-			//		elem[name] = !!value;
-			//	} else if (hook.set) {
-			//		hook.set(elem, name, value);
-			//	} else if (name in elem) {
-			//		assert(elem.tagName !== 'FORM' || name !== 'className' || typeof elem.className === 'string', "Dom.prototype.setAttr(name, type): 表单内不能存在 name='className' 的节点。");
-			//		elem[name] = value;
-			//	}
-
-			//	return this;
-
-			//	// 如果是节点具有的属性。
-			//}
-
-			//return this;
-
 		},
 
+		/**
+		 * 设置或删除一个 DOM 属性值。
+		 * @param {String} name 要设置的属性名称。
+		 * @param {String} value 要设置的属性值。当设置为 null 时，删除此属性。
+		 * @return this
+		 * @example
+		 * 为所有图像设置src属性。
+		 * #####HTML:
+		 * <pre lang="htm" format="none">
+		 * &lt;img/&gt;
+		 * &lt;img/&gt;
+		 * </pre>
+		 * #####JavaScript:
+		 * <pre>Dom.query("img").setAttr("src","test.jpg");</pre>
+		 * #####结果:
+		 * <pre lang="htm" format="none">[ &lt;img src= "test.jpg" /&gt; , &lt;img src= "test.jpg" /&gt; ]</pre>
+		 *
+		 * 将文档中图像的src属性删除
+		 * #####HTML:
+		 * <pre lang="htm" format="none">&lt;img src="test.jpg"/&gt;</pre>
+		 * #####JavaScript:
+		 * <pre>Dom.query("img").setAttr("src");</pre>
+		 * #####结果:
+		 * <pre lang="htm" format="none">[ &lt;img /&gt; ]</pre>
+		 */
 		setProp: function(name, value) {
-
-			name = propFix[name] || name;
-
-			var elem = this.dom,
-				hook = Dom.propHooks[name];
-
-			if (value === null) {
-
-				// 避免 IE 报错。
-				try {
-					elem[name] = undefined;
-					delete elem[name];
-				} catch (e) { }
-			} else {
-				//  assert(!elem[hook] || !elem[hook].nodeType, "Dom.getAttr(elem, name): 表单内不能存在 {name} 的元素。", name);
-				elem[name] = value;
-			}
-
+			Dom.setProp(this.dom, name, value);
 			return this;
 		},
 
@@ -2309,8 +2250,7 @@
 		 * <pre>Dom.query("input").setText("hello world!");</pre>
 		 */
 		setText: function(value) {
-			var elem = this.dom;
-			elem[textFix[elem.nodeName] || propFix.innerText] = value;
+			Dom.setText(this.dom, value);
 			return this;
 		},
 
@@ -3400,15 +3340,19 @@
 		};
 
 		DomList.prototype[key] = function(html) {
+			var r;
 			if (typeof html === 'string') {
-				this.invoke(key, [html]);
+				r = new DomList(this.invoke(key, [html]));
 			} else {
+				r = new DomList;
 				html = Dom.get(html);
 				this.forEach(function(value) {
-					Dom.get(value)[key](html.clone());
+					var cloned = html.clone();
+					Dom.get(value)[key](cloned);
+					r.push(cloned.dom);
 				});
 			}
-			return this;
+			return r;
 		};
 
 	});
@@ -3537,7 +3481,6 @@
 		propFix[value.toLowerCase()] = value;
 	});
 
-
 	// 初始化 attrHooks。
 	map("checked selected disabled autofocus autoplay async controls hidden loop open required scoped compact nowrap ismap declare noshade multiple noresize defer readOnly useMap defaultChecked", function (value) {
 		attrHooks[value] = boolHook;
@@ -3562,12 +3505,12 @@
 	
 	// DomList 函数。
 	t = DomList.prototype;
-	map("shift pop unshift push include indexOf each forEach", function (value) {
-		t[value] = ap[value];
+	map("shift pop unshift push include indexOf each forEach", function (funcName) {
+		t[funcName] = ap[funcName];
 	});
-	map("slice splice reverse unique", function(value) {
-		t[value] = function() {
-			return new DomList(ap[value].apply(this, arguments));
+	map("slice splice reverse unique", function(funcName) {
+		t[funcName] = function() {
+			return new DomList(ap[funcName].apply(this, arguments));
 		};
 	});
 	
@@ -3927,17 +3870,6 @@
 		assert(elem && (elem.nodeType || elem.setInterval), 'Dom.getDocument(elem): {elem} 必须是节点。', elem);
 		return elem.ownerDocument || elem.document || elem;
 	}
-	
-	function createEnumerator(func){
-		return  function () {
-			var len = this.length, i = -1, target;
-			while(++i < len) {
-				target = new Dom(this[i]);
-				target[func].apply(target, arguments);
-			}
-			return this;
-		};
-	}
 
 	/**
 	 * 返回简单的遍历函数。
@@ -4171,6 +4103,38 @@
 		return x && typeof x === 'object' ? x: {
 			x: x,
 			y: y
+		};
+	}
+	
+	function createDomListMthod(funcName, listType){
+		return !listType ? function () {
+			// 为每个 Dom 对象调用 funcName 。
+			var i = 0, len = this.length, target;
+			while(i < len) {
+				target = new Dom(this[i++]);
+				target[funcName].apply(target, arguments);
+			}
+			return this;
+		} : listType === 2 ? function() {
+			// 返回第一个元素的对应值 。
+			if(this.length) {
+				var target = new Dom(this[0]);
+				return target[funcName].apply(target, arguments);
+			}
+		} : listType === 3 ? function() {
+			// 将返回的每个节点放入新的 DomList 中。
+			var r = new DomList;
+			return r.concat.apply(r, this.invoke(funcName, arguments));
+		} : listType === 4 ? function() {
+			// 只要有一个返回非 false，就返回这个值。
+			var i = 0, r, target;
+			while (i < this.length && !r) {
+				target = new Dom(this[i++]);
+				r = target[func].apply(target, arguments);
+			}
+			return r;
+		} : function() {
+			
 		};
 	}
 

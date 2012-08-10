@@ -3547,7 +3547,8 @@ Demo.extend(Demo, {
 		var data = Demo.globalTestCases[id],
 			i,
 			value,
-			ret;
+			ret,
+			hasError;
 
 		if (console.group)
 			console.group(data.name);
@@ -3578,8 +3579,12 @@ Demo.extend(Demo, {
 			}
 
 			console.log(value.text, " => ", ret);
-			document.getElementById('demo-testcase-' + id).className = Demo.assert.hasError ? 'demo-tip demo-tip-error' : 'demo-tip demo-tip-success';
+			
+			hasError = hasError || Demo.assert.hasError;
+			
 		}
+		
+		document.getElementById('demo-testcase-' + id).className = hasError ? 'demo-tip demo-tip-error' : 'demo-tip demo-tip-success';
 
 		if(console.groupEnd)
 			console.groupEnd();
@@ -3634,6 +3639,7 @@ Demo.extend(Demo, {
 	assert: function (value) {
 		if (!value) {
 			Demo.assert.hasError = true;
+			
 			if (console.error.apply) {
 				console.error.apply(console, [].slice.call(arguments, 1));
 			} else {

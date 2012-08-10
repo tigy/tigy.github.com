@@ -2577,7 +2577,7 @@ function imports(namespace) {
 		debugStepThrough: true,
 
 		deprected: function(message) {
-			trace.info(message);
+			trace.warn(message);
 		},
 
 		/**
