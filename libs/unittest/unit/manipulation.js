@@ -736,7 +736,7 @@ test("Dom.prototype.clone", function() {
 	var divEvt = Dom.parse("<div><ul><li>test</li></ul></div>").on('click' ,function(){
 		ok( false, "Bound event still exists after .clone()." );
 	}),
-		cloneEvt = divEvt.clone(false);
+		cloneEvt = divEvt.clone(true, false);
 
 	// Make sure that doing .clone() doesn't clone events
 	cloneEvt.trigger("click");

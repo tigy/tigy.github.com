@@ -1820,9 +1820,13 @@ function trace() {
 		if (hasConsole && console.log && console.log.apply) {
 			return console.log.apply(console, arguments);
 		}
-
+		
 		// 最后使用 trace.inspect
-		data = trace.inspect(arguments);
+		for (var i = 0, r = []; i < arguments.length; i++) {
+			r[i] = trace.inspect(arguments[i]);
+		}
+
+		data = r.join(' ');
 
 		return hasConsole && console.log ? console.log(data) : alert(data);
 	}
@@ -2421,11 +2425,21 @@ function imports(namespace) {
 								return r;
 							}
 
-							return '[Node name=' + obj.nodeName + 'value=' + obj.nodeValue + ']';
+							return '[Node type=' + obj.nodeType +' name=' + obj.nodeName + ' value=' + obj.nodeValue + ']';
 						}
-						var r = "{\r\n", i;
-						for (i in obj)
-							r += "\t" + i + " = " + trace.inspect(obj[i], deep - 1) + "\r\n";
+						var r = "{\r\n", i, flag = 0;
+						for (i in obj) {
+							if (typeof obj[i] !== 'function')
+								r += "\t" + i + " = " + trace.inspect(obj[i], deep - 1) + "\r\n";
+							else {
+								flag++;
+							}
+						}
+
+						if (flag) {
+							r += '\t... (' + flag + '个函数)\r\n';
+						}
+
 						r += "}";
 						return r;
 					}

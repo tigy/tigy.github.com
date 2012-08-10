@@ -39,31 +39,31 @@
 		
 		<script>
 		
-			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o'), abcd = new DomList($('all').dom.getElementsByTagName("div"));
+			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o'), abcd = new DomList($('all').node.getElementsByTagName("div"));
 			
 			Demo.writeTestCases({
 				'Dom': '-',
 				'Dom.get': {
 				    'Dom.get(o)': function(value, assert) {
-				        assert.isTrue(value.dom);
+				        assert.isTrue(value.node);
 				    }
                 },
 				'Dom.find': {
 				    'Dom.find("#o")': function(value, assert) {
-				        assert.areEqual(value.dom, o.dom);
+				        assert.areEqual(value.node, o.node);
 				    }
 				},
 				'Dom.query': {
 				    'Dom.query("#o")': function(value, assert) {
-				        assert.areEqual(value[0], o.dom);
+				        assert.areEqual(value[0], o.node);
                     }
                 },
 				'Dom.create': {
 				    'Dom.create("div")': function(value, assert) {
-                       assert.isTrue(value.dom.tagName === "DIV");
+				        assert.isTrue(value.node.tagName === "DIV");
                     },
 				    'Dom.create("a")': function(value, assert) {
-                       assert.isTrue(value.dom.tagName === "A");
+				        assert.isTrue(value.node.tagName === "A");
                     }
                 },
 				'Dom.parse': {
@@ -74,8 +74,8 @@
 				    'Dom.parse("<input type=\'radio\' checked=\'checked\'>")': '-'
                 },
                 'new Dom': {
-                    'new Dom(a.dom)': function(value, assert) {
-                       assert.areEqual(value.dom, a.dom);
+                    'new Dom(a.node)': function(value, assert) {
+                        assert.areEqual(value.node, a.node);
                     }
                 },
 				'DomList': '-',
@@ -93,8 +93,8 @@
                     }
                 },
 				'DomList.prototype.filter': {
-                    'abcd.filter(function(value){ return value === a.dom || value === c.dom})': function(value, assert){
-                       assert.areEqual(value, [a.dom, c.dom]);
+                    'abcd.filter(function(value){ return value === a.node || value === c.node})': function(value, assert){
+                        assert.areEqual(value, [a.node, c.node]);
                     }
                 },
 				'DomList.prototype.invoke': {
@@ -104,19 +104,19 @@
                     }
                 },
 				'DomList.prototype.indexOf': {
-                    'abcd.indexOf(a.dom)': 0,
-                    'abcd.indexOf(d.dom)': 3,
-                    'abcd.indexOf(o.dom)': -1
+                    'abcd.indexOf(a.node)': 0,
+                    'abcd.indexOf(d.node)': 3,
+                    'abcd.indexOf(o.node)': -1
                 },
 				'Dom 扩展': {
 				    'extendDom()': '-',
                     'abcd.a()': abcd,
                     'abcd.b()': 1,
                     'abcd.c()': function(value, assert){
-                      assert.areEqual(value, [a.dom, b.dom,c.dom, d.dom]);
+                      assert.areEqual(value, [a.node, b.node,c.node, d.node]);
                     },
                     'abcd.d()': function(value, assert){
-                      assert.areEqual(value, [a.dom, b.dom,c.dom, d.dom]);
+                      assert.areEqual(value, [a.node, b.node,c.node, d.node]);
                     }
                 }
             });

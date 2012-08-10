@@ -94,7 +94,7 @@ test("Dom.prototype.siblings()", function() {
 	deepEqual(Dom.query("#sndp").siblings(":has(code)"), q("sap"), "Check for filtered siblings (has code child element)");
 	deepEqual(Dom.query("#sndp").siblings(":has(a)"), q("en", "sap"), "Check for filtered siblings (has anchor child element)");
 	deepEqual(Dom.query("#foo").siblings("form, b"), q("form", "floatTest", "lengthtest", "name-tests", "testForm"), "Check for multiple filters");
-	var set = navigator.isQuirks ? q("sap", "en") :  q("en", "sap");
+	var set = navigator.isQuirks ? q("sndp", "sap") : q("en", "sap");
 	deepEqual(Dom.query("#en, #sndp").siblings(), set, "Check for unique results from siblings");
 	deepEqual(Dom.query("#option5a").siblings("option[data-attr]"), q("option5c"), "Has attribute selector in siblings (#9261)");
 	equal(Dom.parse("<a/>").siblings().length, 0, "Detached elements have no siblings (#11370)");
@@ -156,5 +156,5 @@ test("Dom.prototype.getElements", function() {
 	expect(2);
 
 	deepEqual(document.getElements("body")[0], document.body, "Simple getElements check");
-	deepEqual(document.getElements("html")[0], document.dom, "Simple getElements check");
+	deepEqual(document.getElements("html")[0], document.node, "Simple getElements check");
 });
