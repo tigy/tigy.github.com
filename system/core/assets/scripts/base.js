@@ -1,5 +1,5 @@
 /**
- * J+ Library, 3.0
+ * J+ Library, 3
  * @projectDescription J+：轻便的、易扩展的UI组件库
  * @copyright 2011-2012 J+ Team
  * @fileOverview 定义最基本的工具函数。
@@ -69,12 +69,22 @@
 			 * @param {Function/Class} constructor 用于转换的对象，将修改此对象，让它看上去和普通的类一样。
 			 * @return {Function} 返回生成的类。
 			 * @remark 转换后的类将有继承、扩展等功能。
+			 * @example <pre>
+			 * function myFunc(){}
+			 * 
+			 * JPlus.Native(myFunc);
+			 * 
+			 * // 现在可以直接使用 implement 函数了。
+			 * myFunc.implement({
+			 * 	  a: 2
+			 * });
+			 * </pre>
 			 */
 			Native: function (constructor) {
 
-				// 简单拷贝 Object 的成员，即拥有类的特性。
-				// 在 JavaScript， 一切函数都可作为类，故此函数存在。
-				// Object 的成员一般对当前类构造函数原型辅助。
+				// JPlus 创建的类和普通的 Javascript 函数的最大区别在于:
+				// JPlus 创建的类还拥有 classMembers 指定的成员。
+				// 因此，将普通函数转换为 JPlus 类的方法就是复制 classMembers 下的方法。
 				return extend(constructor, classMembers);
 			},
 
@@ -93,7 +103,7 @@
 			 * 获取当前框架的版本号。
 			 * @getter
 			 */
-			version: 3.2
+			version: 3.2/*@Version*/
 
 		},
 		
@@ -120,9 +130,9 @@
 			 */
 			implement: function (members) {
 
-				assert(this.prototype, "System.Base.implement(members): 无法扩展当前类，因为当前类的 prototype 为空。");
+				assert(this.prototype, "JPlus.Base.implement(members): 无法扩展当前类，因为当前类的 prototype 为空。");
 
-				// 复制到原型 。
+				// 直接将成员复制到原型上即可 。
 				Object.extend(this.prototype, members);
 
 				return this;
@@ -136,7 +146,7 @@
 			 */
 			implementIf: function (members) {
 
-				assert(this.prototype, "System.Base.implementIf(members): 无法扩展当前类，因为当前类的 prototype 为空。");
+				assert(this.prototype, "JPlus.Base.implementIf(members): 无法扩展当前类，因为当前类的 prototype 为空。");
 
 				Object.extendIf(this.prototype, members);
 
@@ -149,20 +159,22 @@
 			 * @param {String} setters 设置函数的方法名数组，用空格隔开。
 			 * @param {String} getters 获取函数的方法名数组，用空格隔开。
 			 * @static
-			 * @example <code>
+			 * @example <pre>
 			 * MyClass.defineMethod('prop', 'fn');
-			 * </code>
-			 * 等价于 <code>
+			 * </pre>
+			 * 等价于 <pre>
 			 * MyClass.implement({fn:  function(){ this.prop.fn();  }})
-			 * </code>
+			 * </pre>
 			 */
 			defineMethod: function(targetProperty, setters, getters) {
 				
+				// => defineMethod(targetProperty, getterOrSetter, boolIsGetterOrSetter)
 				if (typeof getters === 'string') {
 					this.defineMethod(targetProperty, getters, true);
 					getters = 0;
 				}
-
+				
+				// 最后使用 implement 添加成员。
 				this.implement(Object.map(setters, function(func) {
 					return getters ? function(args1, args2) {
 						return this[targetProperty][func](args1, args2);
@@ -170,7 +182,7 @@
 						this[targetProperty][func](args1, args2);
 						return this;
 					};
-				}, {}), getters ? 2 : 1);
+				}, {}), getters ? 2 : 1);  // 支持 Dom.implement, 传递第二个参数。
 
 				return this;
 			},
@@ -269,12 +281,15 @@
 			addEvents: function (eventName, properties) {
 
 				assert.isString(eventName, "System.Base.addEvents(eventName, properties): {eventName} ~");
-
+				
+				// 获取存储事件信息的变量。如果不存在则创建。
 				var eventObj = this.$event || (this.$event = {}),
 					defaultEvent = eventObj.$default;
 					
 				if(properties) {
 					Object.extendIf(properties, defaultEvent);
+					
+					// 处理 base: 'event' 字段，自动生成 add 和 remove 函数。
 					if(properties.base) {
 						assert(defaultEvent, "使用 base 字段功能必须预先定义 $default 事件。");
 						properties.add = function(ctrl, type, fn){
@@ -356,7 +371,7 @@
 				// 清空临时对象。
 				emptyFn.prototype = null;
 
-				// 指定Class内容 。
+				// 创建类 。
 				return JPlus.Native(subClass);
 
 			}
@@ -389,7 +404,7 @@
 		 */
 		extend: (function () {
 			for (var item in {
-				toString: true
+				toString: 1
 			})
 				return extend;
 
@@ -432,7 +447,7 @@
 
 			assert(dest != null, "Object.extendIf(dest, src): {dest} 不可为空。", dest);
 
-			// 和 extend 类似，只是判断目标的值是否为 undefiend 。
+			// 和 extend 类似，只是判断目标的值，如果不是 undefined 然后拷贝。
 			for (var b in src)
 				if (dest[b] === undefined)
 					dest[b] = src[b];
@@ -481,7 +496,7 @@
 
 			}
 
-			// 正常结束。
+			// 正常结束返回 true。
 			return true;
 		},
 
@@ -546,8 +561,6 @@
 	     * </pre>
 		 */
 		isArray: Array.isArray || function (obj) {
-
-			// 检查原型。
 			return toString.call(obj) === "[object Array]";
 		},
 
@@ -563,8 +576,6 @@
 	     * </pre>
 		 */
 		isFunction: function (obj) {
-
-			// 检查原型。
 			return toString.call(obj) === "[object Function]";
 		},
 
@@ -580,7 +591,6 @@
 	     * </pre>
 		 */
 		isObject: function (obj) {
-
 			// 只检查 null 。
 			return obj !== null && typeof obj === "object";
 		},
@@ -822,6 +832,8 @@
 	 * </pre>
 	 */
 	window.Class = function (members) {
+		
+		// 所有类都是继承 JPlus.Base 创建的。
 		return Base.extend(members);
 	};
 
