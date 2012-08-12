@@ -457,51 +457,157 @@
 			height: 'setHeight',
 			width: 'setWidth'
 		},
-
+		
+		/**
+		 * 默认用于获取和设置属性的函数。
+		 */
 		defaultHook = {
 			get: function(elem, name) {
-				return elem.getAttribute(name);
+				return elem.getAttribute ? elem.getAttribute(name) : null;
 			},
 			set: function(elem, name, value) {
-				if (value === null) {
-					elem.removeAttribute(name);
-				} else {
-					elem.setAttribute(name, value);
+				if(elem.setAttribute){
+					
+					// 如果设置值为 null, 表示删除属性。
+					if (value === null) {
+						elem.removeAttribute(name);
+					} else {
+						elem.setAttribute(name, value);
+					}
 				}
 			}
 		},
-
-		boolHook = {
-			get: function(elem, name) {
-				return elem[propFix[name] || name] ? name : null;
+		
+		/**
+		 * 获取和设置优先使用 prop 而不是 attr 的特殊属性的函数。
+		 */
+		propHook = {
+			get: function(elem, name, type) {
+				return type ? defaultHook.get(elem, name) : elem[name];
 			},
 			set: function(elem, name, value) {
-				elem[propFix[name] || name] = value;
+				elem[name] = value;
 			}
 		},
-	
+
+		/**
+		 * 获取和设置返回类型是 boolean 的特殊属性的函数。
+		 */
+		boolHook = {
+			get: function(elem, name, type) {
+				return type ? elem[name] ? name.toLowerCase() : null : elem[name];
+			},
+			set: propHook.set
+		},
+		
+		/**
+		 * 获取和设置 FORM 专有属性的函数。
+		 */
+		formHook = {
+			get: function(elem, name, type){
+				var value = defaultHook.get(elem, name);
+				if(!type && !value) {
+					
+					// elem[name] 被覆盖成 DOM 节点，创建空的 FORM 获取默认值。
+					if(elem[name].nodeType){
+						elem = Dom.createNode('form');
+					}
+					value = elem[name];
+				}
+				return value;
+			},	
+			set: defaultHook.set
+		},
+		
 		/**
 		 * 特殊属性的列表。
 		 * @type Object
 		 */
 		attrHooks = {
-			value: {
-				get: function(elem, name) {
-					return name in elem ? elem[name] : defaultHook.get(elem, name);
+			innerHTML: propHook,
+			innerText: propHook,
+			textContent: propHook,
+			enctype: formHook,
+			encoding: formHook,
+			action: formHook,
+			method: formHook,
+			target: formHook,
+			defaultValue: propHook,
+			defaultSelected: propHook,
+			defaultChecked: propHook,
+			selectedIndex: propHook,
+			
+			tabIndex: {
+				get: function(elem, name, type) {
+					// elem.tabIndex doesn't always return the correct value when it hasn't been explicitly set
+					// http://fluidproject.org/blog/2008/01/09/getting-setting-and-removing-tabindex-values-with-javascript/
+					var value = elem.getAttributeNode(name);
+					value = value && value.specified && value.value || null;
+					return type ? value : +value;
 				},
+				set: propHook.set	
+			},
+
+			maxLength: {
+				get: propHook.get,
 				set: function(elem, name, value) {
-					if(name in elem) {
+					if (value || value === 0) {
 						elem[name] = value;
 					} else {
-						defaultHook.set(elem, name, value);
+						defaultHook.set(elem, name, null);
 					}
 				}
 			},
+
+			style: {
+				get: propHook.get,
+				set: function(elem, name, value) {
+					if(value == null){
+						defaultHook.set(elem, name, value);	
+					} else {
+						elem.style.cssText = value;
+					}
+				}
+			},
+
 			selected: {
-				get: function(elem, name) {
-					return Dom.propHooks.selected.get(elem, name) ? name : null;
+				get: function(elem, name, type) {
+
+					// Webkit、IE 误报 Selected 属性。
+					// 通过调用 parentNode 属性修复。
+					var parent = elem.parentNode;
+					
+					// 激活 select, 更新 option 的 select 状态。
+					if (parent) {
+						parent.selectedIndex;
+						
+						// 同理，处理 optgroup 
+						if (parent.parentNode) {
+							parent.parentNode.selectedIndex;
+						}
+					}
+					
+					// type  0 => boolean , 1 => "selected",  2 => defaultSelected => "selected"
+					return type ? (type === 1 ? elem[name] : elem.defaultSelected) ? name : null : elem[name];
+						
 				},
 				set : boolHook.set
+			},
+			
+			checked: {
+				get: function(elem, name, type) {
+					// type  0 => boolean , 1 => "checked",  2 => defaultChecked => "checked"
+					return type ? (type === 1 ? elem[name] : elem.defaultChecked) ? name : null : elem[name];
+				},
+				set: boolHook.set
+			},
+			
+			value: {
+				get: function(elem, name, type) {
+					// type  0/1 => "value",  2 => defaultValue => "value"
+					return type !== 2 ? elem[name] : elem.defaultValue;
+				},
+				set: propHook.set
 			}
 		},
 
@@ -510,9 +616,9 @@
 		 * @type Object
 		 */
 		propFix = {
-			innerText: 'innerText' in div ? 'innerText' : 'textContent',
-			'for': 'htmlFor',
-			'class': 'className'
+			//innerText: 'innerText' in div ? 'innerText' : 'textContent',
+			//'for': 'htmlFor',
+		//	'class': 'className'
 		},
 		
 		/**
@@ -1037,38 +1143,18 @@
 		 * @return {String} 返回属性值。如果元素没有相应属性，则返回 null 。
 	 	 * @static
 		 */
-		getAttr: function(elem, name) {
+		getAttr: function(elem, name, type) {
 			
 			assert.isNode(elem, "Dom.getAttr(elem, name): {elem} ~");
-			// 如果不支持 getAttribute 使用 getProp
-			// 属性名统一小写。
-			// 如果存在钩子，使用钩子获取属性，否则使用原生的 getAttribute 获取。
-			return elem.getAttribute ? (attrHooks[name = name.toLowerCase()] || defaultHook).get(elem, name) : Dom.getProp(elem, name);
-
-		},
-
-		/**
-		 * 获取元素的 DOM 属性值。
-		 * @param {Node} elem 元素。
-		 * @param {String} name 要获取的属性名称。
-		 * @return {String} 返回属性值。如果元素没有相应属性，则返回 null 。
-	 	 * @example
-	 	 * 返回文档中 id="img" 的图像的src属性值。
-	 	 * #####HTML:
-	 	 * <pre lang="htm" format="none">&lt;img id="img" src="test.jpg"/&gt;</pre>
-	 	 * #####JavaScript:
-	 	 * <pre>Dom.get("img").getAttr("src");</pre>
-	 	 * #####结果:
-	 	 * <pre lang="htm" format="none">test.jpg</pre>
-		 */
-		getProp: function(elem, name) {
-
-			assert.isNode(elem, "Dom.getAttr(elem, name): {elem} ~");
-
-			var hook = Dom.propHooks[name = propFix[name] || name];
-
-			return hook && hook.get ? hook.get(elem, name) : name in elem ? elem[name] : null;
 			
+			name = propFix[name] || name;
+			
+			var hook = attrHooks[name];
+			
+			// 如果存在钩子，使用钩子获取属性。
+			// 最后使用 defaultHook 获取。
+			return hook && (name in elem) ? hook.get(elem, name, type) : defaultHook.get(elem, name.toLowerCase(), type);
+
 		},
 		
 		/**
@@ -1156,49 +1242,7 @@
 		 * @private
 		 */
 		propHooks: {
-			tabIndex: {
-				get: function(elem, name) {
-					return +Dom.getAttr(elem, name);
-				}
-			},
-
-			maxLength: {
-				set: function(elem, name, value) {
-					if (value || value === 0) {
-						elem[name] = value;
-					} else {
-						defaultHook.set(elem, name, null);
-					}
-				}
-			},
-
-			style: {
-				set: function(elem, name, value) {
-					if (!value || typeof value === 'string') {
-						elem.style.cssText = value;
-					} else {
-						extend(elem[name], value);
-					}
-				}
-			},
-
-			selected: {
-				get: function(elem, name) {
-
-					// IE9 误报 Selected 属性。
-					// 通过调用 parentNode 属性修复。
-					var parent = elem.parentNode;
-
-					if (parent) {
-						parent.selectedIndex;
-
-						if (parent.parentNode) {
-							parent.parentNode.selectedIndex;
-						}
-					}
-					return elem[name];
-				}
-			}
+			
 		},
 		
 		/**
@@ -1259,7 +1303,7 @@
 			not: function(elem, args){ return !match(elem, args); },
 			has: function(elem, args){ return query(args, new Dom(elem)).length > 0; },
 			
-			selected: function(elem){ return elem.selected; },
+			selected: function(elem){ return attrHooks.get(elem, 'selected'); },
 			checked: function(elem){ return elem.checked; },
 			enabled: function(elem){ return elem.disabled === false; },
 			disabled: function(elem){ return elem.disabled === true; },
@@ -1960,16 +2004,27 @@
 			//assert(name !== 'type' || elem.tagName !== "INPUT" || !elem.parentNode, "Dom.prototype.setAttr(name, type): 无法修改INPUT元素的 type 属性。");
 
 			var elem = this.node;
-
-			if (elem.setAttribute) {
-
-				// 属性名统一小写。
-				(attrHooks[name = name.toLowerCase()] || defaultHook).set(elem, name, value);
-			} else {
-
-				// 如果不支持 setAttribute 使用 setProp 。
-				this.setProp(name, value);
+			
+			name = propFix[name] || name;
+			
+			var hook = attrHooks[name];
+			
+			if(!hook || !(name in elem)) {
+				hook = defaultHook;
+				name = name.toLowerCase();
 			}
+			
+			hook.set(elem, name, value);	
+// 
+			// if (elem.setAttribute) {
+// 
+				// // 属性名统一小写。
+				// (attrHooks[name = name.toLowerCase()] || defaultHook).set(elem, name, value);
+			// } else {
+// 
+				// // 如果不支持 setAttribute 使用 setProp 。
+				// this.setProp(name, value);
+			// }
 
 			return this;
 
@@ -2001,26 +2056,7 @@
 		 * <pre lang="htm" format="none">[ &lt;img /&gt; ]</pre>
 		 */
 		setProp: function(name, value) {
-
-			var elem = this.node,
-				hook = Dom.propHooks[name = propFix[name] || name];
-
-			if (hook && hook.set) {
-				hook.set(elem, name, value);
-			} else if (value === null) {
-
-				// 避免 IE 报错。
-				try {
-					elem[name] = undefined;
-					delete elem[name];
-				} catch (e) { }
-
-			} else {
-				elem[name] = value;
-			}
-
-			return this;
-
+			return this.setAttr(name, value);
 		},
 
 		/**
@@ -2508,7 +2544,7 @@
 	 	 * <pre lang="htm" format="none">test.jpg</pre>
 		 */
 		getAttr: function(name) {
-			return Dom.getAttr(this.node, name);
+			return Dom.getAttr(this.node, name, 1);
 		},
 
 		/**
@@ -2525,7 +2561,7 @@
 	 	 * <pre lang="htm" format="none">test.jpg</pre>
 		 */
 		getProp: function(name) {
-			return Dom.getProp(this.node, name);
+			return Dom.getAttr(this.node, name);
 		},
 	
 		/**
@@ -3144,7 +3180,7 @@
 		 * @return {Boolean} 当前元素已经隐藏返回 true，否则返回  false 。
 		 */
 		isHidden: function(){
-			return Dom.isHidden(this.node) && styleString(this.node, 'visibility') !== 'hidden';
+			return Dom.isHidden(this.node);
 		},
 		
 		/**
@@ -3434,7 +3470,7 @@
 	});
 
 	// 初始化 attrHooks。
-	map("checked disabled readonly autofocus autoplay async controls hidden loop open required scoped compact nowrap ismap declare noshade multiple noresize defer usemap", function(value) {
+	map("disabled readOnly autofocus autoplay async controls hidden loop open required scoped compact noWrap isMap declare noshade multiple noresize defer useMap", function(value) {
 		attrHooks[value] = boolHook;
 	});
 	
@@ -3588,55 +3624,55 @@
 
 		Dom.cloneFix.SCRIPT = 'text';
 
-		defaultHook = {
-			get: function(elem, name) {
+		defaultHook.get = function(elem, name) {
 
-				// 获取属性节点，避免 IE 返回属性。
-				name = elem.getAttributeNode(name);
+			// 获取属性节点，避免 IE 返回属性。
+			name = elem.getAttributeNode(name);
 
-				// 如果不存在节点， name 为 null ，如果不存在节点值， 返回 null。
-				return name ? name.value || (name.specified ? "" : null) : null;
+			// 如果不存在节点， name 为 null ，如果不存在节点值， 返回 null。
+			return name ? name.value || (name.specified ? "" : null) : null;
 
-			},
-			set: function(elem, name, value) {
-
-				// 获取原始的属性节点。
-				var node = elem.getAttributeNode(name);
-
-				// 如果 value === null 表示删除节点。
-				if (value === null) {
-
-					// 仅本来存在属性时删除节点。
-					if (node) {
-						node.nodeValue = '';
-						elem.removeAttributeNode(node);
-					}
-
-					// 本来存在属性值，则设置属性值。
-				} else if (node) {
-					node.nodeValue = value;
-				} else {
-					elem.setAttribute(name, value);
-				}
-
-			}
 		};
 
-		attrHooks.style = {
-			get: function(elem, name) {
-				return elem.style.cssText.toLowerCase() || null;
-			},
-			set: Dom.propHooks.style.set
+		defaultHook.set = function(elem, name, value) {
+
+			// 获取原始的属性节点。
+			var node = elem.getAttributeNode(name);
+
+			// 如果 value === null 表示删除节点。
+			if (value === null) {
+
+				// 仅本来存在属性时删除节点。
+				if (node) {
+					node.nodeValue = '';
+					elem.removeAttributeNode(node);
+				}
+
+				// 本来存在属性值，则设置属性值。
+			} else if (node) {
+				node.nodeValue = value;
+			} else {
+				elem.setAttribute(name, value);
+			}
+
+		};
+		
+		// IE678 无法获取 style 属性，改用 style.cssText 获取。
+		attrHooks.style.get =  function(elem, name, type) {
+			return type ? elem[name].cssText.toLowerCase() || null : elem[name];
 		};
 
 		if (navigator.isQuirks) {
 
-			propFix.enctype = propFix.encoding;
-
+			//  propFix.enctype = propFix.encoding;
+			
+			// IE 6/7 获取 Button 的value会返回文本。
 			attrHooks.value = {
 				
-				get: function(elem, name) {
-					return elem.tagName === 'BUTTON' ? defaultHook.get(elem, name) : elem.value;
+				_get: attrHooks.value.get,
+				
+				get: function(elem, name, type) {
+					return elem.tagName === 'BUTTON' ? defaultHook.get(elem, name) : this._get(elem, name, type);
 				},
 				
 				set: function(elem, name, value) {
@@ -3648,20 +3684,8 @@
 				}
 			};
 
-			attrHooks.tabindex = {
-
-				get: function(elem, name) {
-					// elem.tabIndex doesn't always return the correct value when it hasn't been explicitly set
-					// http://fluidproject.org/blog/2008/01/09/getting-setting-and-removing-tabindex-values-with-javascript/
-					var attributeNode = elem.getAttributeNode(name);
-					return attributeNode.specified ? attributeNode.value : null;
-				},
-
-				set: defaultHook.set
-
-			};
-
-			attrHooks.href = attrHooks.src = attrHooks.usemap = attrHooks.width = attrHooks.height = {
+			// IE 6/7 会自动添加值到下列属性。
+			attrHooks.href = attrHooks.src = attrHooks.useMap = attrHooks.width = attrHooks.height = {
 
 				get: function(elem, name) {
 					return elem.getAttribute(name, 2);
@@ -3672,9 +3696,10 @@
 				}
 			};
 
+			// IE 6/7 在设置 contenteditable 为空时报错。
 			attrHooks.contenteditable = {
 
-				get: attrHooks.tabindex.get,
+				get: defaultHook.get,
 
 				set: function(elem, name, value) {
 					if (value === null) {
