@@ -1742,8 +1742,8 @@
 		 */
 		empty: function() {
 			var elem = this.node;
-			if (elem.nodeType == 1)
-				each(elem.getElementsByTagName("*"), clean);
+			//if (elem.nodeType == 1)
+			//	each(elem.getElementsByTagName("*"), clean);
 			while (elem = this.last(true))
 				this.removeChild(elem);
 			return this;
@@ -1769,9 +1769,10 @@
 		 * <pre>Dom.query("p").dispose(".hello");</pre>
 		 */
 		dispose: function() {
-			if (this.node.nodeType == 1) {
-				each(this.node.getElementsByTagName("*"), clean);
-				clean(this.node);
+			var elem = this.node;
+			if (elem.nodeType == 1) {
+				each(elem.getElementsByTagName("*"), clean);
+				clean(elem);
 			}
 
 			return this.remove();
@@ -2218,7 +2219,7 @@
 			try {
 
 				// 对每个子元素清空内存。
-				each(elem.getElementsByTagName("*"), clean);
+				// each(elem.getElementsByTagName("*"), clean);
 
 				// 内部执行 innerHTML 。
 				elem.innerHTML = value;
@@ -3401,17 +3402,17 @@
 	});
 
 	// 初始化 attrFix。
-	map("defaultValue defaultChecked defaultSelected readOnly disabled autofocus autoplay async controls hidden loop open required scoped compact noWrap isMap declare noshade multiple noresize defer useMap", function(value) {
+	map("defaultChecked defaultSelected readOnly disabled autofocus autoplay async controls hidden loop open required scoped compact noWrap isMap declare noshade multiple noresize defer useMap", function(value) {
 		attrFix[value] = boolHook;
 	});
 
 	// 初始化 propFix。
-	map("readOnly tabIndex defaultValue defaultChecked defaultSelected accessKey useMap contentEditable maxLength", function(value) {
+	map("readOnly tabIndex defaultChecked defaultSelected accessKey useMap contentEditable maxLength", function(value) {
 		propFix[value.toLowerCase()] = value;
 	});
 
 	// 初始化 attrFix。
-	map("innerHTML innerText textContent selectedIndex cellPadding cellSpacing rowSpan colSpan frameBorder nodeName tagName", function(value) {
+	map("innerHTML innerText textContent tagName nodeName nodeType nodeValue defaultValue selectedIndex cellPadding cellSpacing rowSpan colSpan frameBorder", function(value) {
 		propFix[value.toLowerCase()] = value;
 		attrFix[value] = propHook;
 	});
@@ -4115,7 +4116,7 @@
 			// 将返回的每个节点放入新的 DomList 中。
 			var r = new DomList;
 			return r.concat.apply(r, this.invoke(funcName, arguments));
-		} : listType === 4 ? function() {
+		} : function() {
 			// 只要有一个返回非 false，就返回这个值。
 			var i = 0, r, target;
 			while (i < this.length && !r) {
@@ -4123,8 +4124,6 @@
 				r = target[func].apply(target, arguments);
 			}
 			return r;
-		} : function() {
-			
 		};
 	}
 
