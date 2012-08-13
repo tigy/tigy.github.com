@@ -93,14 +93,50 @@ var Ajax = (function() {
 
 	});
 
-	Ajax.dataTypes = {};
-
-	Ajax.status = {
-		'2': 'Syntax Error',
-		'-1': 'Unexpected Exception',
-		'-2': 'Timeout',
-		'-3': 'Aborted'
-	};
+	Object.extend(Ajax, {
+		
+		dataTypes: {},
+		
+		status: {
+			'2': 'Syntax Error',
+			'-1': 'Unexpected Exception',
+			'-2': 'Timeout',
+			'-3': 'Aborted'
+		},
+		
+		accepts: {
+			
+		},
+		
+		/**
+		 * 返回变量的地址形式。
+		 * @param {Object} obj 变量。
+		 * @return {String} 字符串。
+		 * @example <pre>
+		 * Ajax.param({a: 4, g: 7}); //  a=4&g=7
+		 * </pre>
+		 */
+		param: function(obj, name) {
+	
+			var s;
+			if (Object.isObject(obj)) {
+				s = [];
+				Object.each(obj, function(value, key) {
+					s.push(Ajax.param(value, name ? name + "[" + key + "]" : key));
+				});
+				s = s.join('&');
+			} else {
+				s = encodeURIComponent(name) + "=" + encodeURIComponent(obj);
+			}
+	
+			return s.replace(/%20/g, '+');
+		},
+		
+		concatUrl: function(url, param) {
+			return param ? url + (url.indexOf('?') >= 0 ? '&' : '?') + param : url;
+		}
+		
+	});
 
 	/**
 	 * 提供一个请求的基本功能。
@@ -196,7 +232,7 @@ var Ajax = (function() {
 			}
 
 			if (!me.cache) {
-				me.url = Ajax.combineUrl(me.url, '_=' + Date.now() + JPlus.id++);
+				me.url = Ajax.concatUrl(me.url, '_=' + Date.now() + JPlus.id++);
 			}
 
 		}
@@ -237,24 +273,24 @@ var Ajax = (function() {
 
 		/**
 		 * 判断一个 HTTP 状态码是否表示正常响应。
-		 * @param {Number} statusCode 要判断的状态码。
+		 * @param {Number} status 要判断的状态码。
 		 * @return {Boolean} 如果正常则返回true, 否则返回 false 。
 		 * 一般地， 200、304、1223 被认为是正常的状态吗。
 		 */
-		checkStatusCode: function(statusCode) {
+		checkstatus: function(status) {
 
 			// 获取状态。
-			if (!statusCode) {
+			if (!status) {
 
 				// 获取协议。
 				var protocol = window.location.protocol;
 
-				// 对谷歌浏览器, 在有些协议， statusCode 不存在。
+				// 对谷歌浏览器, 在有些协议， status 不存在。
 				return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");
 			}
 
 			// 检查， 各浏览器支持不同。
-			return (statusCode >= 200 && statusCode < 300) || statusCode == 304 || statusCode == 1223;
+			return (status >= 200 && status < 300) || status == 304 || status == 1223;
 		},
 
 		/**
@@ -326,13 +362,13 @@ var Ajax = (function() {
 							xhr.abort();
 						}
 
-						// 出现错误 statusCode = errorCode 。
-						me.statusCode = errorNo;
+						// 出现错误 status = errorCode 。
+						me.status = errorNo;
 						me.statusText = Ajax.status[errorNo];
 					} else {
 
-						me.statusCode = xhr.status;
-						errorNo = me.checkStatusCode(xhr.status) ? 0 : 1;
+						me.status = xhr.status;
+						errorNo = me.checkstatus(xhr.status) ? 0 : 1;
 
 						// 如果跨域，火狐报错。
 						try {
@@ -370,7 +406,7 @@ var Ajax = (function() {
 						}
 
 						if (me.complete)
-							me.complete(me.ajax, errorNo, me);
+							me.complete.call(me.ajax, errorNo, me);
 
 					} finally {
 
@@ -402,7 +438,7 @@ var Ajax = (function() {
 
 			// data
 			if (me.data && me.type == 'GET') {
-				me.url = Ajax.combineUrl(me.url, me.data);
+				me.url = Ajax.concatUrl(me.url, me.data);
 				me.data = null;
 			}
 
@@ -510,7 +546,7 @@ var Ajax = (function() {
 
 	});
 
-	Ajax.accepts.json = 'application/json, text/javascript, ~;q=0.01';
+	Ajax.accepts.json = 'application/json, text/javascript, application/javascript, ~;q=0.01';
 
 	Ajax.dataTypes.json = Ajax.JSON = Ajax.Text.extend({
 
@@ -527,6 +563,17 @@ var Ajax = (function() {
 		}
 
 	});
+
+	Ajax.dataTypes.js = Ajax.Javascript = Ajax.Text.extend({
+
+		getResponse: function(response) {
+			window.execScript(response);
+		}
+
+	});
+
+
+	Ajax.accepts.script = 'text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, ~;q=0.01';
 
 	Ajax.dataTypes.script = Ajax.Script = Ajax.Request.extend({
 
@@ -551,15 +598,15 @@ var Ajax = (function() {
 
 					if (errorNo) {
 
-						// 记录 statusCode。
-						me.statusCode = errorNo;
+						// 记录 status。
+						me.status = errorNo;
 						me.statusText = Ajax.status[errorNo];
 
 						if (me.error)
 							me.error.call(me.ajax, errorNo, me);
 					} else {
 
-						me.statusCode = 200;
+						me.status = 200;
 						me.statusText = "OK";
 
 						if (me.success)
@@ -567,7 +614,7 @@ var Ajax = (function() {
 					}
 
 					if (me.complete)
-						me.complete(me.ajax, errorNo, me);
+						me.complete.call(me.ajax, errorNo, me);
 
 				} finally {
 
@@ -584,6 +631,10 @@ var Ajax = (function() {
 		},
 
 		send: function() {
+			
+			if(!this.crossDomain){
+			//	return Ajax.Javascript
+			}
 
 			var me = this,
 				script = me.script = document.createElement('SCRIPT'),
@@ -620,7 +671,7 @@ var Ajax = (function() {
 
 	});
 
-	Ajax.dataTypes.jsonp = Ajax.JSONP = Ajax.Request.extend({
+	Ajax.dataTypes.jsonp = Ajax.JSONP = Ajax.Script.extend({
 
 		jsonp: 'callback',
 
@@ -629,7 +680,7 @@ var Ajax = (function() {
 			var me = this,
 				url = me.url;
 
-			url = Ajax.combineUrl(url, data);
+			url = Ajax.concatUrl(url, data);
 
 			// 处理 callback=?
 			var callback = me.callback || ('jsonp' + Date.now() + JPlus.id++);
@@ -639,7 +690,7 @@ var Ajax = (function() {
 				if (url.indexOf(me.jsonp + '=?') >= 0) {
 					url = url.replace(me.jsonp + '=?', me.jsonp + '=' + callback);
 				} else {
-					url = Ajax.combineUrl(url, me.jsonp + "=" + callback);
+					url = Ajax.concatUrl(url, me.jsonp + "=" + callback);
 				}
 
 			}
@@ -663,34 +714,6 @@ var Ajax = (function() {
 		},
 
 	});
-
-	/**
-	 * 返回变量的地址形式。
-	 * @param { Base} obj 变量。
-	 * @return {String} 字符串。
-	 * @example <code>
-	 * Ajax.param({a: 4, g: 7}); //  a=4&g=7
-	 * </code>
-	 */
-	Ajax.param = function(obj, name) {
-
-		var s;
-		if (Object.isObject(obj)) {
-			s = [];
-			Object.each(obj, function(value, key) {
-				s.push(Ajax.param(value, name ? name + "[" + key + "]" : key));
-			});
-			s = s.join('&');
-		} else {
-			s = encodeURIComponent(name) + "=" + encodeURIComponent(obj);
-		}
-
-		return s.replace(/%20/g, '+');
-	};
-
-	Ajax.combineUrl = function(url, param) {
-		return param ? url + (url.indexOf('?') >= 0 ? '&' : '?') + param : url;
-	};
 
 	return Ajax;
 
