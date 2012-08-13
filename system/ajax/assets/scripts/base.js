@@ -25,6 +25,73 @@ var Ajax = (function() {
 	ajaxLocParts = rUrl.exec(ajaxLoc.toLowerCase()) || [];
 
 	var Ajax = Deferrable.extend({
+		
+		options: {
+			
+			/**
+			 * 传输的数据类型。
+			 * @type String
+			 */
+			dataType: 'text',
+	
+			/**
+			 * 当前 AJAX 发送的地址。
+			 * @field url
+			 */
+			url: ajaxLoc,
+	
+			/**
+			 * 超时的时间大小。 (单位: 毫秒)
+			 * @property timeouts
+			 * @type Number
+			 */
+			timeout: -1,
+	
+			/**
+			 * 获取或设置是否为允许缓存。
+			 * @type Boolean
+			 */
+			cache: true,
+	
+			/**
+			 * 发送的数据。
+			 * @type Obeject/String
+			 */
+			data: null,
+	
+			/**
+			 * 发送数据前的回调。
+			 * @type Function
+			 */
+			start: null,
+	
+			/**
+			 * 发送数据成功的回调。
+			 * @type Function
+			 */
+			success: null,
+	
+			/**
+			 * 发送数据错误的回调。
+			 * @type Function
+			 */
+			error: null,
+	
+			/**
+			 * 发送数据完成的回调。
+			 * @type Function
+			 */
+			complete: null,
+		
+			formatData: function(data) {
+				return typeof data === 'string' ? data : Ajax.param(data);
+			},
+	
+			parseData: function(data) {
+				return data;
+			}
+			
+		},
 
 		constructor: function() {
 
@@ -62,24 +129,70 @@ var Ajax = (function() {
 		 * @param {String} link 当出现两次并发的请求后的操作。
 		 */
 		run: function(options, link) {
-			if (this.defer(options, link)) {
-				return this;
+			var me = this;
+			
+			if (!me.defer(options, link)) {
+	
+				assert.notNull(options, "Ajax.prototype.run(options, link): {options} ~");
+				
+				// 将默认配置里的项拷贝 options 到当前对象，如果 options未指定项，则使用默认配置。
+				for (var option in me.options) {
+					me[option] = (option in options ? options : me.options)[option];
+				}
+				
+				// 保存 options 。
+				me.options = options;
+				
+				// 当前用于传输的工具。
+				var transport = Ajax.transports[me.dataType];
+				
+				assert(transport, "Ajax.prototype.run(options, link): {me.dataType} ~", me.dataType);
+				
+				// 初始化 transport 。
+				transport.init(me);
+				
+				// url
+				me.url = me.url.replace(/#.*$/, "");
+	
+				// data
+				me.data = me.data ? me.formatData(me.data) : null;
+	
+				// crossDomain
+				if (me.crossDomain == null) {
+	
+					var parts = rUrl.exec(me.url.toLowerCase());
+	
+					// from jQuery: 跨域判断。
+					me.crossDomain = !!(parts &&
+						(parts[1] != ajaxLocParts[1] || parts[2] != ajaxLocParts[2] ||
+							(parts[3] || (parts[1] === "http:" ? 80 : 443)) !=
+								(ajaxLocParts[3] || (ajaxLocParts[1] === "http:" ? 80 : 443)))
+					);
+	
+				}
+				
+				// cache
+				if (!me.cache) {
+					me.url = Ajax.concatUrl(me.url, '_=' + Date.now() + JPlus.id++);
+				}
+				
+				// 实际的发送操作。
+				transport.send(me);
+				
+				// // 获取用于发送指定数据的 Request 对象。
+				// var Request = Ajax.dataTypes[options.dataType] || Ajax.Text;
+// 	
+				// // 创建 Request 对象。
+				// this.request = new Request(this);
+// 	
+				// // 初始化 Request 对象。
+				// this.request.init(options);
+// 	
+				// // 使用 Request 对象开始真正的请求。
+				// this.request.send();
 			}
-
-			assert.notNull(options, "Ajax.prototype.run(options, link): {options} ~");
-
-			// 获取用于发送指定数据的 Request 对象。
-			var Request = Ajax.dataTypes[options.dataType] || Ajax.Text;
-
-			// 创建 Request 对象。
-			this.request = new Request(this);
-
-			// 初始化 Request 对象。
-			this.request.init(options);
-
-			// 使用 Request 对象开始真正的请求。
-			this.request.send();
-			return this;
+			
+			return me;
 		},
 
 		/**
@@ -94,6 +207,8 @@ var Ajax = (function() {
 	});
 
 	Object.extend(Ajax, {
+		
+		transports: {},
 		
 		dataTypes: {},
 		
@@ -146,47 +261,6 @@ var Ajax = (function() {
 	Ajax.Request = Class({
 
 		/**
-		 * 当前 AJAX 发送的地址。
-		 * @field url
-		 */
-		url: ajaxLoc,
-
-		/**
-		 * 超时的时间大小。 (单位: 毫秒)
-		 * @property timeouts
-		 * @type Number
-		 */
-		timeout: -1,
-
-		/**
-		 * 是否允许缓存。
-		 * @type Boolean
-		 */
-		cache: true,
-
-		/**
-		 * 发送的数据。
-		 * @type Obeject/String
-		 */
-		data: null,
-
-		start: null,
-
-		success: null,
-
-		error: null,
-
-		complete: null,
-
-		formatData: function(data) {
-			return typeof data === 'string' ? data : Ajax.param(data);
-		},
-
-		parseData: function(data) {
-			return data;
-		},
-
-		/**
 		 * 当系统处理时发生一个异常后的回调。
 		 * @protected virtual
 		 */
@@ -201,43 +275,72 @@ var Ajax = (function() {
 			this.ajax = ajax;
 
 		},
-
-		init: function(options) {
-
-			var me = this;
-
-			// 将配置对象拷贝到当前对象。
-			for (var option in options) {
-				me[option] = options[option];
-			}
-
-			// IE 6/7 不支持 hash 。
-			me.url = me.url.replace(/#.*$/, "");
-
-			// data
-			me.data = me.data ? me.formatData(me.data) : null;
-
-			// crossDomain
-			if (me.crossDomain == null) {
-
-				var parts = rUrl.exec(me.url.toLowerCase());
-
-				// from jQuery: 跨域判断。
-				me.crossDomain = !!(parts &&
-					(parts[1] != ajaxLocParts[1] || parts[2] != ajaxLocParts[2] ||
-						(parts[3] || (parts[1] === "http:" ? 80 : 443)) !=
-							(ajaxLocParts[3] || (ajaxLocParts[1] === "http:" ? 80 : 443)))
-				);
-
-			}
-
-			if (!me.cache) {
-				me.url = Ajax.concatUrl(me.url, '_=' + Date.now() + JPlus.id++);
-			}
-
-		}
-
+ 
 	});
+	
+	Ajax.prototype.options.type = {
+		
+	};
+	
+	Ajax.transports.text = {
+		
+		send: function(ajax){
+			
+			// 拷贝配置。
+			
+			// options
+			var options = ajax.options;
+			
+			// type
+			ajax.type = options.type ? options.type.toUpperCase() : 'GET';
+			
+			// async
+			ajax.async = options.async !== false;
+			
+			// username
+			ajax.username = options.username;
+			
+			// password
+			ajax.password = options.password;
+			
+			// data
+			if (ajax.data && ajax.type == 'GET') {
+				ajax.url = Ajax.concatUrl(ajax.url, ajax.data);
+				ajax.data = null;
+			}
+
+			// headers
+			var headers = ajax.headers = {};
+
+			// headers['Accept']
+			headers.Accept = options.dataType in Ajax.accepts ? Ajax.accepts[options.dataType] + ", " + defaultAcceptes + "; q=0.01" : defaultAccepts;
+
+			// headers['Content-Type']
+			if (ajax.data) {
+				headers['Content-Type'] = "application/x-www-form-urlencoded; charset=" + (options.charset || "UTF-8");
+			}
+
+			// headers['Accept-Charset']
+			if (options.charset) {
+				headers["Accept-Charset"] = value;
+			}
+
+			// headers['X-Requested-With']
+			if (!ajax.crossDomain) {
+				headers['X-Requested-With'] = 'XMLHttpRequest';
+			}
+
+			// 如果参数有 headers, 复制到当前 headers 。
+			if (options.headers) {
+				Object.extend(headers, options.headers);
+			}
+			
+			// 发送请求。
+			
+			
+		},
+		
+	};
 
 	Ajax.dataTypes.text = Ajax.Text = Ajax.Request.extend({
 
@@ -250,11 +353,6 @@ var Ajax = (function() {
 		 * 获取或设置是否为异步请求。
 		 */
 		async: true,
-
-		/**
-		 * 获取或设置是否为允许缓存。
-		 */
-		cache: true,
 
 		/**
 		 * 获取或设置是否为请求使用的用户名。
