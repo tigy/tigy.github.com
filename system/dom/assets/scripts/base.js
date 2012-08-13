@@ -195,7 +195,7 @@
 				if (doms) {
 					var dom;
 					
-					// 将参数的 elemOrDoms 拷贝到当前集合。
+					// 将参数的 doms 拷贝到当前集合。
 					while (dom = doms[this.length]) {
 						this[this.length++] = Dom.getNode(dom);
 					}
@@ -286,7 +286,9 @@
 			 * 触发每个元素事件。
 			 * @remark 见 {@link JPlus.Base#trigger}
 			 */
-			trigger: createDomListMthod('trigger')
+			trigger: function(type, e) {
+				return this.invoke('trigger', [type, e]).indexOf(false) < 0;
+			}
 			
 		}),
 	
@@ -483,10 +485,14 @@
 		 */
 		propHook = {
 			get: function(elem, name, type) {
-				return type ? defaultHook.get(elem, name) : elem[name];
+				return type || !(name in elem) ? defaultHook.get(elem, name) : elem[name];
 			},
 			set: function(elem, name, value) {
-				elem[name] = value;
+				if (name in elem) {
+					elem[name] = value;
+				} else {
+					defaultHook.set(elem, name, value);
+				}
 			}
 		},
 
@@ -495,9 +501,11 @@
 		 */
 		boolHook = {
 			get: function(elem, name, type) {
-				return type ? elem[name] ? name.toLowerCase() : null : elem[name];
+				return type ? elem[name] ? name.toLowerCase() : null : !!elem[name];
 			},
-			set: propHook.set
+			set: function(elem, name, value) {
+				elem[name] = value;
+			}
 		},
 		
 		/**
@@ -518,35 +526,20 @@
 			},	
 			set: defaultHook.set
 		},
+
+		/**
+		 * 别名属性的列表。
+		 * @type Object
+		 */
+		propFix = {
+			innerText: 'innerText' in div ? 'innerText' : 'textContent'
+		},
 		
 		/**
 		 * 特殊属性的列表。
 		 * @type Object
 		 */
-		attrHooks = {
-			innerHTML: propHook,
-			innerText: propHook,
-			textContent: propHook,
-			enctype: formHook,
-			encoding: formHook,
-			action: formHook,
-			method: formHook,
-			target: formHook,
-			defaultValue: propHook,
-			defaultSelected: propHook,
-			defaultChecked: propHook,
-			selectedIndex: propHook,
-			
-			tabIndex: {
-				get: function(elem, name, type) {
-					// elem.tabIndex doesn't always return the correct value when it hasn't been explicitly set
-					// http://fluidproject.org/blog/2008/01/09/getting-setting-and-removing-tabindex-values-with-javascript/
-					var value = elem.getAttributeNode(name);
-					value = value && value.specified && value.value || null;
-					return type ? value : +value;
-				},
-				set: propHook.set	
-			},
+		attrFix = {
 
 			maxLength: {
 				get: propHook.get,
@@ -555,17 +548,6 @@
 						elem[name] = value;
 					} else {
 						defaultHook.set(elem, name, null);
-					}
-				}
-			},
-
-			style: {
-				get: propHook.get,
-				set: function(elem, name, value) {
-					if(value == null){
-						defaultHook.set(elem, name, value);	
-					} else {
-						elem.style.cssText = value;
 					}
 				}
 			},
@@ -588,8 +570,8 @@
 					}
 					
 					// type  0 => boolean , 1 => "selected",  2 => defaultSelected => "selected"
-					return type ? (type === 1 ? elem[name] : elem.defaultSelected) ? name : null : elem[name];
-						
+					return name in elem ? type ? (type === 1 ? elem[name] : elem.defaultSelected) ? name : null : elem[name] : defaultHook.get(elem, name);
+					
 				},
 				set : boolHook.set
 			},
@@ -597,7 +579,7 @@
 			checked: {
 				get: function(elem, name, type) {
 					// type  0 => boolean , 1 => "checked",  2 => defaultChecked => "checked"
-					return type ? (type === 1 ? elem[name] : elem.defaultChecked) ? name : null : elem[name];
+					return name in elem ? type ? (type === 1 ? elem[name] : elem.defaultChecked) ? name : null : elem[name] : defaultHook.get(elem, name);
 				},
 				set: boolHook.set
 			},
@@ -605,20 +587,22 @@
 			value: {
 				get: function(elem, name, type) {
 					// type  0/1 => "value",  2 => defaultValue => "value"
-					return type !== 2 ? elem[name] : elem.defaultValue;
+					return name in elem ? type !== 2 ? elem[name] : elem.defaultValue : defaultHook.get(elem, name);
+				},
+				set: propHook.set
+			},
+
+			tabIndex: {
+				get: function(elem, name, type) {
+					// elem.tabIndex doesn't always return the correct value when it hasn't been explicitly set
+					// http://fluidproject.org/blog/2008/01/09/getting-setting-and-removing-tabindex-values-with-javascript/
+					var value = elem.getAttributeNode(name);
+					value = value && value.specified && value.value || null;
+					return type ? value : +value;
 				},
 				set: propHook.set
 			}
-		},
 
-		/**
-		 * 别名属性的列表。
-		 * @type Object
-		 */
-		propFix = {
-			//innerText: 'innerText' in div ? 'innerText' : 'textContent',
-			//'for': 'htmlFor',
-		//	'class': 'className'
 		},
 		
 		/**
@@ -1149,11 +1133,11 @@
 			
 			name = propFix[name] || name;
 			
-			var hook = attrHooks[name];
+			var hook = attrFix[name];
 			
 			// 如果存在钩子，使用钩子获取属性。
 			// 最后使用 defaultHook 获取。
-			return hook && (name in elem) ? hook.get(elem, name, type) : defaultHook.get(elem, name.toLowerCase(), type);
+			return hook ? hook.get(elem, name, type) : defaultHook.get(elem, name.toLowerCase(), type);
 
 		},
 		
@@ -1223,7 +1207,7 @@
 		 * @static
 		 * @private
 		 */
-		attrHooks: attrHooks,
+		attrFix: attrFix,
 
 		/**
 		 * 特殊属性集合。
@@ -1303,7 +1287,7 @@
 			not: function(elem, args){ return !match(elem, args); },
 			has: function(elem, args){ return query(args, new Dom(elem)).length > 0; },
 			
-			selected: function(elem){ return attrHooks.get(elem, 'selected'); },
+			selected: function(elem) { return attrFix.selected.get(elem, 'selected', 1); },
 			checked: function(elem){ return elem.checked; },
 			enabled: function(elem){ return elem.disabled === false; },
 			disabled: function(elem){ return elem.disabled === true; },
@@ -2007,9 +1991,9 @@
 			
 			name = propFix[name] || name;
 			
-			var hook = attrHooks[name];
+			var hook = attrFix[name];
 			
-			if(!hook || !(name in elem)) {
+			if(!hook) {
 				hook = defaultHook;
 				name = name.toLowerCase();
 			}
@@ -2019,7 +2003,7 @@
 			// if (elem.setAttribute) {
 // 
 				// // 属性名统一小写。
-				// (attrHooks[name = name.toLowerCase()] || defaultHook).set(elem, name, value);
+				// (attrFix[name = name.toLowerCase()] || defaultHook).set(elem, name, value);
 			// } else {
 // 
 				// // 如果不支持 setAttribute 使用 setProp 。
@@ -2028,35 +2012,6 @@
 
 			return this;
 
-		},
-
-		/**
-		 * 设置或删除一个 DOM 属性值。
-		 * @param {String} name 要设置的属性名称。
-		 * @param {String} value 要设置的属性值。当设置为 null 时，删除此属性。
-		 * @return this
-		 * @example
-		 * 为所有图像设置src属性。
-		 * #####HTML:
-		 * <pre lang="htm" format="none">
-		 * &lt;img/&gt;
-		 * &lt;img/&gt;
-		 * </pre>
-		 * #####JavaScript:
-		 * <pre>Dom.query("img").setAttr("src","test.jpg");</pre>
-		 * #####结果:
-		 * <pre lang="htm" format="none">[ &lt;img src= "test.jpg" /&gt; , &lt;img src= "test.jpg" /&gt; ]</pre>
-		 *
-		 * 将文档中图像的src属性删除
-		 * #####HTML:
-		 * <pre lang="htm" format="none">&lt;img src="test.jpg"/&gt;</pre>
-		 * #####JavaScript:
-		 * <pre>Dom.query("img").setAttr("src");</pre>
-		 * #####结果:
-		 * <pre lang="htm" format="none">[ &lt;img /&gt; ]</pre>
-		 */
-		setProp: function(name, value) {
-			return this.setAttr(name, value);
 		},
 
 		/**
@@ -2096,10 +2051,6 @@
 				// css 。
 				else if (elem.style && (name in elem.style || rStyle.test(name)))
 					me.setStyle(name, value);
-
-				// prop 。
-				else if(name in elem)
-					me.setProp(name, value);
 
 				// attr 。
 				else 
@@ -2543,25 +2494,8 @@
 	 	 * #####结果:
 	 	 * <pre lang="htm" format="none">test.jpg</pre>
 		 */
-		getAttr: function(name) {
-			return Dom.getAttr(this.node, name, 1);
-		},
-
-		/**
-		 * 获取当前 Dom 对象的 DOM 属性值。
-		 * @param {String} name 要获取的属性名称。
-		 * @return {String} 返回属性值。如果元素没有相应属性，则返回 null 。
-	 	 * @example
-	 	 * 返回文档中 id="img" 的图像的src属性值。
-	 	 * #####HTML:
-	 	 * <pre lang="htm" format="none">&lt;img id="img" src="test.jpg"/&gt;</pre>
-	 	 * #####JavaScript:
-	 	 * <pre>Dom.get("img").getAttr("src");</pre>
-	 	 * #####结果:
-	 	 * <pre lang="htm" format="none">test.jpg</pre>
-		 */
-		getProp: function(name) {
-			return Dom.getAttr(this.node, name);
+		getAttr: function(name, type) {
+			return Dom.getAttr(this.node, name, type);
 		},
 	
 		/**
@@ -3433,14 +3367,11 @@
 		 * @param {Number} y 坐标。
 		 * @return {Document} this 。
 		 * 传递参数值时，设置垂直滚动条顶部偏移为该值。
-        <longdesc>此方法对可见和隐藏元素均有效。</longdesc>
-        <params name="val" type="String, Number">
-          设定垂直滚动条值
-        </params>
-        @example
-          设置相对滚动条顶部的偏移
-          #####JavaScript:<pre>Dom.query("div.demo").setScroll(300);</pre>
-        
+		 * @example
+		 * 设置相对滚动条顶部的偏移
+		 * #####JavaScript: <pre>
+		 * Dom.query("div.demo").setScroll(300);
+		 *</pre>
 		 */
 		setScroll: function(x, y) {
 			var doc = this, offsetPoint = formatPoint(x, y);
@@ -3464,15 +3395,33 @@
 	tagFix.tbody = tagFix.tfoot = tagFix.colgroup = tagFix.caption = tagFix.thead;
 	tagFix.th = tagFix.td;
 
+	// 初始化 attrFix。
+	map("enctype encoding action method target", function(value) {
+		attrFix[value] = formHook;
+	});
+
+	// 初始化 attrFix。
+	map("defaultValue defaultChecked defaultSelected readOnly disabled autofocus autoplay async controls hidden loop open required scoped compact noWrap isMap declare noshade multiple noresize defer useMap", function(value) {
+		attrFix[value] = boolHook;
+	});
+
 	// 初始化 propFix。
-	map("readOnly tabIndex defaultValue accessKey defaultChecked cellPadding cellSpacing rowSpan colSpan frameBorder maxLength useMap contentEditable", function (value) {
+	map("readOnly tabIndex defaultValue defaultChecked defaultSelected accessKey useMap contentEditable maxLength", function(value) {
 		propFix[value.toLowerCase()] = value;
 	});
 
-	// 初始化 attrHooks。
-	map("disabled readOnly autofocus autoplay async controls hidden loop open required scoped compact noWrap isMap declare noshade multiple noresize defer useMap", function(value) {
-		attrHooks[value] = boolHook;
+	// 初始化 attrFix。
+	map("innerHTML innerText textContent selectedIndex cellPadding cellSpacing rowSpan colSpan frameBorder nodeName tagName", function(value) {
+		propFix[value.toLowerCase()] = value;
+		attrFix[value] = propHook;
 	});
+
+	//function setAll(target, props, value, i) {
+	//	i = (props = props.split(' ')).length;
+	//	while (i--) {
+	//		target[props[i]] = value;
+	//	}
+	//}
 	
 	// 初始化 textFix。
 	textFix.INPUT = textFix.SELECT = textFix.TEXTAREA = 'value';
@@ -3482,7 +3431,7 @@
 	Dom.addEvents('$default', eventObj);
 
 	// Dom 函数。
-	Dom.defineMethod('dom', 'scrollIntoView focus blur select click submit reset');
+	Dom.defineMethod('node', 'scrollIntoView focus blur select click submit reset');
 
 	// document 函数。
 	map('on un trigger', function (name) {
@@ -3634,7 +3583,7 @@
 
 		};
 
-		defaultHook.set = function(elem, name, value) {
+		defaultHook.set = formHook.set = function(elem, name, value) {
 
 			// 获取原始的属性节点。
 			var node = elem.getAttributeNode(name);
@@ -3656,20 +3605,23 @@
 			}
 
 		};
-		
+
 		// IE678 无法获取 style 属性，改用 style.cssText 获取。
-		attrHooks.style.get =  function(elem, name, type) {
-			return type ? elem[name].cssText.toLowerCase() || null : elem[name];
+		attrFix.style = {
+			get: function(elem, name) {
+				return elem.style.cssText.toLowerCase() || null;
+			},
+			set: function(elem, name, value) {
+				elem.style.cssText = value || '';
+			}
 		};
 
 		if (navigator.isQuirks) {
-
-			//  propFix.enctype = propFix.encoding;
 			
 			// IE 6/7 获取 Button 的value会返回文本。
-			attrHooks.value = {
+			attrFix.value = {
 				
-				_get: attrHooks.value.get,
+				_get: attrFix.value.get,
 				
 				get: function(elem, name, type) {
 					return elem.tagName === 'BUTTON' ? defaultHook.get(elem, name) : this._get(elem, name, type);
@@ -3685,7 +3637,7 @@
 			};
 
 			// IE 6/7 会自动添加值到下列属性。
-			attrHooks.href = attrHooks.src = attrHooks.useMap = attrHooks.width = attrHooks.height = {
+			attrFix.href = attrFix.src = attrFix.useMap = attrFix.width = attrFix.height = {
 
 				get: function(elem, name) {
 					return elem.getAttribute(name, 2);
@@ -3697,14 +3649,21 @@
 			};
 
 			// IE 6/7 在设置 contenteditable 为空时报错。
-			attrHooks.contenteditable = {
+			attrFix.contentEditable = {
 
-				get: defaultHook.get,
+				get: function(elem, name) {
+
+					// 获取属性节点，避免 IE 返回属性。
+					name = elem.getAttributeNode(name);
+
+					// 如果不存在节点， name 为 null ，如果不存在节点值， 返回 null。
+					return name && name.specified ? name.value : null;
+
+				},
 
 				set: function(elem, name, value) {
 					if (value === null) {
-						var node = elem.getAttributeNode(name);
-						elem.removeAttributeNode(node);
+						elem.removeAttributeNode(elem.getAttributeNode(name));
 					} else {
 						defaultHook.set(elem, name, value || "false");
 					}
@@ -4377,7 +4336,7 @@
 					}
 				} else {
 					while(elem = oldResult[i++]){
-						var actucalVal = Dom.getAttr(elem, filterData[0]),
+						var actucalVal = Dom.getAttr(elem, filterData[0], 1),
 							expectedVal = filterData[2],
 							tmpResult;
 						switch(filterData[1]){

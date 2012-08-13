@@ -25,7 +25,7 @@ test("Dom.prototype.getAttr", function() {
 	// [7472] & [3113] (form contains an input with name="action" or name="id")
 	var extras = Dom.parse("<input name='id' name='name' /><input id='target' name='target' />").appendTo("testForm");
 	equal( Dom.query("#form").setAttr("action","newformaction").getAttr("action"), "newformaction", "Check that action attribute was changed" );
-	equal(Dom.query("#testForm").getAttr("target"), null, "Retrieving target does not equal the input with name=target");
+	equal(Dom.query("#testForm").getAttr("target", 1), null, "Retrieving target does not equal the input with name=target");
 	
 	equal( Dom.query("#testForm").setAttr("target", "newTarget").getAttr("target"), "newTarget", "Set target successfully on a form" );
 	equal( Dom.query("#testForm").setAttr("id", null).getAttr("id"), null, "Retrieving id does not equal the input with name=id after id is removed [#7472]" );
@@ -62,7 +62,7 @@ test("Dom.prototype.getAttr", function() {
 	optgroup.appendChild( option );
 	select.appendChild( optgroup );
 
-	equal( Dom.query( option ).getAttr("selected"), "selected", "Make sure that a single option is selected, even when in an optgroup." );
+	equal( Dom.query( option ).getAttr("selected", 1), "selected", "Make sure that a single option is selected, even when in an optgroup." );
 
 	var $img = Dom.parse("<img style='display:none' width='215' height='53' src='http://static.jquery.com/files/rocker/images/logo_jquery_215x53.gif'/>").appendTo();
 	equal( $img.getAttr("width"), "215", "Retrieve width attribute an an element with display:none." );
@@ -95,7 +95,7 @@ test("Dom.prototype.getAttr", function() {
 	equal( Dom.parse("<input/>").getAttr("value"), "", "An unset value on an input returns current value." );
 
 	$form = Dom.query("#form").setAttr("enctype", "multipart/form-data");
-	equal( $form.getProp("enctype"), "multipart/form-data", "Set the enctype of a form (encoding in IE6/7 #6743)" );
+	equal( $form.getAttr("enctype"), "multipart/form-data", "Set the enctype of a form (encoding in IE6/7 #6743)" );
 });
 
 test("Dom.prototype.setAttr", function() {
@@ -124,32 +124,32 @@ test("Dom.prototype.setAttr", function() {
 	
 	Dom.get("check2").setAttr("checked", false);
 	equal( document.getElementById("check2").checked, false, "Set checked attribute" );
-	equal(Dom.get("check2").getProp("checked"), false, "Set checked attribute");
+	equal(Dom.get("check2").getAttr("checked"), false, "Set checked attribute");
 	Dom.get("text1").setAttr("readonly", true);
 	equal( document.getElementById("text1").readOnly, true, "Set readonly attribute" );
-	equal( Dom.get("text1").getProp("readonly"), true, "Set readonly attribute" );
+	equal( Dom.get("text1").getAttr("readonly"), true, "Set readonly attribute" );
 	Dom.get("text1").setAttr("readonly", false);
 	equal( document.getElementById("text1").readOnly, false, "Set readonly attribute" );
-	equal(Dom.get("text1").getProp("readonly"), false, "Set readonly attribute");
+	equal(Dom.get("text1").getAttr("readonly"), false, "Set readonly attribute");
 
 	Dom.get("check2").dom.checked = true;
 	equal( document.getElementById("check2").checked, true, "Set checked attribute" );
-	equal(Dom.get("check2").getProp("checked"), true, "Set checked attribute");
+	equal(Dom.get("check2").getAttr("checked"), true, "Set checked attribute");
 	Dom.get("check2").dom.checked = false;
 	equal( document.getElementById("check2").checked, false, "Set checked attribute" );
-	equal(Dom.get("check2").getProp("checked"), false, "Set checked attribute");
+	equal(Dom.get("check2").getAttr("checked"), false, "Set checked attribute");
 	
 	Dom.get("check2").setAttr("checked", "checked");
 	equal( document.getElementById("check2").checked, true, "Set checked attribute with 'checked'" );
-	equal(Dom.get("check2").getProp("checked"), true, "Set checked attribute");
+	equal(Dom.get("check2").getAttr("checked"), true, "Set checked attribute");
 	
 	Dom.get("text1").dom.readOnly = true;
 	equal( document.getElementById("text1").readOnly, true, "Set readonly attribute" );
-	equal(Dom.get("text1").getProp("readOnly"), true, "Set readonly attribute");
+	equal(Dom.get("text1").getAttr("readOnly"), true, "Set readonly attribute");
 	
 	Dom.get("text1").dom.readOnly = false;
 	equal( document.getElementById("text1").readOnly, false, "Set readonly attribute" );
-	equal(Dom.get("text1").getProp("readOnly"), false, "Set readonly attribute");
+	equal(Dom.get("text1").getAttr("readOnly"), false, "Set readonly attribute");
 	
 	Dom.get("name").setAttr("maxlength", "5");
 	equal( document.getElementById("name").maxLength, 5, "Set maxlength attribute" );
@@ -158,17 +158,17 @@ test("Dom.prototype.setAttr", function() {
 
 	// HTML5 boolean attributes
 	var $text = Dom.get("text1").setAttr("autofocus", true).setAttr("required", true);
-	equal($text.getProp("autofocus"), true, "Set boolean attributes to the same name");
-	equal($text.setAttr("autofocus", false).getProp("autofocus"), false, "Setting autofocus attribute to false removes it");
-	equal($text.getProp("required"), true, "Set boolean attributes to the same name");
-	equal($text.setAttr("required", false).getProp("required"), false, "Setting required attribute to false removes it");
+	equal($text.getAttr("autofocus"), true, "Set boolean attributes to the same name");
+	equal($text.setAttr("autofocus", false).getAttr("autofocus"), false, "Setting autofocus attribute to false removes it");
+	equal($text.getAttr("required"), true, "Set boolean attributes to the same name");
+	equal($text.setAttr("required", false).getAttr("required"), false, "Setting required attribute to false removes it");
 
 	var $details = Dom.parse("<details open></details>");
 	
 	$details = $details.first() || $details;
 	$details.appendTo("qunit-fixture");
 	//equal( !$details.getAttr("open"), true, "open attribute presense indicates true" );
-	equal($details.setAttr("open", false).getProp("open"), false, "Setting open attribute to false removes it");
+	equal($details.setAttr("open", false).getAttr("open"), false, "Setting open attribute to false removes it");
 
 	$text.setAttr("data-something", true);
 	equal( $text.getAttr("data-something"), "true", "Set data attributes");
@@ -309,24 +309,24 @@ test("Dom.prototype.getAttr('tabindex')", function() {
 
 	// elements not natively tabbable
 	equal( Dom.query("#listWithTabIndex").getAttr("tabindex"), "5", "not natively tabbable, with tabindex set to 0" );
-	equal( Dom.query("#divWithNoTabIndex").getAttr("tabindex"), undefined, "not natively tabbable, no tabindex set" );
+	equal( Dom.query("#divWithNoTabIndex").getAttr("tabindex", 1), undefined, "not natively tabbable, no tabindex set" );
 
 	// anchor with href
-	equal( Dom.query("#linkWithNoTabIndex").getAttr("tabindex"), undefined, "anchor with href, no tabindex set" );
-	equal( Dom.query("#linkWithTabIndex").getAttr("tabindex"), "2", "anchor with href, tabindex set to 2" );
-	equal( Dom.query("#linkWithNegativeTabIndex").getAttr("tabindex"), "-1", "anchor with href, tabindex set to -1" );
+	equal(Dom.query("#linkWithNoTabIndex").getAttr("tabindex", 1), undefined, "anchor with href, no tabindex set");
+	equal(Dom.query("#linkWithTabIndex").getAttr("tabindex", 1), "2", "anchor with href, tabindex set to 2");
+	equal(Dom.query("#linkWithNegativeTabIndex").getAttr("tabindex", 1), "-1", "anchor with href, tabindex set to -1");
 
 	// anchor without href
-	equal( Dom.query("#linkWithNoHrefWithNoTabIndex").getAttr("tabindex"), undefined, "anchor without href, no tabindex set" );
-	equal( Dom.query("#linkWithNoHrefWithTabIndex").getAttr("tabindex"), "1", "anchor without href, tabindex set to 2" );
-	equal( Dom.query("#linkWithNoHrefWithNegativeTabIndex").getAttr("tabindex"), "-1", "anchor without href, no tabindex set" );
+	equal(Dom.query("#linkWithNoHrefWithNoTabIndex").getAttr("tabindex", 1), undefined, "anchor without href, no tabindex set");
+	equal(Dom.query("#linkWithNoHrefWithTabIndex").getAttr("tabindex", 1), "1", "anchor without href, tabindex set to 2");
+	equal(Dom.query("#linkWithNoHrefWithNegativeTabIndex").getAttr("tabindex", 1), "-1", "anchor without href, no tabindex set");
 });
 
 test("Dom.prototype.setAttr('tabindex', value)", function() {
 	expect( 9 );
 
 	var element = Dom.query("#divWithNoTabIndex");
-	equal( element.getAttr("tabindex"), undefined, "start with no tabindex" );
+	equal( element.getAttr("tabindex", 1), undefined, "start with no tabindex" );
 
 	// set a positive string
 	element.setAttr("tabindex", "1");
@@ -367,16 +367,16 @@ test("Dom.prototype.setAttr(String, null)", function() {
 	equal( Dom.query("#form").setAttr("id", null).getAttr("id"), undefined, "Remove id" );
 	equal( Dom.query("#foo").setAttr("style", "position:absolute;").setAttr("style", null).getAttr("style"), undefined, "Check removing style attribute" );
 	equal( Dom.query("#form").setAttr("style", "position:absolute;").setAttr("style", null).getAttr("style"), undefined, "Check removing style attribute on a form" );
-	equal( Dom.parse("<div style='position: absolute'></div>").appendTo("foo").setAttr("style", null).getProp("style").cssText, "", "Check removing style attribute (#9699 Webkit)" );
+	equal(Dom.parse("<div style='position: absolute'></div>").appendTo("foo").setAttr("style", null).node.style.cssText, "", "Check removing style attribute (#9699 Webkit)");
 	equal( Dom.find("#fx-test-group").setAttr("height", "3px").setAttr("height", null).dom.style.height, "1px", "Removing height attribute has no effect on height set with style attribute" );
 
-	Dom.query("#check1").setAttr("checked", null).setProp("checked", true).setAttr("checked", null);
+	Dom.query("#check1").setAttr("checked", null).setAttr("checked", true).setAttr("checked", null);
 	equal( document.getElementById("check1").checked, false, "removeAttr sets boolean properties to false" );
-	Dom.query("#text1").setProp("readOnly", true).setAttr("readonly", null);
+	Dom.query("#text1").setAttr("readOnly", true).setAttr("readonly", null);
 	equal( document.getElementById("text1").readOnly, false, "removeAttr sets boolean properties to false" );
 
 	Dom.query("#option2c").setAttr("selected", null);
-	equal( Dom.query("#option2d").getAttr("selected"), "selected", "Removing `selected` from an option that is not selected does not remove selected from the currently selected option (#10870)");
+	equal( Dom.query("#option2d").getAttr("selected", 1), "selected", "Removing `selected` from an option that is not selected does not remove selected from the currently selected option (#10870)");
 
 	try {
 		$first = Dom.query("#first").setAttr("contenteditable", "true").setAttr("contenteditable", null);
@@ -390,148 +390,6 @@ test("Dom.prototype.setAttr(String, null)", function() {
 	$first.setAttr("Case", null);
 	// IE 6/7 return empty string here, not undefined
 	ok( !$first.getAttr("Case"), "mixed-case attribute was removed" );
-});
-
-test("Dom.prototype.getProp()", function() {
-	expect(31);
-
-	equal( Dom.query("#text1").getProp("value"), "Test", "Check for value attribute" );
-	equal( Dom.query("#text1").setProp("value", "Test2").getProp("defaultValue"), "Test", "Check for defaultValue attribute" );
-	equal( Dom.query("#select2").getProp("selectedIndex"), 3, "Check for selectedIndex attribute" );
-	equal( Dom.query("#foo").getProp("nodeName").toUpperCase(), "DIV", "Check for nodeName attribute" );
-	equal( Dom.query("#foo").getProp("tagName").toUpperCase(), "DIV", "Check for tagName attribute" );
-	equal( Dom.parse("<option/>").getProp("selected"), false, "Check selected attribute on disconnected element." );
-
-	equal( Dom.query("#listWithTabIndex").getProp("tabindex"), 5, "Check retrieving tabindex" );
-	Dom.query("#text1").setProp("readonly", true);
-	equal( document.getElementById("text1").readOnly, true, "Check setting readOnly property with 'readonly'" );
-	equal( Dom.query("#label-for").getProp("for"), "action", "Check retrieving htmlFor" );
-	Dom.query("#text1").setProp("class", "test");
-	equal( document.getElementById("text1").className, "test", "Check setting className with 'class'" );
-	equal( Dom.query("#text1").getProp("maxlength"), 30, "Check retrieving maxLength" );
-	Dom.query("#table").setProp("cellspacing", 1);
-	equal( Dom.query("#table").getProp("cellSpacing"), "1", "Check setting and retrieving cellSpacing" );
-	Dom.query("#table").setProp("cellpadding", 1);
-	equal( Dom.query("#table").getProp("cellPadding"), "1", "Check setting and retrieving cellPadding" );
-	Dom.query("#table").setProp("rowspan", 1);
-	equal( Dom.query("#table").getProp("rowSpan"), 1, "Check setting and retrieving rowSpan" );
-	Dom.query("#table").setProp("colspan", 1);
-	equal( Dom.query("#table").getProp("colSpan"), 1, "Check setting and retrieving colSpan" );
-	Dom.query("#table").setProp("usemap", 1);
-	equal( Dom.query("#table").getProp("useMap"), 1, "Check setting and retrieving useMap" );
-	Dom.query("#table").setProp("frameborder", 1);
-	equal( Dom.query("#table").getProp("frameBorder"), 1, "Check setting and retrieving frameBorder" );
-	QUnit.reset();
-
-	var body = document.body,
-		$body = Dom.query( body );
-
-	ok( $body.getProp("nextSibling") === null, "Make sure a null expando returns null" );
-	body["foo"] = "bar";
-	equal( $body.getProp("foo"), "bar", "Make sure the expando is preferred over the dom attribute" );
-	body["foo"] = undefined;
-	ok( $body.getProp("foo") === undefined, "Make sure the expando is preferred over the dom attribute, even if undefined" );
-
-	var select = document.createElement("select"), optgroup = document.createElement("optgroup"), option = document.createElement("option");
-	optgroup.appendChild( option );
-	select.appendChild( optgroup );
-
-	equal( Dom.query(option).getProp("selected"), true, "Make sure that a single option is selected, even when in an optgroup." );
-	equal( Dom.query(document).getProp("nodeName"), "#document", "prop works correctly on document nodes (bug #7451)." );
-
-	var attributeNode = document.createAttribute("irrelevant"),
-		commentNode = document.createComment("some comment"),
-		textNode = document.createTextNode("some text"),
-		obj = {};
-	Object.each([document, attributeNode, commentNode, textNode, textNode, "#firstp"], function(ele, i) {  
-		strictEqual( Dom.query(ele).getProp("nonexisting"), null, "prop works correctly for non existing attributes (bug #7500)." );
-	});
-
-	Object.each([document, document], function(ele) {
-		var $ele = Dom.query( ele );
-		$ele.setProp( "nonexisting", "foo" );
-		equal( $ele.getProp("nonexisting"), "foo", "prop(name, value) works correctly for non existing attributes (bug #7500)." );
-	});
-	Dom.query( document ).setProp("nonexisting", null);
-
-	var $form = Dom.query("#form").setProp("enctype", "multipart/form-data");
-	equal( $form.getProp("enctype"), "multipart/form-data", "Set the enctype of a form (encoding in IE6/7 #6743)" );
-});
-
-test("Dom.prototype.getProp('tabindex')", function() {
-	expect(8);
-
-	// elements not natively tabbable
-	equal(Dom.query("#listWithTabIndex").getProp("tabindex"), 5, "not natively tabbable, with tabindex set to 0");
-	equal(Dom.query("#divWithNoTabIndex").getProp("tabindex"), 0, "not natively tabbable, no tabindex set");
-
-	// anchor with href
-	equal(Dom.query("#linkWithNoTabIndex").getProp("tabindex"), 0, "anchor with href, no tabindex set");
-	equal(Dom.query("#linkWithTabIndex").getProp("tabindex"), 2, "anchor with href, tabindex set to 2");
-	equal(Dom.query("#linkWithNegativeTabIndex").getProp("tabindex"), -1, "anchor with href, tabindex set to -1");
-
-	// anchor without href
-	equal(Dom.query("#linkWithNoHrefWithNoTabIndex").getProp("tabindex"), 0, "anchor without href, no tabindex set");
-	equal(Dom.query("#linkWithNoHrefWithTabIndex").getProp("tabindex"), 1, "anchor without href, tabindex set to 2");
-	equal(Dom.query("#linkWithNoHrefWithNegativeTabIndex").getProp("tabindex"), -1, "anchor without href, no tabindex set");
-});
-
-test("Dom.prototype.setProp('tabindex', value)", function() {
-	expect(9);
-
-	var element = Dom.query("#divWithNoTabIndex");
-	equal(element.getProp("tabindex"), 0, "start with no tabindex");
-
-	// set a positive string
-	element.setProp("tabindex", "1");
-	equal(element.getProp("tabindex"), 1, "set tabindex to 1 (string)");
-
-	// set a zero string
-	element.setProp("tabindex", "0");
-	equal(element.getProp("tabindex"), 0, "set tabindex to 0 (string)");
-
-	// set a negative string
-	element.setProp("tabindex", "-1");
-	equal(element.getProp("tabindex"), -1, "set tabindex to -1 (string)");
-
-	// set a positive number
-	element.setProp("tabindex", 1);
-	equal(element.getProp("tabindex"), 1, "set tabindex to 1 (number)");
-
-	// set a zero number
-	element.setProp("tabindex", 0);
-	equal(element.getProp("tabindex"), 0, "set tabindex to 0 (number)");
-
-	// set a negative number
-	element.setProp("tabindex", -1);
-	equal(element.getProp("tabindex"), -1, "set tabindex to -1 (number)");
-
-	element = Dom.query("#linkWithTabIndex");
-	equal(element.getProp("tabindex"), 2, "start with tabindex 2");
-
-	element.setProp("tabindex", -1);
-	equal(element.getProp("tabindex"), -1, "set negative tabindex");
-});
-
-test("Dom.prototype.setProp(String, null)", function() {
-	expect(6);
-	var attributeNode = document.createAttribute("irrelevant"),
-		commentNode = document.createComment("some comment"),
-		textNode = document.createTextNode("some text"),
-		obj = {};
-
-	strictEqual( Dom.query( "#firstp" ).setProp( "nonexisting", "foo" ).setProp( "nonexisting", null )[0]["nonexisting"], undefined, "removeprop works correctly on DOM element nodes" );
-
-	Object.each([document, document], function(ele, i) {
-		var $ele = Dom.get( ele );
-		$ele.setProp( "nonexisting", "foo" ).setProp( "nonexisting", null );
-		strictEqual( ele["nonexisting"], undefined, "removeProp works correctly on non DOM element nodes (bug #7500)." );
-	});
-	Object.each([commentNode, document, document], function(ele, i) {
-		var $ele = Dom.get( ele );
-		$ele.setProp( "nonexisting", "foo" ).setProp( "nonexisting", null );
-		strictEqual( ele["nonexisting"], undefined, "removeProp works correctly on non DOM element nodes (bug #7500)." );
-	});
 });
 
 if ( "value" in document.createElement("meter") &&

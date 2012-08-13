@@ -877,7 +877,7 @@
 			// 浏览器名字。
 			browser = match[1],
 
-			isStd = eval("-[1,]");
+			isStd = !!eval("-[1,]");
 
 		navigator["is" + browser] = navigator["is" + browser + parseInt(match[2])] = true;
 
