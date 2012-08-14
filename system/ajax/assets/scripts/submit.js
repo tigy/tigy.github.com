@@ -1,8 +1,6 @@
 
 
-using("System.Request.Base");
-using("System.Request.Ajax");
-using("System.Request.Text");
+using("System.Ajax.Base");
 using("System.Dom.Base");
 
 /**
