@@ -464,18 +464,30 @@
 		 * 默认用于获取和设置属性的函数。
 		 */
 		defaultHook = {
+			getProp: function(elem, name) {
+				return name in elem ? elem[name] : null;
+			},
+
+			setProp: function(elem, name, value) {
+				if ('238'.indexOf(elem.nodeType) === -1){
+					elem[name] = value;
+				}
+			},
+
 			get: function(elem, name) {
-				return elem.getAttribute ? elem.getAttribute(name) : null;
+				return elem.getAttribute ? elem.getAttribute(name) : this.getProp(elem, name);
 			},
 			set: function(elem, name, value) {
-				if(elem.setAttribute){
-					
+				if (elem.setAttribute) {
+
 					// 如果设置值为 null, 表示删除属性。
 					if (value === null) {
 						elem.removeAttribute(name);
 					} else {
 						elem.setAttribute(name, value);
 					}
+				} else {
+					this.setProp(elem, name, value);
 				}
 			}
 		},
@@ -2698,7 +2710,7 @@
 			var elem = this.node, 
 				bound = elem.getBoundingClientRect(),
 				doc = getDocument(elem),
-				html = doc.node,
+				html = doc.documentElement,
 				htmlScroll = doc.getScroll();
 			return new Point(bound.left + htmlScroll.x - html.clientLeft, bound.top + htmlScroll.y - html.clientTop);
 		},
@@ -2728,12 +2740,16 @@
 				win,
 				x,
 				y;
-			if(elem.nodeType !== 9 || !('pageXOffset' in (win = elem.defaultView || elem.parentWindow))){
+			if(elem.nodeType !== 9){
 				x = elem.scrollLeft;
 				y = elem.scrollTop;
-			} else {
+			} else if('pageXOffset' in (win = elem.defaultView || elem.parentWindow)) {
 				x = win.pageXOffset;
 				y = win.pageYOffset;
+			} else {
+				elem = elem.documentElement;
+				x = elem.scrollLeft;
+				y = elem.scrollTop;
 			}
 			
 			return new Point(x, y);
@@ -3355,9 +3371,16 @@
 
 	// Dom 函数。
 	Dom.defineMethod('node', 'scrollIntoView focus blur select click submit reset');
+	
+	// 拷贝 DOM Event 到 document 。
+	if(document.constructor){
+		document.constructor.$event = Dom.$event;
+	} else {
+		document.constructor = Dom;
+	}
 
 	// document 函数。
-	map('on un trigger once delegate dataField getElements getPosition getScroll getScrollSize first last parent child children hasChild', function (funcName) {
+	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize first last parent child children hasChild', function (funcName) {
 		document[funcName] = Dom.prototype[funcName];
 	});
 	
@@ -3496,6 +3519,10 @@
 
 		defaultHook.get = function(elem, name) {
 
+			if (!elem.getAttributeNode) {
+				return defaultHook.getProp(elem, name);
+			}
+
 			// 获取属性节点，避免 IE 返回属性。
 			name = elem.getAttributeNode(name);
 
@@ -3506,25 +3533,30 @@
 
 		defaultHook.set = formHook.set = function(elem, name, value) {
 
-			// 获取原始的属性节点。
-			var node = elem.getAttributeNode(name);
+			if (elem.getAttributeNode) {
 
-			// 如果 value === null 表示删除节点。
-			if (value === null) {
+				// 获取原始的属性节点。
+				var node = elem.getAttributeNode(name);
 
-				// 仅本来存在属性时删除节点。
-				if (node) {
-					node.nodeValue = '';
-					elem.removeAttributeNode(node);
+				// 如果 value === null 表示删除节点。
+				if (value === null) {
+
+					// 仅本来存在属性时删除节点。
+					if (node) {
+						node.nodeValue = '';
+						elem.removeAttributeNode(node);
+					}
+
+					// 本来存在属性值，则设置属性值。
+				} else if (node) {
+					node.nodeValue = value;
+				} else {
+					elem.setAttribute(name, value);
 				}
 
-				// 本来存在属性值，则设置属性值。
-			} else if (node) {
-				node.nodeValue = value;
 			} else {
-				elem.setAttribute(name, value);
+				defaultHook.setProp(elem, name, value);
 			}
-
 		};
 
 		// IE678 无法获取 style 属性，改用 style.cssText 获取。

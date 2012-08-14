@@ -181,8 +181,8 @@ test("Dom.prototype.setAttr", function() {
 	Dom.get("foo").setAttr("contenteditable", true);
 	equal( Dom.get("foo").getAttr("contenteditable"), "true", "Enumerated attributes are set properly" );
 
-	strictEqual( document.getAttr("nonexisting"), null, "attr works correctly for non existing attributes." );
-		equal( document.setAttr("something", "foo" ).getAttr("something"), "foo", "attr falls back to prop on unsupported arguments" );
+	strictEqual( Dom.document.getAttr("nonexisting"), null, "attr works correctly for non existing attributes." );
+		equal( Dom.document.setAttr("something", "foo" ).getAttr("something"), "foo", "attr falls back to prop on unsupported arguments" );
 
 	var table = Dom.get("table");
 	

@@ -29,12 +29,13 @@ testoffset("absolute", function(iframe) {
 
 	iframe.scrollTo(1, 1);
 	
-	equal( getDom(document, "absolute-1").getPosition().x, 1, "getDom(document, 'absolute-1').getOffsets().x");
-	equal( getDom(document, "absolute-1").getPosition().y, 1, "getDom(document, 'absolute-1').getOffsets().y");
+	
+	equal( getDom(document, "absolute-1").getPosition().x, 1, "getDom(document, 'absolute-1').getPosition().x");
+	equal( getDom(document, "absolute-1").getPosition().y, 1, "getDom(document, 'absolute-1').getPosition().y");
 
 	
-	equal( getDom(document, "absolute-1").getOffset().x, 0, "getDom(document, 'absolute-1').getPosition().x");
-	equal( getDom(document, "absolute-1").getOffset().y, 0, "getDom(document, 'absolute-1').getPosition().y");
+	equal( getDom(document, "absolute-1").getOffset().x, 0, "getDom(document, 'absolute-1').getOffset().x");
+	equal( getDom(document, "absolute-1").getOffset().y, 0, "getDom(document, 'absolute-1').getOffset().y");
 
 	forceScroll.remove();
 });

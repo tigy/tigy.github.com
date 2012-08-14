@@ -156,5 +156,5 @@ test("Dom.prototype.getElements", function() {
 	expect(2);
 
 	deepEqual(document.getElements("body")[0], document.body, "Simple getElements check");
-	deepEqual(document.getElements("html")[0], document.node, "Simple getElements check");
+	deepEqual(document.getElements("html")[0], document.documentElement, "Simple getElements check");
 });
