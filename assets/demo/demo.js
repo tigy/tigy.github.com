@@ -3415,10 +3415,14 @@ Demo.extend(Demo, {
 		};
 	},
 
-	TestCase: function (id, name, data) {
+	TestCase: function (id, name, data, options) {
 
 		this.name = name;
 		this.data = [];
+
+		if (options) {
+			Demo.extend(this, options);
+		}
 
 		switch (typeof data) {
 			case 'string':
@@ -3484,7 +3488,7 @@ Demo.extend(Demo, {
 	/**
 	 * 输出测试用例。
 	 */
-	writeTestCases: function (testcases, dftOptions) {
+	writeTestCases: function (testcases, options) {
 
 		document.write('<div class="demo-control-testcases demo-clear">');
 
@@ -3503,7 +3507,7 @@ Demo.extend(Demo, {
 				document.write('<h2>' + Demo.encodeHTML(name) + '</h2>');
 				continue;
 			}
-			globalTestCases.push(testcase = new Demo.TestCase(id, name, testcase));
+			globalTestCases.push(testcase = new Demo.TestCase(id, name, testcase, options));
 
 			var text = [];
 
@@ -3606,12 +3610,9 @@ Demo.extend(Demo, {
 			
 		try{
 
-			do {
+			if (data.times) {
 
-				time += 10;
-
-				currentTime = 10;
-				while (--currentTime > 0) {
+				for (currentTime = data.times ; currentTime > 0; currentTime--) {
 					for (i = 0 ; i < arr.length; i++) {
 						arr[i].fn.call(window, Demo.assert);
 					}
@@ -3619,7 +3620,24 @@ Demo.extend(Demo, {
 
 				past = +new Date() - start;
 
-			} while (past < 100);
+			} else {
+
+				do {
+
+					time += 10;
+
+					currentTime = 10;
+					while (--currentTime > 0) {
+						for (i = 0 ; i < arr.length; i++) {
+							arr[i].fn.call(window, Demo.assert);
+						}
+					}
+
+					past = +new Date() - start;
+
+				} while (past < 100);
+
+			}
 			
 		} catch (e) {
 			document.getElementById('demo-testcase-' + id).className = 'demo-tip demo-tip-error';
