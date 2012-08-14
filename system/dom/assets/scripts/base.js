@@ -12,7 +12,7 @@
 // Attribute - 属性部分
 // Event - 事件部分
 // DomReady - 加载部分
-// Dimension - 尺寸部分
+// Dimension - 尺寸部分 
 // Offset - 定位部分
 
 (function(window) {
@@ -699,15 +699,6 @@
 			var elem = this.node;
 			return new Point(elem.scrollLeft, elem.scrollTop);
 		},
-		
-		/**
-		 * 获取窗口滚动大小的方法。
-		 * @type Function
-		 */
-		getWindowScroll = 'pageXOffset' in window ? function() {
-			var win = this.defaultView;
-			return new Point(win.pageXOffset, win.pageYOffset);
-		}: getScroll,
 		
 		/**
 		 * 一个返回 true 的函数。
@@ -1559,13 +1550,13 @@
 		 */
 		implement: function(members, listType, copyIf) {
 		
-			var classes = [DomList.prototype, document, Dom.prototype], i;
+			var classes = [DomList, Dom], i;
 		
 			for(var funcName in members){
 				i = classes.length;
 				while(i--) {
-					if(!copyIf || !classes[i][funcName]) {
-						classes[i][funcName] = i ? members[funcName] : createDomListMthod(funcName, listType);
+					if(!copyIf || !classes[i].prototype[funcName]) {
+						classes[i].prototype[funcName] = i ? members[funcName] : createDomListMthod(funcName, listType);
 					}
 				}
 			}
@@ -2373,11 +2364,20 @@
 		setScroll: function(x, y) {
 			var elem = this.node,
 				offsetPoint = formatPoint(x, y);
-
-			if (offsetPoint.x != null) elem.scrollLeft = offsetPoint.x;
-			if (offsetPoint.y != null) elem.scrollTop = offsetPoint.y;
+				
+			if(elem.nodeType !== 9){
+				if (offsetPoint.x != null) elem.scrollLeft = offsetPoint.x;
+				if (offsetPoint.y != null) elem.scrollTop = offsetPoint.y;
+			} else {
+				if(offsetPoint.x == null)
+					offsetPoint.x = this.getScroll().x;
+				if(offsetPoint.y == null)
+					offsetPoint.y = this.getScroll().y;
+				(elem.defaultView || elem.parentWindow).scrollTo(offsetPoint.x, offsetPoint.y);
+			}
+			
 			return this;
-
+			
 		},
 
 		/**
@@ -2551,9 +2551,20 @@
 		 * <pre lang="htm" format="none">{x=200,y=100}</pre>
 		 */
 		getSize: function() {
-			var elem = this.node;
+			var elem = this.node,
+				x,
+				y;
+				
+			if(elem.nodeType !== 9){
+				x = elem.offsetWidth;
+				y = elem.offsetHeight;
+			} else {
+				elem = elem.documentElement;
+				x = elem.clientWidth;
+				y = elem.clientHeight;
+			}
 		
-			return new Point(elem.offsetWidth, elem.offsetHeight);
+			return new Point(x, y);
 		},
 	
 		/**
@@ -2595,9 +2606,21 @@
 		 * 此方法对可见和隐藏元素均有效。
 		 */
 		getScrollSize: function() {
-			var elem = this.node;
+			var elem = this.node,
+				x,
+				y;
+				
+			if(elem.nodeType !== 9) {
+				x = elem.scrollWidth;
+				y = elem.scrollHeight;
+			} else {
+				var body = elem.body;
+				elem = elem.documentElement;
+				x = Math.max(elem.scrollWidth, body.scrollWidth, elem.clientWidth);
+				y = Math.max(elem.scrollHeight, body.scrollHeight, elem.clientHeight);
+			}
 		
-			return new Point(elem.scrollWidth, elem.scrollHeight);
+			return new Point(x, y);
 		},
 		
 		/**
@@ -2665,59 +2688,19 @@
 		 * #####结果:
 		 * <pre lang="htm" format="none">&lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;left: 0, top: 35&lt;/p&gt;</pre>
 		 */
-		getPosition: div.getBoundingClientRect ? function() {
+		getPosition: function() {
+			
+			// 对于 document，返回 scroll 。
+			if(this.node.nodeType === 9){
+				return this.getScroll();
+			}
+		
 			var elem = this.node, 
 				bound = elem.getBoundingClientRect(),
 				doc = getDocument(elem),
 				html = doc.node,
 				htmlScroll = doc.getScroll();
 			return new Point(bound.left + htmlScroll.x - html.clientLeft, bound.top + htmlScroll.y - html.clientTop);
-		}: function() {
-			var elem = this.node, p = new Point(0, 0), t = elem.parentNode;
-		
-			if(styleString(elem, 'position') === 'fixed')
-				return new Point(elem.offsetLeft, elem.offsetTop).add(document.getScroll());
-		
-			while(t && !rBody.test(t.nodeName)) {
-				p.x -= t.scrollLeft;
-				p.y -= t.scrollTop;
-				t = t.parentNode;
-			}
-			t = elem;
-		
-			while(elem && !rBody.test(elem.nodeName)) {
-				p.x += elem.offsetLeft;
-				p.y += elem.offsetTop;
-				if(navigator.isFirefox) {
-					if(styleString(elem, 'MozBoxSizing') !== 'border-box') {
-						add(elem);
-					}
-					var parent = elem.parentNode;
-					if(parent && styleString(parent, 'overflow') !== 'visible') {
-						add(parent);
-					}
-				} else if(elem !== t && navigator.isSafari) {
-					add(elem);
-				}
-		
-				if(styleString(elem, 'position') === 'fixed') {
-					p = p.add(document.getScroll());
-					break;
-				}
-				elem = elem.offsetParent;
-			}
-			if(navigator.isFirefox && styleString(t, 'MozBoxSizing') !== 'border-box') {
-				p.x -= styleNumber(t, 'borderLeftWidth');
-				p.y -= styleNumber(t, 'borderTopWidth');
-			}
-		
-			function add(elem) {
-				p.x += styleNumber(elem, 'borderLeftWidth');
-				p.y += styleNumber(elem, 'borderTopWidth');
-			}
-		
-			return p;
-
 		},
 	
 		/**
@@ -2740,7 +2723,21 @@
 		 * &lt;p&gt;Hello&lt;/p&gt;&lt;p&gt;scrollTop: 0&lt;/p&gt;
 		 * </pre>
 		 */
-		getScroll: getScroll,
+		getScroll: function() {
+			var elem = this.node,
+				win,
+				x,
+				y;
+			if(elem.nodeType !== 9 || !('pageXOffset' in (win = elem.defaultView || elem.parentWindow))){
+				x = elem.scrollLeft;
+				y = elem.scrollTop;
+			} else {
+				x = win.pageXOffset;
+				y = win.pageYOffset;
+			}
+			
+			return new Point(x, y);
+		},
 
 		/**
 		 * 获取当前 Dom 对象的在原节点的位置。
@@ -3254,10 +3251,6 @@
 			return html;
 		};
 
-		document[key] = function(html) {
-			return new Dom(this.body)[key](html);
-		};
-
 		DomList.prototype[key] = function(html) {
 			var r;
 			if (typeof html === 'string') {
@@ -3282,24 +3275,9 @@
 	 * @namespace document
 	 * @ignore
 	 */
-	Object.extend(document, {
+	extend(document, {
 
-		node: document.documentElement,
-
-		// document 函数。
-		once: Dom.prototype.once,
-
-		dataField: Dom.prototype.dataField,
-
-		getProp: function(name){
-			return Dom.getProp(this, name);
-		},
-		
-		remove: function() {
-			var body = new Dom(this.body);
-			body.remove.apply(body, arguments);
-			return this;
-		},
+		node: document,
 		
 		find: function(selector){
 			assert.isString(selector, "Dom.prototype.find(selector): selector ~");
@@ -3327,62 +3305,6 @@
 				result = query(selector, this);
 			}
 			return new DomList(result);
-		},
-		
-		/**
-		 * 获取元素可视区域大小。包括 padding 和 border 大小。
-		 * @return {Point} 位置。
-		 */
-		getSize: function() {
-			var doc = this.node;
-
-			return new Point(doc.clientWidth, doc.clientHeight);
-		},
-		
-		/**
-		 * 获取滚动区域大小。
-		 * @return {Point} 位置。
-		 */
-		getScrollSize: function() {
-			var html = this.node, min = this.getSize(), body = this.body;
-
-			return new Point(Math.max(html.scrollWidth, body.scrollWidth, min.x), Math.max(html.scrollHeight, body.scrollHeight, min.y));
-		},
-
-		/**
-		 * 获取距父元素的偏差。
-		 * @return {Point} 位置。
-		 */
-		getPosition: getWindowScroll,
-
-		/**
-		 * 获取滚动条已滚动的大小。
-		 * @return {Point} 位置。
-		 */
-		getScroll: getWindowScroll,
-
-		/**
-		 * 滚到。
-		 * @method setScroll
-		 * @param {Number} x 坐标。
-		 * @param {Number} y 坐标。
-		 * @return {Document} this 。
-		 * 传递参数值时，设置垂直滚动条顶部偏移为该值。
-		 * @example
-		 * 设置相对滚动条顶部的偏移
-		 * #####JavaScript: <pre>
-		 * Dom.query("div.demo").setScroll(300);
-		 *</pre>
-		 */
-		setScroll: function(x, y) {
-			var doc = this, offsetPoint = formatPoint(x, y);
-			if(offsetPoint.x == null)
-				offsetPoint.x = doc.getScroll().x;
-			if(offsetPoint.y == null)
-				offsetPoint.y = doc.getScroll().y;
-			(doc.defaultView || doc.parentWindow).scrollTo(offsetPoint.x, offsetPoint.y);
-
-			return doc;
 		}
 		
 	});
@@ -3435,10 +3357,8 @@
 	Dom.defineMethod('node', 'scrollIntoView focus blur select click submit reset');
 
 	// document 函数。
-	map('on un trigger', function (name) {
-		document[name] = function(){
-			return Dom.document[name].apply(Dom.document, arguments);
-		};
+	map('on un trigger once delegate dataField getElements getPosition getScroll getScrollSize first last parent child children hasChild', function (funcName) {
+		document[funcName] = Dom.prototype[funcName];
 	});
 	
 	// DomList 函数。
@@ -3858,7 +3778,7 @@
 	 * @return {Document} 文档。
 	 */
 	function getDocument(elem) {
-		assert(elem && (elem.nodeType || elem.setInterval), 'Dom.getDocument(elem): {elem} 必须是节点。', elem);
+		assert.isNode(elem, 'Dom.getDocument(elem): {elem} ~', elem);
 		return elem.ownerDocument || elem.document || elem;
 	}
 
@@ -3983,7 +3903,7 @@
 
 		if (cloneDataAndEvent !== false && (cloneDataAndEvent = srcElem.$data)) {
 
-			destElem.$data = cloneDataAndEvent = Object.extend({}, cloneDataAndEvent);
+			destElem.$data = cloneDataAndEvent = extend({}, cloneDataAndEvent);
 			
 			// event 作为系统内部对象。事件的拷贝必须重新进行 on 绑定。
 			var event = cloneDataAndEvent.$event, dest;
@@ -4259,6 +4179,7 @@
 				// 解析的第三步: 解析剩余的选择器:获取所有子节点。第四步再一一筛选。
 			} else {
 				result = result.getElements();
+				result = new DomList(result);
 			}
 			
 			// 解析的第四步: 筛选以上三步返回的结果。

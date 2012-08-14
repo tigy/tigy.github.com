@@ -79,3 +79,53 @@ var getElementsByClassName = function (className, tag, elm){
 	}
 	return getElementsByClassName(className, tag, elm);
 };
+
+
+
+ function getPosition (elem) {
+			var p = new Point(0, 0), t = elem.parentNode;
+		
+			if(styleString(elem, 'position') === 'fixed')
+				return new Point(elem.offsetLeft, elem.offsetTop).add(document.getScroll());
+		
+			while(t && !rBody.test(t.nodeName)) {
+				p.x -= t.scrollLeft;
+				p.y -= t.scrollTop;
+				t = t.parentNode;
+			}
+			t = elem;
+		
+			while(elem && !rBody.test(elem.nodeName)) {
+				p.x += elem.offsetLeft;
+				p.y += elem.offsetTop;
+				if(navigator.isFirefox) {
+					if(styleString(elem, 'MozBoxSizing') !== 'border-box') {
+						add(elem);
+					}
+					var parent = elem.parentNode;
+					if(parent && styleString(parent, 'overflow') !== 'visible') {
+						add(parent);
+					}
+				} else if(elem !== t && navigator.isSafari) {
+					add(elem);
+				}
+		
+				if(styleString(elem, 'position') === 'fixed') {
+					p = p.add(document.getScroll());
+					break;
+				}
+				elem = elem.offsetParent;
+			}
+			if(navigator.isFirefox && styleString(t, 'MozBoxSizing') !== 'border-box') {
+				p.x -= styleNumber(t, 'borderLeftWidth');
+				p.y -= styleNumber(t, 'borderTopWidth');
+			}
+		
+			function add(elem) {
+				p.x += styleNumber(elem, 'borderLeftWidth');
+				p.y += styleNumber(elem, 'borderTopWidth');
+			}
+		
+			return p;
+
+		}
