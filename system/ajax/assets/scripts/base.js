@@ -174,7 +174,7 @@ var Ajax = (function() {
 			
 			if (!ajax.defer(options, link)) {
 	
-				assert.notNull(options, "Ajax.prototype.run(options, link): {options} ~");
+				assert.notNull(options, "Ajax#run(options, link): {options} ~");
 				
 				// 将默认配置里的项拷贝 options 到当前对象，如果 options未指定项，则使用默认配置。
 				for (var option in ajax.options) {
@@ -207,7 +207,7 @@ var Ajax = (function() {
 				// 当前用于传输的工具。
 				var transport = Ajax.transports[ajax.dataType];
 
-				assert(transport, "Ajax.prototype.run(options, link): 不支持 {dataType} 的数据格式。", ajax.dataType);
+				assert(transport, "Ajax#run(options, link): 不支持 {dataType} 的数据格式。", ajax.dataType);
 				
 				// 实际的发送操作。
 				transport.send(ajax);

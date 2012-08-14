@@ -136,8 +136,6 @@ using("System.Dom.Base");
 			 * @param {Object} to 结束。
 			 */
 			init: function (options) {
-			//	assert.notNull(from, "Fx.Animate.prototype.run(from, to, duration, callback, link): 参数 {from} ~。");
-			//	assert.notNull(to, "Fx.Animate.prototype.run(from, to, duration, callback, link): 参数 {to} ~。");
 					
 				// 对每个设置属性
 				var me = this,
@@ -191,7 +189,7 @@ using("System.Dom.Base");
 							parser: parser
 						};
 						
-						assert(me.current[key].from !== null && me.current[key].to !== null, "Animate.prototype.init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, me.current[key].from, me.current[key].to);
+						assert(me.current[key].from !== null && me.current[key].to !== null, "Animate#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, me.current[key].from, me.current[key].to);
 					}
 					
 				}
@@ -535,7 +533,7 @@ using("System.Dom.Base");
 		 * @return this
 		 */
 		highlight: function(color, duration, callback){
-			assert(!callback || Object.isFunction(callback), "Dom.prototype.highlight(color, duration, callback): 参数 {callback} 不是可执行的函数。", callback);
+			assert(!callback || Object.isFunction(callback), "Dom#highlight(color, duration, callback): 参数 {callback} 不是可执行的函数。", callback);
 			var from = {},
 				to = {
 					backgroundColor: color || '#ffff88'
