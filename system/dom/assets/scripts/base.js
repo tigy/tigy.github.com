@@ -111,7 +111,7 @@
 			 * @param {Node} node 封装的元素。
 			 */
 			constructor: function(node) {
-				assert.isNode(node, "Dom.prototype.constructor(node): {node} 必须是 DOM 节点。");
+				assert.isNode(node, "Dom#constructor(node): {node} 必须是 DOM 节点。");
 				this.node = node;
 
 				/// TODO: clear
@@ -126,8 +126,8 @@
 			 * @protected virtual
 			 */
 			attach: function(parentNode, refNode) {
-				assert(parentNode && parentNode.nodeType, 'Dom.prototype.attach(parentNode, refNode): {parentNode} 必须是 DOM 节点。', parentNode);
-				assert(refNode === null || refNode.nodeType, 'Dom.prototype.attach(parentNode, refNode): {refNode} 必须是 null 或 DOM 节点 。', refNode);
+				assert(parentNode && parentNode.nodeType, 'Dom#attach(parentNode, refNode): {parentNode} 必须是 DOM 节点。', parentNode);
+				assert(refNode === null || refNode.nodeType, 'Dom#attach(parentNode, refNode): {refNode} 必须是 null 或 DOM 节点 。', refNode);
 				parentNode.insertBefore(this.node, refNode);
 			},
 		
@@ -137,7 +137,7 @@
 			 * @protected virtual
 			 */
 			detach: function(parentNode) {
-				assert(parentNode && parentNode.removeChild, 'Dom.prototype.detach(parentNode): {parentNode} 必须是 DOM 节点 Dom 对象。', parent);
+				assert(parentNode && parentNode.removeChild, 'Dom#detach(parentNode): {parentNode} 必须是 DOM 节点 Dom 对象。', parent);
 				parentNode.removeChild(this.node);
 			},
 		
@@ -148,7 +148,7 @@
 			 * @protected virtual
 			 */
 			insertBefore: function(childControl, refControl) {
-				assert(childControl && childControl.attach, 'Dom.prototype.insertBefore(childControl, refControl): {childControl} 必须 Dom 对象。', childControl);
+				assert(childControl && childControl.attach, 'Dom#insertBefore(childControl, refControl): {childControl} 必须 Dom 对象。', childControl);
 				childControl.attach(this.node, refControl && refControl.node || null);
 			},
 		
@@ -158,7 +158,7 @@
 			 * @protected virtual
 			 */
 			removeChild: function(childControl) {
-				assert(childControl && childControl.detach, 'Dom.prototype.removeChild(childControl): {childControl} 必须 Dom 对象。', childControl);
+				assert(childControl && childControl.detach, 'Dom#removeChild(childControl): {childControl} 必须 Dom 对象。', childControl);
 				childControl.detach(this.node);
 			}
 			
@@ -223,28 +223,37 @@
 			
 			/**
 			 * 对当前集合的每个节点的 Dom 封装调用其指定属性名的函数，并将返回值放入新的数组返回。
-			 * @param {String} fnName 要调用的函数名。
-			 * @param {Array} args 调用时的参数数组。
+			 * @param {String} funcName 要调用的函数名。
+			 * @param {Array} args=[] 调用时的参数数组。
 			 * @return {Array} 返回包含执行结果的数组。
 			 * @see Array#see
 			 */
-			invoke: function(fnName, args) {
+			invoke: function(funcName, args) {
 				args = args || [];
 				var r = [];
-				assert(Dom.prototype[fnName] && Dom.prototype[fnName].apply, "DomList.prototype.invoke(fnName, args): Dom 不包含方法 {fnName}。", fnName);
-				ap.forEach.call(this, function(value) {
+				assert(dp[funcName] && dp[funcName].apply, "DomList#invoke(funcName): {funcName} 不是 Dom 对象的方法。", funcName);
+				this.forEach(function(value) {
 					value = new Dom(value);
-					r.push(value[fnName].apply(value, args));
+					r.push(value[funcName].apply(value, args));
 				});
 				return r;
 			},
+			
+			///TODO: clear
+			
+			concat: function(){
+				assert.deprected('DomList#concat 已过时，请改用 DomList#add');
+				return this.add.apply(this, arguments);
+			},
+			
+			///TODO: clear
 			
 			/**
 			 * 将参数节点添加到当前集合。
 			 * @param {Node/NodeList/Array/DomList} ... 要增加的节点。
 			 * @return this
 			 */
-			concat: function() {
+			add: function() {
 				for (var args = arguments, i = 0, value; i < args.length; i++) {
 					value = args[i], j = -1;
 					if(value){
@@ -265,8 +274,8 @@
 			 * @return {DomList} 满足要求的元素的新 DomList 对象。
 			 */
 			filter: function(expression) {
-				return new DomList(ap.filter.call(this, typeof expression === 'string' ? function(value){
-					return Dom.match(value, expression);
+				return new DomList(ap.filter.call(this, typeof expression === 'string' ? function(elem){
+					return Dom.match(elem, expression);
 				} : expression));
 			},
 			
@@ -323,7 +332,7 @@
 			 * @return {Point} this
 			 */
 			add: function(p) {
-				assert(p && 'x' in p && 'y' in p, "Point.prototype.add(p): {p} 必须有 'x' 和 'y' 属性。", p);
+				assert(p && 'x' in p && 'y' in p, "Point#add(p): {p} 必须有 'x' 和 'y' 属性。", p);
 				return new Point(this.x + p.x, this.y + p.y);
 			},
 
@@ -333,7 +342,7 @@
 			 * @return {Point} this
 			 */
 			sub: function(p) {
-				assert(p && 'x' in p && 'y' in p, "Point.prototype.sub(p): {p} 必须有 'x' 和 'y' 属性。", p);
+				assert(p && 'x' in p && 'y' in p, "Point#sub(p): {p} 必须有 'x' 和 'y' 属性。", p);
 				return new Point(this.x - p.x, this.y - p.y);
 			}
 		}),
@@ -405,6 +414,10 @@
 
 		},
 
+		pep,
+		
+		dp = Dom.prototype,
+
 		/**
 		 * 处理 <div/> 格式标签的正则表达式。
 		 * @type RegExp
@@ -456,8 +469,7 @@
 		},
 		
 		styleFix = {
-			height: 'setHeight',
-			width: 'setWidth'
+			
 		},
 		
 		/**
@@ -658,7 +670,7 @@
 					case 'width':
 						return elem.offsetWidth === 0 ? 'auto': elem.offsetWidth -  Dom.calc(elem, 'bx+px') + 'px';
 					case 'opacity':
-						return new Dom(elem).getOpacity().toString();
+						return '' + rOpacity.test(styleString(elem, 'filter')) ? parseInt(RegExp.$1) / 100: 1;
 				}
 			}
 			// currentStyle：IE的样式获取方法,runtimeStyle是获取运行时期的样式。
@@ -731,9 +743,7 @@
 		 */
 		domReady,
 
-		t,
-
-		pep;
+		t;
 	
 	/// #region Dom
 	
@@ -1074,7 +1084,7 @@
 	 	 * @static
 		 */
 		match: function (elem, selector) {
-			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
+			assert.isString(selector, "Dom#find(selector): selector ~。");
 			
 			if(elem.nodeType !== 1)
 				return false;
@@ -1170,7 +1180,7 @@
 		// * @return {Object} 一个用于存储数据的对象，该对象和指定节点绑定。
 		// */
 		//dataField: function(elem){
-		//	return Dom.prototype.dataField.call({dom: elem});
+		//	return Dom#dataField.call({dom: elem});
 		//},
 		
 		/**
@@ -1362,11 +1372,15 @@
 		 */
 		window: new Dom(window),
 		
+		/// TODO: clear
+		
 		/**
 		 * 获取 document 对象的 Dom 对象封装示例。
 	 	 * @static
 		 */
 		document: new Dom(document),
+		
+		/// TODO: clear
 
 		/**
 		 * 获取元素的计算样式。
@@ -1611,7 +1625,7 @@
 			 * @constructor
 			 */
 			constructor: function(target, type, e) {
-				assert.notNull(target, "Dom.Event.prototype.constructor(target, type, e): {target} ~");
+				assert.notNull(target, "Dom.Event#constructor(target, type, e): {target} ~");
 
 				var me = this;
 				me.target = target;
@@ -1650,7 +1664,7 @@
 			 * @return {Dom} 发生事件 Dom 对象。
 			 */
 			getTarget: function() {
-				assert(this.target, "Dom.Event.prototype.getTarget(): 当前事件不支持 getTarget 操作");
+				assert(this.target, "Dom.Event#getTarget(): 当前事件不支持 getTarget 操作");
 				return new Dom(this.target.nodeType === 3 ? this.target.parentNode: this.target);
 			}
 		})
@@ -1722,7 +1736,7 @@
 		remove: function(child) {
 
 			if (arguments.length) {
-				assert(child && this.hasChild(child), 'Dom.prototype.remove(child): {child} 不是当前节点的子节点', child);
+				assert(child && this.hasChild(child), 'Dom#remove(child): {child} 不是当前节点的子节点', child);
 				this.removeChild(child);
 			} else if (child = this.parentControl || this.parent()) {
 				child.removeChild(this);
@@ -1795,8 +1809,8 @@
 			// 获取样式
 			var me = this;
 
-			assert.isString(name, "Dom.prototype.setStyle(name, value): {name} ~");
-			assert.isElement(me.node, "Dom.prototype.setStyle(name, value): 当前 dom 不支持样式");
+			assert.isString(name, "Dom#setStyle(name, value): {name} ~");
+			assert.isElement(me.node, "Dom#setStyle(name, value): 当前 dom 不支持样式");
 
 			// 设置通用的属性。
 			if (arguments.length == 1) {
@@ -1806,12 +1820,12 @@
 			} else if (name in styleFix) {
 
 				// setHeight setWidth setOpacity
-				return me[styleFix[name]](value);
+				return styleFix[name].call(me, value);
 
 			} else {
 				name = name.replace(rStyle, formatStyle);
 
-				assert(value || !isNaN(value), "Dom.prototype.setStyle(name, value): {value} 不是正确的属性值。", value);
+				assert(value || !isNaN(value), "Dom#setStyle(name, value): {value} 不是正确的属性值。", value);
 
 				// 如果值是函数，运行。
 				if (typeof value === "number" && !(name in Dom.styleNumbers))
@@ -1825,62 +1839,6 @@
 			return me;
 
 		},
-
-		/**
-		 * 设置当前 Dom 对象的透明度。
-		 * @param {Number} value 要设置的透明度， 0 表示完全透明，  1 表示不透明。
-		 * @return this
-		 * @remark 此函数等效于 setStyle('opacity', value);
-		 */
-		setOpacity: 'opacity' in div.style ? function(value) {
-
-			assert(value <= 1 && value >= 0, 'Dom.prototype.setOpacity(value): {value} 必须在 0~1 间。', value);
-			assert.isElement(this.node, "Dom.prototype.setStyle(name, value): 当前 dom 不支持样式");
-
-			// 标准浏览器使用 opacity
-			this.node.style.opacity = value;
-			return this;
-
-		} : function(value) {
-			var elem = this.node, style = elem.style;
-
-			assert(!+value || (value <= 1 && value >= 0), 'Dom.prototype.setOpacity(value): {value} 必须在 0~1 间。', value);
-			assert.isElement(elem, "Dom.prototype.setStyle(name, value): 当前 dom 不支持样式");
-
-			if (value)
-				value *= 100;
-			value = value || value === 0 ? 'opacity=' + value : '';
-
-			// 获取真实的滤镜。
-			elem = styleString(elem, 'filter');
-
-			assert(!/alpha\([^)]*\)/i.test(elem) || rOpacity.test(elem), 'Dom.prototype.setOpacity(value): 当前元素的 {filter} CSS属性存在不属于 alpha 的 opacity， 将导致 setOpacity 不能正常工作。', elem);
-
-			// 当元素未布局，IE会设置失败，强制使生效。
-			style.zoom = 1;
-
-			// 设置值。
-			style.filter = rOpacity.test(elem) ? elem.replace(rOpacity, value) : (elem + ' alpha(' + value + ')');
-
-			return this;
-
-		},
-
-		/// #else
-
-		/// setOpacity: function (value) {
-		///
-		/// 	assert(value <= 1 && value >= 0,
-		//   'Dom.prototype.setOpacity(value): {value} 必须在 0~1 间。',
-		//    value);
-		///
-		/// 	// 标准浏览器使用 opacity
-		/// 	(this.node).style.opacity = value;
-		/// 	return this;
-		///
-		/// },
-
-		/// #endif
 
 		/**
 		 * 向用户显示当前 Dom 对象。
@@ -1949,15 +1907,15 @@
 		 * @return this
 		 */
 		unselectable: 'unselectable' in div ? function(value) {
-			assert.isElement(this.node, "Dom.prototype.unselectable(value): 当前 dom 不支持此操作");
+			assert.isElement(this.node, "Dom#unselectable(value): 当前 dom 不支持此操作");
 			this.node.unselectable = value !== false ? 'on' : '';
 			return this;
 		} : 'onselectstart' in div ? function(value) {
-			assert.isElement(this.node, "Dom.prototype.unselectable(value): 当前 dom 不支持此操作");
+			assert.isElement(this.node, "Dom#unselectable(value): 当前 dom 不支持此操作");
 			this.node.onselectstart = value !== false ? Function.from(false) : null;
 			return this;
 		} : function(value) {
-			assert.isElement(this.node, "Dom.prototype.unselectable(value): 当前 dom 不支持此操作");
+			assert.isElement(this.node, "Dom#unselectable(value): 当前 dom 不支持此操作");
 			this.node.style.MozUserSelect = value !== false ? 'none' : '';
 			return this;
 		},
@@ -1989,7 +1947,7 @@
 		 */
 		setAttr: function(name, value) {
 
-			//assert(name !== 'type' || elem.tagName !== "INPUT" || !elem.parentNode, "Dom.prototype.setAttr(name, type): 无法修改INPUT元素的 type 属性。");
+			//assert(name !== 'type' || elem.tagName !== "INPUT" || !elem.parentNode, "Dom#setAttr(name, type): 无法修改INPUT元素的 type 属性。");
 
 			var elem = this.node;
 			
@@ -2093,7 +2051,7 @@
 		 * <pre lang="htm" format="none">[ &lt;p class="selected highlight"&gt;Hello&lt;/p&gt; ]</pre>
 		 */
 		addClass: function(className) {
-			assert.isString(className, "Dom.prototype.addClass(className): {className} ~");
+			assert.isString(className, "Dom#addClass(className): {className} ~");
 
 			var elem = this.node, classList = className.split(/\s+/), newClass, i;
 
@@ -2134,7 +2092,7 @@
 		 * </pre>
 		 */
 		removeClass: function(className) {
-			assert(!className || className.split, "Dom.prototype.removeClass(className): {className} ~");
+			assert(!className || className.split, "Dom#removeClass(className): {className} ~");
 
 			var elem = this.node, classList, newClass = "", i;
 
@@ -2216,7 +2174,7 @@
 			var elem = this.node,
 				map = tagFix.$default;
 
-			assert(elem.nodeType === 1, "Dom.prototype.setHtml(value): {elem} 不是元素节点(nodeType === 1), 无法执行 setHtml。", elem);
+			assert(elem.nodeType === 1, "Dom#setHtml(value): {elem} 不是元素节点(nodeType === 1), 无法执行 setHtml。", elem);
 
 			value = (map[1] + value + map[2]).replace(rXhtmlTag, "<$1></$2>");
 			try {
@@ -2322,7 +2280,7 @@
 		 */
 		setOffset: function(offsetPoint) {
 
-			assert(Object.isObject(offsetPoint), "Dom.prototype.setOffset(offsetPoint): {offsetPoint} 必须有 'x' 和 'y' 属性。", offsetPoint);
+			assert(Object.isObject(offsetPoint), "Dom#setOffset(offsetPoint): {offsetPoint} 必须有 'x' 和 'y' 属性。", offsetPoint);
 			var style = this.node.style;
 
 			if (offsetPoint.y != null)
@@ -2427,7 +2385,7 @@
 		 */
 		delegate: function(selector, eventName, handler) {
 
-			assert.isFunction(handler, "Dom.prototype.delegate(selector, eventName, handler): {handler}  ~");
+			assert.isFunction(handler, "Dom#delegate(selector, eventName, handler): {handler}  ~");
 
 			var eventInfo = Dom.$event[eventName];
 
@@ -2463,36 +2421,12 @@
 		
 			var elem = this.node;
 		
-			assert.isString(name, "Dom.prototype.getStyle(name): {name} ~");
-			assert(elem.style, "Dom.prototype.getStyle(name): 当 Dom 对象对应的节点不是元素，无法使用样式。");
+			assert.isString(name, "Dom#getStyle(name): {name} ~");
+			assert(elem.style, "Dom#getStyle(name): 当 Dom 对象对应的节点不是元素，无法使用样式。");
 		
 			return elem.style[name = name.replace(rStyle, formatStyle)] || getStyle(elem, name);
 		
 		},
-	
-		/// #if CompactMode
-		
-		/**
-		 * 获取当前 Dom 对象的透明度。
-		 * @method
-		 * @return {Number} 透明度。0 表示完全透明，  1 表示不透明。
-		 * @remark 此函数等效于 getStyle('opacity', value);
-		 */
-		getOpacity: 'opacity' in div.style ? function() {
-			return styleNumber(this.node, 'opacity');
-		}: function() {
-			return rOpacity.test(styleString(this.node, 'filter')) ? parseInt(RegExp.$1) / 100: 1;
-		},
-	
-		/// #else
-		///
-		/// getOpacity: function () {
-		///
-		/// 	return styleNumber(this.node, 'opacity');
-		///
-		/// },
-		
-		/// #endif
 		
 		/**
 		 * 获取当前 Dom 对象的 HTML 属性值。
@@ -2542,7 +2476,7 @@
 		 * <pre lang="htm" format="none">"&lt;p/&gt;"</pre>
 		 */
 		getHtml: function() {
-			assert(this.node.nodeType === 1, "Dom.prototype.getHtml(): 仅当 dom.nodeType === 1 时才能使用此函数。"); 
+			assert(this.node.nodeType === 1, "Dom#getHtml(): 仅当 dom.nodeType === 1 时才能使用此函数。"); 
 			return this.node.innerHTML;
 		},
 	
@@ -2928,7 +2862,7 @@
 		 * @return {DomList} 返回一个 DomList 对象。
 		 */
 		siblings: function(args) {
-			return this.prevAll(args).concat(this.nextAll(args));
+			return this.prevAll(args).add(this.nextAll(args));
 		},
 
 		/**
@@ -2982,8 +2916,8 @@
 		 * <pre lang="htm" format="none">[ &lt;span&gt;Hello&lt;/span&gt; ]</pre>
 		 */
 		query: function(selector){
-			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
-			assert(selector, "Dom.prototype.find(selector): {selector} 不能为空。", selector);
+			assert.isString(selector, "Dom#find(selector): selector ~。");
+			assert(selector, "Dom#find(selector): {selector} 不能为空。", selector);
 			var elem = this.node, result;
 			
 			if(elem.nodeType !== 1) {
@@ -3061,7 +2995,7 @@
 		 * <pre lang="htm" format="none">[ &lt;span&gt;Hello&lt;/span&gt; ]</pre>
 		 */
 		find: function(selector) {
-			assert.isString(selector, "Dom.prototype.find(selector): selector ~");
+			assert.isString(selector, "Dom#find(selector): selector ~");
 			var elem = this.node, result;
 			if (elem.nodeType !== 1) {
 				return document.find.call(this, selector)
@@ -3231,7 +3165,7 @@
 		}
 
 	}, function(value, key) {
-		Dom.prototype[key] = function(html) {
+		dp[key] = function(html) {
 			html = Dom.parse(html, this);
 			
 			value(this, html);
@@ -3296,7 +3230,7 @@
 		node: document,
 		
 		find: function(selector){
-			assert.isString(selector, "Dom.prototype.find(selector): selector ~");
+			assert.isString(selector, "Dom#find(selector): selector ~");
 			var result;
 			try{
 				result = this.querySelector(selector);
@@ -3313,7 +3247,7 @@
 		 * @return {Element/undefined} 节点。
 		 */
 		query: function(selector){
-			assert.isString(selector, "Dom.prototype.find(selector): selector ~。");
+			assert.isString(selector, "Dom#find(selector): selector ~。");
 			var result;
 			try{
 				result = this.querySelectorAll(selector);
@@ -3335,14 +3269,10 @@
 	tagFix.th = tagFix.td;
 
 	// 初始化 attrFix。
-	map("enctype encoding action method target", function(value) {
-		attrFix[value] = formHook;
-	});
+	map("enctype encoding action method target", formHook, attrFix);
 
 	// 初始化 attrFix。
-	map("defaultChecked defaultSelected readOnly disabled autofocus autoplay async controls hidden loop open required scoped compact noWrap isMap declare noshade multiple noresize defer useMap", function(value) {
-		attrFix[value] = boolHook;
-	});
+	map("defaultChecked defaultSelected readOnly disabled autofocus autoplay async controls hidden loop open required scoped compact noWrap isMap declare noshade multiple noresize defer useMap", boolHook, attrFix);
 
 	// 初始化 propFix。
 	map("readOnly tabIndex defaultChecked defaultSelected accessKey useMap contentEditable maxLength", function(value) {
@@ -3354,17 +3284,13 @@
 		propFix[value.toLowerCase()] = value;
 		attrFix[value] = propHook;
 	});
-
-	//function setAll(target, props, value, i) {
-	//	i = (props = props.split(' ')).length;
-	//	while (i--) {
-	//		target[props[i]] = value;
-	//	}
-	//}
 	
 	// 初始化 textFix。
 	textFix.INPUT = textFix.SELECT = textFix.TEXTAREA = 'value';
 	textFix['#text'] = textFix['#comment'] = 'nodeValue';
+	
+	styleFix.height = dp.setHeight;
+	styleFix.width = dp.setWidth;
 	
 	// 初始化事件对象。
 	Dom.addEvents('$default', eventObj);
@@ -3373,15 +3299,17 @@
 	Dom.defineMethod('node', 'scrollIntoView focus blur select click submit reset');
 	
 	// 拷贝 DOM Event 到 document 。
-	if(document.constructor){
-		document.constructor.$event = Dom.$event;
+	t = document.constructor;
+	if(t){
+		t.$event = Dom.$event;
+		t.base = Dom.base;
 	} else {
 		document.constructor = Dom;
 	}
 
 	// document 函数。
 	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize first last parent child children hasChild', function (funcName) {
-		document[funcName] = Dom.prototype[funcName];
+		document[funcName] = dp[funcName];
 	});
 	
 	// DomList 函数。
@@ -3398,8 +3326,6 @@
 	// 其它对象。
 	pep = Dom.Event.prototype;
 	Point.format = formatPoint;
-
-	/// #if CompactMode
 
 	var mousEnterEventInfo = {
 		initEvent: function (e) {
@@ -3427,9 +3353,11 @@
 			delegate: 'focusout'
 		});
 
+	/// #if CompactMode
+
 	if(isStd) {
 
-		/// #endif
+	/// #endif
 
 		t = window.Event.prototype;
 		t.stop = pep.stop;
@@ -3439,10 +3367,10 @@
 		if (div.onfocusin !== null) {
 
 			Dom.addEvents('focusin focusout', {
-				bind: function(elem, type, fnName) {
+				fix: function(elem, type, funcName) {
 					var base = type === 'focusin' ? 'focus' : 'blur';
 					var doc = elem.node.ownerDocument || elem.node;
-					doc[fnName](base, this.handler, true);
+					doc[funcName](base, this.handler, true);
 				},
 				handler: function(e) {
 					var type = e.type === 'focus' ? 'focusin' : 'focusout';
@@ -3459,10 +3387,10 @@
 					document.trigger(type, e);
 				},
 				add: function(elem, type, fn) {
-					this.bind(elem, type, 'addEventListener');
+					this.fix(elem, type, 'addEventListener');
 				},
 				remove: function() {
-					this.bind(elem, type, 'removeEventListener');
+					this.fix(elem, type, 'removeEventListener');
 				}
 			});
 
@@ -3476,7 +3404,8 @@
 				}
 			});
 		}
-		/// #if CompactMode
+	/// #if CompactMode
+	
 	} else {
 
 		eventObj.initEvent = function (e) {
@@ -3510,10 +3439,31 @@
 		});
 		
 		domReady = 'readystatechange';
+		
+		styleFix.opacity = function(value){
+			var elem = this.node, style = elem.style;
 
-		if (!('opacity' in div.style)) {
-			styleFix.opacity = 'setOpacity';
-		}
+			assert(!+value || (value <= 1 && value >= 0), 'Dom#setOpacity(value): {value} 必须在 0~1 间。', value);
+			assert.isElement(elem, "Dom#setStyle(name, value): 当前 dom 不支持样式");
+
+			if (value)
+				value *= 100;
+			value = value || value === 0 ? 'opacity=' + value : '';
+
+			// 获取真实的滤镜。
+			elem = styleString(elem, 'filter');
+
+			assert(!/alpha\([^)]*\)/i.test(elem) || rOpacity.test(elem), 'Dom#setOpacity(value): 当前元素的 {filter} CSS属性存在不属于 alpha 的 opacity， 将导致 setOpacity 不能正常工作。', elem);
+
+			// 当元素未布局，IE会设置失败，强制使生效。
+			style.zoom = 1;
+
+			// 设置值。
+			style.filter = rOpacity.test(elem) ? elem.replace(rOpacity, value) : (elem + ' alpha(' + value + ')');
+
+			return this;
+
+		};
 
 		Dom.cloneFix.SCRIPT = 'text';
 
@@ -3705,7 +3655,7 @@
 					Dom.ready();
 
 				} else {
-					isFn = Dom.document;
+					isFn = document;
 					fn = domReady;
 				}
 
@@ -3736,7 +3686,7 @@
 	if(document.readyState !== "complete") {
 
 		// 使用系统文档完成事件。
-		eventObj.add(Dom.document, domReady, Dom.ready);
+		eventObj.add(document, domReady, Dom.ready);
 
 		eventObj.add(Dom.window, 'load', Dom.load, false);
 
@@ -3785,6 +3735,7 @@
 	
 	div = null;
 
+	// 导出类。
 	extend(window, {
 
 		Dom: Dom,
@@ -3794,15 +3745,51 @@
 		DomList: DomList
 
 	});
-
-	Object.extendIf(window, {
-		$: Dom.get,
-		$$: Dom.query
-	});
+	
+	// 导出函数。
+	window.$ = window.$ || Dom.get;
+	window.$$ = window.$$ || Dom.query;
 	
 	/**
 	 * @class
 	 */
+
+	function createDomListMthod(funcName, listType){
+		return !listType ? function () {
+			// 为每个 Dom 对象调用 funcName 。
+			var i = 0, len = this.length, target;
+			while(i < len) {
+				target = new Dom(this[i++]);
+				target[funcName].apply(target, arguments);
+			}
+			return this;
+		} : listType === 2 ? function() {
+			// 返回第一个元素的对应值 。
+			if(this.length) {
+				var target = new Dom(this[0]);
+				return target[funcName].apply(target, arguments);
+			}
+		} : listType === 3 ? function() {
+			// 将返回的每个节点放入新的 DomList 中。
+			var r = new DomList;
+			return r.add.apply(r, this.invoke(funcName, arguments));
+		} : function() {
+			// 只要有一个返回非 false，就返回这个值。
+			var i = 0, r, target;
+			while (i < this.length && !r) {
+				target = new Dom(this[i++]);
+				r = target[func].apply(target, arguments);
+			}
+			return r;
+		};
+	}
+
+	function each(nodelist, fn) {
+		var i = 0, node;
+		while( node = nodelist[i++]){
+			fn(node);
+		}
+	}
 
 	/**
 	 * 获取元素的文档。
@@ -3816,7 +3803,6 @@
 
 	/**
 	 * 返回简单的遍历函数。
-	 * @param {Boolean} getFirst 返回第一个还是返回所有元素。
 	 * @param {String} next 获取下一个成员使用的名字。
 	 * @param {String} first=next 获取第一个成员使用的名字。
 	 * @return {Function} 遍历函数。
@@ -3841,6 +3827,12 @@
 		};
 	}
 
+	/**
+	 * 返回简单的遍历函数。
+	 * @param {String} next 获取下一个成员使用的名字。
+	 * @param {String} first=next 获取第一个成员使用的名字。
+	 * @return {Function} 遍历函数。
+	 */
 	function createTreeDir(next, first) {
 		first = first || next;
 		return function(args) {
@@ -3897,7 +3889,7 @@
 			
 		}
 
-		assert.isFunction(args, "Dom.prototype.xxxAll(args): {args} 必须是一个函数、空、数字或字符串。", args);
+		assert.isFunction(args, "Dom#xxxAll(args): {args} 必须是一个 null、函数、数字或字符串。", args);
 		
 		return args;
 	}
@@ -4049,63 +4041,22 @@
 		};
 	}
 	
-	function createDomListMthod(funcName, listType){
-		return !listType ? function () {
-			// 为每个 Dom 对象调用 funcName 。
-			var i = 0, len = this.length, target;
-			while(i < len) {
-				target = new Dom(this[i++]);
-				target[funcName].apply(target, arguments);
-			}
-			return this;
-		} : listType === 2 ? function() {
-			// 返回第一个元素的对应值 。
-			if(this.length) {
-				var target = new Dom(this[0]);
-				return target[funcName].apply(target, arguments);
-			}
-		} : listType === 3 ? function() {
-			// 将返回的每个节点放入新的 DomList 中。
-			var r = new DomList;
-			return r.concat.apply(r, this.invoke(funcName, arguments));
-		} : function() {
-			// 只要有一个返回非 false，就返回这个值。
-			var i = 0, r, target;
-			while (i < this.length && !r) {
-				target = new Dom(this[i++]);
-				r = target[func].apply(target, arguments);
-			}
-			return r;
-		};
-	}
-
-	function each(nodelist, fn) {
-		var i = 0, node;
-		while( node = nodelist[i++]){
-			fn(node);
-		}
-	}
-
-	/// #region Selector
-	
-	function throwError(string) {
-		throw new SyntaxError('An invalid or illegal string was specified : "' + string + '"!');
-	}
-
 	function match(dom, selector){
-		var r, i = -1;
+		var r, i = 0;
 		try{
 			r = dom.parentNode.querySelectorAll(selector);
 		} catch(e){
-			return query(selector, new Dom(dom.parentNode)).indexOf(dom) >= 0 || query(selector, Dom.document).indexOf(dom) >= 0;
+			return query(selector, new Dom(dom.parentNode)).indexOf(dom) >= 0 || query(selector, document).indexOf(dom) >= 0;
 		}
-		while(r[++i])
-			if(r[i] === dom)
+		while(r[i])
+			if(r[i++] === dom)
 				return true;
 		
 		return false;
 	}
 
+	/// #region Selector
+	
 	/**
 	 * 使用指定的选择器代码对指定的结果集进行一次查找。
 	 * @param {String} selector 选择器表达式。
@@ -4159,17 +4110,16 @@
 							break;
 								
 					}
-					
-					// 无法加速，等待第四步进行过滤。
+		
+					// 如果仅仅为简单的 #id .className tagName 直接返回。
+					if (!selector) {
+						return new DomList(result);
+					}
+							
+				// 无法加速，等待第四步进行过滤。
 				} else {
 					result = result.getElements();
 				}
-
-				result = new DomList(result);
-
-				// 如果仅仅为简单的 #id .className tagName 直接返回。
-				if (!selector)
-					break;
 			
 				// 解析的第二步: 解析父子关系操作符(比如子节点筛选)
 			
@@ -4211,6 +4161,10 @@
 				// 解析的第三步: 解析剩余的选择器:获取所有子节点。第四步再一一筛选。
 			} else {
 				result = result.getElements();
+			}
+		
+			// 强制转 DomList 以继续处理。
+			if(!(result instanceof DomList)){
 				result = new DomList(result);
 			}
 			
@@ -4261,7 +4215,10 @@
 							if(m[1]) {
 								filterData[1] = m[1];
 								filterData[2] = m[3] || m[4];
-								filterData[2] = filterData[2] ? filterData[2].replace(/\\([0-9a-fA-F]{2,2})/g, toHex).replace(rBackslash, "") : "";
+								filterData[2] = filterData[2] ? filterData[2].replace(/\\([0-9a-fA-F]{2,2})/g, function (x, y) {
+									return String.fromCharCode(parseInt(y, 16));
+								} 
+								).replace(rBackslash, "") : "";
 							}
 						}
 						break;
@@ -4331,7 +4288,7 @@
 
 			if( m = /^\s*,\s*/.exec(selector)) {
 				selector = RegExp.rightContext;
-				return result.concat(query(selector, prevResult));
+				return result.add(query(selector, prevResult));
 			}
 
 
@@ -4343,8 +4300,8 @@
 		return result;
 	}
 	
-	function toHex(x, y) {
-		return String.fromCharCode(parseInt(y, 16));
+	function throwError(string) {
+		throw new SyntaxError('An invalid or illegal string was specified : "' + string + '"!');
 	}
 
 	/// #endregion

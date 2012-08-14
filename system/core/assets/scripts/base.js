@@ -1,14 +1,15 @@
 /**
  * J+ Library, 3
- * @projectDescription J+：轻便的、易扩展的UI组件库
+ * @projectDescription J+：轻便的、易扩展的UI组件。
  * @copyright 2011-2012 J+ Team
  * @fileOverview 定义最基本的工具函数。
  * @pragma defaultExtends JPlus.Base
+ * @license The BSD License
  */
 
 // 可用的宏
-// 	CompactMode - 兼容模式 - 支持 IE6+ FF3.6+ Chrome10+ Opera10.5+ Safari5+ , 若无此宏，将只支持 HTML5。
-// 	Publish - 启用发布操作 - 删除 assert 和 trace 和 using 支持。
+// 	CompactMode - 兼容模式 - 支持 IE6+ FF3+ Chrome10+ Opera10.5+ Safari5+ , 若无此宏，将只支持 HTML5。
+// 	Publish - 启用发布操作 - 删除 assert 、 trace 、 imports 和 using 支持。
 
 
 (function (window, undefined) {
@@ -60,7 +61,8 @@
 
 			/**
 			 * 所有类的基类。
-			 * @constructor
+			 * @abstract class
+			 * {@link JPlus.Base} 提供了全部类都具有的基本函数。
 			 */
 			Base: Base,
 
@@ -103,13 +105,14 @@
 			 * 获取当前框架的版本号。
 			 * @getter
 			 */
-			version: 3.2/*@Version*/
+			version: /*@Version*/3.2/*@/Version*/
 
 		},
 		
 		/**
 		 * 类成员方法。
 		 * @type Object
+		 * @namespace JPlus.Base
 		 */
 		classMembers = {
 
@@ -130,7 +133,7 @@
 			 */
 			implement: function (members) {
 
-				assert(this.prototype, "JPlus.Base.implement(members): 无法扩展当前类，因为当前类的 prototype 为空。");
+				assert(this.prototype, "MyClass.implement(members): 无法扩展当前类，因为当前类的 prototype 为空。");
 
 				// 直接将成员复制到原型上即可 。
 				Object.extend(this.prototype, members);
@@ -146,7 +149,7 @@
 			 */
 			implementIf: function (members) {
 
-				assert(this.prototype, "JPlus.Base.implementIf(members): 无法扩展当前类，因为当前类的 prototype 为空。");
+				assert(this.prototype, "MyClass.implementIf(members): 无法扩展当前类，因为当前类的 prototype 为空。");
 
 				Object.extendIf(this.prototype, members);
 
@@ -155,18 +158,30 @@
 
 			/**
 			 * 添加当前类的动态方法，该方法基于某个属性的同名方法实现。
-			 * @param {String} target 要基于的属性名。
-			 * @param {String} setters 设置函数的方法名数组，用空格隔开。
-			 * @param {String} getters 获取函数的方法名数组，用空格隔开。
-			 * @static
+			 * @param {String} targetProperty 要基于的属性名。
+			 * @param {String} setters=undefined 设置函数的方法名数组，用空格隔开。
+			 * @param {String} getters=undefined 获取函数的方法名数组，用空格隔开。
 			 * @example <pre>
-			 * MyClass.defineMethod('prop', 'fn');
+			 * MyClass.defineMethod('field', 'fn1 fn2', 'fn3');
 			 * </pre>
 			 * 等价于 <pre>
-			 * MyClass.implement({fn:  function(){ this.prop.fn();  }})
+			 * MyClass.implement({
+			 * 		fn1:  function(){ 
+			 * 			return this.field.fn1();  
+			 * 		},
+			 * 		fn2:  function(){ 
+			 * 			return this.field.fn2();  
+			 * 		},
+			 * 		fn3:  function(){ 
+			 * 			this.field.fn();
+			 * 			return this;
+			 * 		}
+			 * });
 			 * </pre>
 			 */
 			defineMethod: function(targetProperty, setters, getters) {
+				
+				assert.isString(setters, "MyClass.defineMethod(targetProperty, setters, getters): {setters} ~");
 				
 				// => defineMethod(targetProperty, getterOrSetter, boolIsGetterOrSetter)
 				if (typeof getters === 'string') {
@@ -175,16 +190,15 @@
 				}
 				
 				// 最后使用 implement 添加成员。
-				this.implement(Object.map(setters, function(func) {
-					return getters ? function(args1, args2) {
-						return this[targetProperty][func](args1, args2);
-					} : function(args1, args2) {
-						this[targetProperty][func](args1, args2);
-						return this;
+				return this.implement(Object.map(setters, function(funcName) {
+					return function() {
+						var target = this[targetProperty];
+						target = target[funcName].apply(target, arguments);
+						
+						// 如果不是 getter，返回 this 链式引用。
+						return getters ? target : this;
 					};
 				}, {}), getters ? 2 : 1);  // 支持 Dom.implement, 传递第二个参数。
-
-				return this;
 			},
 
 			/**
@@ -280,7 +294,7 @@
 			 */
 			addEvents: function (eventName, properties) {
 
-				assert.isString(eventName, "System.Base.addEvents(eventName, properties): {eventName} ~");
+				assert.isString(eventName, "MyClass.addEvents(eventName, properties): {eventName} ~");
 				
 				// 获取存储事件信息的变量。如果不存在则创建。
 				var eventObj = this.$event || (this.$event = {}),
@@ -292,22 +306,20 @@
 					// 处理 base: 'event' 字段，自动生成 add 和 remove 函数。
 					if(properties.base) {
 						assert(defaultEvent, "使用 base 字段功能必须预先定义 $default 事件。");
-						properties.add = function(ctrl, type, fn){
-							defaultEvent.add(ctrl, this.base, fn);
+						properties.add = function(obj, type, fn){
+							defaultEvent.add(obj, this.base, fn);
 						};
 						
-						properties.remove = function(ctrl, type, fn){
-							defaultEvent.remove(ctrl, this.base, fn);
+						properties.remove = function(obj, type, fn){
+							defaultEvent.remove(obj, this.base, fn);
 						};
 					}
 				} else {
 					properties = defaultEvent || emptyObj;
 				}
 
-				// 更新事件对象。
-				eventName.split(' ').forEach(function (value) {
-					eventObj[value] = properties;
-				});
+				// 将 eventName 指定的事件对象都赋值为 properties。
+				Object.map(eventName, properties, eventObj);
 
 				return this;
 			},
@@ -479,7 +491,7 @@
 
 			assert(!Object.isFunction(iterable), "Object.each(iterable, fn, bind): {iterable} 不能是函数。 ", iterable);
 			assert(Object.isFunction(fn), "Object.each(iterable, fn, bind): {fn} 必须是函数。", fn);
-
+			
 			// 如果 iterable 是 null， 无需遍历 。
 			if (iterable != null) {
 
@@ -487,8 +499,8 @@
 				if (typeof iterable.length !== "number") {
 
 					// Object 遍历。
-					for (var t in iterable)
-						if (fn.call(bind, iterable[t], t, iterable) === false)
+					for (var key in iterable)
+						if (fn.call(bind, iterable[key], key, iterable) === false)
 							return false;
 				} else {
 					return each.call(iterable, fn, bind);
@@ -514,28 +526,48 @@
 		 * @return {Object/Undefiend} 返回的结果对象。当 *iterable* 是字符串时且未指定 dest 时，返回空。
 		 * @example
 		 * <pre>
-	     * Object.map(["a","b"], function(a){return a + a}); // => ["aa", "bb"];
+		 * 
+		 * // 传统的 map 用法:
+		 * 
+	     * Object.map(["a","b"], function(a){
+	     * 	  return a + a;
+	     * }); // => ["aa", "bb"];
 	     *
-	     * Object.map({a: "a", b: "b"}, function(a){return a + a}); // => {a: "aa", b: "bb"};
+	     * Object.map({a: "a", b: "b"}, function(a){
+	     * 	  return a + a
+	     * }); // => {a: "aa", b: "bb"};
 	     *
-	     * Object.map({length: 1, "0": "a"}, function(a){return a + a}); // => ["a"];
+	     * Object.map({length: 1, "0": "a"}, function(a){
+	     * 	   return a + a
+	     * }); // => ["a"];
+	     * 
+	     * // 字符串 map 用法:
 	     *
-	     * Object.map("a b", function(a){return a + a}, {}); // => {a: "aa", b: "bb"};
+	     * Object.map("a b", function(a){
+	     * 		return a + a
+	     * }, {}); // => {a: "aa", b: "bb"};
+	     *
+	     * Object.map("a b", function(a){
+	     * 		return a + a
+	     * }); // => undefined; 注意: 如果未指定 dest，则结果值将丢失。
+	     *
+	     * Object.map("a b", 3, {}); // => {a: 3, b: 3};
 	     * </pre>
 		 */
 		map: function (iterable, fn, dest) {
-
-			assert(Object.isFunction(fn), "Object.map(iterable, fn): {fn} 必须是函数。 ", fn);
 
 			var actualFn;
 
 			// 如果是目标对象是一个字符串，则改为数组。
 			if (typeof iterable === 'string') {
 				iterable = iterable.split(' ');
-				actualFn = dest ? function (value, key, array) {
+				actualFn = dest ? typeof fn === 'function' ? function (value, key, array) {
 					this[value] = fn(value, key, array);
+				} : function(value){
+					this[value] = fn;
 				} : fn;
 			} else {
+				assert(Object.isFunction(fn), "Object.map(iterable, fn): {fn} 必须是函数。 ", fn);
 				dest = typeof iterable.length !== "number" ? {} : [];
 				actualFn = function (value, key, array) {
 					this[key] = fn(value, key, array);
@@ -628,40 +660,41 @@
 		set: function (obj, options) {
 
 			assert.notNull(obj, "Object.set(obj, options): {obj} ~");
+			
+			var key, value, setter;
 
-			for (var key in options) {
+			for (key in options) {
 
-				// 检查 setValue 。
-				var val = options[key],
-			    	setter = 'set' + key.capitalize();
+				value = options[key],
+			    setter = 'set' + key.capitalize();
 
-				if (Object.isFunction(obj[setter])) {
-					obj[setter](val);
-
-				} else if (key in obj) {
+				// obj.setKey(value)
+				if (Object.isFunction(obj[setter]))
+					obj[setter](value);
+			
+				else if (key in obj) {
 
 					setter = obj[key];
 
-					// 是否存在函数。
+					// obj.key(value)
 					if (Object.isFunction(setter))
-						obj[key](val);
+						obj[key](value);
 
-						// 检查 value.set 。
+					// obj.key.set(value)
 					else if (setter && setter.set)
-						setter.set(val);
+						setter.set(value);
 
-						// 最后，就直接赋予。
+					// obj.key = value
 					else
-						obj[key] = val;
-				}
+						obj[key] = value;
+				
+				// obj.set(key, value)
+				} else if (obj.set)
+					obj.set(key, value);
 
-						// 检查 set 。
-				else if (obj.set)
-					obj.set(key, val);
-
-					// 最后，就直接赋予。
+				// obj.key = value
 				else
-					obj[key] = val;
+					obj[key] = value;
 
 			}
 
@@ -707,11 +740,26 @@
 
 	/**
 	 * 格式化指定的字符串。
-	 * @param {String} formatString 字符。
+	 * @param {String} formatString 要格式化的字符串。格式化的方式见备注。
 	 * @param {Object} ... 格式化用的参数。
 	 * @return {String} 格式化后的字符串。
-  	 * @remark 格式化的字符串{}不允许包含空格。
-	 *  不要出现{{{ 和 }}} 这样将获得不可预知的结果。
+  	 * @remark 
+  	 * 
+  	 * 格式化字符串中，使用 {0} {1} ... 等元字符来表示传递给 String.format 用于格式化的参数。
+  	 * 如 String.format("{0} 年 {1} 月 {2} 日", 2012, 12, 32) 中， {0} 被替换成 2012，
+  	 * {1} 被替换成 12 ，依次类推。
+  	 * 
+  	 * String.format 也支持使用一个 JSON来作为格式化参数。
+  	 * 如 String.format("{year} 年 {month} 月 ", { year: 2012, month:12});
+  	 * 若要使用这个功能，请确保 String.format 函数有且仅有 2个参数，且第二个参数是一个 Object。
+  	 * 
+  	 * 格式化的字符串{}不允许包含空格。
+  	 * 
+  	 * 默认地，String.format 将使用函数的作用域(默认为 String) 函数将参数格式化为字符串后填入目标字符串。
+  	 * 因此在使用 String.format 时，应该保证 String.format 的作用域为 String 或其它格式化函数。
+  	 * 
+  	 * 如果需要在格式化字符串中出现 { 和 }，请分别使用 {{ 和 }} 替代。
+	 * 不要出现{{{ 和 }}} 这样将获得不可预知的结果。
 	 * @memberOf String
 	 * @example <pre>
 	 *  String.format("{0}转换", 1); //  "1转换"
@@ -876,7 +924,8 @@
 
 			// 浏览器名字。
 			browser = match[1],
-
+			
+			// IE678 = false, 其它 = true
 			isStd = !!eval("-[1,]");
 
 		navigator["is" + browser] = navigator["is" + browser + parseInt(match[2])] = true;
@@ -1043,12 +1092,12 @@
     	 * </pre>
     	 */
 		dataField: function () {
-			return this;
+			return this.$data || (this.$data = {});
 		},
 
 		/**
 	     * 调用父类的成员函数。
-	     * @param {String} methodName 调用的函数名。
+	     * @param {String} funcName 调用的函数名。
 	     * @param {Object} [...] 调用的参数。如果不填写此项，则自动将当前函数的全部参数传递给父类的函数。
 	     * @return {Object} 返回父类函数的返回值。
 	     * @protected
@@ -1073,31 +1122,31 @@
 	     * new B().fn(1, 2); // 输出 3 和 6
 	     * </pre>
 	     */
-		base: function (methodName) {
+		base: function (funcName) {
 
 			var me = this.constructor,
 
-	            fn = this[methodName],
+	            fn = this[funcName],
 
 	            oldFn = fn,
 
 	            args = arguments;
 
-			assert(fn, "Base.prototype.base(methodName, args): 子类不存在 {methodName} 的属性或方法。", name);
+			assert(fn, "JPlus.Base#base(funcName, args): 子类不存在 {funcName} 的属性或方法。", funcName);
 
 			// 标记当前类的 fn 已执行。
 			fn.$bubble = true;
 
-			assert(!me || me.prototype[methodName], "Base.prototype.base(methodName, args): 父类不存在 {methodName} 的属性或方法。", name);
+			assert(!me || me.prototype[funcName], "JPlus.Base#base(funcName, args): 父类不存在 {funcName} 的方法。", funcName);
 
 			// 保证得到的是父类的成员。
 
 			do {
 				me = me.base;
-				assert(me && me.prototype[methodName], "Base.prototype.base(methodName, args): 父类不存在 {methodName} 的属性或方法。", name);
-			} while ('$bubble' in (fn = me.prototype[methodName]));
+				assert(me && me.prototype[funcName], "JPlus.Base#base(funcName, args): 父类不存在 {funcName} 的方法。", funcName);
+			} while ('$bubble' in (fn = me.prototype[funcName]));
 
-			assert.isFunction(fn, "Base.prototype.base(methodName, args): 父类的成员 {fn}不是一个函数。  ");
+			assert.isFunction(fn, "JPlus.Base#base(funcName, args): 父类的成员 {fn}不是一个函数。  ");
 
 			fn.$bubble = true;
 
@@ -1138,7 +1187,7 @@
 		 */
 		on: function (type, listener, bind) {
 
-			assert.isFunction(listener, 'System.Object.prototype.on(type, listener, bind): {listener} ~');
+			assert.isFunction(listener, 'JPlus.Base#on(type, listener, bind): {listener} ~');
 
 			// 获取本对象 本对象的数据内容 本事件值
 			var me = this,
@@ -1225,7 +1274,7 @@
 		 */
 		un: function (type, listener) {
 
-			assert(!listener || Object.isFunction(listener), 'System.Object.prototype.un(type, listener): {listener} 必须是函数或空参数。', listener);
+			assert(!listener || Object.isFunction(listener), 'JPlus.Base#un(type, listener): {listener} 必须是函数或空参数。', listener);
 
 			// 获取本对象 本对象的数据内容 本事件值
 			var me = this, d = me.dataField().$event, evt, handlers, i;
@@ -1333,7 +1382,7 @@
 		 */
 		once: function (type, listener, bind) {
 
-			assert.isFunction(listener, 'System.Object.prototype.once(type, listener): {listener} ~');
+			assert.isFunction(listener, 'JPlus.Base#once(type, listener): {listener} ~');
 
 			var me = this;
 
@@ -1369,8 +1418,6 @@
 	     * </pre>
 		 */
 		trim: function () {
-
-			// 使用正则实现。
 			return this.replace(/^[\s\u00A0]+|[\s\u00A0]+$/g, "");
 		},
 
@@ -1428,7 +1475,7 @@
 		bind: function (bind) {
 
 			var me = this;
-
+			
 			// 返回对 bind 绑定。
 			return function () {
 				return me.apply(bind, arguments);
@@ -1494,12 +1541,10 @@
 	     * </pre>
 		 */
 		include: function (value) {
-
-			// 未包含，则加入。
-			var b = this.indexOf(value) !== -1;
-			if (!b)
+			var exists = this.indexOf(value) >= 0;
+			if (!exists)
 				this.push(value);
-			return b;
+			return exists;
 		},
 
 		/**
@@ -1513,7 +1558,7 @@
 	     * </pre>
 		 */
 		insert: function (index, value) {
-			assert.isNumber(index, "Array.prototype.insert(index, value): {index} ~");
+			assert.isNumber(index, "Array#insert(index, value): {index} ~");
 			var me = this, tmp;
 			if (index < 0 || index >= me.length) {
 				me[index = me.length++] = value;
@@ -1538,10 +1583,10 @@
 	     * </pre>
 		 */
 		invoke: function (fnName, args) {
-			assert(!args || typeof args.length === 'number', "Array.prototype.invoke(fnName, args): {args} 必须是参数数组。", args);
+			assert(!args || typeof args.length === 'number', "Array#invoke(fnName, args): {args} 必须是参数数组。", args);
 			var r = [];
 			ap.forEach.call(this, function (value) {
-				assert(value != null && value[fnName] && value[fnName].apply, "Array.prototype.invoke(fnName, args): {value} 不包含函数 {fnName}。", value, fnName);
+				assert(value != null && value[fnName] && value[fnName].apply, "Array#invoke(fnName, args): {value} 不包含函数 {fnName}。", value, fnName);
 				r.push(value[fnName].apply(value, args || []));
 			});
 
@@ -1658,17 +1703,13 @@
 	     * </pre>
 		 */
 		filter: function (fn, bind) {
-			assert.isFunction(fn, "Array.prototype.filter(fn, bind): {fn} ~");
+			assert.isFunction(fn, "Array#filter(fn, bind): {fn} ~");
 			var r = [];
 			ap.forEach.call(this, function (value, i, array) {
-
-				// 过滤布存在的成员。
 				if (fn.call(bind, value, i, array))
 					r.push(value);
 			});
-
 			return r;
-
 		},
 
 		/**
@@ -1732,7 +1773,7 @@
 	 */
 	function each(fn, bind) {
 
-		assert(Object.isFunction(fn), "Array.prototype.each(fn, bind): {fn} 必须是一个函数。", fn);
+		assert(Object.isFunction(fn), "Array#each(fn, bind): {fn} 必须是一个函数。", fn);
 
 		var i = -1, me = this;
 
@@ -1777,10 +1818,10 @@
 
 		// 遍历父类，找到指定事件。
 		while (!(t = clazz.$event) || !(type in t)) {
-			if (clazz.base === Base) {
+			clazz = clazz.base;
+			if (clazz === Base || !clazz) {
 				return t && t.$default || emptyObj;
 			}
-			clazz = clazz.base;
 		}
 
 		return t[type];
@@ -1798,7 +1839,7 @@ JPlus.Base.prototype.toString = function () {
 			return item;
 	}
 
-	return "Object";
+	return Object.prototype.toString.call(this);
 };
 
 /**
@@ -2599,11 +2640,15 @@ function imports(namespace) {
 		 * @config {Boolean} stackTrace
 		 */
 		stackTrace: true,
-
+		
 		debugStepThrough: true,
-
+		
+		/**
+		 * 指示一个函数已过时。
+		 * @param {String} message="此成员已过时" 提示的信息。
+		 */
 		deprected: function(message) {
-			trace.warn(message);
+			trace.warn(message || "此成员已过时");
 		},
 
 		/**
@@ -2766,24 +2811,24 @@ function imports(namespace) {
 
 		/**
          * 判断一个 HTTP 状态码是否表示正常响应。
-         * @param {Number} statusCode 要判断的状态码。
+         * @param {Number} status 要判断的状态码。
          * @return {Boolean} 如果正常则返回true, 否则返回 false 。
 		 * 一般地， 200、304、1223 被认为是正常的状态吗。
          */
-		checkStatusCode: function (statusCode) {
+		checkStatus: function (status) {
 
 			// 获取状态。
-			if (!statusCode) {
+			if (!status) {
 
 				// 获取协议。
 				var protocol = window.location.protocol;
 
-				// 对谷歌浏览器, 在有些协议， statusCode 不存在。
+				// 对谷歌浏览器, 在有些协议， status 不存在。
 				return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");
 			}
 
 			// 检查， 各浏览器支持不同。
-			return (statusCode >= 200 && statusCode < 300) || statusCode == 304 || statusCode == 1223;
+			return (status >= 200 && status < 300) || status == 304 || status == 1223;
 		},
 
 		/**
@@ -2822,7 +2867,7 @@ function imports(namespace) {
 				xmlHttp.send(null);
 
 				// 检查当前的 XMLHttp 是否正常回复。
-				if (!using.checkStatusCode(xmlHttp.status)) {
+				if (!using.checkStatus(xmlHttp.status)) {
 					// 载入失败的处理。
 					throw "请求失败:  \r\n   地址: " + url + " \r\n   状态: " + xmlHttp.status + "   " + xmlHttp.statusText + "  " + (window.location.protocol == "file:" ? '\r\n原因: 当前正使用 file 协议打开文件，请使用 http 协议。' : '');
 				}

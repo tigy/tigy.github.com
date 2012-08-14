@@ -7,14 +7,14 @@ var options = {
 
 var framewroks = {
 	'jQuery': {
-		js: '../../../../libs/jquery/assets/scripts/jquery.js',
+		js: '../../../libs/jquery/assets/scripts/jquery.js',
 		init:  function(window){
 			window.el = window.$("#header");
 			window.fn = fn;
 		}
 	},
 	'mootools': {
-		js: '../../../../libs/mootools/assets/scripts/mootools.js',
+		js: '../../../libs/mootools/assets/scripts/mootools.js',
 		init:  function(window){
 			window.el = window.$("header");
 			window.fn = fn;
@@ -22,8 +22,8 @@ var framewroks = {
 	},
 	'jplus': {
 		js: [
-			'../../../../system/core/assets/scripts/base.js',
-			'../../../../system/dom/assets/scripts/base.js'
+			'../../../system/core/assets/scripts/base.js',
+			'../../../system/dom/assets/scripts/base.js'
 		],
 		init:  function(window){
 			window.el = window.Dom.get("header");
@@ -41,9 +41,9 @@ var cases = {
 	},
 	'节点': '-',
 	'获取一个节点':{
-		jplus: 'Dom.query("header")',
+		jplus: 'Dom.query("#header")',
 		jQuery: '$("#header")',
-		mootools: '$("header")'
+		mootools: '$("#header")'
 	},
 	'事件 - 添加':{
 		jplus: 'el.on("click", function(e){})',

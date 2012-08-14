@@ -22,20 +22,24 @@ function trace() {
 	if (trace.enable) {
 
 		var hasConsole = window.console, data;
-        
+
 		// 优先使用 console.debug
 		if (hasConsole && console.debug && console.debug.apply) {
 			return console.debug.apply(console, arguments);
 		}
-        
+
 		// 然后使用 console.log
 		if (hasConsole && console.log && console.log.apply) {
 			return console.log.apply(console, arguments);
-		} 
-
+		}
+		
 		// 最后使用 trace.inspect
-		data = trace.inspect(arguments);
-    	
+		for (var i = 0, r = []; i < arguments.length; i++) {
+			r[i] = trace.inspect(arguments[i]);
+		}
+
+		data = r.join(' ');
+
 		return hasConsole && console.log ? console.log(data) : alert(data);
 	}
 }
@@ -57,14 +61,16 @@ function assert(value, message) {
 		var args = arguments;
 
 		switch (args.length) {
-			case 0:
-				message = "断言失败";
 			case 1:
+				message = "断言失败";
+			case 2:
 				break;
+			case 0:
+				return true;
 			default:
 				var i = 2;
 				message = message.replace(/\{([\w\.\(\)]*?)\}/g, function (match, argsName) {
-					return "参数 " + (args.length <= i ? match : argsName + " = " + ellipsis(trace.inspect(args[i++]), 200));
+					return "参数 " + (args.length <= i ? match : argsName + " = " + trace.ellipsis(trace.inspect(args[i++]), 200));
 				});
 		}
 
@@ -84,15 +90,11 @@ function assert(value, message) {
 			}
 
 			if (args)
-				message += "\r\n--------------------------------------------------------------------\r\n" + ellipsis(trace.decodeUTF8(args.toString()), 600);
+				message += "\r\n--------------------------------------------------------------------\r\n" + trace.ellipsis(trace.decodeUTF8(args.toString()), 600);
 
 		}
 
-		trace.error(message);
-
-		function ellipsis(value, length) {
-			return value.length > length ? value.substr(0, length - 3) + "..." : value;
-		}
+		window.trace.error(message);
 
 	}
 
@@ -109,31 +111,31 @@ function assert(value, message) {
 function using(namespace, isStyle) {
 
 	assert.isString(namespace, "using(ns): {ns} 不是合法的名字空间。");
-    
+
 	var cache = using[isStyle ? 'styles' : 'scripts'];
-	
-	for(var i = 0; i < cache.length; i++){
+
+	for (var i = 0; i < cache.length; i++) {
 		if (cache[i] === namespace)
 			return;
 	}
-        
+
 	cache.push(namespace);
 
 	namespace = using.resolve(namespace.toLowerCase(), isStyle);
 
-	var tagName, 
+	var tagName,
     	type,
     	exts,
     	callback;
-    	
+
 	if (isStyle) {
 		tagName = "LINK";
 		type = "href";
 		exts = [".less", ".css"];
 		callback = using.loadStyle;
-    	
-		if(!using.useLess){
-			exts.shift(); 	
+
+		if (!using.useLess) {
+			exts.shift();
 		}
 	} else {
 		tagName = "SCRIPT";
@@ -141,21 +143,21 @@ function using(namespace, isStyle) {
 		exts = [".js"];
 		callback = using.loadScript;
 	}
-    
+
 	// 如果在节点找到符合的就返回，找不到，调用 callback 进行真正的 加载处理。
-    
-	var doms = 	document.getElementsByTagName(tagName),
+
+	var doms = document.getElementsByTagName(tagName),
 		path = namespace.replace(/^[\.\/\\]+/, "");
-	
-	for(var i = 0; doms[i]; i++){
+
+	for (var i = 0; doms[i]; i++) {
 		var url = ((document.constructor ? doms[i][type] : doms[i].getAttribute(type, 4)) || '').toLowerCase();
-		for(var j = 0; j < exts.length; j++){
-			if(url.indexOf(path + exts[j]) >= 0){
-				return ;
+		for (var j = 0; j < exts.length; j++) {
+			if (url.indexOf(path + exts[j]) >= 0) {
+				return;
 			}
 		}
 	}
-    
+
 	callback(using.rootPath + namespace + exts[0]);
 }
 
@@ -635,11 +637,21 @@ function imports(namespace) {
 								return r;
 							}
 
-							return '[Node name=' + obj.nodeName + 'value=' + obj.nodeValue + ']';
+							return '[Node type=' + obj.nodeType +' name=' + obj.nodeName + ' value=' + obj.nodeValue + ']';
 						}
-						var r = "{\r\n", i;
-						for (i in obj)
-							r += "\t" + i + " = " + trace.inspect(obj[i], deep - 1) + "\r\n";
+						var r = "{\r\n", i, flag = 0;
+						for (i in obj) {
+							if (typeof obj[i] !== 'function')
+								r += "\t" + i + " = " + trace.inspect(obj[i], deep - 1) + "\r\n";
+							else {
+								flag++;
+							}
+						}
+
+						if (flag) {
+							r += '\t... (' + flag + '个函数)\r\n';
+						}
+
 						r += "}";
 						return r;
 					}
@@ -787,8 +799,16 @@ function imports(namespace) {
 		 * @config {Boolean} stackTrace
 		 */
 		stackTrace: true,
-
+		
 		debugStepThrough: true,
+		
+		/**
+		 * 指示一个函数已过时。
+		 * @param {String} message="此成员已过时" 提示的信息。
+		 */
+		deprected: function(message) {
+			trace.warn(message || "此成员已过时");
+		},
 
 		/**
          * 确认一个值为函数。
@@ -950,24 +970,24 @@ function imports(namespace) {
 
 		/**
          * 判断一个 HTTP 状态码是否表示正常响应。
-         * @param {Number} statusCode 要判断的状态码。
+         * @param {Number} status 要判断的状态码。
          * @return {Boolean} 如果正常则返回true, 否则返回 false 。
 		 * 一般地， 200、304、1223 被认为是正常的状态吗。
          */
-		checkStatusCode: function (statusCode) {
+		checkStatus: function (status) {
 
 			// 获取状态。
-			if (!statusCode) {
+			if (!status) {
 
 				// 获取协议。
 				var protocol = window.location.protocol;
 
-				// 对谷歌浏览器, 在有些协议， statusCode 不存在。
+				// 对谷歌浏览器, 在有些协议， status 不存在。
 				return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");
 			}
 
 			// 检查， 各浏览器支持不同。
-			return (statusCode >= 200 && statusCode < 300) || statusCode == 304 || statusCode == 1223;
+			return (status >= 200 && status < 300) || status == 304 || status == 1223;
 		},
 
 		/**
@@ -1006,7 +1026,7 @@ function imports(namespace) {
 				xmlHttp.send(null);
 
 				// 检查当前的 XMLHttp 是否正常回复。
-				if (!using.checkStatusCode(xmlHttp.status)) {
+				if (!using.checkStatus(xmlHttp.status)) {
 					// 载入失败的处理。
 					throw "请求失败:  \r\n   地址: " + url + " \r\n   状态: " + xmlHttp.status + "   " + xmlHttp.statusText + "  " + (window.location.protocol == "file:" ? '\r\n原因: 当前正使用 file 协议打开文件，请使用 http 协议。' : '');
 				}
