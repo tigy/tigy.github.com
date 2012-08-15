@@ -556,22 +556,18 @@
 		 */
 		map: function (iterable, fn, dest) {
 
-			var actualFn;
+			var isString = typeof iterable === 'string',
+				actualFn = typeof fn === 'function' ? !isString || dest ? function (value, key, array) {
+					this[value] = fn(value, key, array);
+				} : fn : function(value){
+					this[value] = fn;
+				};
 
 			// 如果是目标对象是一个字符串，则改为数组。
-			if (typeof iterable === 'string') {
+			if (isString) {
 				iterable = iterable.split(' ');
-				actualFn = dest ? typeof fn === 'function' ? function (value, key, array) {
-					this[value] = fn(value, key, array);
-				} : function(value){
-					this[value] = fn;
-				} : fn;
 			} else {
-				assert(Object.isFunction(fn), "Object.map(iterable, fn): {fn} 必须是函数。 ", fn);
 				dest = typeof iterable.length !== "number" ? {} : [];
-				actualFn = function (value, key, array) {
-					this[key] = fn(value, key, array);
-				};
 			}
 
 			// 遍历对象。

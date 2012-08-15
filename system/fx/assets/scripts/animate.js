@@ -4,315 +4,12 @@
  */
 
 
-using("System.Fx.Base");
 using("System.Dom.Base");
+using("System.Fx.Tween");
 
+ 
 
 (function(){
-	
-	
-	/// #region 字符串扩展
-	
-	/**
-	 * @namespace String
-	 */
-	Object.extend(String, {
-		
-		/**
-		 * 把十六进制颜色转为 RGB 数组。
-		 * @param {String} hex 十六进制色。
-		 * @return {Array} rgb RGB 数组。
-		 */
-		hexToArray: function(hex){
-			assert.isString(hex, "String.hexToArray(hex): 参数 {hex} ~。");
-			if(hex == 'transparent')
-				return [255, 255, 255];
-			var m = hex.match(/^#([\da-f]{1,2})([\da-f]{1,2})([\da-f]{1,2})$/i);
-			if(!m)return null;
-			var i = 0, r = [];
-			while (++i <= 3) {
-				var bit = m[i];
-				r.push(parseInt(bit.length == 1 ? bit + bit : bit, 16));
-			}
-			return r;
-		},
-		
-		/**
-		 * 把 RGB 数组转为数组颜色。
-		 * @param {Array} rgb RGB 数组。
-		 * @return {Array} rgb RGB 数组。
-		 */
-		rgbToArray: function(rgb){
-			assert.isString(rgb, "String.rgbToArray(rgb): 参数 {rgb} ~。");
-			var m = rgb.match(/(\d+),\s*(\d+),\s*(\d+)/);
-			if(!m) return null;
-			var i = 0, r = [];
-			while (++i <= 3) {
-				r.push(parseInt(m[i]));
-			}
-			return r;
-		},
-		
-		/**
-		 * 把 RGB 数组转为十六进制色。
-		 * @param {Array} rgb RGB 数组。
-		 * @return {String} hex 十六进制色。
-		 */
-		arrayToHex: function(rgb){
-			assert.isArray(rgb, "String.arrayToHex(rgb): 参数 {rgb} ~。");
-			var i = -1, r = [];
-			while(++i < 3) {
-				var bit = rgb[i].toString(16);
-				r.push((bit.length == 1) ? '0' + bit : bit);
-			}
-			return '#' + r.join('');
-		}
-	});
-	
-	/// #endregion
-	
-	/**
-	 * compute 简写。
-	 * @param {Object} from 从。
-	 * @param {Object} to 到。
-	 * @param {Object} delta 变化。
-	 * @return {Object} 结果。
-	 */
-	var compute = Fx.compute,
-	
-		Dom = window.Dom,
-
-		emptyObj = {},
-	
-		/**
-		 * @class Tween
-		 * @extends Fx.Base
-		 */
-		Tween = Fx.Tween = Fx.extend({
-			
-			/**
-			 * 当前的状态存储。
-			 * @type Object
-			 * @protected
-			 */
-			tween: null,
-			
-			/**
-			 * 初始化当前特效。
-			 */
-			constructor: function(){
-				
-			},
-			
-			/**
-			 * 根据指定变化量设置值。
-			 * @param {Number} delta 变化量。 0 - 1 。
-			 * @override
-			 */
-			set: function(delta){
-				var tweens = this.tweens,
-					target = this.target,
-					tweener,
-					key,
-					value;
-
-				// 对当前每个需要执行的特效进行重新计算并赋值。
-				for (key in tweens) {
-					value = tweens[key];
-					tweener = value.tweener;
-					tweener.set(target, key, tweener.compute(value.from, value.to, delta));
-				}
-			},
-			
-			/**
-			 * 生成当前变化所进行的初始状态。
-			 * @param {Object} from 开始。
-			 * @param {Object} to 结束。
-			 */
-			init: function (options) {
-					
-				// 对每个设置属性
-				var me = this,
-					key,
-					tweener,
-					part,
-					value,
-					parsed,
-					t,
-					from,
-					to,
-					// 生成新的 tween 对象。
-					tweens = me.tweens = {};
-				
-				for (key in options.tween) {
-
-					// value
-					value = options.tweens[key];
-
-					// 如果 value 是字符串，判断 += -= 或 a-b
-					if (typeof value === 'string' && (part = /^([+-]=|(.+)-)(.*)$/.exec(value))) {
-						value = part[3];
-					}
-
-					// 找到用于变化指定属性的解析器。
-					tweener = Fx.tweeners[key = key.toCamelCase()];
-					
-					// 已经编译过，直接使用， 否则找到合适的解析器。
-					if (!tweener) {
-						
-						// 如果是纯数字属性，使用 numberParser 。
-						if(key in Dom.styleNumbers) {
-							tweener = numberParser;
-						} else {
-							
-							// 尝试使用每个转换器
-							for (t in Fx.defaultTweeners) {
-								
-								// 获取转换器
-								t = Fx.defaultTweeners[t];
-								parsed = tweener.parse(value, key);
-								
-								// 如果转换后结果合格，证明这个转换器符合此属性。
-								if (parsed || parsed === 0) {
-									tweener = t;
-									break;
-								}
-							}
-
-							// 找不到合适的解析器。
-							if (!tweener) {
-								continue;
-							}
-							
-						}
-
-						// 缓存 tweeners，下次直接使用。
-						Fx.tweeners[key] = tweener;
-					}
-
-					from = part && part[2] || tweener.get(me.target, key);
-
-					if(tweener.parse){
-						from = tweener.parse(from);
-					}
-
-					to = part && part[1] ? from + parseFloat(part[1] === '+=' ? value : '-' + value) : tweener.parse ? tweener.parse(value) : value;
-					
-					tweens[key] = {
-						tweener: tweener,
-						from: from,
-						to: to
-					};
-						
-					assert(from !== null && to !== null, "Animate#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, from, to);
-					
-				}
-				
-				return me;
-			}
-		
-		}),
-
-		/**
-		 * 缓存已解析的属性名。
-		 */
-		cache = Animate.parsers = {
-			//opacity: {
-			//	set: function (target, name, from, to, delta) {
-			//		target.setOpacity(compute(from, to, delta));
-			//	},
-			//	parse: self,
-			//	get: function (target) {
-			//		return target.getOpacity();
-			//	}
-			//},
-
-			scrollTop: {
-				set: function (target, name, from, to, delta) {
-					target.setScroll(null, compute(from, to, delta));
-				},
-				parse: self,
-				get: function (target) {
-					return target.getScroll().y;
-				}
-			},
-
-			scrollLeft: {
-				set: function (target, name, from, to, delta) {
-					target.setScroll(compute(from, to, delta));
-				},
-				parse: self,
-				get: function (target) {
-					return target.getScroll().x;
-				}
-			}
-
-		},
-		
-		numberParser = {
-			set: function(target, name, from, to, delta){
-				target.dom.style[name] = compute(from, to, delta);
-			},
-			parse: function(value){
-				return typeof value == "number" ? value : parseFloat(value);
-			},
-			get: function(target, name){
-				return Dom.styleNumber(target.dom, name);
-			}
-		};
-	
-	Animate.parsers = {
-		
-		/**
-		 * 数字。
-		 */
-		length: {
-			
-			set: navigator.isStd ? function (target, name, from, to, delta) {
-				
-				target.dom.style[name] = compute(from, to, delta) + 'px';
-			} : function(target, name, from, to, delta){
-				try {
-					
-					// ie 对某些负属性内容报错
-					target.dom.style[name] = compute(from, to, delta);
-				}catch(e){}
-			},
-			
-			parse: numberParser.parse,
-			
-			get: numberParser.get
-			
-		},
-		
-		/**
-		 * 颜色。
-		 */
-		color: {
-			
-			set: function set(target, name, from, to, delta){
-				target.dom.style[name] = String.arrayToHex([
-					Math.round(compute(from[0], to[0], delta)),
-					Math.round(compute(from[1], to[1], delta)),
-					Math.round(compute(from[2], to[2], delta))
-				]);
-			},
-			
-			parse: function(value){
-				return String.hexToArray(value) || String.rgbToArray(value);
-			},
-			
-			get: function(target, name){
-				return Dom.getStyle(target.dom, name);
-			}
-	
-		}
-		
-	};
-	
-	function self(v){
-		return v;
-	}
 	
 	/// #region Dom
 	
@@ -373,12 +70,12 @@ using("System.Dom.Base");
 	Dom.implement({
 		
 		/**
-		 * 获取和当前节点有关的 Animate 实例。
-		 * @return {Animate} 一个 Animate 的实例。
+		 * 获取和当前节点有关的 Tween 实例。
+		 * @return {Animate} 一个 Tween 的实例。
 		 */
 		fx: document.fx = function() {
 			var data = this.dataField();
-			return data.$fx || (data.$fx = new Fx.Animate(this));
+			return data.$fx || (data.$fx = new Fx.Tween());
 		}
 		
 	}, 2)
@@ -395,19 +92,21 @@ using("System.Dom.Base");
 		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 rerun 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
 		 * @return this
 		 */
-		animate: document.animate = function (params, duration, callback, link) {
-			if(params.to){
-				link = params.link;
-			} else {
-				params = {
-					target: this,
-					to: params,
-					duration: duration,
-					complete: callback
-				};
+		animate: document.animate = function (params, duration, oncomplete, onstart, link) {
+			if(typeof duration === 'object'){
+				link = duration.link;
+				oncomplete = duration.complete;
+				onstart = duration.start;
+				duration = duration.duration;
 			}
 			
-			this.fx().run(params, link);
+			this.fx().run( {
+				target: this,
+				tweens: params,
+				start: onstart,
+				duration: duration,
+				complete: oncomplete
+			}, link);
 			
 			return this;
 		},
@@ -431,42 +130,41 @@ using("System.Dom.Base");
 				callback = args[2];
 		
 			me.fx().run({
-				target: this,
+				target: me,
 				duration: args[1],
-				start: function (options) {
+				start: function (tweens, fx) {
 					
-					var elem = this.target.dom;
+					var elem = this.node;
 						
 					if(!Dom.isHidden(elem)){
 						if (callback)
-							callback.call(this.target, true, true);
+							callback.call(this, true, true);
 						return false;
 					}
 					
 					Dom.show(elem);
 					
-					this.orignal = {};
+					fx.orignal = {};
 					
 					var from = Fx.toggleTypes[args[0]](this, elem, false);
 					
 					if(from){
-						this.from = from;
-						this.to = {};	
+						fx.tweens = {};	
 							
-						for(from in this.from) {
-							this.to[from] = Dom.styleNumber(elem, from);
+						for(from in tweens) {
+							fx.tweens[from] = Dom.styleNumber(elem, from);
 						}
 					}
 					
-					for(from in this.to){
-						this.orignal[from] = elem.style[from];
+					for(from in fx.tweens){
+						fx.orignal[from] = elem.style[from];
 					}
 				},
-				complete:  function(){
-					Object.extend(this.target.dom.style, this.orignal);
+				complete:  function(isAbort, fx){
+					Object.extend(this.node.style, fx.orignal);
 				
 					if (callback)
-						callback.call(this.target, true);
+						callback.call(this, false, isAbort);
 				}
 			}, args[3]);
 		
@@ -492,14 +190,15 @@ using("System.Dom.Base");
 				callback = args[2];
 		
 			me.fx().run({
+				target: me,
 				duration: args[1],
-				start: function () {
+				start: function (tweens, fx) {
 					
-					var elem = this.target.dom;
+					var elem = this.node;
 						
 					if(Dom.isHidden(elem)){
 						if(callback)
-							callback.call(this.target, false, true);
+							callback.call(this, false, true);
 						return false;
 					}
 					
@@ -508,18 +207,17 @@ using("System.Dom.Base");
 					var to = Fx.toggleTypes[args[0]](this, elem, true);
 					
 					if(to){
-						this.from = null;
-						this.to = to;
+						fx.tweens = to;
 					}
 					
-					for(var i in this.to){
-						this.orignal[i] = elem.style[i];
+					for(var i in tweens){
+						fx.orignal[i] = elem.style[i];
 					}
 				},
-				complete: function () {
+				complete: function (isAbort, fx) {
 					
-					var elem = this.target.dom;
-					Object.extend(elem.style, this.orignal);
+					var elem = this.node;
+					Object.extend(elem.style, fx.orignal);
 					Dom.hide(elem);
 					if (callback)
 						callback.call(this.target, false);
@@ -537,40 +235,6 @@ using("System.Dom.Base");
 			}, arguments);
 
 			return me;
-		},
-		
-		/**
-		 * 高亮元素。
-		 * @param {String} color 颜色。
-		 * @param {Function} [callback] 回调。
-		 * @param {Number} duration=500 时间。
-		 * @return this
-		 */
-		highlight: function(color, duration, callback){
-			assert(!callback || Object.isFunction(callback), "Dom#highlight(color, duration, callback): 参数 {callback} 不是可执行的函数。", callback);
-			var from = {},
-				to = {
-					backgroundColor: color || '#ffff88'
-				},
-				fx = this.fx();
-			
-			fx.run({
-				target: this,
-				from: from,
-				to: to,
-				duration: duration,
-				start: function(){
-					this.from.backgroundColor = Dom.getStyle(this.target.dom, 'backgroundColor');
-				}
-			}).run({
-				target: this,
-				from: to,
-				to: from,
-				duration: duration,
-				stop: callback
-			});
-			
-			return this;
 		}
 	
 	});

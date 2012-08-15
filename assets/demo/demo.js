@@ -3612,7 +3612,7 @@ Demo.extend(Demo, {
 
 			if (data.times) {
 
-				for (currentTime = data.times ; currentTime > 0; currentTime--) {
+				for (currentTime = time = data.times ; currentTime > 0; currentTime--) {
 					for (i = 0 ; i < arr.length; i++) {
 						arr[i].fn.call(window, Demo.assert);
 					}

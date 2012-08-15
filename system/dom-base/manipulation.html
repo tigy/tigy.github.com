@@ -54,61 +54,61 @@
 				'Dom.hasChild' : {
 					'Dom.hasChild(a.dom, b.dom)' : true
 				},
-				'Dom.prototype.hasChild' : {
+				'Dom#hasChild' : {
 					'a.hasChild(a)' : false,
 					'a.hasChild(b)' : true,
 					'a.hasChild(c)' : true,
 					'a.hasChild(d)' : true
 				},
-				'Dom.prototype.clone' : {
+				'Dom#clone' : {
 					'a.clone(a)' : '-'
 				},
 
 				'Insert' : '-',
-				'Dom.prototype.append' : {
+				'Dom#append' : {
 				    'a.append("append")': '-'
 				},
-				'Dom.prototype.prepend' : {
+				'Dom#prepend' : {
 				    'a.prepend("prepend")': '-'
                 },
-				'Dom.prototype.after': {
+				'Dom#after': {
 				    'a.after("after")': '-'
                 },
-				'Dom.prototype.before': {
+				'Dom#before': {
 				    'a.before("before")': '-'
 				},
-				'Dom.prototype.appendTo' : {
+				'Dom#appendTo' : {
 					'a.appendTo(document.body)' : '-'
 				},
 
 				'Remove' : '-',
-				'Dom.prototype.remove' : {
+				'Dom#remove' : {
 					'b.remove()' : '-'
 				},
-				'Dom.prototype.empty' : {
+				'Dom#empty' : {
 					'd.empty()' : '-'
 				},
-				'Dom.prototype.dispose' : {
+				'Dom#dispose' : {
 					'd.dispose()' : '-'
 				},
 
 				'Update' : '-',
-				'Dom.prototype.replaceWith' : {
+				'Dom#replaceWith' : {
 					'a.replaceWith(b)' : '-'
                 },
 
 			    '底层': '-',
 
-				'Dom.prototype.insertBefore': {
+				'Dom#insertBefore': {
 				    'b.insertBefore(c, null)': '-'
 				},
-				'Dom.prototype.attach': {
+				'Dom#attach': {
 				    'd.attach(c.dom, null)': '-'
                 },
-				'Dom.prototype.removeChild': {
+				'Dom#removeChild': {
 				    'b.removeChild(c)': '-'
 				},
-				'Dom.prototype.detach': {
+				'Dom#detach': {
 				    'd.detach(c.dom)': '-'
 				}
 			};

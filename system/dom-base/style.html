@@ -39,29 +39,29 @@
 			
 			var testcases = {
 				'Style': '-',
-				'Dom.prototype.setStyle': {
+				'Dom#setStyle': {
 				    'a.setStyle("font-size", 14)': function(value, assert){
 				        assert.areEqual(a.dom.style.fontSize, "14px")
 				     } 
 				},
-				'Dom.prototype.getStyle': {
+				'Dom#getStyle': {
                     'a.getStyle("font-size")': "14px"
                 },
 				'Application': '-',
-				'Dom.prototype.toggle': {
+				'Dom#toggle': {
                     'a.toggle()': '-'
                 },
-				'Dom.prototype.hide': {
+				'Dom#hide': {
                     'a.hide()': function(value, assert){
                         assert.areEqual(Dom.isHidden(a.dom), true);
                      } 
                 },
-				'Dom.prototype.show': {
+				'Dom#show': {
                     'a.show()': function(value, assert){
                          assert.areEqual(Dom.isHidden(a.dom), false);
                      } 
                 },
-				'Dom.prototype.unselectable': {
+				'Dom#unselectable': {
                     'a.unselectable()': '-'
                 }
 			};

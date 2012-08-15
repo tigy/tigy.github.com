@@ -39,49 +39,49 @@
 			
 			var testcases = {
 				'Attribute': '-',
-				'Dom.prototype.setAttr': {
+				'Dom#setAttr': {
                     'a.setAttr("innerText", "12121")': function(value, assert){
                         assert.areEqual(a.getAttr("innerText"), "12121");
                     }
                 },
-				'Dom.prototype.getAttr':  {
+				'Dom#getAttr':  {
                     'a.getAttr("innerText")': "12121"
                 },
-				'Dom.prototype.set': {
+				'Dom#set': {
                     'a.set({"innerHTML": "cv"})': '-'
                 },
 				'Application': '-',
-				'Dom.prototype.setText': {
+				'Dom#setText': {
                     'a.setText("cv")': function(value, assert){
                         assert.areEqual(a.getText(), "cv");
                     }
                 },
-                'Dom.prototype.getText': {
+                'Dom#getText': {
                     'a.getText()': "cv"
                 },
-				'Dom.prototype.setHtml': {
+				'Dom#setHtml': {
                     'a.setHtml("cv")': function(value, assert){
                         assert.areEqual(a.getHtml(), "cv");
                     }
                 },
-                'Dom.prototype.getHtml': {
+                'Dom#getHtml': {
                     'a.getHtml()': "cv"
                 },
 				'Class': '-',
-				'Dom.prototype.addClass': {
+				'Dom#addClass': {
                     'a.addClass("light")': function(value, assert){
                         assert.areEqual(a.hasClass("light"), true);
                     }
                 },
-				'Dom.prototype.hasClass': {
+				'Dom#hasClass': {
                     'a.hasClass("light")':true
                 },
-				'Dom.prototype.removeClass': {
+				'Dom#removeClass': {
                     'a.removeClass("light")': function(value, assert){
                         assert.areEqual(a.hasClass("light"), false);
                     }
                 },
-				'Dom.prototype.toggleClass': {
+				'Dom#toggleClass': {
                     'a.toggleClass("light")': function(value, assert){
                         assert.areEqual(a.hasClass("light"), true);
                     }

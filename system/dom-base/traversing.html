@@ -51,12 +51,12 @@
 
 			var testcases = {
                 'CSS 选择器': '-',
-				'Dom.prototype.find' : {
+				'Dom#find' : {
 					'a.find("div")' : b,
 					'a.find(".b")' : b,
 					'a.find("[_tag=\\\"b\\\"]")' : b
 				},
-				'Dom.prototype.query' : {
+				'Dom#query' : {
 					'a.query("div")' : function(value, assert) {
 						assert.areEqual(value[0], b.dom);
 					},
@@ -67,30 +67,30 @@
 						assert.areEqual(value[0], b.dom);
 					}
 				},
-				'Dom.prototype.match' : {
+				'Dom#match' : {
 					'a.match("div")' : true,
 					'a.match(".b")' : false
                 },
-				'Dom.prototype.closest': {
+				'Dom#closest': {
 				    'b.closest("div")': function(value, assert) {
 				        assert.areEqual(value.dom, b.dom);
 				    }
 				},
 				'关系节点': '-',
-				'Dom.prototype.parent': {
+				'Dom#parent': {
 				    'b.parent()': function(value, assert) {
 				        assert.areEqual(value.dom, a.dom);
 				    }
 				},
-				'Dom.prototype.prev' : {
+				'Dom#prev' : {
 					'b.prev()' : null
 				},
-				'Dom.prototype.next' : {
+				'Dom#next' : {
 					'b.next()' : function(value, assert) {
 						assert.areEqual(value.dom, d.dom);
 					}
                 },
-				'Dom.prototype.child': {
+				'Dom#child': {
 				    'b.child(0)': function(value, assert) {
 				        assert.areEqual(value.dom, c.dom);
                     },
@@ -98,42 +98,42 @@
 				        assert.areEqual(value.dom, c.dom);
 				    }
 				},
-				'Dom.prototype.first' : {
+				'Dom#first' : {
 					'b.first()' : function(value, assert) {
 						assert.areEqual(value.dom, c.dom);
 					}
 				},
-				'Dom.prototype.last' : {
+				'Dom#last' : {
 					'b.last()' : function(value, assert) {
 						assert.areEqual(value.dom, c.dom);
 					}
 				},
-                'Dom.prototype.parentAll': {
+                'Dom#parentAll': {
                     'b.parentAll()': function(value, assert) {
                         assert.areEqual(value[0], a.dom);
                     }
                 },
-                'Dom.prototype.prevAll': {
+                'Dom#prevAll': {
                     'b.prevAll()': function(value, assert) {
                         assert.areEqual(value[0], undefined);
                     }
                 },
-                'Dom.prototype.nextAll': {
+                'Dom#nextAll': {
                     'b.nextAll()': function(value, assert) {
                         assert.areEqual(value[0], d.dom);
                     }
                 },
-                'Dom.prototype.siblings': {
+                'Dom#siblings': {
                     'b.siblings()': function(value, assert) {
                         assert.areEqual(value[0], d.dom);
                     }
                 },
-                'Dom.prototype.children': {
+                'Dom#children': {
                     'b.children()': function(value, assert) {
                         assert.areEqual(1, value.length);
                     }
                 },
-                'Dom.prototype.getElements': {
+                'Dom#getElements': {
                     'b.getElements()': function(value, assert) {
                         assert.areEqual(value[0], c.dom);
                     }

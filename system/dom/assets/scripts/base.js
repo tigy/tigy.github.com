@@ -716,15 +716,6 @@
 		/// #endif
 		
 		/**
-		 * 获取滚动大小的方法。
-		 * @type Function
-		 */
-		getScroll = function() {
-			var elem = this.node;
-			return new Point(elem.scrollLeft, elem.scrollTop);
-		},
-		
-		/**
 		 * 一个返回 true 的函数。
 		 */
 		returnTrue = Function.from(true),

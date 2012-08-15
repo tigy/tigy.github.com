@@ -62,50 +62,50 @@
 			        }
 			    },
 			    'Array': '-',
-			    'Array.prototype.indexOf': {
+			    'Array#indexOf': {
 			        '[5,4].indexOf(5)': 0,
 			        '[5,4].indexOf(4)': 1,
 			        '[5,4].indexOf()': -1,
 			        '[5,4].indexOf("4")': -1
 			    },
-			    'Array.prototype.item': {
+			    'Array#item': {
 			        '[5,4].item(0)': 5,
 			        '[5,4].item(1)': 4,
 			        '[5,4].item(-1)': 4,
 			        '[5,4].item(2)': undefined
 			    },
-			    'Array.prototype.invoke': {
+			    'Array#invoke': {
 			        '[5,4].invoke("toString", [])':  ["5", "4"]
 			    },
-			    'Array.prototype.unique': {
+			    'Array#unique': {
 			        '[2, 5, 7, 5].unique()':  [2, 5, 7]
 			    },
-			    'Array.prototype.forEach': {
+			    'Array#forEach': {
 			        '[5,4].forEach(assert.log)': function(value, assert){
 			            assert.logged("54");
 			        }	
 			    },
-			    'Array.prototype.each': {
+			    'Array#each': {
 			        '[5,4].each(assert.log)': function(value, assert){
 			            assert.logged("54");
 			        }   
 			    },
-			    'Array.prototype.filter': {
+			    'Array#filter': {
 			        '[5,4].filter(function(v){return v > 2;})': [5,4],
 			        '[5,4].filter(function(v){return v > 4;})': [5],
 			        '[5,4].filter(function(v){return v > 5;})': []
 			    },
-			    'Array.prototype.include': {
+			    'Array#include': {
 			        'var ar = [5,4];ar.include(2); ar': function(value, assert){
 			            assert.areEqual(value, [5, 4, 2]);
 			        }
 			    },
-			    'Array.prototype.insert': {
+			    'Array#insert': {
 			        'var ar = [5,4];ar.insert(1, "1"); ar': function(value, assert){
 			            assert.areEqual(value, [5, "1", 4]);
 			        }
 			    },
-			    'Array.prototype.remove': {
+			    'Array#remove': {
 			        'var ar = [5,4];ar.remove(4); ar':  function(value, assert){
 			            assert.areEqual(value, [5]);
 			        }
@@ -114,7 +114,7 @@
 			        'Array.create(["a","a",null,"a"], 1)': ["a", null, "a"]
 			    },
 			    'Function': '-',
-			    'Function.prototype.bind': {
+			    'Function#bind': {
 			        '(function(){assert.log(this)}).bind(2)': function (value, assert) {
 			            value();
 			            assert.logged("2");
@@ -129,10 +129,10 @@
 			        }
 			    },
 			    'String': '-',
-			    'String.prototype.capitalize':  {
+			    'String#capitalize':  {
 			        '"ab".capitalize()':  "Ab"	
 			    },
-			    'String.prototype.toCamelCase': {
+			    'String#toCamelCase': {
 			        '"a-b".toCamelCase()':  "aB"	
 			    },
 			    //'String.ellipsis': {

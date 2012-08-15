@@ -150,10 +150,14 @@ var Fx = (function() {
 			var fx = this;
 			fx.pause();
 			fx.set(1);
-			if (fx.options.complete) {
-				fx.options.complete.call(fx.target, isAbort, fx);
+			try {
+				if (fx.options.complete) {
+					fx.options.complete.call(fx.target, isAbort, fx);
+				}
+			} finally {
+				fx.progress();
 			}
-			return fx.progress();
+			return fx;
 		},
 		
 		/**
@@ -205,13 +209,3 @@ var Fx = (function() {
 	
 
 })();
-
-/**
- * 常用计算。
- * @param {Object} from 开始。
- * @param {Object} to 结束。
- * @param {Object} delta 变化。
- */
-Fx.compute = function(from, to, delta){
-	return (to - from) * delta + from;
-};

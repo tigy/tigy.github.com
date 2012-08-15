@@ -40,19 +40,19 @@
 			
 			
 			var testcases = {
-				'Dom.prototype.on': {
+				'Dom#on': {
                     'a.on("click", function(){console.log("clicked") })': '-'
                 },
-				'Dom.prototype.un': {
+				'Dom#un': {
                     'a.un("click")': '-'
                 },
-				'Dom.prototype.trigger': {
+				'Dom#trigger': {
                     'a.trigger("click")': '-'
                 },
-				'Dom.prototype.once': {
+				'Dom#once': {
                     'a.once("click", function(){console.log("clicked - once") })': '-'
                 },
-				'Dom.prototype.delegate': {
+				'Dom#delegate': {
                     'a.delegate("#c", "click", function(){console.log("delegate clicked") })': '-'
                 }
 			};

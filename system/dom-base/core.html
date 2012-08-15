@@ -79,31 +79,31 @@
                     }
                 },
 				'DomList': '-',
-				'DomList.prototype.length': {
+				'DomList#length': {
                     'abcd.length': 4
                 },
-				'DomList.prototype.forEach': {
+				'DomList#forEach': {
 				    'abcd.forEach(function(value){ assert.log(value.id)})': function (value, assert) {
 				        assert.logged("abcd");
 				    }
 				},
-				'DomList.prototype.each': {
+				'DomList#each': {
                     'abcd.each(function(value){ assert.log(value.id)})': function(value, assert){
                        assert.logged("abcd");
                     }
                 },
-				'DomList.prototype.filter': {
+				'DomList#filter': {
                     'abcd.filter(function(value){ return value === a.node || value === c.node})': function(value, assert){
                         assert.areEqual(value, [a.node, c.node]);
                     }
                 },
-				'DomList.prototype.invoke': {
+				'DomList#invoke': {
                     'abcd.invoke("setAttr", ["ff", 1])': function(value, assert){
                        assert.isTrue(a.getAttr("ff") == 1);
                        assert.isTrue(d.getAttr("ff") == 1);
                     }
                 },
-				'DomList.prototype.indexOf': {
+				'DomList#indexOf': {
                     'abcd.indexOf(a.node)': 0,
                     'abcd.indexOf(d.node)': 3,
                     'abcd.indexOf(o.node)': -1

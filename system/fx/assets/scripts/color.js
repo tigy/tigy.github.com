@@ -1,69 +1,56 @@
-//===========================================
-//  系统的颜色               A
-//===========================================
+/**
+ * DOM 补间动画 - 颜色
+ * @author xuld
+ */
+
+using("System.Fx.Tween");
 
 
-
-
-using("System.Fx.Animate");
-
-
-Object.extend(Fx.Animate.parsers.color, {
+Fx.defaultTweeners.unshift({
 	
-	// Some named colors to work with
-	// From Interface by Stefan Petre
-	// http://interface.eyecon.ro/
-
-	color: {
-		aqua:[0,255,255],
-		azure:[240,255,255],
-		beige:[245,245,220],
-		black:[0,0,0],
-		blue:[0,0,255],
-		brown:[165,42,42],
-		cyan:[0,255,255],
-		darkblue:[0,0,139],
-		darkcyan:[0,139,139],
-		darkgrey:[169,169,169],
-		darkgreen:[0,100,0],
-		darkkhaki:[189,183,107],
-		darkmagenta:[139,0,139],
-		darkolivegreen:[85,107,47],
-		darkorange:[255,140,0],
-		darkorchid:[153,50,204],
-		darkred:[139,0,0],
-		darksalmon:[233,150,122],
-		darkviolet:[148,0,211],
-		fuchsia:[255,0,255],
-		gold:[255,215,0],
-		green:[0,128,0],
-		indigo:[75,0,130],
-		khaki:[240,230,140],
-		lightblue:[173,216,230],
-		lightcyan:[224,255,255],
-		lightgreen:[144,238,144],
-		lightgrey:[211,211,211],
-		lightpink:[255,182,193],
-		lightyellow:[255,255,224],
-		lime:[0,255,0],
-		magenta:[255,0,255],
-		maroon:[128,0,0],
-		navy:[0,0,128],
-		olive:[128,128,0],
-		orange:[255,165,0],
-		pink:[255,192,203],
-		purple:[128,0,128],
-		violet:[128,0,128],
-		red:[255,0,0],
-		silver:[192,192,192],
-		white:[255,255,255],
-		yellow:[255,255,0],
-		transparent: [255,255,255]
+	set: Fx.numberTweener.set,
+	
+	compute: function(from, to, delta){
+		var compute = Fx.numberTweener.compute,
+			r = [
+				Math.round(compute(from[0], to[0], delta)),
+				Math.round(compute(from[1], to[1], delta)),
+				Math.round(compute(from[2], to[2], delta))
+			],
+			i = 0;
+		
+		while(i < 3) {
+			delta = r[i].toString(16);
+			r[i++] = delta.length === 1 ? '0' + delta : delta;
+		}
+		return '#' + r.join('');
 	},
 	
 	parse: function(value){
-		return this.color[value] || String.hexToArray(value) ||
-			String.rgbToArray(value);
+		if(value === 'transparent')
+			return [255, 255, 255];
+		var i, r, part;
+		
+		if(part = /^#([\da-f]{1,2})([\da-f]{1,2})([\da-f]{1,2})$/i.exec(value)){
+			i = 0;
+			r = [];
+			while (++i <= 3) {
+				value = part[i];
+				r.push(parseInt(value.length == 1 ? value + value : value, 16));
+			}
+		} else if(part = /(\d+),\s*(\d+),\s*(\d+)/.exec(value)){
+			i = 0;
+			r = [];
+			while (++i <= 3) {
+				r.push(parseInt(part[i]));
+			}
+		}
+		
+		return r;
+	},
+	
+	get: function(target, name){
+		return this.parse(Dom.styleString(target.node, name));
 	}
 
 });
