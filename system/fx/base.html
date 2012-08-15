@@ -12,24 +12,20 @@
 	<body>
 		<script>
 
-		    var fx = new Fx.Base();
+		    var fx = new Fx();
 		    fx.set = function (value) {
-                console.log(value);
+                trace(value);
             };
 			
-			var testcases = {
+		    Demo.writeTestCases({
 				
 				// 简单创建一个特效。
 				'createAnimate': function () {
-                    fx.run();
-                    fx.run(null, 'abort');
-                    fx.run();
+				    fx.run({});
+                    fx.run({}, 'abort');
+                    fx.run({});
 				}
-			};
-			
-			
-			
-			Demo.writeTestCases(testcases, {times: 8});
+			}, {times: 8});
 			
 		</script>
 	</body>

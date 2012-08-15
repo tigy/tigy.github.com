@@ -5,15 +5,13 @@
 
 using("System.Utils.Deferrable");
 
-var Fx = Fx || {};
-
 /**
  * 特效算法基类。
- * @class Fx.Base
+ * @class Fx
  * @extends Deferrable
  * @abstract
  */
-Fx.Base = (function(){
+var Fx = (function() {
 	
 	
 	/// #region interval
@@ -44,6 +42,20 @@ Fx.Base = (function(){
 		 * @type {Number}
 		 */
 		duration: 500,
+
+		/**
+		 * 用于实现渐变曲线的计算函数。函数的参数为：
+		 *
+		 * - @param {Object} p 转换前的数值，0-1 之间。
+		 *
+		 * 返回值是一个数字，表示转换后的值，0-1 之间。
+		 * @field
+		 * @type Function
+		 * @remark
+		 */
+		transition: function(p) {
+			return -(Math.cos(Math.PI * p) - 1) / 2;
+		},
 		
 		/**
 		 * 当被子类重写时，实现生成当前变化所进行的初始状态。
@@ -66,20 +78,6 @@ Fx.Base = (function(){
 		set: Function.empty,
 		
 		/**
-		 * 用于实现渐变曲线的计算函数。函数的参数为：
-		 *
-		 * - @param {Object} p 转换前的数值，0-1 之间。
-		 *
-		 * 返回值是一个数字，表示转换后的值，0-1 之间。
-		 * @field
-		 * @type Function
-		 * @remark 
-		 */
-		transition: function(p) {
-			return -(Math.cos(Math.PI * p) - 1) / 2;
-		},
-		
-		/**
 		 * 进入变换的下步。
 		 */
 		step: function() {
@@ -87,7 +85,7 @@ Fx.Base = (function(){
 			if (time < me.duration) {
 				me.set(me.transition(time / me.duration));
 			}  else {
-				me.done();
+				me.end();
 			}
 		},
 		
@@ -102,38 +100,49 @@ Fx.Base = (function(){
 		 * @return {Base} this
 		 */
 		run: function (options, link) {
-			var me = this;
-            if (me.defer(options, link))
-                return me;
-			
-            var duration = me.duration;
-			Object.extend(me, options);
-			
-			// 防止 duration 覆盖了值。
-			if (me.duration == undefined)
-				me.duration = duration;
-			else if (me.duration < 0)
-				me.duration = duration / -me.duration;
+			var fx = this, defaultOptions, duration;
+			if (!fx.defer(options, link)) {
 
-			if (me.start && me.start(options) === false) {
-				return me.progress();
+				assert.notNull(options, "Fx#run(options, link): {options} ~");
+
+				defaultOptions = Fx.prototype;
+
+				// options
+				fx.options = options;
+
+				// transition
+				fx.transition = options.transition || defaultOptions.transition;
+
+				// target
+				fx.target = options.target;
+				
+				// duration
+				duration = options.duration;
+				assert(duration == undefined || duration === 0 || +duration, "Fx#run(options, link): duration 必须是数字。如果需要使用默认的时间，使用 -1 。");
+				fx.duration = duration !== -1 && duration != undefined ? duration < 0 ? -defaultOptions.duration * duration : fx.duration : defaultOptions.duration;
+
+				// start
+				if (options.start && options.start.call(fx.target, fx) === false) {
+					fx.progress();
+				} else {
+					fx.init(options);
+					fx.set(0);
+					fx.time = 0;
+					fx.resume();
+				}
 			}
-		
-			me.init(options);
-			me.set(0);
-			me.time = 0;
-			
-			me.resume();
-			return me;
+
+			return fx;
 		},
 		
-		done: function(){
-			this.pause();
-			this.set(1);
-			if(this.complete){
-				this.complete();
+		end: function() {
+			var fx = this;
+			fx.pause();
+			fx.set(1);
+			if (fx.options.complete) {
+				fx.options.complete.call(fx.target, fx);
 			}
-			return this.progress();
+			return fx.progress();
 		},
 		
 		/**
@@ -141,7 +150,7 @@ Fx.Base = (function(){
 		 */
 		stop: function() {
 			this.abort();
-			this.done();
+			this.end();
 			return this;
 		},
 		

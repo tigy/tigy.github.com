@@ -7,214 +7,397 @@
     </head>
 	<body class="demo-doc">
 	    <style>
-	       td[colspan], td[rowspan] {
+	       td[colspan], .cat, th {
 	           text-align: center;
 	       }
+
+	        em {
+	            color:#c4acac;
+	        }
+
+	        .dif {
+	            color: #000;
+	        }
 	    </style>
 			<table width="100%">
 				<tr>
 					<th>分类</th>
 					<th>jQuery</th>
 					<th>J+ UI</th>
-                    <th>说明</th>
 				</tr>
 				<tr>
-					<td rowspan="7">核心</td>
-					<td></td>
-					<td>Dom.get(id)<small>/$</small></td>
-                    <td></td>
+					<th rowspan="7" class="cat">核心</th>
+					<td><em>jQuery('#' + id)</em></td>
+					<td>Dom.get(id)</td>
 				</tr>
-                <tr>
-                    <td>jQuery(selector)<small>/$</small></td>
-                    <td>Dom.query(selector)<small>/$$</small></td>
-                    <td></td>
+                <tr class="dif">
+                    <td>jQuery(selector)</td>
+                    <td>Dom.query(selector)</td>
                 </tr>
                 <tr>
-                    <td></td>
+                    <td><em>jQuery(selector).eq(0)</em></td>
                     <td>Dom.find(selector)</td>
-                    <td>同 query(selector)，但只返回第一个匹配的结果。</td>
                 </tr>
                 <tr>
-                    <td>jQuery(html)</td>
-                    <td>Dom.parse(html)</td>
-                    <td>当解析为多个节点时， jQuery 返回列表，Dom.parse返回  DocumentFragment 。<br>
-                        普通文本 jQuery认为是选择器， Dom.parse返回 TextNode 。
-                    </td>
+                    <td>jQuery(html) <br /><small>解析为多个节点时返回列表。</small></td>
+                    <td>Dom.parse(html) <br /><small>解析为多个节点时返回DocumentFragment。</small></td>
                 </tr>
                 <tr>
-                    <td></td>
+                    <td><em>jQuery("&lt;" + tagName + "/&gt;")</em></td>
                     <td>Dom.create(tagName)</td>
-                    <td>jQuery 使用 jQuery("&lt;" + tagName + "/&gt;") 实现。</td>
                 </tr>
-                <tr>
-                    <td>jQuery(readyCallback)</td>
+                <tr class="dif">
+                    <td>jQuery(readyCallback) <br /><small>jQuery(document).ready(readyCallback)</small></td>
                     <td>Dom.ready(readyCallback)</td>
-                    <td></td>
                 </tr>
                 <tr>
-                    <td></td>
+                    <td><em>jQuery(window).load(loadCallback)</em></td>
                     <td>Dom.load(loadCallback)</td>
-                    <td></td>
+                </tr>
+                <tr class="dif">
+                    <th rowspan="6" class="cat">样式</th>
+                    <td rowspan="2">css</td>
+                    <td>getStyle</td>
+                </tr>
+                <tr class="dif">
+                    <td>setStyle</td>
                 </tr>
                 <tr>
-                    <td rowspan="3">样式</td>
-                    <td>css</td>
-                    <td>getStyle/setStyle</td>
-                    <td></td>
+                    <td colspan="2">show</td>
                 </tr>
                 <tr>
-                    <td colspan="2">show/hide/toggle</td>
-                    <td></td>
+                    <td colspan="2">hide</td>
+                </tr>
+                <tr>
+                    <td colspan="2">toggle</td>
                 </tr>
                 <tr>
                     <td></td>
                     <td>unselectable(value)</td>
-                    <td></td>
+                </tr>
+                <tr class="dif">
+                    <th rowspan="16" class="cat">属性</th>
+                    <td rowspan="2">attr</td>
+                    <td>getAttr(name, 1)</td>
+                </tr>
+                <tr class="dif">
+                    <td>setAttr</td>
+                </tr>
+                <tr class="dif">
+                    <td rowspan="2">prop</td>
+                    <td>getAttr</td>
+                </tr>
+                <tr class="dif">
+                    <td>setAttr</td>
+                </tr>
+                <tr class="dif">
+                    <td>removeAttr</td>
+                    <td rowspan="2">setAttr(name, null)</td>
+                </tr>
+                <tr class="dif">
+                    <td>removeProp</td>
                 </tr>
                 <tr>
-                    <td rowspan="6">属性</td>
-                    <td>attr</td>
-                    <td>getAttr(name, 1)/setAttr</td>
-                    <td></td>
+                    <td colspan="2">addClass</td>
                 </tr>
                 <tr>
-                    <td>prop</td>
-                    <td>getAttr(name)/setAttr</td>
-                    <td></td>
+                    <td colspan="2">removeClass</td>
                 </tr>
                 <tr>
-                    <td>removeAttr/removeProp</td>
-                    <td>setAttr(name, null)</td>
-                    <td></td>
+                    <td colspan="2">toggleClass</td>
                 </tr>
                 <tr>
-                    <td colspan="2">addClass/removeClass/toggleClass/hasClass</td>
-                    <td></td>
+                    <td colspan="2">hasClass</td>
+                </tr>
+                <tr class="dif">
+                    <td rowspan="2">text<br />val</td>
+                    <td>getText</td>
+                </tr>
+                <tr class="dif">
+                    <td>setText</td>
+                </tr>
+                <tr class="dif">
+                    <td rowspan="2">html</td>
+                    <td>getHtml</td>
+                </tr>
+                <tr class="dif">
+                    <td>setHtml</td>
                 </tr>
                 <tr>
-                    <td>text/val</td>
-                    <td>getText/setText</td>
+                    <td colspan="2">index</td>
+                </tr>
+                <tr class="dif">
+                    <td>is</td>
+                    <td>match</td>
+                </tr>
+                <tr class="dif">
+                    <th rowspan="10" class="cat">尺寸</th>
+                    <td rowspan="2">width</td>
+                    <td>getWidth</td>
+                </tr>
+                <tr class="dif">
+                    <td>setWidth</td>
+                </tr>
+                <tr class="dif">
+                    <td rowspan="2">height</td>
+                    <td>getHeight</td>
+                </tr>
+                <tr class="dif">
+                    <td>setHeight</td>
+                </tr>
+                <tr class="dif">
+                    <td>innerWidth</td>
                     <td></td>
                 </tr>
-                <tr>
-                    <td>html</td>
-                    <td>getHtml/setHtml</td>
+                <tr class="dif">
+                    <td>innerHeight</td>
                     <td></td>
                 </tr>
-                <tr>
-                    <td rowspan="4">尺寸</td>
-                    <td>width/height</td>
-                    <td>getWidth/setWidth/getHeight/setHeight</td>
-                    <td></td>
+                <tr class="dif">
+                    <td>outerWidth</td>
+                    <td rowspan="2">getSize()</td>
+                </tr>
+                <tr class="dif">
+                    <td>outerHeight</td>
                 </tr>
                 <tr>
-                    <td>innerWidth/innerHeight</td>
                     <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>outerWidth/outerHeight</td>
-                    <td>getSize/setSize</td>
-                    <td></td>
+                    <td>setSize</td>
                 </tr>
                 <tr>
                     <td></td>
                     <td>getScrollSize</td>
-                    <td></td>
                 </tr>
-                <tr>
-                    <td rowspan="3">位置</td>
+                <tr class="dif">
+                    <th rowspan="6" class="cat">位置</th>
                     <td>offset</td>
-                    <td>getPosition/setPosition</td>
+                    <td>getPosition</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>setPosition</td>
+                </tr>
+                <tr class="dif">
+                    <td rowspan="2">position</td>
+                    <td>getOffset</td>
+                </tr>
+                <tr class="dif">
+                    <td>setOffset</td>
+                </tr>
+                <tr class="dif">
+                    <td>scrollLeft</td>
+                    <td rowspan="2">getScroll<br />setScroll</td>
+                </tr>
+                <tr class="dif">
+                    <td>scrollTop</td>
+                </tr>
+                <tr class="dif">
+                    <th rowspan="9" class="cat">事件</th>
+                    <td>bind</td>
+                    <td>on</td>
+                </tr>
+                <tr class="dif">
+                    <td>unbind</td>
+                    <td>un</td>
+                </tr>
+                <tr class="dif">
+                    <td>one</td>
+                    <td>once</td>
+                </tr>
+                <tr>
+                    <td colspan="2">trigger</td>
+                </tr>
+                <tr>
+                    <td colspan="2">delegate</td>
+                </tr>
+                <tr>
+                    <td>undelagete</td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td>position</td>
-                    <td>getOffset/setOffset</td>
+                    <td>live</td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td>scrollTop/scrollLeft</td>
-                    <td>getScroll</td>
+                    <td>die</td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td rowspan="3">事件</td>
-                    <td>bind/unbind/one/trigger</td>
-                    <td>on/un/once/trigger</td>
+                    <td>on</td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td>delegate/undelagete</td>
-                    <td>delegate</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>live/die/on</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td rowspan="8">节点</td>
+                    <th rowspan="34" class="cat">节点</th>
                     <td colspan="2">hasChild</td>
-                    <td></td>
                 </tr>
                 <tr>
                     <td colspan="2">clone</td>
+                </tr>
+                <tr>
+                    <td colspan="2">append</td>
+                </tr>
+                <tr>
+                    <td colspan="2">prepend</td>
+                </tr>
+                <tr>
+                    <td colspan="2">after</td>
+                </tr>
+                <tr>
+                    <td colspan="2">before</td>
+                </tr>
+                <tr>
+                    <td colspan="2">appendTo</td>
+                </tr>
+                <tr>
+                    <td>prependTo</td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td colspan="2">append/prepend/after/before</td>
+                    <td colspan="2">first</td>
+                </tr>
+                <tr>
+                    <td colspan="2">last</td>
+                </tr>
+                <tr>
+                    <td colspan="2">prev</td>
+                </tr>
+                <tr>
+                    <td colspan="2">next</td>
+                </tr>
+                <tr>
+                    <td colspan="2">parent</td>
+                </tr>
+                <tr>
+                    <td colspan="2">closest</td>
+                </tr>
+                <tr>
+                    <td colspan="2">child</td>
+                </tr>
+                <tr>
+                    <td colspan="2">prevAll</td>
+                </tr>
+                <tr>
+                    <td colspan="2">prevAll</td>
+                </tr>
+                <tr>
+                    <td colspan="2">nextAll</td>
+                </tr>
+                <tr>
+                    <td colspan="2">offsetParent</td>
+                </tr>
+                <tr>
+                    <td>prevUtil</td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td>appendTo/prependTo</td>
-                    <td>appendTo</td>
+                    <td>nextUtil</td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td colspan="2">remove/empty</td>
+                    <td>parentsUtil</td>
                     <td></td>
                 </tr>
+                <tr class="dif">
+                    <td>parents</td>
+                    <td>parentAll</td>
+                </tr>
                 <tr>
-                    <td></td>
+                    <td colspan="2">children</td>
+                </tr>
+                <tr>
+                    <td colspan="2">siblings</td>
+                </tr>
+                <tr>
+                    <td colspan="2">empty</td>
+                </tr>
+                <tr>
+                    <td>detach</td>
+                    <td>remove</td>
+                </tr>
+                <tr>
+                    <td>remove</td>
                     <td>dispose</td>
+                </tr>
+                <tr>
+                    <td>wrap</td>
                     <td></td>
                 </tr>
                 <tr>
-                    <td>wrap/unwrap</td>
+                    <td>wrapAll</td>
                     <td></td>
+                </tr>
+                <tr>
+                    <td>wrapInner</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>unwrap</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>replaceAll</td>
                     <td></td>
                 </tr>
                 <tr>
                     <td colspan="2">replaceWith</td>
-                    <td></td>
                 </tr>
                 <tr>
-                    <td rowspan="3">特效</td>
+                    <th rowspan="7" class="cat">DomList</th>
+                    <td colspan="2">each</td>
+                </tr>
+                <tr>
+                    <td colspan="2">length</td>
+                </tr>
+                <tr>
+                    <td colspan="2">filter</td>
+                </tr>
+                <tr>
+                    <td colspan="2">add</td>
+                </tr>
+                <tr>
+                    <td colspan="2">slice</td>
+                </tr>
+                <tr>
+                    <td colspan="2">splice</td>
+                </tr>
+                <tr>
+                    <td colspan="2">push</td>
+                </tr>
+                <tr>
+                    <th rowspan="3" class="cat">特效</th>
                     <td colspan="2">animate</td>
-                    <td></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td>highlight</td>
-                    <td></td>
                 </tr>
                 <tr>
                     <td>stop</td>
-                    <td>fx().stop()</td>
-                    <td></td>
+                    <td><em>fx().stop()</em></td>
                 </tr>
-                <tr>
-                    <td rowspan="2">Ajax</td>
+                <tr class="dif">
+                    <th rowspan="6" class="cat">Ajax</th>
                     <td>jQuery.ajax</td>
                     <td>Ajax.send</td>
-                    <td></td>
                 </tr>
-                <tr>
-                    <td>jQuery.get/jQuery.post/jQuery.getScript/jQuery.getJSON</td>
-                    <td>Ajax.get/Ajax.post/Ajax.script/Ajax.json/Ajax.jsonp</td>
-                    <td></td>
+                <tr class="dif">
+                    <td>jQuery.get</td>
+                    <td>Ajax.get</td>
+                </tr>
+                <tr class="dif">
+                    <td>jQuery.post</td>
+                    <td>Ajax.post</td>
+                </tr>
+                <tr class="dif">
+                    <td>jQuery.getScript</td>
+                    <td>Ajax.script</td>
+                </tr>
+                <tr class="dif">
+                    <td rowspan="2">jQuery.getJSON</td>
+                    <td>Ajax.json</td>
+                </tr>
+                <tr class="dif">
+                    <td>Ajax.jsonp</td>
                 </tr>
 			</table>
 	</body>

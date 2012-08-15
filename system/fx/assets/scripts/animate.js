@@ -88,7 +88,7 @@ using("System.Dom.Base");
 		 * @class Animate
 		 * @extends Fx.Base
 		 */
-		Animate = Fx.Animate = Fx.Base.extend({
+		Animate = Fx.Animate = Fx.extend({
 			
 			/**
 			 * 当前绑定的节点。
@@ -203,15 +203,15 @@ using("System.Dom.Base");
 		 * 缓存已解析的属性名。
 		 */
 		cache = Animate.props = {
-			opacity: {
-				set: function (target, name, from, to, delta) {
-					target.setOpacity(compute(from, to, delta));
-				},
-				parse: self,
-				get: function (target) {
-					return target.getOpacity();
-				}
-			},
+			//opacity: {
+			//	set: function (target, name, from, to, delta) {
+			//		target.setOpacity(compute(from, to, delta));
+			//	},
+			//	parse: self,
+			//	get: function (target) {
+			//		return target.getOpacity();
+			//	}
+			//},
 
 			scrollTop: {
 				set: function (target, name, from, to, delta) {
@@ -306,10 +306,10 @@ using("System.Dom.Base");
 		
 		return0 = Function.from(0),
 	
-		ep = Dom.prototype,
-		show = ep.show,
-		hide = ep.hide,
-		toggle = ep.toggle;
+		dp = Dom.prototype,
+		show = dp.show,
+		hide = dp.hide,
+		toggle = dp.toggle;
 		
 	Fx.toggleTypes = {};
 		
@@ -362,7 +362,7 @@ using("System.Dom.Base");
 		 * 获取和当前节点有关的 Animate 实例。
 		 * @return {Animate} 一个 Animate 的实例。
 		 */
-		fx: function(){
+		fx: document.fx = function() {
 			var data = this.dataField();
 			return data.$fx || (data.$fx = new Fx.Animate(this));
 		}
@@ -381,7 +381,7 @@ using("System.Dom.Base");
 		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 rerun 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
 		 * @return this
 		 */
-		animate: function (params, duration, callback, link) {
+		animate: document.animate = function (params, duration, callback, link) {
 			if(params.to){
 				link = params.link;
 			} else {
