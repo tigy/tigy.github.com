@@ -438,7 +438,7 @@
 		 * 是否属性的正则表达式。
 		 * @type RegExp
 		 */
-		rStyle = /-(\w)|float/,
+		rStyle = /-(\w)|float/g,
 		
 		/**
 		 * 判断 body 节点的正则表达式。

@@ -85,33 +85,23 @@ using("System.Dom.Base");
 		emptyObj = {},
 	
 		/**
-		 * @class Animate
+		 * @class Tween
 		 * @extends Fx.Base
 		 */
-		Animate = Fx.Animate = Fx.extend({
-			
-			/**
-			 * 当前绑定的节点。
-			 * @type Dom
-			 * @protected
-			 */
-			target: null,
+		Tween = Fx.Tween = Fx.extend({
 			
 			/**
 			 * 当前的状态存储。
 			 * @type Object
 			 * @protected
 			 */
-			current: null,
+			tween: null,
 			
 			/**
 			 * 初始化当前特效。
-			 * @param {Object} options 选项。
-			 * @param {Object} key 键。
-			 * @param {Number} duration 变化时间。
 			 */
-			constructor: function(target){
-				this.target = target;
+			constructor: function(){
+				
 			},
 			
 			/**
@@ -120,13 +110,17 @@ using("System.Dom.Base");
 			 * @override
 			 */
 			set: function(delta){
-				var me = this,
+				var tweens = this.tweens,
+					target = this.target,
+					tweener,
 					key,
-					target = me.target,
 					value;
-				for(key in me.current){
-					value = me.current[key];
-					value.parser.set(target, key, value.from, value.to, delta);
+
+				// 对当前每个需要执行的特效进行重新计算并赋值。
+				for (key in tweens) {
+					value = tweens[key];
+					tweener = value.tweener;
+					tweener.set(target, key, tweener.compute(value.from, value.to, delta));
 				}
 			},
 			
@@ -139,58 +133,78 @@ using("System.Dom.Base");
 					
 				// 对每个设置属性
 				var me = this,
-					form,
+					key,
+					tweener,
+					part,
+					value,
+					parsed,
+					t,
+					from,
 					to,
-					key;
-					
-				// 生成新的 current 对象。
-				me.current = {};
-
-				from = this.from || emptyObj;
-				to = this.to;
+					// 生成新的 tween 对象。
+					tweens = me.tweens = {};
 				
-				for (key in to) {
-					
-					var parsed = undefined,
-						fromValue = from[key],
-						toValue = to[key],
-						parser = cache[key = key.toCamelCase()];
+				for (key in options.tween) {
+
+					// value
+					value = options.tweens[key];
+
+					// 如果 value 是字符串，判断 += -= 或 a-b
+					if (typeof value === 'string' && (part = /^([+-]=|(.+)-)(.*)$/.exec(value))) {
+						value = part[3];
+					}
+
+					// 找到用于变化指定属性的解析器。
+					tweener = Fx.tweeners[key = key.toCamelCase()];
 					
 					// 已经编译过，直接使用， 否则找到合适的解析器。
-					if (!parser) {
+					if (!tweener) {
 						
+						// 如果是纯数字属性，使用 numberParser 。
 						if(key in Dom.styleNumbers) {
-							cache[key] = numberParser;
+							tweener = numberParser;
 						} else {
 							
 							// 尝试使用每个转换器
-							for (parser in Animate.parsers) {
+							for (t in Fx.defaultTweeners) {
 								
 								// 获取转换器
-								parser = Animate.parsers[parser];
-								parsed = parser.parse(toValue, key);
+								t = Fx.defaultTweeners[t];
+								parsed = tweener.parse(value, key);
 								
 								// 如果转换后结果合格，证明这个转换器符合此属性。
 								if (parsed || parsed === 0) {
-									// 缓存，下次直接使用。
-									cache[key] = parser;
+									tweener = t;
 									break;
 								}
 							}
+
+							// 找不到合适的解析器。
+							if (!tweener) {
+								continue;
+							}
 							
 						}
+
+						// 缓存 tweeners，下次直接使用。
+						Fx.tweeners[key] = tweener;
 					}
+
+					from = part && part[2] || tweener.get(me.target, key);
+
+					if(tweener.parse){
+						from = tweener.parse(from);
+					}
+
+					to = part && part[1] ? from + parseFloat(part[1] === '+=' ? value : '-' + value) : tweener.parse ? tweener.parse(value) : value;
 					
-					// 找到合适转换器
-					if (parser) {
-						me.current[key] = {
-							from: parser.parse((fromValue ? fromValue === 'auto' : fromValue !== 0) ? parser.get(me.target, key) : fromValue),
-							to: parsed === undefined ? parser.parse(toValue, key) : parsed,
-							parser: parser
-						};
+					tweens[key] = {
+						tweener: tweener,
+						from: from,
+						to: to
+					};
 						
-						assert(me.current[key].from !== null && me.current[key].to !== null, "Animate#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, me.current[key].from, me.current[key].to);
-					}
+					assert(from !== null && to !== null, "Animate#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, from, to);
 					
 				}
 				
@@ -202,7 +216,7 @@ using("System.Dom.Base");
 		/**
 		 * 缓存已解析的属性名。
 		 */
-		cache = Animate.props = {
+		cache = Animate.parsers = {
 			//opacity: {
 			//	set: function (target, name, from, to, delta) {
 			//		target.setOpacity(compute(from, to, delta));

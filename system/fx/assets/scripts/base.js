@@ -30,6 +30,13 @@ var Fx = (function() {
 	/// #endregion
 		
 	return Deferrable.extend({
+
+		/**
+		 * 当前绑定的节点。
+		 * @type Dom
+		 * @protected
+		 */
+		target: null,
 	
 		/**
 		 * 每秒的运行帧次。
@@ -85,7 +92,7 @@ var Fx = (function() {
 			if (time < me.duration) {
 				me.set(me.transition(time / me.duration));
 			}  else {
-				me.end();
+				me.end(false);
 			}
 		},
 		
@@ -122,7 +129,7 @@ var Fx = (function() {
 				fx.duration = duration !== -1 && duration != undefined ? duration < 0 ? -defaultOptions.duration * duration : fx.duration : defaultOptions.duration;
 
 				// start
-				if (options.start && options.start.call(fx.target, fx) === false) {
+				if (options.start && options.start.call(fx.target, options, fx) === false) {
 					fx.progress();
 				} else {
 					fx.init(options);
@@ -134,13 +141,17 @@ var Fx = (function() {
 
 			return fx;
 		},
-		
-		end: function() {
+
+		/**
+		 * 由应用程序通知当前 Fx 对象特效执行完。
+		 * @param {Boolean} isAbort 如果是强制中止则为 true, 否则是 false 。
+		 */
+		end: function(isAbort) {
 			var fx = this;
 			fx.pause();
 			fx.set(1);
 			if (fx.options.complete) {
-				fx.options.complete.call(fx.target, fx);
+				fx.options.complete.call(fx.target, isAbort, fx);
 			}
 			return fx.progress();
 		},
@@ -150,7 +161,7 @@ var Fx = (function() {
 		 */
 		stop: function() {
 			this.abort();
-			this.end();
+			this.end(true);
 			return this;
 		},
 		
