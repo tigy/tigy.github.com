@@ -23,22 +23,35 @@ using("System.Fx.Tween");
 		
 		height = 'height marginTop paddingTop marginBottom paddingBottom';
 
+	function fixProp(options, elem, prop) {
+		options.orignal[prop] = elem.style[prop];
+		elem.style[prop] = Dom.styleNumber(elem, prop) + 'px';
+	}
+
 	Object.each({
 		all: height + ' opacity width',
 		height: height,
 		width: 'width marginLeft paddingLeft marginRight paddingRight'
 	}, function(value, key){
 		value = Object.map(value, this, {});
-		displayEffects[key] = function(fx, elem, isShow) {
+
+		displayEffects[key] = function(options, elem, isShow) {
 
 			// 修复 overflow 。
-			fx.orignal.overflow = elem.style.overflow;
+			options.orignal.overflow = elem.style.overflow;
 			elem.style.overflow = 'hidden';
 
 			// inline 元素不支持 修改 width 。
 			if (Dom.styleString(elem, 'display') === 'inline') {
-				fx.orignal.display = elem.style.display;
+				options.orignal.display = elem.style.display;
 				elem.style.display = 'inline-block';
+			}
+
+			// 如果是 width, 固定 height 。
+			if (key === 'height') {
+				fixProp(options, elem, 'width');
+			} else if (key === 'width') {
+				fixProp(options, elem, 'height');
 			}
 			
 			return value;
@@ -47,26 +60,34 @@ using("System.Fx.Tween");
 	
 	Object.map('left right top bottom', function(key, index) {
 		key = 'margin' + key.capitalize();
-		return function(fx, elem, isShow) {
+		return function(options, elem, isShow) {
 
 			// 将父元素的 overflow 设为 hidden 。
 			elem.parentNode.style.overflow = 'hidden';
 
 			var tweens = {},
-				currentValue,
-				key2;
+				fromValue,
+				toValue,
+				key2,
+				delta;
 			
-			if(index <= 1){
-				currentValue = -elem.offsetHeight - Dom.styleNumber(elem, key);
-				tweens[key] = isShow ? (currentValue + '-0') : ('0-' + currentValue);
-
+			if (index <= 1) {
 				key2 = index === 0 ? 'marginRight' : 'marginLeft';
-				currentValue = -elem.offsetHeight - Dom.styleNumber(elem, key2);
-				tweens[key2] = isShow ? (currentValue + '-0') : ('0-' + currentValue);
+				fromValue = -elem.offsetWidth - Dom.styleNumber(elem, key2);
+				toValue = Dom.styleNumber(elem, key);
+				tweens[key] = isShow ? (fromValue + '-' + toValue) : (toValue + '-' + fromValue);
+
+				fixProp(options, elem, 'width');
+				delta = toValue - fromValue;
+				toValue = Dom.styleNumber(elem, key2);
+				fromValue = toValue + delta;
+				tweens[key2] = isShow ? (fromValue + '-' + toValue) : (toValue + '-' + fromValue);
 
 			} else {
-				currentValue = -elem.offsetHeight - Dom.styleNumber(elem, key);
-				tweens[key] = isShow ? (currentValue + '-0') : ('0-' + currentValue);
+				key2 = index === 2 ? 'marginBottom' : 'marginTop';
+				fromValue = -elem.offsetHeight - Dom.styleNumber(elem, key2);
+				toValue = Dom.styleNumber(elem, key);
+				tweens[key] = isShow ? (fromValue + '-' + toValue) : (toValue + '-' + fromValue);
 			}
 
 			return tweens;
@@ -107,6 +128,10 @@ using("System.Fx.Tween");
 				onstart = duration.start;
 				duration = duration.duration;
 			}
+
+			assert(!duration || typeof duration === 'number', "Dom#animate(params, duration, onstart, onstart, link): {duration} 必须是数字。如果需要制定为默认时间，使用 -1 。", onstart);
+			assert(!oncomplete || Object.isFunction(oncomplete), "Dom#animate(params, duration, oncomplete, onstart, link): {oncomplete} 必须是函数", oncomplete);
+			assert(!onstart || Object.isFunction(onstart), "Dom#animate(params, duration, onstart, onstart, link): {onstart} 必须是函数", onstart);
 			
 			this.fx().run( {
 				target: this,
@@ -148,6 +173,7 @@ using("System.Fx.Tween");
 					start: function(options, fx) {
 
 						var elem = this.node,
+							t,
 							tweens,
 							tween;
 
@@ -162,33 +188,38 @@ using("System.Fx.Tween");
 						Dom.show(elem);
 
 						// 保存原有的值。
-						fx.orignal = {};
+						options.orignal = {};
+
+						// 新建一个新的 tweens 。
+						options.tweens = tweens = {};
 
 						// 获取指定特效实际用于展示的css字段。
-						options.tweens = tweens = Fx.displayEffects[effect](fx, elem, false);
+						t = Fx.displayEffects[effect](options, elem, true);
 
 						// 保存原有的css值。
 						// 用于在hide的时候可以正常恢复。
-						for (tween in tweens) {
-							fx.orignal[tween] = elem.style[tween];
+						for (tween in t) {
+							options.orignal[tween] = elem.style[tween];
 						}
 
 						// 因为当前是显示元素，因此将值为 0 的项修复为当前值。
-						for (tween in tweens) {
-							if (tweens[tween] === 0) {
+						for (tween in t) {
+							if (t[tween] === 0) {
 
 								// 设置变化的目标值。
 								tweens[tween] = Dom.styleNumber(elem, tween);
 
 								// 设置变化的初始值。
 								elem.style[tween] = 0;
+							} else {
+								tweens[tween] = t[tween];
 							}
 						}
 					},
 					complete: function(isAbort, fx) {
 
 						// 拷贝回默认值。
-						Object.extend(this.node.style, fx.orignal);
+						Object.extend(this.node.style, fx.options.orignal);
 
 						if (callback)
 							callback.call(this, false, isAbort);
@@ -240,15 +271,15 @@ using("System.Fx.Tween");
 						}
 
 						// 保存原有的值。
-						fx.orignal = {};
+						options.orignal = {};
 
 						// 获取指定特效实际用于展示的css字段。
-						options.tweens = tweens = Fx.displayEffects[effect](fx, elem, true);
+						options.tweens = tweens = Fx.displayEffects[effect](options, elem, false);
 
 						// 保存原有的css值。
 						// 用于在show的时候可以正常恢复。
 						for (tween in tweens) {
-							fx.orignal[tween] = elem.style[tween];
+							options.orignal[tween] = elem.style[tween];
 						}
 					},
 					complete: function(isAbort, fx) {
@@ -259,7 +290,7 @@ using("System.Fx.Tween");
 						Dom.hide(elem);
 
 						// 恢复所有属性的默认值。
-						Object.extend(elem.style, fx.orignal);
+						Object.extend(elem.style, fx.options.orignal);
 
 						// callback
 						if (callback)

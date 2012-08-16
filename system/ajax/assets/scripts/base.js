@@ -29,16 +29,16 @@ var Ajax = (function() {
 	 * 用于发送和接收 AJAX 请求的工具。
 	 */
 	Ajax = Deferrable.extend({
-
-		/**
-		 * 供 Transport 设置的状态回调。
-		 */
-		callback: Function.empty,
 		
 		/**
 		 * Ajax 默认配置。
 		 */
 		options: {
+
+			///**
+			// * 供 Transport 设置的状态回调。
+			// */
+			//callback: Function.empty,
 			
 			/**
 			 * 传输的数据类型。
@@ -58,42 +58,49 @@ var Ajax = (function() {
 			 * @type Number
 			 */
 			timeout: -1,
-	
+
 			/**
-			 * 获取或设置是否为允许缓存。
-			 * @type Boolean
+			 * 出现错误后的回调。
 			 */
-			cache: true,
+			exception: function(e) {
+				this.callback(e.message, -1);
+			},
 	
-			/**
-			 * 发送的数据。
-			 * @type Obeject/String
-			 */
-			data: null,
+			///**
+			// * 获取或设置是否为允许缓存。
+			// * @type Boolean
+			// */
+			//cache: true,
 	
-			/**
-			 * 发送数据前的回调。
-			 * @type Function
-			 */
-			start: null,
+			///**
+			// * 发送的数据。
+			// * @type Obeject/String
+			// */
+			//data: null,
 	
-			/**
-			 * 发送数据成功的回调。
-			 * @type Function
-			 */
-			success: null,
+			///**
+			// * 发送数据前的回调。
+			// * @type Function
+			// */
+			//start: null,
 	
-			/**
-			 * 发送数据错误的回调。
-			 * @type Function
-			 */
-			error: null,
+			///**
+			// * 发送数据成功的回调。
+			// * @type Function
+			// */
+			//success: null,
 	
-			/**
-			 * 发送数据完成的回调。
-			 * @type Function
-			 */
-			complete: null,
+			///**
+			// * 发送数据错误的回调。
+			// * @type Function
+			// */
+			//errorCode: null,
+	
+			///**
+			// * 发送数据完成的回调。
+			// * @type Function
+			// */
+			//complete: null,
 		
 			/**
 			 * 用于格式化原始数据的函数。
@@ -146,13 +153,13 @@ var Ajax = (function() {
 		 * async - 是否为异步的请求。默认为 true 。
 		 * cache - 是否允许缓存。默认为 true 。
 		 * charset - 请求的字符编码。
-		 * complete(error, xhr) - 请求完成时的回调。
+		 * complete(errorCode, xhr) - 请求完成时的回调。
 		 * //  contentType - 请求头的 Content-Type 。默认为 'application/x-www-form-urlencoded; charset=UTF-8'。
-		 * createNativeRequest() - 创建原生 XHR 对象的函数。
+		 * // createNativeRequest() - 创建原生 XHR 对象的函数。
 		 * crossDomain - 指示 AJAX 强制使用跨域方式的请求。默认为 null,表示系统自动判断。
 		 * data - 请求的数据。
 		 * dataType - 请求数据的类型。默认为根据返回内容自动识别。
-		 * error(message, xhr) - 请求失败时的回调。
+		 * errorCode(message, xhr) - 请求失败时的回调。
 		 * formatData(data) - 用于将 data 格式化为字符串的函数。
 		 * headers - 附加的额外请求头信息。
 		 * jsonp - 如果使用 jsonp 请求，则指示 jsonp 参数。如果设为 false，则不添加后缀。默认为 callback。
@@ -170,33 +177,37 @@ var Ajax = (function() {
 		 * @param {String} link 当出现两次并发的请求后的操作。
 		 */
 		run: function(options, link) {
-			var ajax = this;
+			var me = this, defaultOptions, transport;
 			
-			if (!ajax.defer(options, link)) {
-	
-				assert.notNull(options, "Ajax#run(options, link): {options} ~");
-				
-				// 将默认配置里的项拷贝 options 到当前对象，如果 options未指定项，则使用默认配置。
-				for (var option in ajax.options) {
-					ajax[option] = (option in options ? options : ajax.options)[option];
-				}
-				
-				// 保存 options 。
-				ajax.options = options;
-				
+			if (!me.defer(options, link)) {
+
+				// defaultOptions
+				defaultOptions = me.options;
+
+				// options
+				me.options = options = Object.extend({
+					target: me,
+					formatData: defaultOptions.formatData,
+					timeout: defaultOptions.timeout,
+					exception: defaultOptions.exception
+				}, options);
+
+				// dataType
+				options.dataType = options.dataType || defaultOptions.dataType;
+
 				// url
-				ajax.url = ajax.url.replace(/#.*$/, "");
+				options.url = options.url ? options.url.replace(/#.*$/, "") : defaultOptions.url;
 	
 				// data
-				ajax.data = ajax.data ? ajax.formatData(ajax.data) : null;
+				options.data = options.data ? options.formatData(options.data) : null;
 	
 				// crossDomain
-				if (ajax.crossDomain == null) {
+				if (options.crossDomain == null) {
 	
-					var parts = rUrl.exec(ajax.url.toLowerCase());
+					var parts = rUrl.exec(options.url.toLowerCase());
 	
 					// from jQuery: 跨域判断。
-					ajax.crossDomain = !!(parts &&
+					options.crossDomain = !!(parts &&
 						(parts[1] != ajaxLocParts[1] || parts[2] != ajaxLocParts[2] ||
 							(parts[3] || (parts[1] === "http:" ? 80 : 443)) !=
 								(ajaxLocParts[3] || (ajaxLocParts[1] === "http:" ? 80 : 443)))
@@ -205,16 +216,16 @@ var Ajax = (function() {
 				}
 
 				// 当前用于传输的工具。
-				var transport = Ajax.transports[ajax.dataType];
+				transport = Ajax.transports[options.dataType];
 
-				assert(transport, "Ajax#run(options, link): 不支持 {dataType} 的数据格式。", ajax.dataType);
+				assert(transport, "Ajax#run(options, link): 不支持 {dataType} 的数据格式。", options.dataType);
 				
 				// 实际的发送操作。
-				transport.send(ajax);
+				transport.send(options);
 
 			}
 			
-			return ajax;
+			return me;
 		},
 
 		/**
@@ -222,12 +233,8 @@ var Ajax = (function() {
 		 * @return this
 		 */
 		pause: function() {
-			this.callback('Aborted', -3);
+			this.options.callback('Aborted', -3);
 			return this;
-		},
-
-		exception: function(e) {
-			this.callback(e.message, -1);
 		}
 
 	});
@@ -330,47 +337,46 @@ var Ajax = (function() {
 
 		/**
 		 * 发送指定配置的 Ajax 对象。
-		 * @type {Ajax} ajax 要发送的 AJAX 对象。
+		 * @type {Ajax} options 要发送的 AJAX 对象。
 		 */
-		send: function(ajax) {
+		send: function(options) {
 
 			// 拷贝配置。
 
 			// options
-			var options = ajax.options,
-					headers,
-					xhr,
-					key,
-					callback;
+			var headers,
+				xhr,
+				key,
+				callback;
 
 			// type
-			ajax.type = options.type ? options.type.toUpperCase() : 'GET';
+			options.type = options.type ? options.type.toUpperCase() : 'GET';
 
 			// async
-			ajax.async = options.async !== false;
+			options.async = options.async !== false;
 
 			// getResponse
-			ajax.getResponse = options.getResponse || this.getResponse;
+			options.getResponse = options.getResponse || this.getResponse;
 
 			// data
-			if (ajax.data && ajax.type == 'GET') {
-				ajax.url = Ajax.concatUrl(ajax.url, ajax.data);
-				ajax.data = null;
+			if (options.data && options.type == 'GET') {
+				options.url = Ajax.concatUrl(options.url, options.data);
+				options.data = null;
 			}
 
 			// cache
-			if (!ajax.cache) {
-				ajax.url = Ajax.concatUrl(ajax.url, '_=' + Date.now() + JPlus.id++);
+			if (options.cache === false) {
+				options.url = Ajax.concatUrl(options.url, '_=' + Date.now() + JPlus.id++);
 			}
 
 			// headers
-			headers = ajax.headers = {};
+			headers = options.headers = {};
 
 			// headers['Accept']
 			headers.Accept = options.dataType in Ajax.accepts ? Ajax.accepts[options.dataType] + ", " + defaultAccepts + "; q=0.01" : defaultAccepts;
 
 			// headers['Content-Type']
-			if (ajax.data) {
+			if (options.data) {
 				headers['Content-Type'] = "application/x-www-form-urlencoded; charset=" + (options.charset || "UTF-8");
 			}
 
@@ -380,7 +386,7 @@ var Ajax = (function() {
 			}
 
 			// headers['X-Requested-With']
-			if (!ajax.crossDomain) {
+			if (!options.crossDomain) {
 				headers['X-Requested-With'] = 'XMLHttpRequest';
 			}
 
@@ -392,12 +398,12 @@ var Ajax = (function() {
 			// 发送请求。
 
 			// 请求对象。
-			ajax.xhr = xhr = (options.createNativeRequest || Ajax.createNativeRequest)();
+			options.xhr = xhr = Ajax.createNativeRequest();
 
 			/**
 			 * 由 XHR 负责调用的状态检测函数。
 			 * @param {Object} _ 忽略的参数。
-			 * @param {Integer} error 系统控制的错误码。
+			 * @param {Integer} errorCode 系统控制的错误码。
 			 *
 			 * - 0: 成功。
 			 * - -1: 程序出现异常，导致进程中止。
@@ -406,111 +412,114 @@ var Ajax = (function() {
 			 * - 1: HTTP 成功相应，但返回的状态码被认为是不对的。
 			 * - 2: HTTP 成功相应，但返回的内容格式不对。
 			 */
-			callback = ajax.callback = function(errorMessage, error) {
+			callback = options.callback = function(errorMessage, errorCode) {
 
 				// xhr
-				var xhr = ajax.xhr;
+				var xhr = options.xhr;
 
 				try {
 
-					if (xhr && (error || xhr.readyState === 4)) {
+					if (xhr && (errorCode || xhr.readyState === 4)) {
 
 						// 删除 readystatechange  。
-						// 删除 ajax.callback 避免被再次触发。
-						xhr.onreadystatechange = ajax.callback = Function.empty;
+						// 删除 options.callback 避免被再次触发。
+						xhr.onreadystatechange = options.callback = Function.empty;
 
 						// 如果存在错误。
-						if (error) {
+						if (errorCode) {
 
 							// 如果是因为超时引发的，手动中止请求。
 							if (xhr.readyState !== 4) {
 								xhr.abort();
 							}
 
-							// 出现错误 status = error 。
-							ajax.status = error;
-							ajax.statusText = null;
-							ajax.errorMessage = errorMessage;
+							// 出现错误 status = errorCode 。
+							options.status = errorCode;
+							options.statusText = null;
+							options.errorMessage = errorMessage;
 						} else {
 
-							ajax.status = xhr.status;
+							options.status = xhr.status;
 
 							// 如果跨域，火狐报错。
 							try {
-								ajax.statusText = xhr.statusText;
+								options.statusText = xhr.statusText;
 							} catch (firefoxCrossDomainError) {
 								// 模拟 Webkit: 设为空字符串。
-								ajax.statusText = "";
+								options.statusText = "";
 							}
 
 							// 检验状态码是否正确。
-							if (Ajax.checkStatus(ajax.status)) {
+							if (Ajax.checkStatus(options.status)) {
 								// 如果请求合法，且数据返回正常，则使用 getResponse 获取解析的原始数据。
-								error = 0;
-								ajax.errorMessage = null;
+								errorCode = 0;
+								options.errorMessage = null;
 								try {
-									ajax.response = ajax.getResponse(xhr);
+									options.response = options.getResponse(xhr);
 								} catch (getResponseError) {
-									error = 2;
-									ajax.errorMessage = getResponseError.message;
+									errorCode = 2;
+									options.errorMessage = getResponseError.message;
 								}
 							} else {
-								error = 1;
-								ajax.errorMessage = ajax.statusText;
+								errorCode = 1;
+								options.errorMessage = options.statusText;
 							}
 
 						}
 
-						// 保存 error 。
-						ajax.error = error;
+						// 保存 errorCode 。
+						options.errorCode = errorCode;
 
 						try {
 
-							if (error) {
-								if (ajax.error)
-									ajax.error(ajax.errorMessage, xhr);
+							if (errorCode) {
+								if (options.error)
+									options.error.call(options.target, options.errorMessage, xhr);
 
 							} else {
-								if (ajax.success)
-									ajax.success(ajax.response, xhr);
+								if (options.success)
+									options.success.call(options.target, options.response, xhr);
 							}
 
-							if (ajax.complete)
-								ajax.complete(error, xhr);
+							if (options.complete)
+								options.complete.call(options.target, options, xhr);
 
 						} finally {
 
 							// 删除 XHR 以确保 onStateChange 不重复执行。
-							ajax.xhr = xhr = null;
+							options.xhr = xhr = null;
+
+							// 删除 options 。
+							delete options.target.options;
 
 							// 确保 AJAX 的等待项正常继续。
-							ajax.progress();
+							options.target.progress();
 
 						}
 					}
 				} catch (firefoxAccessError) {
 
 					// 赋予新的空对象，避免再次访问 XHR 。
-					ajax.xhr = {readyState: 4};
-					ajax.exception(firefoxAccessError);
+					options.xhr = {readyState: 4};
+					options.exception(firefoxAccessError);
 				}
 			};
 
 			// 预处理数据。
-			if (ajax.start && ajax.start(ajax, xhr) === false)
+			if (options.start && options.start.call(options.target, options, xhr) === false)
 				return callback(0, -3);
 
 			try {
 
 				if (options.username)
-					xhr.open(ajax.type, ajax.url, ajax.async, options.username, options.password);
+					xhr.open(options.type, options.url, options.async, options.username, options.password);
 				else
-					xhr.open(ajax.type, ajax.url, ajax.async);
+					xhr.open(options.type, options.url, options.async);
 
 			} catch (ieOpenError) {
 
 				//  出现错误地址时  ie 在此产生异常
-				return ajax.exception(ieOpenError);
+				return options.exception(ieOpenError);
 			}
 
 			// 设置文件头。
@@ -525,21 +534,21 @@ var Ajax = (function() {
 			xhr.onreadystatechange = callback;
 
 			try {
-				xhr.send(ajax.data);
+				xhr.send(options.data);
 			} catch (sendError) {
-				return ajax.exception(sendError);
+				return options.exception(sendError);
 			}
 
 			// 同步时，火狐不会自动调用 onreadystatechange
-			if (!ajax.async) {
+			if (!options.async) {
 				callback();
 			} else if (xhr.readyState === 4) {
 				// IE6/7： 如果存在缓存，需要手动执行回调函数。
 				setTimeout(callback, 0);
-			} else if (ajax.timeouts > 0) {
+			} else if (options.timeouts > 0) {
 				setTimeout(function() {
 					callback('Timeout', -2);
-				}, ajax.timeouts);
+				}, options.timeouts);
 			}
 
 			// 发送完成。

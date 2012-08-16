@@ -32,36 +32,36 @@ var Fx = (function() {
 	return Deferrable.extend({
 
 		/**
-		 * 当前绑定的节点。
-		 * @type Dom
-		 * @protected
+		 * 当前 FX 对象的默认配置。
 		 */
-		target: null,
-	
-		/**
-		 * 每秒的运行帧次。
-		 * @type {Number}
-		 */
-		fps: 50,
-		
-		/**
-		 * 特效执行毫秒数。
-		 * @type {Number}
-		 */
-		duration: 300,
+		options: {
 
-		/**
-		 * 用于实现渐变曲线的计算函数。函数的参数为：
-		 *
-		 * - @param {Object} p 转换前的数值，0-1 之间。
-		 *
-		 * 返回值是一个数字，表示转换后的值，0-1 之间。
-		 * @field
-		 * @type Function
-		 * @remark
-		 */
-		transition: function(p) {
-			return -(Math.cos(Math.PI * p) - 1) / 2;
+			/**
+			 * 特效执行毫秒数。
+			 * @type {Number}
+			 */
+			duration: 300,
+
+			/**
+			 * 每秒的运行帧次。
+			 * @type {Number}
+			 */
+			fps: 50,
+
+			/**
+			 * 用于实现渐变曲线的计算函数。函数的参数为：
+			 *
+			 * - @param {Object} p 转换前的数值，0-1 之间。
+			 *
+			 * 返回值是一个数字，表示转换后的值，0-1 之间。
+			 * @field
+			 * @type Function
+			 * @remark
+			 */
+			transition: function(p) {
+				return -(Math.cos(Math.PI * p) - 1) / 2;
+			}
+
 		},
 		
 		/**
@@ -88,9 +88,11 @@ var Fx = (function() {
 		 * 进入变换的下步。
 		 */
 		step: function() {
-			var me = this, time = Date.now() - me.time;
-			if (time < me.duration) {
-				me.set(me.transition(time / me.duration));
+			var me = this,
+				time = Date.now() - me.time,
+				options = me.options;
+			if (time < options.duration) {
+				me.set(options.transition(time / options.duration));
 			}  else {
 				me.end(false);
 			}
@@ -101,46 +103,49 @@ var Fx = (function() {
 		 * @param {Object} from 开始位置。
 		 * @param {Object} to 结束位置。
 		 * @param {Number} duration=-1 变化的时间。
-		 * @param {Function} [onStop] 停止回调。
-		 * @param {Function} [onStart] 开始回调。
+		 * @param {Function} [onComplete] 停止回调。
 		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 restart 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
 		 * @return {Base} this
 		 */
 		run: function (options, link) {
-			var fx = this, defaultOptions, duration;
-			if (!fx.defer(options, link)) {
+			var me = this, defaultOptions, duration;
+			if (!me.defer(options, link)) {
 
-				assert.notNull(options, "Fx#run(options, link): {options} ~");
+				defaultOptions = me.options;
 
 				// options
-				fx.options = options;
+				me.options = options = Object.extend({
+					transition: defaultOptions.transition,
+					fps: defaultOptions.fps
+				}, options);
+
+				// duration
+				duration = options.duration;
+				assert(duration == undefined || duration === 0 || +duration, "Fx#run(options, link): duration 必须是数字。如果需要使用默认的时间，使用 -1 。");
+				options.duration = duration !== -1 && duration != undefined ? duration < 0 ? -defaultOptions.duration * duration : duration : defaultOptions.duration;
 
 				// start
-				if (options.start && options.start.call(options.target, options, fx) === false) {
-					fx.progress();
+				if (options.start && options.start.call(options.target, options, me) === false) {
+					me.progress();
 				} else {
 
-					defaultOptions = Fx.prototype;
-
-					// transition
-					fx.transition = options.transition || defaultOptions.transition;
-
-					// target
-					fx.target = options.target;
-				
-					// duration
-					duration = options.duration;
-					assert(duration == undefined || duration === 0 || +duration, "Fx#run(options, link): duration 必须是数字。如果需要使用默认的时间，使用 -1 。");
-					fx.duration = duration !== -1 && duration != undefined ? duration < 0 ? -defaultOptions.duration * duration : fx.duration : defaultOptions.duration;
-
-					fx.init(options);
-					fx.set(0);
-					fx.time = 0;
-					fx.resume();
+					me.init(options);
+					me.set(0);
+					me.time = 0;
+					me.resume();
 				}
 			}
 
-			return fx;
+			return me;
+		},
+
+		/**
+		 * 让当前特效执行器等待指定时间。
+		 */
+		delay: function(timeout){
+			return this.run({
+				duration: timeout
+			});
 		},
 
 		/**
@@ -148,17 +153,22 @@ var Fx = (function() {
 		 * @param {Boolean} isAbort 如果是强制中止则为 true, 否则是 false 。
 		 */
 		end: function(isAbort) {
-			var fx = this;
-			fx.pause();
-			fx.set(1);
+			var me = this;
+			me.pause();
+			me.set(1);
 			try {
-				if (fx.options.complete) {
-					fx.options.complete.call(fx.target, isAbort, fx);
+
+				// 调用回调函数。
+				if (me.options.complete) {
+					me.options.complete.call(me.options.target, isAbort, me);
 				}
 			} finally {
-				fx.progress();
+
+				// 删除配置对象。恢复默认的配置对象。
+				delete me.options;
+				me.progress();
 			}
-			return fx;
+			return me;
 		},
 		
 		/**
@@ -174,12 +184,13 @@ var Fx = (function() {
 		 * 暂停当前效果。
 		 */
 		pause: function() {
-			var me = this;
+			var me = this, fps, intervals;
 			if (me.timer) {
 				me.time = Date.now() - me.time;
-				var fps = me.fps, value = cache[fps];
-				value.remove(me);
-				if (value.length === 0) {
+				fps = me.options.fps;
+				intervals = cache[fps];
+				intervals.remove(me);
+				if (intervals.length === 0) {
 					clearInterval(me.timer);
 					delete cache[fps];
 				}
@@ -192,13 +203,14 @@ var Fx = (function() {
 		 * 恢复当前效果。
 		 */
 		resume: function() {
-			var me = this;
+			var me = this, fps, intervals;
 			if (!me.timer) {
 				me.time = Date.now() - me.time;
-				var fps = me.fps, value = cache[fps];
-				if(value){
-					value.push(me);
-					me.timer = value[0].timer;
+				fps = me.options.fps;
+				intervals = cache[fps];
+				if (intervals) {
+					intervals.push(me);
+					me.timer = intervals[0].timer;
 				} else {
 					me.timer = setInterval(interval.bind(cache[fps] = [me]), Math.round(1000 / fps ));
 				}

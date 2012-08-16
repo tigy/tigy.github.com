@@ -13,19 +13,21 @@ Ajax.transports.jsonp = {
 		return this.response;
 	},
 
-	send: function(ajax) {
+	send: function(options) {
 
-		ajax.jsonp = ('jsonp' in ajax.options ? ajax.options : this).jsonp;
+		if (options.jsonp === undefined) {
+			options.jsonp = this.jsonp;
+		}
 
 		// callback=?
-		var jsonpCallback = ajax.jsonpCallback = ajax.options.jsonpCallback || ('jsonp' + Date.now() + JPlus.id++);
+		var jsonpCallback = options.jsonpCallback || (options.jsonpCallback = 'jsonp' + Date.now() + JPlus.id++);
 
 		// callback=jsonp123
-		if (ajax.jsonp) {
-			if (ajax.url.indexOf(ajax.jsonp + '=?') >= 0) {
-				ajax.url = ajax.url.replace(ajax.jsonp + '=?', ajax.jsonp + '=' + jsonpCallback);
+		if (options.jsonp) {
+			if (options.url.indexOf(options.jsonp + '=?') >= 0) {
+				options.url = options.url.replace(options.jsonp + '=?', options.jsonp + '=' + jsonpCallback);
 			} else {
-				ajax.url = Ajax.concatUrl(ajax.url, ajax.jsonp + "=" + jsonpCallback);
+				options.url = Ajax.concatUrl(options.url, options.jsonp + "=" + jsonpCallback);
 			}
 		}
 
@@ -37,14 +39,14 @@ Ajax.transports.jsonp = {
 			window[jsonpCallback] = oldMethod;
 
 			// 保存 response 数据。
-			ajax.response = data;
+			options.response = data;
 
 			// 通知 onStateChange 已完成请求。
-			ajax.callback();
+			options.callback();
 		};
 
 		// 最后使用 Script 协议发送。
-		Ajax.transports.script.send.call(this, ajax);
+		Ajax.transports.script.send.call(this, options);
 	}
 
 };Ajax.jsonp = function(url, data, onsuccess) {

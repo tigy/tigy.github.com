@@ -3,18 +3,18 @@
 		var code = Ajax.XHR.getResponse(xhr);
 		window.execScript(code);
 		return code;
-	},	send: function(ajax) {
-		if (!ajax.crossDomain) {
-			return Ajax.XHR.send.call(this, ajax);		}		ajax.type = "GET";		// cache		if (!ajax.cache || ajax.options.cache !== false) {
-			ajax.cache = false;
-			ajax.url = Ajax.concatUrl(ajax.url, '_=' + Date.now() + JPlus.id++);		}		var options = ajax.options,			script = ajax.script = document.createElement('SCRIPT'),
+	},	send: function(options) {
+		if (!options.crossDomain) {
+			return Ajax.XHR.send.call(this, options);		}		options.type = "GET";		// cache		if (!options.cache || options.options.cache !== false) {
+			options.cache = false;
+			options.url = Ajax.concatUrl(options.url, '_=' + Date.now() + JPlus.id++);		}		var script = options.script = document.createElement('SCRIPT'),
 			t,
-			callback = ajax.callback = function(errorMessage, error) {
-				var script = ajax.script;
+			callback = options.callback = function(errorMessage, error) {
+				var script = options.script;
 				if (script && (error || !script.readyState || !/in/.test(script.readyState))) {
 
 					// 删除 callback 避免再次执行。
-					ajax.callback = Function.empty;
+					options.callback = Function.empty;
 
 					// 删除全部绑定的函数。
 					script.onerror = script.onload = script.onreadystatechange = null;
@@ -22,37 +22,39 @@
 					// 删除当前脚本。
 					script.parentNode.removeChild(script);
 
-					// 保存 error 。
-					ajax.error = error;
+					// 保存 errorCode 。
+					options.errorCode = error;
 
 					try {
 
 						if (error >= 0) {
-							ajax.status = 200;
-							ajax.statusText = "OK";
-							ajax.errorMessage = null;
+							options.status = 200;
+							options.statusText = "OK";
+							options.errorMessage = null;
 						} else {
-							ajax.status = error;
-							ajax.statusText = null;
-							ajax.errorMessage = errorMessage;
+							options.status = error;
+							options.statusText = null;
+							options.errorMessage = errorMessage;
 						}
 
 						if (error) {
-							if (ajax.error)
-								ajax.error(ajax.errorMessage, script);
+							if (options.error)
+								options.error.call(options.target, options.errorMessage, script);
 						} else {
-							if (ajax.success)
-								ajax.success(ajax.response, script);
+							if (options.success)
+								options.success.call(options.target, options.response, script);
 						}
 
-						if (ajax.complete)
-							ajax.complete(error, script);
+						if (options.complete)
+							options.complete.call(options.target, options, script);
 
 					} finally {
 
-						ajax.script = script = null;
+						options.script = script = null;
 
-						ajax.progress();
+						delete options.target.options;
+
+						options.target.progress();
 					}
 				}
 			};
@@ -64,7 +66,7 @@
 			script.charset = options.charset;
 		
 		// 预处理数据。
-		if (ajax.start && ajax.start(ajax.data, xhr) === false)
+		if (options.start && options.start.call(options.target, options, xhr) === false)
 			return callback(0, -3);
 
 		script.onload = script.onreadystatechange = callback;
@@ -72,10 +74,10 @@
 		script.onerror = function(e) {
 			callback(e.message, 2);
 		};		
-		if (ajax.timeouts > 0) {
+		if (options.timeouts > 0) {
 			setTimeout(function() {
 				callback('Timeout', -2);
-			}, ajax.timeouts);
+			}, options.timeouts);
 		}
 
 		t = document.getElementsByTagName("SCRIPT")[0];

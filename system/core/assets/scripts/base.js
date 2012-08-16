@@ -556,18 +556,21 @@
 		 */
 		map: function (iterable, fn, dest) {
 
-			var isString = typeof iterable === 'string',
-				actualFn = typeof fn === 'function' ? !isString || dest ? function (value, key, array) {
+			var actualFn;
+
+			// 如果是目标对象是一个字符串，则改为数组。
+			if (typeof iterable === 'string') {
+				iterable = iterable.split(' ');
+				actualFn = typeof fn === 'function' ? dest ? function (value, key, array) {
 					this[value] = fn(value, key, array);
 				} : fn : function(value){
 					this[value] = fn;
-				};
-
-			// 如果是目标对象是一个字符串，则改为数组。
-			if (isString) {
-				iterable = iterable.split(' ');
+				}
 			} else {
 				dest = typeof iterable.length !== "number" ? {} : [];
+				actualFn = function (value, key, array) {
+					this[key] = fn(value, key, array);
+				};
 			}
 
 			// 遍历对象。

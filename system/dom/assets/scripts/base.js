@@ -3419,7 +3419,7 @@
 		styleFix.opacity = function(value){
 			var elem = this.node, style = elem.style;
 
-			assert(!+value || (value <= 1 && value >= 0), 'Dom#setOpacity(value): {value} 必须在 0~1 间。', value);
+			assert(!+value || (value <= 1 && value >= 0), 'Dom#setStyle("opacity", value): {value} 必须在 0~1 间。', value);
 			assert.isElement(elem, "Dom#setStyle(name, value): 当前 dom 不支持样式");
 
 			if (value)
