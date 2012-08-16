@@ -1,5 +1,6 @@
 
 using("System.Browser.Base");
+using("System.Browser.Cookie");
 	
 Browser.getSubCookie = function (key, subkey) {
 		

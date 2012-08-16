@@ -12,22 +12,20 @@
 	</head>
 	<body>
 		<script>
-			var testcases = {
-			    'Browser.setSubCookie': {
-				    '~("a", "b", "c")': function(value, assert){
+			Demo.writeTestCases({
+			    '设置子 Cookie': {
+				    'Browser.setSubCookie("a", "b", "c")': function(value, assert){
 				        assert.areEqual(Browser.getCookie("a"), "b");
 				    },
-				    '~("a", "c", null)': function (value, assert) {
+				    'Browser.setSubCookie("a", "c", null)': function (value, assert) {
                         assert.areEqual(Browser.getCookie("a"), undefined);
                     },
-				    '~("a", "c", "b", 1)': '-'
+				    'Browser.setSubCookie("a", "c", "b", 1)': '-'
 				},
-			    'Browser.getSubCookie': {
-				    '~("a", "b")': "b"
+			    '获取子 Cookie': {
+				    'Browser.getSubCookie("a", "b")': "b"
 				}
-			};
-			
-			Demo.writeTestCases(testcases);
+			});
 			
 		</script>
 	</body>

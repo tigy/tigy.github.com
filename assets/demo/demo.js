@@ -3569,6 +3569,7 @@ Demo.extend(Demo, {
 			} catch (e) {
 				document.getElementById('demo-testcase-' + id).className = 'demo-tip demo-tip-error';
 				Demo.reportError(value.text, e);
+				hasError = true;
 				continue;
 			}
 
@@ -3578,6 +3579,7 @@ Demo.extend(Demo, {
 				} catch (e) {
 					document.getElementById('demo-testcase-' + id).className = 'demo-tip demo-tip-warning';
 					Demo.reportError(value.text, e);
+					hasError = true;
 					continue;
 				}
 			}

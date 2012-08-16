@@ -11,7 +11,7 @@
 	</head>
 	<body>
 		<script>
-		    var testcases = {
+		    Demo.writeTestCases({
 			    '获取 Cookie': {
 			        'Browser.getCookie("aaaa")': "-"
                 },
@@ -26,10 +26,7 @@
 			            assert.areEqual(Browser.getCookie("aaaa"), undefined);
 			        }
 			    }
-			};
-			
-			Demo.writeTestCases(testcases);
-			
+			});
 		</script>
 	</body>
 </html>

@@ -3,7 +3,7 @@
  */
 
 
-using("System.Request.Base");
+using("System.Ajax.Base");
 
 
 var QueryString = QueryString || {};
@@ -40,7 +40,7 @@ QueryString.parse = function (value) {
  * @param name {String} (optional) Name of the current key, for handling children recursively.
  * @static
  */
-QueryString.stringify = Request.param;
+QueryString.stringify = Ajax.param;
 
 
 //function (obj, name, stack) {

@@ -4,7 +4,7 @@
 		<meta charset="UTF-8">
 		<title>J+ Library</title>
 		<script src="../../system/core/assets/scripts/base.js" type="text/javascript"></script>
-		<script src="../../system/utils/assets/scripts/json.js" type="text/javascript"></script>
+		<script src="../../system/data/assets/scripts/json.js" type="text/javascript"></script>
 		<script src="../../system/browser/assets/scripts/base.js" type="text/javascript"></script>
 		<script src="../../system/browser/assets/scripts/cookie.js" type="text/javascript"></script>
 		<script src="../../system/browser/assets/scripts/localstorage.js" type="text/javascript"></script>
@@ -13,8 +13,7 @@
 	</head>
 	<body>
 		<script>
-		    ;
-		    var testcases = {
+		    Demo.writeTestCases({
 		        "获取本地存储数据": {
 		            'Browser.getData("key")': function (value, assert) {
 		                Browser.setData("key", "value");
@@ -29,9 +28,7 @@
 		            }
 		        },
 		        "设置本地存储数据的JSON": 'Browser.setJSON("key", {value: 1})'
-		    };
-
-		    Demo.writeTestCases(testcases);
+		    });
 		</script>
 	</body>
 </html>

@@ -10,13 +10,9 @@ using("System.Browser.Base");
  * @param {String} 值。
  */
 Browser.getCookie = function (name) {
-		
 	assert.isString(name, "Browser.getCookie(name): 参数 {name} ~");
-		
-	name = encodeURIComponent(name);
-		
-	var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([-.*+?^${}()|[\]\/\\])/g, '\\$1') + "=([^;]*)"));
-	return matches ? decodeURIComponent(matches[1]) : undefined;
+	var matches = document.cookie.match(new RegExp("(?:^|; )" + encodeURIComponent(name).replace(/([-.*+?^${}()|[\]\/\\])/g, '\\$1') + "=([^;]*)"));
+	return matches ? decodeURIComponent(matches[1]) : null;
 };
 	
 /**
@@ -31,8 +27,6 @@ Browser.setCookie = function (name, value, expires, props) {
 		    updatedCookie = e(name) + "=" + e(value),
 		    t;
 
-	assert(updatedCookie.length < 4096, "Browser.setCookie(name, value, expires, props): 参数  value 内容过长(大于 4096)，操作失败。");
-
 	if (expires == undefined)
 		expires = value === null ? -1 : 1000;
 
@@ -45,10 +39,12 @@ Browser.setCookie = function (name, value, expires, props) {
 	for (t in props) {
 		updatedCookie = String.concat(updatedCookie, "; " + t, "=", e(props[t]));
 	}
+	
+	assert(updatedCookie.length < 4096, "Browser.setCookie(name, value, expires, props): 参数  value 内容过长(大于 4096)，操作失败。");
 
 	document.cookie = updatedCookie;
 
-	return Browser;
+	return value;
 };
 
 

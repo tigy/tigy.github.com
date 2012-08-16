@@ -11,14 +11,10 @@
 	</head>
 	<body>
 		<script>
-            
-            
-            var testcases = {
-                'XML.parse': '~("<a></a>")'
-            };
-            
-            Demo.writeTestCases(testcases);
-            
+            Demo.writeTestCases({
+                'XML.parse': 'XML.parse("<a></a>")',
+                'XML.stringify': 'XML.stringify(XML.parse("<a></a>"))'
+            });
         </script>
 	</body>
 </html>

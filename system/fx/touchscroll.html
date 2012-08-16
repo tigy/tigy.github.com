@@ -14,7 +14,7 @@
 		<style>
 			
 			
-			#p {
+			#a {
 				height: 400px;	
 				border: 1px solid #dddddd;
                 
@@ -30,7 +30,7 @@
 	<body>
 		
 		
-		<div id="p">
+		<div id="a">
 			<div id="c">
 				<script>
 					for(var  i = 1; i < 1000; i++)
@@ -40,7 +40,9 @@
 		</div>
 		
 		<script>
-			 Dom.get('p').touchScroll();
+            Demo.writeTestCases({
+                '触摸滚动': 'Dom.get('a').touchScroll()'
+            });
 		</script>
 		
 		

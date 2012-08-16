@@ -23,8 +23,8 @@ Sorter._createFn = function (sortFn) {
 		start = start || 0;
 		end = end || iteratable.length;
 
-		assert.between(start, 0, end + 1, "Sorter.sort(iteratable, start, end, compareFn): 参数 {start} ~。");
-		assert.between(end, start, iteratable.length + 1, "Sorter.sort(iteratable, start, end, compareFn): 参数 {end} ~。");
+		assert(start >= 0 && start <= end, "Sorter.sort(iteratable, start, end, compareFn): 参数 {start} ~。");
+		assert(end <= iteratable.length, "Sorter.sort(iteratable, start, end, compareFn): 参数 {end} ~。");
 		assert.isFunction(compareFn, "Sorter.sort(iteratable, start, end, compareFn): 参数 {compareFn} ~。");
 
 

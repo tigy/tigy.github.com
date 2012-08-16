@@ -11,15 +11,13 @@
 	<body>
 		<script>
 			
-			var testcases = {
+			Demo.writeTestCases({
 			    'Tpl.parse': {
-			        '~("{for p in path}{p}{end}", {path: [1,2,3]})': "123",
-			        '~("{if a}abc{else if b.c}def{end}", {a:0, b: {c: 4}})': "def",
-			        '~("{var aa = 4}{aa}", {a:0, b: {c: 4}})': "4"
+			        'Tpl.parse("{for p in path}{p}{end}", {path: [1,2,3]})': "123",
+			        'Tpl.parse("{if a}abc{else if b.c}def{end}", {a:0, b: {c: 4}})': "def",
+			        'Tpl.parse("{var aa = 4}{aa}", {a:0, b: {c: 4}})': "4"
 			    }
-			};
-			
-			Demo.writeTestCases(testcases);
+			});
 			
 			
 			//trace(  Tpl.compile("abc{\\{}")  .toString()   );
