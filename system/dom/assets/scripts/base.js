@@ -1642,8 +1642,7 @@
 			 * @return {Dom} 发生事件 Dom 对象。
 			 */
 			getTarget: function() {
-				assert(this.target, "Dom.Event#getTarget(): 当前事件不支持 getTarget 操作");
-				return new Dom(this.target.nodeType === 3 ? this.target.parentNode: this.target);
+				return new Dom(this.orignalType && this.currentTarget || (this.target.nodeType === 3 ? this.target.parentNode: this.target));
 			}
 		})
 
@@ -3306,9 +3305,12 @@
 	var mousEnterEventInfo = {
 		initEvent: function (e) {
 			var relatedTarget = e.relatedTarget;
+
+			// 修正 getTarget 返回值。
+			e.orignalType = e.type === 'mouseover' ? 'mouseenter' : 'mouseleave';
 			return this.node !== relatedTarget && !Dom.hasChild(this.node, relatedTarget);
 		},
-		base: div.onmouseenter !== null ? null : 'mouseover',
+		base: div.onmouseenter === null ? null : 'mouseover',
 		delegate: 'mouseover'
 	};
 
@@ -3349,7 +3351,7 @@
 					doc[funcName](base, this.handler, true);
 				},
 				handler: function(e) {
-					var type = e.type === 'focus' ? 'focusin' : 'focusout';
+					var type = e.orignalType = e.type === 'focus' ? 'focusin' : 'focusout';
 
 					var p = e.getTarget();
 
