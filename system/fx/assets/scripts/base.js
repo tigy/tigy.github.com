@@ -48,7 +48,7 @@ var Fx = (function() {
 		 * 特效执行毫秒数。
 		 * @type {Number}
 		 */
-		duration: 500,
+		duration: 300,
 
 		/**
 		 * 用于实现渐变曲线的计算函数。函数的参数为：
@@ -112,26 +112,27 @@ var Fx = (function() {
 
 				assert.notNull(options, "Fx#run(options, link): {options} ~");
 
-				defaultOptions = Fx.prototype;
-
 				// options
 				fx.options = options;
 
-				// transition
-				fx.transition = options.transition || defaultOptions.transition;
-
-				// target
-				fx.target = options.target;
-				
-				// duration
-				duration = options.duration;
-				assert(duration == undefined || duration === 0 || +duration, "Fx#run(options, link): duration 必须是数字。如果需要使用默认的时间，使用 -1 。");
-				fx.duration = duration !== -1 && duration != undefined ? duration < 0 ? -defaultOptions.duration * duration : fx.duration : defaultOptions.duration;
-
 				// start
-				if (options.start && options.start.call(fx.target, options, fx) === false) {
+				if (options.start && options.start.call(options.target, options, fx) === false) {
 					fx.progress();
 				} else {
+
+					defaultOptions = Fx.prototype;
+
+					// transition
+					fx.transition = options.transition || defaultOptions.transition;
+
+					// target
+					fx.target = options.target;
+				
+					// duration
+					duration = options.duration;
+					assert(duration == undefined || duration === 0 || +duration, "Fx#run(options, link): duration 必须是数字。如果需要使用默认的时间，使用 -1 。");
+					fx.duration = duration !== -1 && duration != undefined ? duration < 0 ? -defaultOptions.duration * duration : fx.duration : defaultOptions.duration;
+
 					fx.init(options);
 					fx.set(0);
 					fx.time = 0;

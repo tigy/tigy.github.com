@@ -497,7 +497,7 @@ var Ajax = (function() {
 			};
 
 			// 预处理数据。
-			if (ajax.start && ajax.start(ajax.data, xhr) === false)
+			if (ajax.start && ajax.start(ajax, xhr) === false)
 				return callback(0, -3);
 
 			try {

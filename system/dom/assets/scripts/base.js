@@ -1406,19 +1406,6 @@
 		styleNumber: styleNumber,
 
 		/**
-		 * 初始化 toggle 函数的参数。
-		 * @param {Argument} args 参数对象。
-		 * @return {Array/Argument} 处理后的参数对象。
-		 * @ignore
-		 */
-		initToggleArgs: function (args) {
-			if(typeof args[0] === 'string')
-				return args;
-			ap.unshift.call(args, 'opacity');
-			return args;
-		},
-
-		/**
 		 * 通过设置 display 属性来显示元素。
 		 * @param {Element} elem 元素。
 	 	 * @static
@@ -1846,9 +1833,7 @@
 		 * @remark 此函数是通过设置 css的 display 属性实现的。
 		 */
 		show: function() {
-			var args = Dom.initToggleArgs(arguments);
 			Dom.show(this.node);
-			if (args = args[2]) setTimeout(args, 0);
 			return this;
 		},
 
@@ -1867,9 +1852,7 @@
 		 * @remark 此函数是通过设置 css的 display = none 实现的。
 		 */
 		hide: function(duration, callback) {
-			var args = Dom.initToggleArgs(arguments);
 			Dom.hide(this.node);
-			if (args = args[2]) setTimeout(args, 0);
 			return this;
 		},
 
@@ -1878,6 +1861,7 @@
 		 * @param {String} [type] 显示时使用的特效方式。
 		 * @param {Number} duration=300 效果执行时间。
 		 * @param {Function} [callBack] 效果执行完的回调函数。
+		 * @param {String} [value] 强制设置 toggle 效果。
 		 * @param {String} [link] 当效果正在执行时的处理方式。
 		 *
 		 * - "**wait**"(默认): 等待上个效果执行完成。
@@ -1888,8 +1872,9 @@
 		 * @remark 此函数是通过设置 css的 display 属性实现的。
 		 */
 		toggle: function() {
-			var args = Dom.initToggleArgs(arguments);
-			return this[(args[4] === undefined ? Dom.isHidden(this.node) : args[4]) ? 'show' : 'hide'].apply(this, args);
+			var args = arguments,
+				flag = args[args.length - 1];
+			return this[(typeof flag === 'boolean' ? flag : Dom.isHidden(this.node)) ? 'show' : 'hide'].apply(this, args);
 		},
 
 		/**
