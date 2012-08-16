@@ -35,27 +35,31 @@
 				Dom.get('b').setHeight(width);
 				Dom.get('t').setWidth(width + 20);
 
-				var Trans = Fx.Base.extend({
+				Fx.compute =   function(from, to, delta){				    return (to - from) * delta + from;				};
 
-					link : 'ignore',
+				var Trans = Fx.extend({
 
-					fps : fps,
+				    link: 'ignore',
 
-					duration : duration,
+				    options: {
+
+				        fps: fps,
+
+				        duration: duration
+				    },
 
 					set : function(delta) {
-						this.x++;
-						var y = Fx.compute(this.from, this.to, delta);
-						this.y = width - y;
+					    this.options.x++;
+					    var y = Fx.compute(this.options.from, this.options.to, delta);
+						this.options.y = width - y;
 
-						Dom.create('div', 'p').appendTo('v').setOffset(this);
+						Dom.create('div', 'p').appendTo('v').setOffset(this.options);
 
 						Dom.get('f').dom.style.left = y + 'px';
 					},
 
 					start: function(){
 					    Dom.get('v').empty();
-					    this.x = 0;
 					}
 
 				});
@@ -63,9 +67,9 @@
 				var f = new Trans();
 
 				for (var i in Fx.Transitions) {
-					document.write('<input type="button" onclick="f.transition = Fx.Transitions.' + i + ';  f.run({from: 0, to:' + width + '}, \'ignore\');" value="' + i + '">');
-					document.write('<input type="button" onclick="f.transition = Fx.easeOut(Fx.Transitions.' + i + ');   f.run({from: 0, to:' + width + '}, \'ignore\');" value="easeOut(' + i + ')">');
-					document.write('<input type="button" onclick="f.transition = Fx.easeInOut(Fx.Transitions.' + i + ');   f.run({from: 0, to:' + width + '}, \'ignore\');" value="easeInOut(' + i + ')">');
+				    document.write('<input type="button" onclick="f.run({x: 0, from: 0, to:' + width + ', transition: Fx.Transitions.' + i + '}, \'ignore\');" value="' + i + '">');
+				    document.write('<input type="button" onclick="f.run({x: 0, from: 0, to:' + width + ', transition: Fx.easeOut(Fx.Transitions.' + i + ')}, \'ignore\');" value="easeOut(' + i + ')">');
+				    document.write('<input type="button" onclick="f.run({x: 0, from: 0, to:' + width + ', transition: Fx.easeInOut(Fx.Transitions.' + i + ')}, \'ignore\');" value="easeInOut(' + i + ')">');
 					document.write('<p />');
 				}
 			</script>

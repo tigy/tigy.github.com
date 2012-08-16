@@ -49,7 +49,7 @@ var Marquee = Class({
 	 */
 	
 	_getWidthBefore: function(ctrl, xy){
-		return ctrl && (ctrl = ctrl.prev()) ? Dom.calc(ctrl.dom, xy) + this._getWidthBefore(ctrl, xy) : 0;
+		return ctrl && (ctrl = ctrl.prev()) ? Dom.calc(ctrl.node, xy) + this._getWidthBefore(ctrl, xy) : 0;
 	},
 	
 	_getScrollByIndex: function (value) {
@@ -94,7 +94,7 @@ var Marquee = Class({
 				// 如果本来正在自动播放中，这里恢复自动播放。
 				if (me.step)
 					me.resume();
-			}, 'abort');
+			}, null, 'abort');
 		}
 
 	},
@@ -107,72 +107,58 @@ var Marquee = Class({
 	_animateToWithLoop: function (index, lt) {
 
 		var me = this,
-			oldIndex = me._fixIndex(me._currentIndex),
-			obj;
+			oldIndex = me._fixIndex(me._currentIndex);
 
 		if (me.onChanging(index, oldIndex) !== false) {
 
 			// 暂停自动播放，防止出现抢资源问题。
 			me.pause();
+			
+			me.target.animate({}, me.duration, function () {
 
-			// 计算滚动坐标。
+				// 效果结束。
+				me._animatingTargetIndex = null;
 
-			obj = {
-				from: {},
-				to: {},
-				duration: me.duration,
-				start: function () {
+				// 滚动完成后触发事件。
+				me.onChanged(index, oldIndex);
 
-					// 实际所滚动的区域。
-					var actualIndex = index + me.length,
+				// 如果本来正在自动播放中，这里恢复自动播放。
+				if (me.step)
+					me.resume();
+			}, function (options) {
+
+				// 实际所滚动的区域。
+				var actualIndex = index + me.length,
 						prop = me._horizonal ? 'marginLeft' : 'marginTop',
-						from = Dom.styleNumber(me.target.dom, prop),
+						from = Dom.styleNumber(me.target.node, prop),
 						to = -me._getScrollByIndex(actualIndex);
 
-					// 如果保证是平滑滚动，则修正错误的位置。
-					if (me.flow) {
+				// 如果保证是平滑滚动，则修正错误的位置。
+				if (me.flow) {
 
-						// 如果是往上、左方向滚。
-						if (lt) {
+					// 如果是往上、左方向滚。
+					if (lt) {
 
-							// 确保 from > to
-							if (from > to) {
-								from -= me._size;
-							}
-
-						} else {
-
-							// 确保 from < to
-							if (from < to) {
-								from += me._size;
-							}
+						// 确保 from > to
+						if (from > to) {
+							from -= me._size;
 						}
 
+					} else {
+
+						// 确保 from < to
+						if (from < to) {
+							from += me._size;
+						}
 					}
 
-					obj.from[prop] = from;
-					obj.to[prop] = to;
+				}
 
-					// 记录当前正在转向的目标索引。
-					me._currentIndex = index;
-				},
-				complete: function () {
+				options.tweens[prop] = from + '-' + to;
 
-					// 效果结束。
-					me._animatingTargetIndex = null;
-
-					// 滚动完成后触发事件。
-					me.onChanged(index, oldIndex);
-
-					// 如果本来正在自动播放中，这里恢复自动播放。
-					if (me.step)
-						me.resume();
-				},
-				link: 'abort'
-			};
-
-			
-			me.target.animate(obj);
+				// 记录当前正在转向的目标索引。
+				me._currentIndex = index;
+			}, 'abort');
 		}
 		return this;
 
@@ -292,14 +278,55 @@ var Marquee = Class({
 		if (me._lt) {
 			delta = -delta;
 		}
+		
+		// 如果不延时。
+		if (me.delay === 0) {
+			
+			me.moving = function(){
+				
+				var value = me._current - delta;
 
-		// 设置单步的执行函数。
-		me.step = function() {
-			var index = me._currentIndex + delta;
-			index = me._fixIndex(index);
-			me[me.loop ? '_animateToWithLoop' : '_animateToWithoutLoop'](index, me._lt);
-			me.timer = setTimeout(me.step, me.delay);
-		};
+				if (value <= me._min) {
+					value += me._unit;
+				} else if (value >= me._max) {
+					value -= me._unit;
+				}
+
+				me._current = value;
+				
+				me.target.node.style[me._prop] = value + 'px';
+				
+				me.timer = setTimeout(me.moving, me.duration);
+
+			};
+
+			me.step = function() {
+
+				me._prop = me._horizonal ? 'marginLeft' : 'marginTop';
+				me._current = Dom.styleNumber(me.target.node, me._prop);
+				me._unit = me._getScrollByIndex(me.length + 1);
+
+				if (me.loop) {
+					me._min = -me._unit * 2;
+					me._max = -me._unit;
+				} else {
+					me._min = -me._unit;
+					me._max = 0;
+				}
+				me.moving();
+			};
+
+		} else {
+
+			// 设置单步的执行函数。
+			me.step = function() {
+				var index = me._currentIndex + delta;
+				index = me._fixIndex(index);
+				me[me.loop ? '_animateToWithLoop' : '_animateToWithoutLoop'](index, me._lt);
+				me.timer = setTimeout(me.step, me.delay);
+			};
+
+		}
 
 		// 正式开始。
 		me.resume();
