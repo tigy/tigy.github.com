@@ -13,17 +13,26 @@
 	<body>
 		
 		
-		<img class="a" data-src="../../assets/resources/260x180.gif" width="500" height="300">
-		<img data-src="../../assets/resources/260x180.gif" width="500" height="300">
-		<img data-src="../../assets/resources/260x180.gif" width="500" height="300">
-		<img data-src="../../assets/resources/260x180.gif" width="500" height="300">
-		<img data-src="../../assets/resources/260x180.gif" width="500" height="300">
-		<img data-src="../../assets/resources/260x180.gif" width="500" height="300">
-		<img data-src="../../assets/resources/260x180.gif" width="500" height="300">
-		<img data-src="../../assets/resources/260x180.gif" width="500" height="300">
-		<img data-src="../../assets/resources/260x180.gif" width="500" height="300">
+		<div style="height:2000px">
+			<img class="a" data-src="../../assets/resources/260x180.gif" width="500" height="300">
+		</div>
+		<div style="height:300px">
+			<img data-src="http://static.alibado.com/iu/k/r0/h5kb6cv82j4p.jpg" width="500" height="300">
+			<img data-src="http://static.alibado.com/iu/2n/kl/h5n6xpub2oam.jpg" width="500" height="300">
+			<img data-src="http://img01.taobaocdn.com/tps/i1/T1.EHBXetaXXXcuMLP-480-220.jpg" width="500" height="300">
+		</div>
+		
+		<img data-src="http://img01.taobaocdn.com/imgextra/i1/78758424/T2WWGgXj4XXXXXXXXX_!!78758424.jpg" width="500" height="300">
+		<img data-src="http://img02.taobaocdn.com/tps/i2/T1Q6_wXlNgXXbvJKnq-236-76.gif" width="500" height="300">
+		<img data-src="http://img04.taobaocdn.com/tps/i4/T1_e_AXctXXXcWEyPo-228-68.jpg" width="500" height="300">
+		<img data-src="http://n01.wbc.zhongzhihui.com/zteimage/BF7D36045F7455E8E040007F01001427/attachment/personal/1340007663728046.jpg" width="500" height="300">
+		<img data-src="http://n01.wbc.zhongzhihui.com/zteimage/ff808081336929ad01336e5adcf23d61/attachment/personal/1339988678414227.jpg" width="500" height="300">
+		
 		
 		<script>
+		Dom.ready(function(){
+			Dom.query('img').lazyload();
+		})
         	Demo.writeTestCases({
         	     '懒加载': 'Browser.lazyload({target: document, offset: 0, show: function(){}, load: function(){}})' // 处理指定节点下的 data-src 属性。
         	});

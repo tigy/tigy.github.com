@@ -19,14 +19,12 @@
 			var a = Dom.get("a");
 			var b = Dom.get("b");
 			
-			var testcases = {
+			Demo.writeTestCases({
 		        "获取选区区域范围": 'a.getSelectionRange()',
 		        "设置选区区域范围": 'a.setSelectionRange({start: 1, end: 4})',
 		        "获取选区区域内容": 'a.getSelectedText()',
 		        "设置选区区域内容": 'a.setSelectedText("文本", true)'
-		    };
-
-		    Demo.writeTestCases(testcases);
+		    });
 		</script>
 	</body>
 </html>

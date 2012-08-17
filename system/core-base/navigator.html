@@ -12,9 +12,7 @@
 			判断浏览器用的对象。 navigator 对象是基于 userAgent 实现的。
 		</p>
 		<script>
-			
-			
-			var testcases = {
+			Demo.writeTestCases({
 			    '获取浏览器名字': 'navigator.name',
 			    '获取浏览器版本': 'navigator.version',
 			    '判断是否为标准浏览器（非 IE6/7/8）': 'navigator.isStd',
@@ -29,10 +27,7 @@
 			    'navigator.isChrome': 'navigator.isChrome',
 			    'navigator.isSafari': 'navigator.isSafari',
 			    'navigator 对象': 'navigator'
-			};
-			
-			Demo.writeTestCases(testcases);
-			
+			});
 		</script>
 	</body>
 </html>
