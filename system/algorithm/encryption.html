@@ -11,7 +11,7 @@
 	</head>
 	<body>
 		<script>
-			var testcases = {
+			Demo.writeTestCases({
 			    "MD5 & base64 加密": {
 			        'Encryption.base64Md5("abc")': "kAFQmDzST7DWlj99KOF/cg"
                 },
@@ -21,10 +21,7 @@
 			    "HMD5 & base64 加密": {
 			        'Encryption.base64HmacMd5("abc", "key")': "rB0fA9COpW63Z6sfkXcxdA"
 			    }
-			};
-			
-			Demo.writeTestCases(testcases);
-			
+			});
 		</script>
 		
 	</body>

@@ -10,8 +10,7 @@
 	</head>
 	<body>
 		<script>
-
-		    var testcases = {
+		    Demo.writeTestCases({
 		        'Basic': '-',
 		        'Date.prototype.toString': '@new Date(2011,10,11,11,11,11,11); "yyyy 年 MM 月 dd 日  yy 年 M 月 d 日   hh mm ss" => "2011 年 11 月 11 日  11 年 11 月 11 日   11 11 11"',
 		        'Date.isLeapYear': '2002 => false',
@@ -22,10 +21,7 @@
 		        'Date.prototype.addMonth': '@new Date("2011/2/27"); 2',
 		        'Date.prototype.addYear': '@new Date("2011/2/27"); 2',
 		        'Date.prototype.addWeek': '@new Date("2011/2/27"); 2'
-		    };
-
-		    Demo.writeTestCases(testcases);
-
+		    });
 		</script>
 	</body>
 </html>
