@@ -2,10 +2,10 @@
 
 namespace(".TreeWalker", Class({
 	
-	dom: null,
+	node: null,
 	
 	constructor: function (dom) {
-		this.dom = dom || document;
+		this.node = dom || document;
 	},
 	
 	moveNext: function () {

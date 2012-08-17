@@ -49,7 +49,7 @@
         <script>
 			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o'), abcd = new DomList($('all').dom.getElementsByTagName("div"));
 
-			var testcases = {
+			Demo.writeTestCases({
                 'CSS 选择器': '-',
 				'Dom#find' : {
 					'a.find("div")' : b,
@@ -138,9 +138,7 @@
                         assert.areEqual(value[0], c.dom);
                     }
                 }
-			};
-
-			Demo.writeTestCases(testcases);
+			});
 
         </script>
     </body>

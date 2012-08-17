@@ -100,7 +100,7 @@
 		 */
 		getWindowSize: function() {
 			var win = this.defaultView;
-			return new Point(win.outerWidth || this.dom.clientWidth, win.outerHeight || this.dom.clientHeight);
+			return new Point(win.outerWidth || this.node.clientWidth, win.outerHeight || this.node.clientHeight);
 		},
 
 		/**

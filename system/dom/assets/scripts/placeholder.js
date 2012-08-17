@@ -10,7 +10,7 @@ Dom.implement({
 	 * 设置当文本框空的时候，显示的文本。
 	 */
 	placeholder: function (value) {
-		var dom = this.dom.form;
+		var dom = this.node.form;
 
 		function hidePlaceHolder() {
 			if (this.getText() === value) {

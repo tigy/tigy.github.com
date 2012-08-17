@@ -68,7 +68,7 @@ namespace(".Swiff", JPlus.Control.extend({
 	},
 
 	remote: function () {
-		return Swiff.remote.apply(Swiff, [this.dom || this].append(arguments));
+		return Swiff.remote.apply(Swiff, [this.node || this].append(arguments));
 	}
 
 }));

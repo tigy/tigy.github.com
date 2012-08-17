@@ -25,10 +25,10 @@ var IFrame = JPlus.Control.extend({
 	
 	init: function(){
 		var elem = this;
-		this.dom.renderTo(true);
+		this.node.renderTo(true);
 		if(navigator.isStd){
 			setTimeout(function(){
-				if (elem.dom.contentWindow.document.URL != 'about:blank')
+				if (elem.node.contentWindow.document.URL != 'about:blank')
 					elem.onReady();
 				else
 					setTimeout(arguments.callee, 10);
@@ -39,12 +39,12 @@ var IFrame = JPlus.Control.extend({
 	},
 	
 	getDom: function(){
-		return this.dom.contentWindow.document;
+		return this.node.contentWindow.document;
 	},
 	
 	update: function(){
 		var me = this;
-		JPlus.setupWindow(me.window = me.dom.contentWindow);
+		JPlus.setupWindow(me.window = me.node.contentWindow);
 		
 		if(eval("!-[1,]")){
 			me.window.document.getDom = function(){

@@ -49,7 +49,7 @@
         <script>
 			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o'), abcd = new DomList($('all').dom.getElementsByTagName("div"));
 
-			var testcases = {
+			Demo.writeTestCases({
 				'Select' : '-',
 				'Dom.hasChild' : {
 					'Dom.hasChild(a.dom, b.dom)' : true
@@ -111,9 +111,7 @@
 				'Dom#detach': {
 				    'd.detach(c.dom)': '-'
 				}
-			};
-
-			Demo.writeTestCases(testcases);
+			});
 
         </script>
     </body>

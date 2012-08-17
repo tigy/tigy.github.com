@@ -16,13 +16,13 @@ Dom.implement({
 	// addClassOnOver : function(className, preventFlicker){
 	    // this.on("mouseover", function(){
 	        // Ext.fly(this, '_internal').addClass(className);
-	    // }, this.dom);
+	    // }, this.node);
 	    // var removeFn = function(e){
 	        // if(preventFlicker !== true || !e.within(this, true)){
 	            // Ext.fly(this, '_internal').removeClass(className);
 	        // }
 	    // };
-	    // this.on("mouseout", removeFn, this.dom);
+	    // this.on("mouseout", removeFn, this.node);
 	    // return this;
 	// },
 // 	
@@ -30,15 +30,15 @@ Dom.implement({
 	// addClassOnFocus : function(className){
 	    // this.on("focus", function(){
 	        // Ext.fly(this, '_internal').addClass(className);
-	    // }, this.dom);
+	    // }, this.node);
 	    // this.on("blur", function(){
 	        // Ext.fly(this, '_internal').removeClass(className);
-	    // }, this.dom);
+	    // }, this.node);
 	    // return this;
 	// },
 // 	
 	// addClassOnClick : function(className){
-	    // var dom = this.dom;
+	    // var dom = this.node;
 	    // this.on("mousedown", function(){
 	        // Ext.fly(dom, '_internal').addClass(className);
 	        // var d = Ext.get(document);

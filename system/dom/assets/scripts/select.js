@@ -5,7 +5,7 @@ using("System.Dom.Base");
 var HtmlSelect = Dom.extend({
 
 	constructor: function(id){
-		this.dom = Dom.getNode(id);
+		this.node = Dom.getNode(id);
 	},
 
 	add: function(option){

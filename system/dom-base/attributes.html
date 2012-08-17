@@ -37,7 +37,7 @@
 		
 			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o');
 			
-			var testcases = {
+			Demo.writeTestCases({
 				'Attribute': '-',
 				'Dom#setAttr': {
                     'a.setAttr("innerText", "12121")': function(value, assert){
@@ -86,10 +86,7 @@
                         assert.areEqual(a.hasClass("light"), true);
                     }
                 }
-			};
-			
-			Demo.writeTestCases(testcases);
-			
+			});
 		</script>
 	</body>
 </html>

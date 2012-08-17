@@ -29,7 +29,7 @@
 				parentControl = me,
 				refChild = me;
 
-		html = Dom.parse(html, me.dom);
+		html = Dom.parse(html, me.node);
 
 		switch (where) {
 			case "afterEnd":

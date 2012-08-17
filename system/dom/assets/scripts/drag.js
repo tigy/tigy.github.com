@@ -75,7 +75,7 @@ var Draggable = Class({
 		}, me.dragDelay);
 		
 		// 设置文档  mouseup 和   mousemove
-		Dom.getDocument(me.handle.dom).on('mouseup', me.stopDrag, me).on('mousemove', me.handleDrag, me);
+		Dom.getDocument(me.handle.node).on('mouseup', me.stopDrag, me).on('mousemove', me.handleDrag, me);
 	
 	},
 	
@@ -201,7 +201,7 @@ var Draggable = Class({
 	 * 停止当前对象的拖动。
 	 */
 	stopDragging: function(){
-		Dom.getDocument(this.handle.dom).un('mousemove', this.handleDrag).un('mouseup', this.stopDrag);
+		Dom.getDocument(this.handle.node).un('mousemove', this.handleDrag).un('mouseup', this.stopDrag);
 		clearTimeout(this.timer);
 		Draggable.current = null;
 	},
@@ -230,7 +230,7 @@ Dom.implement({
 				assert(!handle || draggable.handle.target === handle.target, "Dom.prototype.draggable(handle): 无法重复设置 {handle}, 如果希望重新设置handle，使用以下代码：dom.draggable(false);JPlus.removeData(dom, 'draggable');dom.draggable(handle) 。", handle);
 				draggable.draggable();
 			} else  {
-				Dom.movable(this.dom);
+				Dom.movable(this.node);
 				draggable = this.dataField().draggable = new Draggable(this, handle);
 			}
 			

@@ -86,7 +86,7 @@
 		 */
 		getSelectionRange: function(){
 		
-			var s = selection(this.dom);
+			var s = selection(this.node);
 			
 			return{
 				start: s.start,
@@ -101,7 +101,7 @@
 		 */
 		setSelectionRange: function(arg){
 			
-			setRange(this.dom, arg.start, arg.end);
+			setRange(this.node, arg.start, arg.end);
 			
 		},
 		
@@ -111,7 +111,7 @@
 		 */
 		getSelectedText: function(){
 			
-			var s = selection(this.dom);
+			var s = selection(this.node);
 			return s.text;
 			
 		},
@@ -126,7 +126,7 @@
 			var isSelect = isSelect || false;
 			var val = this.getText();
 			
-			var s = selection(this.dom);
+			var s = selection(this.node);
 			
 			var a = val.substring(0,s.start);
 			var b = val.substring(s.end);
@@ -134,9 +134,9 @@
 			this.setText(a + text + b);
 			
 			if(isSelect){
-				setRange(this.dom, s.start, s.start + text.length);
+				setRange(this.node, s.start, s.start + text.length);
 			}else{
-				setCursor(this.dom, s.start + text.length);
+				setCursor(this.node, s.start + text.length);
 			}
 			
 		}

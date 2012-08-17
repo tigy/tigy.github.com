@@ -93,11 +93,11 @@ var DomEvent = Class({
 	
 	preventDefault: function(){
 		this.defaultPrevented = true;
-		return this.dom.preventDefault();
+		return this.node.preventDefault();
 	},
 	
 	stopPropagation: function(){
-		return this.dom.stopPropagation();
+		return this.node.stopPropagation();
 	},
 	
 	stop: function(){

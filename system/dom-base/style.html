@@ -37,7 +37,7 @@
 		
 			var a = $('a'), b = $('b'), c = $('c'), d = $('d');
 			
-			var testcases = {
+			Demo.writeTestCases({
 				'Style': '-',
 				'Dom#setStyle': {
 				    'a.setStyle("font-size", 14)': function(value, assert){
@@ -64,9 +64,7 @@
 				'Dom#unselectable': {
                     'a.unselectable()': '-'
                 }
-			};
-			
-			Demo.writeTestCases(testcases);
+			});
 			
 		</script>
 	</body>

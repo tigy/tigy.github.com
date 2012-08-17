@@ -60,7 +60,7 @@ var Validator = Class({
 							}
 						errorMsg
 						};
-						var other = target.dom.form && $$(dom.form).findAll('[type=password]');
+						var other = target.node.form && $$(dom.form).findAll('[type=password]');
 						if(other.length != 2) {
 							return ;
 						}

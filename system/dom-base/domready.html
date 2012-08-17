@@ -16,12 +16,10 @@
 			Dom.load(function(){    console.log("2/3: load");   });
 			onload = function(){  console.log('3/3: load')    };
 			
-			var testcases = {
+			Demo.writeTestCases({
 				'Dom.ready': '~(function(){})',
 				'Dom.load': '~(function(){})'
-			};
-			
-			Demo.writeTestCases(testcases);
+			});
 			
 		</script>
 		<img src="http://404.com">

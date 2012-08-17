@@ -1,22 +1,19 @@
-﻿/** * @author  */
-
-getOuterHtml: function(value) {
-	if ("outerHTML" in this) {
-		return this.outerHTML;
-	} else {
-		var div = Dom.getDocument(this.dom).createElement('div')
-		div.appendChild(this.clone().dom);
-		return div.innerHTML;
-	}
-},
-
-setOuterHtml: function(value){
-	if ("outerHTML" in this && !/<(?:script|style|link)/i.test(value)) {
-		this.outerHTML = value;
-	} else {
-		this.before(value);
-		this.remove();
-	}
-
-	return this;
-},
+﻿/** * @author  */Dom.implement({	getOuterHtml: function() {
+		var elem = this.node;
+		if ("outerHTML" in elem) {
+			return elem.outerHTML;
+		} else {
+			var div = Dom.getDocument(elem).createElement('div')
+			div.appendChild(this.clone().node);
+			return div.innerHTML;
+		}
+	}}).implement({	setOuterHtml: function(value) {
+		var elem = this.node;
+		if ("outerHTML" in this && !/<(?:script|style|link)/i.test(value)) {
+			elem.outerHTML = value;
+		} else {
+			this.before(value);
+			this.remove();
+		}
+		return this;
+	}});

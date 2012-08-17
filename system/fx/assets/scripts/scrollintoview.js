@@ -7,7 +7,7 @@ Dom.implement({
 
 	scrollIntoView: function (container, hscroll) {
 	if (typeof container == 'boolean') {
-		this.dom.scrollIntoView(container);
+		this.node.scrollIntoView(container);
 	} else {
 		container = Dom.get(container) || document;
 		hscroll = hscroll === undefined ? true : hscroll;

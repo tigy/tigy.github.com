@@ -7,10 +7,10 @@
 	 * @remark 此函数是通过设置 css的 z-index 属性实现的。
 	 */
 	bringToFront: function(target) {
-		assert(!target || (target.dom && target.dom.style), "Dom.prototype.bringToFront(elem): {elem} 必须为 空或允许使用样式 Dom 对象。", target);
+		assert(!target || (target.node && target.node.style), "Dom.prototype.bringToFront(elem): {elem} 必须为 空或允许使用样式 Dom 对象。", target);
 
-		var elem = this.dom,
-				targetZIndex = target && (parseInt(styleString(target.dom, 'zIndex')) + 1) || (Dom.zIndex ? Dom.zIndex++ : (Dom.zIndex = 10000));
+		var elem = this.node,
+				targetZIndex = target && (parseInt(styleString(target.node, 'zIndex')) + 1) || (Dom.zIndex ? Dom.zIndex++ : (Dom.zIndex = 10000));
 
 		// 如果当前元素的 z-index 未超过目标值，则设置
 		if (!(styleString(elem, 'zIndex') > targetZIndex))

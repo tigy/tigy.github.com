@@ -20,7 +20,7 @@ Browser.use = function (namespaces, callBack) {
     // reg_module_name = /(?:^|\/)([^(\/]+)(?=\(|$)/,
     // reg_module_url = /\(([^)]+)\)/,
     // reg_multi_module = /\s*,\s*/g,
-    // _dom = WIN.dom,
+    // _dom = WIN.node,
     // dom = {
         // mix : function(target, source ,override) {
             // var i, ride = (override === void 0) || override;
@@ -134,7 +134,7 @@ Browser.use = function (namespaces, callBack) {
     // });
     // //先行取得核心模块的URL
     // dom.require.getBasePath();
-    // window.dom = dom;
+    // window.node = node;
 // })(this,this.document)
 // 
 // 

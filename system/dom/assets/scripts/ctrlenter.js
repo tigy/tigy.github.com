@@ -14,7 +14,7 @@ Dom.addEvents('ctrlenter', {
 
 Dom.submitOnCtrlEnter = function (dom, check) {
 	Dom.get(dom).on('ctrlenter', function () {
-		if((!check || check(this.value) !== false) && this.dom.form)
+		if((!check || check(this.value) !== false) && this.node.form)
 			this.form.submit();
 	});
 };

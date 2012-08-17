@@ -39,7 +39,7 @@
 			var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o');
 			
 			
-			var testcases = {
+			Demo.writeTestCases({
 				'Dom#on': {
                     'a.on("click", function(){console.log("clicked") })': '-'
                 },
@@ -55,9 +55,7 @@
 				'Dom#delegate': {
                     'a.delegate("#c", "click", function(){console.log("delegate clicked") })': '-'
                 }
-			};
-			
-			Demo.writeTestCases(testcases);
+			});
 			
 		</script>
 	</body>
