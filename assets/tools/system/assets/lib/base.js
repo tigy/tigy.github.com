@@ -2895,9 +2895,9 @@ function imports(namespace) {
 		 * myDiv.addClass("cssClass");
 		 * </pre>
 		 * 其中，myDiv就是一个 **Dom** 对象。然后通过 **Dom** 对象提供的方法可以方便地操作这个节点。<br>
-		 * myDiv.dom 属性就是这个 Dom 对象对应的原生 HTML 节点。即:
+		 * myDiv.node 属性就是这个 Dom 对象对应的原生 HTML 节点。即:
 		 * <pre>
-		 * Dom.get("myDivId").dom === document.getElementById("myDivId");
+		 * Dom.get("myDivId").node === document.getElementById("myDivId");
 		 * </pre>
 		 * 
 		 * **Dom** 类仅实现了对一个节点的操作，如果需要同时处理多个节点，可以使用 {@link DomList} 类。

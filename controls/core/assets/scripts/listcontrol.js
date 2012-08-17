@@ -18,115 +18,99 @@ var ListControl = ScrollableControl.extend({
 	
 	xtype: 'listcontrol',
 	
-	tpl: '<div></div>',
+	tpl: '<ul/>',
+
+	_fixItem: function(item) {
+		return item && item.node.tagName !== 'LI' ? item.parent() : item;
+	},
 	
-	onControlAdded: function(childControl, index){
-		var t = childControl;
-		if(childControl.dom.tagName !== 'LI') {
-			childControl = Dom.create('li', 'x-' + this.xtype + '-content');
+	insertBefore: function(childControl, refControl) {
+
+		// 修复非 LI 的标签为 LI 标签。
+		if (childControl.node.tagName !== 'LI') {
+			var t = childControl;
+			childControl = Dom.create('li', 'x-' + this.xtype + '-item');
 			childControl.append(t);
 		}
-		
-		index = this.controls[index];
-		this.container.insertBefore(childControl, index && index.parent());
-		
-		// 更新选中项。
-		if(this.baseGetSelected(childControl)){
-			this.setSelectedItem(t);
+
+		// 如果插入的项是选中的，则先删除之前的选中项。
+		if (this.baseGetSelected(childControl)) {
+			this.setSelectedItem(null);
 		}
 		
+		// 实际的插入操作。
+		childControl.attach(this.node, refControl ? refControl.node : null);
+		
+		return childControl;
 	},
-	
-	onControlRemoved: function(childControl, index){
-		var t = childControl;
-		if(childControl.dom.tagName !== 'LI'){
+
+	removeChild: function(childControl) {
+
+		var t;
+
+		// 修复非 LI 的标签为 LI 标签。
+		if (childControl.node.tagName !== 'LI') {
+			t = childControl;
 			childControl = childControl.parent();
+			if (!childControl) {
+				return;
+			}
 			childControl.removeChild(t);
 		}
-		
-		this.container.removeChild(childControl);
-		
-		// 更新选中项。
-		if(this.getSelectedItem() == t){
-			this.selectedItem = null;
-			this.setSelectedIndex(index);
-		}
-	},
-	
-	/**
-	 * 获取指定子控件的最外层 <li>元素。
-	 */
-	getContainerOf: function(childControl){
-		return childControl.dom.tagName === 'LI' ? childControl : childControl.parent('li');
-	},
-	
-	/**
-	 * 获取包含指定节点的子控件。
-	 */
-	getItemOf: function(node){
-		var me = this.controls, ul = this.container.dom;
-		while(node){
-			if(node.parentNode === ul){
-				for(var i = me.length; i--;){
-					if((ul = me[i].dom) && (ul === node || ul.parentNode === node)){
-						return me[i];
-					}
-				}
-				break;
-			}
-			node = node.parentNode;
-		}
-		
-		return null;
-	},
-	
-	init: function(options){
-		this.items = this.controls;
-		var classNamePreFix = 'x-' + this.xtype;
-		this.addClass(classNamePreFix);
-		
-		// 获取容器。
-		var container = this.container = this.first('ul');
-		if(container) {
-			// 已经存在了一个 UL 标签，转换为 items 属性。
-			this.controls.addRange(container.query('>li').addClass(classNamePreFix + '-content'));
+
+		// 如果插入的项是选中的，则先删除之前的选中项。
+		if (this.baseGetSelected(childControl)) {
+			t = this.indexOf(childControl);
 		} else {
-			container = this.container = Dom.create('ul', '');
-			this.dom.appendChild(container.dom);
+			t = -1;
 		}
-		container.addClass(classNamePreFix + '-container');
+
+		// 实际的移除操作。
+		childControl.detach(this.node);
+
+		if (t >= 0) {
+			this.setSelectedIndex(t);
+		}
+
+		return childControl;
+
+	},
+
+	hasChild: function(childControl) {
+		if (childControl && childControl.node.tagName !== 'LI')
+			childControl = childControl.parent();
+
+		return this.indexOf(childControl) >= 0;
+	},
+
+	onOverFlowY: function(max) {
+		this.setHeight(max);
 	},
 	
 	// 选择功能
 	
 	/**
-	 * 当前的选中项。
-	 */
-	selectedItem: null,
-	
-	/**
 	 * 底层获取某项的选中状态。该函数仅仅检查元素的 class。
 	 */
-	baseGetSelected: function (itemContainerLi) {
-		return itemContainerLi.hasClass('x-' + this.xtype + '-selected');
+	baseGetSelected: function (item) {
+		return item.hasClass('x-' + this.xtype + '-selected');
 	},
 	
 	/**
 	 * 底层设置某项的选中状态。该函数仅仅设置元素的 class。
 	 */
-	baseSetSelected: function (itemContainerLi, value) {
-		itemContainerLi.toggleClass('x-' + this.xtype + '-selected', value);
-	},
-	
-	onOverFlowY: function(max){
-		this.setHeight(max);
+	baseSetSelected: function(item, value) {
+		item.toggleClass('x-' + this.xtype + '-selected', value);
 	},
 	
 	/**
 	 * 当选中的项被更新后触发。
 	 */
 	onChange: function (old, item){
-		return this.trigger('change', old);
+		return this.trigger('change', {
+			from: old,
+			to: item
+		});
 	},
 	
 	/**
@@ -139,22 +123,34 @@ var ListControl = ScrollableControl.extend({
 	/**
 	 * 获取当前选中项的索引。如果没有向被选中，则返回 -1 。
 	 */
-	getSelectedIndex: function () {
-		return this.controls.indexOf(this.getSelectedItem());
+	getSelectedIndex: function() {
+		for (var c = this.first(), i = 0 ; c; c = c.next(), i++) {
+			if (this.baseGetSelected(c)) {
+				return i;
+			}
+		}
+
+		return -1;
 	},
 	
 	/**
 	 * 设置当前选中项的索引。
 	 */
 	setSelectedIndex: function (value) {
-		return this.setSelectedItem(this.controls[value]);
+		return this.setSelectedItem(this.item(value));
 	},
 	
 	/**
 	 * 获取当前选中的项。如果不存在选中的项，则返回 null 。
 	 */
 	getSelectedItem: function () {
-		return this.selectedItem;
+		for (var c = this.first() ; c; c = c.next()) {
+			if (this.baseGetSelected(c)) {
+				return c;
+			}
+		}
+
+		return null;
 	},
 	
 	/**
@@ -164,24 +160,15 @@ var ListControl = ScrollableControl.extend({
 		
 		// 先反选当前选择项。
 		var old = this.getSelectedItem();
-		if(old && (old = this.getContainerOf(old)))
+		if(old)
 			this.baseSetSelected(old, false);
-	
-		if(this.onSelect(item)){
 		
-			// 更新选择项。
-			this.selectedItem = item;
-			
-			if(item != null){
-				item = this.getContainerOf(item);
-			//	if(!navigator.isQuirks)
-			//		item.scrollIntoView();
-				this.baseSetSelected(item, true);
-				
-			}
-			
+		// 选择项。
+		if(this.onSelect(item) && item != null){
+			this.baseSetSelected(item, true);
 		}
-			
+		
+		// 触发 onChange 事件。
 		if(old !== item)
 			this.onChange(old, item);
 			
@@ -199,32 +186,34 @@ var ListControl = ScrollableControl.extend({
 	/**
 	 * 查找并选中指定文本内容的项。如果没有项的文本和当前项相同，则清空选择状态。
 	 */
-	setText: function (value) {
-		var t = null;
-		this.controls.each(function(item){
-			if(item.getText() === value){
-				t = item;
-				return false;
-			}
-		}, this);
+	setText: function(value) {
 		
-		return this.setSelectedItem(t);
+		for (var c = this.first(), item = null ; c; c = c.next()) {
+			if (c.getText() === value) {
+				item = c;
+				break;
+			}
+		}
+		
+		return this.setSelectedItem(item);
 	},
 	
 	/**
 	 * 切换某一项的选择状态。
 	 */
-	toggleItem: function(item){
+	toggleItem: function(item) {
+
+		var selected = this.getSelectedItem();
 		
 		// 如果当前项已选中，则表示反选当前的项。
-		return  this.setSelectedItem(item === this.getSelectedItem() ? null : item);
+		return this.setSelectedItem(selected && selected.node === item.node ? null : item);
 	},
 	
 	/**
 	 * 确保当前有至少一项被选择。
 	 */
 	select: function () {
-		if(!this.selectedItem) {
+		if (this.getSelectedIndex() < 0) {
 			this.setSelectedIndex(0);
 		}
 		
@@ -235,7 +224,7 @@ var ListControl = ScrollableControl.extend({
 	 * 选择当前选择项的下一项。
 	 */
 	selectNext: function(up){
-		var oldIndex = this.getSelectedIndex(), newIndex, maxIndex = this.controls.length - 1;
+		var oldIndex = this.getSelectedIndex(), newIndex, maxIndex = this.count() - 1;
 		if(oldIndex != -1) {
 			newIndex = oldIndex + ( up !== false ? 1 : -1);
 			if(newIndex < 0) newIndex = maxIndex;
@@ -249,7 +238,7 @@ var ListControl = ScrollableControl.extend({
 	/**
 	 * 选择当前选择项的上一项。
 	 */
-	selectPrevious: function(){
+	selectPrev: function(){
 		return this.selectNext(false);
 	},
 	
@@ -258,9 +247,9 @@ var ListControl = ScrollableControl.extend({
 	 */
 	bindSelector: function(eventName){
 		this.on(eventName, function(e){
-			var item = this.getItemOf(e.target);
-			if(item){
-				this.setSelectedItem(item);
+			var i = this.indexOf(e.target);
+			if(i >= 0){
+				this.setSelectedItem(new Dom(e.target));
 			}
 		}, this);
 		return this;

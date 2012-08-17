@@ -13,7 +13,7 @@ var MySplitButton = SplitButton.extend({
 		this.menuButton.on('click', this.toggleDropDownMenu, this);
 		
 		this.setDropDownMenu(this.next('.button-menu'));
-		this.menuButton.appendTo(this.dom);
+		this.menuButton.appendTo(this.node);
 		this.items = this.controls = this.dropDownMenu.controls;
 	}
 	

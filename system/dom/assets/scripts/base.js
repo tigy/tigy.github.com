@@ -150,6 +150,7 @@
 			insertBefore: function(childControl, refControl) {
 				assert(childControl && childControl.attach, 'Dom#insertBefore(childControl, refControl): {childControl} 必须 Dom 对象。', childControl);
 				childControl.attach(this.node, refControl && refControl.node || null);
+				return childControl;
 			},
 		
 			/**
@@ -160,6 +161,7 @@
 			removeChild: function(childControl) {
 				assert(childControl && childControl.detach, 'Dom#removeChild(childControl): {childControl} 必须 Dom 对象。', childControl);
 				childControl.detach(this.node);
+				return childControl;
 			}
 			
 		}),
@@ -1711,15 +1713,17 @@
 		 * <pre lang="htm" format="none">how are &lt;p&gt;you?&lt;/p&gt;</pre>
 		 */
 		remove: function(child) {
+			assert(!arguments.length || child, 'Dom#remove(child): {child} 不是合法的节点', child);
 
-			if (arguments.length) {
-				assert(child && this.hasChild(child), 'Dom#remove(child): {child} 不是当前节点的子节点', child);
-				this.removeChild(child);
-			} else if (child = this.parentControl || this.parent()) {
-				child.removeChild(this);
-			}
-
-			return this;
+			return arguments.length ?
+				typeof child === 'string' ?
+					this.query(child).remove() :
+					this.hasChild(child) ?
+						this.removeChild(child) :
+						null :
+				child = this.parentControl || this.parent() ?
+					child.removeChild(this) :
+					this;
 		},
 
 		/**
@@ -3068,7 +3072,7 @@
 		 * @return {Dom} 返回插入的新节点对象。
 		 */
 		append: function(ctrl, dom) {
-			ctrl.insertBefore(dom, null);
+			return ctrl.insertBefore(dom, null);
 		},
 
 		/**
@@ -3077,7 +3081,7 @@
 		 * @return {Dom} 返回插入的新节点对象。
 		 */
 		prepend: function(ctrl, dom) {
-			ctrl.insertBefore(dom, ctrl.first(true));
+			return ctrl.insertBefore(dom, ctrl.first(true));
 		},
 
 		/**
@@ -3086,7 +3090,7 @@
 		 * @return {Dom} 返回插入的新节点对象。
 		 */
 		before: function(ctrl, dom) {
-			(ctrl.parentControl || ctrl.parent()).insertBefore(dom, ctrl);
+			return (ctrl.parentControl || ctrl.parent()).insertBefore(dom, ctrl);
 		},
 
 		/**
@@ -3095,7 +3099,7 @@
 		 * @return {Dom} 返回插入的新节点对象。
 		 */
 		after: function(ctrl, dom) {
-			(ctrl.parentControl || ctrl.parent()).insertBefore(dom, ctrl.next(true));
+			return (ctrl.parentControl || ctrl.parent()).insertBefore(dom, ctrl.next(true));
 		},
 
 		/**
@@ -3133,19 +3137,20 @@
 		replaceWith: function(ctrl, dom) {
 			var parent;
 			if (parent = (ctrl.parentControl || ctrl.parent())) {
-				parent.insertBefore(dom, ctrl);
+				dom = parent.insertBefore(dom, ctrl);
 				parent.removeChild(ctrl);
 			}
-
+			return dom;
 		}
 
 	}, function(value, key) {
 		dp[key] = function(html) {
 			html = Dom.parse(html, this);
-			
-			value(this, html);
 
-			var scripts, i = 0, script;
+			var scripts,
+				i = 0,
+				script,
+				r = value(this, html);
 
 			if (html.node.tagName === 'SCRIPT') {
 				scripts = [html.node];
@@ -3173,7 +3178,7 @@
 				}
 			}
 
-			return html;
+			return r;
 		};
 
 		DomList.prototype[key] = function(html) {

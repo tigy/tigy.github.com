@@ -71,39 +71,33 @@ var Control = Dom.extend({
 			opt = Object.extend({}, me.options),
 
 			// 当前实际的节点。
-			dom;
+			node;
 
 		// 如果存在配置。
 		if (options) {
 
 			// 如果 options 是纯配置。
-			if (!options.nodeType && options.constructor === Object) {
-				dom = options.dom || options;
+			if (options.constructor === Object) {
 				Object.extend(opt, options);
+				node = Dom.getNode(opt.dom);
 				delete opt.dom;
 			} else {
-				dom = options;
-			}
-
-			if (typeof dom === "string") {
-				dom = document.getElementById(dom);
-			} else if (!dom.nodeType) {
-				dom = dom.dom;
+				node = Dom.getNode(options);
 			}
 
 		}
 
 		// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。
-		me.dom = dom || me.create(opt);
+		me.node = node || me.create(opt);
 
-		assert.isNode(me.dom, "Dom.prototype.constructor(options): Dom 对象的 {dom} 为空。");
+		assert.isNode(me.node, "Dom#constructor(options): Dom 对象的 {node} 为空。");
 
 		// 调用 init 初始化控件。
 		me.init(opt);
 
 		// 如果指定的节点已经在 DOM 树上，且重写了 attach 方法，则调用之。
-		if (me.dom.parentNode && this.attach !== Control.prototype.attach) {
-			this.attach(me.dom.parentNode, me.dom.nextSibling);
+		if (me.node.parentNode && me.attach !== Control.prototype.attach) {
+			me.attach(me.node.parentNode, me.node.nextSibling);
 		}
 
 		// 复制各个选项。
