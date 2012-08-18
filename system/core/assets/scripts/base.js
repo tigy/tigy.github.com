@@ -162,7 +162,7 @@
 			 * @param {String} setters=undefined 设置函数的方法名数组，用空格隔开。
 			 * @param {String} getters=undefined 获取函数的方法名数组，用空格隔开。
 			 * @example <pre>
-			 * MyClass.defineMethod('field', 'fn1 fn2', 'fn3');
+			 * MyClass.defineMethod('field', 'fn1 fn2 fn3');
 			 * </pre>
 			 * 等价于 <pre>
 			 * MyClass.implement({
@@ -176,29 +176,24 @@
 			 * 			this.field.fn();
 			 * 			return this;
 			 * 		}
+			 * 	// 如果源函数返回 this, 将更新为当前的 this 。
 			 * });
 			 * </pre>
 			 */
-			defineMethod: function(targetProperty, setters, getters) {
+			defineMethod: function(targetProperty, methods, args) {
 				
-				assert.isString(setters, "MyClass.defineMethod(targetProperty, setters, getters): {setters} ~");
-				
-				// => defineMethod(targetProperty, getterOrSetter, boolIsGetterOrSetter)
-				if (typeof getters === 'string') {
-					this.defineMethod(targetProperty, getters, true);
-					getters = 0;
-				}
+				assert.isString(methods, "MyClass.defineMethod(targetProperty, methods): {methods} ~");
 				
 				// 最后使用 implement 添加成员。
-				return this.implement(Object.map(setters, function(funcName) {
+				return this.implement(Object.map(methods, function(funcName) {
 					return function() {
-						var target = this[targetProperty];
-						target = target[funcName].apply(target, arguments);
+						var target = this[targetProperty],
+							r = target[funcName].apply(target, arguments);
 						
 						// 如果不是 getter，返回 this 链式引用。
-						return getters ? target : this;
+						return target === r ? this : r;
 					};
-				}, {}), getters ? 2 : 1);  // 支持 Dom.implement, 传递第二个参数。
+				}, {}), args);  // 支持 Dom.implement, 传递第二个参数。
 			},
 
 			/**

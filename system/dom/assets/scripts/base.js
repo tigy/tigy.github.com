@@ -1585,9 +1585,9 @@
 	
 		//// TODO: clear it
 		define: function(ctrl, target, setters, getters) {
-			assert.deprected("Dom.define(ctrl, target, setters, getters) 已过时，请使用 MyClass.defineMethod(target, setters, getters)");
+			assert.deprected("Dom.define(ctrl, target, setters, getters) 已过时，请使用 MyClass.defineMethod(target, methods)");
 
-			return ctrl.defineMethod(target, setters, getters);
+			return ctrl.defineMethod(target, (setters + " " +  getters).trim());
 		},
 		//// TODO: clear it
 
@@ -1718,7 +1718,7 @@
 			return arguments.length ?
 				typeof child === 'string' ?
 					this.query(child).remove() :
-					this.hasChild(child) ?
+					this.hasChild(child = child.node ? child : Dom.get(child)) ?
 						this.removeChild(child) :
 						null :
 				child = this.parentControl || this.parent() ?
@@ -3276,7 +3276,7 @@
 	Dom.addEvents('$default', eventObj);
 
 	// Dom 函数。
-	Dom.defineMethod('node', 'scrollIntoView focus blur select click submit reset');
+	Dom.defineMethod('node', 'scrollIntoView focus blur select click submit reset', 1);
 	
 	// 拷贝 DOM Event 到 document 。
 	t = document.constructor;

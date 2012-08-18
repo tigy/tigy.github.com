@@ -77,9 +77,7 @@ var ListControl = ScrollableControl.extend({
 	},
 
 	hasChild: function(childControl) {
-		if (childControl && childControl.node.tagName !== 'LI')
-			childControl = childControl.parent();
-
+		childControl = this._fixItem(childControl);
 		return this.indexOf(childControl) >= 0;
 	},
 
@@ -121,6 +119,19 @@ var ListControl = ScrollableControl.extend({
 	},
 	
 	/**
+	 * 切换某一项的选择状态。
+	 */
+	toggleItem: function(item) {
+
+		var selected = this.getSelectedItem();
+		
+		item = this._fixItem(item);
+		
+		// 如果当前项已选中，则表示反选当前的项。
+		return this.setSelectedItem(selected && selected.node === item.node ? null : item);
+	},
+	
+	/**
 	 * 获取当前选中项的索引。如果没有向被选中，则返回 -1 。
 	 */
 	getSelectedIndex: function() {
@@ -157,6 +168,8 @@ var ListControl = ScrollableControl.extend({
 	 * 设置某一项为选中状态。对于单选框，该函数会同时清除已有的选择项。
 	 */
 	setSelectedItem: function(item){
+		
+		item = this._fixItem(item);
 		
 		// 先反选当前选择项。
 		var old = this.getSelectedItem();
@@ -199,17 +212,6 @@ var ListControl = ScrollableControl.extend({
 	},
 	
 	/**
-	 * 切换某一项的选择状态。
-	 */
-	toggleItem: function(item) {
-
-		var selected = this.getSelectedItem();
-		
-		// 如果当前项已选中，则表示反选当前的项。
-		return this.setSelectedItem(selected && selected.node === item.node ? null : item);
-	},
-	
-	/**
 	 * 确保当前有至少一项被选择。
 	 */
 	select: function () {
@@ -245,14 +247,14 @@ var ListControl = ScrollableControl.extend({
 	/**
 	 * 设置某个事件发生之后，自动选择元素。
 	 */
-	bindSelector: function(eventName){
-		this.on(eventName, function(e){
-			var i = this.indexOf(e.target);
-			if(i >= 0){
-				this.setSelectedItem(new Dom(e.target));
+	bindSelector: function(eventName, doToggle){
+		return this.on(eventName, function(e){
+			for(var c = this.first(); c; c = c.next()){
+				if(c.hasChild(e.target, true)){
+					this[doToggle ? "toggleItem" : "setSelectedItem"](c);
+				}
 			}
-		}, this);
-		return this;
+		});
 	}
 	
 }).addEvents('select change');
