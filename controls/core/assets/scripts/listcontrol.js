@@ -16,69 +16,55 @@ using("Controls.Core.ScrollableControl");
  */
 var ListControl = ScrollableControl.extend({
 	
-	xtype: 'listcontrol',
-	
 	tpl: '<ul/>',
-
-	_fixItem: function(item) {
-		return item && item.node.tagName !== 'LI' ? item.parent() : item;
-	},
 	
-	insertBefore: function(childControl, refControl) {
+	/**
+	 * 获取某一个子节点或控件对应当前集合中的项。
+	 * @param {Control} childControl 要获取的子控件。
+	 * @return {Control} 用于管理指定子节点的容器项。
+	 * @protected virtual
+	 */
+	itemOf: function(childControl) {
+		return childControl.node.tagName !== 'LI' ? childControl.parent() : childControl;
+	},
 
-		// 修复非 LI 的标签为 LI 标签。
-		if (childControl.node.tagName !== 'LI') {
+	/**
+	* 当新控件被添加时执行。
+	* @param {Control} childControl 新添加的元素。
+	* @protected virtual
+	*/
+	onAdding: function(childControl) {
+		if(childControl.node.nodeType === 1){
 			var t = childControl;
 			childControl = Dom.create('li', 'x-' + this.xtype + '-item');
 			childControl.append(t);
-		}
-
+		
 		// 如果插入的项是选中的，则先删除之前的选中项。
-		if (this.baseGetSelected(childControl)) {
+		} else if (this.baseGetSelected(childControl)) {
 			this.setSelectedItem(null);
 		}
 		
-		// 实际的插入操作。
-		childControl.attach(this.node, refControl ? refControl.node : null);
-		
 		return childControl;
 	},
-
-	removeChild: function(childControl) {
-
-		var t;
-
-		// 修复非 LI 的标签为 LI 标签。
-		if (childControl.node.tagName !== 'LI') {
-			t = childControl;
+	
+	/**
+ 	 * 当新控件被移除时执行。
+	 * @param {Control} childControl 新添加的元素。
+	 * @protected virtual
+	 */
+	onRemoving: function(childControl) {
+		if(childControl.node.nodeType === 1){
+			var t = childControl;
 			childControl = childControl.parent();
-			if (!childControl) {
-				return;
-			}
 			childControl.removeChild(t);
 		}
 
 		// 如果插入的项是选中的，则先删除之前的选中项。
 		if (this.baseGetSelected(childControl)) {
-			t = this.indexOf(childControl);
-		} else {
-			t = -1;
+			this.setSelectedItem(childControl.next());
 		}
-
-		// 实际的移除操作。
-		childControl.detach(this.node);
-
-		if (t >= 0) {
-			this.setSelectedIndex(t);
-		}
-
+		
 		return childControl;
-
-	},
-
-	hasChild: function(childControl) {
-		childControl = this._fixItem(childControl);
-		return this.indexOf(childControl) >= 0;
 	},
 
 	onOverFlowY: function(max) {
@@ -125,7 +111,7 @@ var ListControl = ScrollableControl.extend({
 
 		var selected = this.getSelectedItem();
 		
-		item = this._fixItem(item);
+		item = this.itemOf(item);
 		
 		// 如果当前项已选中，则表示反选当前的项。
 		return this.setSelectedItem(selected && selected.node === item.node ? null : item);
@@ -169,7 +155,7 @@ var ListControl = ScrollableControl.extend({
 	 */
 	setSelectedItem: function(item){
 		
-		item = this._fixItem(item);
+		item = this.itemOf(item);
 		
 		// 先反选当前选择项。
 		var old = this.getSelectedItem();
@@ -182,7 +168,7 @@ var ListControl = ScrollableControl.extend({
 		}
 		
 		// 触发 onChange 事件。
-		if(old !== item)
+		if((old ? old.node : null) !== (item ? item.node : null))
 			this.onChange(old, item);
 			
 		return this;

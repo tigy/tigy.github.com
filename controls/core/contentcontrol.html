@@ -20,9 +20,17 @@
 		
 		<p>ContentControl 表示一个包含内联数据的组件。并且它可以设置一个图标。</p>
 		
-		<div id="a" class="x-inline-block x-debug">
-			
-		</div>
+		<script class="demo" type="text/html">
+    		
+    		<div id="a" class="x-inline-block x-debug">
+    			
+    		</div>
+    		
+		</script>
+        
+        <div id="a" class="x-inline-block x-debug">
+            
+        </div>
 		
 		
 		<script class="demo">
@@ -37,8 +45,9 @@
 		
 		<script>
 			Demo.writeTestCases({
-				'设置文本内容': 'a.setText("内容内容内容内容内容内容内容内容内容内容内容")',
-				'设置 HTML 内容': 'a.setHtml("<b>内容</b>")'
+			    'ContentControl#setIcon': 'a.setIcon("")',
+				'ContentControl#setText': 'a.setText("内容内容内容内容内容内容内容内容内容内容内容")',
+				'ContentControl#setHtml': 'a.setHtml("<b>内容</b>")'
 			});
 		</script>
 		

@@ -162,7 +162,7 @@
 			 * @param {String} setters=undefined 设置函数的方法名数组，用空格隔开。
 			 * @param {String} getters=undefined 获取函数的方法名数组，用空格隔开。
 			 * @example <pre>
-			 * MyClass.defineMethod('field', 'fn1 fn2 fn3');
+			 * MyClass.defineMethods('field', 'fn1 fn2 fn3');
 			 * </pre>
 			 * 等价于 <pre>
 			 * MyClass.implement({
@@ -180,9 +180,9 @@
 			 * });
 			 * </pre>
 			 */
-			defineMethod: function(targetProperty, methods, args) {
+			defineMethods: function(targetProperty, methods, args) {
 				
-				assert.isString(methods, "MyClass.defineMethod(targetProperty, methods): {methods} ~");
+				assert.isString(methods, "MyClass.defineMethods(targetProperty, methods): {methods} ~");
 				
 				// 最后使用 implement 添加成员。
 				return this.implement(Object.map(methods, function(funcName) {

@@ -1585,9 +1585,9 @@
 	
 		//// TODO: clear it
 		define: function(ctrl, target, setters, getters) {
-			assert.deprected("Dom.define(ctrl, target, setters, getters) 已过时，请使用 MyClass.defineMethod(target, methods)");
+			assert.deprected("Dom.define(ctrl, target, setters, getters) 已过时，请使用 MyClass.defineMethods(target, methods)");
 
-			return ctrl.defineMethod(target, (setters + " " +  getters).trim());
+			return ctrl.defineMethods(target, (setters + " " +  getters).trim());
 		},
 		//// TODO: clear it
 
@@ -3276,7 +3276,7 @@
 	Dom.addEvents('$default', eventObj);
 
 	// Dom 函数。
-	Dom.defineMethod('node', 'scrollIntoView focus blur select click submit reset', 1);
+	Dom.defineMethods('node', 'scrollIntoView focus blur select click submit reset', 1);
 	
 	// 拷贝 DOM Event 到 document 。
 	t = document.constructor;
