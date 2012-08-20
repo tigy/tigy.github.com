@@ -2914,7 +2914,7 @@
 				result = query(selector, this);
 			} finally {
 				if(oldId === 0){
-					elem.id = null;	
+					elem.removeAttribute('id');
 				}
 			}
 			
@@ -2991,7 +2991,7 @@
 				result = query(selector, this)[0];
 			} finally {
 				if (oldId === 0) {
-					elem.id = null;
+					elem.removeAttribute('id');
 				}
 			}
 
@@ -3090,7 +3090,8 @@
 		 * @return {Dom} 返回插入的新节点对象。
 		 */
 		before: function(ctrl, dom) {
-			return (ctrl.parentControl || ctrl.parent()).insertBefore(dom, ctrl);
+			var p = ctrl.parentControl || ctrl.parent();
+			return p ? p.insertBefore(dom, ctrl) : null;
 		},
 
 		/**
@@ -3099,7 +3100,8 @@
 		 * @return {Dom} 返回插入的新节点对象。
 		 */
 		after: function(ctrl, dom) {
-			return (ctrl.parentControl || ctrl.parent()).insertBefore(dom, ctrl.next(true));
+			var p = ctrl.parentControl || ctrl.parent();
+			return p ? p.insertBefore(dom, ctrl.next(true)) : null;
 		},
 
 		/**

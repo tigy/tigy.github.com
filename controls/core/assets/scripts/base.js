@@ -44,10 +44,10 @@ var Control = Dom.extend({
 	 */
 	create: function () {
 
-		assert(this.tpl || this instanceof Dom, "Control.prototype.create(): 当前类不存在 tpl 属性。Control.prototype.create 会调用 tpl 属性，根据这个属性中的 HTML 代码动态地生成节点并返回。子类必须定义 tpl 属性或重写 Control.prototype.create 方法返回节点。");
+		assert(this.tpl, "Control.prototype.create(): 当前类不存在 tpl 属性。Control.prototype.create 会调用 tpl 属性，根据这个属性中的 HTML 代码动态地生成节点并返回。子类必须定义 tpl 属性或重写 Control.prototype.create 方法返回节点。");
 
 		// 转为对 tpl解析。
-		return Dom.parseNode(this.tpl);
+		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype));
 	},
 
 	/**

@@ -16,7 +16,7 @@ using("Controls.Core.ScrollableControl");
  */
 var ListControl = ScrollableControl.extend({
 	
-	tpl: '<ul/>',
+	tpl: '<ul class="x-control"/>',
 	
 	/**
 	 * 获取某一个子节点或控件对应当前集合中的项。
@@ -24,7 +24,7 @@ var ListControl = ScrollableControl.extend({
 	 * @return {Control} 用于管理指定子节点的容器项。
 	 * @protected virtual
 	 */
-	itemOf: function(childControl) {
+	containerOf: function(childControl) {
 		return childControl.node.tagName !== 'LI' ? childControl.parent() : childControl;
 	},
 
@@ -34,17 +34,50 @@ var ListControl = ScrollableControl.extend({
 	* @protected virtual
 	*/
 	onAdding: function(childControl) {
-		if(childControl.node.nodeType === 1){
-			var t = childControl;
-			childControl = Dom.create('li', 'x-' + this.xtype + '-item');
-			childControl.append(t);
-		
-		// 如果插入的项是选中的，则先删除之前的选中项。
-		} else if (this.baseGetSelected(childControl)) {
-			this.setSelectedItem(null);
-		}
-		
 		return childControl;
+	},
+
+	onAdd: function(childControl) {
+
+		// <li> 的 class 属性。
+		var clazz = 'x-' + this.xtype + '-item';
+
+		// 如果 childControl 不是 <li>, 则包装一个 <li> 标签。
+		if (childControl.node.tagName !== 'LI') {
+
+			// 因为 childControl 被包了一层 <li> ，因此设置 parentControl 属性以便删除时可以通过当前控件删除此控件。
+			childControl.parentControl = this;
+			var t = childControl;
+			childControl = Dom.create('LI', clazz);
+			childControl.append(t);
+
+			// 存储 <li> -> 子控件的关联。
+			childControl.dataField().control = t;
+		} else {
+			childControl.addClass(clazz);
+
+			// 如果插入的项是选中的，则先删除之前的选中项。
+			if (this.baseGetSelected(childControl)) {
+				this.setSelectedItem(null);
+			}
+		}
+		// 添加 <li> 到 <ul>。		childControl.attach(this.node, refControl ? refControl.node : null);
+	},
+
+	onRemove: function(childControl) {
+
+		// 如果 childControl 不是 <li>, 则退出 <li> 的包装。
+		if (childControl.node.tagName !== 'LI') {
+			var t = childControl;
+			childControl = childControl.parent();
+			childControl.removeChild(t);			// 删除关联节点。			childControl.parentControl = null;
+		}
+
+		// 如果插入的项是选中的，则先删除之前的选中项。
+		if (this.baseGetSelected(childControl)) {
+			this.setSelectedItem(childControl.next());
+		}
+		// 添加 <li> 到 <ul>。		childControl.detach(this.node, refControl ? refControl.node : null);
 	},
 	
 	/**
@@ -53,18 +86,11 @@ var ListControl = ScrollableControl.extend({
 	 * @protected virtual
 	 */
 	onRemoving: function(childControl) {
-		if(childControl.node.nodeType === 1){
-			var t = childControl;
-			childControl = childControl.parent();
-			childControl.removeChild(t);
-		}
-
-		// 如果插入的项是选中的，则先删除之前的选中项。
-		if (this.baseGetSelected(childControl)) {
-			this.setSelectedItem(childControl.next());
-		}
-		
 		return childControl;
+	},
+
+	init: function() {
+		this.query('>li').addClass('x-' + this.xtype + '-item');
 	},
 
 	onOverFlowY: function(max) {
