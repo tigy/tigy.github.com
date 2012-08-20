@@ -39,7 +39,7 @@ Demo.onLoad(function(){
 	if(isLibs){
 		var NamespaceAutoComplete = AutoComplete.extend({
 			
-			dropDownMenuWidth: -1,
+			menuWidth: -1,
 			
 			getSuggestItems: function(text){
 				

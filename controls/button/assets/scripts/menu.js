@@ -1,5 +1,5 @@
 /**
- * @author
+ * @author xuld
  */
 
 
@@ -13,7 +13,7 @@ var MenuItem = ContentControl.extend({
 
 	xtype: 'menuitem',
 
-	tpl: '<a class="x-menuitem"></a>',
+	tpl: '<a class="x-control"></a>',
 
 	/**
 	 * 获取当前菜单管理的子菜单。
@@ -31,17 +31,17 @@ var MenuItem = ContentControl.extend({
 	},
 
 	attach: function(parentNode, refNode) {
-		parentNode.insertBefore(this.node, refNode);
 		if (this.subMenu && !this.subMenu.parent('body')) {
-			this.after(this.subMenu);
+			parentNode.insertBefore(this.subMenu.node, refNode);
 		}
+		parentNode.insertBefore(this.node, refNode);
 	},
 
 	detach: function(parentNode) {
-		parentNode.removeChild(this.node);
 		if (this.subMenu) {
 			this.subMenu.remove();
 		}
+		parentNode.removeChild(this.node);
 	},
 
 	getSubMenu: function(){
@@ -57,8 +57,8 @@ var MenuItem = ContentControl.extend({
 				menu = new Menu(menu);
 			}
 
-			if (!menu.parent('body')) {
-				this.after(menu);
+			if (!menu.parent('body') && this.node.parentNode) {
+				this.node.parentNode.insertBefore(menu.node, this.node.nextSibling);
 			}
 
 			this.subMenu = menu.hide();
@@ -89,17 +89,25 @@ var MenuItem = ContentControl.extend({
 		}
 
 		if (tg) {
-			var dt = new Dom(tg).dataField().menu;
-			tg.hideSubMenu();
+			new Dom(tg).dataField().control.hideSubMenu();
 		}
 
 	},
 
 	onMouseEnter: function() {
+		this.showSubMenu();
+	},
+	
+	showSubMenu: function(){
 
 		// 使用父菜单打开本菜单，显示子菜单。
 		this.parentControl && this.parentControl.showSubMenu(this);
+	},
+	
+	hideSubMenu: function(){
 
+		// 使用父菜单打开本菜单，显示子菜单。
+		this.parentControl && this.parentControl.hideSubMenu(this);
 	},
 
 	onMouseLeave: function(e) {
@@ -140,12 +148,6 @@ var Menu = ListControl.extend({
 
 	xtype: 'menu',
 
-	item: function(index) {
-		var item = this.child(index);
-
-		return item && item.dataField().control || item;
-	},
-
 	_createMenuItem: function(childControl, item) {
 
 		// 如果是文本。
@@ -185,7 +187,7 @@ var Menu = ListControl.extend({
 	/**
 	 * 分析一个 <li> 标签，并返回对应的 MenuItem 。
 	 */
-	_initChild: function(item) {
+	_initContainer: function(item) {
 
 		// 找到第一个节点。
 		var childControl = item.first();
@@ -212,15 +214,21 @@ var Menu = ListControl.extend({
 		if (subMenu) {
 			childControl.setSubMenu(subMenu);
 		}
+		
+		childControl.parentControl = this;
+		
+		item.dataField().namedItem = childControl;
+		
+		item.addClass('x-' + this.xtype + '-item');
 
 	},
-
-	onAdding: function(childControl) {
-
+	
+	initChild: function(childControl){
+		
 		// 如果是添加 <li> 标签，则直接返回。
 		// .add('<li></li>')
 		if (childControl.node.tagName === 'LI') {
-			this._initChild(childControl);
+			this._initContainer(childControl);
 
 			// .add(new MenuItem())
 		} else if (!(childControl instanceof MenuItem)) {
@@ -239,7 +247,7 @@ var Menu = ListControl.extend({
 		this.dataField().control = this;
 
 		// 根据已有的 DOM 结构初始化菜单。
-		this.each(this.onAdding, this);
+		this.each(this._initContainer, this);
 	},
 
 	showMenu: function() {
@@ -251,7 +259,28 @@ var Menu = ListControl.extend({
 		this.hide();
 		this.onHide();
 	},
+	
+	/**
+	 * 底层获取某项的选中状态。该函数仅仅检查元素的 class。
+	 */
+	baseGetSelected: function (container) {
+		return this.itemOf(container).getSelected();
+	},
+	
+	/**
+	 * 底层设置某项的选中状态。该函数仅仅设置元素的 class。
+	 */
+	baseSetSelected: function(container, value) {
+		this.itemOf(container).setSelected(value);
+	},
 
+	/**
+	 * 底层获取某项的选中状态。该函数仅仅检查元素的 class。
+	 */
+	isSelectable: function (item) {
+		return item.node.tagName === 'A';
+	},
+	
 	/**
 	 * 当前菜单依靠某个控件显示。
 	 * @param {Control} ctrl 方向。

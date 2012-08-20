@@ -5,16 +5,16 @@
 
 var MySplitButton = SplitButton.extend({
 	
-	dropDownMenuWidth: -1,
+	menuWidth: -1,
 	
 	init: function () {
 		this.container = this.find('.x-button');
 		this.menuButton = this.find('.x-button:last-child');
-		this.menuButton.on('click', this.toggleDropDownMenu, this);
+		this.menuButton.on('click', this.toggleMenu, this);
 		
-		this.setDropDownMenu(this.next('.button-menu'));
+		this.setMenu(this.next('.button-menu'));
 		this.menuButton.appendTo(this.node);
-		this.items = this.controls = this.dropDownMenu.controls;
+		this.items = this.controls = this.menu.controls;
 	}
 	
 });

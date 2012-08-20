@@ -31,7 +31,7 @@
 				var c = new ContextMenu();
 				
 				// 添加一个新的 MenuItem，并绑定点击事件。
-				c.items.add('aa').on('click', function(){trace(this.getText())});
+				c.add('aa').on('click', function(){trace(this.getText())});
 				
 				// 应用当前菜单到节点 a 。
 				c.setControl(a);

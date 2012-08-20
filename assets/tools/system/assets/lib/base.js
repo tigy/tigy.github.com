@@ -8445,32 +8445,32 @@ var ListControl = ScrollableControl.extend({
 
 
 /************************************
- * Controls.Core.IDropDownMenuContainer
+ * Controls.Core.IMenuContainer
  ************************************/
-var IDropDownMenuContainer = {
+var IMenuContainer = {
 	
 	/**
 	 * 获取当前控件的下拉菜单。
 	 * @type Control
-	 * @property dropDownMenu
+	 * @property menu
 	 */
 	
-	dropDownMenuWidth: 'auto',
+	menuWidth: 'auto',
 	
-	onDropDownMenuOpen: function(){
-		this.trigger('dropdownmenuopen');
+	onMenuOpen: function(){
+		this.trigger('menuopen');
 	},
 	
-	onDropDownMenuClose: function(){
-		this.trigger('dropdownmenuclose');
+	onMenuClose: function(){
+		this.trigger('menuclose');
 	},
 
-	setDropDownMenu: function(control){
+	setMenu: function(control){
 		
 		control = Dom.get(control);
 		
 		// 设置下拉菜单。
-		this.dropDownMenu = control.addClass('x-dropdownmenu').hide();
+		this.menu = control.addClass('x-menu').hide();
 		
 		// 如果当前节点已经添加到 DOM 树，则同时添加 control 。
 		if(!control.parent('body')){
@@ -8491,56 +8491,56 @@ var IDropDownMenuContainer = {
 		
 	},
 	
-	realignDropDownMenu: function (offsetX, offsetY) {
-		this.dropDownMenu.align(this, 'bl', offsetX, offsetY);
+	realignMenu: function (offsetX, offsetY) {
+		this.menu.align(this, 'bl', offsetX, offsetY);
 	},
 	
-	toggleDropDownMenu: function(e){
-		if(e) this._dropDownMenuTrigger = e.target;
-		return this._dropDownMenuVisible ? this.hideDropDownMenu() : this.showDropDownMenu();
+	toggleMenu: function(e){
+		if(e) this._menuTrigger = e.target;
+		return this._menuVisible ? this.hideMenu() : this.showMenu();
 	},
 	
-	showDropDownMenu: function(){
+	showMenu: function(){
 		
-		if(this._dropDownMenuVisible){
-			this.realignDropDownMenu(0, -1);
+		if(this._menuVisible){
+			this.realignMenu(0, -1);
 			return ;	
 		}
 		
-		this._dropDownMenuVisible = true;
-		this.dropDownMenu.show();
-		this.realignDropDownMenu(0, -1);
+		this._menuVisible = true;
+		this.menu.show();
+		this.realignMenu(0, -1);
 		
-		var size = this.dropDownMenuWidth;
+		var size = this.menuWidth;
 		if(size === 'auto') {
 			size = this.getSize().x;
-			if(size < Dom.styleNumber(this.dropDownMenu.dom, 'min-width'))
+			if(size < Dom.styleNumber(this.menu.dom, 'min-width'))
 				size = -1;
 		}
 		
 		if(size !== -1) {
-			this.dropDownMenu.setSize(size);
+			this.menu.setSize(size);
 		}
 		
-		this.onDropDownMenuOpen();
+		this.onMenuOpen();
 		
-		document.on('mouseup', this.dropDownMenuMouseUpHandler = this.hideDropDownMenu.bind(this));
+		document.on('mouseup', this.menuMouseUpHandler = this.hideMenu.bind(this));
 	},
 	
-	hideDropDownMenu: function (e) {
+	hideMenu: function (e) {
 		
 		// 如果是来自事件的关闭，则检测是否需要关闭菜单。
 		if(e){
 			e = e.target;
-			if([this._dropDownMenuTrigger, this.dropDownMenu.dom, this.dom].indexOf(e) >= 0 || Dom.hasChild(this.dropDownMenu.dom, e) || Dom.hasChild(this.dom, e)) 
+			if([this._menuTrigger, this.menu.dom, this.dom].indexOf(e) >= 0 || Dom.hasChild(this.menu.dom, e) || Dom.hasChild(this.dom, e)) 
 				return;
 		}
 		
-		this.onDropDownMenuClose();
-		this.dropDownMenu.hide();
-		document.un('mouseup', this.dropDownMenuMouseUpHandler);
+		this.onMenuClose();
+		this.menu.hide();
+		document.un('mouseup', this.menuMouseUpHandler);
 		
-		this._dropDownMenuVisible = false;
+		this._menuVisible = false;
 	}
 	
 };
@@ -8719,13 +8719,13 @@ var AutoComplete = Control.extend({
 		switch(e.keyCode) {
 			case 40:
 			case 38:
-				this.showDropDownMenu();
-				this.dropDownMenu.selectNext(e.keyCode === 40);
+				this.showMenu();
+				this.menu.selectNext(e.keyCode === 40);
 			    e.preventDefault();
 			    return;
 			case 13:
 			case 10:
-				var currentIndex = this.dropDownMenu.getSelectedIndex();
+				var currentIndex = this.menu.getSelectedIndex();
 				if(currentIndex != -1) {
 					this.onSelectItem(this.controls[currentIndex]);
 					e.preventDefault();
@@ -8749,14 +8749,14 @@ var AutoComplete = Control.extend({
 		var items = this.getSuggestItems(text);
 		
 		if(!items || !items.length || (items.length === 1 && items[0] === text))  {
-			return this.hideDropDownMenu();
+			return this.hideMenu();
 		}
 		
 		this.items.set(items);
 		
-		this.showDropDownMenu();
-		this.dropDownMenu.selectedItem = null;
-		this.dropDownMenu.setSelectedIndex(0);
+		this.showMenu();
+		this.menu.selectedItem = null;
+		this.menu.setSelectedIndex(0);
 	},
 	
 	onKeyUp: function(e){
@@ -8775,12 +8775,12 @@ var AutoComplete = Control.extend({
 	
 	onSelectItem: function(item){
 		this.setText(item.getText());
-		this.hideDropDownMenu();
+		this.hideMenu();
 		return false;
 	},
 	
 	onOverflowY: function(height){
-		this.dropDownMenu.onOverflowY(height);
+		this.menu.onOverflowY(height);
 	},
 	
 	init: function(options){
@@ -8793,14 +8793,14 @@ var AutoComplete = Control.extend({
 		
 		suggest.on('mousedown', function(e){
 			e.preventDefault();
-			this._dropDownMenuDown = true;
+			this._menuDown = true;
 		}, this);
 		
 		suggest.on('mouseup', function(){
-			this._dropDownMenuDown = false;
+			this._menuDown = false;
 		}, this);
 		
-		this.setDropDownMenu(suggest);
+		this.setMenu(suggest);
 		
 		this.items = this.controls = suggest.controls;
 		
@@ -8816,16 +8816,16 @@ var AutoComplete = Control.extend({
 		
 		this.on('blur', function (e) {
 			var me = this;
-			if(this._dropDownMenuDown)
+			if(this._menuDown)
 				return;
-			this.hideDropDownMenu();
-			this._dropDownMenuDown = false;
+			this.hideMenu();
+			this._menuDown = false;
 		});
 		
 		this.setAttr('autocomplete', 'off');
 	}
 	
-}).implement(IDropDownMenuContainer);
+}).implement(IMenuContainer);
 
 // AutoComplete.SuggestListBox = ListBox.extend({
 // 	
@@ -8956,7 +8956,7 @@ var Button = ContentControl.extend({
 /************************************
  * Controls.Button.MenuButton
  ************************************/
-var MenuButton = Button.extend(IDropDownMenuContainer).implement({
+var MenuButton = Button.extend(IMenuContainer).implement({
 	
 	xtype: 'menubutton',
 	
@@ -8966,24 +8966,24 @@ var MenuButton = Button.extend(IDropDownMenuContainer).implement({
 		this.base('init');
 		this.addClass('x-' + this.xtype);
 		this.menuButton = this.find('.x-button-menu');
-		this.on('click', this.toggleDropDownMenu);
-		this.setDropDownMenu(new Menu());
-		this.items = this.controls = this.dropDownMenu.controls;
-		this.dropDownMenu.on('click', this.onSelectItem, this);
+		this.on('click', this.toggleMenu);
+		this.setMenu(new Menu());
+		this.items = this.controls = this.menu.controls;
+		this.menu.on('click', this.onSelectItem, this);
 	},
 	
-	onDropDownMenuOpen: function(){
+	onMenuOpen: function(){
 		this.setActived(true);
-		this.trigger('dropdownmenuopen');
+		this.trigger('menuopen');
 	},
 	
-	onDropDownMenuClose: function(){
-		this.trigger('dropdownmenuclose');
+	onMenuClose: function(){
+		this.trigger('menuclose');
 		this.setActived(false);
 	},
 	
 	onSelectItem: function(){
-		this.hideDropDownMenu();
+		this.hideMenu();
 		return false;
 	},
 	
@@ -9015,11 +9015,11 @@ var SplitButton = MenuButton.extend({
 	init: function () {
 		this.container = this.find('.x-button');
 		this.menuButton = this.find('.x-button:last-child');
-		this.menuButton.on('click', this.toggleDropDownMenu, this);
-		this.setDropDownMenu(new Menu().appendTo(this.dom));
+		this.menuButton.on('click', this.toggleMenu, this);
+		this.setMenu(new Menu().appendTo(this.dom));
 		this.menuButton.appendTo(this.dom);
-		this.items = this.controls = this.dropDownMenu.controls;
-		this.dropDownMenu.on('click', this.onSelectItem, this);
+		this.items = this.controls = this.menu.controls;
+		this.menu.on('click', this.onSelectItem, this);
 	},
 	
 	setText: ContentControl.prototype.setText,
