@@ -15,11 +15,16 @@
   _zoom: 0;
   _display: block;
   _width: 160px;
+  
+  padding: 4px 0;
+  margin: 0; // override default ul
+  list-style: none;
+  _overflow: hidden;
 
 }
 
 // Links within the dropdown menu
-.x-listbox-content {
+.x-listbox-item {
 	display: block;
   padding: 3px 10px;
   color: @gray;
@@ -28,21 +33,13 @@
   _width:100%;
 }
 
-.x-listbox-container {
-  padding: 4px 0;
-  margin: 0; // override default ul
-  list-style: none;
-  _width:100%;
-  _overflow: hidden;
-}
-
 // Hover state
-.x-listbox-content:hover, .x-dropdownmenu .x-listbox-selected{
+.x-listbox-item:hover, .x-dropdownmenu .x-listbox-selected{
   background-color: @linkColor;
   
 }
 
-.x-listbox-content a{
+.x-listbox-item a{
   color: @textColor;
 }
 
@@ -50,7 +47,7 @@
   background-color: darken(@linkColor, 15%);
 }
 
-.x-listbox-content:hover, .x-listbox-selected {
+.x-listbox-item:hover, .x-listbox-selected {
   color: @white;
   a {
     color: @white;

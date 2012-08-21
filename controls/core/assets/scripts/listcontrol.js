@@ -151,7 +151,7 @@ var ListControl = ScrollableControl.extend({
 	/**
 	 * 切换某一项的选择状态。
 	 */
-	toggleItem: function(item) {
+	toggleSelected: function(item) {
 
 		var selected = this.getSelectedItem();
 		
@@ -206,16 +206,14 @@ var ListControl = ScrollableControl.extend({
 	 */
 	setSelectedItem: function(item){
 		
-		item = this.containerOf(item);
-		
 		// 先反选当前选择项。
 		var old = this.getSelectedItem();
 		if(old)
-			this.baseSetSelected(old, false);
+			this.baseSetSelected(this.containerOf(old), false);
 		
 		// 选择项。
 		if(this.onSelect(item) && item != null){
-			this.baseSetSelected(item, true);
+			this.baseSetSelected(this.containerOf(item), true);
 		}
 		
 		// 触发 onChange 事件。
@@ -301,7 +299,7 @@ var ListControl = ScrollableControl.extend({
 		return this.on(eventName, function(e){
 			for(var c = this.first(); c; c = c.next()){
 				if(c.hasChild(e.target, true)){
-					this[doToggle ? "toggleItem" : "setSelectedItem"](c);
+					this[doToggle ? "toggleSelected" : "setSelectedItem"](c);
 				}
 			}
 		});
