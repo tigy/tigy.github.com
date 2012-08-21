@@ -16,16 +16,16 @@ using("Controls.Core.ScrollableControl");
  */
 var ListControl = ScrollableControl.extend({
 	
-	tpl: '<ul class="x-control"/>',
-	
 	/**
-	 * 获取用于封装指定子控件的容器控件。
-	 * @param {Control} item 要获取的子控件。
-	 * @return {Control} 用于管理指定子控件的容器控件。
-	 * @protected override
+	 * 模板。
+	 */
+	tpl: '<ul class="x-control"/>',
+	/**	 * 获取用于包装指定子控件的容器控件。	 * @param {Control} item 要获取的子控件。	 * @return {Control} 用于包装指定子控件的容器控件。	 * @protected virtual	 * @see #itemOf
 	 */
 	containerOf: function(childControl) {
 		return childControl.node.tagName !== 'LI' ? childControl.parent() : childControl;
+	},	/**	 * 获取某一个容器节点封装的子控件。	 * @param {Control} container 要获取的容器控件。	 * @return {Control} 指定容器控件包装的真实子控件。如果不存在相应的子控件，则返回自身。	 * @protected virtual	 * @see #containerOf	 * @remark 该函数实际上会返回 container.dataField().namedItem 属性值。	 */	itemOf: function(container) {
+		return container.dataField().namedItem || container;
 	},
 
 	/**

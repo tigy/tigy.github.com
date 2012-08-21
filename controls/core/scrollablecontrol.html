@@ -18,65 +18,128 @@
 	</head>
 	<body>
 		
-		<p>ScrollableControl 从名字上看是一个带滚动条的组件。
-			但实际上它是一个包含很多子控件的控件。
-			ScrollableControl 并不专指容器，它是子控件管理的抽象模型。
-		</p>
+		<p>ScrollableControl 是管理子控件的抽象模型，它提供了子控件管理的一系列方法。</p>
+
+        <p>子控件可以是任何 HTML 元素(nodeType=1)(如 Dom.parse("&lt;div /&gt;")) 或 Control 对象(如 new TextBox())</p>
+			
+		<div id="a" class="demo-container">
+            <div>这是一个 ScrollableControl 控件 (id=a)</div>
+		</div>
 		
-		<p>子控件管理，具体指这些功能：添加子控件、删除子控件、获取第n个子控件、获取子控件的个数。</p>
+		<script>
+		    var a = new ScrollableControl('a');
+		    var b = Dom.parse('<div>我是一个普通节点。</div>');
+
+		    Demo.writeTestCases({
+		        '使用 ScrollableControl 提供的方法操作子控件': '-',
+		        '添加子控件到末尾': 'a.add("<div>这是通过 add 插入的</div>");',
+		        '添加子控件到指定位置': 'a.insertAt(0, "<div>这是通过 insertAt 插入的</div>");',
+		        '删除指定位置的子控件': 'a.removeAt(0)',
+		        '获取某一位置的子控件': 'a.item(0)',
+		        '获取一个子控件在当前控件集合中的位置': 'a.indexOf(b)',
+		        '遍历子控件': 'a.each(function(item, i){trace("#", i, " => ", item.getText());})',
+		        '获取子控件的个数': "a.count()"
+		    });
+		</script>
+
+        <p>
+            即使 ScrollableControl 提供了全部子控件操作的 API，但仍然可以使用继承于 DOM 的方式操作子控件。
+        </p>
+		
+		<script>
+		    Demo.writeTestCases({
+		        '使用 Dom 提供的方法操作子节点': '-',
+		        '添加子控件到末尾': 'a.append("<div>这是通过 append 插入的</div>");',
+		        '添加子控件到第一个节点': 'a.prepend("<div>这是通过 prepend 插入的</div>");',
+		        '删除指定子控件': 'a.remove(b);',
+		        '清空子控件': 'a.empty()',
+		        '获取子控件列表': 'a.children()',
+		        '判断子控件是否存在于当前控件中': 'a.hasChild(b)'
+		    });
+		</script>
+
+        <p>
+            大部分情况下，通过 ScrollableControl 提供的 API 或者通过 DOM 的 API 操作子控件可以达到完全一样的效果。
+            但如果有些父控件对子控件作了特殊处理，则肯能返回不同的结果。比如 ListControl 的源码如下：
+        </p>
+
+        <script type="text/html" class="demo">
+            <ul id="ul"></ul>
+        </script>
+
+        <p>现在往内部添加一项： ul.add("&lt;div /&gt;") ， 则 ul 标签变成： </p>
+        
+        <script type="text/html" class="demo">
+            <ul id="ul">
+                <li><div /></li>
+            </ul>
+        </script>
+
+        <p>此时， ul.item(0) 返回 div 标签而 ul.child(0) 返回 li 标签。</p>
+
+        <hr />
 		
 		<p>
-			ScrollableControl 提供了默认的子控件管理的全部功能。 ScrollableControl 的子类可以重写相关方法实现个性化的子控件管理方式。
+			用户可以继承 ScrollableControl 并实现个性化的子控件管理方式。当用户执行 .add 时，程序会依次调用：
 		</p>
+
+        <ul>
+            <li>a.add("&lt;div /&gt;")</li>
+            <li>a.append("&lt;div /&gt;")</li>
+            <li>a.append(dom = Dom.parse("&lt;div /&gt;"))</li>
+            <li>a.insertBefore(dom, null)</li>
+            <li>dom = a.initChild(dom) - 子类重写此函数实现预处理子控件。</li>
+            <li>a.onAdding(dom, null) - 实际的插入操作，会调用 dom.attach(a.node, null)</li>
+            <li>a.onAdded(dom, null) - 触发 added 事件</li>
+            <li>return dom</li>
+        </ul>
+
+        <p>当用户执行 .remove 时，程序会依次调用：</p>
+
+        <ul>
+            <li>a.remove(dom)</li>
+            <li>a.removeChild(dom)</li>
+            <li>a.onRemoving(dom) - 实际的插入操作，会调用 dom.detach(a.node)</li>
+            <li>a.onemoved(dom) - 触发 removed 事件</li>
+            <li>return dom</li>
+        </ul>
+
+        <hr />
 		
-		<p>ScrollableControl 用法演示：</p>
+		<h4>ScrollableControl 用法演示</h4>
 		
-		<pre class="demo prettyprint linenums lang-html">&lt;div id="container-id"&gt;&lt;/div&gt;</pre>
+		<script type="text/html" class="demo">
+            <div id="container-id"></div>
+		</script>
 		
-		<pre class="demo prettyprint linenums lang-js">// 创建一个新类，其代理的元素是 #container-id
-var a = new ScrollableControl('container-id');</pre>
+		<script class="demo" type="text/js">
+		    // 创建一个新类，其代理的元素是 #container-id
+		    var a = new ScrollableControl('container-id');
+		</script>
 	<p>
 	通过这个 a 对象，可以很方便地实现 a 的子控件的管理。
 	</p>
-<p>
+<h5>
 	1. 添加一个新的子控件
-</p>
-<pre class="demo prettyprint linenums lang-js">a.add('&lt;a href="#"&gt;newElem&lt;/a&gt;');</pre>
+</h5>
+<script type="text/js" class="demo">a.add('&lt;a href="#"&gt;newElem&lt;/a&gt;');</script>
 <p>结果:</p>
-<pre class="demo prettyprint linenums lang-html">&lt;div id="container-id"&gt;&lt;a href="#">newElem&lt;/a&gt;&lt;/div&gt;</pre>
+<script type="text/html" class="demo"><div id="container-id"><a href="#">newElem</a></div></script>
 <p>
-<p>
+<h5>
 	2. 移除子控件
-</p>
-<pre class="demo prettyprint linenums lang-js">a.removeAt(0); // 删除第 0 个子控件。</pre>
+</h5>
+<script type="text/js" class="demo">a.removeAt(0); // 删除第 0 个子控件。</script>
 <p>结果:</p>
-<pre class="demo prettyprint linenums lang-html">&lt;div id="container-id"&gt;&lt;/div&gt;</pre>
-<p>
+<script class="demo" type="text/html"><div id="container-id"></div></script>
+<h5>
 	3. 查看子控件
-</p>
-<pre class="demo prettyprint linenums lang-js">alert( a.children().length ); // 查看子控件的数目。</pre>
+</h5>
+<script class="demo" type="text/js" >alert( a.count() ); // 查看子控件的数目。</script>
 <p>结果:</p>
-<pre class="demo prettyprint linenums lang-html">0</pre>
+<script class="demo" type="text/html">0</script>
 <p>
-	</p>	
-	
-	<p>
-		对于 ScrollableControl 来说，它能清除地知道子控件的增删操作，并在增删子控件时做任何操作。
 	</p>
-			
-		<div id="a">AAA</div>
-		
-		<script>
-			var a = new ScrollableControl('a');
-			
-			Demo.writeTestCases({
-				'ScrollableControl#add': 'a.add("text");',
-				'ScrollableControl#removeAt': 'a.removeAt(0)',
-                'ScrollableControl#count()': "a.count()"
-			});
-		</script>
-		
-		
 		
 	</body>
 </html>

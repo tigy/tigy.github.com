@@ -1406,6 +1406,50 @@
 		 * @static
 		 */
 		styleNumber: styleNumber,
+		
+		/**
+		 * 获取一个标签的默认 display 属性。
+		 * @param {Element} elem 元素。
+		 */
+		defaultDisplay: function(elem){
+			var displays = Dom.displays || (Dom.displays = {}),
+				tagName = elem.tagName,
+				display = displays[tagName],
+				iframe,
+				iframeDoc;
+				
+			if(!display) {
+				
+				elem = document.createElement(tagName);
+				document.body.appendChild(elem);
+				display = getStyle(elem, 'display');
+				document.body.removeChild(elem);
+
+				// 如果简单的测试方式失败。使用 IFrame 测试。
+				if ( display === "none" || display === "" ) {
+					iframe = document.body.appendChild(Dom.emptyIframe || (Dom.emptyIframe = Object.extend(document.createElement("iframe"), {
+						frameBorder: 0,
+						width: 0,
+						height: 0
+					})));
+					
+					// Create a cacheable copy of the iframe document on first call.
+					// IE and Opera will allow us to reuse the iframeDoc without re-writing the fake HTML
+					// document to it; WebKit & Firefox won't allow reusing the iframe document.
+					iframeDoc =  ( iframe.contentWindow || iframe.contentDocument ).document;
+					frameDoc.write("<!doctype html><html><body>");
+					iframeDoc.close();
+
+					elem = iframeDoc.body.appendChild( iframeDoc.createElement(nodeName) );
+					display = getStyle(elem, 'display');
+					document.body.removeChild( iframe );
+				}
+				
+				displays[tagName] = display;
+			}
+		
+			return display;
+		},
 
 		/**
 		 * 通过设置 display 属性来显示元素。
@@ -1420,7 +1464,7 @@
 
 			// 如果元素的 display 仍然为 none , 说明通过 CSS 实现的隐藏。这里默认将元素恢复为 block。
 			if(getStyle(elem, 'display') === 'none')
-				elem.style.display = elem.style.$display || 'block';
+				elem.style.display = elem.style.$display || Dom.defaultDisplay(elem);
 		},
 		
 		/**
@@ -2366,21 +2410,62 @@
 
 			assert.isFunction(handler, "Dom#delegate(selector, eventName, handler): {handler}  ~");
 
-			var eventInfo = Dom.$event[eventName];
+			var eventInfo = Dom.$event[eventName],
+				initEvent,
+				data = this.dataField();
 
-			if (eventInfo.delegate) {
+			if (eventInfo && eventInfo.delegate) {
 				eventName = eventInfo.delegate;
-				eventInfo = eventInfo.initEvent;
-			} else {
-				eventInfo = null;
+				initEvent = eventInfo.initEvent;
 			}
 			
-			return this.on(eventName, function(e) {
-				var target = e.getTarget().closest(selector);
-				if (target && (!eventInfo || eventInfo.call(target, e) !== false)) {
-					return handler.call(target, e, this);
-				}
-			});
+			data = data.$delegate || (data.$delegate = {});
+			
+			if(!data[eventName]){
+				data[eventName] = function(e) {
+					
+					// 获取原始的目标对象。
+					var target = e.getTarget(),
+					
+						// 所有委托的函数信息。
+						delegateHandlers = arguments.callee.handlers,
+						
+						actucalHandlers = [],
+						
+						i,
+						
+						handlerInfo,
+						
+						delegateTarget;
+						
+					for(i = 0; i < delegateHandlers.length; i++){
+					
+						handlerInfo = delegateHandlers[i];
+						
+						if((delegateTarget = target.closest(handlerInfo[0])) && (!initEvent || initEvent.call(delegateTarget, e) !== false)){
+							actucalHandlers.push([delegateTarget, handlerInfo[1]]);
+						}
+					}
+					
+					for(i = 0; i < actucalHandlers.length; i++) {
+					
+						handlerInfo = actucalHandlers[i];
+						
+						if(handlerInfo[1].call(handlerInfo[0], e) === false) {
+							break;
+						}
+					}
+				
+				};
+				
+				this.on(eventName, data[eventName]);
+				
+				data[eventName].handlers = [];
+			}
+			
+			data[eventName].handlers.push([selector, handler]);
+			
+			return this;
 
 		}
 
