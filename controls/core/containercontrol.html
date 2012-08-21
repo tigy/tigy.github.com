@@ -18,10 +18,10 @@
 	</head>
 	<body>
 		
-		<p>ContainerControl 表示一个容器组件。一个容器组件肯能包含一个标题栏。</p>
+		<p>ContainerControl 表示一个容器组件。一个容器组件肯能包含一个标题栏。其格式如:</p>
 		
 		<script class="demo" type="text/html">
-			<div class="x-control" id="a">
+			<div class="x-control">
 				<div class="x-control-header">
 					<h2>header</h2>
 				</div>
@@ -58,16 +58,16 @@
             
             Demo.writeTestCases({
                 '基本': '-',
-                'ConatinerControl#append(e)': "a.append(e);",
-                'ConatinerControl#remove(e)': "a.remove(e)",
-                'ConatinerControl#child(1)': "a.child(1)",
+                'ConatinerControl#append(e)': 'a.append(e)',
+                'ConatinerControl#remove(e)': 'a.remove(e)',
+                'ConatinerControl#child(1)': 'a.child(1)',
                 "HTML 操作": '-',
                 'ConatinerControl#setTitle("<em>value</em>")': 'a.setTitle("<em>value</em>")',
                 'ConatinerControl#getTitle()': "a.getTitle()",
                 'ConatinerControl#setHtml("<em>value</em>")': 'a.setHtml("<em>value</em>")',
                 'ConatinerControl#getHtml()': "a.getHtml()",
                 'ConatinerControl#setText("value")': 'a.setText("value")',
-                'ConatinerControl#getText()': "a.getText()"
+                'ConatinerControl#getText()': 'a.getText()'
             });
             
 		</script>

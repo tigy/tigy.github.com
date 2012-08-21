@@ -1765,7 +1765,7 @@
 					this.hasChild(child = child.node ? child : Dom.get(child)) ?
 						this.removeChild(child) :
 						null :
-				child = this.parentControl || this.parent() ?
+				(child = this.parentControl || this.parent()) ?
 					child.removeChild(this) :
 					this;
 		},
