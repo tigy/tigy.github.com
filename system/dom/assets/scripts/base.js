@@ -450,7 +450,7 @@
 				var event = e;
 				
 				if(!event || !event.type){
-					event = new Dom.Event(ctrl, type);
+					event = new Dom.Event(dom, type);
 					
 					// IE 8- 在处理原生事件时肯能出现错误。
 					try{
@@ -3674,15 +3674,15 @@
 			initEvent: function (e) {
 				
 				// 如果浏览器原生支持 mouseenter/mouseleave, 不作操作。
-				if(e.type === event) {
-					return true;	
+				if(e.type !== event) {
+					
+					var relatedTarget = e.relatedTarget;
+		
+					// 修正 getTarget 返回值。
+					e.orignalType = event;
+					return this.node !== relatedTarget && !Dom.hasChild(this.node, relatedTarget);
+					
 				}
-				
-				var relatedTarget = e.relatedTarget;
-	
-				// 修正 getTarget 返回值。
-				e.orignalType = event;
-				return this.node !== relatedTarget && !Dom.hasChild(this.node, relatedTarget);
 			},
 			base: div.onmouseenter === null ? null : fix,
 			delegate: fix

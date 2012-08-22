@@ -65,4 +65,4 @@
 	 */
 	removeAt: function(index) {		var child = this.child(index);
 		return child ? this.removeChild(child) : null;
-	}	/**	 * 当子控件被添加时触发。	 * @event added	 * @param {Control} childControl 被添加的子控件。	 */	/**	 * 当子控件被添加时触发。	 * @event removed	 * @param {Control} childControl 被删除的子控件。	 */}).addEvents('added removed');
+	}	/**	 * 当子控件被添加时触发。	 * @event added	 * @param {Control} childControl 被添加的子控件。	 */	/**	 * 当子控件被添加时触发。	 * @event removed	 * @param {Control} childControl 被删除的子控件。	 */});
