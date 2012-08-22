@@ -5,7 +5,6 @@
 		<title>J+ Library</title>
 		
 		<link href="../../controls/core/assets/styles/base.css" rel="stylesheet" type="text/css">
-		<link href="../../controls/core/assets/styles/common.css" rel="stylesheet" type="text/css">
 		<link href="../../controls/core/assets/styles/contentcontrol.less" rel="stylesheet/less" type="text/css" />
 		
 		<script src="../../system/core/assets/scripts/base.js" type="text/javascript"></script>
@@ -22,32 +21,26 @@
 		
 		<script class="demo" type="text/html">
     		
-    		<div id="a" class="x-inline-block x-debug">
-    			
+    		<div>
+    			<span class="x-icon"></span>
+                content
     		</div>
     		
 		</script>
         
-        <div id="a" class="x-inline-block x-debug">
+        <div id="a" class="demo-inline-block demo-target">
             
         </div>
-		
-		
-		<script class="demo">
+
+		<script>
 		
 			// 创建一个容器对象。
-			var a = new ContentControl('a');
-			
-			// 添加一项。
-			a.setIcon('');
-			a.setText('text');
-		</script>
-		
-		<script>
+		    var a = new ContentControl('a');
+
 			Demo.writeTestCases({
-			    'ContentControl#setIcon': 'a.setIcon("")',
-				'ContentControl#setText': 'a.setText("内容内容内容内容内容内容内容内容内容内容内容")',
-				'ContentControl#setHtml': 'a.setHtml("<b>内容</b>")'
+			    '设置图标': 'a.setIcon("")',
+			    '设置文本': 'a.setText("内容内容内容内容内容内容内容内容内容内容内容")',
+			    '设置 HTML': 'a.setHtml("<b>内容</b>")'
 			});
 		</script>
 		

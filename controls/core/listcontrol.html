@@ -23,58 +23,56 @@
 	</head>
 	<body>
 		
-		<p>ListControl 封装了列表性质的控件。一个列表性质的控件肯定是一个 ul 或 ol 标签，其格式如:</p>
+		<p>ListControl 是一个列表控件。一个列表控件肯定是一个 ul 或 ol 标签，其格式如:</p>
 		
 		<script class="demo" type="text/html">
 			<ul class="x-control">
 				<li class="x-control-item">选项1</li>
-				<li class="x-control-item x-control-selected">选项2</li>
+				<li class="x-control-item x-control-selected">选项2（选中）</li>
 				<li class="x-control-item">选项3</li>
 				<li class="x-control-item">选项4</li>
 			</ul>
 		</script>
 		
-		<ul id="a" class="demo-container">
-			<li class="x-control-item x-control-selected">#a的第一项</li>
+		<ul id="a" class="x-control demo-target">
+			<li class="x-control-item x-control-selected">#a的第一项（默认为选中）</li>
 		</ul>
-		<div id="d">#d</div>
-		<div id="e">#e</div>
 		
 		<script>
 		
 			// 创建一个容器对象。
 			var a = new ListControl('a');
-			
-			// 添加一项 HTML 。
-			a.append('<em>新建项</em>');
 
-			// 添加一项 Dom 。
-			a.append(Dom.get('d'));
-		</script>
-		
-		<script>
-			
-			var e = Dom.get('e');
-			
+			var b = Dom.parse('<div>我是一个普通节点。</div>');
+
 			Demo.writeTestCases({
-                '基本': '-',
-				'ListControl#append(e)': "a.append(e);",
-				'ListControl#remove(e)': "a.remove(e)",
-				'ListControl#child(1)': "a.child(1)",
-				"选中": '-',
-				'ListControl#setSelectedIndex(1)': "a.setSelectedIndex(1)",
-				'ListControl#getSelectedIndex()': "a.getSelectedIndex()",
-				'ListControl#setSelectedItem(a.item(0))': "a.setSelectedItem(a.item(0))",
-				'ListControl#getSelectedItem()': "a.getSelectedItem()",
-				'ListControl#setText("#d")': 'a.setText("#d")',
-				'ListControl#getText()': "a.getText()",
-                'ListControl#selectNext()': "a.selectNext()",
-                'ListControl#selectPrev()': "a.selectPrev()",
-                'ListControl#bindSelector("click")': 'a.bindSelector("click")'
+			    '使用 ScrollableControl 提供的方法操作子控件': '-',
+			    '添加子控件到末尾': 'a.add("<div>这是通过 add 插入的</div>");',
+			    '添加子控件到指定位置': 'a.insertAt(0, "<div>这是通过 insertAt 插入的</div>");',
+			    '删除指定位置的子控件': 'a.removeAt(0)',
+			    '获取某一位置的子控件': 'a.item(0)',
+			    '获取一个子控件在当前控件集合中的位置': 'a.indexOf(b)',
+			    '遍历子控件': 'a.each(function(item, i){trace("#", i, " => ", item.getText());})',
+			    '获取子控件的个数': "a.count()",
+			    '使用 Dom 提供的方法操作子节点': '-',
+			    '添加子控件到末尾': 'a.append("<div>这是通过 append 插入的</div>");',
+			    '添加子控件到第一个节点': 'a.prepend("<div>这是通过 prepend 插入的</div>");',
+			    '删除指定子控件': 'a.remove(b);',
+			    '清空子控件': 'a.empty()',
+			    '获取子控件列表': 'a.children()',
+			    '获取指定位置的容器': 'a.child(1)',
+			    '判断子控件是否存在于当前控件中': 'a.hasChild(b)',
+			    '操作节点的选中状态': '-',
+			    '设置选中指定项': 'a.setSelectedIndex(0)',
+			    '获取当前选中项的位置': 'a.getSelectedIndex()',
+			    '设置某项被选中': 'a.setSelectedItem(a.item(0))',
+			    '设置当前选中项': 'a.getSelectedItem()',
+			    '通过设置文本更改选中项': 'a.setText("这是通过 append 插入的")',
+			    '获取当前选中的文本': 'a.getText()',
+			    '选中下一个': 'a.selectNext()',
+			    '选中上一个': 'a.selectPrev()',
+			    '设置点击为选择事件': 'a.bindSelector("click")'
 			});
-			
-			
-			
 		</script>
 		
 	</body>

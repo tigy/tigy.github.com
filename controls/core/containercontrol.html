@@ -26,12 +26,14 @@
 					<h2>header</h2>
 				</div>
 				<div class="x-control-body">
-					
+					<div class="x-control-content">
+                        body
+                    </div>
 				</div>
 			</div>
 		</script>
 		
-		<div class="x-control" id="a">
+		<div class="x-control demo-target" id="a">
             <div class="x-control-header">
                 <h2>header</h2>
             </div>
@@ -39,37 +41,35 @@
                 
             </div>
         </div>
-        
-        <div id="e">#e</div>
 		
-		<script class="demo">
-		
-			// 创建一个容器对象。
-			var a = new ContainerControl('a');
-			
-			// 添加一项。
-			a.append('<div class="x-control-container">Body</div>');
-            
-        </script>
-        
-        <script>
-        
-            e = Dom.get('e');
-            
-            Demo.writeTestCases({
-                '基本': '-',
-                'ConatinerControl#append(e)': 'a.append(e)',
-                'ConatinerControl#remove(e)': 'a.remove(e)',
-                'ConatinerControl#child(1)': 'a.child(1)',
-                "HTML 操作": '-',
-                'ConatinerControl#setTitle("<em>value</em>")': 'a.setTitle("<em>value</em>")',
-                'ConatinerControl#getTitle()': "a.getTitle()",
-                'ConatinerControl#setHtml("<em>value</em>")': 'a.setHtml("<em>value</em>")',
-                'ConatinerControl#getHtml()': "a.getHtml()",
-                'ConatinerControl#setText("value")': 'a.setText("value")',
-                'ConatinerControl#getText()': 'a.getText()'
-            });
-            
+		<script>
+
+		    // 创建一个容器对象。
+		    var a = new ContainerControl('a');
+
+		    var b = Dom.parse('<div class="x-control-content">我是一个普通节点</div>');
+
+		    Demo.writeTestCases({
+		        '操作标题': '-',
+		        '设置标题': 'a.setTitle("<em>value</em>")',
+		        '获取标题': 'a.getTitle()',
+		        '使用 ScrollableControl 提供的方法操作子控件': '-',
+		        '添加子控件到末尾': 'a.add("<div>这是通过 add 插入的</div>");',
+		        '添加子控件到指定位置': 'a.insertAt(0, "<div>这是通过 insertAt 插入的</div>");',
+		        '删除指定位置的子控件': 'a.removeAt(0)',
+		        '获取某一位置的子控件': 'a.item(0)',
+		        '获取一个子控件在当前控件集合中的位置': 'a.indexOf(b)',
+		        '遍历子控件': 'a.each(function(item, i){trace("#", i, " => ", item.getText());})',
+		        '获取子控件的个数': "a.count()",
+		        '使用 Dom 提供的方法操作子节点': '-',
+		        '添加子控件到末尾': 'a.append("<div>这是通过 append 插入的</div>");',
+		        '添加子控件到第一个节点': 'a.prepend("<div>这是通过 prepend 插入的</div>");',
+		        '删除指定子控件': 'a.remove(b);',
+		        '清空子控件': 'a.empty()',
+		        '获取子控件列表': 'a.children()',
+		        '获取指定位置的容器': 'a.child(1)',
+		        '判断子控件是否存在于当前控件中': 'a.hasChild(b)'
+		    });
 		</script>
 		
 		

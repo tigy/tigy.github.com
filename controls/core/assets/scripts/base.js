@@ -1,5 +1,5 @@
 /**
- * @author
+ * @author  xuld
  */
 
 imports("Controls.Core.Base");
@@ -96,13 +96,13 @@ var Control = Dom.extend({
 		// 调用 init 初始化控件。
 		me.init(opt);
 
-		// 如果指定的节点已经在 DOM 树上，且重写了 attach 方法，则调用之。
-		if (me.node.parentNode && me.attach !== Control.prototype.attach) {
-			me.attach(me.node.parentNode, me.node.nextSibling);
-		}
+		//// 如果指定的节点已经在 DOM 树上，且重写了 attach 方法，则调用之。
+		//if (me.node.parentNode && me.attach !== Control.prototype.attach) {
+		//	me.attach(me.node.parentNode, me.node.nextSibling);
+		//}
 
 		// 复制各个选项。
-		Object.set(me, opt);
+		me.set(opt);
 	},
 
 	/**

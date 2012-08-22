@@ -2460,9 +2460,13 @@
 		 */
 		delegate: function(selector, eventName, handler) {
 
+			assert.isString(selector, "Dom#delegate(selector, eventName, handler): {selector}  ~");
+			assert.isString(eventName, "Dom#delegate(selector, eventName, handler): {eventName}  ~");
 			assert.isFunction(handler, "Dom#delegate(selector, eventName, handler): {handler}  ~");
 
-			var eventInfo = Dom.$event[eventName],
+			var delegateEventName = 'delegate:' + eventName,
+				delegateEvent,
+				eventInfo = Dom.$event[eventName],
 				initEvent,
 				data = this.dataField();
 
@@ -2471,10 +2475,11 @@
 				initEvent = eventInfo.initEvent;
 			}
 			
-			data = data.$delegate || (data.$delegate = {});
+			data = data.$event || (data.$event = {});
+			delegateEvent = data[delegateEventName];
 			
-			if(!data[eventName]){
-				data[eventName] = function(e) {
+			if(!delegateEvent){
+				data[delegateEventName] = delegateEvent = function(e) {
 					
 					// 获取原始的目标对象。
 					var target = e.getTarget(),
@@ -2494,8 +2499,8 @@
 					
 						handlerInfo = delegateHandlers[i];
 						
-						if((delegateTarget = target.closest(handlerInfo[0])) && (!initEvent || initEvent.call(delegateTarget, e) !== false)){
-							actucalHandlers.push([delegateTarget, handlerInfo[1]]);
+						if((delegateTarget = target.closest(handlerInfo[1])) && (!initEvent || initEvent.call(delegateTarget, e) !== false)){
+							actucalHandlers.push([handlerInfo[0], delegateTarget]);
 						}
 					}
 					
@@ -2503,19 +2508,19 @@
 					
 						handlerInfo = actucalHandlers[i];
 						
-						if(handlerInfo[1].call(handlerInfo[0], e) === false) {
+						if(handlerInfo[0].call(handlerInfo[1], e) === false) {
 							break;
 						}
 					}
 				
 				};
 				
-				this.on(eventName, data[eventName]);
+				this.on(eventName, delegateEvent);
 				
-				data[eventName].handlers = [];
+				delegateEvent.handlers = [];
 			}
 			
-			data[eventName].handlers.push([selector, handler]);
+			delegateEvent.handlers.push([handler, selector]);
 			
 			return this;
 
@@ -3426,49 +3431,7 @@
 		t = Event.prototype;
 		t.stop = ep.stop;
 		t.getTarget = ep.getTarget;
-
-		if (div.onfocusin !== null) {
-
-			Dom.addEvents('focusin focusout', {
-				fix: function(elem, type, funcName) {
-					var base = type === 'focusin' ? 'focus' : 'blur';
-					var doc = elem.node.ownerDocument || elem.node;
-					doc[funcName](base, this.handler, true);
-				},
-				handler: function(e) {
-					var type = e.orignalType = e.type === 'focus' ? 'focusin' : 'focusout';
-
-					var p = e.getTarget();
-
-					while (p) {
-						if (!p.trigger(type, e)) {
-							return;
-						}
-						p = p.parent();
-					}
-
-					document.trigger(type, e);
-				},
-				add: function(elem, type, fn) {
-					this.fix(elem, type, 'addEventListener');
-				},
-				remove: function() {
-					this.fix(elem, type, 'removeEventListener');
-				}
-			});
-
-		}
-
-		// Firefox 会在右击时触发 document.onclick 。
-		if(navigator.isFirefox) {
-			Dom.addEvents('click', {
-				initEvent: function(e){
-					return e.which === 1;
-				}
-			}).addEvents('click', {
-				base: 'DOMMouseScroll'
-			});
-		}
+		
 	/// #if CompactMode
 	
 	} else {
@@ -3507,8 +3470,6 @@
 			}
 		};
 
-		Dom.addEvents("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", mouseEvent).addEvents("keydown keypress keyup", keyEvent);
-		
 		Dom.cloneFix.SCRIPT = 'text';
 
 		styleFix.opacity = function(value){
@@ -3657,17 +3618,70 @@
 	Dom.addEvents("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", mouseEvent);
 	
 	Dom.addEvents("keydown keypress keyup", keyEvent);
+
+	if(div.onfocusin === undefined) {
+
+		Dom.addEvents('focusin focusout', {
+			fix: function(elem, type, funcName) {
+				var base = type === 'focusin' ? 'focus' : 'blur';
+				var doc = elem.node.ownerDocument || elem.node;
+				doc[funcName](base, this.handler, true);
+			},
+			handler: function(e) {
+				var type = e.orignalType = e.type === 'focus' ? 'focusin' : 'focusout';
+
+				var p = e.getTarget();
+
+				while (p) {
+					if (!p.trigger(type, e)) {
+						return;
+					}
+					p = p.parent();
+				}
+
+				document.trigger(type, e);
+			},
+			add: function(elem, type, fn) {
+				this.fix(elem, type, 'addEventListener');
+			},
+			remove: function() {
+				this.fix(elem, type, 'removeEventListener');
+			}
+		});
+
+	}
+
+	if(div.onmousewheel === undefined) {
+		Dom.addEvents('mousewheel', {
+			base: 'DOMMouseScroll'
+		});
+	}
+	
+	// Firefox 会在右击时触发 document.onclick 。
+	if(navigator.isFirefox) {
+		Dom.addEvents('click', {
+			initEvent: function(e){
+				return e.which === 1;
+			}
+		});
+	}
 	
 	Object.each({
 		'mouseenter': 'mouseover',
 		'mouseleave': 'mouseout'
 	}, function(fix, event) {
-		Dom.addEvents(fix, {
+		Dom.addEvents(event, {
 			initEvent: function (e) {
+				
+				// 如果浏览器原生支持 mouseenter/mouseleave, 不作操作。
+				if(e.type === event) {
+					return true;	
+				}
+				
 				var relatedTarget = e.relatedTarget;
 	
 				// 修正 getTarget 返回值。
-				e.orignalType = e.type === 'mouseover' ? 'mouseenter' : 'mouseleave';
+				e.orignalType = event;
 				return this.node !== relatedTarget && !Dom.hasChild(this.node, relatedTarget);
 			},
 			base: div.onmouseenter === null ? null : fix,
