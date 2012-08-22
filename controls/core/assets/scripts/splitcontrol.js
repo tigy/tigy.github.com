@@ -1,0 +1,1 @@
+/** * @author  xuld */var SplitControl = Control.extend(IMenuContainer).implement({	});
