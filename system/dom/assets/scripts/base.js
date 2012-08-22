@@ -18,6 +18,8 @@
 (function(window) {
 	
 	assert(!window.Dom || window.$ !== window.Dom.get, "重复引入 System.Dom.Base 模块。");
+	
+	// 变量简写
 
 	/**
 	 * document 简写。
@@ -53,6 +55,8 @@
 		 * 指示当前浏览器是否为标签浏览器。
 		 */
 		isStd = navigator.isStd,
+	
+		// DOM 
 	
 		/**
 		 * 提供对单一原生 HTML 节点的封装操作。
@@ -350,6 +354,71 @@
 		}),
 		
 		/**
+		 * DOM 事件。
+		 */
+		DomEvent = Class({
+
+			/**
+			 * 构造函数。
+			 * @param {Object} target 事件对象的目标。
+			 * @param {String} type 事件对象的类型。
+			 * @param {Object} [e] 事件对象的属性。
+			 * @constructor
+			 */
+			constructor: function(target, type) {
+				assert.notNull(target, "Dom.Event#constructor(target, type): {target} ~");
+
+				this.target = target;
+				this.type = type;
+			},
+			
+			/**
+			 * 阻止事件的冒泡。
+			 * @remark 默认情况下，事件会向父元素冒泡。使用此函数阻止事件冒泡。
+			 */
+			stopPropagation: function() {
+				this.cancelBubble = true;
+			},
+			
+			/**
+			 * 取消默认事件发生。
+			 * @remark 有些事件会有默认行为，如点击链接之后执行跳转，使用此函数阻止这些默认行为。
+			 */
+			preventDefault: function() {
+				this.returnValue = false;
+			},
+			
+			/**
+			 * 停止默认事件和冒泡。
+			 * @remark 此函数可以完全撤销事件。 事件处理函数中 return false 和调用 stop() 是不同的， return
+			 *         false 只会阻止当前事件其它函数执行， 而 stop() 只阻止事件冒泡和默认事件，不阻止当前事件其它函数。
+			 */
+			stop: function() {
+				this.stopPropagation();
+				this.preventDefault();
+			},
+			
+			/**
+			 * 获取当前发生事件 Dom 对象。
+			 * @return {Dom} 发生事件 Dom 对象。
+			 */
+			getTarget: function() {
+				return new Dom(this.orignalType && this.currentTarget || (this.target.nodeType === 3 ? this.target.parentNode: this.target));
+			}
+		}),
+		
+		// 系统使用的变量
+		
+		dp = Dom.prototype,
+		
+		ep = DomEvent.prototype,
+		
+		/**
+		 * 一个返回 true 的函数。
+		 */
+		returnTrue = Function.from(true),
+
+		/**
 		 * 用于测试的元素。
 		 * @type Element
 		 */
@@ -366,7 +435,7 @@
 		 * @type Object
 		 * @ignore
 		 */
-		eventObj = {
+		defaultEvent = {
 
 			/**
 			 * 创建当前事件可用的参数。
@@ -375,19 +444,23 @@
 			 * @param {Object} target 事件目标。
 			 * @return {Event} e 事件参数。
 			 */
-			trigger: function (ctrl, type, fn, e) {
-				ctrl = ctrl.node;
-
-				// IE 8- 在处理原生事件时肯能出现错误。
-				try {
-					if (!e || !e.type) {
-						e = new Dom.Event(ctrl, type, e);
+			trigger: function (dom, type, fn, e) {
+				dom = dom.node;
+				
+				var event = e;
+				
+				if(!event || !event.type){
+					event = new Dom.Event(ctrl, type);
+					
+					// IE 8- 在处理原生事件时肯能出现错误。
+					try{
+						extend(event, e);
+					}catch(e){
+						
 					}
-				} catch (ex) {
-					e = new Dom.Event(ctrl, type);
 				}
 
-				return fn(e) && (!ctrl[type = 'on' + type] || ctrl[type](e) !== false);
+				return fn(event) && (!dom[type = 'on' + type] || dom[type](event) !== false);
 			},
 
 			/**
@@ -396,10 +469,10 @@
 			 * @param {String} type 类型。
 			 * @param {Function} fn 函数。
 			 */
-			add: div.addEventListener ? function (elem, type, fn) {
-				elem.node.addEventListener(type, fn, false);
+			add: div.addEventListener ? function (dom, type, fn) {
+				dom.node.addEventListener(type, fn, false);
 			} : function (elem, type, fn) {
-				elem.node.attachEvent('on' + type, fn);
+				dom.node.attachEvent('on' + type, fn);
 			},
 
 			/**
@@ -408,17 +481,19 @@
 			 * @param {String} type 类型。
 			 * @param {Function} fn 函数。
 			 */
-			remove: div.removeEventListener ? function (elem, type, fn) {
-				elem.node.removeEventListener(elem, fn, false);
+			remove: div.removeEventListener ? function (dom, type, fn) {
+				dom.node.removeEventListener(type, fn, false);
 			} : function (elem, type, fn) {
-				elem.node.detachEvent('on' + type, fn);
+				dom.node.detachEvent('on' + type, fn);
 			}
 
 		},
-
-		pep,
 		
-		dp = Dom.prototype,
+		mouseEvent = defaultEvent,
+		
+		keyEvent = defaultEvent,
+		
+		// 正则
 
 		/**
 		 * 处理 <div/> 格式标签的正则表达式。
@@ -454,25 +529,7 @@
 		 */
 		rCheckBox = /^(?:checkbox|radio)$/,
 		
-		/**
-		 * 在 Dom.parseNode 和 setHtml 中对 HTML 字符串进行包装用的字符串。
-		 * @type Object 部分元素只能属于特定父元素， tagFix 列出这些元素，并使它们正确地添加到父元素中。 IE678
-		 *       会忽视第一个标签，所以额外添加一个 div 标签，以保证此类浏览器正常运行。
-		 */
-		tagFix = {
-			$default: isStd ? [1, '', '']: [2, '$<div>', '</div>'],
-			option: [2, '<select multiple="multiple">', '</select>'],
-			legend: [2, '<fieldset>', '</fieldset>'],
-			thead: [2, '<table>', '</table>'],
-			tr: [3, '<table><tbody>', '</tbody></table>'],
-			td: [4, '<table><tbody><tr>', '</tr></tbody></table>'],
-			col: [3, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
-			area: [2, '<map>', '</map>']
-		},
-		
-		styleFix = {
-			
-		},
+		// attr
 		
 		/**
 		 * 默认用于获取和设置属性的函数。
@@ -552,7 +609,39 @@
 			},	
 			set: defaultHook.set
 		},
-
+		
+		// 修复用的 JSON 对象
+		
+		/**
+		 * 在 Dom.parseNode 和 setHtml 中对 HTML 字符串进行包装用的字符串。
+		 * @type Object 部分元素只能属于特定父元素， tagFix 列出这些元素，并使它们正确地添加到父元素中。 IE678
+		 *       会忽视第一个标签，所以额外添加一个 div 标签，以保证此类浏览器正常运行。
+		 */
+		tagFix = {
+			$default: isStd ? [1, '', '']: [2, '$<div>', '</div>'],
+			option: [2, '<select multiple="multiple">', '</select>'],
+			legend: [2, '<fieldset>', '</fieldset>'],
+			thead: [2, '<table>', '</table>'],
+			tr: [3, '<table><tbody>', '</tbody></table>'],
+			td: [4, '<table><tbody><tr>', '</tr></tbody></table>'],
+			col: [3, '<table><tbody></tbody><colgroup>', '</colgroup></table>'],
+			area: [2, '<map>', '</map>']
+		},
+		
+		/**
+		 * 特殊属性的设置方式。
+		 */
+		styleFix = {
+			height: function(value) {
+				this.node.style.height = value > 0 ? value + 'px' : value <= 0 ? '0px' : value;
+				return this;
+			},
+			width: function(value) {
+				this.node.style.width = value > 0 ? value + 'px' : value <= 0 ? '0px' : value;
+				return this;
+			}
+		},
+		
 		/**
 		 * 别名属性的列表。
 		 * @type Object
@@ -716,11 +805,6 @@
 		///
 		/// },
 		/// #endif
-		
-		/**
-		 * 一个返回 true 的函数。
-		 */
-		returnTrue = Function.from(true),
 
 		/**
 		 * float 属性的名字。
@@ -737,6 +821,34 @@
 		domReady,
 
 		t;
+	
+	// 变量初始化。
+
+	// 初始化 tagFix。
+	tagFix.optgroup = tagFix.option;
+	tagFix.tbody = tagFix.tfoot = tagFix.colgroup = tagFix.caption = tagFix.thead;
+	tagFix.th = tagFix.td;
+
+	// 初始化 attrFix。
+	map("enctype encoding action method target", formHook, attrFix);
+
+	// 初始化 attrFix。
+	map("defaultChecked defaultSelected readOnly disabled autofocus autoplay async controls hidden loop open required scoped compact noWrap isMap declare noshade multiple noresize defer useMap", boolHook, attrFix);
+
+	// 初始化 propFix。
+	map("readOnly tabIndex defaultChecked defaultSelected accessKey useMap contentEditable maxLength", function(value) {
+		propFix[value.toLowerCase()] = value;
+	});
+
+	// 初始化 attrFix。
+	map("innerHTML innerText textContent tagName nodeName nodeType nodeValue defaultValue selectedIndex cellPadding cellSpacing rowSpan colSpan frameBorder", function(value) {
+		propFix[value.toLowerCase()] = value;
+		attrFix[value] = propHook;
+	});
+	
+	// 初始化 textFix。
+	textFix.INPUT = textFix.SELECT = textFix.TEXTAREA = 'value';
+	textFix['#text'] = textFix['#comment'] = 'nodeValue';
 	
 	/// #region Dom
 	
@@ -1167,14 +1279,10 @@
 			return (" " + elem.className + " ").indexOf(" " + className + " ") >= 0;
 		},
 
-		///**
-		// * 获取一个节点对应的数据字段。
-		// * @param {Element} elem 需要获取属性的节点。
-		// * @return {Object} 一个用于存储数据的对象，该对象和指定节点绑定。
-		// */
-		//dataField: function(elem){
-		//	return Dom#dataField.call({dom: elem});
-		//},
+		/**
+		 * 存储事件对象的信息。
+		 */
+		$event: {},
 		
 		/**
 		 * 特殊属性集合。
@@ -1223,17 +1331,6 @@
 		 * @private
 		 */
 		propFix: propFix,
-		
-		/**
-		 * 特殊属性集合。
-		 * @property
-		 * @type Object
-		 * @static
-		 * @private
-		 */
-		propHooks: {
-			
-		},
 		
 		/**
 		 * 获取文本时应使用的属性值。
@@ -1639,64 +1736,13 @@
 		 * 表示事件的参数。
 		 * @class Dom.Event
 		 */
-		Event: Class({
+		Event: DomEvent
 
-			/**
-			 * 构造函数。
-			 * @param {Object} target 事件对象的目标。
-			 * @param {String} type 事件对象的类型。
-			 * @param {Object} [e] 事件对象的属性。
-			 * @constructor
-			 */
-			constructor: function(target, type, e) {
-				assert.notNull(target, "Dom.Event#constructor(target, type, e): {target} ~");
-
-				var me = this;
-				me.target = target;
-				me.type = type;
-				extend(me, e);
-			},
-			
-			/**
-			 * 阻止事件的冒泡。
-			 * @remark 默认情况下，事件会向父元素冒泡。使用此函数阻止事件冒泡。
-			 */
-			stopPropagation: function() {
-				this.cancelBubble = true;
-			},
-			
-			/**
-			 * 取消默认事件发生。
-			 * @remark 有些事件会有默认行为，如点击链接之后执行跳转，使用此函数阻止这些默认行为。
-			 */
-			preventDefault: function() {
-				this.returnValue = false;
-			},
-			
-			/**
-			 * 停止默认事件和冒泡。
-			 * @remark 此函数可以完全撤销事件。 事件处理函数中 return false 和调用 stop() 是不同的， return
-			 *         false 只会阻止当前事件其它函数执行， 而 stop() 只阻止事件冒泡和默认事件，不阻止当前事件其它函数。
-			 */
-			stop: function() {
-				this.stopPropagation();
-				this.preventDefault();
-			},
-			
-			/**
-			 * 获取当前发生事件 Dom 对象。
-			 * @return {Dom} 发生事件 Dom 对象。
-			 */
-			getTarget: function() {
-				return new Dom(this.orignalType && this.currentTarget || (this.target.nodeType === 3 ? this.target.parentNode: this.target));
-			}
-		})
-
-	});
+	})
 	
 	/**@class Dom*/
 	
-	Dom.implement({
+	.implement({
 
 		/**
 		 * 将当前 Dom 对象添加到其它节点或 Dom 对象中。
@@ -1983,17 +2029,7 @@
 				name = name.toLowerCase();
 			}
 			
-			hook.set(elem, name, value);	
-// 
-			// if (elem.setAttribute) {
-// 
-				// // 属性名统一小写。
-				// (attrFix[name = name.toLowerCase()] || defaultHook).set(elem, name, value);
-			// } else {
-// 
-				// // 如果不支持 setAttribute 使用 setProp 。
-				// this.setProp(name, value);
-			// }
+			hook.set(elem, name, value);
 
 			return this;
 
@@ -2022,29 +2058,53 @@
 		 * });
 		 * </pre>
 		 */
-		set: function(name, value) {
-			var me = this;
+		set: function(options, value) {
+			var me = this,
+				key,
+				setter;
 
-			if (typeof name === "string") {
+			// .set(key, value)
+			if (typeof options === 'string') {
+				key = options;
+				options = {};
+				options[key] = value;
+			}
 
-				var elem = me.node;
+			for (key in options) {
+				value = options[key];
 
-				// event 。
-				if (/^on(\w+)/.test(name))
+				// .setKey(value)
+				if (Object.isFunction(me[setter = 'set' + key.capitalize()]))
+					me[setter](value);
+
+				// 如果是当前对象的成员。
+				else if (key in me) {
+
+					setter = me[key];
+
+					// .key(value)
+					if (Object.isFunction(setter))
+						me[key](value);
+
+					// .key.set(value)
+					else if (setter && setter.set)
+						setter.set(value);
+
+					// .key = value
+					else
+						me[key] = value;
+					
+				// .on(event, value)
+				} else if (/^on(\w+)/.test(key))
 					me.on(RegExp.$1, value);
 
-				// css 。
-				else if (elem.style && (name in elem.style || rStyle.test(name)))
-					me.setStyle(name, value);
-
-				// attr 。
-				else 
-					me.setAttr(name, value);
-
-			} else if (Object.isObject(name)) {
-
-				for (value in name)
-					me.set(value, name[value]);
+				// .setStyle(css, value)
+				else if (me.node.style && (key in me.node.style || rStyle.test(key)))
+					me.setStyle(key, value);
+				
+				// .setAttr(attr, value);
+				else
+					me.setAttr(key, value);
 
 			}
 
@@ -2261,11 +2321,7 @@
 		 * 将所有段落的宽设为 20。
 		 * <pre>Dom.query("p").setWidth(20);</pre>
 		 */
-		setWidth: function(value) {
-
-			this.node.style.width = value > 0 ? value + 'px' : value <= 0 ? '0px' : value;
-			return this;
-		},
+		setWidth: styleFix.width,
 
 		/**
 		 * 获取当前 Dom 对象设置CSS高度(hidth)属性的值（不带滚动条）。
@@ -2275,11 +2331,7 @@
 		 * 将所有段落的高设为 20。
 		 * <pre>Dom.query("p").setHeight(20);</pre>
 		 */
-		setHeight: function(value) {
-
-			this.node.style.height = value > 0 ? value + 'px' : value <= 0 ? '0px' : value;
-			return this;
-		},
+		setHeight: styleFix.height,
 
 		/**
 		 * 设置当前 Dom 对象相对父元素的偏移。
@@ -3289,78 +3341,54 @@
 	/// #region document
 	
 	/**
-	 * @namespace document
-	 * @ignore
+	 * 获取当 Dom 对象实际对应的 HTML 节点实例。
+	 * @type Node
+	 * @protected
 	 */
-	extend(document, {
-
-		node: document,
-		
-		find: function(selector){
-			assert.isString(selector, "Dom#find(selector): selector ~");
-			var result;
-			try{
-				result = this.querySelector(selector);
-			} catch(e) {
-				result = query(selector, this)[0];
-			}
-			return result ? new Dom(result) : null;
-		},
-		
-		/**
-		 * 执行选择器。
-		 * @method
-		 * @param {String} selecter 选择器。 如 h2 .cls attr=value 。
-		 * @return {Element/undefined} 节点。
-		 */
-		query: function(selector){
-			assert.isString(selector, "Dom#find(selector): selector ~。");
-			var result;
-			try{
-				result = this.querySelectorAll(selector);
-			} catch(e) {
-				result = query(selector, this);
-			}
-			return new DomList(result);
+	document.node = document;
+	
+	/**
+	 * 搜索所有与指定CSS表达式匹配的第一个元素。
+	 * @param {String} selecter 用于查找的表达式。
+	 * @return {Dom} 返回一个节点对象。如果不存在，则返回 null 。
+	 * @example
+	 * 从所有的段落开始，进一步搜索下面的span元素。与Dom.find("p span")相同。
+	 * #####HTML:
+	 * <pre lang="htm" format="none">&lt;p&gt;&lt;span&gt;Hello&lt;/span&gt;, how are you?&lt;/p&gt;</pre>
+	 * #####JavaScript:
+	 * <pre>Dom.query("p").find("span")</pre>
+	 * #####结果:
+	 * <pre lang="htm" format="none">[ &lt;span&gt;Hello&lt;/span&gt; ]</pre>
+	 */
+	document.find = function(selector){
+		assert.isString(selector, "Dom#find(selector): selector ~");
+		var result;
+		try{
+			result = this.querySelector(selector);
+		} catch(e) {
+			result = query(selector, this)[0];
 		}
-		
-	});
+		return result ? new Dom(result) : null;
+	};
+	
+	/**
+	 * 执行选择器。
+	 * @method
+	 * @param {String} selecter 选择器。 如 h2 .cls attr=value 。
+	 * @return {Element/undefined} 节点。
+	 */
+	document.query = function(selector){
+		assert.isString(selector, "Dom#find(selector): selector ~。");
+		var result;
+		try{
+			result = this.querySelectorAll(selector);
+		} catch(e) {
+			result = query(selector, this);
+		}
+		return new DomList(result);
+	};
 	
 	/// #endif
-	
-	// 变量初始化。
-
-	// 初始化 tagFix。
-	tagFix.optgroup = tagFix.option;
-	tagFix.tbody = tagFix.tfoot = tagFix.colgroup = tagFix.caption = tagFix.thead;
-	tagFix.th = tagFix.td;
-
-	// 初始化 attrFix。
-	map("enctype encoding action method target", formHook, attrFix);
-
-	// 初始化 attrFix。
-	map("defaultChecked defaultSelected readOnly disabled autofocus autoplay async controls hidden loop open required scoped compact noWrap isMap declare noshade multiple noresize defer useMap", boolHook, attrFix);
-
-	// 初始化 propFix。
-	map("readOnly tabIndex defaultChecked defaultSelected accessKey useMap contentEditable maxLength", function(value) {
-		propFix[value.toLowerCase()] = value;
-	});
-
-	// 初始化 attrFix。
-	map("innerHTML innerText textContent tagName nodeName nodeType nodeValue defaultValue selectedIndex cellPadding cellSpacing rowSpan colSpan frameBorder", function(value) {
-		propFix[value.toLowerCase()] = value;
-		attrFix[value] = propHook;
-	});
-	
-	// 初始化 textFix。
-	textFix.INPUT = textFix.SELECT = textFix.TEXTAREA = 'value';
-	textFix['#text'] = textFix['#comment'] = 'nodeValue';
-	
-	styleFix.height = dp.setHeight;
-	styleFix.width = dp.setWidth;
-	
-	// 初始化事件对象。
-	Dom.addEvents('$default', eventObj);
 
 	// Dom 函数。
 	Dom.defineMethods('node', 'scrollIntoView focus blur select click submit reset', 1);
@@ -3380,59 +3408,24 @@
 	});
 	
 	// DomList 函数。
-	t = DomList.prototype;
-	map("shift pop unshift push include indexOf each forEach", function (funcName) {
-		t[funcName] = ap[funcName];
-	});
-	map("slice splice reverse unique", function(funcName) {
-		t[funcName] = function() {
+	map("slice splice reverse unique shift pop unshift push include indexOf each forEach", function (funcName, index) {
+		DomList.prototype[funcName] = index < 4 ? function() {
 			return new DomList(ap[funcName].apply(this, arguments));
-		};
+		} : ap[funcName];
 	});
 	
-	// 其它对象。
-	pep = Dom.Event.prototype;
-	Point.format = formatPoint;
-
-	var mousEnterEventInfo = {
-		initEvent: function (e) {
-			var relatedTarget = e.relatedTarget;
-
-			// 修正 getTarget 返回值。
-			e.orignalType = e.type === 'mouseover' ? 'mouseenter' : 'mouseleave';
-			return this.node !== relatedTarget && !Dom.hasChild(this.node, relatedTarget);
-		},
-		base: div.onmouseenter === null ? null : 'mouseover',
-		delegate: 'mouseover'
-	};
-
-	Dom
-		.addEvents('mouseenter', mousEnterEventInfo)
-
-		.addEvents('mouseleave', {
-			initEvent: mousEnterEventInfo.initEvent,
-			base: mousEnterEventInfo.base && 'mouseout',
-			delegate: 'mouseout'
-		})
-
-		.addEvents('focus', {
-			delegate: 'focusin'
-		})
-
-		.addEvents('blur', {
-			delegate: 'focusout'
-		});
-
+	map("$default mousewheel blur focus scroll change select submit resize error load unload touchstart touchmove touchend hashchange", defaultEvent, Dom.$event);
+	
 	/// #if CompactMode
 
 	if(isStd) {
 
 	/// #endif
 
-		t = window.Event.prototype;
-		t.stop = pep.stop;
-		t.getTarget = pep.getTarget;
 		domReady = 'DOMContentLoaded';
+		t = Event.prototype;
+		t.stop = ep.stop;
+		t.getTarget = ep.getTarget;
 
 		if (div.onfocusin !== null) {
 
@@ -3472,28 +3465,32 @@
 				initEvent: function(e){
 					return e.which === 1;
 				}
+			}).addEvents('click', {
+				base: 'DOMMouseScroll'
 			});
 		}
 	/// #if CompactMode
 	
 	} else {
 
-		eventObj.initEvent = function (e) {
+		domReady = 'readystatechange';
+		
+		defaultEvent.initEvent = function (e) {
 			e.target = e.srcElement;
-			e.stop = pep.stop;
-			e.getTarget = pep.getTarget;
-			e.stopPropagation = pep.stopPropagation;
-			e.preventDefault = pep.preventDefault;
+			e.stop = ep.stop;
+			e.getTarget = ep.getTarget;
+			e.stopPropagation = ep.stopPropagation;
+			e.preventDefault = ep.preventDefault;
 		};
-
-		Dom.addEvents("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", {
+		
+		mouseEvent = {
 			initEvent: function (e) {
 				if(!e.stop) {
-					eventObj.initEvent(e);
+					var node = getDocument(e.target).node;
+					defaultEvent.initEvent(e);
 					e.relatedTarget = e.fromElement === e.srcElement ? e.toElement: e.fromElement;
-					var dom = getDocument(e.target).node;
-					e.pageX = e.clientX + dom.scrollLeft;
-					e.pageY = e.clientY + dom.scrollTop;
+					e.pageX = e.clientX + node.scrollLeft;
+					e.pageY = e.clientY + node.scrollTop;
 					e.layerX = e.x;
 					e.layerY = e.y;
 					// 1 ： 单击 2 ： 中键点击 3 ： 右击
@@ -3501,15 +3498,19 @@
 
 				}
 			}
-		}).addEvents("keydown keypress keyup",  {
+		};
+		
+		keyEvent = {
 			initEvent: function (e) {
-				eventObj.initEvent(e);
+				defaultEvent.initEvent(e);
 				e.which = e.keyCode;
 			}
-		});
+		};
+
+		Dom.addEvents("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", mouseEvent).addEvents("keydown keypress keyup", keyEvent);
 		
-		domReady = 'readystatechange';
-		
+		Dom.cloneFix.SCRIPT = 'text';
+
 		styleFix.opacity = function(value){
 			var elem = this.node, style = elem.style;
 
@@ -3534,8 +3535,6 @@
 			return this;
 
 		};
-
-		Dom.cloneFix.SCRIPT = 'text';
 
 		defaultHook.get = function(elem, name) {
 
@@ -3655,6 +3654,33 @@
 
 	}
 	
+	Dom.addEvents("click dblclick mousedown mouseup mouseover mouseenter mousemove mouseleave mouseout contextmenu selectstart selectend", mouseEvent);
+	
+	Dom.addEvents("keydown keypress keyup", keyEvent);
+	
+	Object.each({
+		'mouseenter': 'mouseover',
+		'mouseleave': 'mouseout'
+	}, function(fix, event) {
+		Dom.addEvents(fix, {
+			initEvent: function (e) {
+				var relatedTarget = e.relatedTarget;
+	
+				// 修正 getTarget 返回值。
+				e.orignalType = e.type === 'mouseover' ? 'mouseenter' : 'mouseleave';
+				return this.node !== relatedTarget && !Dom.hasChild(this.node, relatedTarget);
+			},
+			base: div.onmouseenter === null ? null : fix,
+			delegate: fix
+		});
+	});
+	
+	Dom.addEvents('focus', {
+			delegate: 'focusin'
+		}).addEvents('blur', {
+			delegate: 'focusout'
+		});
+	
 	/// #endif
 
 	/**
@@ -3692,9 +3718,11 @@
 	map('ready load', function(readyOrLoad, isLoad) {
 
 		var isReadyOrIsLoad = isLoad ? 'isLoaded': 'isReady';
+		
+		readyOrLoad = 'dom' + readyOrLoad;
 
 		// 设置 ready load
-		Dom[readyOrLoad] = function (fn, bind) {
+		return function (fn, bind) {
 			
 			// 忽略参数不是函数的调用。
 			var isFn = Object.isFunction(fn);
@@ -3729,7 +3757,7 @@
 					fn = domReady;
 				}
 
-				eventObj.remove(isFn, fn, arguments.callee);
+				defaultEvent.remove(isFn, fn, arguments.callee);
 
 				// 先设置为已经执行。
 				Dom[isReadyOrIsLoad] = true;
@@ -3749,16 +3777,15 @@
 			return document;
 		};
 
-		readyOrLoad = 'dom' + readyOrLoad;
-	});
+	}, Dom);
 	
 	// 如果readyState 不是 complete, 说明文档正在加载。
 	if(document.readyState !== "complete") {
 
 		// 使用系统文档完成事件。
-		eventObj.add(document, domReady, Dom.ready);
+		defaultEvent.add(document, domReady, Dom.ready);
 
-		eventObj.add(Dom.window, 'load', Dom.load, false);
+		defaultEvent.add(Dom.window, 'load', Dom.load, false);
 
 		/// #if CompactMode
 		
@@ -3804,19 +3831,11 @@
 	}
 	
 	div = null;
-
-	// 导出类。
-	extend(window, {
-
-		Dom: Dom,
-
-		Point: Point,
-		
-		DomList: DomList
-
-	});
 	
 	// 导出函数。
+	window.Dom = Dom;
+	window.DomList = DomList;
+	window.Point = Point;
 	window.$ = window.$ || Dom.get;
 	window.$$ = window.$$ || Dom.query;
 	
@@ -3848,7 +3867,7 @@
 			var i = 0, r, target;
 			while (i < this.length && !r) {
 				target = new Dom(this[i++]);
-				r = target[func].apply(target, arguments);
+				r = target[funcName].apply(target, arguments);
 			}
 			return r;
 		};

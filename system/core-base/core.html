@@ -56,11 +56,6 @@
 			            assert.logged("aaaa23");
 			        }
 			    },
-			    'Object.set': {
-			        'var target = {setA: function (value) {assert.log("1");trace("设置 a =  ", value);}, b: function (value) {trace(value);}};Object.set(target, {a: 8, b: 6, c: 4});': function (value, assert) {
-			            assert.logged("1");
-			        }
-			    },
 			    'Array': '-',
 			    'Array#indexOf': {
 			        '[5,4].indexOf(5)': 0,
