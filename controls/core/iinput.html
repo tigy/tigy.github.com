@@ -30,8 +30,10 @@
 		    Object.extend(a, IInput);
 
 		    Demo.writeTestCases({
-		        '禁用': 'a.setAttr("disabled", true)',
-		        '只读': 'a.setAttr("readonly", true)',
+		        '设置禁用': 'a.disabled()',
+		        '取消禁用': 'a.disabled(false)',
+		        '设置只读': 'a.readOnly()',
+		        '取消只读': 'a.readOnly(false)',
 		        '设置表单域': 'a.setAttr("name", "name")',
 		        '清空内容': 'a.clear()',
 		        '选中内容': 'a.select()',

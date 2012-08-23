@@ -343,21 +343,21 @@
   .reset-filter();
 
   // in these cases the gradient won't cover the background, so we override
-  &:hover, &:active, &.x-button-actived, &.x-button-disabled, &[disabled] {
-    background-color: @endColor;
-  }
+  // &:hover, &:active, &.x-button-actived, &.x-button-disabled, &[disabled] {
+    // background-color: @endColor;
+  // }
 
   // IE 7 + 8 can't handle box-shadow to show active, so we darken a bit ourselves
-  &:active,
-  &.x-button-actived {
-    background-color: darken(@endColor, 10%) e("\9");
-  }
+  // &:active,
+  // &.x-button-actived {
+    // background-color: darken(@endColor, 10%) e("\9");
+  // }
 }
 
 // FORM CONTROL
 // ---------------------
 
-.x-formField() {
+.formField() {
   #font > #family > .sans-serif();
   padding: 4px;
   font-size: @baseFontSize + 1;
@@ -379,8 +379,8 @@
   }
   
   &[disabled], &[readonly] {
-    border-color: #ddd;
-    background-color: #eee; 
+    border-color: @grayBorder; 
+    background-color: @grayLighter; 
   }
 }
 

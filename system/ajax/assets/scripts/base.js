@@ -571,7 +571,7 @@ var Ajax = (function() {
 				data: data,
 				success: onsuccess,
 				type: type,
-				dataType: dataType,
+				dataType: dataType
 			});
 		};
 
