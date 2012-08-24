@@ -20,14 +20,32 @@
 	<body>
 		
 		<aside class="demo">
-	 	  <ul class="x-listbox" id="a">
+	 	  <ul class="x-listbox x-listbox-disabled" id="a">
             <li class="x-listbox-item">内容 tmp</li>
             <li class="x-listbox-item x-listbox-selected"><a href="#">内容  tmp</a></li>
             <li class="x-listbox-item"><a href="#">内容   tmp</a></li>
             <li class="x-listbox-item"><a href="#">内容  tmp</a></li>
+            <li class="x-listbox-item"><a href="#">内容  tmp</a></li>
+            <li class="x-listbox-item"><a href="#">内容  tmp</a></li>
+            <li class="x-listbox-item"><a href="#">内容  tmp</a></li>
+            <li class="x-listbox-item"><a href="#">内容  tmp</a></li>
+            <li class="x-listbox-item"><a href="#">内容  tmp</a></li>
+            <li class="x-listbox-item"><a href="#">内容  tmp</a></li>
+            <li class="x-listbox-item"><a href="#">内容  tmp</a></li>
           </ul>
          <script>
 			var a = new ListBox('a');
+			
+		    Demo.writeTestCases({
+		        '设置禁用': 'a.disabled()',
+		        '取消禁用': 'a.disabled(false)',
+		        '设置只读': 'a.readOnly()',
+		        '取消只读': 'a.readOnly(false)',
+		        '设置表单域': 'a.setAttr("name", "name")',
+		        '清空内容': 'a.clear()',
+		        '选中内容': 'a.select()',
+		        '获取表单': 'a.form()'
+		    });
 		</script>
    		</aside>
 		

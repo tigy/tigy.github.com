@@ -110,9 +110,33 @@ var ListControl = ScrollableControl.extend({
 	init: function() {
 		this.query('>li').addClass('x-' + this.xtype + '-item');
 	},
-
-	onOverFlowY: function(max) {
-		this.setHeight(max);
+	
+	/**
+	 * 当当前控件在屏幕中显示不下时，由 align 函数触发执行此函数。
+	 * @param {String} xOry 值为 "x" 或 "y"。
+	 * @param {Integer} value 设置的最大值。
+	 * @param {Boolean} isOverflowing 如果值为 true，表示发生了此事件，否则表示恢复此状态。
+	 */
+	onOverflow: function(xOry, value, isOverflowing){
+		var data = this['overflow' + xOry];
+		if(isOverflowing){
+			if(!data){
+				this['overflow' + xOry] = this[xOry === 'x' ? 'getWidth' : 'getHeight']();
+			}
+			this[xOry === 'x' ? 'setWidth' : 'setHeight'](value);
+		} else if(data !== undefined){
+			this[xOry === 'x' ? 'setWidth' : 'setHeight'](data);
+			delete this['overflow' + xOry];
+		}
+	},
+	
+	// 悬浮功能
+	
+	/**
+	 * 底层设置某项的悬停状态。该函数仅仅设置元素的 class。
+	 */
+	baseSetHover: function(container, value) {
+		container.toggleClass('x-' + this.xtype + '-hover', value);
 	},
 	
 	// 选择功能
@@ -257,10 +281,14 @@ var ListControl = ScrollableControl.extend({
 		return this;
 	},
 	
+	hoverItem: function(){
+		
+	},
+	
 	/**
 	 * 选择当前选择项的下一项。
 	 */
-	selectNext: function(up){
+	hoverNext: function(up){
 		var oldIndex = this.getSelectedIndex(), 
 			newIndex, 
 			maxIndex = this.count() - 1,
@@ -282,29 +310,61 @@ var ListControl = ScrollableControl.extend({
 			
 		} while(!this.isSelectable(item) && available-- > 0);
 		
-		return this.setSelectedItem(item);
+		return this.hoverItem(item);
 	},
 	
 	/**
 	 * 选择当前选择项的上一项。
 	 */
-	selectPrev: function(){
-		return this.selectNext(false);
+	hoverPrev: function(){
+		return this.hoverNext(false);
 	},
 	
 	/**
-	 * 设置某个事件发生之后，自动选择元素。
+	 * 设置某个事件发生之后，执行某个函数.
+	 * @param {String} eventName 事件名。
+	 * @param {String} funcName 执行的函数名。
 	 */
-	bindSelector: function(eventName, doToggle){
+	bindSelector: function(eventName, funcName){
 		return this.on(eventName, function(e){
 			for(var c = this.first(); c; c = c.next()){
 				if(c.hasChild(e.target, true)){
-					this[doToggle ? "toggleSelected" : "setSelectedItem"](c);
+					this[funcName](c);
 				}
 			}
 		});
 	}
 	
-}).addEvents('select change');
+}).addEvents('select change')
+
+// .addEvents('itemclick', {
+// 	
+	// handler: function(e){
+// 		
+		// // 如果无法更改值，则直接忽略。
+		// if(this.hasClass('x-' + this.xtype + '-disabled') || this.hasClass('x-' + this.xtype + '-readonly'))
+			// return;
+// 			
+		// //获取当前项。
+		// var item = e.getTarget().closest('li');
+		// if(item && !!this.clickItem(item)){
+			// e.stop();
+		// }
+// 		
+		// this.trigger('itemclick');
+	// },
+// 	
+	// add: function(dom, type, fn){
+		// dom.on('click', this.handler);
+	// },
+// 	
+	// remove: function(dom, type, fn){
+		// dom.un('click', this.handler);
+	// }
+// 	
+// })
+
+
+;
 
 

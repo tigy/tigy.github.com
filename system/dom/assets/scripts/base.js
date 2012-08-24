@@ -166,6 +166,15 @@
 				assert(childControl && childControl.detach, 'Dom#removeChild(childControl): {childControl} 必须 Dom 对象。', childControl);
 				childControl.detach(this.node);
 				return childControl;
+			},
+			
+			/**
+			 * 判断当前节点是否和指定节点相等。
+			 * @param {Dom} childControl 要判断的节点。
+			 * @return {Boolean} 如果节点相同，则返回 true，否则返回 false 。
+			 */
+			equals: function(childControl){
+				return this.node === childControl || (childControl && this.node === childControl.node);
 			}
 			
 		}),

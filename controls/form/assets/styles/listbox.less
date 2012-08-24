@@ -11,15 +11,13 @@
   border-width: 1px;
   .border-radius(5px);
   .ie7-inline-block();
-  min-width: 140px;
   _zoom: 0;
   _display: block;
-  _width: 160px;
   
   padding: 4px 0;
   margin: 0; // override default ul
   list-style: none;
-  _overflow: hidden;
+  overflow: auto;
 
 }
 
@@ -33,14 +31,13 @@
   _width:100%;
 }
 
-// Hover state
-.x-listbox-item:hover, .x-dropdownmenu .x-listbox-selected{
-  background-color: @linkColor;
-  
-}
-
 .x-listbox-item a{
   color: @textColor;
+}
+
+// Hover state
+.x-listbox-item:hover{
+  background-color: @linkColor;
 }
 
 .x-listbox-selected {
@@ -53,5 +50,18 @@
     color: @white;
     text-decoration: none;
     cursor: default;
+  }
+}
+
+.x-listbox-readonly {
+  background-color: @grayLighter!important;
+}
+
+.x-listbox-disabled{
+  border-color: @grayBorder!important;
+  background-color: @grayLighter!important;
+  
+  .x-listbox-selected {
+    background-color: @gray;
   }
 }
