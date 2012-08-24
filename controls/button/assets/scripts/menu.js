@@ -44,6 +44,24 @@ var MenuItem = ContentControl.extend({
 		parentNode.removeChild(this.node);
 	},
 
+	onMouseEnter: function() {
+		this.hovering(true);
+		this.showSubMenu();
+	},
+	
+	onMouseLeave: function(e) {
+		
+		this.hovering(false);
+
+		// 没子菜单，需要自取消激活。
+		// 否则，由父菜单取消当前菜单的状态。
+		// 因为如果有子菜单，必须在子菜单关闭后才能关闭激活。
+
+		if (!this.subMenu)
+			this.setSelected(false);
+
+	},
+	
 	getSubMenu: function(){
 		if(!this.subMenu){
 			this.setSubMenu(new Menu());
@@ -94,10 +112,6 @@ var MenuItem = ContentControl.extend({
 
 	},
 
-	onMouseEnter: function() {
-		this.showSubMenu();
-	},
-	
 	showSubMenu: function(){
 
 		// 使用父菜单打开本菜单，显示子菜单。
@@ -110,27 +124,19 @@ var MenuItem = ContentControl.extend({
 		this.parentControl && this.parentControl.hideSubMenu(this);
 	},
 
-	onMouseLeave: function(e) {
-
-		// 没子菜单，需要自取消激活。
-		// 否则，由父菜单取消当前菜单的状态。
-		// 因为如果有子菜单，必须在子菜单关闭后才能关闭激活。
-
-		if (!this.subMenu)
-			this.setSelected(false);
-
+	/**
+	 * 切换显示鼠标是否移到当前项。
+	 */
+	hovering: function(value){
+		return this.toggleClass('x-' + this.xtype + '-hover', value);
 	}
 
 });
 
-Object.map("Selected Checked Disabled", function(key) {
-	var p = MenuItem.prototype, c = 'x-menuitem-' + key.toLowerCase();
-	p['set' + key] = function(value) {
-		return this.toggleClass(c, value);
-	};
-
-	p['get' + key] = function() {
-		return this.hasClass(c);
+Object.map("selected checked disabled", function(funcName) {
+	MenuItem.prototype[funcName] = function(value) {
+		this.toggleClass('x-' + this.xtype + '-' + funcName, value);
+		return this.setAttr(funcName, value);
 	};
 });
 
@@ -263,23 +269,23 @@ var Menu = ListControl.extend({
 	/**
 	 * 底层获取某项的选中状态。该函数仅仅检查元素的 class。
 	 */
-	baseGetSelected: function (container) {
-		return this.itemOf(container).getSelected();
-	},
+	//baseGetSelected: function (container) {
+	//	return this.itemOf(container).getSelected();
+	//},
 	
 	/**
 	 * 底层设置某项的选中状态。该函数仅仅设置元素的 class。
 	 */
-	baseSetSelected: function(container, value) {
-		this.itemOf(container).setSelected(value);
-	},
+	//baseSetSelected: function(container, value) {
+	//	this.itemOf(container).setSelected(value);
+	//},
 
 	/**
 	 * 底层获取某项的选中状态。该函数仅仅检查元素的 class。
 	 */
-	isSelectable: function (item) {
-		return item.node.tagName === 'A';
-	},
+	//isSelectable: function (item) {
+	//	return item.node.tagName === 'A';
+	//},
 	
 	/**
 	 * 当前菜单依靠某个控件显示。
