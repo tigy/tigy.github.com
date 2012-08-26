@@ -142,7 +142,10 @@
 			 */
 			detach: function(parentNode) {
 				assert(parentNode && parentNode.removeChild, 'Dom#detach(parentNode): {parentNode} 必须是 DOM 节点 Dom 对象。', parent);
-				parentNode.removeChild(this.node);
+				
+				// 仅当是直接父节点时删除。
+				if(this.node.parentNode === parentNode)
+					parentNode.removeChild(this.node);
 			},
 		
 			/**
@@ -164,6 +167,7 @@
 			 */
 			removeChild: function(childControl) {
 				assert(childControl && childControl.detach, 'Dom#removeChild(childControl): {childControl} 必须 Dom 对象。', childControl);
+				
 				childControl.detach(this.node);
 				return childControl;
 			},
@@ -1214,6 +1218,15 @@
 			}
 			return match(elem, selector);
 		},
+		
+		/// TODO: clear
+		
+		hasChild: function(elem, child){
+			assert.deprected("Dom.hasChild 已过时，请改用 Dom.has");
+			return Dom.has(elem, child);
+		},
+		
+		/// TODO: clear
 
 		/**
 		 * 判断指定节点之后有无存在子节点。
@@ -1222,14 +1235,14 @@
 		 * @return {Boolean} 如果确实存在子节点，则返回 true ， 否则返回 false 。
 	 	 * @static
 		 */
-		hasChild: div.compareDocumentPosition ? function(elem, child) {
+		has: div.compareDocumentPosition ? function(elem, child) {
 			assert.isNode(elem, "Dom.hasChild(elem, child): {elem} ~");
 			assert.isNode(child, "Dom.hasChild(elem, child): {child} ~");
 			return !!(elem.compareDocumentPosition(child) & 16);
 		}: function(elem, child) {
 			assert.isNode(elem, "Dom.hasChild(elem, child): {elem} ~");
 			assert.isNode(child, "Dom.hasChild(elem, child): {child} ~");
-			while( child = child.parentNode)
+			while(child = child.parentNode)
 				if(elem === child)
 					return true;
 
@@ -1817,9 +1830,7 @@
 			return arguments.length ?
 				typeof child === 'string' ?
 					this.query(child).remove() :
-					this.hasChild(child = child.node ? child : Dom.get(child)) ?
-						this.removeChild(child) :
-						null :
+					this.removeChild(child) :
 				(child = this.parentControl || this.parent()) ?
 					child.removeChild(this) :
 					this;
@@ -3195,20 +3206,28 @@
 			return Dom.isHidden(this.node);
 		},
 		
+		/// TODO: clear
+		
+		hasChild: function(dom, allowSelf){
+			assert.deprected("Dom#hasChild 已过时，请改用 Dom#has");
+			return this.has(dom, allowSelf);
+		},
+		
+		/// TODO: clear
+		
 		/**
 		 * 判断一个节点是否有子节点。
-		 * @param {Dom} [dom] 子节点。如果未传递此参数，则判断是否存在任何子节点。
+		 * @param {Dom} dom 子节点。
 		 * @param {Boolean} allowSelf=false 如果为 true，则当当前节点等于指定的节点时也返回 true 。
 		 * @return {Boolean} 存在子节点则返回true 。
 		 */
-		hasChild: function(dom, allowSelf) {
-			var elem = this.node;
-			if(dom){
-				dom = Dom.getNode(dom);
-				return (allowSelf && elem === dom) || Dom.hasChild(elem, dom);
-			}
+		has: function(dom, allowSelf){
+			if(typeof dom === "string")
+				return (allowSelf && this.match(dom)) || !!this.find(dom);
+				
+			dom = Dom.getNode(dom);
 			
-			return Dom.isEmpty(elem);
+			return (allowSelf && this.node === dom) || Dom.has(this.node, dom);
 		}
 		
 	}, 4);
