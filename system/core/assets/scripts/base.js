@@ -184,11 +184,25 @@
 				
 				assert.isString(methods, "MyClass.defineMethods(targetProperty, methods): {methods} ~");
 				
+				var propertyGetterFunc;
+				
+				if(/\(\)$/.test(targetProperty)){
+					propertyGetterFunc = targetProperty.substr(0, targetProperty.length - 2);
+				}
+				
 				// 最后使用 implement 添加成员。
 				return this.implement(Object.map(methods, function(funcName) {
 					return function() {
-						var target = this[targetProperty],
-							r = target[funcName].apply(target, arguments);
+						
+						// 获取实际调用的函数目标对象。
+						var target = propertyGetterFunc ? this[propertyGetterFunc]() : this[targetProperty],
+							r;
+							
+						assert(target, "#" + targetProperty + " 不能为空。");
+						assert(!target || Object.isFunction(target[funcName]), "#" + targetProperty + "." + funcName + "(): 不是函数。");
+						
+						// 调用被代理的实际函数。
+						r = target[funcName].apply(target, arguments);
 						
 						// 如果不是 getter，返回 this 链式引用。
 						return target === r ? this : r;

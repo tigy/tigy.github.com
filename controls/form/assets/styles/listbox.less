@@ -33,23 +33,24 @@
 
 .x-listbox-item a{
   color: @textColor;
+  cursor: default;
 }
 
 // Hover state
-.x-listbox-item:hover{
-  background-color: @linkColor;
-}
 
 .x-listbox-selected {
   background-color: darken(@linkColor, 15%);
 }
 
-.x-listbox-item:hover, .x-listbox-selected {
+.x-listbox-hover {
+  background-color: @linkColor;
+}
+
+.x-listbox-selected, .x-listbox-hover {
   color: @white;
   a {
     color: @white;
     text-decoration: none;
-    cursor: default;
   }
 }
 

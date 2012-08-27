@@ -1,4 +1,4 @@
-﻿/** * @author xuld *//** * 所有表单输入控件实现的接口。 * @interface IInput */var IInput = {		/**	 * 当设置文本时执行此函数。
+﻿/** * @author xuld *//** * 所有表单输入控件实现的接口。 * @interface IInput */var IInput = {		/**	 * 获取或设置当前表单的实际域。	 * @protected	 * @type {Control}	 */	hiddenField: null,		/**	 * 当设置文本时执行此函数。
 	 */	onChange: function(){		this.trigger('change');	},		/**	 * 创建用于在表单内保存当前输入值的隐藏域。	 * @return {Dom} 隐藏输入域。
 	 */	createHiddenField: function(){		return Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));	},		/**	 * 获取当前输入域实际用于提交数据的表单域。	 * @return {Dom} 一个用于提交表单的数据域。	 */	input: function(){				// 如果不存在隐藏域。		if(!this.hiddenField) {						// 如果 当前元素是表单元素，直接返回。			if(/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(this.node.tagName)){				return this;			}						this.hiddenField = this.createHiddenField();		}				return this.hiddenField;	},		/**	 * 获取当前控件所在的表单。	 * @return {Dom} 表单。
 	 */	form: function () {		return Dom.get(this.input().node.form);	},		/**	 * 清空当前控件的数据。	 * @return this

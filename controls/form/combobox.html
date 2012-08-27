@@ -5,20 +5,21 @@
 		<title>J+ Library</title>
 		
 		<link href="../../controls/core/assets/styles/base.css" rel="stylesheet" type="text/css">
-		<link href="../../controls/core/assets/styles/imenucontainer.less" rel="stylesheet/less" type="text/css" />
+		<link href="../../controls/core/assets/styles/idropdownowner.less" rel="stylesheet/less" type="text/css" />
+		<link href="../../controls/form/assets/styles/picker.less" rel="stylesheet/less" type="text/css" />
+		<link href="../../controls/form/assets/styles/listbox.less" rel="stylesheet/less" type="text/css" />
 		<link href="../../controls/form/assets/styles/combobox.less" rel="stylesheet/less" type="text/css" />
 		
 		<script src="../../system/core/assets/scripts/base.js" type="text/javascript"></script>
 		<script src="../../system/dom/assets/scripts/base.js" type="text/javascript"></script>
 		<script src="../../system/data/assets/scripts/collection.js" type="text/javascript"></script>
 		<script src="../../controls/core/assets/scripts/base.js" type="text/javascript"></script>
-		<script src="../../controls/core/assets/scripts/imenucontainer.js" type="text/javascript"></script>
+		<script src="../../controls/core/assets/scripts/idropdownowner.js" type="text/javascript"></script>
+		<script src="../../controls/core/assets/scripts/iinput.js" type="text/javascript"></script>
 		<script src="../../controls/core/assets/scripts/scrollablecontrol.js" type="text/javascript"></script>
 		<script src="../../controls/core/assets/scripts/listcontrol.js" type="text/javascript"></script>
-		<script src="../../controls/core/assets/scripts/iinput.js" type="text/javascript"></script>
 		<script src="../../controls/form/assets/scripts/textbox.js" type="text/javascript"></script>
-		<script src="../../controls/form/assets/scripts/combinedtextbox.js" type="text/javascript"></script>
-		<script src="../../controls/form/assets/scripts/listbox.js" type="text/javascript"></script>
+		<script src="../../controls/form/assets/scripts/picker.js" type="text/javascript"></script>
 		<script src="../../controls/form/assets/scripts/combobox.js" type="text/javascript" type="text/javascript"></script>
 		
 		<script src="../../assets/demo/less.js" type="text/javascript"></script>
@@ -26,7 +27,7 @@
 	</head>
 	<body>
 		
-		<section class="demo">
+		<!-- <section class="demo">
 			
 			<h3 class="demo">基于 &lt;input&gt; 创建</h3>
 			
@@ -111,7 +112,25 @@
 				<\/script>
 	   		</script>
 	   		
-   		</section>
+   		</section> -->
+   		
+   		<script>
+   			var a = new ComboBox();
+   			var a1 = a.add('选项A');
+   			var a2 = a.add('选项B');
+   			var a3 = a.add('选项C');
+   			var a4 = a.add('选项D');
+   			a.appendTo();
+   			
+   			Demo.writeTestCases({
+   				'新增一项': 'a.add("我是通过 add 增加的")',
+   				'在首个位置插入一项': 'a.addAt(0, "我是通过 addAt 增加的")',
+   				'获取当前选中的索引': 'a.getSelectedIndex()',
+   				'设置当前选中的索引': 'a.setSelectedIndex(1)',
+   				'设置被选中后执行': 'a.on("select", trace)',
+   				'设置值更改后执行': 'a.on("change", trace)'
+   			});
+   		</script>
 		
 	</body>
 </html>

@@ -1111,7 +1111,7 @@ var Dpl = {
 					"status" : "+",
 					"attribute" : ""
 				},
-				"IDropDown" : {
+				"IDropDownOwner" : {
 					"summary" : "有下拉菜单的控件",
 					"status" : "+",
 					"attribute" : ""
