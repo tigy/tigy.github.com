@@ -57,10 +57,14 @@ var Deferrable = Class({
 				this[link]();
 				this.isRunning = true;
 				return false;
+			case "replace":
+				this.init(this.options = Object.extend(this.options, args));
+				
+			// fall through
 			case "ignore":
 				return true;
 			default:
-				assert(!link || link === 'wait', "Deferred.prototype.defer(args, link): 成员 {link} 必须是 wait、cancel、ignore 之一。", link);
+				assert(link === "wait", "Deferred#defer(args, link): 成员 {link} 必须是 wait、abort、stop、ignore、replace 之一。", link);
 		}
 
 		this.chain(this, args);
@@ -94,6 +98,8 @@ var Deferrable = Class({
 		}
 		return this;
 	},
+	
+	pause: Function.empty,
 	
 	skip: function(){
 		this.pause();

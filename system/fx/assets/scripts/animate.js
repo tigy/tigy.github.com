@@ -65,7 +65,7 @@ using("System.Fx.Tween");
 			// 将父元素的 overflow 设为 hidden 。
 			elem.parentNode.style.overflow = 'hidden';
 
-			var tweens = {},
+			var params = {},
 				fromValue,
 				toValue,
 				key2,
@@ -75,22 +75,22 @@ using("System.Fx.Tween");
 				key2 = index === 0 ? 'marginRight' : 'marginLeft';
 				fromValue = -elem.offsetWidth - Dom.styleNumber(elem, key2);
 				toValue = Dom.styleNumber(elem, key);
-				tweens[key] = isShow ? (fromValue + '-' + toValue) : (toValue + '-' + fromValue);
+				params[key] = isShow ? (fromValue + '-' + toValue) : (toValue + '-' + fromValue);
 
 				fixProp(options, elem, 'width');
 				delta = toValue - fromValue;
 				toValue = Dom.styleNumber(elem, key2);
 				fromValue = toValue + delta;
-				tweens[key2] = isShow ? (fromValue + '-' + toValue) : (toValue + '-' + fromValue);
+				params[key2] = isShow ? (fromValue + '-' + toValue) : (toValue + '-' + fromValue);
 
 			} else {
 				key2 = index === 2 ? 'marginBottom' : 'marginTop';
 				fromValue = -elem.offsetHeight - Dom.styleNumber(elem, key2);
 				toValue = Dom.styleNumber(elem, key);
-				tweens[key] = isShow ? (fromValue + '-' + toValue) : (toValue + '-' + fromValue);
+				params[key] = isShow ? (fromValue + '-' + toValue) : (toValue + '-' + fromValue);
 			}
 
-			return tweens;
+			return params;
 		
 		};
 		
@@ -99,8 +99,8 @@ using("System.Fx.Tween");
 	Dom.implement({
 		
 		/**
-		 * 获取和当前节点有关的 Tween 实例。
-		 * @return {Animate} 一个 Tween 的实例。
+		 * 获取和当前节点有关的 param 实例。
+		 * @return {Animate} 一个 param 的实例。
 		 */
 		fx: function() {
 			var data = this.dataField();
@@ -114,32 +114,30 @@ using("System.Fx.Tween");
 		/**
 		 * 变化到某值。
 		 * @param {String/Object} [name] 变化的名字或变化的末值或变化的初值。
-		 * @param {Object} value 变化的值或变化的末值。
 		 * @param {Number} duration=-1 变化的时间。
 		 * @param {Function} [oncomplete] 停止回调。
-		 * @param {Function} [onStart] 开始回调。
 		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 rerun 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
 		 * @return this
 		 */
-		animate: function (params, duration, oncomplete, onstart, link) {
-			if(typeof duration === 'object'){
-				link = duration.link;
-				oncomplete = duration.complete;
-				onstart = duration.start;
-				duration = duration.duration;
+		animate: function (params, duration, oncomplete, link) {
+			assert.notNull(params, "Dom#animate(params, duration, oncomplete, link): {params} ~", params);
+				
+			if(params.params){
+				link = params.link;
+			} else {
+				params = {
+					params: params,
+					duration: duration,
+					complete: oncomplete
+				};
 			}
-
-			assert(!duration || typeof duration === 'number', "Dom#animate(params, duration, onstart, onstart, link): {duration} 必须是数字。如果需要制定为默认时间，使用 -1 。", onstart);
-			assert(!oncomplete || Object.isFunction(oncomplete), "Dom#animate(params, duration, oncomplete, onstart, link): {oncomplete} 必须是函数", oncomplete);
-			assert(!onstart || Object.isFunction(onstart), "Dom#animate(params, duration, onstart, onstart, link): {onstart} 必须是函数", onstart);
 			
-			this.fx().run( {
-				target: this,
-				tweens: params,
-				start: onstart,
-				duration: duration,
-				complete: oncomplete
-			}, link);
+			params.target = this;
+
+			assert(!params.duration || typeof params.duration === 'number', "Dom#animate(params, duration, oncomplete, link): {duration} 必须是数字。如果需要制定为默认时间，使用 -1 。", params.duration);
+			assert(!params.oncomplete || Object.isFunction(params.oncomplete), "Dom#animate(params, duration, oncomplete, link): {oncomplete} 必须是函数", params.oncomplete);
+			
+			this.fx().run(params, link);
 			
 			return this;
 		},
@@ -174,8 +172,8 @@ using("System.Fx.Tween");
 
 						var elem = this.node,
 							t,
-							tweens,
-							tween;
+							params,
+							param;
 
 						// 如果元素本来就是显示状态，则不执行后续操作。
 						if (!Dom.isHidden(elem)) {
@@ -190,29 +188,29 @@ using("System.Fx.Tween");
 						// 保存原有的值。
 						options.orignal = {};
 
-						// 新建一个新的 tweens 。
-						options.tweens = tweens = {};
+						// 新建一个新的 params 。
+						options.params = params = {};
 
 						// 获取指定特效实际用于展示的css字段。
 						t = Fx.displayEffects[effect](options, elem, true);
 
 						// 保存原有的css值。
 						// 用于在hide的时候可以正常恢复。
-						for (tween in t) {
-							options.orignal[tween] = elem.style[tween];
+						for (param in t) {
+							options.orignal[param] = elem.style[param];
 						}
 
 						// 因为当前是显示元素，因此将值为 0 的项修复为当前值。
-						for (tween in t) {
-							if (t[tween] === 0) {
+						for (param in t) {
+							if (t[param] === 0) {
 
 								// 设置变化的目标值。
-								tweens[tween] = Dom.styleNumber(elem, tween);
+								params[param] = Dom.styleNumber(elem, param);
 
 								// 设置变化的初始值。
-								elem.style[tween] = 0;
+								elem.style[param] = 0;
 							} else {
-								tweens[tween] = t[tween];
+								params[param] = t[param];
 							}
 						}
 					},
@@ -260,8 +258,8 @@ using("System.Fx.Tween");
 					start: function(options, fx) {
 
 						var elem = this.node,
-							tweens,
-							tween;
+							params,
+							param;
 
 						// 如果元素本来就是隐藏状态，则不执行后续操作。
 						if (Dom.isHidden(elem)) {
@@ -274,12 +272,12 @@ using("System.Fx.Tween");
 						options.orignal = {};
 
 						// 获取指定特效实际用于展示的css字段。
-						options.tweens = tweens = Fx.displayEffects[effect](options, elem, false);
+						options.params = params = Fx.displayEffects[effect](options, elem, false);
 
 						// 保存原有的css值。
 						// 用于在show的时候可以正常恢复。
-						for (tween in tweens) {
-							options.orignal[tween] = elem.style[tween];
+						for (param in params) {
+							options.orignal[param] = elem.style[param];
 						}
 					},
 					complete: function(isAbort, fx) {

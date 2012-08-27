@@ -27,26 +27,30 @@
 	</head>
 	<body>
 		
-		<!-- <section class="demo">
+		<section class="demo">
 			
 			<h3 class="demo">基于 &lt;input&gt; 创建</h3>
 			
 			<aside class="demo">
 				<input type="text" class="x-textbox" value="文本框" id="a"/>
+				
+				<ul class="x-dropdown x-listbox">
+					<li>预定义的选项</li>
+				</ul>
 				<script>
 					 var a = new ComboBox("a");
-					 a.menu.add("选1");
-					 a.menu.add("选2");
-					 a.menu.add("选3");
+					 a.add("选1");
+					 a.add("选2");
+					 a.add("选3");
 				</script>
 	   		</aside>
 	   		<script class="demo" type="text/html">
 	   			<input type="text" class="x-textbox" value="文本框" id="a"/>
 				<script>
 					 var a = new ComboBox("a");
-					 a.menu.add("选1");
-					 a.menu.add("选2");
-					 a.menu.add("选3");
+					 a.add("选1");
+					 a.add("选2");
+					 a.add("选3");
 				<\/script>
 	   		</script>
 	   		
@@ -59,8 +63,8 @@
 			<h2 class="demo">基于 &lt;select&gt; 创建</h2>
 			
 			<aside class="demo">
-				<select id="b" name="a">
-					<option value="1">选项1</option>
+				<select id="b" name="a" placeholder="AAA">
+					<option value="1">选项1111111111111111111</option>
 		
 					<option value="2" selected="selected">选项2</option>
 				</select>
@@ -94,25 +98,25 @@
 				</span>
 				<script>
 					 var c = new ComboBox("c");
-					 c.menu.add("选1");
-					 c.menu.add("选2");
-					 c.menu.add("选3");
+					 c.add("选1");
+					 c.add("选2");
+					 c.add("选3");
 				</script>
 	   		</aside>
 	   		<script class="demo" type="text/html">
-	   			<span class="x-combinedtextbox" id="c">
+	   			<span class="x-picker" id="c">
 					<input type="text" class="x-textbox" value="文本框"/>
 					<button class="x-button"><span class="x-button-menu"></span></button>
 				</span>
 				<script>
 					 var c = new ComboBox("c");
-					 c.menu.add("选1");
-					 c.menu.add("选2");
-					 c.menu.add("选3");
+					 c.add("选1");
+					 c.add("选2");
+					 c.add("选3");
 				<\/script>
 	   		</script>
 	   		
-   		</section> -->
+   		</section>
    		
    		<script>
    			var a = new ComboBox();

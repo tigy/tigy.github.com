@@ -94,7 +94,7 @@ var Marquee = Class({
 				// 如果本来正在自动播放中，这里恢复自动播放。
 				if (me.step)
 					me.resume();
-			}, null, 'abort');
+			}, 'abort');
 		}
 
 	},
@@ -114,50 +114,55 @@ var Marquee = Class({
 			// 暂停自动播放，防止出现抢资源问题。
 			me.pause();
 			
-			me.target.animate({}, me.duration, function () {
-
-				// 效果结束。
-				me._animatingTargetIndex = null;
-
-				// 滚动完成后触发事件。
-				me.onChanged(index, oldIndex);
-
-				// 如果本来正在自动播放中，这里恢复自动播放。
-				if (me.step)
-					me.resume();
-			}, function (options) {
-
-				// 实际所滚动的区域。
-				var actualIndex = index + me.length,
-						prop = me._horizonal ? 'marginLeft' : 'marginTop',
-						from = Dom.styleNumber(me.target.node, prop),
-						to = -me._getScrollByIndex(actualIndex);
-
-				// 如果保证是平滑滚动，则修正错误的位置。
-				if (me.flow) {
-
-					// 如果是往上、左方向滚。
-					if (lt) {
-
-						// 确保 from > to
-						if (from > to) {
-							from -= me._size;
+			me.target.animate({
+				params: {},
+				duration: me.duration,
+				complete: function () {
+	
+					// 效果结束。
+					me._animatingTargetIndex = null;
+	
+					// 滚动完成后触发事件。
+					me.onChanged(index, oldIndex);
+	
+					// 如果本来正在自动播放中，这里恢复自动播放。
+					if (me.step)
+						me.resume();
+				},
+				start: function (options) {
+	
+					// 实际所滚动的区域。
+					var actualIndex = index + me.length,
+							prop = me._horizonal ? 'marginLeft' : 'marginTop',
+							from = Dom.styleNumber(me.target.node, prop),
+							to = -me._getScrollByIndex(actualIndex);
+	
+					// 如果保证是平滑滚动，则修正错误的位置。
+					if (me.flow) {
+	
+						// 如果是往上、左方向滚。
+						if (lt) {
+	
+							// 确保 from > to
+							if (from > to) {
+								from -= me._size;
+							}
+	
+						} else {
+	
+							// 确保 from < to
+							if (from < to) {
+								from += me._size;
+							}
 						}
-
-					} else {
-
-						// 确保 from < to
-						if (from < to) {
-							from += me._size;
-						}
+	
 					}
-
+	
+					options.tweens[prop] = from + '-' + to;
+	
+					// 记录当前正在转向的目标索引。
+					me._currentIndex = index;
 				}
-
-				options.tweens[prop] = from + '-' + to;
-
-				// 记录当前正在转向的目标索引。
-				me._currentIndex = index;
 			}, 'abort');
 		}
 		return this;

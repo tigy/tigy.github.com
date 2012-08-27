@@ -21,7 +21,7 @@
 		}
 
 		Object.each(args, this.append, this);		return this;
-	},		/**	 * 获取指定索引的项。	 */	item: function(index) {		return this.itemOf(this.child(index));	},	
+	},		clear: Dom.prototype.empty,		/**	 * 获取指定索引的项。	 */	item: function(index) {		return this.itemOf(this.child(index));	},	
 	/**
 	 * 对集合的每一项执行函数。
 	 */

@@ -121,8 +121,8 @@ var Fx = (function() {
 
 				// duration
 				duration = options.duration;
-				assert(duration == undefined || duration === 0 || +duration, "Fx#run(options, link): duration 必须是数字。如果需要使用默认的时间，使用 -1 。");
-				options.duration = duration !== -1 && duration != undefined ? duration < 0 ? -defaultOptions.duration * duration : duration : defaultOptions.duration;
+				assert(duration == undefined || duration === 0 || +duration, "Fx#run(options, link): {duration} 必须是数字。如果需要使用默认的时间，使用 -1 。",  duration);
+				options.duration = duration !== -1 && duration != undefined ? duration < 0 ? -defaultOptions.duration / duration : duration : defaultOptions.duration;
 
 				// start
 				if (options.start && options.start.call(options.target, options, me) === false) {
