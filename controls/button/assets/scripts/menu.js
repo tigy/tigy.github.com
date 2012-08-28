@@ -24,7 +24,6 @@ var MenuItem = ContentControl.extend({
 	 *
 	 */
 	init: function() {
-		this.base('init');
 		this.unselectable();
 		this.on('mouseover', this.onMouseEnter);
 		this.on('mouseout', this.onMouseLeave);
@@ -41,7 +40,10 @@ var MenuItem = ContentControl.extend({
 		if (this.subMenu) {
 			this.subMenu.remove();
 		}
-		parentNode.removeChild(this.node);
+		
+		if(this.node.parentNode === parentNode) {
+			parentNode.removeChild(this.node);
+		}
 	},
 
 	onMouseEnter: function() {
@@ -50,15 +52,13 @@ var MenuItem = ContentControl.extend({
 	},
 	
 	onMouseLeave: function(e) {
-		
-		this.hovering(false);
 
 		// 没子菜单，需要自取消激活。
 		// 否则，由父菜单取消当前菜单的状态。
 		// 因为如果有子菜单，必须在子菜单关闭后才能关闭激活。
 
 		if (!this.subMenu)
-			this.setSelected(false);
+			this.hovering(false);
 
 	},
 	
@@ -123,6 +123,13 @@ var MenuItem = ContentControl.extend({
 		// 使用父菜单打开本菜单，显示子菜单。
 		this.parentControl && this.parentControl.hideSubMenu(this);
 	},
+	
+	setAttr: function(name, value) {
+		if(/^(selected|checked|disabled)$/i.test(name)){
+			return this[name.toLowerCase()](value);
+		}
+		return Dom.prototype.setAttr.call(this, name, value);
+	},
 
 	/**
 	 * 切换显示鼠标是否移到当前项。
@@ -136,7 +143,7 @@ var MenuItem = ContentControl.extend({
 Object.map("selected checked disabled", function(funcName) {
 	MenuItem.prototype[funcName] = function(value) {
 		this.toggleClass('x-' + this.xtype + '-' + funcName, value);
-		return this.setAttr(funcName, value);
+		return Dom.prototype.setAttr.call(this, funcName, value);
 	};
 });
 
@@ -229,7 +236,7 @@ var Menu = ListControl.extend({
 
 	},
 	
-	initChild: function(childControl){
+	onAdding: function(childControl){
 		
 		// 如果是添加 <li> 标签，则直接返回。
 		// .add('<li></li>')
@@ -245,6 +252,36 @@ var Menu = ListControl.extend({
 		}
 
 		return childControl;
+	},
+	
+	onRemoving: function(childControl){
+		return this.itemOf(childControl);
+	},
+	
+	doAdd: function(childControl, refControl){
+
+		// 如果 childControl 不是 <li>, 则包装一个 <li> 标签。
+		if (childControl.node.tagName !== 'LI') {
+
+			// 创建 <li>
+			var li = Dom.create('LI', 'x-' + this.xtype + '-item');
+			
+			// 复制节点。
+			li.append(childControl);
+			
+			ScrollableControl.prototype.onAdding.call(this, childControl);
+			
+			// 赋值。
+			childControl = li;
+		}
+		
+		// childControl = ListControl.prototype.onAdding.call(this, childControl);
+		return ListControl.prototype.doAdd.call(this, childControl, refControl);
+	},
+	
+	doRemove: function(childControl){
+		var base = ListControl.prototype;
+		return base.doRemove.call(this, childControl, refControl);
 	},
 
 	init: function() {
@@ -265,27 +302,6 @@ var Menu = ListControl.extend({
 		this.hide();
 		this.onHide();
 	},
-	
-	/**
-	 * 底层获取某项的选中状态。该函数仅仅检查元素的 class。
-	 */
-	//baseGetSelected: function (container) {
-	//	return this.itemOf(container).getSelected();
-	//},
-	
-	/**
-	 * 底层设置某项的选中状态。该函数仅仅设置元素的 class。
-	 */
-	//baseSetSelected: function(container, value) {
-	//	this.itemOf(container).setSelected(value);
-	//},
-
-	/**
-	 * 底层获取某项的选中状态。该函数仅仅检查元素的 class。
-	 */
-	//isSelectable: function (item) {
-	//	return item.node.tagName === 'A';
-	//},
 	
 	/**
 	 * 当前菜单依靠某个控件显示。
@@ -354,7 +370,7 @@ var Menu = ListControl.extend({
 		this.hideSubMenu();
 
 		// 激活本项。
-		menuItem.setSelected(true);
+		menuItem.hovering(true);
 
 		// 如果指定的项存在子菜单。
 		if (menuItem.subMenu) {
@@ -381,7 +397,7 @@ var Menu = ListControl.extend({
 			this.currentSubMenu.subMenu.hide();
 
 			// 取消激活菜单。
-			this.currentSubMenu.setSelected(false);
+			this.currentSubMenu.hovering(false);
 			this.currentSubMenu = null;
 		}
 	}

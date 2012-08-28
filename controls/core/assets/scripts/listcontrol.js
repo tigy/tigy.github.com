@@ -20,7 +20,7 @@ var ListControl = ScrollableControl.extend({
 	/**	 * 获取用于包装指定子控件的容器控件。	 * @param {Control} item 要获取的子控件。	 * @return {Control} 用于包装指定子控件的容器控件。	 * @protected override	 * @see #itemOf
 	 */
 	childOf: function(childControl) {
-		return childControl && childControl.node.parentNode !== this.node ? childControl.parent() : childControl;
+		return childControl && childControl.node.tagName !== 'LI' ? childControl.parent() : childControl;
 	},
 	
 	/**
@@ -91,6 +91,7 @@ var ListControl = ScrollableControl.extend({
 	},
 
 	init: function() {
+		this.addClass('x-' + this.xtype);
 		this.query('>li').addClass('x-' + this.xtype + '-item');
 	},
 	
