@@ -27,9 +27,9 @@ var ListControl = ScrollableControl.extend({
 	 * 当被子类重写时，用于初始化新添加的节点。
 	 * @param {Control} childControl 正在添加的节点。
 	 * @return {Control} 需要真正添加的子控件。
-	 * @protected virtual
+	 * @protected override
 	 */
-	onAdding: function(childControl){
+	initChild: function(childControl){
 		
 		// <li> 的 class 属性。
 		var clazz = 'x-' + this.xtype + '-item', li;
@@ -43,9 +43,6 @@ var ListControl = ScrollableControl.extend({
 			// 复制节点。
 			li.append(childControl);
 			
-			// 因为 childControl 被包了一层 <li> ，因此设置 parentControl 属性以便删除时可以通过当前控件删除此控件。
-			childControl.parentControl = this;
-			
 			// 赋值。
 			childControl = li;
 		} else {
@@ -54,15 +51,16 @@ var ListControl = ScrollableControl.extend({
 			childControl.addClass(clazz);
 		}
 		
-		return ScrollableControl.prototype.onAdding.call(this, childControl);
+		return childControl;
 	},
 	
 	/**
  	 * 当新控件被移除时执行。
 	 * @param {Control} childControl 新添加的元素。
-	 * @protected virtual
+	 * @return {Control} 需要真正删除的子控件。
+	 * @protected override
 	 */
-	onRemoving: function(childControl) {
+	uninitChild: function(childControl) {
 		
 		// 如果 childControl 不是 <li>, 则退出 <li> 的包装。
 		if (childControl.node.parentNode !== this.node) {
@@ -77,22 +75,26 @@ var ListControl = ScrollableControl.extend({
 			
 			// 删除节点。
 			li.removeChild(childControl);
-
-			// 删除关联节点。
-			childControl.parentControl = null;
 			
 			// 赋值。
 			childControl = li;
 		}
 		
 		// 返回实际需要删除的组件。
-		return ScrollableControl.prototype.onRemoving.call(this, childControl);
+		return childControl;
 
 	},
-
+	
+	/**
+	 * 当被子类重写时，实现初始化 DOM 中已经存在的项。 
+	 */
+	initItems: function(){
+		this.query('>li').addClass('x-' + this.xtype + '-item');
+	},
+	
 	init: function() {
 		this.addClass('x-' + this.xtype);
-		this.query('>li').addClass('x-' + this.xtype + '-item');
+		this.initItems();
 	},
 	
 	/**

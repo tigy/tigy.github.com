@@ -9,6 +9,10 @@ using("Controls.Core.ContentControl");
 using("Controls.Core.ListControl");
 
 
+
+/**
+ * 表示菜单项。 
+ */
 var MenuItem = ContentControl.extend({
 
 	xtype: 'menuitem',
@@ -116,12 +120,16 @@ var MenuItem = ContentControl.extend({
 
 		// 使用父菜单打开本菜单，显示子菜单。
 		this.parentControl && this.parentControl.showSubMenu(this);
+		
+		return this;
 	},
 	
 	hideSubMenu: function(){
 
 		// 使用父菜单打开本菜单，显示子菜单。
 		this.parentControl && this.parentControl.hideSubMenu(this);
+		
+		return this;
 	},
 	
 	setAttr: function(name, value) {
@@ -129,6 +137,13 @@ var MenuItem = ContentControl.extend({
 			return this[name.toLowerCase()](value);
 		}
 		return Dom.prototype.setAttr.call(this, name, value);
+	},
+	
+	removeChild: function(childControl){
+		childControl.detach(this.node);
+		
+		if(this.subMenu)
+			childControl.detach(this.subMenu.node);
 	},
 
 	/**
@@ -138,7 +153,7 @@ var MenuItem = ContentControl.extend({
 		return this.toggleClass('x-' + this.xtype + '-hover', value);
 	}
 
-});
+}).defineMethods('getSubMenu()', 'item indexOf each count add addAt removeAt');;
 
 Object.map("selected checked disabled", function(funcName) {
 	MenuItem.prototype[funcName] = function(value) {
@@ -161,7 +176,7 @@ var Menu = ListControl.extend({
 
 	xtype: 'menu',
 
-	_createMenuItem: function(childControl, item) {
+	_createMenuItem: function(childControl, parent) {
 
 		// 如果是文本。
 		if (childControl.node.nodeType === 3) {
@@ -170,8 +185,8 @@ var Menu = ListControl.extend({
 			if (/^\s*-\s*$/.test(childControl.getText())) {
 
 				// 删除文本节点。
-				if (item) {
-					item.remove(childControl);
+				if (parent) {
+					parent.remove(childControl);
 				}
 
 				childControl = new MenuSeperator;
@@ -184,9 +199,11 @@ var Menu = ListControl.extend({
 				childControl = new MenuItem;
 				childControl.append(t);
 			}
-			if (item) {
-				item.prepend(childControl);
+			if (parent) {
+				parent.prepend(childControl);
 			}
+		} else if(childControl.hasClass('x-menuseperator')){
+			childControl = new MenuSeperator;
 		} else {
 
 			// 创建对应的 MenuItem 。
@@ -198,99 +215,77 @@ var Menu = ListControl.extend({
 	},
 
 	/**
-	 * 分析一个 <li> 标签，并返回对应的 MenuItem 。
+	 * 处理一个子控件，返回相应的 MenuItem 对象。
 	 */
-	_initContainer: function(item) {
-
-		// 找到第一个节点。
-		var childControl = item.first();
-
-		// 如果没找到节点或者找到的节点是 x-menu, 重新查找文本节点。
-		if (!childControl || childControl.hasClass('x-menu')) {
-
-			// 包含文本节点继续查找。
-			childControl = item.first(true);
-
-			// 如果仍然只找到 x-menu 或节点不存在，则说明没有符合要求的节点，创建一个空节点占据位置。
-			if (!childControl || childControl.hasClass('x-menu')) {
-				childControl = new MenuItem;
-			}
-		}
-
-		// 创建菜单。
-		childControl = this._createMenuItem(childControl, item);
-
-		// 获取子菜单。
-		var subMenu = item.find('>.x-menu');
+	_initLiChild: function(li){
+	
+		// 获取第一个子节点。
+		var subMenu = li.find('>.x-' + this.xtype),
+			item = (subMenu ? (subMenu.prev() || subMenu.prev(true)) : (li.first() || li.first(true))) || Dom.parse('');
+			
+		// 根据节点创建一个 MenuItem 对象。
+		item = this._createMenuItem(item, li);
 
 		// 如果存在子菜单，设置子菜单。
 		if (subMenu) {
-			childControl.setSubMenu(subMenu);
+			item.setSubMenu(subMenu);
 		}
+			
+		// 保存 li -> childControl 的关联。
+		li.dataField().namedItem = item;
 		
-		childControl.parentControl = this;
-		
-		item.dataField().namedItem = childControl;
-		
-		item.addClass('x-' + this.xtype + '-item');
+		return item;
 
 	},
-	
-	onAdding: function(childControl){
+
+	/**
+	 * 处理一个子控件。
+	 */
+	initChild: function(childControl){
+		
+		var item;
 		
 		// 如果是添加 <li> 标签，则直接返回。
 		// .add('<li></li>')
 		if (childControl.node.tagName === 'LI') {
-			this._initContainer(childControl);
-
-			// .add(new MenuItem())
-		} else if (!(childControl instanceof MenuItem)) {
-
+			
+			this._initLiChild(childControl);
+	
+		// .add(new MenuItem())
+		} else {
+			
+			// 转为 MenuItem 对象。
 			// .add(文本或节点)
-			childControl = this._createMenuItem(childControl);
-
+			item = childControl instanceof MenuItem ? childControl : this._createMenuItem(childControl);
+			
+			// 创建一个新的容器节点。
+			childControl = Dom.create('LI', 'x-' + this.xtype + '-item');
+			
+			// 复制节点。
+			childControl.append(item);
+				
+			// 保存 li -> childControl 的关联。
+			childControl.dataField().namedItem = item;
 		}
 
 		return childControl;
 	},
 	
-	onRemoving: function(childControl){
-		return this.itemOf(childControl);
-	},
-	
-	doAdd: function(childControl, refControl){
-
-		// 如果 childControl 不是 <li>, 则包装一个 <li> 标签。
-		if (childControl.node.tagName !== 'LI') {
-
-			// 创建 <li>
-			var li = Dom.create('LI', 'x-' + this.xtype + '-item');
-			
-			// 复制节点。
-			li.append(childControl);
-			
-			ScrollableControl.prototype.onAdding.call(this, childControl);
-			
-			// 赋值。
-			childControl = li;
+	initItems: function(){
+		for(var c = this.first(); c; c = c.next()){
+			this._initLiChild(c).parentControl = this;
 		}
-		
-		// childControl = ListControl.prototype.onAdding.call(this, childControl);
-		return ListControl.prototype.doAdd.call(this, childControl, refControl);
 	},
 	
-	doRemove: function(childControl){
-		var base = ListControl.prototype;
-		return base.doRemove.call(this, childControl, refControl);
-	},
-
 	init: function() {
+		
+		this.addClass('x-' + this.xtype);
 
 		// 绑定节点和控件，方便发生事件后，根据事件源得到控件。
 		this.dataField().control = this;
 
 		// 根据已有的 DOM 结构初始化菜单。
-		this.each(this._initContainer, this);
+		this.initItems();
 	},
 
 	showMenu: function() {
@@ -382,6 +377,7 @@ var Menu = ListControl.extend({
 			menuItem.subMenu.showBy(menuItem);
 
 		}
+		
 	},
 
 	/**
@@ -394,12 +390,13 @@ var Menu = ListControl.extend({
 		if (this.currentSubMenu) {
 
 			// 关闭子菜单。
-			this.currentSubMenu.subMenu.hide();
+			this.currentSubMenu.subMenu.hideMenu();
 
 			// 取消激活菜单。
 			this.currentSubMenu.hovering(false);
 			this.currentSubMenu = null;
 		}
+		
 	}
 
 });
