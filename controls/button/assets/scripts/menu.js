@@ -5,103 +5,64 @@
 
 imports("Controls.Button.Menu");
 using("System.Dom.Align");
-using("Controls.Core.ContentControl");
-using("Controls.Core.ListControl");
+using("Controls.Core.TreeControl");
 
 
 
 /**
  * 表示菜单项。 
  */
-var MenuItem = ContentControl.extend({
+var MenuItem = TreeControl.Item.extend({
 
 	xtype: 'menuitem',
 
-	tpl: '<a class="x-control"></a>',
-
-	/**
-	 * 获取当前菜单管理的子菜单。
-	 */
-	subMenu: null,
-
-	/**
-	 *
-	 */
-	init: function() {
-		this.unselectable();
-		this.on('mouseover', this.onMouseEnter);
-		this.on('mouseout', this.onMouseLeave);
-	},
-
-	attach: function(parentNode, refNode) {
-		if (this.subMenu && !this.subMenu.parent('body')) {
-			parentNode.insertBefore(this.subMenu.node, refNode);
-		}
-		parentNode.insertBefore(this.node, refNode);
-	},
-
-	detach: function(parentNode) {
-		if (this.subMenu) {
-			this.subMenu.remove();
-		}
-		
-		if(this.node.parentNode === parentNode) {
-			parentNode.removeChild(this.node);
-		}
-	},
-
-	onMouseEnter: function() {
-		this.hovering(true);
-		this.showSubMenu();
+	createSubControl: function(treeControl){
+		return new Menu(treeControl);
 	},
 	
-	onMouseLeave: function(e) {
+	initSubControl: function(treeControl){
+		treeControl.hide();
+		treeControl.floating = false;
+		this.addClass('x-menuitem-submenu');
+		this.on('mouseup', this._cancelHideMenu);
+	},
+	
+	uninitSubControl: function(treeControl){
+		treeControl.floating = true;
+		this.removeClass('x-menuitem-submenu');
+		this.un('mouseup', this._cancelHideMenu);
+	},
+
+	onMouseOver: function() {
+		this.hovering(true);
+		if (this.subControl)
+			this.showSubMenu();
+		else if(this.parentControl)
+			this.parentControl.hideSubMenu();
+	},
+	
+	onMouseOut: function() {
 
 		// 没子菜单，需要自取消激活。
 		// 否则，由父菜单取消当前菜单的状态。
 		// 因为如果有子菜单，必须在子菜单关闭后才能关闭激活。
 
-		if (!this.subMenu)
+		if (!this.subControl)
 			this.hovering(false);
 
 	},
 	
-	getSubMenu: function(){
-		if(!this.subMenu){
-			this.setSubMenu(new Menu());
-		}
-		return this.subMenu;
+	/**
+	 *
+	 */
+	init: function() {
+		this.unselectable();
+		this.on('mouseover', this.onMouseOver);
+		this.on('mouseout', this.onMouseOut);
 	},
-
-	setSubMenu: function(menu) {
-		if (menu) {
-			if (!(menu instanceof Menu)) {
-				menu = new Menu(menu);
-			}
-
-			if (!menu.parent('body') && this.node.parentNode) {
-				this.node.parentNode.insertBefore(menu.node, this.node.nextSibling);
-			}
-
-			this.subMenu = menu.hide();
-			menu.floating = false;
-			this.addClass('x-menuitem-submenu');
-			this.on('mouseup', this._cancelHideMenu);
-		} else {
-			menu.floating = true;
-			this.removeClass('x-menuitem-submenu');
-			this.un('mouseup', this._cancelHideMenu);
-		}
-		return this;
-	},
-
+	
 	_cancelHideMenu: function(e) {
 		e.stopPropagation();
-	},
-
-	toggleIcon: function(icon, val) {
-		this.icon.toggleClass(icon, val);
-		return this;
 	},
 
 	_hideTargetMenu: function(e) {
@@ -115,6 +76,10 @@ var MenuItem = ContentControl.extend({
 		}
 
 	},
+
+	getSubMenu: TreeControl.Item.prototype.getSubControl,
+	
+	setSubMenu: TreeControl.Item.prototype.setSubControl,
 
 	showSubMenu: function(){
 
@@ -130,53 +95,23 @@ var MenuItem = ContentControl.extend({
 		this.parentControl && this.parentControl.hideSubMenu(this);
 		
 		return this;
-	},
-	
-	setAttr: function(name, value) {
-		if(/^(selected|checked|disabled)$/i.test(name)){
-			return this[name.toLowerCase()](value);
-		}
-		return Dom.prototype.setAttr.call(this, name, value);
-	},
-	
-	removeChild: function(childControl){
-		childControl.detach(this.node);
-		
-		if(this.subMenu)
-			childControl.detach(this.subMenu.node);
-	},
-
-	/**
-	 * 切换显示鼠标是否移到当前项。
-	 */
-	hovering: function(value){
-		return this.toggleClass('x-' + this.xtype + '-hover', value);
 	}
 
-}).defineMethods('getSubMenu()', 'item indexOf each count add addAt removeAt');;
-
-Object.map("selected checked disabled", function(funcName) {
-	MenuItem.prototype[funcName] = function(value) {
-		this.toggleClass('x-' + this.xtype + '-' + funcName, value);
-		return Dom.prototype.setAttr.call(this, funcName, value);
-	};
 });
 
 var MenuSeperator = MenuItem.extend({
 
 	tpl: '<div class="x-menuseperator"></div>',
 
-	init: Function.empty,
-
-	setSubMenu: Function.empty
+	init: Function.empty
 
 });
 
-var Menu = ListControl.extend({
+var Menu = TreeControl.extend({
 
 	xtype: 'menu',
 
-	_createMenuItem: function(childControl, parent) {
+	createTreeItem: function(childControl, parent) {
 
 		// 如果是文本。
 		if (childControl.node.nodeType === 3) {
@@ -214,72 +149,7 @@ var Menu = ListControl.extend({
 
 	},
 
-	/**
-	 * 处理一个子控件，返回相应的 MenuItem 对象。
-	 */
-	_initLiChild: function(li){
-	
-		// 获取第一个子节点。
-		var subMenu = li.find('>.x-' + this.xtype),
-			item = (subMenu ? (subMenu.prev() || subMenu.prev(true)) : (li.first() || li.first(true))) || Dom.parse('');
-			
-		// 根据节点创建一个 MenuItem 对象。
-		item = this._createMenuItem(item, li);
-
-		// 如果存在子菜单，设置子菜单。
-		if (subMenu) {
-			item.setSubMenu(subMenu);
-		}
-			
-		// 保存 li -> childControl 的关联。
-		li.dataField().namedItem = item;
-		
-		return item;
-
-	},
-
-	/**
-	 * 处理一个子控件。
-	 */
-	initChild: function(childControl){
-		
-		var item;
-		
-		// 如果是添加 <li> 标签，则直接返回。
-		// .add('<li></li>')
-		if (childControl.node.tagName === 'LI') {
-			
-			this._initLiChild(childControl);
-	
-		// .add(new MenuItem())
-		} else {
-			
-			// 转为 MenuItem 对象。
-			// .add(文本或节点)
-			item = childControl instanceof MenuItem ? childControl : this._createMenuItem(childControl);
-			
-			// 创建一个新的容器节点。
-			childControl = Dom.create('LI', 'x-' + this.xtype + '-item');
-			
-			// 复制节点。
-			childControl.append(item);
-				
-			// 保存 li -> childControl 的关联。
-			childControl.dataField().namedItem = item;
-		}
-
-		return childControl;
-	},
-	
-	initItems: function(){
-		for(var c = this.first(); c; c = c.next()){
-			this._initLiChild(c).parentControl = this;
-		}
-	},
-	
 	init: function() {
-		
-		this.addClass('x-' + this.xtype);
 
 		// 绑定节点和控件，方便发生事件后，根据事件源得到控件。
 		this.dataField().control = this;
@@ -288,14 +158,32 @@ var Menu = ListControl.extend({
 		this.initItems();
 	},
 
-	showMenu: function() {
-		this.show();
-		this.onShow();
+	onShow: function() {
+		this.floating = true;
+		document.once('mouseup', this.hide, this);
+		this.trigger('show');
 	},
 
-	hideMenu: function() {
-		this.hide();
+	/**
+	 * 关闭本菜单。
+	 */
+	onHide: function() {
+
+		// 先关闭子菜单。
+		this.hideSubMenu();
+		this.trigger('hide');
+	},
+
+	show: function() {
+		Dom.show(this.node);
+		this.onShow();
+		return this;
+	},
+
+	hide: function() {
+		Dom.hide(this.node);
 		this.onHide();
+		return this;
 	},
 	
 	/**
@@ -303,13 +191,14 @@ var Menu = ListControl.extend({
 	 * @param {Control} ctrl 方向。
 	 */
 	showAt: function(x, y) {
-
+		
+		// 确保菜单已添加到文档内。
 		if (!this.parent('body')) {
 			this.appendTo();
 		}
 
 		// 显示节点。
-		this.showMenu();
+		this.show();
 
 		this.setPosition(x, y);
 
@@ -322,32 +211,17 @@ var Menu = ListControl.extend({
 	 */
 	showBy: function(ctrl, pos, offsetX, offsetY, enableReset) {
 
+		// 确保菜单已添加到文档内。
 		if (!this.parent('body')) {
 			this.appendTo(ctrl.parent());
 		}
 
 		// 显示节点。
-		this.showMenu();
+		this.show();
 
 		this.align(ctrl, pos || 'rt', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);
 
 		return this;
-	},
-
-	onShow: function() {
-		this.floating = true;
-		document.once('mouseup', this.hideMenu, this);
-		this.trigger('show');
-	},
-
-	/**
-	 * 关闭本菜单。
-	 */
-	onHide: function() {
-
-		// 先关闭子菜单。
-		this.hideSubMenu();
-		this.trigger('hide');
 	},
 
 	/**
@@ -368,13 +242,13 @@ var Menu = ListControl.extend({
 		menuItem.hovering(true);
 
 		// 如果指定的项存在子菜单。
-		if (menuItem.subMenu) {
+		if (menuItem.subControl) {
 
 			// 设置当前激活的项。
 			this.currentSubMenu = menuItem;
 
 			// 显示子菜单。
-			menuItem.subMenu.showBy(menuItem);
+			menuItem.subControl.showBy(menuItem);
 
 		}
 		
@@ -390,7 +264,7 @@ var Menu = ListControl.extend({
 		if (this.currentSubMenu) {
 
 			// 关闭子菜单。
-			this.currentSubMenu.subMenu.hideMenu();
+			this.currentSubMenu.subControl.hide();
 
 			// 取消激活菜单。
 			this.currentSubMenu.hovering(false);

@@ -93,7 +93,6 @@ var ListControl = ScrollableControl.extend({
 	},
 	
 	init: function() {
-		this.addClass('x-' + this.xtype);
 		this.initItems();
 	},
 	
@@ -148,3 +147,18 @@ var ListControl = ScrollableControl.extend({
 	}
 	
 });
+
+
+ListControl.aliasMethods = function(controlClass, targetProperty, removeChildProperty){
+	controlClass.defineMethods(targetProperty, 'add addAt removeAt item indexOf each count');
+	
+	removeChildProperty = removeChildProperty || targetProperty;
+	controlClass.prototype.removeChild = function(childControl){
+		childControl.detach(this.node);
+		
+		var child = this[removeChildProperty];
+		if(child)
+			childControl.detach(child.node);
+	};
+	
+};

@@ -484,7 +484,7 @@
 			 */
 			add: div.addEventListener ? function (dom, type, fn) {
 				dom.node.addEventListener(type, fn, false);
-			} : function (elem, type, fn) {
+			} : function (dom, type, fn) {
 				dom.node.attachEvent('on' + type, fn);
 			},
 
@@ -496,7 +496,7 @@
 			 */
 			remove: div.removeEventListener ? function (dom, type, fn) {
 				dom.node.removeEventListener(type, fn, false);
-			} : function (elem, type, fn) {
+			} : function (dom, type, fn) {
 				dom.node.detachEvent('on' + type, fn);
 			}
 
@@ -1484,15 +1484,11 @@
 		 */
 		window: new Dom(window),
 		
-		/// TODO: clear
-		
 		/**
 		 * 获取 document 对象的 Dom 对象封装示例。
 	 	 * @static
 		 */
 		document: new Dom(document),
-		
-		/// TODO: clear
 
 		/**
 		 * 获取元素的计算样式。
@@ -4177,7 +4173,7 @@
 		try{
 			r = dom.parentNode.querySelectorAll(selector);
 		} catch(e){
-			return query(selector, new Dom(dom.parentNode)).indexOf(dom) >= 0 || query(selector, document).indexOf(dom) >= 0;
+			return query(selector, new Dom(dom.parentNode)).indexOf(dom) >= 0 || query(selector, Dom.document).indexOf(dom) >= 0;
 		}
 		while(r[i])
 			if(r[i++] === dom)
