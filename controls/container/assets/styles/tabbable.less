@@ -14,22 +14,19 @@
 .x-tabbable{
   // Give the tabs something to sit on
   border-bottom: 1px solid #ddd;
+  margin: 0;
   .clearfix();
 }
 
-.x-tabbable-container {
-  margin: 0;
-}
-
 // Make the list-items overlay the bottom border
-.x-tabbable-content {
+.x-tabbable-item {
   margin: 0 0 -1px;
   list-style: none;
   float: left;
 }
 
 // Make links block level
-.x-tabbable-content a {
+.x-tabbable-item a {
   display: block;
   border: 1px solid transparent;
   _border-color:white;
@@ -58,7 +55,7 @@
 .x-tabbable-alt {
   border-bottom: none; 
   
-  .x-tabbable-content a, .x-tabbable-content a:hover {
+  .x-tabbable-item a, .x-tabbable-item a:hover {
     border-color: transparent;
    _border-color:white;
   }
@@ -68,7 +65,7 @@
 // -----
 
 // Links rendered as pills
-.x-tabbable-alt .x-tabbable-content a {
+.x-tabbable-alt .x-tabbable-item a {
   padding-top: 6px;
   padding-bottom: 6px;
   .border-radius(5px);
