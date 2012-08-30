@@ -16,10 +16,21 @@ var MenuItem = TreeControl.Item.extend({
 
 	xtype: 'menuitem',
 
+	/**
+	 * 当被子类重写时，用于创建子树。
+	 * @param {TreeControl} treeControl 要初始化的子树。
+	 * @return {TreeControl} 新的 {@link TreeControl} 对象。
+	 * @protected override
+	 */
 	createSubControl: function(treeControl){
 		return new Menu(treeControl);
 	},
 	
+	/**
+	 * 当被子类重写时，用于初始化子树。
+	 * @param {TreeControl} treeControl 要初始化的子树。
+	 * @protected override
+	 */
 	initSubControl: function(treeControl){
 		treeControl.hide();
 		treeControl.floating = false;
@@ -27,6 +38,11 @@ var MenuItem = TreeControl.Item.extend({
 		this.on('mouseup', this._cancelHideMenu);
 	},
 	
+	/**
+	 * 当被子类重写时，用于删除初始化子树。
+	 * @param {TreeControl} treeControl 要删除初始化的子树。
+	 * @protected override
+	 */
 	uninitSubControl: function(treeControl){
 		treeControl.floating = true;
 		this.removeClass('x-menuitem-submenu');
@@ -112,37 +128,41 @@ var Menu = TreeControl.extend({
 	xtype: 'menu',
 
 	createTreeItem: function(childControl, parent) {
-
-		// 如果是文本。
-		if (childControl.node.nodeType === 3) {
-
-			// - => MenuSeperator
-			if (/^\s*-\s*$/.test(childControl.getText())) {
-
-				// 删除文本节点。
-				if (parent) {
-					parent.remove(childControl);
+		
+		if(!(childControl instanceof MenuItem)){
+	
+			// 如果是文本。
+			if (childControl.node.nodeType === 3) {
+	
+				// - => MenuSeperator
+				if (/^\s*-\s*$/.test(childControl.getText())) {
+	
+					// 删除文本节点。
+					if (parent) {
+						parent.remove(childControl);
+					}
+	
+					childControl = new MenuSeperator;
+	
+					// 其它 => 添加到 MenuItem
+				} else {
+	
+					// 保存原有 childControl 。
+					var t = childControl;
+					childControl = new MenuItem;
+					childControl.append(t);
 				}
-
+				if (parent) {
+					parent.prepend(childControl);
+				}
+			} else if(childControl.hasClass('x-menuseperator')){
 				childControl = new MenuSeperator;
-
-				// 其它 => 添加到 MenuItem
 			} else {
-
-				// 保存原有 childControl 。
-				var t = childControl;
-				childControl = new MenuItem;
-				childControl.append(t);
+	
+				// 创建对应的 MenuItem 。
+				childControl = new MenuItem(childControl);
 			}
-			if (parent) {
-				parent.prepend(childControl);
-			}
-		} else if(childControl.hasClass('x-menuseperator')){
-			childControl = new MenuSeperator;
-		} else {
-
-			// 创建对应的 MenuItem 。
-			childControl = new MenuItem(childControl);
+				
 		}
 
 		return childControl;
