@@ -1,5 +1,5 @@
 ﻿/*
- * This file is created by a tool at 2012/08/31 21:20:05
+ * This file is created by a tool at 2012/08/31 21:33:51
  */
 
 
@@ -10330,9 +10330,16 @@ var MenuButton = Button.extend(IDropDownOwner).implement({
 		return this.find('.x-button-menu').prev(true);
 	},
 	
+	createDropDown: function(existDom){
+		if(existDom && !existDom.hasClass('x-menu')){
+			return existDom;
+		}
+		return new Menu(existDom).on('click', this.onDropDownClick, this);
+	},
+	
 	init: function () {
 		var next = this.next();
-		this.setDropDown(new Menu(next && next.hasClass('x-dropdown') ? next : null).on('click', this.onDropDownClick, this));
+		this.setDropDown(this.createDropDown(next && next.hasClass('x-dropdown') ? next : null));
 		this.on('click', this.toggleDropDown, this);
 	},
 	
@@ -10972,11 +10979,8 @@ var SplitButton = MenuButton.extend({
 	
 	init: function () {
 		var next = this.next();
+		this.setDropDown(this.createDropDown(next && next.hasClass('x-dropdown') ? next : null));
 		this.find('>.x-button:last-child').on('click', this.toggleDropDown, this);
-		next = (next && next.hasClass('x-dropdown') ? next.hasClass('x-menu') ? new Menu(next) : next : new Menu());
-		if(next instanceof Menu) 
-			next.floating = true;
-		this.setDropDown(next);
 	}
 	
 });
