@@ -54,6 +54,7 @@ var Deferrable = Class({
 				break;
 			case "abort":
 			case "stop":
+			case "skip":
 				this[link]();
 				this.isRunning = true;
 				return false;
@@ -97,6 +98,10 @@ var Deferrable = Class({
 			callback.call(this, args);
 		}
 		return this;
+	},
+	
+	delay: function(duration){
+		return this.run({duration: duration});
 	},
 	
 	pause: Function.empty,
