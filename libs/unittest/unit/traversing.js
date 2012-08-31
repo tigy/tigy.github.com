@@ -6,7 +6,7 @@ module("traversing");
 function q(){
 	var el = new DomList();
 	Object.each(arguments, function (dom) {
-		el.concat(Dom.get(dom));
+		el.add(Dom.get(dom));
 	});
 	
 	return el;

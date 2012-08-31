@@ -389,7 +389,7 @@ test("offsetParent", function(){
 	var div = getDom(document, "nothiddendivchild").offsetParent();
 	equal( div.dom, document.body, "The body is the offsetParent." );
 
-	getDom(document, "nothiddendiv").set("position", "relative");
+	getDom(document, "nothiddendiv").setStyle("position", "relative");
 
 	div = getDom(document, "nothiddendivchild").offsetParent();
 	equal( div.dom, getDom(document, "nothiddendiv").dom, "The div is the offsetParent." );
@@ -406,13 +406,11 @@ test("fractions (see #7730 and #7885)", function() {
 	var expected = { y: 1000, x: 1000 };
 	var div = getDom(document, 'fractions');
 
-	div.set({
-		position: 'absolute',
-		left: '1000.7432222px',
-		top: '1000.532325px',
-		width: 100,
-		height: 100
-	});
+	div.setStyle('position', 'absolute');
+	div.setStyle('left', '1000.7432222px');
+	div.setStyle('top', '1000.532325px');
+	div.setStyle('width', 100);
+	div.setStyle('height', 100);
 
 	div.setOffset(expected);
 

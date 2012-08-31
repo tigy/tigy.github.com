@@ -1,5 +1,5 @@
 ﻿/*
- * This file is created by a tool at 2012/08/31 18:35:35
+ * This file is created by a tool at 2012/08/31 21:20:05
  */
 
 
@@ -3653,7 +3653,7 @@ function imports(namespace) {
 					case 'width':
 						return elem.offsetWidth === 0 ? 'auto': elem.offsetWidth -  Dom.calc(elem, 'bx+px') + 'px';
 					case 'opacity':
-						return '' + rOpacity.test(styleString(elem, 'filter')) ? parseInt(RegExp.$1) / 100: 1;
+						return rOpacity.test(styleString(elem, 'filter')) ? parseInt(RegExp.$1) / 100 + '': '1';
 				}
 			}
 			// currentStyle：IE的样式获取方法,runtimeStyle是获取运行时期的样式。
@@ -4115,12 +4115,12 @@ function imports(namespace) {
 	 	 * @static
 		 */
 		has: div.compareDocumentPosition ? function(elem, child) {
-			assert.isNode(elem, "Dom.hasChild(elem, child): {elem} ~");
-			assert.isNode(child, "Dom.hasChild(elem, child): {child} ~");
+			assert.isNode(elem, "Dom.has(elem, child): {elem} ~");
+			assert.isNode(child, "Dom.has(elem, child): {child} ~");
 			return !!(elem.compareDocumentPosition(child) & 16);
 		}: function(elem, child) {
-			assert.isNode(elem, "Dom.hasChild(elem, child): {elem} ~");
-			assert.isNode(child, "Dom.hasChild(elem, child): {child} ~");
+			assert.isNode(elem, "Dom.has(elem, child): {elem} ~");
+			assert.isNode(child, "Dom.has(elem, child): {child} ~");
 			while(child = child.parentNode)
 				if(elem === child)
 					return true;
@@ -4211,6 +4211,9 @@ function imports(namespace) {
 			OBJECT: function(destElem, srcElem) {
 				if (destElem.parentNode) {
 					destElem.outerHTML = srcElem.outerHTML;
+					
+					if(srcElem.innerHTML && !destElem.innerHTML)
+						destElem.innerHTML = srcElem.innerHTML;
 				}
 			}
 		},
@@ -4967,9 +4970,13 @@ function imports(namespace) {
 
 			for (key in options) {
 				value = options[key];
+				
+				// .setStyle(css, value)
+				if (me.node.style && (key in me.node.style || rStyle.test(key)))
+					me.setStyle(key, value);
 
 				// .setKey(value)
-				if (Object.isFunction(me[setter = 'set' + key.capitalize()]))
+				else if (Object.isFunction(me[setter = 'set' + key.capitalize()]))
 					me[setter](value);
 
 				// 如果是当前对象的成员。
@@ -4993,10 +5000,6 @@ function imports(namespace) {
 				} else if (/^on(\w+)/.test(key))
 					me.on(RegExp.$1, value);
 
-				// .setStyle(css, value)
-				else if (me.node.style && (key in me.node.style || rStyle.test(key)))
-					me.setStyle(key, value);
-				
 				// .setAttr(attr, value);
 				else
 					me.setAttr(key, value);
@@ -5756,7 +5759,7 @@ function imports(namespace) {
 		 */
 		closest: function(selector, context) {
 			selector = typeof selector === 'function' ? selector(this, this.node) : this.match(selector) ? this : this.parent(selector);
-			return selector && (!context || Dom.get(context).hasChild(selector)) ? selector : null;
+			return selector && (!context || Dom.get(context).has(selector)) ? selector : null;
 		},
 
 		/**
@@ -6311,7 +6314,7 @@ function imports(namespace) {
 	}
 
 	// document 函数。
-	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize first last parent child children hasChild', function (funcName) {
+	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize first last parent child children has', function (funcName) {
 		document[funcName] = dp[funcName];
 	});
 	
@@ -6583,7 +6586,7 @@ function imports(namespace) {
 		
 					// 修正 getTarget 返回值。
 					e.orignalType = event;
-					return this.node !== relatedTarget && !Dom.hasChild(this.node, relatedTarget);
+					return this.node !== relatedTarget && !Dom.has(this.node, relatedTarget);
 					
 				}
 			},
@@ -6958,7 +6961,7 @@ function imports(namespace) {
 			if (typeof keepId === 'string') {
 				destElem[keepId] = srcElem[keepId];
 			} else {
-				keepId(srcElem, destElem);
+				keepId(destElem, srcElem);
 			}
 		}
 	}
@@ -10970,7 +10973,10 @@ var SplitButton = MenuButton.extend({
 	init: function () {
 		var next = this.next();
 		this.find('>.x-button:last-child').on('click', this.toggleDropDown, this);
-		this.setDropDown(new Menu(next && next.hasClass('x-dropdown') ? next : null).on('click', this.onDropDownClick, this));
+		next = (next && next.hasClass('x-dropdown') ? next.hasClass('x-menu') ? new Menu(next) : next : new Menu());
+		if(next instanceof Menu) 
+			next.floating = true;
+		this.setDropDown(next);
 	}
 	
 });

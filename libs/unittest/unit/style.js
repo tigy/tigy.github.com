@@ -158,7 +158,7 @@ test("Dom.prototype.setStyle", function() {
 	
 	var div = Dom.parse("<div>").appendTo("qunit-fixture");
 
-	div.setStyle("fill-opacity", 0).set({ "fill-opacity": 1.0 });
+	div.setStyle("fill-opacity", 0).setStyle("fill-opacity", 1.0);
 	
 	equal( div.getStyle("fill-opacity"), 1, "Do not append px to 'fill-opacity'");
 
