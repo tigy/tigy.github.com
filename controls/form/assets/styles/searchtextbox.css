@@ -1,7 +1,6 @@
 /**
  * @author 
  */
-
 .x-searchtextbox {
   padding-left: 14px;
   padding-right: 14px;
@@ -10,7 +9,7 @@
   -moz-border-radius: 14px;
   border-radius: 14px;
 }
-.x-searchtextbox-search {
+.x-picker .x-searchtextbox-search {
   padding-left: 10px;
   padding-right: 20px;
   margin-left: 0;
@@ -24,7 +23,7 @@
   top: 0;
   _padding-bottom: 1px;
   _margin-right: -1px;
-  background: url(../../assets/images/searchtextbox.gif) center center no-repeat;
+  background: url(../images/searchtextbox.gif) center center no-repeat;
   border: none;
   height: 28px;
 }

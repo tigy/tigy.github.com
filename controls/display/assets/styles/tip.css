@@ -1,12 +1,11 @@
 /**
  * @author 
  */
-
 .x-tip {
   padding: 2px 4px 3px;
   font-size: 10.2px;
   font-weight: bold;
-  color: white;
+  color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   background-color: #999999;
   -webkit-border-radius: 3px;
@@ -14,7 +13,7 @@
   border-radius: 3px;
 }
 .x-tip:hover {
-  color: white;
+  color: #ffffff;
   text-decoration: none;
 }
 .x-tip-error {

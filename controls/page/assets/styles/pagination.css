@@ -1,11 +1,8 @@
 /**
  * @author 
  */
-
 .x-pagination {
   height: 36px;
-}
-.x-pagination ul {
   display: inline-block;
   *display: inline;
   *zoom: 1;
@@ -26,12 +23,12 @@
   padding: 0 14px;
   line-height: 34px;
   text-decoration: none;
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
   border-left-width: 0;
 }
 .x-pagination a:hover,
 .x-pagination .x-pagination-actived a {
-  background-color: whitesmoke;
+  background-color: #f5f5f5;
 }
 .x-pagination .x-pagination-actived a {
   color: #999999;

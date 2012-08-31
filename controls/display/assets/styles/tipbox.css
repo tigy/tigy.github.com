@@ -33,7 +33,7 @@ div.x-tipbox {
   background-color: #ebf6e7;
   border-color: #b9d99d;
   color: #468847;
-  background-image: url(../../assets/images/success.png);
+  background-image: url(../images/success.png);
 }
 .x-tipbox-warning {
   background-color: #fcf8e3;
@@ -44,13 +44,13 @@ div.x-tipbox {
   background-color: #f2dede;
   border-color: #e3b7b7;
   color: #b94a48;
-  background-image: url(../../assets/images/error.png);
+  background-image: url(../images/error.png);
 }
 .x-tipbox-info {
   background-color: #eaf5fb;
   border-color: #a1cbdf;
   color: #3a87ad;
-  background-image: url(../../assets/images/info.png);
+  background-image: url(../images/info.png);
 }
 .x-tipbox-plain {
   background-color: transparent;

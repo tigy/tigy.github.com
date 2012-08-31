@@ -1,13 +1,11 @@
 /**
  * @author 
  */
-
 /* �˵�    */
-
 .x-menu {
   min-width: 130px;
   position: absolute;
-  background: url(../../assets/images/menu.gif) #f0f0f0 repeat-y;
+  background: url(../images/menu.gif) #f0f0f0 repeat-y;
   border: 1px solid #999999;
   *width: 200px;
 }
@@ -37,11 +35,11 @@
   border-color: transparent;
   cursor: default;
   font-size: 12px;
-  color: black;
+  color: #000000;
   _padding: 0 2px;
 }
 .x-menuitem:hover {
-  color: black;
+  color: #000000;
   text-decoration: none;
 }
 .x-menu-handle-top,
@@ -60,7 +58,7 @@
 }
 .x-menuitem-selected {
   background-position: center;
-  background-image: url(../../assets/images/item-over.gif);
+  background-image: url(../images/item-over.gif);
   background-color: #dbecf4;
 }
 .x-menu-content,
@@ -74,7 +72,7 @@
   border-color: #aaccf6;
 }
 .x-menuitem-menu {
-  background: url(../../assets/images/menu-arrow.gif) no-repeat right 5px;
+  background: url(../images/menu-arrow.gif) no-repeat right 5px;
   padding-right: 21px;
 }
 .x-menuitem-disabled {
@@ -84,8 +82,8 @@
   display: block;
   margin: 0 0 0 22px;
   height: 0px;
-  border-top: 1px solid #e0e0e0;
-  border-bottom: 1px solid white;
+  border-top: 1px solid #E0E0E0;
+  border-bottom: 1px solid #FFFFFF;
   *font-size: expression(this.runtimeStyle.fontSize = this.parentNode.runtimeStyle.lineHeight = this.parentNode.runtimeStyle.fontSize = 0);
 }
 .x-menu-content .x-icon {
@@ -96,10 +94,10 @@
   background-image: none!important;
 }
 .x-menu-handle-top {
-  background-image: url(../../assets/images/mini-top.gif);
+  background-image: url(../images/mini-top.gif);
 }
 .x-menu-handle-bottom {
-  background-image: url(../../assets/images/mini-bottom.gif);
+  background-image: url(../images/mini-bottom.gif);
 }
 .x-menu-handle-top:hover,
 .x-menu-handle-bottom:hover {
@@ -107,11 +105,11 @@
   border-color: #aaccf6;
 }
 .x-icon-selected {
-  background-image: url(../../assets/images/selected.gif);
+  background-image: url(../images/selected.gif);
 }
 .x-icon-checked {
-  background-image: url(../../assets/images/checked.gif);
+  background-image: url(../images/checked.gif);
 }
 .x-icon-unchecked {
-  background-image: url(../../assets/images/unchecked.gif);
+  background-image: url(../images/unchecked.gif);
 }

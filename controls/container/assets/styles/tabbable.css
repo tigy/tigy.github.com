@@ -1,9 +1,9 @@
 /**
  * @author 
  */
-
 .x-tabbable {
-  border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid #ddd;
+  margin: 0;
   *zoom: 1;
 }
 .x-tabbable:after {
@@ -13,48 +13,45 @@
   clear: both;
   visibility: hidden;
 }
-.x-tabbable-container {
-  margin: 0;
-}
-.x-tabbable-content {
+.x-tabbable-item {
   margin: 0 0 -1px;
   list-style: none;
   float: left;
 }
-.x-tabbable-content a {
+.x-tabbable-item a {
   display: block;
   border: 1px solid transparent;
   _border-color: white;
-  _filter: chroma(color=white);
+  _filter: chroma(color=#ffffff);
   -webkit-border-radius: 4px 4px 0 0;
   -moz-border-radius: 4px 4px 0 0;
   border-radius: 4px 4px 0 0;
   padding: 7px 12px;
   text-decoration: none;
 }
-.x-tabbable-content a:hover {
+.x-tabbable-item a:hover {
   border-color: #eeeeee #eeeeee #dddddd;
   background-color: #eeeeee;
 }
 .x-tabbable-selected a,
 .x-tabbable-selected a:hover {
   color: #555555;
-  background-color: white;
-  border: 1px solid #dddddd;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
   border-bottom-color: transparent;
   _border-bottom-color: white;
-  _filter: chroma(color=white);
+  _filter: chroma(color=#ffffff);
   cursor: default;
 }
 .x-tabbable-alt {
   border-bottom: none;
 }
-.x-tabbable-alt .x-tabbable-content a,
-.x-tabbable-alt .x-tabbable-content a:hover {
+.x-tabbable-alt .x-tabbable-item a,
+.x-tabbable-alt .x-tabbable-item a:hover {
   border-color: transparent;
   _border-color: white;
 }
-.x-tabbable-alt .x-tabbable-content a {
+.x-tabbable-alt .x-tabbable-item a {
   padding-top: 6px;
   padding-bottom: 6px;
   -webkit-border-radius: 5px;
@@ -63,6 +60,6 @@
 }
 .x-tabbable-alt .x-tabbable-selected a,
 .x-tabbable-alt .x-tabbable-selected a:hover {
-  color: white;
+  color: #ffffff;
   background-color: #0088cc;
 }

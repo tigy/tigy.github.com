@@ -3,7 +3,7 @@
 var System = System || {};
 
 System.getJSONP = function (path, data, onSuccess) {
-	Ajax.getJSONP(Dpl.configs.host + ':' + Dpl.configs.port + '/' + path, data, onSuccess, function(){
+	Ajax.jsonp(Dpl.configs.host + ':' + Dpl.configs.port + '/' + path, data, onSuccess, function(){
 		var r = 'assets/bin/startserver.bat';
 		if(navigator.platform.indexOf("Win") === -1) {
 			r = 'assets/bin-linux/startserver.sh';
@@ -410,12 +410,12 @@ var DplManager = {
 				
 				node.inited = true;
 				
-				var autoComplete = new AutoComplete(node);
+				var autoComplete = new Suggest(node);
 				
 				var tr = autoComplete.parent(1), info = DplManager.ViewData.getInfo(tr);
 				
 				for(var cat in Dpl.libs[info[0]]){
-					autoComplete.items.add(cat);
+					autoComplete.add(cat);
 				}
 				
 			});
@@ -427,7 +427,7 @@ var DplManager = {
 				
 				node.inited = true;
 				
-				var a = new AutoComplete(node);
+				var a = new Suggest(node);
 				
 				a.getSuggestItems = function(text){
 					var tr = this.parent(1), info = DplManager.ViewData.getInfo(tr), r= [];
@@ -638,12 +638,12 @@ var DplManager = {
 				
 				node.inited = true;
 				
-				var autoComplete = new AutoComplete(node);
+				var autoComplete = new Suggest(node);
 				
 				var tr = autoComplete.parent(1), info = DplManager.ViewData.getInfo(tr);
 				
 				for(var cat in Dpl.res[info[0]]){
-					autoComplete.items.add(cat);
+					autoComplete.add(cat);
 				}
 				
 			});
@@ -655,7 +655,7 @@ var DplManager = {
 				
 				node.inited = true;
 				
-				var a = new AutoComplete(node);
+				var a = new Suggest(node);
 				
 				a.getSuggestItems = function(text){
 					var tr = this.parent(1), info = DplManager.ViewData.getInfo(tr), r= [];

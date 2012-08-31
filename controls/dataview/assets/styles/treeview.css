@@ -1,17 +1,10 @@
 /**
  * @author 
  */
-
-/**
- * @author 
- */
-
-/* Tree */
-
-.x-treeview {
+/* Tree */.x-treeview {
   padding: 3px 0;
   overflow: auto;
-  border: 1px solid #cccccc;
+  border: 1px solid #CCCCCC;
   overflow: auto;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -20,21 +13,23 @@
 .x-treeview-plain {
   border: 0;
 }
+.x-treeview-item {
+  white-space: nowrap;
+}
 .x-treenode,
 .x-treeview a,
 .x-treenode-space {
   height: 20px;
+  vertical-align: top;
 }
 .x-treenode {
-  overflow: hidden;
   cursor: default;
   display: block;
   color: #333333;
   font-size: 14px;
 }
 .x-treenode-space {
-  float: left;
-  display: block;
+  display: inline-block;
   width: 19px;
   background-repeat: no-repeat;
 }
@@ -42,14 +37,14 @@
   background-image: none!important;
 }
 .x-treenode-selected {
-  background-color: #d9e8fb;
+  background-color: #D9E8FB;
 }
 .x-treenode:hover {
-  background-color: #eeeeee;
+  background-color: #EEEEEE;
   text-decoration: none;
 }
 .x-treenode-space {
-  background-image: url(../../assets/images/treeview.gif);
+  background-image: url(../images/treeview.gif);
   background-repeat: no-repeat;
 }
 .x-treenode-plus {
@@ -65,7 +60,7 @@
   background-position: -30px -60px;
 }
 .x-treeview-alt .x-treenode-space {
-  background-image: url(../../assets/images/treeview-alt.gif);
+  background-image: url(../images/treeview-alt.gif);
 }
 .x-treeview-alt .x-treenode-normal {
   background-position: 0 -90px;
@@ -80,6 +75,6 @@
   background-position: 0 -180px;
 }
 .x-treenode-loading {
-  background-image: url(../../assets/images/loading.gif) !important;
+  background-image: url(../images/loading.gif) !important;
   background-position: 50% 50%;
 }

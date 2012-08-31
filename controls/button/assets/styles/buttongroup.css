@@ -1,5 +1,6 @@
 .x-buttongroup {
   display: inline-block;
+  vertical-align: middle;
   *margin-left: .3em;
   *zoom: 1;
 }

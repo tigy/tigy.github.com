@@ -120,14 +120,24 @@ var ListControl = ScrollableControl.extend({
 	},
 
 	getItemByText: function(value){
-		for (var c = this.first(), child = null ; c; c = c.next()) {
+		for (var c = this.first(), child ; c; c = c.next()) {
 			if (c.getText() === value) {
 				child = c;
 				break;
 			}
 		}
 		
-		return this.itemOf(child);
+		return child ? this.itemOf(child) : null;
+	},
+	
+	set: function(items){
+		if(Object.isArray(items)){
+			this.clear();
+			this.add.apply(this, items);
+			return this;
+		}
+		
+		return Dom.prototype.set.apply(this, arguments);
 	},
 
 	/**

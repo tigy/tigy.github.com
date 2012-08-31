@@ -37,7 +37,9 @@ Demo.onLoad(function(){
 	DplManager[isLibs ? 'showLib' : 'showRes'](module, 'demo-list-' + module);
 	
 	if(isLibs){
-		var NamespaceAutoComplete = AutoComplete.extend({
+		var NamespaceSuggest = Suggest.extend({
+			
+			dropDownWidth: 260,
 			
 			menuWidth: -1,
 			
@@ -62,7 +64,7 @@ Demo.onLoad(function(){
 				location.href = Demo.rootPath + this.getText().toLowerCase().replace(/\./g, "/") + ".html";
 			},
 			
-			onSelectItem: function(item){
+			updateText: function(item){
 				this.setText(item.getText());
 				this.go();
 				return false;
@@ -71,7 +73,7 @@ Demo.onLoad(function(){
 		});
 
 
-		var a = new NamespaceAutoComplete('control-searchbox');
+		var a = new NamespaceSuggest('control-searchbox');
 		
 		a.on('keyup', function (e) {
 		  if(e.which === 13){

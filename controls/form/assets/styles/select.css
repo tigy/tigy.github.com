@@ -1,13 +1,12 @@
 /**
  * @author 
  */
-
 .x-select {
   padding: 4px;
   font-size: 14px;
   line-height: 18px;
   color: #555555;
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;

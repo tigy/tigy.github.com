@@ -1,6 +1,6 @@
 .x-menu {
-  background-color: white;
-  border-color: #cccccc;
+  background-color: #ffffff;
+  border-color: #ccc;
   border-color: rgba(0, 0, 0, 0.2);
   border-style: solid;
   border-width: 1px;
@@ -19,8 +19,6 @@
   -webkit-background-clip: padding-box;
   -moz-background-clip: padding;
   background-clip: padding-box;
-}
-.x-menu-container {
   padding: 4px 0;
   margin: 0;
   list-style: none;
@@ -36,28 +34,27 @@
 .x-menuitem a {
   color: #555555;
 }
-.x-menu-seperator {
+.x-menuseperator {
   height: 1px;
   margin: 1px;
   overflow: hidden;
   background-color: #e5e5e5;
-  border-bottom: 1px solid white;
+  border-bottom: 1px solid #ffffff;
   display: block;
   *font-size: 1px;
   *width: 100%;
 }
-.x-menuitem-menu {
+.x-menuitem-submenu {
   padding-right: 20px;
-  background: url(../../assets/images/menu-arrow.gif) 100% 7px no-repeat;
+  background: url(../images/menu-arrow.gif) 100% 7px no-repeat;
 }
-.x-menuitem:hover,
-.x-menuitem-selected {
+.x-menuitem:hover {
+  text-decoration: none;
+}
+.x-menuitem-hover {
   background-color: #0088cc;
 }
-.x-menuitem:hover,
-.x-menuitem-selected,
-.x-menuitem:hover a,
-.x-menuitem-selected a {
-  color: white;
-  text-decoration: none;
+.x-menuitem-hover,
+.x-menuitem-hover a {
+  color: #ffffff !important;
 }

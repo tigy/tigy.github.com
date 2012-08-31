@@ -92,19 +92,9 @@ html div.x-row {
   height: 10px;
   display: block;
   visibility: hidden;
-  color: white;
+  color: #ffffff;
 }
 .x-debug {
-  background: #cc0033 !important;
-  color: white !important;
-}
-blockquote.x-right {
-  padding-left: 0;
-  padding-right: 15px;
-  border-left: 0;
-  border-right: 5px solid #eeeeee;
-}
-blockquote.x-right p,
-blockquote.x-right small {
-  text-align: right;
+  background: #C03!important;
+  color: #fff!important;
 }

@@ -1,16 +1,15 @@
 /**
  * @author 
  */
-
 .x-panel {
-  background: none repeat scroll 0 0 white;
-  border: 1px solid #cccccc;
+  background: none repeat scroll 0 0 #FFFFFF;
+  border: 1px solid #CCCCCC;
   border-radius: 4px;
 }
 .x-panel-header {
-  background-color: #fafafa;
-  background-image: -moz-linear-gradient(center top, white, #f3f3f3);
-  border-bottom: 1px solid #cccccc;
+  background-color: #FAFAFA;
+  background-image: -moz-linear-gradient(center top, #ffffff, #f3f3f3);
+  border-bottom: 1px solid #CCCCCC;
   padding: 10px 10px;
   border-radius: 4px 4px 0 0;
 }

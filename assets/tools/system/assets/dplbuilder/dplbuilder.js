@@ -3,7 +3,7 @@
 var JPlus = JPlus || {};
 
 JPlus.getJSONP = function (path, data, onSuccess) {
-	Ajax.getJSONP(Dpl.configs.host + ':' + Dpl.configs.port + '/' + path, data, onSuccess, 1000, function(){
+	Ajax.jsonp(Dpl.configs.host + ':' + Dpl.configs.port + '/' + path, data, onSuccess, 1000, function(){
 		var r = 'assets/bin/startserver.bat';
 		if(navigator.platform.indexOf("Win") === -1) {
 			r = 'assets/bin-linux/startserver.sh';
@@ -61,13 +61,11 @@ var DplBuilder = {
 	// 编辑页
 	
 	initNavBar: function(){
-		 // x-tabbable-actived
+		 // x-tabbable-selected
 		
-		var html = Tpl.parse('<ul class="x-tabbable-container">\
-		{for item in $data}<li class="x-tabbable-content" data-name="{$index}"><a href="#{$index}">{$index}</a></li>{end}\
-		<li class="x-tabbable-content" data-name=""><a href="buildfile.html#">✚ 新建合成方案</a></li>\
-		<li class="x-tabbable-content" data-name="$bak"><a href="build.html">←返回组件列表</a></li>\
-		</ul>\
+		var html = Tpl.parse('{for item in $data}<li class="x-tabbable-item" data-name="{$index}"><a href="#{$index}">{$index}</a></li>{end}\
+		<li class="x-tabbable-item" data-name=""><a href="buildfile.html#">✚ 新建合成方案</a></li>\
+		<li class="x-tabbable-item" data-name="$bak"><a href="build.html">←返回组件列表</a></li>\
 		', BuildFiles);
 		Dom.get('tabbable').setHtml(html);
 		
@@ -91,6 +89,15 @@ var DplBuilder = {
 			
 		}, BuildFiles[base]);
 		
+		if(newProj.bottom)
+		newProj.bottom = newProj.bottom.slice(0);
+		
+		if(newProj.top)
+		newProj.top = newProj.top.slice(0);
+		
+		if(newProj.using)
+		newProj.using = newProj.using.slice(0);
+		
 		newProj.name = null;
 		
 		return DplBuilder.addFile = newProj;
@@ -99,8 +106,8 @@ var DplBuilder = {
 	showView: function (buildFileName) {
 		DplBuilder.write();
 		
-		Dom.get('tabbable').query('.x-tabbable-actived').removeClass('x-tabbable-actived');
-		Dom.get('tabbable').query('[data-name="' + buildFileName + '"]').addClass('x-tabbable-actived');
+		Dom.get('tabbable').query('.x-tabbable-selected').removeClass('x-tabbable-selected');
+		Dom.get('tabbable').query('[data-name="' + buildFileName + '"]').addClass('x-tabbable-selected');
 		
 		DplBuilder.currentBuildFileName = buildFileName;
 		DplBuilder.currentBuildFile = BuildFiles[buildFileName] || DplBuilder.createNewFile();
@@ -247,7 +254,7 @@ var DplBuilder = {
 		
 		Dom.get('content').setHtml(html);
 		
-		new NamespaceAutoComplete(document.find('#namespaces .add .control-namespace'));
+		new NamespaceSuggest(document.find('#namespaces .add .control-namespace'));
 		
 	},
 	
@@ -541,7 +548,9 @@ var DplBuilder = {
 
 
 
-var NamespaceAutoComplete = AutoComplete.extend({
+var NamespaceSuggest = Suggest.extend({
+	
+	dropDownWidth: 262,
 	
 	_guess: function(name, r){
 		

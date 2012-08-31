@@ -1,7 +1,6 @@
 /**
  * @author 
  */
-
 .x-tooltip {
   position: absolute;
   z-index: 1020;
@@ -10,13 +9,13 @@
   opacity: 0.8;
   filter: alpha(opacity=80);
 }
-.x-tooltip-container {
+.x-tooltip-content {
   max-width: 200px;
   padding: 4px 9px;
-  color: white;
+  color: #ffffff;
   text-align: center;
   text-decoration: none;
-  background-color: black;
+  background-color: #000000;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;

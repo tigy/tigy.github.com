@@ -1,7 +1,6 @@
 /**
  * @author 
  */
-
 .x-carousel {
   position: relative;
 }
@@ -18,15 +17,15 @@
   text-align: center;
   opacity: 0.9;
   filter: alpha(opacity=90);
-  background-color: black;
+  background-color: #000000;
   line-height: 32px;
-  color: white;
+  color: #ffffff;
   cursor: pointer;
 }
 .x-carousel-header .x-carousel-header-selected {
   font-weight: bold;
-  background-color: #f2f2f2;
-  color: black;
+  background-color: #F2F2F2;
+  color: #000000;
 }
 .x-carousel-container {
   *zoom: 1;

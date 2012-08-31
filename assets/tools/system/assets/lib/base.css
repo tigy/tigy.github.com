@@ -1,5 +1,5 @@
 ﻿/*
- * This file is created by a tool at 2012/07/10 15:42:31
+ * This file is created by a tool at 2012/08/31 18:35:35
  */
 
 
@@ -7,10 +7,9 @@
  * Controls.Core.Base
  ************************************/
 /**
- * 最底层的 CSS 样式。
+ * 最底层�?CSS 样式�?
  * @author xuld
  */
-
 html,
 body,
 form,
@@ -221,7 +220,7 @@ dd {
 abbr {
   font-size: 90%;
   text-transform: uppercase;
-  border-bottom: 1px dotted #dddddd;
+  border-bottom: 1px dotted #ddd;
   cursor: help;
 }
 address,
@@ -230,7 +229,7 @@ cite {
 }
 code {
   padding: 0 4px;
-  color: #1e347b;
+  color: #1E347B;
   background-color: #f7f7f9;
   border: 1px solid #e1e1e8;
   -webkit-border-radius: 3px;
@@ -245,24 +244,15 @@ pre code {
   color: inherit;
   font-family: inherit;
 }
-blockquote {
-  padding: 0 0 0 15px;
-  margin: 18px 0;
-  border-left: 5px solid #eeeeee;
+abbr {
+  font-size: 90%;
+  text-transform: uppercase;
+  border-bottom: 1px dotted #ddd;
+  cursor: help;
 }
-blockquote p {
-  margin-bottom: 0;
-  font-size: 16px;
-  font-weight: 300;
-  line-height: 22.5px;
-}
-blockquote small {
-  display: block;
-  font-size: 100%;
-  color: #999999;
-}
-blockquote small:before {
-  content: '\2014 \00A0';
+address,
+cite {
+  font-style: normal;
 }
 fieldset {
   padding: 0;
@@ -278,14 +268,14 @@ legend {
   line-height: 36px;
   color: #333333;
   border: 0;
-  border-bottom: 1px solid #eeeeee;
+  border-bottom: 1px solid #eee;
 }
 legend small {
   font-size: 13.5px;
   color: #999999;
 }
 select {
-  background-color: white;
+  background-color: #ffffff;
 }
 /************************************
  * Controls.Core.Common
@@ -384,29 +374,12 @@ html div.x-row {
   height: 10px;
   display: block;
   visibility: hidden;
-  color: white;
+  color: #ffffff;
 }
 .x-debug {
-  background: #cc0033 !important;
-  color: white !important;
+  background: #C03!important;
+  color: #fff!important;
 }
-blockquote.x-right {
-  padding-left: 0;
-  padding-right: 15px;
-  border-left: 0;
-  border-right: 5px solid #eeeeee;
-}
-blockquote.x-right p,
-blockquote.x-right small {
-  text-align: right;
-}
-/************************************
- * Controls.Form.IInput
- ************************************/
-/**
- * @author 
- */
-
 /************************************
  * Controls.Form.TextBox
  ************************************/
@@ -416,7 +389,7 @@ blockquote.x-right small {
   font-size: 13px;
   line-height: 18px;
   color: #555555;
-  border: 1px solid #cccccc;
+  border: 1px solid #ccc;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
@@ -491,35 +464,45 @@ textarea.x-textbox {
 /**
  * @author 
  */
-
+/************************************
+ * Controls.Core.ContentControl
+ ************************************/
+/**
+ * @author 
+ */
 /************************************
  * Controls.Core.ListControl
  ************************************/
 /**
  * @author 
  */
-
 /************************************
- * Controls.Core.IDropDownMenuContainer
+ * Controls.Core.TreeControl
  ************************************/
 /**
  * @author 
  */
-
-.x-dropdownmenu {
+/************************************
+ * Controls.Core.IDropDownOwner
+ ************************************/
+/**
+ * @author  xuld
+ */
+.x-dropdown {
   -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   position: absolute;
   z-index: 1000;
+  max-height: 300px;
 }
 /************************************
  * Controls.Form.ListBox
  ************************************/
 .x-listbox {
   display: inline-block;
-  background-color: white;
-  border-color: #cccccc;
+  background-color: #ffffff;
+  border-color: #ccc;
   border-color: rgba(0, 0, 0, 0.2);
   border-style: solid;
   border-width: 1px;
@@ -528,12 +511,14 @@ textarea.x-textbox {
   border-radius: 5px;
   *display: inline;
   *zoom: 1;
-  min-width: 140px;
   _zoom: 0;
   _display: block;
-  _width: 160px;
+  padding: 4px 0;
+  margin: 0;
+  list-style: none;
+  overflow: auto;
 }
-.x-listbox-content {
+.x-listbox-item {
   display: block;
   padding: 3px 10px;
   color: #555555;
@@ -541,53 +526,37 @@ textarea.x-textbox {
   cursor: default;
   _width: 100%;
 }
-.x-listbox-container {
-  padding: 4px 0;
-  margin: 0;
-  list-style: none;
-  _width: 100%;
-  _overflow: hidden;
-}
-.x-listbox-content:hover,
-.x-dropdownmenu .x-listbox-selected {
-  background-color: #0088cc;
-}
-.x-listbox-content a {
+.x-listbox-item a {
   color: #333333;
+  cursor: default;
 }
 .x-listbox-selected {
   background-color: #005580;
 }
-.x-listbox-content:hover,
-.x-listbox-selected {
-  color: white;
+.x-listbox-hover {
+  background-color: #0088cc;
 }
-.x-listbox-content:hover a,
-.x-listbox-selected a {
-  color: white;
+.x-listbox-item a:hover {
   text-decoration: none;
-  cursor: default;
 }
-/************************************
- * Controls.Form.AutoComplete
- ************************************/
-/**
- * @author 
- */
-
-.x-suggest {
-  margin-top: 2px;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
+.x-listbox-selected,
+.x-listbox-hover {
+  color: #ffffff;
 }
-/************************************
- * Controls.Core.ContentControl
- ************************************/
-/**
- * @author 
- */
-
+.x-listbox-selected a,
+.x-listbox-hover a {
+  color: #ffffff;
+}
+.x-listbox-readonly {
+  background-color: #eeeeee !important;
+}
+.x-listbox-disabled {
+  border-color: #dddddd !important;
+  background-color: #eeeeee !important;
+}
+.x-listbox-disabled .x-listbox-selected {
+  background-color: #555555;
+}
 /************************************
  * Controls.Button.Button
  ************************************/
@@ -602,16 +571,16 @@ textarea.x-textbox {
   text-align: center;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
   vertical-align: middle;
-  background-color: whitesmoke;
-  background-image: -moz-linear-gradient(top, white, #e6e6e6);
-  background-image: -ms-linear-gradient(top, white, #e6e6e6);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(white), to(#e6e6e6));
-  background-image: -webkit-linear-gradient(top, white, #e6e6e6);
-  background-image: -o-linear-gradient(top, white, #e6e6e6);
-  background-image: linear-gradient(top, white, #e6e6e6);
+  background-color: #f5f5f5;
+  background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
+  background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
+  background-image: linear-gradient(top, #ffffff, #e6e6e6);
   background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='white', endColorstr='#e6e6e6', GradientType=0);
-  border-color: #e6e6e6 #e6e6e6 silver;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0);
+  border-color: #e6e6e6 #e6e6e6 #bfbfbf;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
   border: 1px solid #cccccc;
@@ -626,9 +595,7 @@ textarea.x-textbox {
 }
 .x-button:hover,
 .x-button:active,
-.x-button.x-button-actived,
-.x-button.x-button-disabled,
-.x-button[disabled] {
+.x-button.x-button-actived {
   background-color: #e6e6e6;
 }
 .x-button:active,
@@ -674,12 +641,12 @@ input.x-button:focus {
 .x-button-disabled {
   cursor: default;
   background-image: none;
-  background-color: #e6e6e6;
+  background-color: #eeeeee !important;
   opacity: 0.65;
   filter: alpha(opacity=65);
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
 }
 .x-button-large {
   padding: 9px 14px;
@@ -710,7 +677,7 @@ input.x-button:focus {
 .x-button-inverse,
 .x-button-inverse:hover {
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  color: white;
+  color: #ffffff;
 }
 .x-button-highlight {
   background-color: #4a9bca;
@@ -728,9 +695,7 @@ input.x-button:focus {
 }
 .x-button-highlight:hover,
 .x-button-highlight:active,
-.x-button-highlight.x-button-actived,
-.x-button-highlight.x-button-disabled,
-.x-button-highlight[disabled] {
+.x-button-highlight.x-button-actived {
   background-color: #4a81ca;
 }
 .x-button-highlight:active,
@@ -753,9 +718,7 @@ input.x-button:focus {
 }
 .x-button-warning:hover,
 .x-button-warning:active,
-.x-button-warning.x-button-actived,
-.x-button-warning.x-button-disabled,
-.x-button-warning[disabled] {
+.x-button-warning.x-button-actived {
   background-color: #f89406;
 }
 .x-button-warning:active,
@@ -778,9 +741,7 @@ input.x-button:focus {
 }
 .x-button-error:hover,
 .x-button-error:active,
-.x-button-error.x-button-actived,
-.x-button-error.x-button-disabled,
-.x-button-error[disabled] {
+.x-button-error.x-button-actived {
   background-color: #bd362f;
 }
 .x-button-error:active,
@@ -803,9 +764,7 @@ input.x-button:focus {
 }
 .x-button-success:hover,
 .x-button-success:active,
-.x-button-success.x-button-actived,
-.x-button-success.x-button-disabled,
-.x-button-success[disabled] {
+.x-button-success.x-button-actived {
   background-color: #51a351;
 }
 .x-button-success:active,
@@ -828,9 +787,7 @@ input.x-button:focus {
 }
 .x-button-info:hover,
 .x-button-info:active,
-.x-button-info.x-button-actived,
-.x-button-info.x-button-disabled,
-.x-button-info[disabled] {
+.x-button-info.x-button-actived {
   background-color: #2f96b4;
 }
 .x-button-info:active,
@@ -847,15 +804,13 @@ input.x-button:focus {
   background-image: linear-gradient(top, #454545, #262626);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#454545', endColorstr='#262626', GradientType=0);
-  border-color: #262626 #262626 black;
+  border-color: #262626 #262626 #000000;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
 }
 .x-button-inverse:hover,
 .x-button-inverse:active,
-.x-button-inverse.x-button-actived,
-.x-button-inverse.x-button-disabled,
-.x-button-inverse[disabled] {
+.x-button-inverse.x-button-actived {
   background-color: #262626;
 }
 .x-button-inverse:active,
@@ -887,10 +842,176 @@ input.x-button-small {
   padding-right: 20px;
 }
 /************************************
+ * Controls.Button.Menu
+ ************************************/
+.x-menu {
+  background-color: #ffffff;
+  border-color: #ccc;
+  border-color: rgba(0, 0, 0, 0.2);
+  border-style: solid;
+  border-width: 1px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  min-width: 140px;
+  _zoom: 0;
+  _display: block;
+  _width: 160px;
+  position: absolute;
+  z-index: 1000;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  padding: 4px 0;
+  margin: 0;
+  list-style: none;
+}
+.x-menuitem {
+  display: block;
+  padding: 3px 10px;
+  white-space: nowrap;
+  cursor: default;
+  _width: 100%;
+}
+.x-menuitem,
+.x-menuitem a {
+  color: #555555;
+}
+.x-menuseperator {
+  height: 1px;
+  margin: 1px;
+  overflow: hidden;
+  background-color: #e5e5e5;
+  border-bottom: 1px solid #ffffff;
+  display: block;
+  *font-size: 1px;
+  *width: 100%;
+}
+.x-menuitem-submenu {
+  padding-right: 20px;
+  background: url(images/button/menu-arrow.gif) 100% 7px no-repeat;
+}
+.x-menuitem:hover {
+  text-decoration: none;
+}
+.x-menuitem-hover {
+  background-color: #0088cc;
+}
+.x-menuitem-hover,
+.x-menuitem-hover a {
+  color: #ffffff !important;
+}
+/************************************
+ * Controls.Button.MenuButton
+ ************************************/
+.x-button-menu {
+  display: inline-block;
+  vertical-align: middle;
+  opacity: 0.3;
+  filter: alpha(opacity=30);
+  content: "\2193";
+  font-size: 0;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #000000;
+  margin-top: -3px;
+  *margin-top: 0;
+  _vertical-align: baseline;
+  _background: transparent;
+  _border-left: 4px solid white;
+  _border-right: 4px solid white;
+  _filter: chroma(color=#ffffff);
+}
+.x-button .x-button-menu {
+  margin-left: 5px;
+  _margin-top: 7px;
+  _margin-bottom: 5px;
+}
+.x-button:hover .x-button-menu,
+.x-button-actived .x-button-menu {
+  opacity: 1;
+  filter: alpha(opacity=100);
+}
+.x-button[disabled]:hover .x-button-menu,
+.x-button-disabled:hover .x-button-menu {
+  opacity: 0.3;
+  filter: alpha(opacity=30);
+}
+/************************************
+ * Controls.Form.Picker
+ ************************************/
+/**
+ * @author xuld
+ */
+.x-picker {
+  position: relative;
+  display: inline-block;
+  *margin-left: .3em;
+}
+.x-picker:first-child {
+  *margin-left: 0;
+}
+.x-picker button {
+  padding-left: 4px;
+  padding-right: 8px;
+  margin-left: 0;
+  *margin-top: 1px;
+  *padding: 3px 6px 3px 2px;
+  position: absolute;
+  -webkit-border-radius: 0 4px 4px 0;
+  -moz-border-radius: 0 4px 4px 0;
+  border-radius: 0 4px 4px 0;
+  right: 0;
+  top: 0;
+  _padding-bottom: 1px;
+  _margin-right: -1px;
+}
+.x-picker button .x-icon {
+  margin-left: 2px;
+  margin-right: -2px;
+}
+.x-picker input {
+  padding-right: 30px;
+}
+.x-picker input:focus + button {
+  border-color: rgba(82, 168, 236, 0.8);
+}
+.x-picker a {
+  cursor: default!important;
+  text-align: left;
+  height: 18px;
+  display: inline-block;
+  padding-right: 35px;
+}
+/************************************
+ * Controls.Form.ComboBox
+ ************************************/
+/**
+ * @author 
+ */
+/************************************
+ * Controls.Form.Suggest
+ ************************************/
+/**
+ * @author  xuld
+ */
+.x-suggest {
+  margin-top: 2px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+/************************************
  * Controls.Button.ButtonGroup
  ************************************/
 .x-buttongroup {
   display: inline-block;
+  vertical-align: middle;
   *margin-left: .3em;
   *zoom: 1;
 }
@@ -930,50 +1051,11 @@ input.x-button-small {
   border-bottom-right-radius: 4px;
 }
 /************************************
- * Controls.Button.MenuButton
- ************************************/
-.x-button-menu {
-  display: inline-block;
-  vertical-align: middle;
-  opacity: 0.3;
-  filter: alpha(opacity=30);
-  content: "\2193";
-  font-size: 0;
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 4px solid black;
-  margin-top: -3px;
-  *margin-top: 0;
-  _vertical-align: baseline;
-  _background: transparent;
-  _border-left: 4px solid white;
-  _border-right: 4px solid white;
-  _filter: chroma(color=white);
-}
-.x-button .x-button-menu {
-  margin-left: 5px;
-  _margin-top: 7px;
-  _margin-bottom: 5px;
-}
-.x-button:hover .x-button-menu,
-.x-button-actived .x-button-menu {
-  opacity: 1;
-  filter: alpha(opacity=100);
-}
-.x-button[disabled]:hover .x-button-menu,
-.x-button-disabled:hover .x-button-menu {
-  opacity: 0.3;
-  filter: alpha(opacity=30);
-}
-/************************************
  * Controls.Button.SplitButton
  ************************************/
 /**
  * @author 
  */
-
 .x-splitbutton .x-button:last-child {
   padding-left: 8px;
   padding-right: 8px;
@@ -990,9 +1072,9 @@ input.x-button-small {
 /**
  * @author 
  */
-
 .x-tabbable {
-  border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid #ddd;
+  margin: 0;
   *zoom: 1;
 }
 .x-tabbable:after {
@@ -1002,48 +1084,45 @@ input.x-button-small {
   clear: both;
   visibility: hidden;
 }
-.x-tabbable-container {
-  margin: 0;
-}
-.x-tabbable-content {
+.x-tabbable-item {
   margin: 0 0 -1px;
   list-style: none;
   float: left;
 }
-.x-tabbable-content a {
+.x-tabbable-item a {
   display: block;
   border: 1px solid transparent;
   _border-color: white;
-  _filter: chroma(color=white);
+  _filter: chroma(color=#ffffff);
   -webkit-border-radius: 4px 4px 0 0;
   -moz-border-radius: 4px 4px 0 0;
   border-radius: 4px 4px 0 0;
   padding: 7px 12px;
   text-decoration: none;
 }
-.x-tabbable-content a:hover {
+.x-tabbable-item a:hover {
   border-color: #eeeeee #eeeeee #dddddd;
   background-color: #eeeeee;
 }
 .x-tabbable-selected a,
 .x-tabbable-selected a:hover {
   color: #555555;
-  background-color: white;
-  border: 1px solid #dddddd;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
   border-bottom-color: transparent;
   _border-bottom-color: white;
-  _filter: chroma(color=white);
+  _filter: chroma(color=#ffffff);
   cursor: default;
 }
 .x-tabbable-alt {
   border-bottom: none;
 }
-.x-tabbable-alt .x-tabbable-content a,
-.x-tabbable-alt .x-tabbable-content a:hover {
+.x-tabbable-alt .x-tabbable-item a,
+.x-tabbable-alt .x-tabbable-item a:hover {
   border-color: transparent;
   _border-color: white;
 }
-.x-tabbable-alt .x-tabbable-content a {
+.x-tabbable-alt .x-tabbable-item a {
   padding-top: 6px;
   padding-bottom: 6px;
   -webkit-border-radius: 5px;
@@ -1052,7 +1131,7 @@ input.x-button-small {
 }
 .x-tabbable-alt .x-tabbable-selected a,
 .x-tabbable-alt .x-tabbable-selected a:hover {
-  color: white;
+  color: #ffffff;
   background-color: #0088cc;
 }
 /************************************
@@ -1061,75 +1140,74 @@ input.x-button-small {
 /**
  * @author 
  */
-
 .x-tabbable-bottom,
 .x-tabbable-right,
 .x-tabbable-left {
   border-bottom: 0;
 }
 .x-tabbable-bottom {
-  border-top: 1px solid #dddddd;
+  border-top: 1px solid #ddd;
 }
-.x-tabbable-bottom .x-tabbable-container {
+.x-tabbable-bottom .x-tabbable-item {
   margin-top: -1px;
   margin-bottom: 0;
 }
-.x-tabbable-bottom .x-tabbable-content a {
+.x-tabbable-bottom .x-tabbable-item a {
   -webkit-border-radius: 0 0 4px 4px;
   -moz-border-radius: 0 0 4px 4px;
   border-radius: 0 0 4px 4px;
 }
-.x-tabbable-bottom .x-tabbable-content a:hover {
+.x-tabbable-bottom .x-tabbable-item a:hover {
   border-bottom-color: transparent;
-  border-top-color: #dddddd;
+  border-top-color: #ddd;
 }
-.x-tabbable-bottom .x-tabbable-actived a,
-.x-tabbable-bottom .x-tabbable-actived a:hover {
-  border-color: white #dddddd #dddddd #dddddd;
+.x-tabbable-bottom .x-tabbable-selected a,
+.x-tabbable-bottom .x-tabbable-selected a:hover {
+  border-color: #ffffff #dddddd #dddddd #dddddd;
 }
-.x-tabbable-left .x-tabbable-content,
-.x-tabbable-right .x-tabbable-content {
+.x-tabbable-left .x-tabbable-item,
+.x-tabbable-right .x-tabbable-item {
   float: none;
 }
-.x-tabbable-left .x-tabbable-content a,
-.x-tabbable-right .x-tabbable-content a {
+.x-tabbable-left .x-tabbable-item a,
+.x-tabbable-right .x-tabbable-item a {
   min-width: 74px;
   margin-right: 0;
   margin-bottom: 3px;
 }
 .x-tabbable-left {
   float: left;
-  border-right: 1px solid #dddddd;
+  border-right: 1px solid #ddd;
 }
-.x-tabbable-left .x-tabbable-content  a {
+.x-tabbable-left .x-tabbable-item a {
   margin-right: -1px;
   -webkit-border-radius: 4px 0 0 4px;
   -moz-border-radius: 4px 0 0 4px;
   border-radius: 4px 0 0 4px;
 }
-.x-tabbable-left .x-tabbable-content a:hover {
+.x-tabbable-left .x-tabbable-item a:hover {
   border-color: #eeeeee #dddddd #eeeeee #eeeeee;
 }
-.x-tabbable-left .x-tabbable-actived a,
-.x-tabbable-left .x-tabbable-actived a:hover {
-  border-color: #dddddd white #dddddd #dddddd;
+.x-tabbable-left .x-tabbable-selected a,
+.x-tabbable-left .x-tabbable-selected a:hover {
+  border-color: #dddddd #ffffff #dddddd #dddddd;
 }
 .x-tabbable-right {
   float: right;
-  border-left: 1px solid #dddddd;
+  border-left: 1px solid #ddd;
 }
-.x-tabbable-right .x-tabbable-content a {
+.x-tabbable-right .x-tabbable-item a {
   margin-left: -1px;
   -webkit-border-radius: 0 4px 4px 0;
   -moz-border-radius: 0 4px 4px 0;
   border-radius: 0 4px 4px 0;
 }
-.x-tabbable-right .x-tabbable-content a:hover {
+.x-tabbable-right .x-tabbable-item a:hover {
   border-color: #eeeeee #eeeeee #eeeeee #dddddd;
 }
-.x-tabbable-right .x-tabbable-actived a,
-.x-tabbable-right .x-tabbable-actived a:hover {
-  border-color: #dddddd #dddddd #dddddd white;
+.x-tabbable-right .x-tabbable-selected a,
+.x-tabbable-right .x-tabbable-selected a:hover {
+  border-color: #dddddd #dddddd #dddddd #ffffff;
 }
 /************************************
  * Controls.Form.Form
@@ -1137,7 +1215,6 @@ input.x-button-small {
 /**
  * @author 
  */
-
 .x-formfield {
   line-height: 28px;
   margin-bottom: 10px;
@@ -1257,8 +1334,8 @@ input.x-button-small {
  ************************************/
 .x-bubble {
   padding: 15px;
-  background-color: whitesmoke;
-  border: 1px solid #eeeeee;
+  background-color: #f5f5f5;
+  border: 1px solid #eee;
   border: 1px solid rgba(0, 0, 0, 0.05);
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -1268,7 +1345,7 @@ input.x-button-small {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 .x-bubble blockquote {
-  border-color: #dddddd;
+  border-color: #ddd;
   border-color: rgba(0, 0, 0, 0.15);
 }
 /************************************
@@ -1277,7 +1354,6 @@ input.x-button-small {
 /**
  * @author 
  */
-
 .x-linkbutton {
   text-decoration: underline;
 }

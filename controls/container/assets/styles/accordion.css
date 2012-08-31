@@ -1,7 +1,6 @@
 /**
  * @author 
  */
-
 .x-accordion {
   margin-bottom: 18px;
 }
@@ -19,7 +18,7 @@
 .x-accordion-body {
   overflow: hidden;
 }
-.x-accordion-container {
+.x-accordion-content {
   padding: 9px 15px;
   border-top: 1px solid #e5e5e5;
 }
