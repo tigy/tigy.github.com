@@ -13,132 +13,118 @@ using("System.Dom.Base");
  */
 Dom.implement((function(){
 	
-	var aligns = {
-		
-		ol: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var x = targetPosition.x - ctrlSize.x - offset;
-			if(enableReset && x <= documentPosition.x) {
-				x = aligns.or(ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, 1);
-			}
+	var aligners = {
 			
-			return x;
-		},
-		
-		or: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var x = targetPosition.x + targetSize.x + offset;
-			if(enableReset && x + ctrlSize.x >= documentPosition.x + documentSize.x) {
-				if(ctrl.onOverflowX){
-					ctrl.onOverflowX(documentSize.x);  
+			xc: function (opt) {
+				opt.x = opt.tp.x + (opt.ts.x - opt.s.x) / 2 + opt.ox;
+			},
+			
+			ol: function(opt, r){
+				opt.x = opt.tp.x - opt.s.x - opt.ox;
+				
+				if(r > 0 && opt.x <= opt.dp.x) {
+					aligners.or(opt, --r);
 				}
-				x = aligns[enableReset === 1 ? 'xc' : 'ol'](ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, true);
-			}
+			},
 			
-			return x;
-		},
-		
-		xc: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl) {
-			return targetPosition.x + (targetSize.x - ctrlSize.x) / 2 + offset;
-		},
-		
-		il: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var x = targetPosition.x + offset;
-			if(enableReset && x <= x + ctrlSize.x >= documentPosition.x + documentSize.x) {
-				x = aligns.ir(ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, true);
-			}
-			
-			return x;
-		},
-		
-		ir: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var x = targetPosition.x + targetSize.x - ctrlSize.x - offset;
-			if(enableReset && x <= documentPosition.x) {
-				x = aligns.il(ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl);
-			}
-			
-			return x;
-		},
-		
-		ot: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var y = targetPosition.y - ctrlSize.y - offset;
-			if(enableReset && y <= documentPosition.y) {
-				y = aligns.ob(ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, 1);
-			}
-			
-			return y;
-		},
-		
-		ob: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var y = targetPosition.y + targetSize.y + offset;
-			if(enableReset && y + ctrlSize.x >= documentPosition.y + documentSize.y) {
-				if(ctrl.onOverflowY){
-					ctrl.onOverflowY(documentSize.y);  
+			or: function(opt, r){
+				opt.x = opt.tp.x + opt.ts.x + opt.ox;
+				
+				if(r > 0 && opt.x + opt.s.x >= opt.dp.x + opt.ds.x) {
+					aligners.ol(opt, --r);
 				}
-				y = aligns[enableReset === 1 ? 'yc' : 'ot'](ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, true);
+			},
+			
+			il: function (opt, r) {
+				opt.x = opt.tp.x + opt.ox;
+				
+				if(r > 0 && opt.x + opt.s.x >= opt.dp.x + opt.ds.x) {
+					aligners.ir(opt, --r);
+				}
+			},
+			
+			ir: function (opt, r) {
+				opt.x = opt.tp.x + opt.ts.x - opt.s.x - opt.ox;
+				
+				if(r > 0 && opt.x <= opt.dp.x) {
+					aligners.il(opt, --r);
+				}
+			},
+			
+			yc: function (opt) {
+				opt.y = opt.tp.y + (opt.ts.y - opt.s.y) / 2 + opt.oy;
+			},
+			
+			ot: function(opt, r){
+				opt.y = opt.tp.y - opt.s.y - opt.oy;
+				
+				if(r > 0 && opt.y <= opt.dp.y) {
+					aligners.ob(opt, --r);
+				}
+			},
+			
+			ob: function(opt, r){
+				opt.y = opt.tp.y + opt.ts.y + opt.oy;
+				
+				if(r > 0 && opt.y + opt.s.y >= opt.dp.y + opt.ds.y) {
+					aligners.ot(opt, --r);
+				}
+			},
+			
+			it: function (opt, r) {
+				opt.y = opt.tp.y + opt.oy;
+				
+				if(r > 0 && opt.y + opt.s.y >= opt.dp.y + opt.ds.y) {
+					aligners.ib(opt, --r);
+				}
+			},
+			
+			ib: function (opt, r) {
+				opt.y = opt.tp.y + opt.ts.y - opt.s.y - opt.oy;
+				
+				if(r > 0 && opt.y <= opt.dp.y) {
+					aligners.it(opt, --r);
+				}
 			}
 			
-			return y;
 		},
 		
-		yc: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl) {
-			return targetPosition.y + (targetSize.y - ctrlSize.y) / 2 + offset;
-		},
-		
-		it: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var y = targetPosition.y + offset;
-			if(enableReset && y + ctrlSize.x >= documentPosition.y + documentSize.y) {
-				y = aligns.ib(ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, true);
-			}
+		setter = Object.map({
+			bl: 'il ob',
+			rt: 'or it',
+			rb: 'or ib',
+			lt: 'ol it',
+			lb: 'ol ib',
+			br: 'ir ob',
+			tr: 'ir ot',
+			tl: 'il ot',
+			rc: 'or yc',
+			bc: 'xc ob',
+			tc: 'xc ot',
+			lc: 'ol yc',
+			cc: 'xc yc',
 			
-			return y;
-		},
-		
-		ib: function (ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl, enableReset) {
-			var y = targetPosition.y + targetSize.y - ctrlSize.y - offset;
-			if(enableReset && y <= documentPosition.y) {
-				y = aligns.it(ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offset, ctrl);
-			}
+			'~lb': 'il ib',
+			'~rt': 'ir it',
+			'~rb': 'ir ib',
+			'~lt': 'il it',
+			'~rc': 'ir yc',
+			'~bc': 'xc ib',
+			'~tc': 'xc it',
+			'~lc': 'il yc',
 			
-			return y;
-		}
-		
-	},
-	
-	setter = Object.map({
-		bl: 'il ob',
-		rt: 'or it',
-		rb: 'or ib',
-		lt: 'ol it',
-		lb: 'ol ib',
-		br: 'ir ob',
-		tr: 'ir ot',
-		tl: 'il ot',
-		rc: 'or yc',
-		bc: 'xc ob',
-		tc: 'xc ot',
-		lc: 'ol yc',
-		cc: 'xc yc',
-		
-		'lb-': 'il ib',
-		'rt-': 'ir it',
-		'rb-': 'ir ib',
-		'lt-': 'il it',
-		'rc-': 'ir yc',
-		'bc-': 'xc ib',
-		'tc-': 'xc it',
-		'lc-': 'il yc',
-		
-		'lb^': 'ol ob',
-		'rt^': 'or ot',
-		'rb^': 'or ob',
-		'lt^': 'ol ot'
-		
-	}, function(value){
-		value = value.split(' ');
-		value[0] = aligns[value[0]];
-		value[1] = aligns[value[1]];
-		return value;
-	}, {});
-		
+			'^lb': 'ol ob',
+			'^rt': 'or ot',
+			'^rb': 'or ob',
+			'^lt': 'ol ot'
+			
+		}, function(value){
+			value = value.split(' ');
+			value[0] = aligners[value[0]];
+			value[1] = aligners[value[1]];
+			return value;
+		}, {});
+			
 		/*
 		 *      tl   tc   tr
 		 *      ------------
@@ -163,22 +149,26 @@ Dom.implement((function(){
 		 * @memberOf Control
 		 */
 		align: function(ctrl, position, offsetX, offsetY, enableReset) {
-			ctrl = Dom.get(ctrl);
-			var ctrlSize = this.getSize(),
-				targetSize = ctrl.getSize(),
-				targetPosition = ctrl.getPosition(),
-				documentSize = document.getSize(),
-				documentPosition = document.getPosition();
 					
 			assert(!position || position in setter, "Control.prototype.align(ctrl, position,  offsetX, offsetY): {position} 必须是 l r c 和 t b c 的组合。如 lt", position);
-				
-			position = setter[position] || setter.lb;
-			enableReset = enableReset !== false;
 			
-			this.setPosition(
-				position[0](ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offsetX || 0, this, enableReset),
-				position[1](ctrlSize, targetSize, targetPosition, documentSize, documentPosition, offsetY || 0, this, enableReset)
-			);
+			ctrl = ctrl instanceof Dom ? ctrl : Dom.get(ctrl);
+			position = setter[position] || setter.lb;
+			
+			var opt = {
+				s: this.getSize(),
+				ts: ctrl.getSize(),
+				tp: ctrl.getPosition(),
+				ds: document.getSize(),
+				dp: document.getPosition(),
+				ox: offsetX,
+				oy: offsetY
+			}, r = enableReset === false ? 0 : 2;
+			
+			position[0](opt, r);
+			position[1](opt, r);
+			
+			return this.setPosition(opt);
 		}
 		
 	};

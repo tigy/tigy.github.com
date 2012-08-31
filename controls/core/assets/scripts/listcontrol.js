@@ -96,24 +96,24 @@ var ListControl = ScrollableControl.extend({
 		this.initItems();
 	},
 	
-	/**
-	 * 当当前控件在屏幕中显示不下时，由 align 函数触发执行此函数。
-	 * @param {String} xOry 值为 "x" 或 "y"。
-	 * @param {Integer} value 设置的最大值。
-	 * @param {Boolean} isOverflowing 如果值为 true，表示发生了此事件，否则表示恢复此状态。
-	 */
-	onOverflow: function(xOry, value, isOverflowing){
-		var data = this['overflow' + xOry];
-		if(isOverflowing){
-			if(!data){
-				this['overflow' + xOry] = this[xOry === 'x' ? 'getWidth' : 'getHeight']();
-			}
-			this[xOry === 'x' ? 'setWidth' : 'setHeight'](value);
-		} else if(data !== undefined){
-			this[xOry === 'x' ? 'setWidth' : 'setHeight'](data);
-			delete this['overflow' + xOry];
-		}
-	},
+	// /**
+	 // * 当当前控件在屏幕中显示不下时，由 align 函数触发执行此函数。
+	 // * @param {String} xOry 值为 "x" 或 "y"。
+	 // * @param {Integer} value 设置的最大值。
+	 // * @param {Boolean} isOverflowing 如果值为 true，表示发生了此事件，否则表示恢复此状态。
+	 // */
+	// onOverflow: function(xOry, value, isOverflowing){
+		// var data = this['overflow' + xOry];
+		// if(isOverflowing){
+			// if(!data){
+				// this['overflow' + xOry] = this[xOry === 'x' ? 'getWidth' : 'getHeight']();
+			// }
+			// this[xOry === 'x' ? 'setWidth' : 'setHeight'](value);
+		// } else if(data !== undefined){
+			// this[xOry === 'x' ? 'setWidth' : 'setHeight'](data);
+			// delete this['overflow' + xOry];
+		// }
+	// },
 	
 	indexOf: function(item){
 		return ScrollableControl.prototype.indexOf.call(this, this.childOf(item));
