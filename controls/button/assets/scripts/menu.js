@@ -126,6 +126,11 @@ var MenuSeperator = MenuItem.extend({
 var Menu = TreeControl.extend({
 
 	xtype: 'menu',
+	
+	/**
+	 * 表示当前菜单是否为浮动的菜单。 
+	 */
+	floating: false,
 
 	createTreeItem: function(childControl, parent) {
 		
@@ -179,8 +184,10 @@ var Menu = TreeControl.extend({
 	},
 
 	onShow: function() {
-		this.floating = true;
-		document.once('mouseup', this.hide, this);
+		
+		// 如果菜单是浮动的，则点击后关闭菜单，否则，只关闭子菜单。
+		if(this.floating)
+			document.once('mouseup', this.hide, this);
 		this.trigger('show');
 	},
 
