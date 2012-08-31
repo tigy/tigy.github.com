@@ -69,7 +69,7 @@ var Control = Dom.extend({
 		var me = this,
 
 			// 临时的配置对象。
-			opt = Object.extend({}, me.options),
+			opt = {},
 
 			// 当前实际的节点。
 			node;
