@@ -191,6 +191,8 @@ var Ajax = (function() {
 					timeout: defaultOptions.timeout,
 					exception: defaultOptions.exception
 				}, options);
+				
+				assert(!options.url || options.url.replace, "Ajax#run(options): {options.url} 必须是字符串。", options.url);
 
 				// dataType
 				options.dataType = options.dataType || defaultOptions.dataType;

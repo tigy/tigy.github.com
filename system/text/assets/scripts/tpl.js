@@ -29,87 +29,64 @@ var Tpl = {
 	
 	cache: {},
 	
-	encodeJs: function(input){
-		return input.replace(/[\r\n]/g, '\\n').replace(/"/g, '\\"');
+	/**
+	 * 使用指定的数据解析模板，并返回生成的内容。
+	 * @param {String} tpl 表示模板的字符串。
+	 * @param {Object} data 数据。
+	 * @param {Object} bind 模板中 this 的指向。
+	 * @return {String} 处理后的字符串。 
+	 */
+	parse: function(tpl, data, bind) {
+		return (Tpl.cache[tpl] || (Tpl.cache[tpl] = Tpl.compile(tpl))).call(bind, data);
 	},
-
-	processStatement: function(text, empty){
-		return 'try{with($data){$tmp=' + text + ';}}catch(e){$tmp=' + empty + '}';
-	},
-	
-	processCommand: function(command, blockStack){
-		var head = (command.match(/^\w+\b/) || [''])[0],
-			text = command.replace(head, "");
-
-		switch(head) {
-			case "end":
-				return blockStack.pop() === true ? "},this);" : "}";
-			case 'if':
-			case 'while':
-				blockStack.push(false);
-				assert(text, "Tpl.processCommand(command): 无法处理命令{" + head + " " + text + " } (" + head + " 命名的格式为 {" + head + " condition}");
-				return Tpl.processStatement(text, "\"\"") + head + "(Object.isArray($tmp)?$tmp.length:$tmp){";
-			case 'for':
-				if (/^\(/.test(text)) {
-					blockStack.push(false);
-					return "for" + text + "{";
-				}
-
-				command = text.split(/\s+in\s+/);
-				blockStack.push(true);
-				assert(command.length === 2 && command[0] && command[1], "Tpl.processCommand(command): 无法处理命令{for " + text + " } (for 命名的格式为 {for var_name in obj}");
-				return Tpl.processStatement(command[1], "null") + 'Object.each($tmp, function(' + command[0].replace('var ', '') + ', $index, $value){';
-			case 'else':
-				text = text.trim();
-				if (/^if\b/.exec(text)) {
-					blockStack.pop();
-					return '}else ' + Tpl.processCommand(text, blockStack);
-				}
-				return '}else{';
-			case 'var':
-				return command + ';';
-			case 'eval':
-				return text;
-			default:
-				return Tpl.processStatement(command || "\"\"", "\"\"") + 'if($tmp!=undefined){$output+=$tmp;}';
-		}
-	},
-	
+		
 	/**
 	 * 把一个模板编译为函数。
 	 * @param {String} tpl 表示模板的字符串。
 	 * @return {Function} 返回的函数。
 	 */
 	compile: function(tpl){
+		tpl = Tpl.build(Tpl.lexer(tpl));
+		return new Function("_", tpl);
+	},
+	
+	/**
+	 * 对一个模板进行词法解析。返回拆分的数据单元。
+	 * @param {String} tpl 表示模板的字符串。
+	 * @return {Array} 返回解析后的数据单元。
+	 */
+	lexer: function (tpl) {
 		
-		var output = 'var $output="",$tmp;',
+		/**
+		 * [字符串1, 代码块1, 字符串2, 代码块2, ...]
+		 */
+		var output = [],
 			
 			// 块的开始位置。
 			blockStart = -1,
 			
 			// 块的结束位置。
-			blockEnd = -1,
-			
-			blockStack = [];
+			blockEnd = -1;
 		
 		while ((blockStart = tpl.indexOf('{', blockStart + 1)) >= 0) {
-
-			output += '$output+="' + Tpl.encodeJs(tpl.substring(blockEnd + 1, blockStart)).replace(/\}\}/g, "}") + '";';
-
-			// 从  blockStart 处搜索 }
-			blockEnd = blockStart;
 
 			// 如果 { 后面是 { , 忽略之。
 			if (tpl.charAt(blockStart + 1) === '{') {
 				blockStart++;
 				continue;
 			}
+			
+			// 放入第一个数据区块。
+			output.push(tpl.substring(blockEnd + 1, blockStart));
 
-			// 找到第一个后面不是 } 的  } 字符。
+			// 从  blockStart 处搜索 }
+			blockEnd = blockStart;
+
+			// 搜索 } 字符，如果找到的字符尾随一个 } 则跳过。
 			do {
 				blockEnd = tpl.indexOf('}', blockEnd + 1);
 
-				if (tpl.charAt(blockEnd + 1) !== '}') {
+				if (tpl.charAt(blockEnd + 1) !== '}' || tpl.charAt(blockEnd + 2) === '}') {
 					break;
 				}
 
@@ -117,37 +94,125 @@ var Tpl = {
 			} while (true);
 
 			if (blockEnd == -1) {
-				blockEnd = blockStart++;
-				assert(false, "Tpl.compile(tpl): {tpl} 出现了未关闭的标签。", tpl);
+				Tpl.throwError("缺少 '}'", tpl.substr(blockStart));
 			} else {
-				output += Tpl.processCommand(tpl.substring(blockStart + 1, blockStart = blockEnd).trim().replace(/\}\}/g, "}"), blockStack);
+				output.push(tpl.substring(blockStart + 1, blockStart = blockEnd).trim());
 			}
 
 		}
 		
-		output += '$output+="' + Tpl.encodeJs(tpl.substring(blockEnd + 1, tpl.length)) + '";return $output';
-
-		assert(blockStack.length === 0, "Tpl.compile(tpl): {tpl} 中 if/for 和 end 数量不匹配。");
+		// 剩余的部分。
+		output.push(tpl.substring(blockEnd + 1, tpl.length));
 		
-		try{
-		
-			return new Function("$data", output);
-
-		} catch (e) {
-			trace.error(output + ": " + e.message);
-
-			return Function.from(tpl);
-		}
+		return output;
 	},
 	
 	/**
-	 * 使用指定的数据解析模板，并返回生成的内容。
-	 * @param {String} tpl 表示模板的字符串。
-	 * @param {Object} data 数据。
-	 * @return {String} 处理后的字符串。 
+	 * 将词法解析器的结果编译成函数源码。
 	 */
-	parse: function(tpl, data) {
-		return (Tpl.cache[tpl] || (Tpl.cache[tpl] = Tpl.compile(tpl))).call(data, data);
+	build: function(lexerOutput){
+		
+		var output = "var __OUTPUT__=\"\",__INDEX__,__KEY__,__TARGET__,__TMP__;";
+		
+		for(var i = 0, len = lexerOutput.length, source, isString = true; i < len; i++){
+			source = lexerOutput[i].replace(/([\{\}]){2}/g, "$1");
+			
+			if(isString){
+				output += "__OUTPUT__+=\"" + source.replace(/[\"\\\n\r]/g, Tpl.replaceSpecialChars) + "\";";
+			} else {
+				output += Tpl.parseMacro(source);
+			}
+			
+			isString = !isString;
+		}
+		
+		output +=";return __OUTPUT__";
+		
+		return output;
+	},
+	
+	parseMacro: function(macro){
+		var command = (macro.match(/^\w+\b/) || [''])[0],
+			params = macro.substr(command.length);
+
+		switch(command) {
+			case "end":
+				return "}";
+			case 'if':
+			case 'while':
+				if(!params)
+					Tpl.throwError("'" + command + "' 语句缺少条件, '" + command + "' 语句的格式为 {" + command + " condition}", macro);
+				macro = command + "(Object.isArray(__TMP__=" + params + ")?__TMP__.length:__TMP__){";
+				break;
+			case 'for':
+				if(command = /^\s*(var\s+)?([\w$]+)\s+in\s+/.exec(params)) {
+					macro = "__INDEX__=0;__TARGET__=" + params.substr(command[0].length) + ";for(__KEY__ in __TARGET__){if(!__TARGET__.hasOwnProperty(__KEY__))continue;__INDEX__++;var " + command[2] + "=__TARGET__[__KEY__];";	
+				} else if (/^\(/.test(params)) {
+					return macro + "{";
+				} else {
+					Tpl.throwError("'for' 语法错误， 'for' 语句的格式为 {for var_name in obj}", macro);
+				}
+				break;
+			case 'else':
+				return '}else ' + (/^\s*if\b/.exec(params) ? Tpl.parseMacro(params.trim()) : '{');
+			case 'var':
+				macro += ';';
+				break;
+			case 'function':
+				macro += '{';
+				break;
+			case 'break':
+			case 'continue':
+				break;
+			case 'eval':
+				macro = params;
+				break;
+			default:
+				macro = '__TMP__=' + macro + ';if(__TMP__!=undefined)__OUTPUT__+=__TMP__;';
+				break;
+		}
+		
+		return macro.replace(/@(\w+)\b/g, Tpl.replaceConsts);
+	},
+
+	isLast: function(obj, index){
+		if(typeof obj.length === 'number')
+			return index >= obj.length - 1;
+			
+		for(var p in obj){
+			index--;	
+		}
+		
+		return !index;
+	},
+	
+	consts: {
+		'target': '__TARGET__',
+		'key': '__KEY__',
+		'index': '__INDEX__',
+		'first': '__INDEX__==0',
+		'last': 'Tpl.isLast(__TARGET__,__INDEX__)',
+		'odd': '__INDEX__%2===1',
+		'even': '__INDEX__%2'
+	},
+	
+	replaceConsts: function(_, consts){
+		return Tpl.consts[consts] || _;
+	},
+	
+	specialChars: {
+		'"': '\\"',
+		'\n': '\\n',
+		'\r': '\\r',
+		'\\': '\\\\'
+	},
+	
+	replaceSpecialChars: function(specialChar){
+		return Tpl.specialChars[specialChar] || specialChar;
+	},
+
+	throwError: function(message, tpl){
+		throw new SyntaxError("Tpl.parse: " + message + "。 (在 '" + tpl +"' 附近)");
 	}
 	
 };

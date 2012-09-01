@@ -5,7 +5,7 @@
 		return code;
 	},	send: function(options) {
 		if (!options.crossDomain) {
-			return Ajax.XHR.send.call(this, options);		}		options.type = "GET";		// cache		if (!options.cache || options.options.cache !== false) {
+			return Ajax.XHR.send.call(this, options);		}		options.type = "GET";		// cache		if (!options.cache !== false) {
 			options.cache = false;
 			options.url = Ajax.concatUrl(options.url, '_=' + Date.now() + JPlus.id++);		}		var script = options.script = document.createElement('SCRIPT'),
 			t,
@@ -59,7 +59,7 @@
 				}
 			};
 
-		script.src = me.url;
+		script.src = options.url;
 		script.type = "text/javascript";
 		script.async = "async";
 		if (options.charset)
