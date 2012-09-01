@@ -72,9 +72,11 @@ var MenuItem = TreeControl.Item.extend({
 	 *
 	 */
 	init: function() {
-		this.unselectable();
-		this.on('mouseover', this.onMouseOver);
-		this.on('mouseout', this.onMouseOut);
+		if(this.hasClass('x-' + this.xtype)) {
+			this.unselectable();
+			this.on('mouseover', this.onMouseOver);
+			this.on('mouseout', this.onMouseOut);
+		}
 	},
 	
 	_cancelHideMenu: function(e) {
@@ -155,7 +157,7 @@ var Menu = TreeControl.extend({
 					// 保存原有 childControl 。
 					var t = childControl;
 					childControl = new MenuItem;
-					childControl.append(t);
+					childControl.content().replaceWith(t);
 				}
 				if (parent) {
 					parent.prepend(childControl);
