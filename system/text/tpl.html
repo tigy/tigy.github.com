@@ -13,8 +13,8 @@
 			
 			Demo.writeTestCases({
 			    'Tpl.parse': {
-			        'Tpl.parse("{for p in path}{p}{end}", {path: [1,2,3]})': "123",
-			        'Tpl.parse("{if a}abc{else if b.c}def{end}", {a:0, b: {c: 4}})': "def",
+			        'Tpl.parse("{for p in _.path}{p}{end}", {path: [1,2,3]})': "123",
+			        'Tpl.parse("{if _.a}abc{else if _.b.c}def{end}", {a:0, b: {c: 4}})': "def",
 			        'Tpl.parse("{var aa = 4}{aa}", {a:0, b: {c: 4}})': "4"
 			    }
 			});
@@ -33,7 +33,7 @@
 		</script>
 		
 		<textarea id="from" class="demo">遍历 dataA 对象: 
-{for a in dataA}
+{for a in _.dataA}
 	判断当前遍历的数据      {a} : 
 	{if a}
 		不空

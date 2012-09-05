@@ -2,6 +2,10 @@
  * @author xuld
  */
 
+
+
+using("System.Utils.Set");
+
 Object.extend(JPlus, {
 
 	classMembers: {

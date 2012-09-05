@@ -158,12 +158,13 @@ var Marquee = Class({
 	
 					}
 	
-					options.tweens[prop] = from + '-' + to;
+					options.params[prop] = from + '-' + to;
 	
 					// 记录当前正在转向的目标索引。
 					me._currentIndex = index;
-				}
-			}, 'abort');
+				},
+				link: 'stop'
+			});
 		}
 		return this;
 

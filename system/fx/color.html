@@ -21,7 +21,7 @@
                 'Fx.Tween#run(#000000)': function() {
                      return tween.run({
                         target: Dom.get('a'),
-                        tweens: {
+                        params: {
                           backgroundColor: '#000000'
                         }
                     });
@@ -29,7 +29,7 @@
                 'Fx.Tween#run(rgb(0, 0, 0))': function() {
                      return tween.run({
                         target: Dom.get('a'),
-                        tweens: {
+                        params: {
                           backgroundColor: 'rgb(0, 0, 0)'
                         }
                     });
@@ -37,7 +37,7 @@
                 'Fx.Tween#run("#000000-#ffffff")': function() {
                      return tween.run({
                         target: Dom.get('a'),
-                        tweens: {
+                        params: {
                           backgroundColor: '#000000-#ffffff'
                         }
                     });
