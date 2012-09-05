@@ -27,7 +27,7 @@
 
 					try {
 
-						if (error >= 0) {
+						if (error === 0) {
 							options.status = 200;
 							options.statusText = "OK";
 							options.errorMessage = null;
@@ -72,7 +72,7 @@
 		script.onload = script.onreadystatechange = callback;
 
 		script.onerror = function(e) {
-			callback(e.message, 2);
+			callback('Network Error', 2);
 		};		
 		if (options.timeouts > 0) {
 			setTimeout(function() {
