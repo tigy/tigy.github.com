@@ -10,7 +10,7 @@ using("System.Dom.Drag");
 
 
 
-var Droppable = (function(){
+(function(){
 	
 	/**
 	 * 全部的区。
@@ -19,7 +19,7 @@ var Droppable = (function(){
 		
 		dp = Draggable.prototype,
 		
-		Droppable = Class({
+		Droppable = window.Droppable = Class({
 		
 			initEvent: function (draggable, e) {
 				e.draggable = draggable;
@@ -202,9 +202,5 @@ var Droppable = (function(){
 		},
 		initEvent: mouseEvents && mouseEvents.initEvent
 	});
-	
-	
-	return Droppable;
-
 })();
 
