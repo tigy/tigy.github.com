@@ -1480,6 +1480,8 @@
 				this.push(value);
 			return exists;
 		},
+		
+		/// TODO: clear
 
 		/**
 		 * 将指定的 *value* 插入到当前数组的指定位置。
@@ -1492,6 +1494,7 @@
 	     * </pre>
 		 */
 		insert: function (index, value) {
+			assert.deprected("Array#insert 即将从 System.Core.Base 移除。要使用此函数，可引用 System.Utils.Array 组件。");
 			assert.isNumber(index, "Array#insert(index, value): {index} ~");
 			var me = this, tmp;
 			if (index < 0 || index >= me.length) {
@@ -1505,6 +1508,8 @@
 			return index;
 
 		},
+		
+		/// TODO: clear
 
 		/**
 		 * 对当前数组的每个元素调用其指定属性名的函数，并将返回值放入新的数组返回。
