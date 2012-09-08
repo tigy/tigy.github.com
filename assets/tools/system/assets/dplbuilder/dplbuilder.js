@@ -239,7 +239,7 @@ var DplBuilder = {
 	                        <option value="bottom" title="置底一个组件">置底</option>\
 	                    </select>\
 	                  \
-	                      <input type="text" class="x-textbox control-namespace" placeholder="输入组件的名字空间" />\
+	                      <input type="text" class="x-textbox control-namespace" placeholder="输入组件全名" />\
 	                   <a href="javascript://添加一个组件" class="x-button x-button-success" onclick="DplBuilder.addControl()">添加</a>\
 	            \
 	            </div>\
@@ -263,7 +263,7 @@ var DplBuilder = {
 			return false;	
 		}	
 		if(namespace.indexOf('.') === -1 || namespace.indexOf('.') === namespace.lastIndexOf('.') || /\.$/.test(namespace)) {
-			alert('组件名字空间格式如下：组件库.分类.组件名。  如  JPlus.Dom.Base ');	
+			alert('组件全名格式如下：组件库.分类.组件名。  如  JPlus.Dom.Base ');	
 			return  false;
 		}
 	},

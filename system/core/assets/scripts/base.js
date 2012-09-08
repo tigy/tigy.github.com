@@ -1882,15 +1882,15 @@ function assert(value, message) {
 }
 
 /**
- * 使用一个名空间。
- * @param {String} namespace 名字空间。
+ * 载入一个组件的 js 和 css源码。
+ * @param {String} namespace 组件全名。
  * @example <pre>
  * using("System.Dom.Keys");
  * </pre>
  */
 function using(namespace, isStyle) {
 
-	assert.isString(namespace, "using(ns): {ns} 不是合法的名字空间。");
+	assert.isString(namespace, "using(ns): {ns} 不是合法的组件全名。");
 
 	var cache = using[isStyle ? 'styles' : 'scripts'];
 
@@ -1942,8 +1942,8 @@ function using(namespace, isStyle) {
 }
 
 /**
- * 导入指定名字空间表示的样式文件。
- * @param {String} namespace 名字空间。
+ * 导入指定组件全名表示的样式文件。
+ * @param {String} namespace 组件全名。
  */
 function imports(namespace) {
 	return using(namespace, true);
@@ -2836,7 +2836,7 @@ function imports(namespace) {
 		styles: [],
 
 		/**
-         * 全部已载入的名字空间。
+         * 全部已载入的组件全名。
          * @type Array
          * @private
          */
@@ -2868,12 +2868,12 @@ function imports(namespace) {
 		})().replace("system/core/assets/scripts/", ""),
 
 		/**
-         * 将指定的名字空间转为路径。
-         * @param {String} ns 名字空间。
+         * 将指定的组件全名转为路径。
+         * @param {String} namespace 组件全名。
          * @param {Boolean} isStyle=false 是否为样式表。
          */
-		resolve: function (ns, isStyle) {
-			return ns.replace(/^([^.]+\.[^.]+)\./, isStyle ? '$1.assets.styles.' : '$1.assets.scripts.').replace(/\./g, '/');
+		resolve: function (namespace, isStyle) {
+			return namespace.replace(/^([^.]+\.[^.]+)\./, isStyle ? '$1.assets.styles.' : '$1.assets.scripts.').replace(/\./g, '/');
 		}
 
 	});
