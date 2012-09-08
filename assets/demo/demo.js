@@ -74,16 +74,37 @@ Demo.extend(Demo, {
 
 	// 代码处理
 
-	encodeHTML: function (value) {
-		return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\'/g, "&#39;").replace(/\"/g, "&quot;");
+	encodeHTML: (function(map){
+		function replaceMap(v){
+			return map[v];
+		}
+		
+		return function (value) {
+			return value.replace(/[&<>\'\"]/g, replaceMap);
+		};
+	})({
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'\'': '&#39;',
+		'\"': '&quot;'
+	}),
 
-	},
-
-	encodeJs: function (value) {
-		return value.replace(/\\/g, "\\\\").replace(/'/g, "\\\'").replace(/"/g, "\\\"").replace(/\r/g, "\\r").replace(/\n/g, "\\n");
-
-	},
-
+	encodeJs: (function(map){
+		function replaceMap(v){
+			return map[v];
+		}
+		
+		return function (value) {
+			return value.replace(/[\\\'\"\r\n]/g, replaceMap);
+		};
+	})({
+		'\\': '\\\\',
+		'\'': '\\\'',
+		'\"': '\\\"',
+		'\r': '\\r',
+		'\\n': '\\n'
+	}),
 
 	/**
  	 * 将字符串从 utf-8 字符串转义。

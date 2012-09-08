@@ -112,7 +112,7 @@ var Tpl = {
 	 */
 	build: function(lexerOutput){
 		
-		var output = "var __OUTPUT__=\"\",__INDEX__,__KEY__,__TARGET__,__TMP__;";
+		var output = "var __OUTPUT__=\"\",__INDEX__,__KEY__,__TARGET__,__TMP__;with(_){";
 		
 		for(var i = 0, len = lexerOutput.length, source, isString = true; i < len; i++){
 			source = lexerOutput[i].replace(/([\{\}]){2}/g, "$1");
@@ -126,7 +126,7 @@ var Tpl = {
 			isString = !isString;
 		}
 		
-		output +=";return __OUTPUT__";
+		output +="};return __OUTPUT__";
 		
 		return output;
 	},
