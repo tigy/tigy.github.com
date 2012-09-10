@@ -21,25 +21,12 @@
 					// 删除当前脚本。
 					script.parentNode.removeChild(script);
 
-					// 保存 errorCode 。
-					options.errorCode = error;
+					try {												if(error < 0) {							options.status = error;							options.statusText = "";						} else {							options.status = 200;							options.statusText = "OK";						}
 
-					try {
-
-						if (error === 0) {
-							options.status = 200;
-							options.statusText = "OK";
-							options.errorMessage = null;
-						} else {
-							options.status = error;
-							options.statusText = null;
-							options.errorMessage = errorMessage;
-						}
-
-						if (error) {
+						if (error) {														options.errorCode = error;							options.errorMessage = errorMessage;							
 							if (options.error)
 								options.error.call(options.target, options.errorMessage, script);
-						} else {
+						} else {														options.errorCode = 0;							options.errorMessage = null;							
 							if (options.success)
 								options.success.call(options.target, options.response, script);
 						}

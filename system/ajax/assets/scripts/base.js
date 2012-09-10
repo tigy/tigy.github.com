@@ -94,7 +94,7 @@ var Ajax = (function() {
 			// * 发送数据错误的回调。
 			// * @type Function
 			// */
-			//errorCode: null,
+			//error: null,
 	
 			///**
 			// * 发送数据完成的回调。
@@ -418,30 +418,30 @@ var Ajax = (function() {
 			 * - 1: HTTP 成功相应，但返回的状态码被认为是不对的。
 			 * - 2: HTTP 成功相应，但返回的内容格式不对。
 			 */
-			callback = options.callback = function(errorMessage, errorCode) {
+			callback = options.callback = function(errorMessage, error) {
 
 				// xhr
 				var xhr = options.xhr;
 
 				try {
 
-					if (xhr && (errorCode || xhr.readyState === 4)) {
+					if (xhr && (error || xhr.readyState === 4)) {
 
 						// 删除 readystatechange  。
 						// 删除 options.callback 避免被再次触发。
 						xhr.onreadystatechange = options.callback = Function.empty;
 
 						// 如果存在错误。
-						if (errorCode) {
+						if (error) {
 
 							// 如果是因为超时引发的，手动中止请求。
 							if (xhr.readyState !== 4) {
 								xhr.abort();
 							}
 
-							// 出现错误 status = errorCode 。
-							options.status = errorCode;
-							options.statusText = null;
+							// 出现错误 status = error 。
+							options.status = error;
+							options.statusText = "";
 							options.errorMessage = errorMessage;
 						} else {
 
@@ -458,27 +458,27 @@ var Ajax = (function() {
 							// 检验状态码是否正确。
 							if (Ajax.checkStatus(options.status)) {
 								// 如果请求合法，且数据返回正常，则使用 getResponse 获取解析的原始数据。
-								errorCode = 0;
+								error = 0;
 								options.errorMessage = null;
 								try {
 									options.response = options.getResponse(xhr);
 								} catch (getResponseError) {
-									errorCode = 2;
+									error = 2;
 									options.errorMessage = getResponseError.message;
 								}
 							} else {
-								errorCode = 1;
+								error = 1;
 								options.errorMessage = options.statusText;
 							}
 
 						}
 
-						// 保存 errorCode 。
-						options.errorCode = errorCode;
+						// 保存 error 。
+						options.errorCode = error;
 
 						try {
 
-							if (errorCode) {
+							if (error) {
 								if (options.error)
 									options.error.call(options.target, options.errorMessage, xhr);
 
