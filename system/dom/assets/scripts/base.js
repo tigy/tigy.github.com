@@ -2443,6 +2443,35 @@
 			return this;
 			
 		},
+		
+		/**
+		 * 批量为当前 DOM 节点绑定事件。 
+		 * @since 3.2
+		 */
+		bind: function(eventAndSelector, handler){
+			
+			var eventName, selector;
+			
+			if(Object.isObject(eventAndSelector)){
+				for(eventName in eventAndSelector) {
+					this.on(eventName, eventAndSelector[eventName]);
+				}
+			} else {
+				
+				eventName = (/^\w+/.match(eventAndSelector) || [''])[0];
+					
+				assert(eventName, "Dom#bind(eventAndSelector, handler): {eventAndSelector} 中不存在事件信息。正确的 eventAndSelector 格式： click.selector")
+				
+				if(selector = eventAndSelector.substr(eventName.length)){
+					this.delegate(eventName, delegateEventName, handler);
+				} else {
+					this.on(eventName, handler);
+				}
+				
+			}
+			
+			return this;
+		},
 
 		/**
 		 * 通过当前 Dom 对象代理执行子节点的事件。
