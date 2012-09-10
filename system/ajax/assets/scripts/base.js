@@ -216,7 +216,7 @@ var Ajax = (function() {
 					);
 	
 				}
-
+				
 				// 当前用于传输的工具。
 				transport = Ajax.transports[options.dataType];
 
@@ -282,6 +282,10 @@ var Ajax = (function() {
 		concatUrl: function(url, param) {
 			return param ? url + (url.indexOf('?') >= 0 ? '&' : '?') + param : url;
 		},
+		
+		addCachePostfix: function(url){
+			return /[?&]_=/.test(url) ? url : Ajax.concatUrl(url, '_=' + Date.now() + JPlus.id++);
+		},
 
 		/**
 		 * 判断一个 HTTP 状态码是否表示正常响应。
@@ -321,7 +325,7 @@ var Ajax = (function() {
 	 * 公共的 XHR 对象。
 	 */
 	Ajax.transports.text = Ajax.XHR = {
-
+		
 		/**
 		 * 根据 xhr 获取响应。
 		 * @type {XMLHttpRequest} xhr 要获取的 xhr 。
@@ -368,11 +372,11 @@ var Ajax = (function() {
 
 			// cache
 			if (options.cache === false) {
-				options.url = Ajax.concatUrl(options.url, '_=' + Date.now() + JPlus.id++);
+				options.url = Ajax.addCachePostfix(options.url);
 			}
 
 			// headers
-			headers = options.headers = {};
+			headers = {};
 
 			// headers['Accept']
 			headers.Accept = options.dataType in Ajax.accepts ? Ajax.accepts[options.dataType] + ", " + defaultAccepts + "; q=0.01" : defaultAccepts;
@@ -394,7 +398,7 @@ var Ajax = (function() {
 
 			// 如果参数有 headers, 复制到当前 headers 。
 			if (options.headers) {
-				Object.extend(headers, options.headers);
+				options.headers = Object.extend(headers, options.headers);
 			}
 
 			// 发送请求。

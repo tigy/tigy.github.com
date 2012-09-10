@@ -5,9 +5,8 @@
 		return code;
 	},	send: function(options) {
 		if (!options.crossDomain) {
-			return Ajax.XHR.send.call(this, options);		}		options.type = "GET";		// cache		if (!options.cache !== false) {
-			options.cache = false;
-			options.url = Ajax.concatUrl(options.url, '_=' + Date.now() + JPlus.id++);		}		var script = options.script = document.createElement('SCRIPT'),
+			return Ajax.XHR.send.call(this, options);		}		options.type = "GET";				// cache		if (options.cache !== false) {
+			options.cache = false;						options.url = Ajax.addCachePostfix(options.url);		}		// data		if (options.data) {			options.url = Ajax.concatUrl(options.url, options.data);			options.data = null;		}		var script = options.script = document.createElement('SCRIPT'),
 			t,
 			callback = options.callback = function(errorMessage, error) {
 				var script = options.script;
