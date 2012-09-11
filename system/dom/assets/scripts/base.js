@@ -3867,27 +3867,27 @@
 			var topLevel = false;
 
 			try {
-				topLevel = window.frameElement == null;
+				topLevel = window.frameElement == null && document.documentElement;
 			} catch(e) {
 			}
 
-			if(topLevel && document.documentElement.doScroll) {
+			if(topLevel && topLevel.doScroll) {
 
 				/**
 				 * 为 IE 检查状态。
 				 * @private
 				 */
-				(function() {
+				(function doScrollCheck() {
 					if(Dom.isReady) {
 						return;
 					}
 
 					try {
-						// http:// javascript.nwbox.com/IEContentLoaded/
-						document.documentElement.doScroll("left");
+						// Use the trick by Diego Perini
+						// http://javascript.nwbox.com/IEContentLoaded/
+						topLevel.doScroll("left");
 					} catch(e) {
-						setTimeout(arguments.callee, 1);
-						return;
+						return setTimeout(doScrollCheck, 50);
 					}
 
 					Dom.ready();
