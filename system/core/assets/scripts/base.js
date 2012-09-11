@@ -205,7 +205,7 @@
 						r = target[funcName].apply(target, arguments);
 						
 						// 如果不是 getter，返回 this 链式引用。
-						return target === r ? this : r;
+						return target === r || r === undefined ? this : r;
 					};
 				}, {}), args);  // 支持 Dom.implement, 传递第二个参数。
 			},
@@ -233,13 +233,8 @@
 			 *  },
 			 *
 			 *  // 当用户执行 target.trigger(e) 时执行下列函数:
-			 *  trigger: function(target, type, fn, e){
+			 *  dispatch: function(target, type, fn, e){
 			 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。e 是参数。
-			 *  },
-			 *
-			 *  // 当 fn 被执行时首先执行下列函数:
-			 *  initEvent: function(e){
-			 * 		// 其中 e 是参数。
 			 *  }
 			 *
 			 * });
@@ -259,7 +254,7 @@
 			 * remove(obj, '事件名', evtTrigger) 移除事件。
 			 *
 			 * 当用户使用 obj.trigger(参数) 时， 系统会找到相应 evtTrigger， 如果事件有trigger， 则使用
-			 * trigger(obj, '事件名', evtTrigger, 参数) 触发事件。 如果没有， 则直接调用
+			 * dispatch(obj, '事件名', evtTrigger, 参数) 触发事件。 如果没有， 则直接调用
 			 * evtTrigger(参数)。
 			 *
 			 * 下面分别介绍各函数的具体内容。
@@ -1135,13 +1130,15 @@
 			if (!evt) {
 
 				// 支持自定义安装。
-				d[type] = evt = function (e) {
+				d[type] = evt = d.createHandler ? d.createHandler() : function (e) {
 					var listener = arguments.callee, handlers = listener.handlers.slice(0), i = -1, len = handlers.length;
 
 					// 循环直到 return false。
-					while (++i < len)
-						if (handlers[i][0].call(handlers[i][1], e) === false)
+					while (++i < len) {
+						if (handlers[i][0].call(handlers[i][1], e) === false) {
 							return false;
+						}
+					}
 
 					return true;
 				};
@@ -1150,7 +1147,7 @@
 				d = getMgr(me, type);
 
 				// 当前事件的全部函数。
-				evt.handlers = d.initEvent ? [[d.initEvent, me]] : [];
+				evt.handlers = [];
 
 				// 添加事件。
 				if (d.add) {
@@ -1225,7 +1222,7 @@
 							if (handlers[i][0] === listener) {
 								handlers.splice(i, 1);
 
-								if (!i || (i === 1 && handlers[0] === d.initEvent)) {
+								if (!i) {
 									listener = 0;
 								}
 
@@ -1286,7 +1283,7 @@
 			var me = this, evt = me.dataField().$event, eMgr;
 
 			// 执行事件。
-			return !evt || !(evt = evt[type]) || ((eMgr = getMgr(me, type)).trigger ? eMgr.trigger(me, type, evt, e) : evt(e));
+			return !evt || !(evt = evt[type]) || ((eMgr = getMgr(me, type)).dispatch ? eMgr.dispatch(me, type, evt, e) : evt(e));
 
 		},
 

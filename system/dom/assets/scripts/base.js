@@ -401,15 +401,20 @@
 				this.returnValue = false;
 			},
 			
+			/// TODO: clear
+			
 			/**
 			 * 停止默认事件和冒泡。
 			 * @remark 此函数可以完全撤销事件。 事件处理函数中 return false 和调用 stop() 是不同的， return
 			 *         false 只会阻止当前事件其它函数执行， 而 stop() 只阻止事件冒泡和默认事件，不阻止当前事件其它函数。
 			 */
 			stop: function() {
+				assert.deprected('Dom.Event#stop() 已过时，请改用 return false 实现阻止事件。');
 				this.stopPropagation();
 				this.preventDefault();
 			},
+			
+			/// TODO: clear
 			
 			/**
 			 * 获取当前发生事件 Dom 对象。
@@ -449,6 +454,32 @@
 		 * @ignore
 		 */
 		defaultEvent = {
+			
+			/**
+			 * 创建事件的默认执行函数。
+			 */
+			createHandler:  function () {
+				var handler = function(e){
+						eventFix[e.type](e);
+						var listener = arguments.callee, handlers = listener.handlers.slice(0), i = -1, len = handlers.length;
+
+						// 循环直到 return false。
+						while (++i < len) {
+							if (handlers[i][0].call(handlers[i][1], e) === false) {
+								e.stopPropagation();
+								e.preventDefault();
+								return false;
+							}
+						}
+
+						return true;
+					},
+					initEvent = this.initEvent;
+					
+				return initEvent ? function(e){
+					return initEvent(e) !== false && handler(e);
+				} : handler;
+			},
 
 			/**
 			 * 创建当前事件可用的参数。
@@ -457,7 +488,7 @@
 			 * @param {Object} target 事件目标。
 			 * @return {Event} e 事件参数。
 			 */
-			trigger: function (dom, type, fn, e) {
+			dispatch: function (dom, type, fn, e) {
 				dom = dom.node;
 				
 				var event = e;
@@ -2472,6 +2503,16 @@
 			
 			return this;
 		},
+		
+		/**
+		 * 模拟提交表单。
+		 */
+		submit: function(){
+			if(this.trigger('submit')){
+				this.node.submit();
+			}
+			return this;
+		},
 
 		/**
 		 * 通过当前 Dom 对象代理执行子节点的事件。
@@ -2557,6 +2598,8 @@
 						handlerInfo = actucalHandlers[i];
 						
 						if(handlerInfo[0].call(handlerInfo[1], e) === false) {
+							e.stopPropagation();
+							e.preventDefault();
 							break;
 						}
 					}
@@ -3452,7 +3495,7 @@
 	/// #endif
 
 	// Dom 函数。
-	Dom.defineMethods('node', 'scrollIntoView focus blur select click submit reset', 1);
+	Dom.defineMethods('node', 'scrollIntoView focus blur select click reset', 1);
 	
 	// 拷贝 DOM Event 到 document 。
 	t = document.constructor;
@@ -3485,7 +3528,11 @@
 
 		domReady = 'DOMContentLoaded';
 		t = Event.prototype;
+		
+		/// TODO: clear
 		t.stop = ep.stop;
+		
+		/// TODO: clear
 		t.getTarget = ep.getTarget;
 		
 	/// #if CompactMode
@@ -3496,7 +3543,11 @@
 		
 		defaultEvent.initEvent = function (e) {
 			e.target = e.srcElement;
+		
+		/// TODO: clear
 			e.stop = ep.stop;
+		
+		/// TODO: clear
 			e.getTarget = ep.getTarget;
 			e.stopPropagation = ep.stopPropagation;
 			e.preventDefault = ep.preventDefault;
