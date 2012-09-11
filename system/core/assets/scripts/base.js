@@ -859,7 +859,7 @@
 			browser = match[1],
 			
 			// IE678 = false, 其它 = true
-			isStd = !!eval("-[1,]");
+			isStd = !!+"\v1";
 
 		navigator["is" + browser] = navigator["is" + browser + parseInt(match[2])] = true;
 
