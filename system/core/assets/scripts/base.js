@@ -479,7 +479,7 @@
 		 * - {Array} array 当前正在遍历的数组。
 		 *
 		 * 可以让函数返回 **false** 来强制中止循环。
-		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @param {Object} [scope] 定义 *fn* 执行时 **this** 的值。
 		 * @return {Boolean} 如果循环是因为 *fn* 返回 **false** 而中止，则返回 **false**， 否则返回 **true**。
 		 * @see Array#each
 		 * @see Array#forEach
@@ -491,10 +491,10 @@
 	     * // 输出 'a : 1' 'c : 3'
 	     * </pre>
 		 */
-		each: function (iterable, fn, bind) {
+		each: function (iterable, fn, scope) {
 
-			assert(!Object.isFunction(iterable), "Object.each(iterable, fn, bind): {iterable} 不能是函数。 ", iterable);
-			assert(Object.isFunction(fn), "Object.each(iterable, fn, bind): {fn} 必须是函数。", fn);
+			assert(!Object.isFunction(iterable), "Object.each(iterable, fn, scope): {iterable} 不能是函数。 ", iterable);
+			assert(Object.isFunction(fn), "Object.each(iterable, fn, scope): {fn} 必须是函数。", fn);
 			
 			// 如果 iterable 是 null， 无需遍历 。
 			if (iterable != null) {
@@ -504,10 +504,10 @@
 
 					// Object 遍历。
 					for (var key in iterable)
-						if (fn.call(bind, iterable[key], key, iterable) === false)
+						if (fn.call(scope, iterable[key], key, iterable) === false)
 							return false;
 				} else {
-					return each.call(iterable, fn, bind);
+					return each.call(iterable, fn, scope);
 				}
 
 			}
@@ -525,7 +525,7 @@
 		 * - {Number} index 当前元素的索引。
 		 * - {Array} array 当前正在遍历的数组。
 		 *
-		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @param {Object} [scope] 定义 *fn* 执行时 **this** 的值。
 		 * @param {Object} [dest] 仅当 *iterable* 是字符串时，传递 *dest* 可以将函数的返回值保存到 dest。
 		 * @return {Object/Undefiend} 返回的结果对象。当 *iterable* 是字符串时且未指定 dest 时，返回空。
 		 * @example
@@ -1094,7 +1094,7 @@
 		 * 增加一个事件监听者。
 		 * @param {String} eventName 事件名。
 		 * @param {Function} eventHandler 监听函数。当事件被处罚时会执行此函数。
-		 * @param {Object} bind=this *eventHandler* 执行时的作用域。
+		 * @param {Object} scope=this *eventHandler* 执行时的作用域。
 		 * @return this
 		 * @example
 		 * <pre>
@@ -1113,9 +1113,9 @@
          * });
          * </pre>
 		 */
-		on: function (eventName, eventHandler, bind) {
+		on: function (eventName, eventHandler, scope) {
 
-			assert.isFunction(eventHandler, 'JPlus.Base#on(eventName, eventHandler, bind): {eventHandler} ~');
+			assert.isFunction(eventHandler, 'JPlus.Base#on(eventName, eventHandler, scope): {eventHandler} ~');
 
 			// 获取本对象 本对象的数据内容 本事件值
 			var me = this,
@@ -1130,7 +1130,7 @@
 			eventListener = data[eventName];
 			
 			// 生成默认的事件作用域。
-			bind = [eventHandler, bind || me];
+			scope = [eventHandler, scope || me];
 
 			// 如果未绑定过这个事件, 则不存在监听器，先创建一个有关的监听器。
 			if (!eventListener) {
@@ -1165,8 +1165,8 @@
 				
 				// 当前事件的全部函数。
 				eventListener.handlers = eventManager.initEvent ? 
-					[[eventManager.initEvent, me, true], bind] : 
-					[bind];
+					[[eventManager.initEvent, me, true], scope] : 
+					[scope];
 
 				// 如果事件允许阻止，则存储字段。
 				if(eventManager.stopEvent) {
@@ -1181,7 +1181,7 @@
 			} else {
 						
 				// 添加到 handlers 。
-				eventListener.handlers.push(bind);
+				eventListener.handlers.push(scope);
 			}
 
 
@@ -1331,7 +1331,7 @@
 		 * 增加一个仅监听一次的事件监听者。
 		 * @param {String} type 事件名。
 		 * @param {Function} listener 监听函数。当事件被处罚时会执行此函数。
-		 * @param {Object} bind=this *listener* 执行时的作用域。
+		 * @param {Object} scope=this *listener* 执行时的作用域。
 		 * @return this
 		 * @example <pre>
 	     *
@@ -1351,14 +1351,14 @@
          * a.trigger('click');   //  没有输出
          * </pre>
 		 */
-		once: function (eventName, eventHandler, bind) {
+		once: function (eventName, eventHandler, scope) {
 
 			assert.isFunction(eventHandler, 'JPlus.Base#once(eventName, eventHandler): {eventHandler} ~');
 
 			// 先插入一个用于删除句柄的函数。
 			return this.on(eventName, function(){
 				this.un(eventName, eventHandler).un(eventName, arguments.callee);	
-			}).on(eventName, eventHandler, bind);
+			}).on(eventName, eventHandler, scope);
 		}
 
 	});
@@ -1423,8 +1423,8 @@
 	Function.implementIf({
 
 		/**
-		 * 绑定函数作用域(**this**)。并返回一个新函数，这个函数内的 **this** 为指定的 *bind* 。
-		 * @param {Object} bind 要绑定的作用域的值。
+		 * 绑定函数作用域(**this**)。并返回一个新函数，这个函数内的 **this** 为指定的 *scope* 。
+		 * @param {Object} scope 要绑定的作用域的值。
 		 * @example
 		 * <pre>
 		 * var fn = function(){ trace(this);  };
@@ -1434,13 +1434,13 @@
 	     * fnProxy()  ; //  输出 0
 	     * </pre>
 		 */
-		bind: function (bind) {
+		bind: function (scope) {
 
 			var me = this;
 			
-			// 返回对 bind 绑定。
+			// 返回对 scope 绑定。
 			return function () {
-				return me.apply(bind, arguments);
+				return me.apply(scope, arguments);
 			}
 		}
 
@@ -1461,7 +1461,7 @@
 		 * - {Array} array 当前正在遍历的数组。
 		 *
 		 * 可以让函数返回 **false** 来强制中止循环。
-		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @param {Object} [scope] 定义 *fn* 执行时 **this** 的值。
 		 * @return {Boolean} 如果循环是因为 *fn* 返回 **false** 而中止，则返回 **false**， 否则返回 **true**。
 		 * @method
 		 * @see Object.each
@@ -1655,7 +1655,7 @@
 		 * - {Array} array 当前正在遍历的数组。
 		 *
 		 * 如果函数返回 **true**，则当前元素会被添加到返回值数组。
-		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @param {Object} [scope] 定义 *fn* 执行时 **this** 的值。
 		 * @return {Array} 返回一个新的数组，包含过滤后的元素。
 		 * @remark 目前除了 IE8-，主流浏览器都已内置此函数。
 		 * @see #each
@@ -1668,11 +1668,11 @@
 	     * })  //  [1, 2]
 	     * </pre>
 		 */
-		filter: function (fn, bind) {
-			assert.isFunction(fn, "Array#filter(fn, bind): {fn} ~");
+		filter: function (fn, scope) {
+			assert.isFunction(fn, "Array#filter(fn, scope): {fn} ~");
 			var r = [];
 			ap.forEach.call(this, function (value, i, array) {
-				if (fn.call(bind, value, i, array))
+				if (fn.call(scope, value, i, array))
 					r.push(value);
 			});
 			return r;
@@ -1687,7 +1687,7 @@
 		 * - {Array} array 当前正在遍历的数组。
 		 *
 		 * 可以让函数返回 **false** 来强制中止循环。
-		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @param {Object} [scope] 定义 *fn* 执行时 **this** 的值。
 		 * @see #each
 		 * @see Object.each
 		 * @see #filter
@@ -1734,17 +1734,17 @@
 	/**
 	 * 对数组运行一个函数。
 	 * @param {Function} fn 遍历的函数。参数依次 value, index, array 。
-	 * @param {Object} bind 对象。
+	 * @param {Object} scope 对象。
 	 * @return {Boolean} 返回一个布尔值，该值指示本次循环时，有无出现一个函数返回 false 而中止循环。
 	 */
-	function each(fn, bind) {
+	function each(fn, scope) {
 
-		assert(Object.isFunction(fn), "Array#each(fn, bind): {fn} 必须是一个函数。", fn);
+		assert(Object.isFunction(fn), "Array#each(fn, scope): {fn} 必须是一个函数。", fn);
 
 		var i = -1, me = this;
 
 		while (++i < me.length)
-			if (fn.call(bind, me[i], i, me) === false)
+			if (fn.call(scope, me[i], i, me) === false)
 				return false;
 		return true;
 	}

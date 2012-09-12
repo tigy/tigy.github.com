@@ -3848,7 +3848,7 @@
 		readyOrLoad = 'dom' + readyOrLoad;
 
 		// 设置 ready load
-		return function (fn, bind) {
+		return function (fn, scope) {
 			
 			// 忽略参数不是函数的调用。
 			var isFn = Object.isFunction(fn);
@@ -3857,12 +3857,12 @@
 			if(Dom[isReadyOrIsLoad]) {
 
 				if (isFn)
-					fn.call(bind);
+					fn.call(scope);
 
 				// 如果参数是函数。
 			} else if (isFn) {
 
-				document.on(readyOrLoad, fn, bind);
+				document.on(readyOrLoad, fn, scope);
 
 				// 触发事件。
 				// 如果存在 JS 之后的 CSS 文件， 肯能导致 document.body 为空，此时延时执行 DomReady
