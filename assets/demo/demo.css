@@ -9,7 +9,7 @@ article.demo, aside.demo, footer.demo, header.demo, hgroup.demo, nav.demo, secti
 }
 
 article.demo {
-	padding: 10px;
+	margin-bottom: 10px;
 }
 
 aside.demo {

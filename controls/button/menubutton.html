@@ -26,25 +26,52 @@
 	</head>
 	<body>
 		
-		<aside class="demo">
-   			<a id="a" href="#" class="x-button x-menubutton">菜单Menu<span class="x-button-menu x-button-menu-down"></span></a>
+		<section class="demo">
+			
+			<h2>创建组件</h2>
+		
+			<h3>预览</h3>
+			
+			<aside>
+	   			<a id="c1" href="javascript:;" onclick="trace('menu click')" class="x-button x-menubutton">菜单Menu<span class="x-button-menu"> </span></a>
+		   		<script>
+		   			var c1 = new MenuButton('c1');
+		   			c1.add('<a href="javascript:;" onclick="trace(\'item click\')" class="x-menuitem">click me</a>');
+		   		</script>
+	   		</aside>
+	   		
+	   		<script class="demo" type="text/html">
+	   			<a id="c1" href="javascript:;" onclick="trace('menu click')" class="x-button x-menubutton">菜单Menu<span class="x-button-menu"> </span></a>
+		   		<script>
+		   			var c1 = new MenuButton('c1');
+		   			c1.add('<a href="javascript:;" onclick="trace(\'item click\')" class="x-menuitem">click me</a>');
+		   		<\/script>
+	   		</script>
+		
+			<h3>预览</h3>
+			
+		</section>
+		
+		<h3>自定义图标</h3>
+   		
+   		<script class="demo" type="text/html">
+			<a id="a" href="#" class="x-button x-menubutton">
+   				菜单Menu
+   				<span class="x-icon x-button-icon"></span>
+   			</a>
+   			<ul class="x-dropdown x-menu">
+   				<li class="x-menu-item">选项Item</li>
+   			</ul>
 	   		<script>
 	   			var a = new MenuButton('a');
 	   			a.add('click me').setAttr('href', 'javascript:alert(\'hello\');');
 	   			a.add('<a href="javascript:alert(\'hello\');" class="x-menuitem">click me</a>');
 	   		</script>
-	   		
-   		</aside>
-		
-		<script class="demo" type="text/html">
-			<a id="a" href="#" class="x-button x-menubutton">菜单Menu<span class="x-button-menu x-button-menu-down"></span></a>
-	   		<script>
-	   			var a = new MenuButton('a');
-	   			a.add('click me').setAttr('href', 'javascript:alert(\'hello\');');
-	   			a.add('<a href="javascript:alert(\'hello\');">click me</a>');
-	   		<\/script>
-	   		
 		</script>
+		
+		<h3>使用纯 JS 创建</h3>
+		
+		
 		
 		<section class="demo-test">
    			<button class="x-button x-menubutton">菜单Menu<span class="x-button-menu x-button-menu-down"></span></button>

@@ -3020,14 +3020,17 @@ Demo.extend(Demo, {
 		} else {
 
 			var code = Demo.next(node);
-
-			// 如果跟了一个 <script type="text/html">
-			if (!code || code.type !== 'text/html') {
-				code = Demo.prev(node);
-			}
 			
-			code = Demo.createCode(code.innerHTML, 'text/html');
-			node.appendChild(code);
+			// 如果跟的不是 <script type="text/html">， 则动态创建。
+			if(code.tagName !== 'PRE' && code.tagName !== 'SCRIPT'){
+				
+				if (!code || code.type !== 'text/html') {
+					code = Demo.prev(node);
+				}
+				
+				code = Demo.createCode(code.innerHTML, 'text/html');
+				node.appendChild(code);
+			}
 		}
 
 		Demo.syntaxHighlight(code);
@@ -3061,16 +3064,30 @@ Demo.extend(Demo, {
 	 * 初始化页面上的全部查看源码链接。
 	 */
 	initViewSources: function () {
+		
+		// 处理 SECTION 标签。
+		var nodes = document.getElementsByTagName('SECTION');
+		for (var i = 0, node; node = nodes[i]; i++) {
+			for(var c = node.firstChild; c; c = c.nextSibling) {
+				if(c.nodeType === 1){
+					c.className	= 'demo';
+				}
+			}
+		}
 
 		// 处理 ASIDE 标签。
-		var nodes = document.getElementsByTagName('ASIDE');
-		for (var i = 0, len = nodes.length; i < len; i++) {
-			var node = nodes[i];
+		nodes = document.getElementsByTagName('ASIDE');
+		for (var i = 0, node; node = nodes[i]; i++) {
 			if (node.className === 'demo') {
 				var viewSource = document.createElement('div');
 				viewSource.className = 'demo-control-viewsource demo-control-viewsource-full';
 				viewSource.innerHTML = '<a class="demo" href="javascript://查看用于创建上文组件的所有源码" onclick="Demo.expandSource(this.parentNode)"><span class="demo-control-arrow">▸</span>查看源码</a>';
 				node.parentNode.insertBefore(viewSource, node.nextSibling);
+				
+				node = Demo.next(viewSource);
+				if(node && (node.tagName === 'PRE' || node.tagName === 'SCRIPT')){
+					node.style.display = 'none';	
+				}
 			}
 		}
 	},

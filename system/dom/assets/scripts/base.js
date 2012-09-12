@@ -2502,8 +2502,11 @@
 		/**
 		 * 模拟提交表单。
 		 */
-		submit: function(e){
-			e = new Dom.Event(this.node, 'submit', e);
+		submit: function(){
+			
+			// 当手动调用 submit 的时候，不会触发 submit 事件，因此手动模拟  #8
+			
+			var e = new Dom.Event(this.node, 'submit');
 			this.trigger('submit', e);
 			if(e.returnValue !== false){
 				this.node.submit();
