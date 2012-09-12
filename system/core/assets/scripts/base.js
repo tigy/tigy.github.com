@@ -1092,9 +1092,9 @@
 
 		/**
 		 * 增加一个事件监听者。
-		 * @param {String} type 事件名。
-		 * @param {Function} listener 监听函数。当事件被处罚时会执行此函数。
-		 * @param {Object} bind=this *listener* 执行时的作用域。
+		 * @param {String} eventName 事件名。
+		 * @param {Function} eventHandler 监听函数。当事件被处罚时会执行此函数。
+		 * @param {Object} bind=this *eventHandler* 执行时的作用域。
 		 * @return this
 		 * @example
 		 * <pre>
@@ -1113,59 +1113,85 @@
          * });
          * </pre>
 		 */
-		on: function (type, listener, bind) {
+		on: function (eventName, eventHandler, bind) {
 
-			assert.isFunction(listener, 'JPlus.Base#on(type, listener, bind): {listener} ~');
+			assert.isFunction(eventHandler, 'JPlus.Base#on(eventName, eventHandler, bind): {eventHandler} ~');
 
 			// 获取本对象 本对象的数据内容 本事件值
 			var me = this,
-	        	d = me.dataField(),
-	        	evt;
+	        	data = me.dataField(),
+	        	eventListener,
+	        	eventManager;
+			
+			// 获取存储事件对象的空间。
+			data = data.$event || (data.$event = {});
+			
+			// 获取当前事件对应的函数监听器。
+			eventListener = data[eventName];
+			
+			// 生成默认的事件作用域。
+			bind = [eventHandler, bind || me];
 
-			d = d.$event || (d.$event = {});
+			// 如果未绑定过这个事件, 则不存在监听器，先创建一个有关的监听器。
+			if (!eventListener) {
+				
+				// 获取事件管理对象。
+				eventManager = getMgr(me, eventName);
 
-			evt = d[type];
-
-			// 如果未绑定过这个事件。
-			if (!evt) {
-
-				// 支持自定义安装。
-				d[type] = evt = d.createHandler ? d.createHandler() : function (e) {
-					var listener = arguments.callee, handlers = listener.handlers.slice(0), i = -1, len = handlers.length;
-
+				// 生成实际处理事件的监听器。
+				data[eventName] = eventListener = function (e) {
+					var eventListener = arguments.callee, 
+						handlers = eventListener.handlers.slice(0), 
+						handler,
+						i = -1, 
+						length = handlers.length;
+					
 					// 循环直到 return false。
-					while (++i < len) {
-						if (handlers[i][0].call(handlers[i][1], e) === false) {
+					while (++i < length) {
+						handler = handlers[i];
+						if (handler[0].call(handler[1], e) === false) {
+							
+							// 如果存在 stopEvent 处理函数，则调用。
+							// 如果当前函数是因为 initEvent 返回 false 引起，则不执行 stopEvent 。
+							if(handler[2] !== true && (handler = eventListener.stop)){
+								handler[0].call(handler[1], e);
+							}
 							return false;
 						}
 					}
 
 					return true;
 				};
-
-				// 获取事件管理对象。
-				d = getMgr(me, type);
-
+				
 				// 当前事件的全部函数。
-				evt.handlers = [];
+				eventListener.handlers = eventManager.initEvent ? 
+					[[eventManager.initEvent, me, true], bind] : 
+					[bind];
 
-				// 添加事件。
-				if (d.add) {
-					d.add(me, type, evt);
+				// 如果事件允许阻止，则存储字段。
+				if(eventManager.stopEvent) {
+					eventListener.stop = [eventManager.stopEvent, me];
 				}
 
+				// 如果事件支持自定义的添加方式，则先添加。
+				if (eventManager.add) {
+					eventManager.add(me, eventName, eventListener);
+				}
+
+			} else {
+						
+				// 添加到 handlers 。
+				eventListener.handlers.push(bind);
 			}
 
-			// 添加到 handlers 。
-			evt.handlers.push([listener, bind || me]);
 
 			return me;
 		},
 
 		/**
 		 * 删除一个或多个事件监听器。
-		 * @param {String} [type] 事件名。如果不传递此参数，则删除全部事件的全部监听器。
-		 * @param {Function} [listener] 回调器。如果不传递此参数，在删除指定事件的全部监听器。
+		 * @param {String} [eventName] 事件名。如果不传递此参数，则删除全部事件的全部监听器。
+		 * @param {Function} [eventHandler] 回调器。如果不传递此参数，在删除指定事件的全部监听器。
 		 * @return this
 		 * @remark
 		 * 注意: `function () {} !== function () {}`, 这意味着下列代码的 un 将失败:
@@ -1178,7 +1204,7 @@
          * elem.on('click', fn);
          * elem.un('click', fn); // fn  被成功删除。
          *
-         * 如果同一个 *listener* 被增加多次， un 只删除第一个。
+         * 如果同一个 *eventListener* 被增加多次， un 只删除第一个。
          * </pre>
 		 * @example
 		 * <pre>
@@ -1202,28 +1228,40 @@
          * a.un('click', fn);
          * </pre>
 		 */
-		un: function (type, listener) {
+		un: function (eventName, eventHandler) {
 
-			assert(!listener || Object.isFunction(listener), 'JPlus.Base#un(type, listener): {listener} 必须是函数或空参数。', listener);
+			assert(!eventHandler || Object.isFunction(eventHandler), 'JPlus.Base#un(eventName, eventHandler): {eventHandler} 必须是函数。', eventHandler);
 
 			// 获取本对象 本对象的数据内容 本事件值
-			var me = this, d = me.dataField().$event, evt, handlers, i;
-			if (d) {
-				if (evt = d[type]) {
+			var me = this, 
+				data = me.dataField().$event, 
+				eventListener, 
+				handlers, 
+				i;
+			
+			if (data) {
+				
+				// 获取指定事件的监听器。
+				if (eventListener = data[eventName]) {
+					
+					// 如果删除特定的处理函数。
+					// 搜索特定的处理函数。
+					if (eventHandler) {
 
-					handlers = evt.handlers;
-
-					if (listener) {
-
+						handlers = eventListener.handlers;
 						i = handlers.length;
 
-						// 搜索符合的句柄。
-						while (--i >= 0) {
-							if (handlers[i][0] === listener) {
+						// 根据常见的需求，这里逆序搜索有助于提高效率。
+						while (i-- > 0) {
+							
+							if (handlers[i][0] === eventHandler) {
+								
+								// 删除 hander 。
 								handlers.splice(i, 1);
-
-								if (!i) {
-									listener = 0;
+								
+								// 如果删除后只剩 0 个句柄，或只剩 1个 initEvent 句柄，则删除全部数据。
+								if (!i || (i === 1 && handlers[0] === true)) {
+									eventHandler = 0;
 								}
 
 								break;
@@ -1233,21 +1271,21 @@
 					}
 
 					// 检查是否存在其它函数或没设置删除的函数。
-					if (!listener) {
+					if (!eventHandler) {
 
 						// 删除对事件处理句柄的全部引用，以允许内存回收。
-						delete d[type];
+						delete data[eventName];
 						
 						// 获取事件管理对象。
-						d = getMgr(me, type);
+						data = getMgr(me, eventName);
 
 						// 内部事件管理的删除。
-						if (d.remove)
-							d.remove(me, type, evt);
+						if (data.remove)
+							data.remove(me, eventName, eventListener);
 					}
-				} else if (!type) {
-					for (evt in d)
-						me.un(evt);
+				} else if (!eventName) {
+					for (eventName in data)
+						me.un(eventName);
 				}
 			}
 			return me;
@@ -1277,13 +1315,15 @@
          * a.trigger('click');
          * </pre>
 		 */
-		trigger: function (type, e) {
+		trigger: function (eventName, e) {
 
 			// 获取本对象 本对象的数据内容 本事件值 。
-			var me = this, evt = me.dataField().$event, eMgr;
+			var me = this, 
+				data = me.dataField().$event, 
+				eventManager;
 
 			// 执行事件。
-			return !evt || !(evt = evt[type]) || ((eMgr = getMgr(me, type)).dispatch ? eMgr.dispatch(me, type, evt, e) : evt(e));
+			return !data || !(data = data[eventName]) || ((eventManager = getMgr(me, eventName)).dispatch ? eventManager.dispatch(me, eventName, data, e) : data(e));
 
 		},
 
@@ -1311,21 +1351,14 @@
          * a.trigger('click');   //  没有输出
          * </pre>
 		 */
-		once: function (type, listener, bind) {
+		once: function (eventName, eventHandler, bind) {
 
-			assert.isFunction(listener, 'JPlus.Base#once(type, listener): {listener} ~');
+			assert.isFunction(eventHandler, 'JPlus.Base#once(eventName, eventHandler): {eventHandler} ~');
 
-			var me = this;
-
-			// one 本质上是 on , 只是自动为 listener 执行 un 。
-			return this.on(type, function () {
-
-				// 删除，避免闭包。
-				me.un(type, arguments.callee);
-
-				// 然后调用。
-				return listener.apply(this, arguments);
-			}, bind);
+			// 先插入一个用于删除句柄的函数。
+			return this.on(eventName, function(){
+				this.un(eventName, eventHandler).un(eventName, arguments.callee);	
+			}).on(eventName, eventHandler, bind);
 		}
 
 	});
@@ -1749,18 +1782,18 @@
 	 * @param {String} type 事件名。
 	 * @return {Object} 符合要求的事件管理器，如果找不到合适的，返回默认的事件管理器。
 	 */
-	function getMgr(obj, type) {
+	function getMgr(obj, eventName) {
 		var clazz = obj.constructor, 
 			t;
 
 		// 遍历父类，找到指定事件。
-		while (!(t = clazz.$event) || !(type in t)) {
+		while (!(t = clazz.$event) || !(eventName in t)) {
 			if (!(clazz = clazz.base)) {
 				return emptyObj;
 			}
 		}
 
-		return t[type];
+		return t[eventName];
 	}
 
 	/// #endregion

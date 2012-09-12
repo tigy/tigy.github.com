@@ -456,55 +456,42 @@
 		defaultEvent = {
 			
 			/**
-			 * 创建事件的默认执行函数。
+			 * 阻止事件的函数。 
+			 * @param {Event} e 事件参数。
 			 */
-			createHandler:  function () {
-				var handler = function(e){
-						eventFix[e.type](e);
-						var listener = arguments.callee, handlers = listener.handlers.slice(0), i = -1, len = handlers.length;
-
-						// 循环直到 return false。
-						while (++i < len) {
-							if (handlers[i][0].call(handlers[i][1], e) === false) {
-								e.stopPropagation();
-								e.preventDefault();
-								return false;
-							}
-						}
-
-						return true;
-					},
-					initEvent = this.initEvent;
-					
-				return initEvent ? function(e){
-					return initEvent(e) !== false && handler(e);
-				} : handler;
+			stopEvent: function(e){
+				e.stopPropagation();
+				e.preventDefault();
 			},
 
 			/**
-			 * 创建当前事件可用的参数。
-			 * @param {Dom} ctrl 事件所有者。
-			 * @param {Event} e 事件参数。
-			 * @param {Object} target 事件目标。
+			 * 发送处理指定的事件。
+			 * @param {Dom} dom 事件所有者。
+			 * @param {Event} eventName 事件名。
+			 * @param {Function} eventListener 事件监听器。
 			 * @return {Event} e 事件参数。
 			 */
-			dispatch: function (dom, type, fn, e) {
+			dispatch: function (dom, eventName, eventListener, e) {
 				dom = dom.node;
 				
 				var event = e;
 				
-				if(!event || !event.type){
-					event = new Dom.Event(dom, type);
+				if(!e || !e.type){
+					e = new Dom.Event(dom, eventName);
 					
-					// IE 8- 在处理原生事件时肯能出现错误。
-					try{
-						extend(event, e);
-					}catch(e){
+					if(event) {
+						
+						// IE 8- 在处理原生事件时肯能出现错误。
+						try{
+							extend(e, event);
+						}catch(ex){
+							
+						}
 						
 					}
 				}
 
-				return fn(event) && (!dom[type = 'on' + type] || dom[type](event) !== false);
+				return eventListener(e) && (!dom[eventName = 'on' + eventName] || dom[eventName](e) !== false);
 			},
 
 			/**
@@ -2507,8 +2494,10 @@
 		/**
 		 * 模拟提交表单。
 		 */
-		submit: function(){
-			if(this.trigger('submit')){
+		submit: function(e){
+			e = new Dom.Event(this.node, 'submit', e);
+			this.trigger('submit', e);
+			if(e.returnValue !== false){
 				this.node.submit();
 			}
 			return this;
@@ -3768,7 +3757,7 @@
 	if(navigator.isFirefox) {
 		Dom.addEvents('click', {
 			initEvent: function(e){
-				return e.which === 1;
+				return e.which === undefined || e.which === 1;
 			}
 		});
 	}
