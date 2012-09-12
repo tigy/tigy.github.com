@@ -191,7 +191,7 @@
 				}
 				
 				// 最后使用 implement 添加成员。
-				return this.implement(Object.map(methods, function(funcName) {
+				return this.implement(Object.map(methods, function(fnName) {
 					return function() {
 						
 						// 获取实际调用的函数目标对象。
@@ -199,10 +199,10 @@
 							r;
 							
 						assert(target, "#" + targetProperty + " 不能为空。");
-						assert(!target || Object.isFunction(target[funcName]), "#" + targetProperty + "." + funcName + "(): 不是函数。");
+						assert(!target || Object.isFunction(target[fnName]), "#" + targetProperty + "." + fnName + "(): 不是函数。");
 						
 						// 调用被代理的实际函数。
-						r = target[funcName].apply(target, arguments);
+						r = target[fnName].apply(target, arguments);
 						
 						// 如果不是 getter，返回 this 链式引用。
 						return target === r || r === undefined ? this : r;
@@ -1025,7 +1025,7 @@
 
 		/**
 	     * 调用父类的成员函数。
-	     * @param {String} funcName 调用的函数名。
+	     * @param {String} fnName 调用的函数名。
 	     * @param {Object} [...] 调用的参数。如果不填写此项，则自动将当前函数的全部参数传递给父类的函数。
 	     * @return {Object} 返回父类函数的返回值。
 	     * @protected
@@ -1050,31 +1050,31 @@
 	     * new B().fn(1, 2); // 输出 3 和 6
 	     * </pre>
 	     */
-		base: function (funcName) {
+		base: function (fnName) {
 
 			var me = this.constructor,
 
-	            fn = this[funcName],
+	            fn = this[fnName],
 
 	            oldFn = fn,
 
 	            args = arguments;
 
-			assert(fn, "JPlus.Base#base(funcName, args): 子类不存在 {funcName} 的属性或方法。", funcName);
+			assert(fn, "JPlus.Base#base(fnName, args): 子类不存在 {fnName} 的属性或方法。", fnName);
 
 			// 标记当前类的 fn 已执行。
 			fn.$bubble = true;
 
-			assert(!me || me.prototype[funcName], "JPlus.Base#base(funcName, args): 父类不存在 {funcName} 的方法。", funcName);
+			assert(!me || me.prototype[fnName], "JPlus.Base#base(fnName, args): 父类不存在 {fnName} 的方法。", fnName);
 
 			// 保证得到的是父类的成员。
 
 			do {
 				me = me.base;
-				assert(me && me.prototype[funcName], "JPlus.Base#base(funcName, args): 父类不存在 {funcName} 的方法。", funcName);
-			} while ('$bubble' in (fn = me.prototype[funcName]));
+				assert(me && me.prototype[fnName], "JPlus.Base#base(fnName, args): 父类不存在 {fnName} 的方法。", fnName);
+			} while ('$bubble' in (fn = me.prototype[fnName]));
 
-			assert.isFunction(fn, "JPlus.Base#base(funcName, args): 父类的成员 {fn}不是一个函数。  ");
+			assert.isFunction(fn, "JPlus.Base#base(fnName, args): 父类的成员 {fn}不是一个函数。  ");
 
 			fn.$bubble = true;
 
@@ -1189,6 +1189,42 @@
 		},
 
 		/**
+		 * 手动触发一个监听器。
+		 * @param {String} eventName 监听名字。
+		 * @param {Object} [e] 传递给监听器的事件对象。
+		 * @return this
+		 * @example <pre>
+	     *
+	     * // 创建一个类 A
+	     * var A = new Class({
+	     *
+	     * });
+	     *
+	     * // 创建一个变量。
+	     * var a = new A();
+	     *
+	     * // 绑定一个 click 事件。
+         * a.on('click', function (e) {
+         * 		return true;
+         * });
+         *
+         * // 手动触发 click， 即执行  on('click') 过的函数。
+         * a.trigger('click');
+         * </pre>
+		 */
+		trigger: function (eventName, e) {
+
+			// 获取本对象 本对象的数据内容 本事件值 。
+			var me = this, 
+				data = me.dataField().$event, 
+				eventManager;
+
+			// 执行事件。
+			return !data || !(data = data[eventName]) || ((eventManager = getMgr(me, eventName)).dispatch ? eventManager.dispatch(me, eventName, data, e) : data(e));
+
+		},
+
+		/**
 		 * 删除一个或多个事件监听器。
 		 * @param {String} [eventName] 事件名。如果不传递此参数，则删除全部事件的全部监听器。
 		 * @param {Function} [eventHandler] 回调器。如果不传递此参数，在删除指定事件的全部监听器。
@@ -1292,42 +1328,6 @@
 		},
 
 		/**
-		 * 手动触发一个监听器。
-		 * @param {String} type 监听名字。
-		 * @param {Object} [e] 传递给监听器的事件对象。
-		 * @return this
-		 * @example <pre>
-	     *
-	     * // 创建一个类 A
-	     * var A = new Class({
-	     *
-	     * });
-	     *
-	     * // 创建一个变量。
-	     * var a = new A();
-	     *
-	     * // 绑定一个 click 事件。
-         * a.on('click', function (e) {
-         * 		return true;
-         * });
-         *
-         * // 手动触发 click， 即执行  on('click') 过的函数。
-         * a.trigger('click');
-         * </pre>
-		 */
-		trigger: function (eventName, e) {
-
-			// 获取本对象 本对象的数据内容 本事件值 。
-			var me = this, 
-				data = me.dataField().$event, 
-				eventManager;
-
-			// 执行事件。
-			return !data || !(data = data[eventName]) || ((eventManager = getMgr(me, eventName)).dispatch ? eventManager.dispatch(me, eventName, data, e) : data(e));
-
-		},
-
-		/**
 		 * 增加一个仅监听一次的事件监听者。
 		 * @param {String} type 事件名。
 		 * @param {Function} listener 监听函数。当事件被处罚时会执行此函数。
@@ -1365,7 +1365,6 @@
 
 	/**
 	 * 系统原生的字符串对象。
-	 * @JPlus
 	 * @class String
 	 */
 	String.implementIf({
@@ -1419,7 +1418,6 @@
 
 	/**
 	 * 系统原生的函数对象。
-	 * @JPlus
 	 * @class Function
 	 */
 	Function.implementIf({
@@ -1450,7 +1448,6 @@
 
 	/**
 	 * 系统原生的数组对象。
-	 * @JPlus
 	 * @class Array
 	 */
 	Array.implementIf({

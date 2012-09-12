@@ -242,18 +242,18 @@
 			
 			/**
 			 * 对当前集合的每个节点的 Dom 封装调用其指定属性名的函数，并将返回值放入新的数组返回。
-			 * @param {String} funcName 要调用的函数名。
+			 * @param {String} fnName 要调用的函数名。
 			 * @param {Array} args=[] 调用时的参数数组。
 			 * @return {Array} 返回包含执行结果的数组。
 			 * @see Array#see
 			 */
-			invoke: function(funcName, args) {
+			invoke: function(fnName, args) {
 				args = args || [];
 				var r = [];
-				assert(dp[funcName] && dp[funcName].apply, "DomList#invoke(funcName): {funcName} 不是 Dom 对象的方法。", funcName);
+				assert(dp[fnName] && dp[fnName].apply, "DomList#invoke(fnName): {fnName} 不是 Dom 对象的方法。", fnName);
 				this.forEach(function(value) {
 					value = new Dom(value);
-					r.push(value[funcName].apply(value, args));
+					r.push(value[fnName].apply(value, args));
 				});
 				return r;
 			},
@@ -427,8 +427,14 @@
 		
 		// 系统使用的变量
 		
+		/**
+		 * Dom.prototype
+		 */
 		dp = Dom.prototype,
 		
+		/**
+		 * DomEvent.prototype
+		 */
 		ep = DomEvent.prototype,
 		
 		/**
@@ -451,7 +457,6 @@
 		/**
 		 * 默认事件。
 		 * @type Object
-		 * @ignore
 		 */
 		defaultEvent = {
 			
@@ -520,8 +525,16 @@
 
 		},
 		
+		/**
+		 * 鼠标事件。 
+		 * @type Object
+		 */
 		mouseEvent = defaultEvent,
 		
+		/**
+		 * 键盘事件。 
+		 * @type Object
+		 */
 		keyEvent = defaultEvent,
 		
 		// 正则
@@ -569,13 +582,12 @@
 			getProp: function(elem, name) {
 				return name in elem ? elem[name] : null;
 			},
-
 			setProp: function(elem, name, value) {
 				if ('238'.indexOf(elem.nodeType) === -1){
 					elem[name] = value;
 				}
 			},
-
+			
 			get: function(elem, name) {
 				return elem.getAttribute ? elem.getAttribute(name) : this.getProp(elem, name);
 			},
@@ -645,10 +657,10 @@
 		
 		/**
 		 * 在 Dom.parseNode 和 setHtml 中对 HTML 字符串进行包装用的字符串。
-		 * @type Object 部分元素只能属于特定父元素， tagFix 列出这些元素，并使它们正确地添加到父元素中。 IE678
+		 * @type Object 部分元素只能属于特定父元素， parseFix 列出这些元素，并使它们正确地添加到父元素中。 IE678
 		 *       会忽视第一个标签，所以额外添加一个 div 标签，以保证此类浏览器正常运行。
 		 */
-		tagFix = {
+		parseFix = {
 			$default: isStd ? [1, '', '']: [2, '$<div>', '</div>'],
 			option: [2, '<select multiple="multiple">', '</select>'],
 			legend: [2, '<fieldset>', '</fieldset>'],
@@ -755,9 +767,7 @@
 		 * 字符串字段。
 		 * @type Object
 		 */
-		textFix = {
-			
-		},
+		textFix = {},
 		
 		/// #if CompactMode
 		 
@@ -855,10 +865,10 @@
 	
 	// 变量初始化。
 
-	// 初始化 tagFix。
-	tagFix.optgroup = tagFix.option;
-	tagFix.tbody = tagFix.tfoot = tagFix.colgroup = tagFix.caption = tagFix.thead;
-	tagFix.th = tagFix.td;
+	// 初始化 parseFix。
+	parseFix.optgroup = parseFix.option;
+	parseFix.tbody = parseFix.tfoot = parseFix.colgroup = parseFix.caption = parseFix.thead;
+	parseFix.th = parseFix.td;
 
 	// 初始化 attrFix。
 	map("enctype encoding action method target", formHook, attrFix);
@@ -1152,7 +1162,7 @@
 						assert.isString(srcHTML, 'Dom.parseNode(html, context, cachable): {html} ~');
 						html = context.createElement("div");
 
-						var wrap = tagFix[tag[1].toLowerCase()] || tagFix.$default;
+						var wrap = parseFix[tag[1].toLowerCase()] || parseFix.$default;
 
 						// IE8- 会过滤字符串前的空格。
 						// 为了保证全部浏览器统一行为，此处删除全部首尾空格。
@@ -1738,11 +1748,11 @@
 		
 			var classes = [DomList, Dom], i;
 		
-			for(var funcName in members){
+			for(var fnName in members){
 				i = classes.length;
 				while(i--) {
-					if(!copyIf || !classes[i].prototype[funcName]) {
-						classes[i].prototype[funcName] = i ? members[funcName] : createDomListMthod(funcName, listType);
+					if(!copyIf || !classes[i].prototype[fnName]) {
+						classes[i].prototype[fnName] = i ? members[fnName] : createDomListMthod(fnName, listType);
 					}
 				}
 			}
@@ -1778,8 +1788,6 @@
 		Event: DomEvent
 
 	})
-	
-	/**@class Dom*/
 	
 	.implement({
 
@@ -2292,7 +2300,7 @@
 			}
 
 			var elem = this.node,
-				map = tagFix.$default;
+				map = parseFix.$default;
 
 			assert(elem.nodeType === 1, "Dom#setHtml(value): {elem} 不是元素节点(nodeType === 1), 无法执行 setHtml。", elem);
 
@@ -3292,7 +3300,7 @@
 		
 	}, 4);
 	
-	/// #endif
+	/// #endregion
 
 	Object.each({
 
@@ -3431,6 +3439,9 @@
 
 	});
 	
+	// Dom 函数。
+	Dom.defineMethods('node', 'scrollIntoView focus blur select click reset', 1);
+	
 	/// #region document
 	
 	/**
@@ -3481,11 +3492,6 @@
 		return new DomList(result);
 	};
 	
-	/// #endif
-
-	// Dom 函数。
-	Dom.defineMethods('node', 'scrollIntoView focus blur select click reset', 1);
-	
 	// 拷贝 DOM Event 到 document 。
 	t = document.constructor;
 	if(t){
@@ -3496,17 +3502,25 @@
 	}
 
 	// document 函数。
-	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize first last parent child children has', function (funcName) {
-		document[funcName] = dp[funcName];
+	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize first last parent child children has', function (fnName) {
+		document[fnName] = dp[fnName];
 	});
+	
+	/// #endregion
+
+	/// #region DomList
 	
 	// DomList 函数。
-	map("slice splice reverse unique shift pop unshift push include indexOf each forEach", function (funcName, index) {
-		DomList.prototype[funcName] = index < 4 ? function() {
-			return new DomList(ap[funcName].apply(this, arguments));
-		} : ap[funcName];
+	map("slice splice reverse unique shift pop unshift push include indexOf each forEach", function (fnName, index) {
+		DomList.prototype[fnName] = index < 4 ? function() {
+			return new DomList(ap[fnName].apply(this, arguments));
+		} : ap[fnName];
 	});
 	
+	/// #endregion
+
+	/// #region Event
+
 	map("$default mousewheel blur focus scroll change select submit resize error load unload touchstart touchmove touchend hashchange", defaultEvent, Dom.$event);
 	
 	/// #if CompactMode
@@ -3718,10 +3732,10 @@
 	if(div.onfocusin === undefined) {
 
 		Dom.addEvents('focusin focusout', {
-			fix: function(elem, type, funcName) {
+			fix: function(elem, type, fnName) {
 				var base = type === 'focusin' ? 'focus' : 'blur';
 				var doc = elem.node.ownerDocument || elem.node;
-				doc[funcName](base, this.handler, true);
+				doc[fnName](base, this.handler, true);
 			},
 			handler: function(e) {
 				var type = e.orignalType = e.type === 'focus' ? 'focusin' : 'focusout';
@@ -3791,7 +3805,9 @@
 			delegate: 'focusout'
 		});
 	
-	/// #endif
+	/// #endregion
+
+	/// #region DomReady
 
 	/**
 	 * 设置在页面加载(不包含图片)完成时执行函数。
@@ -3940,6 +3956,10 @@
 		setTimeout(Dom.load, 1);
 	}
 	
+	/// #endregion
+
+	/// #region Export
+	
 	div = null;
 	
 	// 导出函数。
@@ -3949,40 +3969,52 @@
 	window.$ = window.$ || Dom.get;
 	window.$$ = window.$$ || Dom.query;
 	
+	/// #endregion
+
 	/**
 	 * @class
 	 */
 
-	function createDomListMthod(funcName, listType){
+	/**
+	 * 创建 DomList 的方法。 
+	 * @param {NodeList} fnName 对应的 Dom 对象的函数名。
+	 * @param {Integer} listType=0 函数类型。
+	 */
+	function createDomListMthod(fnName, listType){
 		return !listType ? function () {
-			// 为每个 Dom 对象调用 funcName 。
+			// 为每个 Dom 对象调用 fnName 。
 			var i = 0, len = this.length, target;
 			while(i < len) {
 				target = new Dom(this[i++]);
-				target[funcName].apply(target, arguments);
+				target[fnName].apply(target, arguments);
 			}
 			return this;
 		} : listType === 2 ? function() {
 			// 返回第一个元素的对应值 。
 			if(this.length) {
 				var target = new Dom(this[0]);
-				return target[funcName].apply(target, arguments);
+				return target[fnName].apply(target, arguments);
 			}
 		} : listType === 3 ? function() {
 			// 将返回的每个节点放入新的 DomList 中。
 			var r = new DomList;
-			return r.add.apply(r, this.invoke(funcName, arguments));
+			return r.add.apply(r, this.invoke(fnName, arguments));
 		} : function() {
 			// 只要有一个返回非 false，就返回这个值。
 			var i = 0, r, target;
 			while (i < this.length && !r) {
 				target = new Dom(this[i++]);
-				r = target[funcName].apply(target, arguments);
+				r = target[fnName].apply(target, arguments);
 			}
 			return r;
 		};
 	}
-
+	
+	/**
+	 * 遍历 NodeList 对象。 
+	 * @param {NodeList} nodelist 要遍历的 NodeList。
+	 * @param {Function} fn 遍历的函数。
+	 */
 	function each(nodelist, fn) {
 		var i = 0, node;
 		while( node = nodelist[i++]){
@@ -3992,12 +4024,12 @@
 
 	/**
 	 * 获取元素的文档。
-	 * @param {Node} elem 元素。
+	 * @param {Node} node 元素。
 	 * @return {Document} 文档。
 	 */
-	function getDocument(elem) {
-		assert.isNode(elem, 'Dom.getDocument(elem): {elem} ~', elem);
-		return elem.ownerDocument || elem.document || elem;
+	function getDocument(node) {
+		assert.isNode(node, 'Dom.getDocument(node): {node} ~', node);
+		return node.ownerDocument || node.document || node;
 	}
 
 	/**
@@ -4240,15 +4272,20 @@
 		};
 	}
 	
-	function match(dom, selector){
+	/**
+	 * 判断指定选择器是否符合指定的节点。 
+	 * @param {Node} node 判断的节点。
+	 * @param {String} selector 选择器表达式。
+	 */
+	function match(node, selector){
 		var r, i = 0;
 		try{
-			r = dom.parentNode.querySelectorAll(selector);
+			r = node.parentNode.querySelectorAll(selector);
 		} catch(e){
-			return query(selector, new Dom(dom.parentNode)).indexOf(dom) >= 0 || query(selector, Dom.document).indexOf(dom) >= 0;
+			return query(selector, new Dom(node.parentNode)).indexOf(node) >= 0 || query(selector, Dom.document).indexOf(node) >= 0;
 		}
 		while(r[i])
-			if(r[i++] === dom)
+			if(r[i++] === node)
 				return true;
 		
 		return false;
@@ -4498,9 +4535,13 @@
 		
 		return result;
 	}
-	
-	function throwError(string) {
-		throw new SyntaxError('An invalid or illegal string was specified : "' + string + '"!');
+		
+	/**
+	 * 抛出选择器语法错误。 
+ 	 * @param {String} message 提示。
+	 */
+	function throwError(message) {
+		throw new SyntaxError('An invalid or illegal string was specified : "' + message + '"!');
 	}
 
 	/// #endregion
