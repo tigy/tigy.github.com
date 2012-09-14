@@ -1,20 +1,1 @@
-﻿/** * @author  */using("System.Dom.Base");/** * 判断 2 个 Dom 对象是否相同。 * @param {Dom} other 要判断的Dom 对象。 */Dom.prototype.equals = function(other){	return other && other.node === this.node;};Object.each({
-	attr: 0,	css: 'style',	val: 'text',	text: 0,	html: 0,	width: 0,	height: 0,	offset: 0,	position: 0,}, function(value, key) {
-	value = value || key.capitalize();	var getter = Dom.prototype['get' + value];	var setter = Dom.prototype['set' + value];
-	
-	Dom.prototype[key] = Dom.Document.prototype[key] = function() {
-		if (arguments.length === 1) {
-			return getter.apply(this, arguments);
-		}
-
-		setter.apply(this, arguments);
-		return this;
-	};
-
-	DomList.prototype[key] = function() {
-		if (arguments.length === 1) {
-			// return value.get.apply(Dom.get(this[0]), arguments);
-			return this.invoke(key, arguments);
-		}
-		this.invoke(key, arguments);
-		return this;	};});
+﻿/** * @author  */using("System.Dom.Base");var DOM = (function(){		var dp = Dom.prototype;	var lp = DomList.prototype;		Object.each({			attr: 0,			css: 'style'				}, function(value, key) {			value = (value || key).capitalize();		var getter = 'get' + value;		var setter = 'set' + value;					dp[key] = lp[key] = function(key, value) {			if(value === undefined){				if(Object.isObject(key)) {					for(value in key){						this[setter](key, key[value]);						}										return this;				}				return this[getter](key);			}			return this[setter](key, value);		};			});		Object.each({			html: 0,		width: 0,			height: 0,			offset: 0,			position: 0,			val: 'text',			text: 0				}, function(value, key) {			value = (value || key).capitalize();		var getter = 'get' + value;		var setter = 'set' + value;					dp[key] = lp[key] = function(value) {			if(value === undefined){				return this[getter](key);			}			return this[setter](key);		};			});		Object.each(Dom.$event, function(value, eventName){		dp[eventName] = lp[eventName] = function(handler) {						return Object.isFunction(handler) ? this.on(eventName, handler) : 				Object.isFunction(this[eventName]) ? this[eventName](handler) : 				this.trigger(eventName, handler);		};	});		dp.live = lp.live = function(eventName, handler){		if(Object.isObject(eventName)) {			for(handler in eventName){				this.live(eventName, eventName[handler]);			}			return this;		}				document.delegate(this.selector, eventName, handler);		return this;	};		return {				query: function(selector) {			var nodelist = Dom.query(selector);			nodelist.selector = selector;			return nodelist;		},				get: function(id) {			var node = Dom.getNode(id);			return node ? new DomList([node]) : new DomList();		}			};		})();var $ = DOM.query;var $$ = DOM.get;

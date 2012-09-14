@@ -47,7 +47,7 @@
             </div>
         </div>
         <script>
-            var a = $('a'), b = $('b'), c = $('c'), d = $('d'), o = $('o'), abcd = new DomList($('all').dom.getElementsByTagName("div"));
+            var a = Dom.get('a'), b = Dom.get('b'), c = Dom.get('c'), d = Dom.get('d'), o = Dom.get('o'), abcd = new DomList(Dom.get('all').node.getElementsByTagName("div"));
 
 		    Demo.writeTestCases({
 		        'attr': {
