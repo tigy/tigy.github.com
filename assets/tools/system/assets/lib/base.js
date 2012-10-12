@@ -1,5 +1,5 @@
 ﻿/*
- * This file is created by a tool at 2012/08/31 21:33:51
+ * This file is created by a tool at 2012/10/12 19:07:29
  */
 
 
@@ -99,7 +99,7 @@
 			 * 获取当前框架的版本号。
 			 * @getter
 			 */
-			version: /*@Version*/3.2/*@/Version*/
+			version: /*@VERSION*/3.2
 
 		},
 		
@@ -185,7 +185,7 @@
 				}
 				
 				// 最后使用 implement 添加成员。
-				return this.implement(Object.map(methods, function(funcName) {
+				return this.implement(Object.map(methods, function(fnName) {
 					return function() {
 						
 						// 获取实际调用的函数目标对象。
@@ -193,13 +193,13 @@
 							r;
 							
 						assert(target, "#" + targetProperty + " 不能为空。");
-						assert(!target || Object.isFunction(target[funcName]), "#" + targetProperty + "." + funcName + "(): 不是函数。");
+						assert(!target || Object.isFunction(target[fnName]), "#" + targetProperty + "." + fnName + "(): 不是函数。");
 						
 						// 调用被代理的实际函数。
-						r = target[funcName].apply(target, arguments);
+						r = target[fnName].apply(target, arguments);
 						
 						// 如果不是 getter，返回 this 链式引用。
-						return target === r ? this : r;
+						return target === r || r === undefined ? this : r;
 					};
 				}, {}), args);  // 支持 Dom.implement, 传递第二个参数。
 			},
@@ -227,13 +227,8 @@
 			 *  },
 			 *
 			 *  // 当用户执行 target.trigger(e) 时执行下列函数:
-			 *  trigger: function(target, type, fn, e){
+			 *  dispatch: function(target, type, fn, e){
 			 * 		// 其中 target 是目标对象，type是事件名， fn是执行的函数。e 是参数。
-			 *  },
-			 *
-			 *  // 当 fn 被执行时首先执行下列函数:
-			 *  initEvent: function(e){
-			 * 		// 其中 e 是参数。
 			 *  }
 			 *
 			 * });
@@ -253,7 +248,7 @@
 			 * remove(obj, '事件名', evtTrigger) 移除事件。
 			 *
 			 * 当用户使用 obj.trigger(参数) 时， 系统会找到相应 evtTrigger， 如果事件有trigger， 则使用
-			 * trigger(obj, '事件名', evtTrigger, 参数) 触发事件。 如果没有， 则直接调用
+			 * dispatch(obj, '事件名', evtTrigger, 参数) 触发事件。 如果没有， 则直接调用
 			 * evtTrigger(参数)。
 			 *
 			 * 下面分别介绍各函数的具体内容。
@@ -478,7 +473,7 @@
 		 * - {Array} array 当前正在遍历的数组。
 		 *
 		 * 可以让函数返回 **false** 来强制中止循环。
-		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @param {Object} [scope] 定义 *fn* 执行时 **this** 的值。
 		 * @return {Boolean} 如果循环是因为 *fn* 返回 **false** 而中止，则返回 **false**， 否则返回 **true**。
 		 * @see Array#each
 		 * @see Array#forEach
@@ -490,10 +485,10 @@
 	     * // 输出 'a : 1' 'c : 3'
 	     * </pre>
 		 */
-		each: function (iterable, fn, bind) {
+		each: function (iterable, fn, scope) {
 
-			assert(!Object.isFunction(iterable), "Object.each(iterable, fn, bind): {iterable} 不能是函数。 ", iterable);
-			assert(Object.isFunction(fn), "Object.each(iterable, fn, bind): {fn} 必须是函数。", fn);
+			assert(!Object.isFunction(iterable), "Object.each(iterable, fn, scope): {iterable} 不能是函数。 ", iterable);
+			assert(Object.isFunction(fn), "Object.each(iterable, fn, scope): {fn} 必须是函数。", fn);
 			
 			// 如果 iterable 是 null， 无需遍历 。
 			if (iterable != null) {
@@ -503,10 +498,10 @@
 
 					// Object 遍历。
 					for (var key in iterable)
-						if (fn.call(bind, iterable[key], key, iterable) === false)
+						if (fn.call(scope, iterable[key], key, iterable) === false)
 							return false;
 				} else {
-					return each.call(iterable, fn, bind);
+					return each.call(iterable, fn, scope);
 				}
 
 			}
@@ -524,7 +519,7 @@
 		 * - {Number} index 当前元素的索引。
 		 * - {Array} array 当前正在遍历的数组。
 		 *
-		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @param {Object} [scope] 定义 *fn* 执行时 **this** 的值。
 		 * @param {Object} [dest] 仅当 *iterable* 是字符串时，传递 *dest* 可以将函数的返回值保存到 dest。
 		 * @return {Object/Undefiend} 返回的结果对象。当 *iterable* 是字符串时且未指定 dest 时，返回空。
 		 * @example
@@ -853,7 +848,7 @@
 			browser = match[1],
 			
 			// IE678 = false, 其它 = true
-			isStd = !!eval("-[1,]");
+			isStd = !!+"\v1";
 
 		navigator["is" + browser] = navigator["is" + browser + parseInt(match[2])] = true;
 
@@ -1024,7 +1019,7 @@
 
 		/**
 	     * 调用父类的成员函数。
-	     * @param {String} funcName 调用的函数名。
+	     * @param {String} fnName 调用的函数名。
 	     * @param {Object} [...] 调用的参数。如果不填写此项，则自动将当前函数的全部参数传递给父类的函数。
 	     * @return {Object} 返回父类函数的返回值。
 	     * @protected
@@ -1049,31 +1044,31 @@
 	     * new B().fn(1, 2); // 输出 3 和 6
 	     * </pre>
 	     */
-		base: function (funcName) {
+		base: function (fnName) {
 
 			var me = this.constructor,
 
-	            fn = this[funcName],
+	            fn = this[fnName],
 
 	            oldFn = fn,
 
 	            args = arguments;
 
-			assert(fn, "JPlus.Base#base(funcName, args): 子类不存在 {funcName} 的属性或方法。", funcName);
+			assert(fn, "JPlus.Base#base(fnName, args): 子类不存在 {fnName} 的属性或方法。", fnName);
 
 			// 标记当前类的 fn 已执行。
 			fn.$bubble = true;
 
-			assert(!me || me.prototype[funcName], "JPlus.Base#base(funcName, args): 父类不存在 {funcName} 的方法。", funcName);
+			assert(!me || me.prototype[fnName], "JPlus.Base#base(fnName, args): 父类不存在 {fnName} 的方法。", fnName);
 
 			// 保证得到的是父类的成员。
 
 			do {
 				me = me.base;
-				assert(me && me.prototype[funcName], "JPlus.Base#base(funcName, args): 父类不存在 {funcName} 的方法。", funcName);
-			} while ('$bubble' in (fn = me.prototype[funcName]));
+				assert(me && me.prototype[fnName], "JPlus.Base#base(fnName, args): 父类不存在 {fnName} 的方法。", fnName);
+			} while ('$bubble' in (fn = me.prototype[fnName]));
 
-			assert.isFunction(fn, "JPlus.Base#base(funcName, args): 父类的成员 {fn}不是一个函数。  ");
+			assert.isFunction(fn, "JPlus.Base#base(fnName, args): 父类的成员 {fn}不是一个函数。  ");
 
 			fn.$bubble = true;
 
@@ -1091,9 +1086,9 @@
 
 		/**
 		 * 增加一个事件监听者。
-		 * @param {String} type 事件名。
-		 * @param {Function} listener 监听函数。当事件被处罚时会执行此函数。
-		 * @param {Object} bind=this *listener* 执行时的作用域。
+		 * @param {String} eventName 事件名。
+		 * @param {Function} eventHandler 监听函数。当事件被处罚时会执行此函数。
+		 * @param {Object} scope=this *eventHandler* 执行时的作用域。
 		 * @return this
 		 * @example
 		 * <pre>
@@ -1112,57 +1107,121 @@
          * });
          * </pre>
 		 */
-		on: function (type, listener, bind) {
+		on: function (eventName, eventHandler, scope) {
 
-			assert.isFunction(listener, 'JPlus.Base#on(type, listener, bind): {listener} ~');
+			assert.isFunction(eventHandler, 'JPlus.Base#on(eventName, eventHandler, scope): {eventHandler} ~');
 
 			// 获取本对象 本对象的数据内容 本事件值
 			var me = this,
-	        	d = me.dataField(),
-	        	evt;
+	        	data = me.dataField(),
+	        	eventListener,
+	        	eventManager;
+			
+			// 获取存储事件对象的空间。
+			data = data.$event || (data.$event = {});
+			
+			// 获取当前事件对应的函数监听器。
+			eventListener = data[eventName];
+			
+			// 生成默认的事件作用域。
+			scope = [eventHandler, scope || me];
 
-			d = d.$event || (d.$event = {});
+			// 如果未绑定过这个事件, 则不存在监听器，先创建一个有关的监听器。
+			if (!eventListener) {
+				
+				// 获取事件管理对象。
+				eventManager = getMgr(me, eventName);
 
-			evt = d[type];
-
-			// 如果未绑定过这个事件。
-			if (!evt) {
-
-				// 支持自定义安装。
-				d[type] = evt = function (e) {
-					var listener = arguments.callee, handlers = listener.handlers.slice(0), i = -1, len = handlers.length;
-
+				// 生成实际处理事件的监听器。
+				data[eventName] = eventListener = function (e) {
+					var eventListener = arguments.callee, 
+						handlers = eventListener.handlers.slice(0), 
+						handler,
+						i = -1, 
+						length = handlers.length;
+					
 					// 循环直到 return false。
-					while (++i < len)
-						if (handlers[i][0].call(handlers[i][1], e) === false)
+					while (++i < length) {
+						handler = handlers[i];
+						if (handler[0].call(handler[1], e) === false) {
+							
+							// 如果存在 stopEvent 处理函数，则调用。
+							// 如果当前函数是因为 initEvent 返回 false 引起，则不执行 stopEvent 。
+							if(handler[2] !== true && (handler = eventListener.stop)){
+								handler[0].call(handler[1], e);
+							}
 							return false;
+						}
+					}
 
 					return true;
 				};
-
-				// 获取事件管理对象。
-				d = getMgr(me, type);
-
+				
 				// 当前事件的全部函数。
-				evt.handlers = d.initEvent ? [[d.initEvent, me]] : [];
+				eventListener.handlers = eventManager.initEvent ? 
+					[[eventManager.initEvent, me, true], scope] : 
+					[scope];
 
-				// 添加事件。
-				if (d.add) {
-					d.add(me, type, evt);
+				// 如果事件允许阻止，则存储字段。
+				if(eventManager.stopEvent) {
+					eventListener.stop = [eventManager.stopEvent, me];
 				}
 
+				// 如果事件支持自定义的添加方式，则先添加。
+				if (eventManager.add) {
+					eventManager.add(me, eventName, eventListener);
+				}
+
+			} else {
+						
+				// 添加到 handlers 。
+				eventListener.handlers.push(scope);
 			}
 
-			// 添加到 handlers 。
-			evt.handlers.push([listener, bind || me]);
 
 			return me;
 		},
 
 		/**
+		 * 手动触发一个监听器。
+		 * @param {String} eventName 监听名字。
+		 * @param {Object} [e] 传递给监听器的事件对象。
+		 * @return this
+		 * @example <pre>
+	     *
+	     * // 创建一个类 A
+	     * var A = new Class({
+	     *
+	     * });
+	     *
+	     * // 创建一个变量。
+	     * var a = new A();
+	     *
+	     * // 绑定一个 click 事件。
+         * a.on('click', function (e) {
+         * 		return true;
+         * });
+         *
+         * // 手动触发 click， 即执行  on('click') 过的函数。
+         * a.trigger('click');
+         * </pre>
+		 */
+		trigger: function (eventName, e) {
+
+			// 获取本对象 本对象的数据内容 本事件值 。
+			var me = this, 
+				data = me.dataField().$event, 
+				eventManager;
+
+			// 执行事件。
+			return !data || !(data = data[eventName]) || ((eventManager = getMgr(me, eventName)).dispatch ? eventManager.dispatch(me, eventName, data, e) : data(e));
+
+		},
+
+		/**
 		 * 删除一个或多个事件监听器。
-		 * @param {String} [type] 事件名。如果不传递此参数，则删除全部事件的全部监听器。
-		 * @param {Function} [listener] 回调器。如果不传递此参数，在删除指定事件的全部监听器。
+		 * @param {String} [eventName] 事件名。如果不传递此参数，则删除全部事件的全部监听器。
+		 * @param {Function} [eventHandler] 回调器。如果不传递此参数，在删除指定事件的全部监听器。
 		 * @return this
 		 * @remark
 		 * 注意: `function () {} !== function () {}`, 这意味着下列代码的 un 将失败:
@@ -1175,7 +1234,7 @@
          * elem.on('click', fn);
          * elem.un('click', fn); // fn  被成功删除。
          *
-         * 如果同一个 *listener* 被增加多次， un 只删除第一个。
+         * 如果同一个 *eventListener* 被增加多次， un 只删除第一个。
          * </pre>
 		 * @example
 		 * <pre>
@@ -1199,28 +1258,40 @@
          * a.un('click', fn);
          * </pre>
 		 */
-		un: function (type, listener) {
+		un: function (eventName, eventHandler) {
 
-			assert(!listener || Object.isFunction(listener), 'JPlus.Base#un(type, listener): {listener} 必须是函数或空参数。', listener);
+			assert(!eventHandler || Object.isFunction(eventHandler), 'JPlus.Base#un(eventName, eventHandler): {eventHandler} 必须是函数。', eventHandler);
 
 			// 获取本对象 本对象的数据内容 本事件值
-			var me = this, d = me.dataField().$event, evt, handlers, i;
-			if (d) {
-				if (evt = d[type]) {
+			var me = this, 
+				data = me.dataField().$event, 
+				eventListener, 
+				handlers, 
+				i;
+			
+			if (data) {
+				
+				// 获取指定事件的监听器。
+				if (eventListener = data[eventName]) {
+					
+					// 如果删除特定的处理函数。
+					// 搜索特定的处理函数。
+					if (eventHandler) {
 
-					handlers = evt.handlers;
-
-					if (listener) {
-
+						handlers = eventListener.handlers;
 						i = handlers.length;
 
-						// 搜索符合的句柄。
-						while (--i >= 0) {
-							if (handlers[i][0] === listener) {
+						// 根据常见的需求，这里逆序搜索有助于提高效率。
+						while (i-- > 0) {
+							
+							if (handlers[i][0] === eventHandler) {
+								
+								// 删除 hander 。
 								handlers.splice(i, 1);
-
-								if (!i || (i === 1 && handlers[0] === d.initEvent)) {
-									listener = 0;
+								
+								// 如果删除后只剩 0 个句柄，或只剩 1个 initEvent 句柄，则删除全部数据。
+								if (!i || (i === 1 && handlers[0] === true)) {
+									eventHandler = 0;
 								}
 
 								break;
@@ -1230,65 +1301,31 @@
 					}
 
 					// 检查是否存在其它函数或没设置删除的函数。
-					if (!listener) {
+					if (!eventHandler) {
 
 						// 删除对事件处理句柄的全部引用，以允许内存回收。
-						delete d[type];
+						delete data[eventName];
 						
 						// 获取事件管理对象。
-						d = getMgr(me, type);
+						data = getMgr(me, eventName);
 
 						// 内部事件管理的删除。
-						if (d.remove)
-							d.remove(me, type, evt);
+						if (data.remove)
+							data.remove(me, eventName, eventListener);
 					}
-				} else if (!type) {
-					for (evt in d)
-						me.un(evt);
+				} else if (!eventName) {
+					for (eventName in data)
+						me.un(eventName);
 				}
 			}
 			return me;
 		},
 
 		/**
-		 * 手动触发一个监听器。
-		 * @param {String} type 监听名字。
-		 * @param {Object} [e] 传递给监听器的事件对象。
-		 * @return this
-		 * @example <pre>
-	     *
-	     * // 创建一个类 A
-	     * var A = new Class({
-	     *
-	     * });
-	     *
-	     * // 创建一个变量。
-	     * var a = new A();
-	     *
-	     * // 绑定一个 click 事件。
-         * a.on('click', function (e) {
-         * 		return true;
-         * });
-         *
-         * // 手动触发 click， 即执行  on('click') 过的函数。
-         * a.trigger('click');
-         * </pre>
-		 */
-		trigger: function (type, e) {
-
-			// 获取本对象 本对象的数据内容 本事件值 。
-			var me = this, evt = me.dataField().$event, eMgr;
-
-			// 执行事件。
-			return !evt || !(evt = evt[type]) || ((eMgr = getMgr(me, type)).trigger ? eMgr.trigger(me, type, evt, e) : evt(e));
-
-		},
-
-		/**
 		 * 增加一个仅监听一次的事件监听者。
 		 * @param {String} type 事件名。
 		 * @param {Function} listener 监听函数。当事件被处罚时会执行此函数。
-		 * @param {Object} bind=this *listener* 执行时的作用域。
+		 * @param {Object} scope=this *listener* 执行时的作用域。
 		 * @return this
 		 * @example <pre>
 	     *
@@ -1308,28 +1345,20 @@
          * a.trigger('click');   //  没有输出
          * </pre>
 		 */
-		once: function (type, listener, bind) {
+		once: function (eventName, eventHandler, scope) {
 
-			assert.isFunction(listener, 'JPlus.Base#once(type, listener): {listener} ~');
+			assert.isFunction(eventHandler, 'JPlus.Base#once(eventName, eventHandler): {eventHandler} ~');
 
-			var me = this;
-
-			// one 本质上是 on , 只是自动为 listener 执行 un 。
-			return this.on(type, function () {
-
-				// 删除，避免闭包。
-				me.un(type, arguments.callee);
-
-				// 然后调用。
-				return listener.apply(this, arguments);
-			}, bind);
+			// 先插入一个用于删除句柄的函数。
+			return this.on(eventName, function(){
+				this.un(eventName, eventHandler).un(eventName, arguments.callee);	
+			}).on(eventName, eventHandler, scope);
 		}
 
 	});
 
 	/**
 	 * 系统原生的字符串对象。
-	 * @JPlus
 	 * @class String
 	 */
 	String.implementIf({
@@ -1383,14 +1412,13 @@
 
 	/**
 	 * 系统原生的函数对象。
-	 * @JPlus
 	 * @class Function
 	 */
 	Function.implementIf({
 
 		/**
-		 * 绑定函数作用域(**this**)。并返回一个新函数，这个函数内的 **this** 为指定的 *bind* 。
-		 * @param {Object} bind 要绑定的作用域的值。
+		 * 绑定函数作用域(**this**)。并返回一个新函数，这个函数内的 **this** 为指定的 *scope* 。
+		 * @param {Object} scope 要绑定的作用域的值。
 		 * @example
 		 * <pre>
 		 * var fn = function(){ trace(this);  };
@@ -1400,13 +1428,13 @@
 	     * fnProxy()  ; //  输出 0
 	     * </pre>
 		 */
-		bind: function (bind) {
+		bind: function (scope) {
 
 			var me = this;
 			
-			// 返回对 bind 绑定。
+			// 返回对 scope 绑定。
 			return function () {
-				return me.apply(bind, arguments);
+				return me.apply(scope, arguments);
 			}
 		}
 
@@ -1414,7 +1442,6 @@
 
 	/**
 	 * 系统原生的数组对象。
-	 * @JPlus
 	 * @class Array
 	 */
 	Array.implementIf({
@@ -1428,7 +1455,7 @@
 		 * - {Array} array 当前正在遍历的数组。
 		 *
 		 * 可以让函数返回 **false** 来强制中止循环。
-		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @param {Object} [scope] 定义 *fn* 执行时 **this** 的值。
 		 * @return {Boolean} 如果循环是因为 *fn* 返回 **false** 而中止，则返回 **false**， 否则返回 **true**。
 		 * @method
 		 * @see Object.each
@@ -1474,6 +1501,8 @@
 				this.push(value);
 			return exists;
 		},
+		
+		/// TODO: clear
 
 		/**
 		 * 将指定的 *value* 插入到当前数组的指定位置。
@@ -1486,6 +1515,7 @@
 	     * </pre>
 		 */
 		insert: function (index, value) {
+			assert.deprected("Array#insert 即将从 System.Core.Base 移除。要使用此函数，可引用 System.Utils.Array 组件。");
 			assert.isNumber(index, "Array#insert(index, value): {index} ~");
 			var me = this, tmp;
 			if (index < 0 || index >= me.length) {
@@ -1499,6 +1529,8 @@
 			return index;
 
 		},
+		
+		/// TODO: clear
 
 		/**
 		 * 对当前数组的每个元素调用其指定属性名的函数，并将返回值放入新的数组返回。
@@ -1617,7 +1649,7 @@
 		 * - {Array} array 当前正在遍历的数组。
 		 *
 		 * 如果函数返回 **true**，则当前元素会被添加到返回值数组。
-		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @param {Object} [scope] 定义 *fn* 执行时 **this** 的值。
 		 * @return {Array} 返回一个新的数组，包含过滤后的元素。
 		 * @remark 目前除了 IE8-，主流浏览器都已内置此函数。
 		 * @see #each
@@ -1630,11 +1662,11 @@
 	     * })  //  [1, 2]
 	     * </pre>
 		 */
-		filter: function (fn, bind) {
-			assert.isFunction(fn, "Array#filter(fn, bind): {fn} ~");
+		filter: function (fn, scope) {
+			assert.isFunction(fn, "Array#filter(fn, scope): {fn} ~");
 			var r = [];
 			ap.forEach.call(this, function (value, i, array) {
-				if (fn.call(bind, value, i, array))
+				if (fn.call(scope, value, i, array))
 					r.push(value);
 			});
 			return r;
@@ -1649,7 +1681,7 @@
 		 * - {Array} array 当前正在遍历的数组。
 		 *
 		 * 可以让函数返回 **false** 来强制中止循环。
-		 * @param {Object} [bind] 定义 *fn* 执行时 **this** 的值。
+		 * @param {Object} [scope] 定义 *fn* 执行时 **this** 的值。
 		 * @see #each
 		 * @see Object.each
 		 * @see #filter
@@ -1696,17 +1728,17 @@
 	/**
 	 * 对数组运行一个函数。
 	 * @param {Function} fn 遍历的函数。参数依次 value, index, array 。
-	 * @param {Object} bind 对象。
+	 * @param {Object} scope 对象。
 	 * @return {Boolean} 返回一个布尔值，该值指示本次循环时，有无出现一个函数返回 false 而中止循环。
 	 */
-	function each(fn, bind) {
+	function each(fn, scope) {
 
-		assert(Object.isFunction(fn), "Array#each(fn, bind): {fn} 必须是一个函数。", fn);
+		assert(Object.isFunction(fn), "Array#each(fn, scope): {fn} 必须是一个函数。", fn);
 
 		var i = -1, me = this;
 
 		while (++i < me.length)
-			if (fn.call(bind, me[i], i, me) === false)
+			if (fn.call(scope, me[i], i, me) === false)
 				return false;
 		return true;
 	}
@@ -1741,18 +1773,18 @@
 	 * @param {String} type 事件名。
 	 * @return {Object} 符合要求的事件管理器，如果找不到合适的，返回默认的事件管理器。
 	 */
-	function getMgr(obj, type) {
+	function getMgr(obj, eventName) {
 		var clazz = obj.constructor, 
 			t;
 
 		// 遍历父类，找到指定事件。
-		while (!(t = clazz.$event) || !(type in t)) {
+		while (!(t = clazz.$event) || !(eventName in t)) {
 			if (!(clazz = clazz.base)) {
 				return emptyObj;
 			}
 		}
 
-		return t[type];
+		return t[eventName];
 	}
 
 	/// #endregion
@@ -1871,15 +1903,15 @@ function assert(value, message) {
 }
 
 /**
- * 使用一个名空间。
- * @param {String} namespace 名字空间。
+ * 载入一个组件的 js 和 css源码。
+ * @param {String} namespace 组件全名。
  * @example <pre>
  * using("System.Dom.Keys");
  * </pre>
  */
 function using(namespace, isStyle) {
 
-	assert.isString(namespace, "using(ns): {ns} 不是合法的名字空间。");
+	assert.isString(namespace, "using(ns): {ns} 不是合法的组件全名。");
 
 	var cache = using[isStyle ? 'styles' : 'scripts'];
 
@@ -1931,8 +1963,8 @@ function using(namespace, isStyle) {
 }
 
 /**
- * 导入指定名字空间表示的样式文件。
- * @param {String} namespace 名字空间。
+ * 导入指定组件全名表示的样式文件。
+ * @param {String} namespace 组件全名。
  */
 function imports(namespace) {
 	return using(namespace, true);
@@ -2825,7 +2857,7 @@ function imports(namespace) {
 		styles: [],
 
 		/**
-         * 全部已载入的名字空间。
+         * 全部已载入的组件全名。
          * @type Array
          * @private
          */
@@ -2857,12 +2889,12 @@ function imports(namespace) {
 		})().replace("system/core/assets/scripts/", ""),
 
 		/**
-         * 将指定的名字空间转为路径。
-         * @param {String} ns 名字空间。
+         * 将指定的组件全名转为路径。
+         * @param {String} namespace 组件全名。
          * @param {Boolean} isStyle=false 是否为样式表。
          */
-		resolve: function (ns, isStyle) {
-			return ns.replace(/^([^.]+\.[^.]+)\./, isStyle ? '$1.assets.styles.' : '$1.assets.scripts.').replace(/\./g, '/');
+		resolve: function (namespace, isStyle) {
+			return namespace.replace(/^([^.]+\.[^.]+)\./, isStyle ? '$1.assets.styles.' : '$1.assets.scripts.').replace(/\./g, '/');
 		}
 
 	});
@@ -3121,18 +3153,18 @@ function imports(namespace) {
 			
 			/**
 			 * 对当前集合的每个节点的 Dom 封装调用其指定属性名的函数，并将返回值放入新的数组返回。
-			 * @param {String} funcName 要调用的函数名。
+			 * @param {String} fnName 要调用的函数名。
 			 * @param {Array} args=[] 调用时的参数数组。
 			 * @return {Array} 返回包含执行结果的数组。
 			 * @see Array#see
 			 */
-			invoke: function(funcName, args) {
+			invoke: function(fnName, args) {
 				args = args || [];
 				var r = [];
-				assert(dp[funcName] && dp[funcName].apply, "DomList#invoke(funcName): {funcName} 不是 Dom 对象的方法。", funcName);
+				assert(dp[fnName] && dp[fnName].apply, "DomList#invoke(fnName): {fnName} 不是 Dom 对象的方法。", fnName);
 				this.forEach(function(value) {
 					value = new Dom(value);
-					r.push(value[funcName].apply(value, args));
+					r.push(value[fnName].apply(value, args));
 				});
 				return r;
 			},
@@ -3280,15 +3312,20 @@ function imports(namespace) {
 				this.returnValue = false;
 			},
 			
+			/// TODO: clear
+			
 			/**
 			 * 停止默认事件和冒泡。
 			 * @remark 此函数可以完全撤销事件。 事件处理函数中 return false 和调用 stop() 是不同的， return
 			 *         false 只会阻止当前事件其它函数执行， 而 stop() 只阻止事件冒泡和默认事件，不阻止当前事件其它函数。
 			 */
 			stop: function() {
+				assert.deprected('Dom.Event#stop() 已过时，请改用 return false 实现阻止事件。');
 				this.stopPropagation();
 				this.preventDefault();
 			},
+			
+			/// TODO: clear
 			
 			/**
 			 * 获取当前发生事件 Dom 对象。
@@ -3301,8 +3338,14 @@ function imports(namespace) {
 		
 		// 系统使用的变量
 		
+		/**
+		 * Dom.prototype
+		 */
 		dp = Dom.prototype,
 		
+		/**
+		 * DomEvent.prototype
+		 */
 		ep = DomEvent.prototype,
 		
 		/**
@@ -3325,34 +3368,46 @@ function imports(namespace) {
 		/**
 		 * 默认事件。
 		 * @type Object
-		 * @ignore
 		 */
 		defaultEvent = {
+			
+			/**
+			 * 阻止事件的函数。 
+			 * @param {Event} e 事件参数。
+			 */
+			stopEvent: function(e){
+				e.stopPropagation();
+				e.preventDefault();
+			},
 
 			/**
-			 * 创建当前事件可用的参数。
-			 * @param {Dom} ctrl 事件所有者。
-			 * @param {Event} e 事件参数。
-			 * @param {Object} target 事件目标。
+			 * 发送处理指定的事件。
+			 * @param {Dom} dom 事件所有者。
+			 * @param {Event} eventName 事件名。
+			 * @param {Function} eventListener 事件监听器。
 			 * @return {Event} e 事件参数。
 			 */
-			trigger: function (dom, type, fn, e) {
+			dispatch: function (dom, eventName, eventListener, e) {
 				dom = dom.node;
 				
 				var event = e;
 				
-				if(!event || !event.type){
-					event = new Dom.Event(dom, type);
+				if(!e || !e.type){
+					e = new Dom.Event(dom, eventName);
 					
-					// IE 8- 在处理原生事件时肯能出现错误。
-					try{
-						extend(event, e);
-					}catch(e){
+					if(event) {
+						
+						// IE 8- 在处理原生事件时肯能出现错误。
+						try{
+							extend(e, event);
+						}catch(ex){
+							
+						}
 						
 					}
 				}
 
-				return fn(event) && (!dom[type = 'on' + type] || dom[type](event) !== false);
+				return eventListener(e) && (!dom[eventName = 'on' + eventName] || dom[eventName](e) !== false);
 			},
 
 			/**
@@ -3381,8 +3436,16 @@ function imports(namespace) {
 
 		},
 		
+		/**
+		 * 鼠标事件。 
+		 * @type Object
+		 */
 		mouseEvent = defaultEvent,
 		
+		/**
+		 * 键盘事件。 
+		 * @type Object
+		 */
 		keyEvent = defaultEvent,
 		
 		// 正则
@@ -3430,13 +3493,12 @@ function imports(namespace) {
 			getProp: function(elem, name) {
 				return name in elem ? elem[name] : null;
 			},
-
 			setProp: function(elem, name, value) {
 				if ('238'.indexOf(elem.nodeType) === -1){
 					elem[name] = value;
 				}
 			},
-
+			
 			get: function(elem, name) {
 				return elem.getAttribute ? elem.getAttribute(name) : this.getProp(elem, name);
 			},
@@ -3506,10 +3568,10 @@ function imports(namespace) {
 		
 		/**
 		 * 在 Dom.parseNode 和 setHtml 中对 HTML 字符串进行包装用的字符串。
-		 * @type Object 部分元素只能属于特定父元素， tagFix 列出这些元素，并使它们正确地添加到父元素中。 IE678
+		 * @type Object 部分元素只能属于特定父元素， parseFix 列出这些元素，并使它们正确地添加到父元素中。 IE678
 		 *       会忽视第一个标签，所以额外添加一个 div 标签，以保证此类浏览器正常运行。
 		 */
-		tagFix = {
+		parseFix = {
 			$default: isStd ? [1, '', '']: [2, '$<div>', '</div>'],
 			option: [2, '<select multiple="multiple">', '</select>'],
 			legend: [2, '<fieldset>', '</fieldset>'],
@@ -3616,9 +3678,7 @@ function imports(namespace) {
 		 * 字符串字段。
 		 * @type Object
 		 */
-		textFix = {
-			
-		},
+		textFix = {},
 		
 		/// #if CompactMode
 		 
@@ -3716,10 +3776,10 @@ function imports(namespace) {
 	
 	// 变量初始化。
 
-	// 初始化 tagFix。
-	tagFix.optgroup = tagFix.option;
-	tagFix.tbody = tagFix.tfoot = tagFix.colgroup = tagFix.caption = tagFix.thead;
-	tagFix.th = tagFix.td;
+	// 初始化 parseFix。
+	parseFix.optgroup = parseFix.option;
+	parseFix.tbody = parseFix.tfoot = parseFix.colgroup = parseFix.caption = parseFix.thead;
+	parseFix.th = parseFix.td;
 
 	// 初始化 attrFix。
 	map("enctype encoding action method target", formHook, attrFix);
@@ -4013,7 +4073,7 @@ function imports(namespace) {
 						assert.isString(srcHTML, 'Dom.parseNode(html, context, cachable): {html} ~');
 						html = context.createElement("div");
 
-						var wrap = tagFix[tag[1].toLowerCase()] || tagFix.$default;
+						var wrap = parseFix[tag[1].toLowerCase()] || parseFix.$default;
 
 						// IE8- 会过滤字符串前的空格。
 						// 为了保证全部浏览器统一行为，此处删除全部首尾空格。
@@ -4599,11 +4659,11 @@ function imports(namespace) {
 		
 			var classes = [DomList, Dom], i;
 		
-			for(var funcName in members){
+			for(var fnName in members){
 				i = classes.length;
 				while(i--) {
-					if(!copyIf || !classes[i].prototype[funcName]) {
-						classes[i].prototype[funcName] = i ? members[funcName] : createDomListMthod(funcName, listType);
+					if(!copyIf || !classes[i].prototype[fnName]) {
+						classes[i].prototype[fnName] = i ? members[fnName] : createDomListMthod(fnName, listType);
 					}
 				}
 			}
@@ -4639,8 +4699,6 @@ function imports(namespace) {
 		Event: DomEvent
 
 	})
-	
-	/**@class Dom*/
 	
 	.implement({
 
@@ -5153,7 +5211,7 @@ function imports(namespace) {
 			}
 
 			var elem = this.node,
-				map = tagFix.$default;
+				map = parseFix.$default;
 
 			assert(elem.nodeType === 1, "Dom#setHtml(value): {elem} 不是元素节点(nodeType === 1), 无法执行 setHtml。", elem);
 
@@ -5322,6 +5380,50 @@ function imports(namespace) {
 			return this;
 			
 		},
+		
+		/**
+		 * 批量为当前 DOM 节点绑定事件。 
+		 * @since 3.2
+		 */
+		bind: function(eventAndSelector, handler){
+			
+			var eventName, selector;
+			
+			if(Object.isObject(eventAndSelector)){
+				for(eventName in eventAndSelector) {
+					this.on(eventName, eventAndSelector[eventName]);
+				}
+			} else {
+				
+				eventName = (/^\w+/.match(eventAndSelector) || [''])[0];
+					
+				assert(eventName, "Dom#bind(eventAndSelector, handler): {eventAndSelector} 中不存在事件信息。正确的 eventAndSelector 格式： click.selector")
+				
+				if(selector = eventAndSelector.substr(eventName.length)){
+					this.delegate(eventName, delegateEventName, handler);
+				} else {
+					this.on(eventName, handler);
+				}
+				
+			}
+			
+			return this;
+		},
+		
+		/**
+		 * 模拟提交表单。
+		 */
+		submit: function(){
+			
+			// 当手动调用 submit 的时候，不会触发 submit 事件，因此手动模拟  #8
+			
+			var e = new Dom.Event(this.node, 'submit');
+			this.trigger('submit', e);
+			if(e.returnValue !== false){
+				this.node.submit();
+			}
+			return this;
+		},
 
 		/**
 		 * 通过当前 Dom 对象代理执行子节点的事件。
@@ -5407,6 +5509,8 @@ function imports(namespace) {
 						handlerInfo = actucalHandlers[i];
 						
 						if(handlerInfo[0].call(handlerInfo[1], e) === false) {
+							e.stopPropagation();
+							e.preventDefault();
 							break;
 						}
 					}
@@ -6110,7 +6214,7 @@ function imports(namespace) {
 		
 	}, 4);
 	
-	/// #endif
+	/// #endregion
 
 	Object.each({
 
@@ -6249,6 +6353,9 @@ function imports(namespace) {
 
 	});
 	
+	// Dom 函数。
+	Dom.defineMethods('node', 'scrollIntoView focus blur select click reset', 1);
+	
 	/// #region document
 	
 	/**
@@ -6299,11 +6406,6 @@ function imports(namespace) {
 		return new DomList(result);
 	};
 	
-	/// #endif
-
-	// Dom 函数。
-	Dom.defineMethods('node', 'scrollIntoView focus blur select click submit reset', 1);
-	
 	// 拷贝 DOM Event 到 document 。
 	t = document.constructor;
 	if(t){
@@ -6314,17 +6416,25 @@ function imports(namespace) {
 	}
 
 	// document 函数。
-	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize first last parent child children has', function (funcName) {
-		document[funcName] = dp[funcName];
+	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize first last parent child children has', function (fnName) {
+		document[fnName] = dp[fnName];
 	});
+	
+	/// #endregion
+
+	/// #region DomList
 	
 	// DomList 函数。
-	map("slice splice reverse unique shift pop unshift push include indexOf each forEach", function (funcName, index) {
-		DomList.prototype[funcName] = index < 4 ? function() {
-			return new DomList(ap[funcName].apply(this, arguments));
-		} : ap[funcName];
+	map("slice splice reverse unique shift pop unshift push include indexOf each forEach", function (fnName, index) {
+		DomList.prototype[fnName] = index < 4 ? function() {
+			return new DomList(ap[fnName].apply(this, arguments));
+		} : ap[fnName];
 	});
 	
+	/// #endregion
+
+	/// #region Event
+
 	map("$default mousewheel blur focus scroll change select submit resize error load unload touchstart touchmove touchend hashchange", defaultEvent, Dom.$event);
 	
 	/// #if CompactMode
@@ -6335,7 +6445,11 @@ function imports(namespace) {
 
 		domReady = 'DOMContentLoaded';
 		t = Event.prototype;
+		
+		/// TODO: clear
 		t.stop = ep.stop;
+		
+		/// TODO: clear
 		t.getTarget = ep.getTarget;
 		
 	/// #if CompactMode
@@ -6346,7 +6460,11 @@ function imports(namespace) {
 		
 		defaultEvent.initEvent = function (e) {
 			e.target = e.srcElement;
+		
+		/// TODO: clear
 			e.stop = ep.stop;
+		
+		/// TODO: clear
 			e.getTarget = ep.getTarget;
 			e.stopPropagation = ep.stopPropagation;
 			e.preventDefault = ep.preventDefault;
@@ -6528,10 +6646,10 @@ function imports(namespace) {
 	if(div.onfocusin === undefined) {
 
 		Dom.addEvents('focusin focusout', {
-			fix: function(elem, type, funcName) {
+			fix: function(elem, type, fnName) {
 				var base = type === 'focusin' ? 'focus' : 'blur';
 				var doc = elem.node.ownerDocument || elem.node;
-				doc[funcName](base, this.handler, true);
+				doc[fnName](base, this.handler, true);
 			},
 			handler: function(e) {
 				var type = e.orignalType = e.type === 'focus' ? 'focusin' : 'focusout';
@@ -6567,7 +6685,7 @@ function imports(namespace) {
 	if(navigator.isFirefox) {
 		Dom.addEvents('click', {
 			initEvent: function(e){
-				return e.which === 1;
+				return e.which === undefined || e.which === 1;
 			}
 		});
 	}
@@ -6601,7 +6719,9 @@ function imports(namespace) {
 			delegate: 'focusout'
 		});
 	
-	/// #endif
+	/// #endregion
+
+	/// #region DomReady
 
 	/**
 	 * 设置在页面加载(不包含图片)完成时执行函数。
@@ -6642,7 +6762,7 @@ function imports(namespace) {
 		readyOrLoad = 'dom' + readyOrLoad;
 
 		// 设置 ready load
-		return function (fn, bind) {
+		return function (fn, scope) {
 			
 			// 忽略参数不是函数的调用。
 			var isFn = Object.isFunction(fn);
@@ -6651,12 +6771,12 @@ function imports(namespace) {
 			if(Dom[isReadyOrIsLoad]) {
 
 				if (isFn)
-					fn.call(bind);
+					fn.call(scope);
 
 				// 如果参数是函数。
 			} else if (isFn) {
 
-				document.on(readyOrLoad, fn, bind);
+				document.on(readyOrLoad, fn, scope);
 
 				// 触发事件。
 				// 如果存在 JS 之后的 CSS 文件， 肯能导致 document.body 为空，此时延时执行 DomReady
@@ -6717,27 +6837,27 @@ function imports(namespace) {
 			var topLevel = false;
 
 			try {
-				topLevel = window.frameElement == null;
+				topLevel = window.frameElement == null && document.documentElement;
 			} catch(e) {
 			}
 
-			if(topLevel && document.documentElement.doScroll) {
+			if(topLevel && topLevel.doScroll) {
 
 				/**
 				 * 为 IE 检查状态。
 				 * @private
 				 */
-				(function() {
+				(function doScrollCheck() {
 					if(Dom.isReady) {
 						return;
 					}
 
 					try {
-						// http:// javascript.nwbox.com/IEContentLoaded/
-						document.documentElement.doScroll("left");
+						// Use the trick by Diego Perini
+						// http://javascript.nwbox.com/IEContentLoaded/
+						topLevel.doScroll("left");
 					} catch(e) {
-						setTimeout(arguments.callee, 1);
-						return;
+						return setTimeout(doScrollCheck, 50);
 					}
 
 					Dom.ready();
@@ -6750,6 +6870,10 @@ function imports(namespace) {
 		setTimeout(Dom.load, 1);
 	}
 	
+	/// #endregion
+
+	/// #region Export
+	
 	div = null;
 	
 	// 导出函数。
@@ -6759,40 +6883,52 @@ function imports(namespace) {
 	window.$ = window.$ || Dom.get;
 	window.$$ = window.$$ || Dom.query;
 	
+	/// #endregion
+
 	/**
 	 * @class
 	 */
 
-	function createDomListMthod(funcName, listType){
+	/**
+	 * 创建 DomList 的方法。 
+	 * @param {NodeList} fnName 对应的 Dom 对象的函数名。
+	 * @param {Integer} listType=0 函数类型。
+	 */
+	function createDomListMthod(fnName, listType){
 		return !listType ? function () {
-			// 为每个 Dom 对象调用 funcName 。
+			// 为每个 Dom 对象调用 fnName 。
 			var i = 0, len = this.length, target;
 			while(i < len) {
 				target = new Dom(this[i++]);
-				target[funcName].apply(target, arguments);
+				target[fnName].apply(target, arguments);
 			}
 			return this;
 		} : listType === 2 ? function() {
 			// 返回第一个元素的对应值 。
 			if(this.length) {
 				var target = new Dom(this[0]);
-				return target[funcName].apply(target, arguments);
+				return target[fnName].apply(target, arguments);
 			}
 		} : listType === 3 ? function() {
 			// 将返回的每个节点放入新的 DomList 中。
 			var r = new DomList;
-			return r.add.apply(r, this.invoke(funcName, arguments));
+			return r.add.apply(r, this.invoke(fnName, arguments));
 		} : function() {
 			// 只要有一个返回非 false，就返回这个值。
 			var i = 0, r, target;
 			while (i < this.length && !r) {
 				target = new Dom(this[i++]);
-				r = target[funcName].apply(target, arguments);
+				r = target[fnName].apply(target, arguments);
 			}
 			return r;
 		};
 	}
-
+	
+	/**
+	 * 遍历 NodeList 对象。 
+	 * @param {NodeList} nodelist 要遍历的 NodeList。
+	 * @param {Function} fn 遍历的函数。
+	 */
 	function each(nodelist, fn) {
 		var i = 0, node;
 		while( node = nodelist[i++]){
@@ -6802,12 +6938,12 @@ function imports(namespace) {
 
 	/**
 	 * 获取元素的文档。
-	 * @param {Node} elem 元素。
+	 * @param {Node} node 元素。
 	 * @return {Document} 文档。
 	 */
-	function getDocument(elem) {
-		assert.isNode(elem, 'Dom.getDocument(elem): {elem} ~', elem);
-		return elem.ownerDocument || elem.document || elem;
+	function getDocument(node) {
+		assert.isNode(node, 'Dom.getDocument(node): {node} ~', node);
+		return node.ownerDocument || node.document || node;
 	}
 
 	/**
@@ -7050,15 +7186,20 @@ function imports(namespace) {
 		};
 	}
 	
-	function match(dom, selector){
+	/**
+	 * 判断指定选择器是否符合指定的节点。 
+	 * @param {Node} node 判断的节点。
+	 * @param {String} selector 选择器表达式。
+	 */
+	function match(node, selector){
 		var r, i = 0;
 		try{
-			r = dom.parentNode.querySelectorAll(selector);
+			r = node.parentNode.querySelectorAll(selector);
 		} catch(e){
-			return query(selector, new Dom(dom.parentNode)).indexOf(dom) >= 0 || query(selector, Dom.document).indexOf(dom) >= 0;
+			return query(selector, new Dom(node.parentNode)).indexOf(node) >= 0 || query(selector, Dom.document).indexOf(node) >= 0;
 		}
 		while(r[i])
-			if(r[i++] === dom)
+			if(r[i++] === node)
 				return true;
 		
 		return false;
@@ -7308,9 +7449,13 @@ function imports(namespace) {
 		
 		return result;
 	}
-	
-	function throwError(string) {
-		throw new SyntaxError('An invalid or illegal string was specified : "' + string + '"!');
+		
+	/**
+	 * 抛出选择器语法错误。 
+ 	 * @param {String} message 提示。
+	 */
+	function throwError(message) {
+		throw new SyntaxError('An invalid or illegal string was specified : "' + message + '"!');
 	}
 
 	/// #endregion
@@ -7530,7 +7675,7 @@ var Ajax = (function() {
 			// * 发送数据错误的回调。
 			// * @type Function
 			// */
-			//errorCode: null,
+			//error: null,
 	
 			///**
 			// * 发送数据完成的回调。
@@ -7627,6 +7772,8 @@ var Ajax = (function() {
 					timeout: defaultOptions.timeout,
 					exception: defaultOptions.exception
 				}, options);
+				
+				assert(!options.url || options.url.replace, "Ajax#run(options): {options.url} 必须是字符串。", options.url);
 
 				// dataType
 				options.dataType = options.dataType || defaultOptions.dataType;
@@ -7650,7 +7797,7 @@ var Ajax = (function() {
 					);
 	
 				}
-
+				
 				// 当前用于传输的工具。
 				transport = Ajax.transports[options.dataType];
 
@@ -7716,6 +7863,10 @@ var Ajax = (function() {
 		concatUrl: function(url, param) {
 			return param ? url + (url.indexOf('?') >= 0 ? '&' : '?') + param : url;
 		},
+		
+		addCachePostfix: function(url){
+			return /[?&]_=/.test(url) ? url : Ajax.concatUrl(url, '_=' + Date.now() + JPlus.id++);
+		},
 
 		/**
 		 * 判断一个 HTTP 状态码是否表示正常响应。
@@ -7755,7 +7906,7 @@ var Ajax = (function() {
 	 * 公共的 XHR 对象。
 	 */
 	Ajax.transports.text = Ajax.XHR = {
-
+		
 		/**
 		 * 根据 xhr 获取响应。
 		 * @type {XMLHttpRequest} xhr 要获取的 xhr 。
@@ -7802,11 +7953,11 @@ var Ajax = (function() {
 
 			// cache
 			if (options.cache === false) {
-				options.url = Ajax.concatUrl(options.url, '_=' + Date.now() + JPlus.id++);
+				options.url = Ajax.addCachePostfix(options.url);
 			}
 
 			// headers
-			headers = options.headers = {};
+			headers = {};
 
 			// headers['Accept']
 			headers.Accept = options.dataType in Ajax.accepts ? Ajax.accepts[options.dataType] + ", " + defaultAccepts + "; q=0.01" : defaultAccepts;
@@ -7828,7 +7979,7 @@ var Ajax = (function() {
 
 			// 如果参数有 headers, 复制到当前 headers 。
 			if (options.headers) {
-				Object.extend(headers, options.headers);
+				options.headers = Object.extend(headers, options.headers);
 			}
 
 			// 发送请求。
@@ -7848,30 +7999,30 @@ var Ajax = (function() {
 			 * - 1: HTTP 成功相应，但返回的状态码被认为是不对的。
 			 * - 2: HTTP 成功相应，但返回的内容格式不对。
 			 */
-			callback = options.callback = function(errorMessage, errorCode) {
+			callback = options.callback = function(errorMessage, error) {
 
 				// xhr
 				var xhr = options.xhr;
 
 				try {
 
-					if (xhr && (errorCode || xhr.readyState === 4)) {
+					if (xhr && (error || xhr.readyState === 4)) {
 
 						// 删除 readystatechange  。
 						// 删除 options.callback 避免被再次触发。
 						xhr.onreadystatechange = options.callback = Function.empty;
 
 						// 如果存在错误。
-						if (errorCode) {
+						if (error) {
 
 							// 如果是因为超时引发的，手动中止请求。
 							if (xhr.readyState !== 4) {
 								xhr.abort();
 							}
 
-							// 出现错误 status = errorCode 。
-							options.status = errorCode;
-							options.statusText = null;
+							// 出现错误 status = error 。
+							options.status = error;
+							options.statusText = "";
 							options.errorMessage = errorMessage;
 						} else {
 
@@ -7888,27 +8039,27 @@ var Ajax = (function() {
 							// 检验状态码是否正确。
 							if (Ajax.checkStatus(options.status)) {
 								// 如果请求合法，且数据返回正常，则使用 getResponse 获取解析的原始数据。
-								errorCode = 0;
+								error = 0;
 								options.errorMessage = null;
 								try {
 									options.response = options.getResponse(xhr);
 								} catch (getResponseError) {
-									errorCode = 2;
+									error = 2;
 									options.errorMessage = getResponseError.message;
 								}
 							} else {
-								errorCode = 1;
+								error = 1;
 								options.errorMessage = options.statusText;
 							}
 
 						}
 
-						// 保存 errorCode 。
-						options.errorCode = errorCode;
+						// 保存 error 。
+						options.errorCode = error;
 
 						try {
 
-							if (errorCode) {
+							if (error) {
 								if (options.error)
 									options.error.call(options.target, options.errorMessage, xhr);
 
@@ -8035,11 +8186,18 @@ Ajax.transports.script = {
 		}
 
 		options.type = "GET";
-
+		
 		// cache
-		if (!options.cache || options.options.cache !== false) {
+		if (options.cache !== false) {
 			options.cache = false;
-			options.url = Ajax.concatUrl(options.url, '_=' + Date.now() + JPlus.id++);
+			
+			options.url = Ajax.addCachePostfix(options.url);
+		}
+
+		// data
+		if (options.data) {
+			options.url = Ajax.concatUrl(options.url, options.data);
+			options.data = null;
 		}
 
 		var script = options.script = document.createElement('SCRIPT'),
@@ -8057,25 +8215,28 @@ Ajax.transports.script = {
 					// 删除当前脚本。
 					script.parentNode.removeChild(script);
 
-					// 保存 errorCode 。
-					options.errorCode = error;
-
 					try {
-
-						if (error >= 0) {
+						
+						if(error < 0) {
+							options.status = error;
+							options.statusText = "";
+						} else {
 							options.status = 200;
 							options.statusText = "OK";
-							options.errorMessage = null;
-						} else {
-							options.status = error;
-							options.statusText = null;
-							options.errorMessage = errorMessage;
 						}
 
 						if (error) {
+							
+							options.errorCode = error;
+							options.errorMessage = errorMessage;
+							
 							if (options.error)
 								options.error.call(options.target, options.errorMessage, script);
 						} else {
+							
+							options.errorCode = 0;
+							options.errorMessage = null;
+							
 							if (options.success)
 								options.success.call(options.target, options.response, script);
 						}
@@ -8094,7 +8255,7 @@ Ajax.transports.script = {
 				}
 			};
 
-		script.src = me.url;
+		script.src = options.url;
 		script.type = "text/javascript";
 		script.async = "async";
 		if (options.charset)
@@ -8107,7 +8268,7 @@ Ajax.transports.script = {
 		script.onload = script.onreadystatechange = callback;
 
 		script.onerror = function(e) {
-			callback(e.message, 2);
+			callback('Network Error', 2);
 		};
 		
 		if (options.timeouts > 0) {
@@ -8423,87 +8584,64 @@ var Tpl = {
 	
 	cache: {},
 	
-	encodeJs: function(input){
-		return input.replace(/[\r\n]/g, '\\n').replace(/"/g, '\\"');
+	/**
+	 * 使用指定的数据解析模板，并返回生成的内容。
+	 * @param {String} tpl 表示模板的字符串。
+	 * @param {Object} data 数据。
+	 * @param {Object} bind 模板中 this 的指向。
+	 * @return {String} 处理后的字符串。 
+	 */
+	parse: function(tpl, data, bind) {
+		return (Tpl.cache[tpl] || (Tpl.cache[tpl] = Tpl.compile(tpl))).call(bind, data);
 	},
-
-	processStatement: function(text, empty){
-		return 'try{with($data){$tmp=' + text + ';}}catch(e){$tmp=' + empty + '}';
-	},
-	
-	processCommand: function(command, blockStack){
-		var head = (command.match(/^\w+\b/) || [''])[0],
-			text = command.replace(head, "");
-
-		switch(head) {
-			case "end":
-				return blockStack.pop() === true ? "},this);" : "}";
-			case 'if':
-			case 'while':
-				blockStack.push(false);
-				assert(text, "Tpl.processCommand(command): 无法处理命令{" + head + " " + text + " } (" + head + " 命名的格式为 {" + head + " condition}");
-				return Tpl.processStatement(text, "\"\"") + head + "(Object.isArray($tmp)?$tmp.length:$tmp){";
-			case 'for':
-				if (/^\(/.test(text)) {
-					blockStack.push(false);
-					return "for" + text + "{";
-				}
-
-				command = text.split(/\s+in\s+/);
-				blockStack.push(true);
-				assert(command.length === 2 && command[0] && command[1], "Tpl.processCommand(command): 无法处理命令{for " + text + " } (for 命名的格式为 {for var_name in obj}");
-				return Tpl.processStatement(command[1], "null") + 'Object.each($tmp, function(' + command[0].replace('var ', '') + ', $index, $value){';
-			case 'else':
-				text = text.trim();
-				if (/^if\b/.exec(text)) {
-					blockStack.pop();
-					return '}else ' + Tpl.processCommand(text, blockStack);
-				}
-				return '}else{';
-			case 'var':
-				return command + ';';
-			case 'eval':
-				return text;
-			default:
-				return Tpl.processStatement(command || "\"\"", "\"\"") + 'if($tmp!=undefined){$output+=$tmp;}';
-		}
-	},
-	
+		
 	/**
 	 * 把一个模板编译为函数。
 	 * @param {String} tpl 表示模板的字符串。
 	 * @return {Function} 返回的函数。
 	 */
 	compile: function(tpl){
+		tpl = Tpl.build(Tpl.lexer(tpl));
+		return new Function("_", tpl);
+	},
+	
+	/**
+	 * 对一个模板进行词法解析。返回拆分的数据单元。
+	 * @param {String} tpl 表示模板的字符串。
+	 * @return {Array} 返回解析后的数据单元。
+	 */
+	lexer: function (tpl) {
 		
-		var output = 'var $output="",$tmp;',
+		/**
+		 * [字符串1, 代码块1, 字符串2, 代码块2, ...]
+		 */
+		var output = [],
 			
 			// 块的开始位置。
 			blockStart = -1,
 			
 			// 块的结束位置。
-			blockEnd = -1,
-			
-			blockStack = [];
+			blockEnd = -1;
 		
 		while ((blockStart = tpl.indexOf('{', blockStart + 1)) >= 0) {
-
-			output += '$output+="' + Tpl.encodeJs(tpl.substring(blockEnd + 1, blockStart)).replace(/\}\}/g, "}") + '";';
-
-			// 从  blockStart 处搜索 }
-			blockEnd = blockStart;
 
 			// 如果 { 后面是 { , 忽略之。
 			if (tpl.charAt(blockStart + 1) === '{') {
 				blockStart++;
 				continue;
 			}
+			
+			// 放入第一个数据区块。
+			output.push(tpl.substring(blockEnd + 1, blockStart));
 
-			// 找到第一个后面不是 } 的  } 字符。
+			// 从  blockStart 处搜索 }
+			blockEnd = blockStart;
+
+			// 搜索 } 字符，如果找到的字符尾随一个 } 则跳过。
 			do {
 				blockEnd = tpl.indexOf('}', blockEnd + 1);
 
-				if (tpl.charAt(blockEnd + 1) !== '}') {
+				if (tpl.charAt(blockEnd + 1) !== '}' || tpl.charAt(blockEnd + 2) === '}') {
 					break;
 				}
 
@@ -8511,37 +8649,125 @@ var Tpl = {
 			} while (true);
 
 			if (blockEnd == -1) {
-				blockEnd = blockStart++;
-				assert(false, "Tpl.compile(tpl): {tpl} 出现了未关闭的标签。", tpl);
+				Tpl.throwError("缺少 '}'", tpl.substr(blockStart));
 			} else {
-				output += Tpl.processCommand(tpl.substring(blockStart + 1, blockStart = blockEnd).trim().replace(/\}\}/g, "}"), blockStack);
+				output.push(tpl.substring(blockStart + 1, blockStart = blockEnd).trim());
 			}
 
 		}
 		
-		output += '$output+="' + Tpl.encodeJs(tpl.substring(blockEnd + 1, tpl.length)) + '";return $output';
-
-		assert(blockStack.length === 0, "Tpl.compile(tpl): {tpl} 中 if/for 和 end 数量不匹配。");
+		// 剩余的部分。
+		output.push(tpl.substring(blockEnd + 1, tpl.length));
 		
-		try{
-		
-			return new Function("$data", output);
-
-		} catch (e) {
-			trace.error(output + ": " + e.message);
-
-			return Function.from(tpl);
-		}
+		return output;
 	},
 	
 	/**
-	 * 使用指定的数据解析模板，并返回生成的内容。
-	 * @param {String} tpl 表示模板的字符串。
-	 * @param {Object} data 数据。
-	 * @return {String} 处理后的字符串。 
+	 * 将词法解析器的结果编译成函数源码。
 	 */
-	parse: function(tpl, data) {
-		return (Tpl.cache[tpl] || (Tpl.cache[tpl] = Tpl.compile(tpl))).call(data, data);
+	build: function(lexerOutput){
+		
+		var output = "var __OUTPUT__=\"\",__INDEX__,__KEY__,__TARGET__,__TMP__;with(_){";
+		
+		for(var i = 0, len = lexerOutput.length, source, isString = true; i < len; i++){
+			source = lexerOutput[i].replace(/([\{\}]){2}/g, "$1");
+			
+			if(isString){
+				output += "__OUTPUT__+=\"" + source.replace(/[\"\\\n\r]/g, Tpl.replaceSpecialChars) + "\";";
+			} else {
+				output += Tpl.parseMacro(source);
+			}
+			
+			isString = !isString;
+		}
+		
+		output +="};return __OUTPUT__";
+		
+		return output;
+	},
+	
+	parseMacro: function(macro){
+		var command = (macro.match(/^\w+\b/) || [''])[0],
+			params = macro.substr(command.length);
+
+		switch(command) {
+			case "end":
+				return "}";
+			case 'if':
+			case 'while':
+				if(!params)
+					Tpl.throwError("'" + command + "' 语句缺少条件, '" + command + "' 语句的格式为 {" + command + " condition}", macro);
+				macro = command + "(Object.isArray(__TMP__=" + params + ")?__TMP__.length:__TMP__){";
+				break;
+			case 'for':
+				if(command = /^\s*(var\s+)?([\w$]+)\s+in\s+/.exec(params)) {
+					macro = "__INDEX__=0;__TARGET__=" + params.substr(command[0].length) + ";for(__KEY__ in __TARGET__){if(!__TARGET__.hasOwnProperty(__KEY__))continue;__INDEX__++;var " + command[2] + "=__TARGET__[__KEY__];";	
+				} else if (/^\(/.test(params)) {
+					return macro + "{";
+				} else {
+					Tpl.throwError("'for' 语法错误， 'for' 语句的格式为 {for var_name in obj}", macro);
+				}
+				break;
+			case 'else':
+				return '}else ' + (/^\s*if\b/.exec(params) ? Tpl.parseMacro(params.trim()) : '{');
+			case 'var':
+				macro += ';';
+				break;
+			case 'function':
+				macro += '{';
+				break;
+			case 'break':
+			case 'continue':
+				break;
+			case 'eval':
+				macro = params;
+				break;
+			default:
+				macro = '__TMP__=' + macro + ';if(__TMP__!=undefined)__OUTPUT__+=__TMP__;';
+				break;
+		}
+		
+		return macro.replace(/@(\w+)\b/g, Tpl.replaceConsts);
+	},
+
+	isLast: function(obj, index){
+		if(typeof obj.length === 'number')
+			return index >= obj.length - 1;
+			
+		for(var p in obj){
+			index--;	
+		}
+		
+		return !index;
+	},
+	
+	consts: {
+		'target': '__TARGET__',
+		'key': '__KEY__',
+		'index': '__INDEX__',
+		'first': '__INDEX__==0',
+		'last': 'Tpl.isLast(__TARGET__,__INDEX__)',
+		'odd': '__INDEX__%2===1',
+		'even': '__INDEX__%2'
+	},
+	
+	replaceConsts: function(_, consts){
+		return Tpl.consts[consts] || _;
+	},
+	
+	specialChars: {
+		'"': '\\"',
+		'\n': '\\n',
+		'\r': '\\r',
+		'\\': '\\\\'
+	},
+	
+	replaceSpecialChars: function(specialChar){
+		return Tpl.specialChars[specialChar] || specialChar;
+	},
+
+	throwError: function(message, tpl){
+		throw new SyntaxError("Tpl.parse: " + message + "。 (在 '" + tpl +"' 附近)");
 	}
 	
 };
@@ -9290,7 +9516,7 @@ var ContentControl = Control.extend({
 	 * @virtual
 	 */
 	createIcon: function(){
-		return this.prepend(Dom.create('i', 'x-icon'));
+		return this.content().before(Dom.create('i', 'x-icon'));
 	},
 	
 	getIcon: function(){
@@ -9516,7 +9742,7 @@ var TreeControl = ListControl.extend({
 	initItemContainer: function(li){
 	
 		// 获取第一个子节点。
-		var subControl = li.find('>ul'),
+		var subControl = li.addClass('x-' + this.xtype + '-item').find('>ul'),
 			item = (subControl ? (subControl.prev() || subControl.prev(true)) : (li.first() || li.first(true))) || Dom.parse('');
 		
 		// 根据节点创建一个 MenuItem 对象。
@@ -9583,7 +9809,7 @@ var TreeControl = ListControl.extend({
  */
 TreeControl.Item = ContentControl.extend({
 	
-	tpl: '<a class="x-control"></a>',
+	tpl: '<a class="x-control">&nbsp;</a>',
 	
 	/**
 	 * 获取当前菜单管理的子菜单。
@@ -9642,9 +9868,11 @@ TreeControl.Item = ContentControl.extend({
 		
 			this.subControl = treeControl;
 			this.initSubControl(treeControl);
+			treeControl.owner = this;
 		} else if(this.subControl){
 			this.subControl.remove();
 			this.uninitSubControl(this.subControl);
+			delete this.subControl.owner;
 			this.subControl = null;
 		}
 		return this;
@@ -9716,10 +9944,10 @@ var IDropDownOwner = {
 	/**
 	 * 下拉菜单的宽度。
 	 * @config {String}
-	 * @defaultValue 'auto'
+	 * @defaultValue -1
 	 * @return 如果值为 'auto', 则和父容器有同样的宽度。如果设为 -1， 表示不处理宽度。
 	 */
-	dropDownWidth: 'auto',
+	dropDownWidth: -1,
 	
 	onDropDownShow: function(){
 		this.trigger('dropdownshow');
@@ -10085,9 +10313,11 @@ var MenuItem = TreeControl.Item.extend({
 	 *
 	 */
 	init: function() {
-		this.unselectable();
-		this.on('mouseover', this.onMouseOver);
-		this.on('mouseout', this.onMouseOut);
+		if(this.hasClass('x-' + this.xtype)) {
+			this.unselectable();
+			this.on('mouseover', this.onMouseOver);
+			this.on('mouseout', this.onMouseOut);
+		}
 	},
 	
 	_cancelHideMenu: function(e) {
@@ -10168,7 +10398,7 @@ var Menu = TreeControl.extend({
 					// 保存原有 childControl 。
 					var t = childControl;
 					childControl = new MenuItem;
-					childControl.append(t);
+					childControl.content().replaceWith(t);
 				}
 				if (parent) {
 					parent.prepend(childControl);
@@ -10373,12 +10603,17 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 			<a href="javascript:;" class="x-button">A</a>\
 		</span>',
 		
-	menuButtonTpl: '<button class="x-button"><span class="x-button-menu"></span></button>',
+	menuButtonTpl: '<button class="x-button" type="button"><span class="x-button-menu"></span></button>',
 	
 	/**
 	 * 当前控件是否为下拉列表。
 	 */
 	dropDownList: false,
+	
+	/**
+	 * 下拉框的宽度。
+	 */
+	dropDownWidth: 'auto',
 	
 	/**
 	 * @config dropDownList 是否允许用户输入自定义的文本值。
@@ -10395,16 +10630,22 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 	input: function(){
 		
 		// 如果不存在隐藏域。
-		if(!this.hiddenField) {
+	    if (!this.hiddenField) {
+
+	        if(/^(TEXTAREA|INPUT|SELECT)$/.test(this.node.tagName)){
+	            this.hiddenField = new Dom(this.node);
+	        } else {
+                
 			
-			var textBox = this.find('.x-textbox');
+	            var textBox = this.find('.x-textbox');
 			
-			if(textBox){
-				return textBox;	
-			}
+	            if(textBox){
+	                return textBox;	
+	            }
 			
-			this.hiddenField = Dom.parse('<input type="hidden">').appendTo(this);
-			this.hiddenField.setAttr('name', Dom.getAttr(this.node, 'name'));
+	            this.hiddenField = Dom.parse('<input type="hidden">').appendTo(this);
+	            this.hiddenField.setAttr('name', Dom.getAttr(this.node, 'name'));
+	        }
 		}
 		
 		return this.hiddenField;
@@ -10622,8 +10863,8 @@ var ComboBox = Picker.extend({
 	 */
 	onItemClick: function(item, e){
 		
-		// 禁止事件。
-		e.stop();
+	    //e.preventDefault();
+	    //e.StopPropogation();
 	
 		// 如果无法更改值，则直接忽略。
 		if(!this.getAttr('disabled') && !this.getAttr('readonly')) {
@@ -10632,6 +10873,8 @@ var ComboBox = Picker.extend({
 			this.selectItem(item);
 			
 		}
+
+		return false;
 		
 	},
 	
@@ -10669,12 +10912,17 @@ var ComboBox = Picker.extend({
 		
 		// 如果是 dropDownList, 还需要更新 <select> 的值。
 		if(this.dropDownList){
+			var elem = this.hiddenField.node,
+				oldIndex = elem.selectedIndex;
 			if(item == null){
-				this.hiddenField.node.selectedIndex = -1;
+				elem.selectedIndex = -1;
 			} else {
-				this.hiddenField.node.value = item.option.value;
+				elem.value = item.option.value;
 			}
 			this._syncSelect();
+			
+			if(oldIndex !== elem.selectedIndex)
+				this.onChange();
 		} else {
 			IInput.setText.call(this, item.getText());
 		}
@@ -10858,6 +11106,8 @@ ComboBox.DropDownMenu = ListControl.extend({
  ************************************/
 var Suggest = ComboBox.extend({
 	
+	dropDownWidth: 'auto',
+	
 	getSuggestItems: function(text){
 		if(!this.items){
 			this.items = [];
@@ -11017,3 +11267,10 @@ var LinkButton = Control.extend({
 	}
 	
 });
+
+var a = {} || '';
+a.getID = function () {
+    for (key in value) {
+           
+    }
+}

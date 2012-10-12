@@ -2342,7 +2342,7 @@ Demo.extend(Demo, {
 				// Integrate the decorations and tags back into the source code,
 				// modifying the sourceNode in place.
 				recombineTagsAndDecorations(sourceAndSpans, SH.findBrush(language)(sourceAndSpans.sourceCode, 0));
-
+				
 				if (lineNumberStart != undefined ? lineNumberStart !== false : replaceLine.length < pre.className.length) {
 					createLineNumbers(code, sourceAndSpans.sourceCode, +lineNumberStart);
 				}
