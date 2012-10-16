@@ -2304,14 +2304,13 @@
 
 			assert(elem.nodeType === 1, "Dom#setHtml(value): {elem} 不是元素节点(nodeType === 1), 无法执行 setHtml。", elem);
 
-			value = (map[1] + value + map[2]).replace(rXhtmlTag, "<$1></$2>");
 			try {
 
 				// 对每个子元素清空内存。
 				// each(elem.getElementsByTagName("*"), clean);
 
 				// 内部执行 innerHTML 。
-				elem.innerHTML = value;
+				elem.innerHTML = (map[1] + value + map[2]).replace(rXhtmlTag, "<$1></$2>");
 
 				// 如果 innerHTML 出现错误，则直接使用节点方式操作。
 			} catch (e) {

@@ -1,5 +1,5 @@
 ﻿/*
- * This file is created by a tool at 2012/10/12 19:07:29
+ * This file is created by a tool at 2012/10/16 20:51:18
  */
 
 
@@ -5215,14 +5215,13 @@ function imports(namespace) {
 
 			assert(elem.nodeType === 1, "Dom#setHtml(value): {elem} 不是元素节点(nodeType === 1), 无法执行 setHtml。", elem);
 
-			value = (map[1] + value + map[2]).replace(rXhtmlTag, "<$1></$2>");
 			try {
 
 				// 对每个子元素清空内存。
 				// each(elem.getElementsByTagName("*"), clean);
 
 				// 内部执行 innerHTML 。
-				elem.innerHTML = value;
+				elem.innerHTML = (map[1] + value + map[2]).replace(rXhtmlTag, "<$1></$2>");
 
 				// 如果 innerHTML 出现错误，则直接使用节点方式操作。
 			} catch (e) {
@@ -8372,7 +8371,7 @@ Object.extend(JSON, {
 				return '"' + obj.replace(/[\x00-\x1f\\"]/g, JSON.replaceChars) + '"';
 			case 'object':
 				if (obj) {
-					if (Array.isArray(obj)) {
+					if (Object.isArray(obj)) {
 						return '[' + String(Object.map(obj, JSON.encode, [])) + ']';
 					}
 					var s = [];
