@@ -13,28 +13,27 @@
 
         <h2 class="demo">创建控件</h2>
 
-        <table>
-            <tr>
-                <td class="demo-control">
-                    <textarea class="demo-fixed">我是组件</textarea>
-                </td>
-                <td class="demo-api">
-                    <script>
-                        Demo.writeTestCases({
-                            '分类1': '-',
-                            '测试代码1': 'alert(0)',
-                            '分类2': '-',
-                            '测试代码2': function () {
-                                alert(4);
-                            },
-                            '测试代码2': {
-                                'console.log(33)': '-'
-                            }
-                        });
-                    </script>
-                </td>
-            </tr>
-        </table>
+        <section class="demo-control" style="position: fixed">
+            AA
+        </section>
+
+        <section class="demo-api" style="margin-left: 300px;">
+
+            <script>
+                Demo.writeTestCases({
+                    '分类1': '-',
+                    '测试代码1': 'alert(0)',
+                    '分类2': '-',
+                    '测试代码2': function () {
+                        alert(4);
+                    },
+                    '测试代码2': {
+                        'console.log(33)': '-'
+                    }
+                });
+            </script>
+
+        </section>
 
     </article>
 

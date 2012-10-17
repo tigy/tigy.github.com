@@ -141,65 +141,64 @@ body.demo {
 /*************** 语法高亮 ***************/
 
 .syntaxhighligher();
-    
 /***************** 工具 ****************/
 
-// 布局
+html {
+	
+	// 布局
+    .demo-inline {
+        display: inline;
+    }
 
-.demo-inline {
-	display: inline;
-}
+    .demo-block {
+        display: block;
+    }
 
-.demo-block {
-	display: block;
-}
+    .demo-inline-block {
+        display: inline-block;
+        *display: inline;
+        *zoom: 1;
+    }
 
-.demo-inline-block {
-	display: inline-block;
-	*display: inline;
-	*zoom: 1;
-}
+    .demo-hide {
+        display: none;
+    }
 
-.demo-hide {
-	display: none;
-}
+    .demo-left {
+        float: left;
+    }
 
-.demo-left {
-    float: left;
-}
+    .demo-right {
+        float: right;
+    }
 
-.demo-right {
-    float: right;
-}
+    .demo-clear, .demo-grid {
+        .clear();
+    }
 
-.demo-clear, .demo-grid {
-    .clear();
-}
+    // 定位
+    .demo-absolute {
+        position: absolute;
+    }
 
-// 定位
+    .demo-relative {
+        position: relative;
+    }
 
-.demo-absolute {
-	position: absolute;
-}
+    .demo-fixed {
+        position: fixed;
+        _position: absolute;
+    }
+    // 其它
+    .demo-row {
+        margin-bottom: 10px;
+    }
 
-.demo-relative {
-	position: relative;
-}
+    .demo-plain {
+        margin: 0;
+        padding: 0;
+    }
 
-.demo-fixed {
-	position: fixed;
-	_position: absolute;
-}
-
-// 其它
-
-.demo-row {
-	margin-bottom: 10px;
-}
-
-.demo-plain {
-	margin: 0;
-	padding: 0;	
 }
 
 /*// 字体
@@ -290,19 +289,18 @@ body.demo {
 
 // API 展示模式
 
-.demo-control, .demo-api {
-	border: 0;
-	width: 460px;
-}
-
 .demo-control {
 	padding: 10px;
-	vertical-align: top;
+	position: fixed;
+	_position: absolute;
 }
 
 .demo-api {
 	border-left: 1px solid #E5E5E5;
 	padding-left: 10px;
+	width: 980px * 0.618 - 12;
+	vertical-align: top;
+	margin-left: 980px * (1-0.618) - 10;
 }
 
 // 表格布局

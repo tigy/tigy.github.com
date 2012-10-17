@@ -1,1 +1,1 @@
-var DplList={"System.Core.Base":{"name":"核心底层","status":"ok"},"System.Core.Debug":{"name":"核心底层","status":"ok"}};
+var DplList={"System.Core.Base":{"name":"核心底层","status":"ok"},"System.Core.Debug":{"name":"核心底层","status":"ok"},"System.Dom.Base":{"status":"plan","name":"DOM底层"}};

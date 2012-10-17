@@ -303,52 +303,52 @@ body.demo footer.demo {
   color: #48484c;
 }
 /***************** 工具 ****************/
-.demo-inline {
+html .demo-inline {
   display: inline;
 }
-.demo-block {
+html .demo-block {
   display: block;
 }
-.demo-inline-block {
+html .demo-inline-block {
   display: inline-block;
   *display: inline;
   *zoom: 1;
 }
-.demo-hide {
+html .demo-hide {
   display: none;
 }
-.demo-left {
+html .demo-left {
   float: left;
 }
-.demo-right {
+html .demo-right {
   float: right;
 }
-.demo-clear,
-.demo-grid {
+html .demo-clear,
+html .demo-grid {
   *zoom: 1;
 }
-.demo-clear:after,
-.demo-grid:after {
+html .demo-clear:after,
+html .demo-grid:after {
   content: ".";
   display: block;
   height: 0;
   clear: both;
   visibility: hidden;
 }
-.demo-absolute {
+html .demo-absolute {
   position: absolute;
 }
-.demo-relative {
+html .demo-relative {
   position: relative;
 }
-.demo-fixed {
+html .demo-fixed {
   position: fixed;
   _position: absolute;
 }
-.demo-row {
+html .demo-row {
   margin-bottom: 10px;
 }
-.demo-plain {
+html .demo-plain {
   margin: 0;
   padding: 0;
 }
@@ -430,18 +430,17 @@ body.demo footer.demo {
 .demo-toolbar a:hover {
   text-decoration: underline;
 }
-.demo-control,
-.demo-api {
-  border: 0;
-  width: 460px;
-}
 .demo-control {
   padding: 10px;
-  vertical-align: top;
+  position: fixed;
+  _position: absolute;
 }
 .demo-api {
   border-left: 1px solid #E5E5E5;
   padding-left: 10px;
+  width: 593.64px;
+  vertical-align: top;
+  margin-left: 364.36px;
 }
 article.demo-grid {
   margin-bottom: 20px;
