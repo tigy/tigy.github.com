@@ -132,17 +132,7 @@ Demo.extend(Demo, {
         /**
          * 合法的浏览器。
          */
-        support: {
-            'IE6': 'IE6',
-            'IE7': 'IE7',
-            'IE8': 'IE8',
-            'IE9': 'IE9',
-            'IE10': 'IE10',
-            'FireFox': 'FireFox',
-            'Chrome': 'Chrome',
-            'Opera': 'Opera',
-            'Safari': 'Safari'
-        }
+        support: 'IE6|IE7|IE7|IE8|IE10|FireFox|Chrome|Opera|Safari'.split('|')
 
     },
 
@@ -3708,11 +3698,13 @@ if (typeof module !== 'object') {
                         <legend>兼容</legend>';
 
                         i = 1;
-                        var support = dplInfo.support ? dplInfo.support.split('|') : [];
-                        for (key in Demo.Configs.support) {
-                            html += '<input name="support" type="checkbox"' + (support.indexOf(key) >= 0 ? ' checked="checked"' : '') + ' id="demo-controlstate-support-' + key + '" value="' + key + '"><label for="demo-controlstate-support-' + key + '">' + Demo.Configs.support[key] + '</label>';
+                        var support = dplInfo.support ? dplInfo.support.split('|') : Demo.Configs.support;
 
-                            if (i++ === 5) {
+                        for (i = 0; i < Demo.Configs.support.length; i++) {
+                            key = Demo.Configs.support[i];
+                            html += '<input name="support" type="checkbox"' + (support.indexOf(key) >= 0 ? ' checked="checked"' : '') + ' id="demo-controlstate-support-' + key + '" value="' + key + '"><label for="demo-controlstate-support-' + key + '">' + Demo.Configs.support[i] + '</label>';
+
+                            if (i === 5) {
                                 html += '<br>';
                             }
                         }

@@ -17,7 +17,11 @@ switch(request.queryString['action']){
 		};
 
 		if(request.queryString.support) {
-			dplInfo.support = request.queryString.support.join("|");
+			if(request.queryString.support.length !== require('./system').Configs.support.length){
+				dplInfo.support = request.queryString.support.join("|");
+			} else {
+				dplInfo.support = '';
+			}
 		}
 
 		if(request.queryString.hide) {

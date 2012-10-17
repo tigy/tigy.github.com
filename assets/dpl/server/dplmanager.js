@@ -202,7 +202,13 @@ var DplManager = {
                 var metaMatch = new RegExp('(<meta\\s+name\\s*=\\s*([\'\"])' + System.Configs.metaDplInfo + '\\2\\s+content\\s*=\\s*([\'\"]))(.*?)(\\3\\s*\\/?>)').exec(head);
 
                 if (!metaMatch) {
+
+                    if (!dplInfo.support) {
+                        delete dplInfo.support;
+                    }
+
                     dplInfo = System.stringifyDplInfo(dplInfo);
+
                     var titleMatch = /(\s*)(<title[^\>]*?>.*?<\/title>)/m.exec(head);
 
                     if (!titleMatch) {
@@ -214,6 +220,10 @@ var DplManager = {
 
                     var oldDplInfo = System.parseDplInfo(metaMatch[4]);
                     System.extend(oldDplInfo, dplInfo);
+
+                    if (!oldDplInfo.support) {
+                        delete oldDplInfo.support;
+                    }
 
                     dplInfo = System.stringifyDplInfo(oldDplInfo);
 
