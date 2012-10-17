@@ -61,19 +61,19 @@
                         'Dom.load': 'Dom.load(function(){ alert("DOM 已经 load（引用的图片都已加载）") })',
 
                         '事件': '-',
-                        '绑定事件 - Dom#on': {
+                        'Dom#on - 绑定事件': {
                             'a.on("click", function(){ alert("点击事件") })': '-'
                         },
-                        '解绑事件 - Dom#un': {
+                        'Dom#un - 解绑事件': {
                             'a.un("click")': '-'
                         },
-                        '触发事件 - Dom#trigger': {
-                            'a.trigger("click")': '-'
-                        },
-                        '绑定一次性事件 - Dom#once': {
+                        'Dom#once - 绑定一次性的事件': {
                             'a.once("click", function(){ alert("一次性的点击事件（只在第一次点击时发生）") })': '-'
                         },
-                        '委托事件 - Dom#delegate': {
+                        'Dom#trigger - 手动触发事件': {
+                            'a.trigger("click")': '-'
+                        },
+                        'Dom#delegate - 委托事件': {
                             'a.delegate("#c", "click", function(){ alert("委托触发点击事件") })': '-'
                         }
                     });
