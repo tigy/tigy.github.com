@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Dom.window',"source":'base_1.js',"sourceFile":'data/source/base_1.js.html#Dom-window',"summary":'<p>\u83b7\u53d6 window \u5bf9\u8c61\u7684 Dom \u5bf9\u8c61\u5c01\u88c5\u793a\u4f8b\u3002</p>\n',"memberAttribute":'static',"name":'window',"memberOf":'Dom',"memberType":'field'});

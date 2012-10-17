@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>J+ Library</title>
+		<script src="../../assets/demo/demo.js" type="text/javascript"></script>
+	</head>
+	<body class="demo-doc">
+		<h3>组件类图</h3>
+		<img src="images/controls-diagram.jpg">
+		
+		<h3>文件的规范</h3>
+		<p>
+			在每个文件的顶部，都加上这样的注释：
+			<script type="text/js">
+//===========================================
+//  当前文件功能的一句话概述。       
+//  @时间<sup>注</sup> 完成进度： 作者
+//===========================================</script>
+<small>注： @时间可省略</small>   <br>
+其中，完成进度是一个字符，分别为：
+<ul>
+<li>空: 未开始。如果没有完成进度，表示这个文件只是暂存的，并未开工。</li>
+<li>R: 已审查(Review)。已审查表示对上一步进行过确认</li>
+<li>A: 已设计。如果已设计，表示这个文件的API已确定，只是没有实现，或实现肯能有错。</li>
+<li>B: 已实现。如果已实现，表示这个文件已完成，如果没有问题，则不需要再编辑了。</li>
+<li>C: 已测试。如果已测试，表示已经创建了这个文件的测试文件，并测试过。</li>
+<li>D: 已添加检查。如果已添加检查，表示已经为每个参数添加 assert 确认。</li>
+<li>E: 已文档。如果已添加文档，表示已经为每个API 书写正确的文档注释。</li>
+<li>F: 已优化。如果已优化，表示这个文件已经保证了最优质量。</li>
+<li>G: 已完成。如果已完成，你可以喝一杯咖啡了。</li>
+ </ul>
+ 
+ 
+ <h3>开始开发</h3>
+ <p>
+ 	首先，为你的代码分类，在相应的文件夹新建文件。核心的代码应该在 jplus/system 内;控件的js代码在 jplus/system/controls 内、css和图片在 jplus/resources/ 内 (具体见 <a href="controls.html">《控件开发》</a>);
+ 	组件的代码在 jplus/components 内 (具体见 <a href="components.html">《组件开发》</a>)。
+ 	如果你需要创建私有的代码，可以在 jplus 内创建新的文件夹，并把代码放在此文件夹。开发时应该注意遵守 <a href="../standards/javascript.html">Javascript 编码规范 </a> 。
+ </p>
+ 
+ <h3>assert 确认</h3>
+ <p>
+ 使用 assert 函数，对API的参数进行确认，如果传递了不符合要求的参数， assert 可以在第一时间报错。
+ 比如：  </p><script type="text/js">
+using: function(namespace, isStyle) {
+	
+	// 这里的   assert.isString  确保 namespace 是字符串，如果不是，则报错。
+	assert.isString(namespace, "using(namespace): 参数 {namespace} 不是合法的名字空间。");
+
+ 	//    ...
+ 	
+}
+ </script> <p>
+ 报错的格式为： 函数名(参数)： 错误原因。 <br>
+ 这里介绍下 assert 函数的用法：
+ 
+ 最简单的是 assert(判断的内容, "错误提示");
+ 错误提示中，允许使用格式化符号，比如：
+  </p><script type="text/js">
+ function fn(a){
+      assert(a &gt; 0, "fn(a): 参数  {a} 必须大于 0 。", a);
+ }
+  </script> <p>
+  	这是，如果执行 fn(-1)， 将显示这个信息： fn(a): 参数  a = -1 必须大于 0 。
+ </p>比如：
+  </p><script type="text/js">
+ function fn(a, b){
+      assert(a && b, "fn(a, b): 参数  {a} 和  {b} 必须不能空 。", a, b);
+ }
+  </script> <p>
+  	这是，如果执行 fn()， 将显示这个信息： fn(a, b): 参数  a = undefined 和 b = undefined 必须不能空 。
+ </p>
+ 一些常见的判断，都被封装到 assert 自身了，比如：
+ </p><script type="text/js">
+assert.isString(value, "fn(value): 参数 {value} ~。");
+  </script> <p>
+  	这里不再需要额外传递格式化用的变量 value， 也不用写多余的警告信息，而是用 ~ 代替。
+  	此时，如果value = 1 ，则报出警告： fn(value): 参数 value = 1   必须是一个字符串。
+  	
+  	 <h3>预编译指令</h3>
+ <p>
+ 	预编译指令可以帮助生成针对不同环境的代码。比如，可以通过预编译指令将 针对 IE6 的代码包装，如果不再需要支持IE6，只需重新生成代码即可。
+ 	预编译指令的内容和 C语言的 预编译指令相似。一个预编译指令放在 /// 开头的注释内。 比如：  
+ 	
+ 	  </p><script type="text/js">
+///  #ifdef SupportIE6
+///  // 只在 IE6 下使用的代码
+///  var a = 2;
+///  #endif
+  </script> <p>
+  	常用的预编译指令有：
+  	<ul class="list">
+  		<li>#if 宏: 如果定义了一个宏。</li>
+  		<li>#ifdef 宏: 如果定义了一个宏。</li>
+  		<li>#ifndef 宏: 如果未定义一个宏。</li>
+  		<li>#define 宏： 定义一个宏。</li>
+  		<li>#endif： 关闭#ifdef 域和 #if 域  和 #ifndef 域。 </li>
+  		<li>#undef 宏: 取消一个宏。</li>
+  		<li>#region 区域： 定义一个代码区域，只用于可视化。</li>
+  		<li>#endregion： 关闭 #endregion域。</li>
+  		<li>#error 原因： 输出编译错误。</li>
+  		<li>#warn 原因： 输出编译警告。</li>
+  		<li>#info 文字： 输出编译信息。</li>
+  	</ul>
+  	在 #if 下可使用 defined || &amp;&amp; > < == != ( ) 操作符。
+ </p>
+ 
+	</body>
+</html>
