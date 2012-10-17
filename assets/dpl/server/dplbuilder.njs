@@ -87,8 +87,8 @@ function cloneFile(srcFile){
 
 	var newFile = 'untitled';
 
-	if(IO.exists(newFile)){
-		var i = 0;
+	if(IO.exists(root + newFile + '.dpl')){
+		var i = 2;
 		while(IO.exists(root + 'untitled-' + i + '.dpl')){
 			i++;
 		}

@@ -3993,7 +3993,7 @@ if (typeof module !== 'object') {
                 html += '<a href="javascript://常用文档" onclick="Demo.System.showDropDown(\'demo-toolbar-doc\', 1);return false;" onmouseover="Demo.System.showDropDown(\'demo-toolbar-doc\')" onmouseout="Demo.System.hideDropDown()" accesskey="D">文档' + space + '▾</a> | <a href="javascript://常用工具" onclick="Demo.System.showDropDown(\'demo-toolbar-tool\', 1);return false;" onmouseover="Demo.System.showDropDown(\'demo-toolbar-tool\')" onclick="Demo.System.showDropDown(\'demo-toolbar-tool\', 1);return false;" onmouseout="Demo.System.hideDropDown()" accesskey="T">工具' + space + '▾</a> | <a href="javascript://快速打开其他组件" onmouseover="Demo.System.showDropDown(\'demo-toolbar-goto\')" onclick="Demo.System.showDropDown(\'demo-toolbar-goto\', 1);return false;" onmouseout="Demo.System.hideDropDown()" accesskey="G">转到' + space + '▾</a> | ';
 
                 if(Demo.Configs.basePath === Demo.Configs.demo && /^index\.html($|\?|#)/.test(Demo.Configs.pathInfo)){
-                    html += '<a href="' + configs.serverRootUrl + configs.apiPath + 'dplmanager.njs?action=update&postback=' + encodeURIComponent(location.href) + ' " title="刷新组件列表缓存" accesskey="H">刷新列表</a>';
+                    html += '<a href="' + configs.serverRootUrl + configs.apiPath + 'dplmanager.njs?action=updatelist&postback=' + encodeURIComponent(location.href) + ' " title="刷新组件列表缓存" accesskey="H">刷新列表</a>';
                 } else {
                     html += '<a href="' + configs.rootUrl + configs.demo + '/index.html?from=' + encodeURIComponent(location.href) + ' " title="返回组件列表" accesskey="H">返回列表</a>';
                 }
