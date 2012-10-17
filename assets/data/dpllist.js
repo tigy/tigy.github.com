@@ -1,1 +1,1 @@
-var DplList={"System.Core.Base":{"name":"核心底层","status":"ok"},"System.Core.Debug":{"name":"核心底层","status":"ok"},"System.Dom.Base":{"status":"plan","name":"DOM底层"}};
+var DplList={"System.Ajax.Base":{"status":"plan","name":"AJAX底层"},"System.Core.Base":{"name":"核心底层","status":"ok"},"System.Core.Debug":{"name":"核心底层","status":"ok"},"System.Dom.Base":{"status":"plan","name":"DOM底层"},"System.Utils.Deferrable":{"status":"plan","name":"异步操作管理对象"}};

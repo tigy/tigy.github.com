@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>J+ Library</title>
+		<script src="../../system/core/assets/scripts/base.js" type="text/javascript"></script>
+		<script src="../../system/browser/assets/scripts/base.js" type="text/javascript"></script>
+		<script src="../../system/browser/assets/scripts/cookie.js" type="text/javascript"></script>
+
+		<script src="../../assets/demo/demo.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<script>
+		    Demo.writeTestCases({
+			    '获取 Cookie': {
+			        'Browser.getCookie("aaaa")': "-"
+                },
+			    '设置 Cookie': {
+			        'Browser.setCookie("aaaa", "b")': function (value, assert) {
+				        assert.areEqual(Browser.getCookie("aaaa"), "b");
+				    },
+			        'Browser.setCookie("aaaa", "b", 1)': '-'
+                },
+			    '删除 Cookie': {
+			        'Browser.setCookie("aaaa", null)': function(value, assert) {
+			            assert.areEqual(Browser.getCookie("aaaa"), undefined);
+			        }
+			    }
+			});
+		</script>
+	</body>
+</html>

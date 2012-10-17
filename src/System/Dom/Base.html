@@ -60,7 +60,7 @@
                         'Dom.ready': 'Dom.ready(function(){ alert("DOM 已经 ready（引用的图片未开始加载）") })',
                         'Dom.load': 'Dom.load(function(){ alert("DOM 已经 load（引用的图片都已加载）") })',
 
-                        '事件': '-',
+                        '事件(Event)': '-',
                         'Dom#on - 绑定事件': {
                             'a.on("click", function(){ alert("点击事件") })': '-'
                         },
@@ -75,7 +75,261 @@
                         },
                         'Dom#delegate - 委托事件': {
                             'a.delegate("#c", "click", function(){ alert("委托触发点击事件") })': '-'
+                        },
+
+                        '样式(Style)': '-',
+                        'Dom#setStyle': {
+                            'a.setStyle("font-size", 14)': function (value, assert) {
+                                assert.areEqual(a.node.style.fontSize, "14px")
+                            }
+                        },
+                        'Dom#getStyle': {
+                            'a.getStyle("font-size")': "14px"
+                        },
+                        'Dom#toggle': {
+                            'a.toggle()': '-'
+                        },
+                        'Dom#hide': {
+                            'a.hide()': function (value, assert) {
+                                assert.areEqual(Dom.isHidden(a.node), true);
+                            }
+                        },
+                        'Dom#show': {
+                            'a.show()': function (value, assert) {
+                                assert.areEqual(Dom.isHidden(a.node), false);
+                            }
+                        },
+                        'Dom#unselectable': {
+                            'a.unselectable()': '-'
+                        },
+
+                        '属性(Attribute)': '-',
+                        'Dom#setAttr': {
+                            'c.setAttr("innerText", "12121")': function (value, assert) {
+                                assert.areEqual(c.getAttr("innerText"), "12121");
+                            }
+                        },
+                        'Dom#getAttr': {
+                            'c.getAttr("innerText")': "12121"
+                        },
+                        'Dom#set': {
+                            'c.set({"innerHTML": "cv"})': '-'
+                        },
+                        'Dom#setText': {
+                            'c.setText("cv")': function (value, assert) {
+                                assert.areEqual(c.getText(), "cv");
+                            }
+                        },
+                        'Dom#getText': {
+                            'c.getText()': "cv"
+                        },
+                        'Dom#setHtml': {
+                            'c.setHtml("cv")': function (value, assert) {
+                                assert.areEqual(c.getHtml(), "cv");
+                            }
+                        },
+                        'Dom#getHtml': {
+                            'c.getHtml()': "cv"
+                        },
+                        'Dom#addClass': {
+                            'a.addClass("light")': function (value, assert) {
+                                assert.areEqual(a.hasClass("light"), true);
+                            }
+                        },
+                        'Dom#hasClass': {
+                            'a.hasClass("light")': true
+                        },
+                        'Dom#removeClass': {
+                            'a.removeClass("light")': function (value, assert) {
+                                assert.areEqual(a.hasClass("light"), false);
+                            }
+                        },
+                        'Dom#toggleClass': {
+                            'a.toggleClass("light")': function (value, assert) {
+                                assert.areEqual(a.hasClass("light"), true);
+                            }
+                        },
+                        '尺寸(Dimension)': '-',
+                        'Dom#getSize': {
+                            'a.getSize()': '-'
+                        },
+                        'Dom#setSize': {
+                            'a.setSize()': '-'
+                        },
+                        'Dom#getWidth': {
+                            'a.getWidth()': '-'
+                        },
+                        'Dom#setWidth': {
+                            'a.setWidth(23)': '-'
+                        },
+                        'Dom#getHeight': {
+                            'a.getHeight()': '-'
+                        },
+                        'Dom#setHeight': {
+                            'a.setHeight(54)': '-'
+                        },
+                        'Dom#getScrollSize': {
+                            'a.getScrollSize()': '-'
+                        },
+
+                        '位置(Offset)': '-',
+                        'Dom#getOffset': {
+                            'a.getOffset()': '-'
+                        },
+                        'Dom#setOffset': {
+                            'a.setOffset({x:2, y:5})': '-'
+                        },
+                        'Dom#getPosition': {
+                            'a.getPosition()': '-'
+                        },
+                        'Dom#setPosition': {
+                            'a.setPosition()': '-'
+                        },
+                        'Dom#getScroll': {
+                            'a.getScroll()': '-'
+                        },
+
+                        '节点更新(Manipulation)': '-',
+                        'Dom.has': {
+                            'Dom.has(a.node, b.node)': true
+                        },
+                        'Dom#has': {
+                            'a.has(a)': false,
+                            'a.has(b)': true,
+                            'a.has(c)': true,
+                            'a.has(d)': true
+                        },
+                        'Dom#clone': {
+                            'a.clone(a)': '-'
+                        },
+
+                        'Dom#append': {
+                            'a.append("append")': '-'
+                        },
+                        'Dom#prepend': {
+                            'a.prepend("prepend")': '-'
+                        },
+                        'Dom#after': {
+                            'a.after("after")': '-'
+                        },
+                        'Dom#before': {
+                            'a.before("before")': '-'
+                        },
+                        'Dom#appendTo': {
+                            'a.appendTo(document.body)': '-'
+                        },
+
+                        '节点转移(Traversing)': '-',
+                        'Dom#find': {
+                            'a.find("div")': '-',
+                            'a.find(".b")': '-',
+                            'a.find("[_tag=\\\"b\\\"]")': '-'
+                        },
+                        'Dom#query': {
+                            'a.query("div")': function (value, assert) {
+                                assert.areEqual(value[0], b.node);
+                            },
+                            'a.query(".b")': '-',
+                            'a.query("[_tag=\\\"b\\\"]")': '-'
+                        },
+                        'Dom#match': {
+                            'a.match("div")': true,
+                            'a.match(".b")': false
+                        },
+                        'Dom#closest': {
+                            'b.closest("div")': function (value, assert) {
+                                assert.areEqual(value.node, b.node);
+                            }
+                        },
+                        'Dom#parent': {
+                            'b.parent()': function (value, assert) {
+                                assert.areEqual(value.node, a.node);
+                            }
+                        },
+                        'Dom#prev': {
+                            'b.prev()': null
+                        },
+                        'Dom#next': {
+                            'b.next()': function (value, assert) {
+                                assert.areEqual(value.node, d.node);
+                            }
+                        },
+                        'Dom#child': {
+                            'b.child(0)': function (value, assert) {
+                                assert.areEqual(value.node, c.node);
+                            },
+                            'b.child(-1)': function (value, assert) {
+                                assert.areEqual(value.node, c.node);
+                            }
+                        },
+                        'Dom#first': {
+                            'b.first()': function (value, assert) {
+                                assert.areEqual(value.node, c.node);
+                            }
+                        },
+                        'Dom#last': {
+                            'b.last()': function (value, assert) {
+                                assert.areEqual(value.node, c.node);
+                            }
+                        },
+                        'Dom#parentAll': {
+                            'b.parentAll()': function (value, assert) {
+                                assert.areEqual(value[0], a.node);
+                            }
+                        },
+                        'Dom#prevAll': {
+                            'b.prevAll()': function (value, assert) {
+                                assert.areEqual(value[0], undefined);
+                            }
+                        },
+                        'Dom#nextAll': {
+                            'b.nextAll()': function (value, assert) {
+                                assert.areEqual(value[0], d.node);
+                            }
+                        },
+                        'Dom#siblings': {
+                            'b.siblings()': function (value, assert) {
+                                assert.areEqual(value[0], d.node);
+                            }
+                        },
+                        'Dom#children': {
+                            'b.children()': function (value, assert) {
+                                assert.areEqual(1, value.length);
+                            }
+                        },
+                        'Dom#getElements': {
+                            'b.getElements()': function (value, assert) {
+                                assert.areEqual(value[0], c.node);
+                            }
+                        },
+
+                        'Dom#remove': {
+                            'c.remove()': '-'
+                        },
+                        'Dom#empty': {
+                            'c.empty()': '-'
+                        },
+                        'Dom#dispose': {
+                            'c.dispose()': '-'
+                        },
+
+                        'Dom#replaceWith': {
+                            'd.replaceWith("<div/>")': '-'
+                        },
+
+                        'Dom#insertBefore': {
+                            'b.insertBefore(c, null)': '-'
+                        },
+                        'Dom#attach': {
+                            'd.attach(c.node, null)': '-'
+                        },
+                        'Dom#removeChild': {
+                            'b.removeChild(c)': '-'
+                        },
+                        'Dom#detach': {
+                            'd.detach(c.node)': '-'
                         }
+
                     });
 
                 </script>

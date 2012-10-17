@@ -1,5 +1,4 @@
 /**
- * @fileOverview 提供最底层的 DOM 辅助函数。
  * @author xuld
  */
  

@@ -5,6 +5,7 @@
  * @fileOverview 定义最基本的工具函数。
  * @pragma defaultExtends JPlus.Base
  * @license The BSD License
+ * @author xuld
  */
 
 // 可用的宏

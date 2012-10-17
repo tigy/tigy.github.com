@@ -4055,6 +4055,8 @@ if (typeof module !== 'object') {
          * 测试用例对象。
          */
         TestCase: (function () {
+			
+			function emptyFn(){}
 
             function TestCase(id, name, data, options) {
 
@@ -4155,15 +4157,26 @@ if (typeof module !== 'object') {
                 },
 
                 runTestAll: function () {
-                    for (var i = 0, len = Demo.TestCase.data.length; i < len; i++) {
-                        this.runTest(i);
-                    }
+					var me = this, i = 0, len = Demo.TestCase.data.length;
+					work();
+					function work(){
+						if(i < len) {
+							me.runTest(i++);
+							setTimeout(work, 1);
+						}
+					}
+					
                 },
 
                 speedTestAll: function () {
-                    for (var i = 0, len = Demo.TestCase.data.length; i < len; i++) {
-                        this.speedTest(i);
-                    }
+					var me = this, i = 0, len = Demo.TestCase.data.length;
+					work();
+					function work(){
+						if(i < len) {
+							me.speedTest(i++);
+							setTimeout(work, 1);
+						}
+					}
                 },
 
                 reportError: function (text, e) {
@@ -4231,6 +4244,9 @@ if (typeof module !== 'object') {
                     if (window.trace) {
                         window.trace.enable = false;
                     }
+					
+					var _alert = window.alert;
+					window.alert = emptyFn;
 
                     var time = 0,
                         currentTime,
@@ -4270,20 +4286,23 @@ if (typeof module !== 'object') {
 
                     } catch (e) {
                         document.getElementById('demo-testcase-' + id).className = 'demo-tip demo-tip-error';
-                        Demo.TestCase.reportError(value.text, e);
-                    }
+                        Demo.TestCase.reportError('[Speed Test]', e);
+                    } finally {
+						window.alert = _alert;
+
+						if (window.trace) {
+							window.trace.enable = true;
+						}
+					}
 
                     var div = document.getElementById('demo-testcase-' + id);
 
                     if (div.lastChild.tagName !== 'SPAN') {
                         div.appendChild(document.createElement('SPAN'));
+						div.lastChild.className = 'demo-mono';
                     }
 
-                    div.lastChild.innerHTML = '  [' + past / time + 'ms]';
-
-                    if (window.trace) {
-                        window.trace.enable = true;
-                    }
+                    div.lastChild.innerHTML = past === undefined ? '' : '  [' + Math.round(past / time * 1000) / 1000 + 'ms]';
 
 
 
