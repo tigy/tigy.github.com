@@ -1,1 +1,0 @@
-﻿jsonp({"fullName":'JPlus.version',"source":'base.js',"sourceFile":'data/source/base.js.html#JPlus-version',"summary":'<p>\u83b7\u53d6\u5f53\u524d\u6846\u67b6\u7684\u7248\u672c\u53f7\u3002</p>\n',"memberType":'property',"name":'version',"memberOf":'JPlus',"type":'Number',"defaultValue":'3.1',"propertyAttribute":'get'});

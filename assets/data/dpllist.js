@@ -1,0 +1,1 @@
+var DplList={"System.Controls.Form":{"status":"plan","name":"asdadas"},"System.Core.Base2":{"status":"ok","support":"IE6|IE7|IE8|IE9|IE10|FireFox|Chrome|Opera|Safari","name":"文本框"},"System.Core.Base23423":{"status":"plan","name":"234234"},"System.Core.Base2342333":{"status":"plan","name":"234234"},"System.Core1.Gssad":{"status":"plan","name":"阿萨德"}};

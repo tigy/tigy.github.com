@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<%
+	Dpl.share = new Dpl.Target();
+	Dpl.share.targetCss = '../share/assets/styles/share-2.0.css';
+	Dpl.share.targetJs = '../share/assets/styles/share-2.0.js';
+	Dpl.share.imagesPath = '../images/';
+	Dpl.share.using("System.Core.Base");
+	Dpl.share.using("System.Dom.Base");
+	Dpl.share.using("System.Request.Base");
+
+	Dpl.current = new Dpl.Target();
+	Dpl.current.require(Dpl.share);
+	Dpl.current.using("Controls.Core.Base");
+	Dpl.current.using("Controls.Core.Base");
+%>
+<!-- #using Controls.Button.Button  -->
+<link type="text/css" rel="stylesheet" href="../share/assets/styles/share-2.0.dpl#css">
+<link type="text/css" rel="stylesheet" href="<%= Dpl.mergeCss("assets/styles/index.css") %>">
+<script type="text/javascript" src="../share/assets/scripts/share-2.0.dpl#js"></script>
+<script type="text/javascript" src="<%= Dpl.mergeJs("assets/scripts/index.js") %>"></script>
+
+</head>
+<body>
+	
+	<!-- #include virtual="a.html"  -->
+	
+	<!-- #include a.html  -->
+	
+	<% if(a > 4)  { %>
+	
+	<% }  %>
+	
+	<div class="x-button"></div>
+	
+	
+</body>
+</html>

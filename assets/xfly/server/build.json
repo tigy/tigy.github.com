@@ -1,0 +1,11 @@
+{
+	
+	"from": "../dev/",
+	
+	"to": "../build/",
+	
+	"fromEncoding": "utf-8",
+	
+	"toEncoding": "utf-8",
+
+}

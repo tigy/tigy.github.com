@@ -1,2 +1,1 @@
-@"assets/tools/node/win/node.exe" assets/tools/system/server/run.js
-@pause
+@"assets/xfly/node/node.exe" assets/dpl/server/startserver.js

@@ -1,0 +1,42 @@
+
+
+.current, article.demo a:focus {
+    -webkit-text-shadow: 0 0 1px #0088CC;
+    text-shadow: 0 0 1px #0088CC;
+}
+
+.textbox-category {
+    width: 100px;
+}
+
+.textbox-name {
+    width: 120px;
+}
+
+.status-compact {
+    font-style: italic;
+}
+
+.status-complete {
+    font-weight: bold;
+}
+
+.status-obsolete {
+    text-decoration: line-through;
+}
+
+.status-develop {
+    text-decoration: underline;
+}
+
+.status-obsolete,  .status-plan {
+    color: #999;
+}
+
+tr.alt {
+	background-color: #f0f0f0;	
+}
+
+.x-table td{
+	word-break: break-all;
+}

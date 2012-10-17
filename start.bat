@@ -1,1 +1,1 @@
-@"assets/tools/node/win/node.exe" assets/tools/system/server/start.js
+@"assets/xfly/node/node.exe" assets/dpl/server/start.js

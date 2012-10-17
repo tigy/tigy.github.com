@@ -1,0 +1,27 @@
+{
+	
+	"websites": [{
+		
+		"port": 8001,
+		
+		"host": "dev",
+		
+		"physicalPath": "../dev"
+	}, {
+		
+		"port": 8001,
+		
+		"host": "*",
+		
+		"physicalPath": "../"
+	}],
+	
+	"urlRewrite": {
+		"(.*)\\.jss": "$1.js"
+	},
+	
+	"markdown": {
+		"tpl": "<!--  arkdown  -->"
+	}
+
+}
