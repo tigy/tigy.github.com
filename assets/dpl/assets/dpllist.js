@@ -101,7 +101,7 @@ Demo.writeDplList = function (values) {
 
                 var url = Demo.getDemoUrl(c);
 
-                html2 += '<li><a href="' + url + '" class="status-' + controlInfo.status + (from === url ? ' current' : '') + '">' + bi + '(' + controlInfo.name + ')</a></li>';
+                html2 += '<li><a href="' + url + '" class="demo-mono status-' + controlInfo.status + (from === url ? ' current' : '') + '">' + bi + '(' + controlInfo.name + ')</a></li>';
 
                 switch (controlInfo.status) {
                     case 'ok':

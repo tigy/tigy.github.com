@@ -114,7 +114,7 @@ Demo.extend(Demo, {
         <nav class="demo-toolbar">\
             <a href="http://www.jplusui.com/">J+ 首页</a> | <a href="https://www.github.com/jplusui/jplus-milk">Github</a> | <a href="#">返回顶部</a>\
         </nav>\
-Copyright &copy; 2011-2012 J+ Team\
+<span class="demo-mono">Copyright &copy; 2011-2012 J+ Team</span>\
 </footer>',
 
         /**
@@ -4145,7 +4145,7 @@ if (typeof module !== 'object') {
                 },
 
                 getFunctionSource: function (fn) {
-                    return Demo.decodeUTF8(fn.toString()).replace(/^function\s*\(.*?\)\s*\{/, "").replace(/\}\s*$/, "");
+                    return Demo.Text.decodeUTF8(fn.toString()).replace(/^function\s*\(.*?\)\s*\{/, "").replace(/\}\s*$/, "");
                 },
 
                 createAssertFn: function (ret) {
@@ -4190,8 +4190,8 @@ if (typeof module !== 'object') {
                         try {
                             ret = value.fn.call(window, Demo.assert);
                         } catch (e) {
-                            document.getElementById('demo-testcase-' + id).className = 'demo demo-tip demo-tip-error';
-                            Demo.reportError(value.text, e);
+                            document.getElementById('demo-testcase-' + id).className = 'demo-tip demo-tip-error';
+                            Demo.TestCase.reportError(value.text, e);
                             hasError = true;
                             continue;
                         }
@@ -4200,20 +4200,24 @@ if (typeof module !== 'object') {
                             try {
                                 value.assertFn(ret, Demo.assert);
                             } catch (e) {
-                                document.getElementById('demo-testcase-' + id).className = 'demo demo-tip demo-tip-warning';
-                                Demo.reportError(value.text, e);
+                                document.getElementById('demo-testcase-' + id).className = 'demo-tip demo-tip-warning';
+                                Demo.TestCase.reportError(value.text, e);
                                 hasError = true;
                                 continue;
                             }
                         }
 
-                        console.log(value.text, " => ", ret);
+                        if (ret === undefined) {
+                            console.log(value.text);
+                        } else {
+                            console.log(value.text, " => ", ret);
+                        }
 
                         hasError = hasError || Demo.assert.hasError;
 
                     }
 
-                    document.getElementById('demo-testcase-' + id).className = hasError ? 'demo demo-tip demo-tip-error' : 'demo demo-tip demo-tip-success';
+                    document.getElementById('demo-testcase-' + id).className = 'demo-tip demo-tip-' + (hasError ? 'error' : 'success');
 
                     if (console.groupEnd)
                         console.groupEnd();
@@ -4266,7 +4270,7 @@ if (typeof module !== 'object') {
 
                     } catch (e) {
                         document.getElementById('demo-testcase-' + id).className = 'demo-tip demo-tip-error';
-                        Demo.reportError(value.text, e);
+                        Demo.TestCase.reportError(value.text, e);
                     }
 
                     var div = document.getElementById('demo-testcase-' + id);
@@ -4338,13 +4342,13 @@ if (typeof module !== 'object') {
 
                 text = Demo.Text.encodeHTML(text.join('\r\n').replace(/^\s+/gm, ""));
 
-                document.write(['<div id="demo-testcase-', id, '" class="demo demo-tip" onmouseover="this.className += \' demo-tip-hover\'" onmouseout="this.className = this.className.replace(\' demo-tip-hover\', \'\');" title="', text, '">\
+                document.write(['<div id="demo-testcase-', id, '" class="demo-tip" onmouseover="this.className += \' demo-tip-hover\'" onmouseout="this.className = this.className.replace(\' demo-tip-hover\', \'\');" title="', text, '">\
 						    <span class="demo-toolbar">\
 							    <a href="javascript://执行函数并在控制台显示结果" onclick="Demo.TestCase.runTest(', id, ');return false;">执行</a> | \
 							    <a href="javascript://测试函数执行的速度" onclick="Demo.TestCase.speedTest(', id, ');return false;">效率</a> | \
 							    <a class="demo-viewsource-toggle" href="javascript://查看当前测试用例的源码" onclick="Demo.System.toggleSource(this); return false;">查看源码</a>\
 						    </span>\
-						    <a class="demo" href="javascript://', text, '" onclick="Demo.TestCase.runTest(', id, '); return false;">', Demo.Text.encodeHTML(name), '</a>\
+						    <a class="demo demo-mono" href="javascript://', text, '" onclick="Demo.TestCase.runTest(', id, '); return false;">', Demo.Text.encodeHTML(name), '</a>\
 						    </div>'].join(''));
 
             }

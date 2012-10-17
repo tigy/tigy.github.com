@@ -63,7 +63,6 @@ aside.demo {
   margin-bottom: 10px;
 }
 footer.demo {
-  font-family: 'Microsoft YaHei', 'Segoe UI', Verdana, Arial;
   margin-top: -50px;
   margin-bottom: 20px;
 }
@@ -414,10 +413,14 @@ body.demo footer.demo {
   background-color: #000000;
 }
 /***************** 元素 ****************/
-.demo-toolbar {
+.demo-mono,
+.demo-toolbar,
+.demo-toolbar-dropdown {
   font-family: 'Microsoft YaHei', 'Segoe UI', Verdana, Arial;
-  float: right;
   font-size: 12px;
+}
+.demo-toolbar {
+  float: right;
   color: #999999;
 }
 .demo-toolbar a {
@@ -604,8 +607,6 @@ article.demo-grid {
   position: relative;
 }
 .demo-toolbar-dropdown {
-  font-family: 'Microsoft YaHei', 'Segoe UI', Verdana, Arial;
-  font-size: 12px;
   position: absolute;
   right: 0;
   top: 26px;

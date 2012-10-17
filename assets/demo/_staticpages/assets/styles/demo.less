@@ -46,7 +46,6 @@ aside.demo {
 }
 
 footer.demo {
-	.mono();
 	margin-top: -50px;
 	margin-bottom: 20px;
 }
@@ -270,10 +269,13 @@ body.demo {
 
 // 工具条
 
-.demo-toolbar {
+.demo-mono, .demo-toolbar, .demo-toolbar-dropdown {
 	.mono();
-	float: right;
 	font-size: 12px;
+}
+
+.demo-toolbar {
+	float: right;
 	color: #999999;
 	
 	a {
@@ -511,8 +513,6 @@ article.demo-grid {
 }
 
 .demo-toolbar-dropdown {
-	.mono();
-	font-size: 12px;
 	position: absolute;
 	right: 0;
 	top: 26px;

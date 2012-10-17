@@ -12,15 +12,15 @@ Demo.Questions = {
             if (!document.getElementById('demo-questions-q' + i + Demo.Questions.data[i]).checked) {
                 var allButtons = document.getElementsByName('demo-questions-q' + i);
                 errorCount++;
-                qd.className = 'demo demo-tip demo-tip-warning';
+                qd.className = 'demo-tip demo-tip-warning';
                 for(var j = 0; allButtons[j]; j++) {
                     if(allButtons[j].checked) {
-                        qd.className = 'demo demo-tip demo-tip-error';
+                        qd.className = 'demo-tip demo-tip-error';
                         break;
                     }
                 }
             } else {
-                qd.className = 'demo demo-tip';
+                qd.className = 'demo-tip';
             }
         }
 
@@ -52,7 +52,7 @@ Demo.writeQuestions = function (questions) {
 	document.write('<section class="demo demo-questions">');
 	for(var question in questions) {
 		var answers = questions[question];
-		document.write('<div class="demo demo-tip" id="demo-questions-qd' + i + '">\r\n<h4 class="demo">\r\n' + c + '. ' + Demo.Text.encodeHTML(question) + '\r\n</h4>\r\n<menu>\r\n');
+		document.write('<div class="demo-tip" id="demo-questions-qd' + i + '">\r\n<h4 class="demo">\r\n' + c + '. ' + Demo.Text.encodeHTML(question) + '\r\n</h4>\r\n<menu>\r\n');
 
 		for(var j = 0; j < answers.length; j++) {
 			if(answers[j].charAt(0) === '@') {
