@@ -106,7 +106,7 @@
 			 * 获取当前框架的版本号。
 			 * @getter
 			 */
-			version: /*@VERSION*/3.2
+			version: /*@VERSION*/3.21
 
 		},
 		

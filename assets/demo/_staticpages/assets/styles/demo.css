@@ -1,8 +1,8 @@
 /**
- * @author  xuld
+ * 演示系统的主样式文件�?
  */
 /**
- * 演示系统的主样式文件。
+ * @author  xuld
  */
 /***************** 基本 ****************/
 body {
@@ -252,7 +252,7 @@ body.demo footer.demo {
   margin: 0;
   width: 0;
   *width: auto;
-  /* IE6/7  如果 设置了width=0 ，肯能导致列表丢失。 */
+  /* IE6/7  如果 设置了width=0 ，肯能导致列表丢失�?*/
 
   border-radius: 3px 0 0 3px;
   -webkit-border-radius: 3px 0 0 3px;
@@ -303,6 +303,30 @@ body.demo footer.demo {
   color: #48484c;
 }
 /***************** 工具 ****************/
+html {
+  /*// 字体
+    
+    .demo-strong {
+    	font-weight: bold;
+    }
+    
+    .demo-underline {
+    	text-decoration: underline;
+    }
+    
+    .demo-italic {
+    	font-style: italic;
+    }
+    
+    .demo-small {
+    	font-size: x-small;
+    }
+    
+    .demo-large {
+    	font-size: x-large;
+    }*/
+
+}
 html .demo-inline {
   display: inline;
 }
@@ -352,64 +376,43 @@ html .demo-plain {
   margin: 0;
   padding: 0;
 }
-/*// 字体
-
-.demo-strong {
-	font-weight: bold;
-}
-
-.demo-underline {
-	text-decoration: underline;
-}
-
-.demo-italic {
-	font-style: italic;
-}
-
-.demo-small {
-	font-size: x-small;
-}
-
-.demo-large {
-	font-size: x-large;
-}*/
-.demo-white,
-.demo-c0 {
+html .demo-white,
+html .demo-c0 {
   background-color: #ffffff;
   color: #000000;
 }
-.demo-red,
-.demo-c1 {
+html .demo-red,
+html .demo-c1 {
   background-color: #9d261d;
 }
-.demo-orange,
-.demo-c2 {
+html .demo-orange,
+html .demo-c2 {
   background-color: #f89406;
   color: #000000;
 }
-.demo-yellow,
-.demo-c3 {
+html .demo-yellow,
+html .demo-c3 {
   background-color: #ffc40d;
 }
-.demo-green,
-.demo-c4 {
+html .demo-green,
+html .demo-c4 {
   background-color: #B4B900;
 }
-.demo-indigo,
-.demo-c5 {
+html .demo-indigo,
+html .demo-c5 {
   background-color: #90D9E8;
   color: #000000;
 }
-.demo-blue,
-.demo-c6 {
+html .demo-blue,
+html .demo-c6 {
   background-color: #285A8F;
 }
-.demo-purple,
-.demo-c7 {
+html .demo-purple,
+html .demo-c7 {
   background-color: #B05A89;
 }
-.demo-black,
-.demo-c8 {
+html .demo-black,
+html .demo-c8 {
   background-color: #000000;
 }
 /***************** 元素 ****************/

@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="UTF-8">
         <meta name="dpl-info" content="status=plan" />
-		<title>AJAX底层</title>
+		<title>AJAX 底层</title>
 		<script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
 		<script src="../../System/Ajax/assets/scripts/Base.js" type="text/javascript"></script>
 		
@@ -13,13 +13,33 @@
 
         <article class="demo">
 
-            <h2 class="demo">API</h2>
+             <script>
+            var ajax = new Ajax();
+            var settings = {
+                url: 'data/text.txt',
+                data: {
+                    "d1": "内容"
+                },
+                start: function(m) {
+                    trace("开始 =>", m);
+                },
+                success: function(m) {
+                    trace("成功 =>", m);
+                },
+                error: function(m) {
+                    trace("错误 => ", m);
+                },
+                complete: function(m) {
+                    trace("完成 => ", m);
+                }
+            }
 
-            <script>
-                Demo.writeTestCases({
-                    '示例': ''
-                });
-            </script>
+            Demo.writeTestCases({
+                'Ajax#run': 'ajax.run(settings)'
+            }, { times: 8 });
+
+        </script>
+	
 
         </article>
 		

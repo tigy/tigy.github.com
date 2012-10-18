@@ -150,19 +150,19 @@
                             }
                         },
                         '尺寸(Dimension)': '-',
-                        'Dom#getSize': {
+                        'Dom#getSize - 获取带 padding 和 border 的尺寸': {
                             'a.getSize()': '-'
                         },
                         'Dom#setSize': {
                             'a.setSize()': '-'
                         },
-                        'Dom#getWidth': {
+                        'Dom#getWidth - 获取不带 padding 和 border 的宽': {
                             'a.getWidth()': '-'
                         },
                         'Dom#setWidth': {
                             'a.setWidth(23)': '-'
                         },
-                        'Dom#getHeight': {
+                        'Dom#getHeight - 获取不带 padding 和 border 的高': {
                             'a.getHeight()': '-'
                         },
                         'Dom#setHeight': {
@@ -173,13 +173,13 @@
                         },
 
                         '位置(Offset)': '-',
-                        'Dom#getOffset': {
+                        'Dom#getOffset - 获取 .offsetParent() 的偏移': {
                             'a.getOffset()': '-'
                         },
                         'Dom#setOffset': {
                             'a.setOffset({x:2, y:5})': '-'
                         },
-                        'Dom#getPosition': {
+                        'Dom#getPosition - 获取在整个窗口的绝对位置': {
                             'a.getPosition()': '-'
                         },
                         'Dom#setPosition': {
@@ -190,9 +190,6 @@
                         },
 
                         '节点更新(Manipulation)': '-',
-                        'Dom.has': {
-                            'Dom.has(a.node, b.node)': true
-                        },
                         'Dom#has': {
                             'a.has(a)': false,
                             'a.has(b)': true,
@@ -220,12 +217,12 @@
                         },
 
                         '节点转移(Traversing)': '-',
-                        'Dom#find': {
+                        'Dom#find - 返回第一个': {
                             'a.find("div")': '-',
                             'a.find(".b")': '-',
                             'a.find("[_tag=\\\"b\\\"]")': '-'
                         },
-                        'Dom#query': {
+                        'Dom#query - 返回全部节点': {
                             'a.query("div")': function (value, assert) {
                                 assert.areEqual(value[0], b.node);
                             },
@@ -297,7 +294,7 @@
                                 assert.areEqual(1, value.length);
                             }
                         },
-                        'Dom#getElements': {
+                        'Dom#getElements - 根据 tagName 返回原生的子元素列表': {
                             'b.getElements()': function (value, assert) {
                                 assert.areEqual(value[0], c.node);
                             }

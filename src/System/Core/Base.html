@@ -11,7 +11,7 @@
 	<body>
 	
 		<article class="demo">
-			<p class="demo">本组件是必须引用的最底层的组件。</p>
+			<p class="demo-doc">本组件是必须引用的最底层的组件。本组件是对  js 内置函数的补充。</p>
 
             <script>
 
@@ -53,11 +53,11 @@
                         }
                     },
                     'Object.map': {
-                        'Object.map(["aa","aa23"], assert.log)': function (value, assert) {
-                            assert.logged("aaaa23");
+                        'Object.map(["aa","bb"], assert.log)': function (value, assert) {
+                            assert.logged("aabb");
                         },
-                        'Object.map("aa aa23", assert.log)': function (value, assert) {
-                            assert.logged("aaaa23");
+                        'Object.map("aa bb", assert.log)': function (value, assert) {
+                            assert.logged("aabb");
                         }
                     },
                     'Array': '-',
@@ -99,11 +99,11 @@
                             assert.areEqual(value, [5, 4, 2]);
                         }
                     },
-                    'Array#insert': {
-                        'var ar = [5,4];ar.insert(1, "1"); ar': function (value, assert) {
-                            assert.areEqual(value, [5, "1", 4]);
-                        }
-                    },
+                    // 'Array#insert': {
+                        // 'var ar = [5,4];ar.insert(1, "1"); ar': function (value, assert) {
+                            // assert.areEqual(value, [5, "1", 4]);
+                        // }
+                    // },
                     'Array#remove': {
                         'var ar = [5,4];ar.remove(4); ar': function (value, assert) {
                             assert.areEqual(value, [5]);
@@ -129,10 +129,10 @@
                     },
                     'String': '-',
                     'String#capitalize': {
-                        '"ab".capitalize()': "Ab"
+                        '"abcd".capitalize()': "Abcd"
                     },
                     'String#toCamelCase': {
-                        '"a-b".toCamelCase()': "aB"
+                        '"font-size".toCamelCase()': "fontSize"
                     },
                     //'String.ellipsis': {
                     //    '~("saasasdasd", 7)':  "saas...",
