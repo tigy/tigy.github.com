@@ -1929,7 +1929,7 @@ function using(namespace, isStyle) {
 
 	cache.push(namespace);
 
-	namespace = using.resolve(namespace.toLowerCase(), isStyle);
+	namespace = using.resolve(namespace, isStyle);
 
 	var tagName,
     	type,
@@ -1939,12 +1939,9 @@ function using(namespace, isStyle) {
 	if (isStyle) {
 		tagName = "LINK";
 		type = "href";
-		exts = [".less", ".css"];
+		exts = [".css"];
 		callback = using.loadStyle;
 
-		if (!using.useLess) {
-			exts.shift();
-		}
 	} else {
 		tagName = "SCRIPT";
 		type = "src";
@@ -1958,7 +1955,7 @@ function using(namespace, isStyle) {
 		path = namespace.replace(/^[\.\/\\]+/, "");
 
 	for (var i = 0; doms[i]; i++) {
-		var url = ((document.constructor ? doms[i][type] : doms[i].getAttribute(type, 4)) || '').toLowerCase();
+		var url = ((document.constructor ? doms[i][type] : doms[i].getAttribute(type, 4)) || '');
 		for (var j = 0; j < exts.length; j++) {
 			if (url.indexOf(path + exts[j]) >= 0) {
 				return;
@@ -2738,12 +2735,6 @@ function imports(namespace) {
 	extend(using, {
 
 		/**
-    	 * 是否使用 lesscss
-    	 * @config
-    	 */
-		useLess: true,
-
-		/**
          * 同步载入代码。
          * @param {String} uri 地址。
          * @example <pre>
@@ -2771,7 +2762,7 @@ function imports(namespace) {
 			// 在顶部插入一个css，但这样肯能导致css没加载就执行 js 。所以，要保证样式加载后才能继续执行计算。
 			return document.getElementsByTagName("HEAD")[0].appendChild(extend(document.createElement('link'), {
 				href: url,
-				rel: using.useLess ? 'stylesheet/less' : 'stylesheet',
+				rel: 'stylesheet',
 				type: 'text/css'
 			}));
 		},
@@ -2885,7 +2876,7 @@ function imports(namespace) {
 				scripts = !document.constructor ? scripts.getAttribute('src', 4) : scripts.src;
 
 				// 设置路径。
-				return (scripts.match(/[\S\s]*\//) || [""])[0];
+				return (scripts.match(/([\S\s]*\/)System\/Core\/assets\/scripts\//) || [0, ""])[1];
 
 			} catch (e) {
 
@@ -2893,7 +2884,7 @@ function imports(namespace) {
 				return "";
 			}
 
-		})().replace("system/core/assets/scripts/", ""),
+		})(),
 
 		/**
          * 将指定的组件全名转为路径。

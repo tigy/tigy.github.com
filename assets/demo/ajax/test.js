@@ -1,5 +1,1 @@
-
-
-
-
-alert('load success');
+alert('test.js载入成功');

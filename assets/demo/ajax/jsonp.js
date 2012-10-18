@@ -1,1 +1,1 @@
-jsonp14245322344({info: "ok"})
+jsonp({info: "中文"})
