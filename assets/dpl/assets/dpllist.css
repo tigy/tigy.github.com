@@ -5,6 +5,12 @@
     color: #E2E2EB;
     font-size: 14px;
     line-height: 21px;
+    height: 23px;
+    overflow: hidden;
+}
+
+.list small {
+    color: #999999;
 }
 
 .current, article.demo a:focus {

@@ -169,11 +169,11 @@ Demo.writeDplList = function (values) {
 
                 var url = Demo.getDemoUrl(c);
 
-                html2 += '<li><a href="' + url + '" class="demo status-' + dplInfo.status + (from === url ? ' current' : '') + '" title="状态: ' + (Demo.Configs.status[dplInfo.status] || '已完成') + '">' + bi + (!dplInfo.name || dplInfo.name === bi ? '' : '(' + dplInfo.name + ')') + '</a></li>';
+                html2 += '<li><a href="' + url + '" class="demo status-' + dplInfo.status + (from === url ? ' current' : '') + '" title="状态: ' + (Demo.Configs.status[dplInfo.status] || '已完成') + '">' + bi + '</a>' + (!dplInfo.name || dplInfo.name === bi ? '' : '<small title="' + dplInfo.name + '"> - ' + dplInfo.name + '</small>') + '</li>';
 
                 switch (dplInfo.status) {
                     case 'ok':
-                    case 'compact':
+                    case 'compact': ' + dplInfo.name + '
                     case 'complete':
                         finish++;
 

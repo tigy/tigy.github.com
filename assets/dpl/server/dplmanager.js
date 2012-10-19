@@ -162,7 +162,7 @@ var DplManager = {
 
             // dplInfo 存入 meta 标签。
             if (dplInfo) {
-                var metaMatch = new RegExp('(<meta\\s+name\\s*=\\s*([\'\"])' + System.Configs.metaDplInfo + '\\2\\s+content\\s*=\\s*([\'\"]))(.*?)(\\3\\s*\\/?>)').exec(head);
+                var metaMatch = new RegExp('(<meta\\s+name\\s*=\\s*([\'\"])' + System.Configs.metaDplInfo + '\\2\\s+content\\s*=\\s*([\'\"]))(.*?)(\\3\\s*\\/?>\\s*)').exec(head);
 
                 if (!metaMatch) {
 
@@ -170,15 +170,24 @@ var DplManager = {
                         delete dplInfo.support;
                     }
 
+                    if (dplInfo.status == "ok") {
+                        delete dplInfo.status;
+                    }
+
                     dplInfo = System.stringifyDplInfo(dplInfo);
 
-                    var titleMatch = /(\s*)(<title[^\>]*?>.*?<\/title>)/m.exec(head);
+                    if (dplInfo) {
 
-                    if (!titleMatch) {
-                        head = '<meta name="' + System.Configs.metaDplInfo + '" content="' + dplInfo + '\">' + head;
-                    } else {
-                        head = head.replace(titleMatch[0], titleMatch[1] + '<meta name="' + System.Configs.metaDplInfo + '" content="' + dplInfo + '\">' + titleMatch[0]);
+                        var titleMatch = /(\s*)(<title[^\>]*?>.*?<\/title>)/m.exec(head);
+
+                        if (!titleMatch) {
+                            head = '<meta name="' + System.Configs.metaDplInfo + '" content="' + dplInfo + '\">' + head;
+                        } else {
+                            head = head.replace(titleMatch[0], titleMatch[1] + '<meta name="' + System.Configs.metaDplInfo + '" content="' + dplInfo + '\">' + titleMatch[0]);
+                        }
+
                     }
+
                 } else {
 
                     var oldDplInfo = System.parseDplInfo(metaMatch[4]);
@@ -188,9 +197,19 @@ var DplManager = {
                         delete oldDplInfo.support;
                     }
 
-                    dplInfo = System.stringifyDplInfo(oldDplInfo);
+                    if (oldDplInfo.status == "ok") {
+                        delete oldDplInfo.status;
+                    }
 
-                    head = head.replace(metaMatch[0], metaMatch[1] + dplInfo + metaMatch[5]);
+                    dplInfo = System.stringifyDplInfo(oldDplInfo);
+                    if (dplInfo) {
+                        head = head.replace(metaMatch[0], metaMatch[1] + dplInfo + metaMatch[5]);
+                    } else {
+                        head = head.replace(metaMatch[0], "");
+                    }
+
+
+
                 }
 
             }
