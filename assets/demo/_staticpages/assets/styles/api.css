@@ -30,6 +30,10 @@
   color: #3F529C;
   font-size: 30px;
   line-height: 30px;
+  height: 39px;
+  border-bottom: 1px solid #E5E5E5;
+  _width: 100%;
+  _margin-top: 0px;
 }
 .docplus-api h2 {
   color: #3F529C;
@@ -120,6 +124,7 @@
 }
 .docplus-api p {
   margin: 8px 0 16px;
+  line-height: 150%;
 }
 .docplus-api blockquote {
   border: 2px solid #ddd;
@@ -194,7 +199,7 @@
   margin: 0;
   width: 0;
   *width: auto;
-  /* IE6/7  如果 设置了width=0 ，肯能导致列表丢失�?*/
+  /* IE6/7  如果 设置了width=0 ，肯能导致列表丢失。 */
 
   border-radius: 3px 0 0 3px;
   -webkit-border-radius: 3px 0 0 3px;

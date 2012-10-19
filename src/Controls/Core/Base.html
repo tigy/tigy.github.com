@@ -4,370 +4,216 @@
 		<meta charset="UTF-8">
 		<meta name="dpl-info" content="status=plan">
 		<title>控件底层</title>
-		<script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
+
+        <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css" />
 		
 		<script src="../../../assets/demo/demo.js" type="text/javascript"></script>
 	</head>
 	<body>
 	
 		<article class="demo">
-			<p class="demo">本组件是必须引用的最底层的组件。</p>
 
-            <script>
+            <p>
+                Core/Base 组件是全部组件的基础组件。它包含了以下功能：
+            </p>
 
-                Demo.writeTestCases({
-                    'Object': '-',
-                    'Object.extend': {
-                        'var target={"a":"g"}; Object.extend(target, [])': function (value, assert) {
-                            assert.areEqual(value["a"], "g");
-                        }
-                    },
-                    'Object.extendIf': {
-                        'var target={"a":"g"}; Object.extendIf(target, [])': function (value, assert) {
-                            assert.areEqual(value["a"], "g");
-                        }
-                    },
-                    'Object.isObject': {
-                        'Object.isObject({})': true,
-                        'Object.isObject(null)': false,
-                        'Object.isObject(2)': false
-                    },
-                    'Object.isArray': {
-                        'Object.isArray([])': true,
-                        'Object.isArray()': false
-                    },
-                    'Object.isFunction': {
-                        'Object.isFunction(function(){})': true,
-                        'Object.isFunction(new Function())': true,
-                        'Object.isFunction()': false
-                    },
-                    'Object.each': {
-                        'var target={a:1, b:2, c:3}; Object.each(target, assert.log)': function (value, assert) {
-                            assert.logged("123");
-                            return value === true;
-                        },
-                        'var target=null; Object.each(target, assert.log)': true,
-                        'var target=[1,2,3]; Object.each(target, assert.log)': function (value, assert) {
-                            assert.logged("123");
-                            return value === true;
-                        }
-                    },
-                    'Object.map': {
-                        'Object.map(["aa","aa23"], assert.log)': function (value, assert) {
-                            assert.logged("aaaa23");
-                        },
-                        'Object.map("aa aa23", assert.log)': function (value, assert) {
-                            assert.logged("aaaa23");
-                        }
-                    },
-                    'Array': '-',
-                    'Array#indexOf': {
-                        '[5,4].indexOf(5)': 0,
-                        '[5,4].indexOf(4)': 1,
-                        '[5,4].indexOf()': -1,
-                        '[5,4].indexOf("4")': -1
-                    },
-                    'Array#item': {
-                        '[5,4].item(0)': 5,
-                        '[5,4].item(1)': 4,
-                        '[5,4].item(-1)': 4,
-                        '[5,4].item(2)': undefined
-                    },
-                    'Array#invoke': {
-                        '[5,4].invoke("toString", [])': ["5", "4"]
-                    },
-                    'Array#unique': {
-                        '[2, 5, 7, 5].unique()': [2, 5, 7]
-                    },
-                    'Array#forEach': {
-                        '[5,4].forEach(assert.log)': function (value, assert) {
-                            assert.logged("54");
-                        }
-                    },
-                    'Array#each': {
-                        '[5,4].each(assert.log)': function (value, assert) {
-                            assert.logged("54");
-                        }
-                    },
-                    'Array#filter': {
-                        '[5,4].filter(function(v){return v > 2;})': [5, 4],
-                        '[5,4].filter(function(v){return v > 4;})': [5],
-                        '[5,4].filter(function(v){return v > 5;})': []
-                    },
-                    'Array#include': {
-                        'var ar = [5,4];ar.include(2); ar': function (value, assert) {
-                            assert.areEqual(value, [5, 4, 2]);
-                        }
-                    },
-                    'Array#insert': {
-                        'var ar = [5,4];ar.insert(1, "1"); ar': function (value, assert) {
-                            assert.areEqual(value, [5, "1", 4]);
-                        }
-                    },
-                    'Array#remove': {
-                        'var ar = [5,4];ar.remove(4); ar': function (value, assert) {
-                            assert.areEqual(value, [5]);
-                        }
-                    },
-                    'Array.create': {
-                        'Array.create(["a","a",null,"a"], 1)': ["a", null, "a"]
-                    },
-                    'Function': '-',
-                    'Function#bind': {
-                        '(function(){assert.log(this)}).bind(2)': function (value, assert) {
-                            value();
-                            assert.logged("2");
-                        }
-                    },
-                    'Function.empty': {
-                        'Function.empty()': undefined
-                    },
-                    'Function.from': {
-                        'Function.from(1)': function (value, assert) {
-                            assert.areEqual(value(), 1);
-                        }
-                    },
-                    'String': '-',
-                    'String#capitalize': {
-                        '"ab".capitalize()': "Ab"
-                    },
-                    'String#toCamelCase': {
-                        '"a-b".toCamelCase()': "aB"
-                    },
-                    //'String.ellipsis': {
-                    //    '~("saasasdasd", 7)':  "saas...",
-                    //    '~("aba", 3)':  "aba"
-                    //},
-                    'String.format': {
-                        'String.format("{0} {1}", "h", "v")': "h v",
-                        'String.format("{a}", {a: 1})': "1"
-                    },
-                    'Date': '-',
-                    'Date.now': {
-                        'Date.now()': function (value) {
-                            return value > 0;
-                        }
-                    },
-                    'JPlus & Global': '-',
-                    'JPlus.id': 'JPlus.id++',
-                    'window.execScript': {
-                        'window.execScript("Demo.assert.log(false)")': function (value, assert) {
-                            assert.logged("false")
-                        }
-                    },
-                    '浏览器判断': '-',
-                    '判断指定的浏览器(基于UA)': {
-                        'navigator.isIE': '-',
-                        'navigator.isIE6': '-',
-                        'navigator.isIE7': '-',
-                        'navigator.isIE8': '-',
-                        'navigator.isIE9': '-',
-                        'navigator.isFirefox': '-',
-                        'navigator.isOpera': '-',
-                        'navigator.isChrome': '-',
-                        'navigator.isSafari': '-'
-                    },
-                    '判断是否支持 HTML5（非 IE6/7/8）': 'navigator.isStd',
-                    '判断是否为老浏览器（IE6/7）': 'navigator.isQuirks',
-                    '获取浏览器名字': 'navigator.name',
-                    '获取浏览器版本': 'navigator.version',
-                    '查看全部浏览器信息': 'navigator',
-                    '面向对象支持': '-',
-                    '创建类': function () {
+            <ul>
+                <li>css reset: 样式重置 。</li>
+                <li>一些标签的默认样式: 定义标签的默认风格以让标签显示地更和谐。</li>
+                <li>js core: 所有组件最底层依赖的 js 。</li>
+            </ul>
 
-                        // 创建一个类。
-                        var Animale = new Class({
+            <hr>
 
-                            // 类的一个方法。
-                            say: function(){
-                                alert("调用了 say 方法");
-                            }
-                        });
+            <h1>示例：</h1>
 
-                        // 创建一个类的实例。
-                        var ani = new Animale();
+            <h2>标题 H1 - H6</h2>
 
-                        // 调用 Animale 类的 say 方法。
-                        ani.say();
+            <h1>标题1 Heading <small>备注 Hint</small></h1>
+            <h2>标题2 Heading <small>备注 Hint</small></h2>
+            <h3>标题3 Heading <small>备注 Hint</small></h3>
+            <h4>标题4 Heading <small>备注 Hint</small></h4>
+            <h5>标题5 Heading <small>备注 Hint</small></h5>
+            <h6>标题6 Heading <small>备注 Hint</small></h6>
 
-                    },
-                    '定义类的字段': function () {
+            <h1>标题1 Heading <small>备注 Hint</small></h1>
+            <p>正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content </p>
 
-                        // 创建一个类。
-                        var Animale = new Class({
+            <h1>标题1 Heading <small>备注 Hint</small></h1>
+            <h2>标题2 Heading <small>备注 Hint</small></h2>
+            <p>正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content </p>
 
-                            // 类的一个字段。
-                            name: "这是 Animate 的字段",
+            <h3>标题3 Heading <small>备注 Hint</small></h3>
+            <p>正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content 正文 content </p>
 
-                            // 类的一个方法。
-                            say: function () {
-                                alert("字段 name 的值是: " + this.name);
-                            }
-                        });
+            <h4>标题4 Heading <small>备注 Hint</small></h4>
+            <p>内容 content</p>
 
-                        // 创建一个类的实例。
-                        var ani = new Animale();
+            <h4>标题4 Heading <small>备注 Hint</small></h4>
+            <div>内容 div</div>
 
-                        ani.name = "ani 实例覆盖了这个字段的值";
+            <h5>标题5 Heading <small>备注 Hint</small></h5>
+            <div>内容 div</div>
 
-                        // 调用 Animale 类的 say 方法。
-                        ani.say();
+            <h5>标题5 Heading <small>备注 Hint</small></h5>
+            <div>内容 div</div>
 
-                    },
-                    '定义类的构造函数': function () {
+            <h6>标题6 Heading <small>备注 Hint</small></h6>
+            <div>内容 div</div>
 
-                        // 创建一个类。
-                        var Animale = new Class({
+            <h2>链接 Link</h2>
+            <a href="javascript:;">链接 Link</a>
 
-                            // 构造函数。
-                            constructor: function (args) {
-                                alert("正在执行 Animal 类的构造函数。");
-                            }
-                        });
+            <h2>段落 Paragragh</h2>
 
-                        // 创建一个类的实例。
-                        var ani = new Animale();
+            <p>段落 <big>大</big>字  <small>小</small>字 <sup>上</sup>标 <sub>下</sub>标  <small>备注 Hint</small></p>
 
-                    },
-                    '继承类': function () {
+            <h2>列表 List</h2>
 
-                        // 创建一个类。
-                        var Animale = new Class({
+            <ul>
+                <li>列表 list</li>
+                <li>列表 list
+				<ul>
+                    <li>子列表 list</li>
+                    <li>子列表 list</li>
+                </ul>
+                </li>
+            </ul>
 
-                            // 类的一个方法。
-                            say: function () {
-                                alert("正在执行 Animale 类的 say 方法");
-                            },
+            <ol>
+                <li>列表 list</li>
+                <li>列表 list</li>
+            </ol>
 
-                            // 构造函数。
-                            constructor: function (args) {
-                                alert("正在执行 Animal 类的构造函数。");
-                            }
-                        });
+            <dl>
+                <dt>标题 items1</dt>
+                <dd>列表 dd</dd>
+                <dd>列表 dd</dd>
+                <dt>标题 items2</dt>
+                <dd>列表 dd</dd>
+            </dl>
 
-                        // 创建一个类。
-                        var Dog = Animale.extend({
+            <h2>内联 Misc</h2>
+            <strong>strong 重要</strong>
+            <br>
+            <em>em 强调</em>
+            <br>
+            <abbr>abbr 缩写</abbr>
+            <br>
+            <b>b 加粗</b>
+            <br>
+            <i>i 斜体</i>
+            <br>
+            <u>u 下划线</u>
+            <br>
+            <del>del 删除线</del>
+            <br>
+            <big>big 大</big>
+            <br>
+            <small>small 小</small>
+            <br>
+            <cite>cite 引用</cite>
+            <br>
+            <address>address 地址</address>
 
-                            // 类的一个方法。
-                            say2: function () {
-                                alert("正在执行 Dog 类的 say 方法");
-                            }
+            <h2>引用 Blockquote</h2>
 
-                        });
+            <blockquote>
+                <p>引用 blockquote 引用 blockquote 引用 blockquote 引用 blockquote 引用 blockquote 引用 blockquote 引用 blockquote 引用 blockquote 引用 blockquote 引用 blockquote 引用 blockquote 引用 blockquote 引用 blockquote</p>
+                <small>引用 <cite title="作者">作者</cite></small>
+            </blockquote>
 
-                        // 创建一个类的实例。
-                        var dog = new Dog();
+            <h2>代码 Pre</h2>
 
-                        // 调用 Animale 类的 say 方法。
-                        dog.say();
+            <pre><code>代码 pre</code></pre>
+            <code>代码 code</code>
 
-                        // 调用 Dog 类的 say2 方法。
-                        dog.say2();
+            <h2>表格 Table</h2>
 
-                    },
-                    '多态类': function () {
+            <table>
+                <thead>
+                    <tr>
+                        <th>Table</th>
+                        <th>Th 1</th>
+                        <th>Th 2</th>
+                        <th>Th 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Td 1</td>
+                        <td>Td 2</td>
+                        <td>Td 3</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Td 1</td>
+                        <td>Td 2</td>
+                        <td>Td 3</td>
+                    </tr>
+                </tbody>
+            </table>
 
-                        // 创建一个类。
-                        var Animale = new Class({
+            <h2>字段组 FieldSet</h2>
 
-                            // 类的一个方法。
-                            say: function (name) {
-                                alert("正在执行 Animale 类的 say 方法: 参数 name=" + name);
-                            }
+            <fieldset>
+                <legend>Legend <small>Hint</small></legend>
+                FieldSet
+            </fieldset>
 
-                        });
+            <h2>表单 Forms</h2>
 
-                        // 创建一个类。
-                        var Dog = Animale.extend({
+            <p>以下都是默认样式， 要查看具体的效果，见 Form 下的组件。</p>
 
-                            // 类的一个方法。
-                            say: function () {
-                                this.base('say', 'Dog');
-                            }
 
-                        });
-
-                        // 创建一个类。
-                        var Cat = Animale.extend({
-
-                            // 类的一个方法。
-                            say: function () {
-                                this.base('say', 'Cat');
-                            }
-
-                        });
-
-                        var dog = new Dog();
-                        dog.say();
-
-                        var cat = new Cat();
-                        cat.say();
-                    },
-                    '使用类的事件': function () {
-
-                        // 创建一个类。
-                        var Animale = new Class({
-
-                        });
-
-                        var ani = new Animale();
-                        ani.on('needsay', function (name) {
-                            alert("needsay事件被触发了， 参数 name=" + name);
-                        });
-
-                        ani.trigger('needsay', "触发needsay事件时的参数");
-
-                    },
-                    '定义类的事件': function () {
-
-                        // 创建一个类。
-                        var Animale = new Class({
-
-                        });
-
-                        Animale.addEvents('needsay', {
-
-                            add: function (target, eventName, eventHandler) {
-                                alert(eventName + "事件被绑定了一个函数: " + eventHandler);
-                            },
-
-                            remove: function (target, eventName, eventHandler) {
-                                alert(eventName + "事件被解绑了");
-                            },
-
-                            dispatch: function (target, eventName, eventHandler, eventArgs) {
-                                alert(eventName + "事件被触发了, 接下来执行用户传入的事件处理函数");
-
-                                eventHandler(eventArgs);
-                            }
-
-                        });
-
-                        var ani = new Animale();
-                        ani.on('needsay', function (name) {
-                            alert("needsay事件被触发了， 参数 name=" + name);
-                        });
-
-                        ani.trigger('needsay', "触发needsay事件时的参数");
-
-                    },
-                    '将一个已经定义好的 JavaScript 函数转为一个类': function () {
-
-                        function func() {
-                            alert("我是一个已经定义的 func 函数");
-                        }
-                        
-                        // 从一个 Javascript 函数创建一个类。
-                        JPlus.Native(func);
-
-                        var a = new func();
-
-                    }
-                });
-
-            </script>
-
-		</article>
+            文本:
+            <input type="text" value="内容" />
+            <br>
+            密码:
+            <input type="password" value="123" />
+            <br>
+            文件:
+            <input type="file" />
+            <br>
+            复选框:
+            <label>
+                <input type="checkbox" />
+                T</label>
+            <br>
+            单选框:
+            <label>
+                <input type="radio" />
+                T</label>
+            <br>
+            选择框:
+            <select>
+                <option>AA</option>
+                <option>BB</option>
+                <optgroup label="CC">
+                    <option>DD</option>
+                </optgroup>
+            </select>
+            <br>
+            多选框:
+            <select multiple="multiple">
+                <option>AA</option>
+                <option>BB</option>
+                <optgroup label="CC">
+                    <option>DD</option>
+                </optgroup>
+            </select>
+            <br>
+            按钮:
+            <input type="button" value="按钮" />
+            <br>
+            按钮:
+            <button type="button">按钮</button>
+            <br>
+            文本域:
+            <textarea></textarea>
+            <br>
+        </article>
 
 	</body>
 </html>
