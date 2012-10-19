@@ -1,0 +1,42 @@
+/**
+ * @author 
+ */
+.x-carousel {
+  position: relative;
+}
+.x-carousel-header {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 32px;
+  z-index: 10;
+}
+.x-carousel-header li {
+  float: left;
+  width: 120px;
+  text-align: center;
+  opacity: 0.9;
+  filter: alpha(opacity=90);
+  background-color: #000000;
+  line-height: 32px;
+  color: #ffffff;
+  cursor: pointer;
+}
+.x-carousel-header .x-carousel-header-selected {
+  font-weight: bold;
+  background-color: #F2F2F2;
+  color: #000000;
+}
+.x-carousel-container {
+  *zoom: 1;
+}
+.x-carousel-container:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+.x-carousel-content {
+  float: left;
+}

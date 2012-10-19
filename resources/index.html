@@ -8,7 +8,9 @@
 </head>
 <body>
 
-    <article class="demo demo-grid demo-grid-3">
+    
+
+    <article class="demo demo-grid demo-grid-3 demo-relative">
 
         <h2 class="demo" id="tool">工具列表</h2>
 
@@ -27,7 +29,7 @@
 
     </article>
 
-    <article class="demo demo-grid demo-grid-3">
+    <article class="demo demo-grid demo-grid-3 demo-relative">
 
         <h2 class="demo" id="doc">文档列表</h2>
 
@@ -35,7 +37,8 @@
             Demo.writeList({
                 '常用手册': {
                     'J+ API 文档': 'javascript/advance.html',
-                    'J+ API 文档2': 'javascript/advance.html'
+                    'J+ API 文档2': 'javascript/advance.html',
+                    'J+ API 文档4': 'javascript/advance.html'
                 },
                 '常用手册2': {
                     'J+ API 文档': 'javascript/advance.html',
@@ -54,7 +57,7 @@
 
     </article>
 
-    <article class="demo demo-grid demo-grid-3">
+    <article class="demo demo-grid demo-grid-3 demo-relative">
 
         <h2 class="demo" id="lib">框架列表</h2>
 
@@ -74,6 +77,7 @@
     </article>
 
     <script>
+        Demo.waterFall(3);
         Demo.writeFooter();
     </script>
 

@@ -1,5 +1,12 @@
 
 
+.list li{
+    list-style: disc inside;
+    color: #E2E2EB;
+    font-size: 14px;
+    line-height: 21px;
+}
+
 .current, article.demo a:focus {
     -webkit-text-shadow: 0 0 1px #0088CC;
     text-shadow: 0 0 1px #0088CC;

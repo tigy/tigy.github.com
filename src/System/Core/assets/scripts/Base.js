@@ -2741,13 +2741,21 @@ function imports(namespace) {
          * JPlus.loadScript('./v.js');
          * </pre>
          */
-		loadScript: function (url) {
-			return using.loadText(url, window.execScript || function (statements) {
+	    loadScript: function (url) {
 
-				// 如果正常浏览器，使用 window.eval 。
-				window["eval"].call(window, statements);
+	        var src = using.loadText(url);
 
-			});
+	        if(src){
+	            try {
+	                if(window.execScript) {
+	                    window.execScript(src);
+	                } else {
+	                    window["eval"].call(window, src);
+	                }
+	            } catch (e) {
+	                trace.error("执行 " + url + " 出现错误: " + e.toString());
+	            } 
+	        }
 		},
 
 		/**
@@ -2768,28 +2776,6 @@ function imports(namespace) {
 		},
 
 		/**
-         * 判断一个 HTTP 状态码是否表示正常响应。
-         * @param {Number} status 要判断的状态码。
-         * @return {Boolean} 如果正常则返回true, 否则返回 false 。
-		 * 一般地， 200、304、1223 被认为是正常的状态吗。
-         */
-		checkStatus: function (status) {
-
-			// 获取状态。
-			if (!status) {
-
-				// 获取协议。
-				var protocol = window.location.protocol;
-
-				// 对谷歌浏览器, 在有些协议， status 不存在。
-				return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");
-			}
-
-			// 检查， 各浏览器支持不同。
-			return (status >= 200 && status < 300) || status == 304 || status == 1223;
-		},
-
-		/**
          * 同步载入文本。
          * @param {String} uri 地址。
          * @param {Function} [callback] 对返回值的处理函数。
@@ -2798,23 +2784,12 @@ function imports(namespace) {
          * trace(  JPlus.loadText('./v.html')  );
          * </pre>
          */
-		loadText: function (url, callback) {
-
-			assert.notNull(url, "System.loadText(url, callback): {url} ~");
-
-			// assert(window.location.protocol != "file:",
-			// "System.loadText(uri, callback): 当前正使用 file 协议，请使用 http
-			// 协议。 \r\n请求地址: {0}", uri);
+		loadText: function (url) {
 
 			// 新建请求。
 			// 下文对 XMLHttpRequest 对象进行兼容处理。
-			var xmlHttp;
-
-			if (window.XMLHttpRequest) {
-				xmlHttp = new XMLHttpRequest();
-			} else {
-				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
-			}
+		    var xmlHttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"),
+		        status;
 
 			try {
 
@@ -2824,21 +2799,22 @@ function imports(namespace) {
 				// 发送请求。
 				xmlHttp.send(null);
 
-				// 检查当前的 XMLHttp 是否正常回复。
-				if (!using.checkStatus(xmlHttp.status)) {
-					// 载入失败的处理。
-					throw "请求失败:  \r\n   地址: " + url + " \r\n   状态: " + xmlHttp.status + "   " + xmlHttp.statusText + "  " + (window.location.protocol == "file:" ? '\r\n原因: 当前正使用 file 协议打开文件，请使用 http 协议。' : '');
+                // 获取返回的状态码。
+				status = xmlHttp.status;
+
+                // 判断状态码是否合格。
+				if ((status >= 200 && status < 300) || status == 304 || status == 1223) {
+				    // 返回相应内容。
+				    return xmlHttp.responseText;
+				} else {
+				    throw "服务器返回状态码 " + status;
 				}
-
-				url = xmlHttp.responseText;
-
-				// 运行处理函数。
-				return callback ? callback(url) : url;
 
 			} catch (e) {
 
-				// 调试输出。
-				trace.error(e);
+			    // 调试输出。
+			    trace.error("请求失败: " + url + " \r\n\t原因: " + (window.location.protocol == "file:" ? " 本网页是使用 file 协议打开的，请改用 http 协议。" : e.toString()));
+
 			} finally {
 
 				// 释放资源。
