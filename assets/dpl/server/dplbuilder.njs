@@ -1,9 +1,5 @@
-﻿//dplbuilder.njs?action=build&path=aa.dpl
-//dplbuilder.njs?action=savebuild&path=aa.dpl
-//dplbuilder.njs?action=js&path=aa.dpl   //  预览生成的js代码
-//dplbuilder.njs?action=css&path=aa.dpl
-//dplbuilder.njs?action=save&path=aa.dpl
-//dplbuilder.njs?action=edit&path=aa.dpl
+﻿// 如果本源码被直接显示，说明使用了其它服务器。
+// 本源码需要使用 xfly 服务器执行。请运行项目跟目录下的 startserver 文件。
 
 var DplBuilderUI = require('./dplbuilderui');
 var DplFile = require('./dplfile');

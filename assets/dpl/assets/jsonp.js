@@ -1,13 +1,20 @@
 ﻿
 
 Demo.jsonp = function (path, data, onSuccess) {
-    Ajax.jsonp(Demo.Configs.serverRootUrl + path, data, onSuccess, function () {
-        var r = 'startserver.bat';
-        if (navigator.platform.indexOf("Win") === -1) {
-            r = 'startserver.sh';
-        }
-        alert("无法连接到代理服务器 " + Demo.Configs.serverRootUrl + '\r\n请运行 ' + r);
-    }, null, 1000);
+    Ajax.send({
+        url: Demo.Configs.serverRootUrl + path,
+        dataType: "jsonp",
+        data: data,
+        success: onSuccess,
+        error: function () {
+            var r = 'startserver.bat';
+            if (navigator.platform.indexOf("Win") === -1) {
+                r = 'startserver.sh';
+            }
+            alert("无法连接到代理服务器\r\n请求地址: " + Demo.Configs.serverRootUrl + path + '\r\n请运行 [项目跟目录]/' + r);
+        },
+        timeout: 1000
+    });
 };
 
 Demo.submit = function (path, data, target) {

@@ -1,4 +1,6 @@
-﻿
+﻿// 如果本源码被直接显示，说明使用了其它服务器。
+// 本源码需要使用 xfly 服务器执行。请运行项目跟目录下的 startserver 文件。
+
 var DplManager = require('./dplmanager');
 var res = require('./res');
 
