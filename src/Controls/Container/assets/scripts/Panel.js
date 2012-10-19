@@ -1,0 +1,1 @@
+/** * @author  xuld */using("Controls.Core.ICollapsable");using("Controls.Core.ContainerControl");/** * 内容显示面板。 * @class Panel * @extends ContainerControl */var Panel = ContainerControl.extend(ICollapsable).implement({		/**	 * xtype	 * @type String	 */	xtype: 'panel'	});
