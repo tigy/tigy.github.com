@@ -80,43 +80,6 @@ var DplManager = {
 
         }
 
-        //// 生成的 HTML 文件位置。
-        //var targetPath = targetFolder + targetFileName + '.html';
-
-        //// 如果不存在 HTML，则创建。
-        //if (!IO.exists(targetPath)) {
-
-        //    // 读取 HTML 模板内容。
-        //    var text = IO.readFile(tplFolder + 'tpl.html');
-
-        //    // 替换模板。
-        //    text = text.replace(/MODULE/g, module).replace(/CATEGORY/g, category).replace(/NAME/g, targetFileName).replace(/TITLE/g, title).replace(/PATH/g, module + '.' + category + '.' + name);
-
-        //    // 写入文件。
-        //    IO.writeFile(targetPath, text, System.Configs.encoding);
-
-        //}
-
-        //copyAssets("assets\\styles\\tpl.css");
-        //copyAssets("assets\\styles\\tpl.less");
-        //copyAssets("assets\\styles\\tpl.sass");
-        //copyAssets("assets\\scripts\\tpl.js");
-        //copyAssets("assets\\scripts\\tpl.coffee");
-
-        //function copyAssets(fileName) {
-            
-        //    if (IO.exists(tplFolder + fileName)) {
-
-        //        targetPath = targetFolder + fileName.replace('tpl', targetFileName);
-
-        //        if (!IO.exists(targetPath)) {
-        //            IO.copyFile(tplFolder + fileName, targetPath);
-        //        }
-
-        //    }
-
-        //}
-
         this.updateDplList('demo');
 
     },
@@ -249,7 +212,7 @@ var DplManager = {
         // 按照源码搜索全部组件。
         if (type === 'src') {
 
-            var root = System.Configs.physicalPath + System.Configs.src + '\\';
+            var root = System.Configs.physicalPath + System.Configs.src + Path.sep;
             var files = IO.getFiles(root);
             var r = {};
 
@@ -271,7 +234,7 @@ var DplManager = {
 
         } else {
 
-            var root = System.Configs.physicalPath + System.Configs.demo + '\\';
+            var root = System.Configs.physicalPath + System.Configs.demo + Path.sep;
             var files = IO.getFiles(root);
             var r = {};
 
@@ -319,12 +282,12 @@ var DplManager = {
 
     // 获取模板位置。
     getTemplatePath: function (module, category) {
-        return System.Configs.physicalPath + System.Configs.templatePath + '\\' + module + '\\';
+        return System.Configs.physicalPath + System.Configs.templatePath + Path.sep + module + Path.sep;
     },
 
     // 获取存放指定分类的文件夹。
     getCategoryPath: function (module, category, demo) {
-        return System.Configs.physicalPath + System.Configs[demo === true ? 'demo' : 'src'] + '\\' + module + '\\' + category + '\\';
+        return System.Configs.physicalPath + System.Configs[demo === true ? 'demo' : 'src'] + Path.sep + module + Path.sep + category + Path.sep;
     },
 
     // 获取文件名。
@@ -334,7 +297,7 @@ var DplManager = {
 
     // 获取HTML位置。
     getHtmlPath: function (module, category, name) {
-        return System.Configs.physicalPath + System.Configs.demo + '\\' + module + '\\' + category + '\\' + name.replace(/\./g, "\\") + '.html';
+        return System.Configs.physicalPath + System.Configs.demo + Path.sep + module + Path.sep + category + Path.sep + name.replace(/\./g, Path.sep) + '.html';
     },
 
     // 解析一个文件内指定的组件信息。

@@ -3,7 +3,7 @@
 var Http = require('http'),
 	Path = require('path'),
 	Url = require('url'),
-	HttpUtility = require('./HttpUtility');
+	HttpUtility = require('./httputility');
 
 /**
  * 提供创建和操作各 HTTP Cookie 的类型安全方法。

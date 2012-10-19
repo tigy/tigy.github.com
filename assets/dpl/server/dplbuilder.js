@@ -110,7 +110,7 @@ var DplBuilder = {
 
         dplPath = this.getFileName(dplPath, isStyle);
 
-        return dplPath && System.Configs.physicalPath + System.Configs.src + '\\' + dplPath.replace(/\//g, '\\');
+        return dplPath && System.Configs.physicalPath + System.Configs.src + Path.sep + dplPath.replace(/\//g, Path.sep);
     },
 
     /**

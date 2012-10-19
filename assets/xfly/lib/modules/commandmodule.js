@@ -10,6 +10,14 @@ var commands = {
         context.response.write('<script>history.back();</script>');
         context.response.end();
         return true;
+    },
+
+    start: function (context, params) {
+        params = context.request.mapPath(params);
+        require('child_process').exec("start " + params);
+        context.response.write('<script>history.back();</script>');
+        context.response.end();
+        return true;
     }
 
 };

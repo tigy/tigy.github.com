@@ -107,13 +107,13 @@ var XFly = {
 		XFly.defaultHandlers.error.call(XFly, context);
 	},
 	
-	rootPath: Path.resolve(Config.rootPath) + "\\",
+	rootPath: Path.resolve(Config.rootPath) + Path.sep,
 	
 	servers: [],
 	
 	log: function(){
 		console.log.apply(console, arguments); 
-	}
+	},
 
 	init: function(){
 		// 创建服务器

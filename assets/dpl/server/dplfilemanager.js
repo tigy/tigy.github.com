@@ -66,7 +66,7 @@ var DplFileManager = {
 	 */
 	getDplFileList: function (folder) {
 
-	    folder = Path.resolve(System.Configs.physicalPath, folder) + '\\';
+	    folder = Path.resolve(System.Configs.physicalPath, folder) + Path.sep;
 
 	    var files = IO.getFiles(folder);
 	    var r = {};
