@@ -1,13 +1,17 @@
 /**
- * @author  xuld
+ * 演示系统的主样式文件�?
  */
 /**
- * 演示系统的主样式文件。
+ * @author  xuld
  */
 /***************** 基本 ****************/
 body {
   margin: 0;
   padding: 0;
+}
+.demo {
+  font-size: 12px;
+  line-height: 18px;
 }
 article.demo,
 aside.demo,
@@ -39,12 +43,6 @@ h6.demo small {
   color: #999999;
   font-weight: normal;
 }
-div.demo,
-span.demo,
-header.demo,
-footer.demo {
-  font-size: 12px;
-}
 header.demo,
 article.demo,
 footer.demo {
@@ -53,7 +51,7 @@ footer.demo {
   margin-right: auto;
 }
 article.demo {
-  margin-bottom: 60px;
+  margin-bottom: 40px;
 }
 section.demo {
   margin-bottom: 30px;
@@ -63,7 +61,7 @@ aside.demo {
   margin-bottom: 10px;
 }
 footer.demo {
-  margin-top: -50px;
+  margin-top: -30px;
   margin-bottom: 20px;
 }
 h1.demo {
@@ -169,8 +167,8 @@ dl.demo dd {
   margin-left: 20px;
 }
 p.demo {
-  margin: 8px 0 16px;
-  line-height: 150%;
+  margin: 8px 0;
+  text-indent: 2em;
 }
 blockquote.demo {
   border: 2px solid #ddd;
@@ -179,9 +177,8 @@ blockquote.demo {
 }
 ol.demo,
 ul.demo {
-  margin: 0 0 9px 25px;
+  margin: 0 0 10px 25px;
   padding: 0;
-  line-height: 18px;
 }
 ul.demo li {
   list-style-type: disc;
@@ -252,7 +249,7 @@ body.demo footer.demo {
   margin: 0;
   width: 0;
   *width: auto;
-  /* IE6/7  如果 设置了width=0 ，肯能导致列表丢失。 */
+  /* IE6/7  如果 设置了width=0 ，肯能导致列表丢失�?*/
 
   border-radius: 3px 0 0 3px;
   -webkit-border-radius: 3px 0 0 3px;
@@ -433,6 +430,10 @@ html .demo-c8 {
 .demo-toolbar a:hover {
   text-decoration: underline;
 }
+body.demo .demo-test {
+  display: none;
+  margin: 10px 0;
+}
 .demo-control {
   padding: 10px;
   position: fixed;
@@ -514,11 +515,6 @@ html .demo-c8 {
   width: 400px;
   line-height: 200px;
   text-align: center;
-}
-.demo-doc {
-  text-indent: 2em;
-  line-height: 150%;
-  font-size: 14px;
 }
 .demo-viewsource {
   margin-bottom: 20px;

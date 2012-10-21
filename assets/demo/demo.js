@@ -3288,14 +3288,28 @@ if (typeof module !== 'object') {
             /**
              * 创建用于展示指定代码的 pre 标签。
              */
-            createCode: function (sourceCode, language, highlight, replaceMark) {
+            createCode: function (sourceCode, language, highlight, replaceMark, noFormat) {
                 sourceCode = this.initCode(sourceCode);
 
                 // 尝试格式化代码。
-                if (language === 'html') {
-                    sourceCode = Demo.Text.formatHTML(sourceCode);
-                } else if (language === 'js') {
-                    sourceCode = Demo.Text.formatJS(sourceCode);
+                if(noFormat !== true) {
+	                if (language === 'html') {
+	                	sourceCode = Demo.Text.formatHTML(sourceCode);
+	                	noFormat = 0;
+	                } else if (language === 'js') {
+	                	sourceCode = Demo.Text.formatJS(sourceCode);
+	                	noFormat = 0;
+	                }
+                }
+                
+                if(noFormat !== 0) {
+                	sourceCode = sourceCode
+                		.replace(/^[\r\n]+/, "")
+                		.replace(/\s+$/, "");
+                	var space = /^\s*/.exec(sourceCode)[0];
+                	while(sourceCode.indexOf(space) >= 0){
+                		sourceCode = sourceCode.replace(space, "");
+                	}
                 }
 
                 var pre = document.createElement('pre');
@@ -3338,16 +3352,19 @@ if (typeof module !== 'object') {
                 // script.demo[type=pre/html] => pre.demo
                 // script.demo[type=pre/javascript] => pre.demo
                 Demo.Dom.iterate('SCRIPT', function (node) {
-                    var code;
+                    var code, noForamt = node.className.indexOf(' demo-noformat') >= 0;
                     switch (node.type) {
                         case '':
                         case 'text/javascript':
-                            code = Demo.System.createCode(node.innerHTML, 'js', false);
+                            code = Demo.System.createCode(node.innerHTML, 'js', false, noForamt);
                             node.parentNode.insertBefore(code, node.nextSibling);
                             break;
                         case 'text/html':
                             code = document.createElement('ASIDE');
                             code.className = 'demo';
+                            if(noForamt){
+                            		code.className += ' demo-noformat';
+                            }
                             node.parentNode.replaceChild(code, node);
                             code.innerHTML = code.$code = Demo.System.initCode(node.innerHTML);
 
@@ -3362,16 +3379,17 @@ if (typeof module !== 'object') {
                             }
                             break;
                         case 'pre/javascript':
-                            code = Demo.System.createCode(node.innerHTML, 'js', false, true);
-                            node.parentNode.replaceChild(code, node);
-                            break;
-                        case 'pre/html':
-                            code = Demo.System.createCode(node.innerHTML, 'html', false, true);
+                            code = Demo.System.createCode(node.innerHTML, 'js', false, true, noForamt);
                             node.parentNode.replaceChild(code, node);
                             break;
                         default:
-                            code = Demo.System.createCode(node.innerHTML, null, false, true);
-                            node.parentNode.replaceChild(code, node);
+                        	if(/^pre\//.test(node.type)){
+                        		code = Demo.System.createCode(node.innerHTML, node.type.substr(4), false, true, noForamt);
+                        	} else {
+	                            code = Demo.System.createCode(node.innerHTML, null, false, true, noForamt);
+	                        }
+	                        
+	                        node.parentNode.replaceChild(code, node);
                             break;
                     }
                 });
@@ -3409,7 +3427,7 @@ if (typeof module !== 'object') {
                     // 完整模式，需要查找附近的 ASIDE 标签。
                     if (fullMode) {
                         code = viewSource.parentNode.previousSibling;
-                        code = Demo.System.createCode(viewSource.parentNode.previousSibling.$code, 'html');
+                        code = Demo.System.createCode(code.$code, 'html', undefined, undefined, code.className.indexOf(' demo-noformat') >= 0);
                         viewSource.parentNode.appendChild(code);
                     } else {
                         var p = viewSource.parentNode.parentNode;
@@ -3480,12 +3498,12 @@ if (typeof module !== 'object') {
                     var next = Demo.Dom.next(node);
 
                     // 如果 aside 后不跟查看源码按钮，则创建一个按钮。
-                    if (next && next.className !== 'demo-viewsource') {
+                    if (!next || next.className !== 'demo-viewsource') {
 
                         // 绑定 aside 内部的源码。
                         if (!node.$code) {
-                            var next = Demo.Dom.next(node);
-                            if (next.type === 'text/html' && next.tagName === 'SCRIPT') {
+                        	next = Demo.Dom.next(node);
+                            if (next && next.type === 'text/html' && next.tagName === 'SCRIPT') {
                                 node.$code = next.innerHTML;
                             } else {
                                 node.$code = node.innerHTML;

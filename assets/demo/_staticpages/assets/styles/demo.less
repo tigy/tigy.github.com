@@ -12,16 +12,17 @@ body {
 	.body();
 }
 
+.demo {
+  font-size: 12px;
+  line-height: 18px;
+}
+
 article.demo, aside.demo, footer.demo, header.demo, hgroup.demo, nav.demo, section.demo {
 	display: block;
 }
 
 h1.demo, h2.demo, h3.demo, h4.demo, h5.demo, h6.demo{
     .heading();
-}
-
-div.demo, span.demo, header.demo, footer.demo {
-	font-size: 12px;
 }
 
 // 页面
@@ -33,7 +34,7 @@ header.demo, article.demo, footer.demo {
 }
 
 article.demo {
-	margin-bottom: 60px;
+	margin-bottom: 40px;
 }
 
 section.demo {
@@ -46,7 +47,7 @@ aside.demo {
 }
 
 footer.demo {
-	margin-top: -50px;
+	margin-top: -30px;
 	margin-bottom: 20px;
 }
 
@@ -103,6 +104,7 @@ dl.demo {
 
 p.demo {
     .p();
+    text-indent: 2em;
 }
 
 blockquote.demo {
@@ -287,6 +289,13 @@ html {
 	}
 }
 
+// 测试模式
+
+body.demo .demo-test {
+  display: none;
+  margin: 10px 0;
+}
+
 // API 展示模式
 
 .demo-control {
@@ -385,14 +394,6 @@ html {
 	width: 400px;
 	line-height: 200px;
 	text-align: center;
-}
-
-// 文档
-
-.demo-doc {
-	text-indent: 2em;
-	line-height: 150%;
-	font-size: 14px;
 }
 
 // 查看源码
