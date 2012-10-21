@@ -26,23 +26,23 @@
     width: 120px;
 }
 
-.status-compact {
+html a.status-compact {
     font-style: italic;
 }
 
-.status-complete {
+html a.status-complete {
     font-weight: bold;
 }
 
-.status-obsolete {
+html a.status-obsolete {
     text-decoration: line-through;
 }
 
-.status-develop {
+html a.status-develop {
     text-decoration: underline;
 }
 
-.status-obsolete,  .status-plan {
+html a.status-obsolete, html a.status-plan {
     color: #999;
 }
 

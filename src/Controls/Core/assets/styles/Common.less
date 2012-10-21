@@ -1,7 +1,7 @@
 // COMMON CLASSES
 // -----------
 
-@import "../../../core/assets/styles/mixins.less";
+@import "../../../Core/assets/less/mixins.less";
 
 // align
 html {
@@ -66,18 +66,18 @@ html {
   	display: none;
   }
   
+  // plain
+  .x-plain, div.x-plain {
+    margin: 0;
+    padding: 0;
+  }
+  
 }
 
 // text
 .x-break-word {
-	word-wrap: break-word;
-	word-break: break-all;
-}
-
-// plain
-html .x-plain, html div.x-plain {
-  margin: 0;
-  padding: 0;
+  word-wrap: break-word;
+  word-break: break-all;
 }
 
 // clear
@@ -86,21 +86,17 @@ html .x-plain, html div.x-plain {
 }
 
 // colors
-  
-html .x-alt, .x-alt a {
-  color: @blueLight;
-}
 
-html .x-hint, .x-hint a {
+html .x-hint, html .x-hint a {
   color: @grayLight;
-}
-
-.x-alt a:hover, .x-hint a:hover, a.x-alt:hover, a.x-hint:hover {
-  color: @linkColorHover;
 }
 
 .x-highlight {
   color: @highlight!important;
+}
+
+.x-info {
+  color: @blueLight!important;
 }
 
 .x-warning {
@@ -133,3 +129,4 @@ html {
   background: #C03!important;
   color: #fff!important;
 }
+
