@@ -1,3 +1,0 @@
-/** * @author xuld */imports("Controls.Button.LinkButton");var LinkButton = Control.extend({		xtype: 'linkbutton',		tpl: '<a class="x-control" href="javascript://" target="_blank"></a>',		setHref: function(value){		return this.setAttr('href', value);	},		getHref: function(){		return this.getAttr('href');	}	});var a = {} || '';a.getID = function () {
-    for (key in value) {
-               }}
