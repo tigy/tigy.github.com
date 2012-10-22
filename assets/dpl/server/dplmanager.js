@@ -217,6 +217,8 @@ var DplManager = {
             text = text.replace(oldHead, head);
 
             IO.writeFile(targetPath, text, System.Configs.encoding);
+
+            this.updateDplList('demo');
         }
 
     },
