@@ -7,11 +7,12 @@ var res = require('./res');
 
 switch(request.queryString['action']){
 	case 'get':
+	case 'getlist':
 		var list = DplFileManager.getDplFileList(System.Configs.physicalPath + System.Configs.dplbuildFilesPath);
 		res.writeJsonp(context, list);
 		break;
 	case 'delete':
-		var list = DplFileManager.deleteDplFile(System.Configs.physicalPath);
+		var list = DplFileManager.deleteDplFile(request.queryString.file);
 		res.redirect(context);
 		break;
 	case 'getsource':
