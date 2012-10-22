@@ -1,29 +1,11 @@
 // Mixins.less
 // Snippets of reusable CSS to develop faster and keep code readable
-// -----------------------------------------------------------------
-
-
-@import "variables.less";
+// ---------------------------------------------------------------
 
 // UTILITY MIXINS
 // --------------------------------------------------
 
-// Clearfix
-// --------
-// For clearing floats like a boss h5bp.com/q
-// .clearfix() {
-  // *zoom: 1;
-  // &:before,
-  // &:after {
-    // display: table;
-    // content: "";
-  // }
-  // &:after {
-    // clear: both;
-  // }
-// }
-
-.clearfix() {
+.clear() {
   *zoom: 1;
   &:after {
     content: ".";
@@ -49,7 +31,7 @@
 .center-block() {
   margin-left: auto;
   margin-right: auto;
-  .clearfix();
+  .clear();
 }
 
 // IE7 inline-block
