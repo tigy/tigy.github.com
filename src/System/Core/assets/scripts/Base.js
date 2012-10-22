@@ -1,11 +1,11 @@
 /**
- * J+ Library, 3
- * @projectDescription J+：轻便的、易扩展的UI组件。
+ * J+ Library, 4
+ * @projectDescription jPlusUI: 简单灵活的 JS UI 组件库。
  * @copyright 2011-2012 J+ Team
- * @fileOverview 定义最基本的工具函数。
- * @pragma defaultExtends JPlus.Base
  * @license The BSD License
  * @author xuld
+ * @fileOverview 定义最基本的工具函数。
+ * @pragma defaultExtends JPlus.Base
  */
 
 // 可用的宏
@@ -106,7 +106,7 @@
 			 * 获取当前框架的版本号。
 			 * @getter
 			 */
-			version: /*@VERSION*/3.21
+			version: /*@VERSION*/4
 
 		},
 		
