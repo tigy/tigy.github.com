@@ -1,0 +1,48 @@
+@import "../../../Core/assets/less/variables.less";
+@import "../../../Core/assets/less/mixins.less";
+
+
+
+// STACKABLE
+// -----------
+
+// Tabs
+.x-stackable {
+  border-bottom: none;
+}
+
+// Make the list-items overlay the bottom border
+.x-stackable .x-tabbable-item {
+   float: none;
+}
+
+// Make links block level
+.x-stackable .x-tabbable-item a {
+  .border-radius(0);
+  border-color: #DDDDDD;
+}
+
+.x-stackable .x-tabbable-item:first-child a {
+  .border-radius(4px 4px 0 0);
+}
+.x-stackable .x-tabbable-item:last-child a {
+  .border-radius(0 0 4px 4px);
+}
+.x-stackable .x-tabbable-item a:hover {
+  border-color: #ddd;
+  z-index: 2;
+}
+
+// Pills
+.x-tabbable-alt.x-stackable .x-tabbable-item a{
+  border-color: transparent; 
+  .border-radius(4px);
+}
+
+.x-tabbable-alt.x-stackable .x-tabbable-item {
+  margin-bottom: 3px;
+}
+
+.x-tabbable-alt.x-stackable .x-tabbable-item li:last-child {
+  margin-bottom: 0; // decrease margin to match sizing of alt tabs
+}

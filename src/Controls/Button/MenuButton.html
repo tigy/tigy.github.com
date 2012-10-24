@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<meta name="dpl-info" content="status=plan">
+		<meta name="dpl-info" content="status=develop">
 		<title>菜单按钮</title>
 		
 		<link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -27,57 +27,51 @@
 	<body>
 	    
 	    <article class="demo">
+
+            <h2 class="demo">创建组件</h2>
     		
     		<section class="demo">
-    			
-    			<h2>创建组件</h2>
     		
-    			<h3>预览</h3>
-    			
-    			<aside>
-    	   			<a id="c1" href="javascript:;" onclick="trace('menu click')" class="x-button x-menubutton">菜单Menu<span class="x-button-menu"> </span></a>
-    		   		<script>
-    		   			var c1 = new MenuButton('c1');
-    		   			c1.add('<a href="javascript:;" onclick="trace(\'item click\')" class="x-menuitem">click me</a>');
-    		   		</script>
-    	   		</aside>
+    			<h3 class="demo">预览</h3>
     	   		
     	   		<script class="demo" type="text/html">
-    	   			<a id="c1" href="javascript:;" onclick="trace('menu click')" class="x-button x-menubutton">菜单Menu<span class="x-button-menu"> </span></a>
-    		   		<script>
-    		   			var c1 = new MenuButton('c1');
-    		   			c1.add('<a href="javascript:;" onclick="trace(\'item click\')" class="x-menuitem">click me</a>');
-    		   		<\/script>
+                    <a id="c1" href="javascript:;" onclick="trace('menu click')" class="x-button x-menubutton">菜单Menu<i class="x-button-menu"> </i></a>
+                    <\script>
+                        var c1 = new MenuButton('c1');
+                        c1.add('<a href="javascript:;" onclick="trace(\'item click\')" class="x-menuitem">click me</a>');
+                    <\/script>
     	   		</script>
-    		
-    			<h3>预览</h3>
     			
     		</section>
+
+            <section class="demo">
     		
-    		<h3>自定义图标</h3>
+    		    <h3 class="demo">自定义图标</h3>
        		
-       		<script class="demo" type="text/html">
-    			<a id="a" href="#" class="x-button x-menubutton">
-       				菜单Menu
-       				<span class="x-icon x-button-icon"></span>
-       			</a>
-       			<ul class="x-dropdown x-menu">
-       				<li class="x-menu-item">选项Item</li>
-       			</ul>
-    	   		<script>
-    	   			var a = new MenuButton('a');
-    	   			a.add('click me').setAttr('href', 'javascript:alert(\'hello\');');
-    	   			a.add('<a href="javascript:alert(\'hello\');" class="x-menuitem">click me</a>');
-    	   		</script>
-    		</script>
+       		    <script class="demo" type="text/html">
+    			    <a id="a" href="#" class="x-button x-menubutton">
+       				    菜单Menu
+       				    <i class="x-icon x-button-icon"></i>
+       			    </a>
+       			    <ul class="x-dropdown x-menu">
+       				    <li class="x-menu-item">选项Item</li>
+       			    </ul>
+    	   		    <script>
+    	   			    var a = new MenuButton('a');
+    	   			    a.add('click me').setAttr('href', 'javascript:alert(\'hello\');');
+    	   			    a.add('<a href="javascript:alert(\'hello\');" class="x-menuitem">click me</a>');
+    	   		    </script>
+    		    </script>
+
+            </section>
+
+            <section class="demo">
     		
-    		<h3>使用纯 JS 创建</h3>
+    		    <h3 class="demo">使用纯 JS 创建</h3>
     		
-    		
-    		
-    		<section class="demo-test">
        			<button class="x-button x-menubutton">菜单Menu<span class="x-button-menu x-button-menu-down"></span></button>
-       		</section>
+
+            </section>
     		
 		</article>
 		
