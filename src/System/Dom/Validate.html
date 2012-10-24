@@ -1,35 +1,37 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8">
-		<meta name="dpl-info" content="status=plan">
-		<title>表单验证</title>
-		
-		<script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
-		<script src="../../System/Dom/assets/scripts/Base.js" type="text/javascript"></script>
-		<script src="../../System/Dom/assets/scripts/validate.js" type="text/javascript"></script>
-		
-		<script src="../../../assets/demo/demo.js" type="text/javascript"></script>
-	</head>
-	<body> 
-		<input value="" type="text" id="a">
-		
-		
-		<input type="button"  value="验证!" onclick="validator.validate();" />
-		<script>
-			var validator = new Validator('a');
-			validator.on('error', function(msg){
-				trace('validate error: ' + msg);
-			});
-			validator.on('success', function(){
-				trace('validate ok');
-			});
-			
-			validator.set('required', true, 'required');
-			validator.set('minLength', 4, 'minLength={0}');
-			validator.set('maxLength', 8, 'maxLength={0}');
-			validator.set('pattern', /\d+/, 'pattern');
+<head>
+    <meta charset="UTF-8">
+    <meta name="dpl-info" content="status=plan">
+    <title>表单验证</title>
 
-		</script>
-	</body>
+    <script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
+    <script src="../../System/Dom/assets/scripts/Base.js" type="text/javascript"></script>
+    <script src="../../System/Dom/assets/scripts/Validate.js" type="text/javascript"></script>
+
+    <script src="../../../assets/demo/demo.js" type="text/javascript"></script>
+</head>
+<body>
+    <article class="demo">
+        <input value="" type="text" id="a">
+
+
+        <input type="button" value="验证!" onclick="validator.validate();" />
+        <script>
+            var validator = new Validator('a');
+            validator.on('error', function (msg) {
+                trace('validate error: ' + msg);
+            });
+            validator.on('success', function () {
+                trace('validate ok');
+            });
+
+            validator.set('required', true, 'required');
+            validator.set('minLength', 4, 'minLength={0}');
+            validator.set('maxLength', 8, 'maxLength={0}');
+            validator.set('pattern', /\d+/, 'pattern');
+
+        </script>
+    </article>
+</body>
 </html>

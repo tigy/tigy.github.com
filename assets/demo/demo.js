@@ -122,8 +122,8 @@ Demo.extend(Demo, {
          */
         status: {
             'ok': '已完成',
-            'complete': '完美版',
             'compact': '凑合版',
+            'complete': '完美版',
             'plan': '计划中',
             'develop': '开发中',
             'obsolete': '已放弃'
