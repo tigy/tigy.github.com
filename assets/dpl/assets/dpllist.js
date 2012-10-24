@@ -153,6 +153,7 @@ Demo.writeDplList = function (values) {
 
         finish = all = 0;
         html2 = '';
+        counts = {};
 
         a = tree[key];
 
@@ -198,7 +199,7 @@ Demo.writeDplList = function (values) {
         }
 
         if (html2) {
-            html += '<article class="demo demo-relative demo-grid demo-grid-' + column + '"><nav class="demo-toolbar"><a href="javascript://在' + key + '下添加一个组件" title="在' + key + '下添加一个组件" class="x-linkbutton" onclick="Demo.DplList.addDpl(this.parentNode, \'' + key + '\')">✚ 添加组件</a></nav><h2 class="demo">' + key + '(' + values[key] + ')' + '<small title="共: ' + (all + counts.obsolete || 0);
+            html += '<article class="demo demo-relative demo-grid demo-grid-' + column + '"><nav class="demo-toolbar"><a href="javascript://在' + key + '下添加一个组件" title="在' + key + '下添加一个组件" class="x-linkbutton" onclick="Demo.DplList.addDpl(this.parentNode, \'' + key + '\')">✚ 添加组件</a></nav><h2 class="demo">' + key + '(' + values[key] + ')' + '<small title="共: ' + (all + (counts.obsolete || 0));
             
             for (var ai in counts) {
                 b = counts[ai];

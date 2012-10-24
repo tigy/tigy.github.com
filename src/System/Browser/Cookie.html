@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=plan">
     <title>Cookie 操作</title>
     <script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
     <script src="../../System/Browser/assets/scripts/Base.js" type="text/javascript"></script>
@@ -25,7 +24,7 @@
                 },
                 '删除 Cookie': {
                     'Browser.setCookie("aaaa", null)': function (value, assert) {
-                        assert.areEqual(Browser.getCookie("aaaa"), undefined);
+                        assert.areEqual(Browser.getCookie("aaaa"), null);
                     }
                 }
             });
