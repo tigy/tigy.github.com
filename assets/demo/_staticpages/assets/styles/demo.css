@@ -1,8 +1,8 @@
 /**
- * 演示系统的主样式文件�?
+ * @author  xuld
  */
 /**
- * @author  xuld
+ * 演示系统的主样式文件。
  */
 /***************** 基本 ****************/
 body {
@@ -132,6 +132,7 @@ table.demo {
   empty-cells: show;
   width: auto;
   min-width: 300px;
+  width: 100%;
 }
 table.demo th,
 table.demo td {
@@ -249,7 +250,7 @@ body.demo footer.demo {
   margin: 0;
   width: 0;
   *width: auto;
-  /* IE6/7  如果 设置了width=0 ，肯能导致列表丢失�?*/
+  /* IE6/7  如果 设置了width=0 ，肯能导致列表丢失。 */
 
   border-radius: 3px 0 0 3px;
   -webkit-border-radius: 3px 0 0 3px;

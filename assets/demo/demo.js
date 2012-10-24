@@ -100,10 +100,10 @@ Demo.extend(Demo, {
         /**
          * 文档的下拉菜单 HTML 模板。
          */
-        doc: '<a href="javascript:;" target="_blank">J+ 文档和演示中心</a>\
-                <a href="javascript:;" target="_blank">J+ Core 文档</a>\
-                <a href="javascript:;" target="_blank">jQuery 转 J+ UI</a>\
-                <a href="javascript:;" target="_blank">演示系统文档</a>\
+        doc: '<a href="~/resources/books/api/index.html" target="_blank">J+ 文档和演示中心</a>\
+                <a href="~/resources/books/cookbooks/jplus-core-api.xml" target="_blank">J+ Core 文档</a>\
+                <a href="~/resources/books/cookbooks/jquery2jplus.html" target="_blank">jQuery 转 J+ UI</a>\
+                <a href="~/resources/index.html" target="_blank">演示系统文档</a>\
                 <a href="~/resources/index.html#doc" target="_blank">更多文档</a>',
 
         /**
@@ -3343,11 +3343,13 @@ if (typeof module !== 'object') {
                     var children = node.getElementsByTagName('*'), i, child;
                     for (i = 0; child =children[i]; i++) {
                         if (child.tagName === 'P') {
-                            Demo.Dom.addClass(child.className, 'demo demo-doc');
+                            Demo.Dom.addClass(child, 'demo demo-doc');
                         } else {
-                            Demo.Dom.addClass(child.className, 'demo');
+                            Demo.Dom.addClass(child, 'demo');
                         }
                     }
+
+                    Demo.Dom.addClass(node, 'demo');
                 });
 
                 // 处理 script.demo 。
