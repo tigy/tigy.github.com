@@ -122,7 +122,7 @@ Demo.extend(Demo, {
          */
         status: {
             'ok': '已完成',
-            'compact': '凑合版',
+            'beta': '凑合版',
             'complete': '完美版',
             'plan': '计划中',
             'develop': '开发中',
