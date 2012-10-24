@@ -3,7 +3,7 @@
  */
 
 
-imports("Controls.Button.Menu");
+imports("Controls.Menu.Menu");
 using("System.Dom.Align");
 using("Controls.Core.TreeControl");
 

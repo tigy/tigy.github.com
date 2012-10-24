@@ -146,6 +146,7 @@ Demo.writeDplList = function (values) {
 
     var list = Demo.DplList.list, tree = Demo.DplList.tree, key, a, ai, b, bi, c, dplInfo, html = '', html2, all, finish,
     	from = decodeURIComponent((/(&|\?)from=(.*?)(&|$)/.exec(location.href) || [0, 0, ""])[2]),
+        counts = {},
     	column = 4;
     
     for (key in values) {
@@ -173,7 +174,7 @@ Demo.writeDplList = function (values) {
 
                 switch (dplInfo.status) {
                     case 'ok':
-                    case 'compact': ' + dplInfo.name + '
+                    case 'beta':
                     case 'complete':
                         finish++;
 
@@ -181,6 +182,12 @@ Demo.writeDplList = function (values) {
                     case 'develop':
                     case 'plan':
                         all++;
+                    case 'obsolete':
+                        if (!counts[dplInfo.status]) {
+                            counts[dplInfo.status] = 1;
+                        } else {
+                            counts[dplInfo.status]++;
+                        }
                 }
 
             }
@@ -191,7 +198,15 @@ Demo.writeDplList = function (values) {
         }
 
         if (html2) {
-            html += '<article class="demo demo-relative demo-grid demo-grid-' + column + '"><nav class="demo-toolbar"><a href="javascript://在' + key + '下添加一个组件" title="在' + key + '下添加一个组件" class="x-linkbutton" onclick="Demo.DplList.addDpl(this.parentNode, \'' + key + '\')">✚ 添加组件</a></nav><h2 class="demo">' + key + '(' + values[key] + ')' + '<small>' + finish + '/' + all + '</small></h2>' + html2 + '</article>';
+            html += '<article class="demo demo-relative demo-grid demo-grid-' + column + '"><nav class="demo-toolbar"><a href="javascript://在' + key + '下添加一个组件" title="在' + key + '下添加一个组件" class="x-linkbutton" onclick="Demo.DplList.addDpl(this.parentNode, \'' + key + '\')">✚ 添加组件</a></nav><h2 class="demo">' + key + '(' + values[key] + ')' + '<small title="共: ' + (all + counts.obsolete || 0);
+            
+            for (var ai in counts) {
+                b = counts[ai];
+
+                html += "&#13;&#10;" + Demo.Configs.status[ai] + ": " + b;
+            }
+
+            html += '">' + finish + '/' + all + '</small></h2>' + html2 + '</article>';
         }
 
     }

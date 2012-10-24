@@ -3306,9 +3306,13 @@ if (typeof module !== 'object') {
                 	sourceCode = sourceCode
                 		.replace(/^[\r\n]+/, "")
                 		.replace(/\s+$/, "");
-                	var space = /^\s*/.exec(sourceCode)[0];
-                	while(sourceCode.indexOf(space) >= 0){
-                		sourceCode = sourceCode.replace(space, "");
+                	var space = /^\s+/.exec(sourceCode);
+
+                	if (space) {
+                	    space = space[0];
+                	    while (sourceCode.indexOf(space) >= 0) {
+                	        sourceCode = sourceCode.replace(space, "");
+                	    }
                 	}
                 }
 

@@ -26,7 +26,7 @@
     width: 120px;
 }
 
-html a.status-compact {
+html a.status-beta {
     font-style: italic;
 }
 
@@ -35,7 +35,7 @@ html a.status-complete {
 }
 
 html a.status-obsolete {
-    text-decoration: line-through;
+    text-decoration: line-through!important;
 }
 
 html a.status-develop {

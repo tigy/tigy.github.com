@@ -1,0 +1,1 @@
+/** * @author  xuld */imports("Controls.Form.RadioButton");using("Controls.Core.IInput");using("Controls.Form.CheckBox");var RadioButton = CheckBox.extend({		xtype: 'checkbox',		tpl: '<input type="checked" class="x-control">'	});
