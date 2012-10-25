@@ -157,7 +157,7 @@ var Menu = TreeControl.extend({
 					// 保存原有 childControl 。
 					var t = childControl;
 					childControl = new MenuItem;
-					childControl.content().replaceWith(t);
+					childControl.content().setText(t.getText());
 				}
 				if (parent) {
 					parent.prepend(childControl);

@@ -364,8 +364,8 @@ if (typeof module !== 'object') {
             /**
              * 格式化 HTML 代码。
              * @param {String} s 要格式化的 HTML 代码。
-             * @param {String} indentCharacter=\t 用于缩进的字符。
-             * @param {Integer} indentSize=\t 缩进字符的数目。
+             * @param {String} indentCharacter=(2个空格) 用于缩进的字符。
+             * @param {Integer} indentSize=2 缩进字符的数目。
              * @return {String} 返回格式化后的代码。
              */
             formatHTML: (function () {
@@ -674,9 +674,9 @@ if (typeof module !== 'object') {
                         this.input = jsSource || '';
                         //gets the input for the HtmlFormater
                         this.output = [];
-                        this.indentCharacter = indentCharacter || '\t';
+                        this.indentCharacter = indentCharacter || '　';
                         this.indentString = '';
-                        this.indentSize = indentSize || 1;
+                        this.indentSize = indentSize || 2;
                         this.indent_level = 0;
                         this.maxChar = maxChar || 80;
                         //maximum amount of characters per line
@@ -877,8 +877,8 @@ if (typeof module !== 'object') {
                     opt_brace_style = options.brace_style ? options.brace_style : (opt_brace_style ? opt_brace_style : "collapse");
 
 
-                    var opt_indent_size = options.indent_size ? options.indent_size : 1;
-                    var opt_indent_char = options.indent_char ? options.indent_char : '\t';
+                    var opt_indent_size = options.indent_size ? options.indent_size : 2;
+                    var opt_indent_char = options.indent_char ? options.indent_char : '　';
                     var opt_preserve_newlines = typeof options.preserve_newlines === 'undefined' ? true : options.preserve_newlines;
                     var opt_max_preserve_newlines = typeof options.max_preserve_newlines === 'undefined' ? false : options.max_preserve_newlines;
                     var opt_jslint_happy = options.jslint_happy === 'undefined' ? false : options.jslint_happy;

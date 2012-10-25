@@ -27,25 +27,36 @@
 		
 		    <aside class="demo">
 			
-			    <div id="a">右击我</div>
-			
+			    <div id="d">右击我</div>
 			
 			    <script>
-				    var a = Dom.get('a');
-				
+
 				    // 创建一个新的菜单。
-				    var c = new ContextMenu();
-				
-				    // 添加一个新的 MenuItem，并绑定点击事件。
-				    c.add('aa').on('click', function(){trace(this.getText())});
+				    var a = new ContextMenu();
 				
 				    // 应用当前菜单到节点 a 。
-				    c.setControl(a);
+				    a.setControl(Dom.get('d'));
 				
 				
-			    </script>
+                </script>
 			
 		    </aside>
+
+            <script>
+
+                Demo.writeTestCases({
+
+                    "添加一个菜单": 'a.add("菜单").on("click", function(){ alert("我被点了") })',
+
+                    "添加一个分隔线": 'a.add("-")',
+
+                    "在第一个菜单中添加一个子菜单": 'a.item(0).add("子菜单")',
+
+                    "删除一个菜单": 'a.removeAt(0)'
+
+                });
+
+            </script>
 
         </article>
 		

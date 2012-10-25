@@ -59,14 +59,6 @@ var IInput = {
 	},
 	
 	/**
-	 * 清空当前控件的数据。
-	 * @return this
-	 */
-	clear: function(){
-		return this.setText('');
-	},
-	
-	/**
 	 * 选中当前控件。
 	 * @return this
 	 */
