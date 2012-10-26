@@ -24,23 +24,22 @@
 	<body>
 
         <article class="demo">
-		
-		    <aside class="demo">
 			
-			    <div id="d">右击我</div>
+			<div id="d">右击我(id=d)</div>
 			
-			    <script>
+			<script class="demo">
 
-				    // 创建一个新的菜单。
-				    var a = new ContextMenu();
+				// 创建一个新的菜单。
+			    var a = new ContextMenu();
+
+                // 增加一个子菜单。
+			    a.add("第一个菜单").on("click", function () { alert("第一个菜单被点了") });
 				
-				    // 应用当前菜单到节点 a 。
-				    a.setControl(Dom.get('d'));
+				// 绑定右击事件。
+				a.setControl(Dom.get('d'));
 				
 				
-                </script>
-			
-		    </aside>
+            </script>
 
             <script>
 

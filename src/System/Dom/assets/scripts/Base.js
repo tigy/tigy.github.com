@@ -1265,13 +1265,15 @@
 		has: div.compareDocumentPosition ? function(elem, child) {
 			assert.isNode(elem, "Dom.has(elem, child): {elem} ~");
 			assert.isNode(child, "Dom.has(elem, child): {child} ~");
-			return !!(elem.compareDocumentPosition(child) & 16);
+			return !!(child && (elem.compareDocumentPosition(child) & 16));
 		}: function(elem, child) {
 			assert.isNode(elem, "Dom.has(elem, child): {elem} ~");
 			assert.isNode(child, "Dom.has(elem, child): {child} ~");
-			while(child = child.parentNode)
-				if(elem === child)
-					return true;
+			if (child) {
+			    while (child = child.parentNode)
+			        if (elem === child)
+			            return true;
+			}
 
 			return false;
 		},
@@ -3559,9 +3561,9 @@
 		
 		mouseEvent = {
 			initEvent: function (e) {
-				if(!e.stop) {
+			    if (!e.getTarget) {
+			        defaultEvent.initEvent(e);
 					var node = getDocument(e.target).node;
-					defaultEvent.initEvent(e);
 					e.relatedTarget = e.fromElement === e.srcElement ? e.toElement: e.fromElement;
 					e.pageX = e.clientX + node.scrollLeft;
 					e.pageY = e.clientY + node.scrollTop;

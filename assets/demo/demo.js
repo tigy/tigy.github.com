@@ -3358,7 +3358,7 @@ if (typeof module !== 'object') {
                 // script.demo[type=pre/html] => pre.demo
                 // script.demo[type=pre/javascript] => pre.demo
                 Demo.Dom.iterate('SCRIPT', function (node) {
-                    var code, noForamt = node.className.indexOf(' demo-noformat') >= 0;
+                    var code, noForamt = node.className.indexOf('demo-noformat') >= 0;
                     switch (node.type) {
                         case '':
                         case 'text/javascript':
@@ -3367,10 +3367,7 @@ if (typeof module !== 'object') {
                             break;
                         case 'text/html':
                             code = document.createElement('ASIDE');
-                            code.className = 'demo';
-                            if(noForamt){
-                            		code.className += ' demo-noformat';
-                            }
+                            code.className = node.className;
                             node.parentNode.replaceChild(code, node);
                             code.innerHTML = code.$code = Demo.System.initCode(node.innerHTML);
 
@@ -3433,7 +3430,7 @@ if (typeof module !== 'object') {
                     // 完整模式，需要查找附近的 ASIDE 标签。
                     if (fullMode) {
                         code = viewSource.parentNode.previousSibling;
-                        code = Demo.System.createCode(code.$code, 'html', undefined, undefined, code.className.indexOf(' demo-noformat') >= 0);
+                        code = Demo.System.createCode(code.$code, 'html', undefined, undefined, code.className.indexOf('demo-noformat') >= 0);
                         viewSource.parentNode.appendChild(code);
                     } else {
                         var p = viewSource.parentNode.parentNode;
@@ -3518,10 +3515,15 @@ if (typeof module !== 'object') {
 
                         var viewSource = document.createElement('div');
                         viewSource.className = 'demo-viewsource';
-                        viewSource.innerHTML = '<span class="demo-viewsource-arrow">▸</span><a class="demo demo-viewsource-toggle" href="javascript://查看用于创建上文组件的所有源码" onclick="Demo.System.toggleSource(this);return false;">查看源码</a>';
+                        viewSource.innerHTML = '<span class="demo-viewsource-arrow" onclick="Demo.System.toggleSource(this.nextSibling);return false;">▸</span><a class="demo demo-viewsource-toggle" href="javascript://查看用于创建上文组件的所有源码" onclick="Demo.System.toggleSource(this);return false;">查看源码</a>';
                         node.parentNode.insertBefore(viewSource, node.nextSibling);
+
+                        if (node.className.indexOf('demo-expand') >= 0) {
+                            Demo.System.toggleSource(viewSource.lastChild);
+                        }
                     }
                 });
+
             },
 
             /**
@@ -4345,7 +4347,7 @@ if (typeof module !== 'object') {
                 document.write('<div class="demo-toolbar">\
     <a onclick="Demo.TestCase.runTestAll();" href="javascript://按顺序执行全部测试用例">全部执行</a> | \
     <a onclick="Demo.TestCase.speedTestAll();" href="javascript://查看每个测试用例的执行效率">全部效率</a> | \
-    <a onclick="Demo.System.toggleSources();" href="javascript://查看每个测试用例的源码">全部源码</a>\
+    <a onclick="Demo.System.toggleSources();" href="javascript://查看每个测试用例的源码">展开全部源码</a>\
 </div>');
             }
 

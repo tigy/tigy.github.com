@@ -7,6 +7,27 @@
  * @interface IInput
  */
 var IInput = {
+
+    /**
+	 * 获取或设置当前输入域的状态。
+	 * @private
+	 */
+    state: function (name, value) {
+        if (value === undefined) {
+            return Dom.getAttr(this.input().node, name);
+        }
+
+        value = value !== false;
+        this.toggleClass('x-' + this.xtype + '-' + name, value);
+        return Dom.prototype.setAttr.call(this.input(), name, value);
+    },
+
+    /**
+	 * 当设置文本时执行此函数。
+	 */
+    onChange: function () {
+        this.trigger('change');
+    },
 	
 	/**
 	 * 获取或设置当前表单的实际域。
@@ -14,13 +35,6 @@ var IInput = {
 	 * @type {Control}
 	 */
 	hiddenField: null,
-	
-	/**
-	 * 当设置文本时执行此函数。
-	 */
-	onChange: function(){
-		this.trigger('change');
-	},
 	
 	/**
 	 * 创建用于在表单内保存当前输入值的隐藏域。
@@ -96,14 +110,14 @@ var IInput = {
 			this.onChange();
 			
 		return this;
+	},
+
+	disabled: function (value) {
+	    return this.state("disabled", value);
+	},
+
+	readOnly: function (value) {
+	    return this.state("readonly", value);
 	}
 	
 };
-
-Object.map("disabled readOnly", function(funcName){
-	IInput[funcName] = function(value){
-		value = value !== false;
-		this.toggleClass('x-' + this.xtype + '-' + funcName.toLowerCase(), value);
-		return Dom.prototype.setAttr.call(this.input(), funcName, value);
-	};
-});

@@ -1,8 +1,8 @@
 /**
- * @author  xuld
+ * 演示系统的主样式文件�?
  */
 /**
- * 演示系统的主样式文件。
+ * @author  xuld
  */
 /***************** 基本 ****************/
 body {
@@ -251,7 +251,7 @@ body.demo footer.demo {
   margin: 0;
   width: 0;
   *width: auto;
-  /* IE6/7  如果 设置了width=0 ，肯能导致列表丢失。 */
+  /* IE6/7  如果 设置了width=0 ，肯能导致列表丢失�?*/
 
   border-radius: 3px 0 0 3px;
   -webkit-border-radius: 3px 0 0 3px;
@@ -529,6 +529,7 @@ body.demo .demo-test {
   float: left;
   font-size: 20px;
   margin-right: 1px;
+  cursor: pointer;
 }
 .demo-tip,
 .demo-tip-error,

@@ -22,20 +22,18 @@ var Button = ContentControl.extend({
 	},
 	
 	setAttr: function (name, value) {
-		if(/^disabled$/i.test(name)){
-			return this.disabled(value);
+	    if (/^(disabled|actived)$/i.test(name)) {
+	        return this[name.toLowerCase()](value);
 		}
 		return Dom.prototype.setAttr.call(this, name, value);
 	},
 	
-	actived: function(value){
-		return this.toggleClass('x-button-actived', value !== false);
+	actived: function (value) {
+	    return this.state("actived", value);
 	},
 	
 	disabled: function (value) {
-	    value = value !== false;
-	    this.toggleClass('x-' + this.xtype + '-disabled', value);
-	    return Dom.prototype.setAttr.call(this, 'disabled', value);
+	    return this.state("disabled", value);
 	}
 	
 });

@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=beta" />
     <title>按钮</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css" />
@@ -25,7 +24,7 @@
 
     <article class="demo">
 
-        <h2 class="demo">HTML 方式</h2>
+        <h2 class="demo">HTML 方式创建</h2>
 
         <section class="demo">
 
@@ -150,14 +149,13 @@
 
     <article class="demo">
 
-        <h2 class="demo">JavaScript 方式</h2>
+        <h2 class="demo">JavaScript 方式创建</h2>
 
         <section class="demo-control demo-absolute">
 
             <div id="container1"></div>
 
-            <aside class="demo">
-
+            <aside class="demo demo-expand">
                 <script>
                     var a = new Button({
                         text: "这是动态创建的按钮",
@@ -167,7 +165,6 @@
                         }
                     });
                 </script>
-
             </aside>
 
         </section>
@@ -180,7 +177,7 @@
                     '更改按钮的文字': 'a.setText("按钮的文本")',
                     '更改按钮的文字（带图标）': 'a.setHtml("<i class=\'x-icon\'></i>按钮的文本")',
                     '绑定点击后执行函数': 'a.on("click", function () { alert("我被点了"); })',
-                    '禁用按钮': 'a.disabled()'
+                    '禁用按钮': 'a.disabled(true)'
                 });
 
             </script>
