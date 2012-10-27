@@ -123,6 +123,16 @@
                 
             </script>
             
+            <script class="demo demo-expand" type="text/html">
+                        
+                <a href="#" class="x-button" id="b">D</a>
+                
+                <\script>
+                    var b = new Picker("b");
+                <\/script>
+                
+            </script>
+            
         </section>
         
         <section class="demo demo-api">
@@ -131,26 +141,26 @@
     
                 Demo.writeTestCases({
                     '文本框形式': '-',
-                    '设置禁用': 'a.disabled()',
-                    '取消禁用': 'a.disabled(false)',
-                    '设置只读': 'a.readOnly()',
-                    '取消只读': 'a.readOnly(false)',
-                    '设置表单域': 'a.setAttr("name", "name")',
-                    '清空内容': 'a.clear()',
-                    '选中内容': 'a.select()',
-                    '获取表单': 'a.form()'
+                    
+                    '设置禁用': 'a.setAttr("disabled", true)',
+                    '取消禁用': 'a.setAttr("disabled", false)',
+                    '获取禁用状态': 'a.getAttr("disabled")',
+                    
+                    '设置只读': 'a.setAttr("readOnly", true)',
+                    '取消只读': 'a.setAttr("readOnly", false)',
+                    '获取只读状态': 'a.getAttr("readOnly")'
                 });
     
                 Demo.writeTestCases({
                     '纯按钮形式': '-',
-                    '设置禁用': 'b.disabled()',
-                    '取消禁用': 'b.disabled(false)',
-                    '设置只读': 'b.readOnly()',
-                    '取消只读': 'b.readOnly(false)',
-                    '设置表单域': 'b.setAttr("name", "name")',
-                    '清空内容': 'b.clear()',
-                    '选中内容': 'b.select()',
-                    '获取表单': 'b.form()'
+                    
+                    '设置禁用': 'b.setAttr("disabled", true)',
+                    '取消禁用': 'b.setAttr("disabled", false)',
+                    '获取禁用状态': 'b.getAttr("disabled")',
+                    
+                    '设置只读': 'b.setAttr("readOnly", true)',
+                    '取消只读': 'b.setAttr("readOnly", false)',
+                    '获取只读状态': 'b.getAttr("readOnly")'
                 });
             </script>
 

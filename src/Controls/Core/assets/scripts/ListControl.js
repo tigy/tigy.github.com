@@ -151,9 +151,9 @@ var ListControl = Control.extend({
 	 */
 	indexOf: function(item) {
 		return item && item.parent && this.equals(item.parent()) ? item.index() : -1;
-	}
+	},
 	
-	//, /**
+	// /**
 	 // * 当当前控件在屏幕中显示不下时，由 align 函数触发执行此函数。
 	 // * @param {String} xOry 值为 "x" 或 "y"。
 	 // * @param {Integer} value 设置的最大值。
@@ -171,7 +171,7 @@ var ListControl = Control.extend({
 			// delete this['overflow' + xOry];
 		// }
 	// },
-/*
+
 	getItemByText: function(value){
 		for (var c = this.first(), child ; c; c = c.next()) {
 			if (c.getText() === value) {
@@ -182,23 +182,23 @@ var ListControl = Control.extend({
 		
 		return child;
 	},
-*/
+
 	/**
 	 * 设置某个事件发生之后，执行某个函数.
 	 * @param {String} eventName 事件名。
 	 * @param {String} funcName 执行的函数名。
 	 */
-/*	itemOn: function(eventName, fn, bind){
+	itemOn: function(eventName, fn, bind){
 		var me = this;
 		return this.on(eventName, function(e){
 			for(var c = me.node.firstChild, target = e.target; c; c = c.nextSibling){
 				if(c === target || Dom.has(c, target)){
-					return fn.call(bind, c, e);
+					return fn.call(bind, new Dom(c), e);
 				}
 			}
 		}, bind);
 	}
-*/	
+
 });
 
 

@@ -107,9 +107,6 @@ var ComboBox = Picker.extend({
 	 * 当用户单击某一项时执行。
 	 */
 	onItemClick: function(item, e){
-		
-	    //e.preventDefault();
-	    //e.StopPropogation();
 	
 		// 如果无法更改值，则直接忽略。
 		if(!this.getAttr('disabled') && !this.getAttr('readonly')) {
@@ -130,11 +127,6 @@ var ComboBox = Picker.extend({
 	 */
 	createDropDown: function(existDom){
 		return new ComboBox.DropDownMenu(existDom);
-	},
-	
-	_syncSelect: function(){
-		var selected = this.hiddenField.find(':selected');
-		this.first().setText(selected ? selected.getText() : this.hiddenField.getAttr('placeholder'));
 	},
 	
 	/**
@@ -172,25 +164,6 @@ var ComboBox = Picker.extend({
 			IInput.setText.call(this, item.getText());
 		}
 		
-	},
-	
-	clear: function(){
-		if(this.dropDownList){
-			this.updateText(null);
-		} else {
-			IInput.clear.call(this, value);
-		}
-	},
-	
-	setText: function(value){
-		
-		IInput.setText.call(this, value);
-		
-		if(this.dropDownList){
-			this._syncSelect();
-		}
-		
-		return this;
 	},
 	
 	init: function (options) {
@@ -250,6 +223,17 @@ var ComboBox = Picker.extend({
 		
 	},
 	
+	setText: function(value){
+		
+		IInput.setText.call(this, value);
+		
+		if(this.dropDownList){
+			this._syncSelect();
+		}
+		
+		return this;
+	},
+	
 	/**
 	 * 模拟鼠标选择某一个项。
 	 */
@@ -272,7 +256,6 @@ var ComboBox = Picker.extend({
 	 * @return this
 	 */
 	setSelectedItem: function(item){
-		item = this.dropDown.itemOf(item);
 		if(this.onSelect(item) !== false) {
 			this.selectedItem = item;
 			this.updateText(item);
@@ -303,10 +286,18 @@ var ComboBox = Picker.extend({
 		return this;
 	},
 	
-	copyItemsFromSelect: function(select){
+	_syncSelect: function(){
+		var selected = this.hiddenField.find(':selected');
+		this.first().setText(selected ? selected.getText() : this.hiddenField.getAttr('placeholder'));
+	},
+	
+	copyItemsFromSelect: function(select) {
+		
+		this.dropDown.empty();
+		
 		for(var node = select.node.firstChild; node; node = node.nextSibling) {
 			if(node.tagName  === 'OPTION') {
-				var item = this.add(Dom.getText(node));
+				var item = this.dropDown.add(Dom.getText(node));
 				
 				item.option = node;
 				if(node.selected){

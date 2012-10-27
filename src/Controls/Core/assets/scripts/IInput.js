@@ -51,10 +51,10 @@ var IInput = {
 			
 			// 如果 当前元素是表单元素，直接返回。
 			if(/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(this.node.tagName)){
-				return this;
+				return new Dom(this.node);
 			}
 			
-			this.hiddenField = this.find("input,select,textarea,button") || this.createHiddenField();
+			this.hiddenField = this.find("input,select,textarea") || this.createHiddenField();
 		}
 		
 		return this.hiddenField;
