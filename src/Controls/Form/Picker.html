@@ -21,60 +21,143 @@
 </head>
 <body>
 
+    <article class="demo demo-grid demo-grid-2">
 
+        <p class="demo">Picker 表示一个文本框加一个按钮的组合框。 选择框(ComboBox)、日期选择器(DatePicker) 等都是继承于此类实现的。</p>
+        
+        <h2 class="demo">HTML 方式创建</h2>
+        
+        <section class="demo">
+            <h3 class="demo">文本框+按钮</h3>
+            
+            <script class="demo" type="text/html">
+                        
+                <span class="x-picker" id="demo3">
+                    <input type="text" class="x-textbox" />
+                    <button class="x-button" onclick="trace('trigger');"><span class="x-button-menu"></span></button>
+                </span>
+                
+                <\script>
+                    var demo3 = new Picker("demo3");
+                <\/script>
+                
+            </script>
+            
+        </section>
+        
+        <section class="demo">
+            <h3 class="demo">层+按钮</h3>
+            
+            <script class="demo" type="text/html">
+                
+                <span class="x-picker" id="demo4">
+                    <a href="javascript:;" class="x-button">C</a>
+                    <button class="x-button" onclick="trace('trigger');"><span class="x-button-menu"></span></button>
+                </span>
+                
+                <\script>
+                    var demo4 = new Picker("demo4");
+                <\/script>
+                
+            </script>
+            
+        </section>
+        
+    </article>
 
+    <article class="demo demo-grid demo-grid-2">
+
+        <h2 class="demo">JavaScript 方式创建</h2>
+        
+        <section class="demo">
+            <h3 class="demo">最简单方式: 单一文本框</h3>
+            
+            <p class="demo">使用 JavaScript 动态添加按钮。</p>
+            
+            <script class="demo demo-expand" type="text/html">
+                        
+                <input type="text" class="x-textbox" id="demo1" />
+                
+                <div class="x-dropdown">紧跟的 class=x-dropdown 项会被作为子菜单打开。</div>
+                
+                <\script>
+                    var demo1 = new Picker("demo1");
+                <\/script>
+                
+            </script>
+            
+        </section>
+        
+        <section class="demo">
+            <h3 class="demo">单一链接</h3>
+            
+            <p class="demo">使用 JavaScript 动态添加按钮。</p>
+            
+            <script class="demo demo-expand" type="text/html">
+                        
+                <a href="javascript:;" class="x-button" id="demo2">B</a>
+                
+                <\script>
+                    var demo2 = new Picker("demo2");
+                <\/script>
+                
+            </script>
+            
+        </section>
+        
+    </article>
+    
     <article class="demo">
+        
+        <h2 class="demo">常用 API</h2>
+        
+        <section class="demo demo-control demo-absolute">
+            
+            <script class="demo demo-expand" type="text/html">
+                        
+                <input type="text" class="x-textbox" id="a" />
+                
+                <\script>
+                    var a = new Picker("a");
+                <\/script>
+                
+            </script>
+            
+        </section>
+        
+        <section class="demo demo-api">
+                
+            <script>
+    
+                Demo.writeTestCases({
+                    '文本框形式': '-',
+                    '设置禁用': 'a.disabled()',
+                    '取消禁用': 'a.disabled(false)',
+                    '设置只读': 'a.readOnly()',
+                    '取消只读': 'a.readOnly(false)',
+                    '设置表单域': 'a.setAttr("name", "name")',
+                    '清空内容': 'a.clear()',
+                    '选中内容': 'a.select()',
+                    '获取表单': 'a.form()'
+                });
+    
+                Demo.writeTestCases({
+                    '纯按钮形式': '-',
+                    '设置禁用': 'b.disabled()',
+                    '取消禁用': 'b.disabled(false)',
+                    '设置只读': 'b.readOnly()',
+                    '取消只读': 'b.readOnly(false)',
+                    '设置表单域': 'b.setAttr("name", "name")',
+                    '清空内容': 'b.clear()',
+                    '选中内容': 'b.select()',
+                    '获取表单': 'b.form()'
+                });
+            </script>
 
-        <p>Picker 表示一个文本框加一个按钮的组合框。</p>
-
-        <span class="x-picker" id="a">
-            <input type="text" placeholder="placeholder" class="x-textbox" type="text" value="文本框" />
-            <button class="x-button" onclick="trace('trigger');"><span class="x-button-menu"></span></button>
-        </span>
-
-        <span class="x-picker" id="b">
-            <a href="javascript:;" class="x-button">A</a>
-            <button class="x-button" onclick="trace('trigger');"><span class="x-button-menu"></span></button>
-        </span>
-
-        <input type="text" placeholder="placeholder" class="x-textbox" type="text" value="文本框" id="c" />
-
-        <a href="javascript:;" class="x-button" id="d">B</a>
-
-        <script>
-
-            // 创建一个容器对象。
-            var a = new Picker('a');
-            var b = new Picker('b');
-            var c = new Picker('c');
-            var d = new Picker('d');
-
-            Demo.writeTestCases({
-                '文本框形式': '-',
-                '设置禁用': 'a.disabled()',
-                '取消禁用': 'a.disabled(false)',
-                '设置只读': 'a.readOnly()',
-                '取消只读': 'a.readOnly(false)',
-                '设置表单域': 'a.setAttr("name", "name")',
-                '清空内容': 'a.clear()',
-                '选中内容': 'a.select()',
-                '获取表单': 'a.form()'
-            });
-
-            Demo.writeTestCases({
-                '纯按钮形式': '-',
-                '设置禁用': 'b.disabled()',
-                '取消禁用': 'b.disabled(false)',
-                '设置只读': 'b.readOnly()',
-                '取消只读': 'b.readOnly(false)',
-                '设置表单域': 'b.setAttr("name", "name")',
-                '清空内容': 'b.clear()',
-                '选中内容': 'b.select()',
-                '获取表单': 'b.form()'
-            });
-        </script>
+        </section>
 
     </article>
+    
 
 </body>
 </html>

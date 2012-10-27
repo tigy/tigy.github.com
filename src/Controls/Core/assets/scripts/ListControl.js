@@ -1,7 +1,7 @@
 /**
  * @author  xuld
  */
-using("Controls.Core.ScrollableControl");
+using("Controls.Core.Base");
 
 
 /**
@@ -10,62 +10,52 @@ using("Controls.Core.ScrollableControl");
  * @extends ScrollableControl
  * ListControl 封装了使用  &lt;ul&gt; 创建列表控件一系列方法。
  */
-var ListControl = ScrollableControl.extend({
+var ListControl = Control.extend({
 	
 	/**
 	 * 模板。
 	 */
 	tpl: '<ul class="x-control"/>',
-
-	/**
-	 * 获取用于包装指定子控件的容器控件。
-	 * @param {Control} item 要获取的子控件。
-	 * @return {Control} 用于包装指定子控件的容器控件。
-	 * @protected override
-	 * @see #itemOf
-	 */
-	childOf: function(childControl) {
-		return childControl && childControl.node.tagName !== 'LI' ? childControl.parent() : childControl;
-	},
 	
+	// 内部实现的项操作
+		
 	/**
-	 * 当被子类重写时，用于初始化新添加的节点。
-	 * @param {Control} childControl 正在添加的节点。
-	 * @return {Control} 需要真正添加的子控件。
+	 * 当新控件被添加时执行。
+	 * @param {Control} childControl 新添加的元素。
+	 * @param {Control} refControl 元素被添加的位置。
 	 * @protected override
 	 */
-	initChild: function(childControl){
+	insertBefore: function(childControl, refControl) {
 		
-		// <li> 的 class 属性。
-		var clazz = 'x-' + this.xtype + '-item', li;
-
 		// 如果 childControl 不是 <li>, 则包装一个 <li> 标签。
 		if (childControl.node.tagName !== 'LI') {
 
 			// 创建 <li>
-			li = Dom.create('LI', clazz);
+			var li = Dom.create('LI');
 			
 			// 复制节点。
 			li.append(childControl);
 			
 			// 赋值。
 			childControl = li;
-		} else {
-			
-			// 自动加上 clazz 。
-			childControl.addClass(clazz);
 		}
+
+		// 自动加上 clazz 。
+		childControl.addClass('x-' + this.xtype + '-item');
 		
+		// 插入 DOM 树。
+		childControl.attach(this.node, refControl && refControl.node || null);
+			
+		// 返回新创建的子控件。
 		return childControl;
 	},
-	
+
 	/**
- 	 * 当新控件被移除时执行。
-	 * @param {Control} childControl 新添加的元素。
-	 * @return {Control} 需要真正删除的子控件。
+	 * 当新控件被移除时执行。
+	 * @param {Object} childControl 新添加的元素。
 	 * @protected override
 	 */
-	uninitChild: function(childControl) {
+	removeChild: function(childControl) {
 		
 		// 如果 childControl 不是 <li>, 则退出 <li> 的包装。
 		if (childControl.node.parentNode !== this.node) {
@@ -79,29 +69,91 @@ var ListControl = ScrollableControl.extend({
 			}
 			
 			// 删除节点。
-			li.removeChild(childControl);
+			childControl.detach(li.node);
 			
 			// 赋值。
 			childControl = li;
 		}
 		
-		// 返回实际需要删除的组件。
+		// 从 DOM 树删除。
+		childControl.detach(this.node);
+		
+		// 返回被删除的子控件。
 		return childControl;
-
 	},
 	
 	/**
 	 * 当被子类重写时，实现初始化 DOM 中已经存在的项。 
 	 */
-	initItems: function(){
+	init: function() {
 		this.query('>li').addClass('x-' + this.xtype + '-item');
 	},
 	
-	init: function() {
-		this.initItems();
+	// 项操作
+
+	/**
+	 * 添加一个子节点到当前控件末尾。
+	 * @param {Control} ... 要添加的子节点。
+	 * @return {Control/this} 返回新添加的子控件。
+	 */
+	add: function() {
+		var args = arguments;
+		if (args.length === 1) {
+			return this.append(args[0]);
+		}
+
+		Object.each(args, this.append, this);
+		return this;
+	},
+
+	/**
+	 * 在指定位置插入一个子节点。
+	 * @param {Integer} index 添加的子控件的索引。
+	 * @param {Control} childControl 要添加的子节点。
+	 * @return {Control} 返回新添加的子控件。
+	 */
+	addAt: function(index, childControl) {
+		return this.insertBefore(Dom.parse(childControl), this.child(index));
+	},
+
+	/**
+	 * 删除指定索引的子节点。
+	 * @param {Integer} index 删除的子控件的索引。
+	 * @return {Control} 返回删除的子控件。如果删除失败（如索引超出范围）则返回 null 。
+	 */
+	removeAt: function(index) {
+		var child = this.child(index);
+		return child ? this.removeChild(child) : null;
 	},
 	
-	// /**
+	/**
+	 * 批量设置当前的项列表。
+	 */
+	set: function(items){
+		if(Object.isArray(items)){
+			this.empty();
+			this.add.apply(this, items);
+			return this;
+		}
+		
+		return Dom.prototype.set.apply(this, arguments);
+	},
+	
+	/**
+	 * 获取指定索引的项。
+	 * @param {Integer} container 要获取的容器控件。
+	 * @return {Control} 指定容器控件包装的真实子控件。如果不存在相应的子控件，则返回自身。
+	 */
+	item: Dom.prototype.child,
+
+	/**
+	 * 获取某一项在列表中的位置。
+	 */
+	indexOf: function(item) {
+		return item && item.parent && this.equals(item.parent()) ? item.index() : -1;
+	}
+	
+	//, /**
 	 // * 当当前控件在屏幕中显示不下时，由 align 函数触发执行此函数。
 	 // * @param {String} xOry 值为 "x" 或 "y"。
 	 // * @param {Integer} value 设置的最大值。
@@ -119,11 +171,7 @@ var ListControl = ScrollableControl.extend({
 			// delete this['overflow' + xOry];
 		// }
 	// },
-	
-	indexOf: function(item){
-		return ScrollableControl.prototype.indexOf.call(this, this.childOf(item));
-	},
-
+/*
 	getItemByText: function(value){
 		for (var c = this.first(), child ; c; c = c.next()) {
 			if (c.getText() === value) {
@@ -132,48 +180,47 @@ var ListControl = ScrollableControl.extend({
 			}
 		}
 		
-		return child ? this.itemOf(child) : null;
+		return child;
 	},
-	
-	set: function(items){
-		if(Object.isArray(items)){
-			this.clear();
-			this.add.apply(this, items);
-			return this;
-		}
-		
-		return Dom.prototype.set.apply(this, arguments);
-	},
-
+*/
 	/**
 	 * 设置某个事件发生之后，执行某个函数.
 	 * @param {String} eventName 事件名。
 	 * @param {String} funcName 执行的函数名。
 	 */
-	itemOn: function(eventName, fn, bind){
+/*	itemOn: function(eventName, fn, bind){
 		var me = this;
 		return this.on(eventName, function(e){
 			for(var c = me.node.firstChild, target = e.target; c; c = c.nextSibling){
 				if(c === target || Dom.has(c, target)){
-					return fn.call(bind, me.itemOf(new Dom(c)), e);
+					return fn.call(bind, c, e);
 				}
 			}
 		}, bind);
 	}
-	
+*/	
 });
 
 
+
+/**
+ * 为非 ListControl 对象扩展 ListControl 的6个方法: add addAt remove removeAt set item
+ */
 ListControl.aliasMethods = function(controlClass, targetProperty, removeChildProperty){
-	controlClass.defineMethods(targetProperty, 'add addAt removeAt item indexOf each count');
+	controlClass.defineMethods(targetProperty, 'add addAt removeAt item set');
 	
 	removeChildProperty = removeChildProperty || targetProperty;
 	controlClass.prototype.removeChild = function(childControl){
-		childControl.detach(this.node);
 		
+		// 尝试在代理的列表中删除项。
 		var child = this[removeChildProperty];
 		if(child)
-			childControl.detach(child.node);
+			childControl.remove(childControl);
+		
+		// 尝试在当前节点中正常删除。
+		childControl.detach(this.node);
+		
+		return childControl;
 	};
 	
 };

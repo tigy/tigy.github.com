@@ -12,11 +12,7 @@ var IInput = {
 	 * 获取或设置当前输入域的状态。
 	 * @private
 	 */
-    state: function (name, value) {
-        if (value === undefined) {
-            return Dom.getAttr(this.input().node, name);
-        }
-
+    updateState: function (name, value) {
         value = value !== false;
         this.toggleClass('x-' + this.xtype + '-' + name, value);
         return Dom.prototype.setAttr.call(this.input(), name, value);
@@ -58,7 +54,7 @@ var IInput = {
 				return this;
 			}
 			
-			this.hiddenField = this.createHiddenField();
+			this.hiddenField = this.find("input,select,textarea,button") || this.createHiddenField();
 		}
 		
 		return this.hiddenField;
@@ -83,20 +79,19 @@ var IInput = {
 	
 	setAttr: function (name, value) {
 		var dom = this;
-		if(/^(disabled|readonly|name)$/i.test(name)){
-			if(/^disabled$/i.test(name)) {
-				return this.disabled(value);
-			} else if(/^readonly$/i.test(name)) {
-				return this.readOnly(value);
-			} 
-			
+		if(/^(disabled|readonly|checked|selected|actived)$/i.test(name)){
+			return this.updateState(name.toLowerCase(), value);
+		}
+		
+		if(/^(value|name|form)$/i.test(name)) {
 			dom = this.input();
 		}
+		
 		return Dom.prototype.setAttr.call(dom, name, value);
 	},
 	
 	getAttr: function (name, type) {
-		return Dom.getAttr((/^(disabled|readonly|name|form)$/i.test(name) ? this.input() : this).node, name, type);
+		return Dom.getAttr((/^(disabled|readonly|checked|selected|actived|value|name|form)$/i.test(name) ? this.input() : this).node, name, type);
 	},
 	
 	getText: function(){
@@ -110,14 +105,6 @@ var IInput = {
 			this.onChange();
 			
 		return this;
-	},
-
-	disabled: function (value) {
-	    return this.state("disabled", value);
-	},
-
-	readOnly: function (value) {
-	    return this.state("readonly", value);
 	}
 	
 };

@@ -3,7 +3,6 @@
  */
 
 imports("Controls.Core.Base");
-using("System.Core.Base");
 using("System.Dom.Base");
 
 
@@ -71,10 +70,24 @@ var Control = Dom.extend({
 
 			// 如果 options 是纯配置。
 			if (options.constructor === Object) {
+				
 				Object.extend(opt, options);
-				node = Dom.getNode(opt.node || opt.dom);
-				delete opt.dom;
-				delete opt.node;
+				
+				if(opt.node) {
+					node = opt.node;
+					delete opt.node;
+				} else if(opt.selector) {
+					node = Dom.find(opt.selector);
+					delete opt.selector;
+				} else if(opt.dom) {
+					node = opt.dom;
+					delete opt.dom;
+				}
+					
+				if(node){
+					node = Dom.getNode(node);
+				}
+				
 			} else {
 				node = Dom.getNode(options);
 			}

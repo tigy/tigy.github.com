@@ -14,9 +14,9 @@ using("Controls.Form.Picker");
  * @extends Picker
  * @example <pre>
  * var comboBox = new ComboBox();
- * comboBox.menu.add("aaa");
- * comboBox.menu.add("bbb");
- * comboBox.menu.setSelectedIndex(0);
+ * comboBox.add("aaa");
+ * comboBox.add("bbb");
+ * comboBox.setSelectedIndex(0);
  * </pre>
  */
 var ComboBox = Picker.extend({
@@ -286,15 +286,6 @@ var ComboBox = Picker.extend({
 	
 	setSelectedIndex: function(value){
 		return this.setSelectedItem(this.dropDown.item(value));
-	},
-	
-	set: function(items){
-		if(Object.isArray(items)){
-			this.dropDown.set(items);
-			return this;
-		}
-		
-		return Dom.prototype.set.apply(this, arguments);
 	},
 	
 	resizeToFitItems: function(){

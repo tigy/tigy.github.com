@@ -50,7 +50,7 @@ var MenuItem = TreeControl.Item.extend({
 	},
 
 	onMouseOver: function() {
-		this.hovering(true);
+		this.updateState("hover", true);
 		if (this.subControl)
 			this.showSubMenu();
 		else if(this.parentControl)
@@ -64,7 +64,7 @@ var MenuItem = TreeControl.Item.extend({
 		// 因为如果有子菜单，必须在子菜单关闭后才能关闭激活。
 
 		if (!this.subControl)
-			this.hovering(false);
+			this.updateState("hover", false);
 
 	},
 	
@@ -134,7 +134,7 @@ var Menu = TreeControl.extend({
 	 */
 	floating: false,
 
-	createTreeItem: function(childControl, parent) {
+	createTreeItem: function(childControl) {
 		
 		if(!(childControl instanceof MenuItem)){
 	
@@ -143,11 +143,8 @@ var Menu = TreeControl.extend({
 	
 				// - => MenuSeperator
 				if (/^\s*-\s*$/.test(childControl.getText())) {
-	
-					// 删除文本节点。
-					if (parent) {
-						parent.remove(childControl);
-					}
+					
+					childControl.remove();
 	
 					childControl = new MenuSeperator;
 	
@@ -157,13 +154,10 @@ var Menu = TreeControl.extend({
 					// 保存原有 childControl 。
 					var t = childControl;
 					childControl = new MenuItem;
-					childControl.content().setText(t.getText());
-				}
-				if (parent) {
-					parent.prepend(childControl);
+					childControl.append(t);
 				}
 			} else if(childControl.hasClass('x-menuseperator')){
-				childControl = new MenuSeperator;
+				childControl = new MenuSeperator(childControl);
 			} else {
 	
 				// 创建对应的 MenuItem 。
@@ -182,7 +176,7 @@ var Menu = TreeControl.extend({
 		this.dataField().control = this;
 
 		// 根据已有的 DOM 结构初始化菜单。
-		this.initItems();
+		TreeControl.prototype.init.call(this);
 	},
 
 	onShow: function() {
@@ -268,7 +262,7 @@ var Menu = TreeControl.extend({
 		this.hideSubMenu();
 
 		// 激活本项。
-		menuItem.hovering(true);
+		menuItem.updateState("hover", true);
 
 		// 如果指定的项存在子菜单。
 		if (menuItem.subControl) {
@@ -296,7 +290,7 @@ var Menu = TreeControl.extend({
 			this.currentSubMenu.subControl.hide();
 
 			// 取消激活菜单。
-			this.currentSubMenu.hovering(false);
+			this.currentSubMenu.updateState("hover", false);
 			this.currentSubMenu = null;
 		}
 		
