@@ -154,7 +154,7 @@ var ComboBox = Picker.extend({
 			if(item == null){
 				elem.selectedIndex = -1;
 			} else {
-				elem.value = item.option.value;
+				elem.value = item.dataField().option.value;
 			}
 			this._syncSelect();
 			
@@ -299,7 +299,7 @@ var ComboBox = Picker.extend({
 			if(node.tagName  === 'OPTION') {
 				var item = this.dropDown.add(Dom.getText(node));
 				
-				item.option = node;
+				item.dataField().option = node;
 				if(node.selected){
 					this.setSelectedItem(item);
 				}
