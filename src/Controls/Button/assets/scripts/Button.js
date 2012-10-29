@@ -19,22 +19,7 @@ var Button = ContentControl.extend({
 	
 	create: function(options){
 		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype).replace('type="button"', 'type="' + (options.type || this.type) + '"'));
-	},
-	
-	setAttr: function (name, value) {
-	    if (/^(disabled|actived)$/i.test(name)) {
-	        return this[name.toLowerCase()](value);
-		}
-		return Dom.prototype.setAttr.call(this, name, value);
-	},
-	
-	actived: function (value) {
-	    return this.state("actived", value);
-	},
-	
-	disabled: function (value) {
-	    return this.state("disabled", value);
 	}
 	
-});
+}).implement(IInput);
 

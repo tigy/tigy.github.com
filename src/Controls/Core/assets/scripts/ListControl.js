@@ -153,24 +153,24 @@ var ListControl = Control.extend({
 		return item && item.parent && this.equals(item.parent()) ? item.index() : -1;
 	},
 	
-	// /**
-	 // * 当当前控件在屏幕中显示不下时，由 align 函数触发执行此函数。
-	 // * @param {String} xOry 值为 "x" 或 "y"。
-	 // * @param {Integer} value 设置的最大值。
-	 // * @param {Boolean} isOverflowing 如果值为 true，表示发生了此事件，否则表示恢复此状态。
-	 // */
-	// onOverflow: function(xOry, value, isOverflowing){
-		// var data = this['overflow' + xOry];
-		// if(isOverflowing){
-			// if(!data){
-				// this['overflow' + xOry] = this[xOry === 'x' ? 'getWidth' : 'getHeight']();
-			// }
-			// this[xOry === 'x' ? 'setWidth' : 'setHeight'](value);
-		// } else if(data !== undefined){
-			// this[xOry === 'x' ? 'setWidth' : 'setHeight'](data);
-			// delete this['overflow' + xOry];
-		// }
-	// },
+    ///**
+    //* 当当前控件在屏幕中显示不下时，由 align 函数触发执行此函数。
+    //* @param {String} xOry 值为 "x" 或 "y"。
+    //* @param {Integer} value 设置的最大值。
+    //* @param {Boolean} isOverflowing 如果值为 true，表示发生了此事件，否则表示恢复此状态。
+    //*/
+    //onOverflow: function(xOry, value, isOverflowing){
+	//    var data = this['overflow' + xOry];
+	//    if(isOverflowing){
+	//        if(!data){
+	//    	    this['overflow' + xOry] = this[xOry === 'x' ? 'getWidth' : 'getHeight']();
+	//        }
+	//        this[xOry === 'x' ? 'setWidth' : 'setHeight'](value);
+	//    } else if(data !== undefined){
+	//        this[xOry === 'x' ? 'setWidth' : 'setHeight'](data);
+	//        delete this['overflow' + xOry];
+	//    }
+    //},
 
 	getItemByText: function(value){
 		for (var c = this.first(), child ; c; c = c.next()) {
@@ -207,9 +207,27 @@ var ListControl = Control.extend({
  * 为非 ListControl 对象扩展 ListControl 的6个方法: add addAt remove removeAt set item
  */
 ListControl.aliasMethods = function(controlClass, targetProperty, removeChildProperty){
-	controlClass.defineMethods(targetProperty, 'add addAt removeAt item set');
+    controlClass.defineMethods(targetProperty, 'add addAt removeAt item');
+
+    removeChildProperty = removeChildProperty || targetProperty;
+
+    controlClass.prototype.set = function (items) {
+        if (Object.isArray(items)) {
+
+            // 尝试在代理的列表中删除项。
+            var child = this[removeChildProperty];
+            if (child)
+                child.empty();
+
+            // 通过 this.add 添加项。
+            this.add.apply(this, items);
+
+            return this;
+        }
+
+        return Dom.prototype.set.apply(this, arguments);
+    };
 	
-	removeChildProperty = removeChildProperty || targetProperty;
 	controlClass.prototype.removeChild = function(childControl){
 		
 		// 尝试在代理的列表中删除项。

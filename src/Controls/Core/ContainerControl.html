@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=beta">
     <title>容器控件</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -18,58 +17,85 @@
 
     <article class="demo">
 
-        <p>ContainerControl 表示一个容器组件。一个容器组件肯能包含一个标题栏。其格式如:</p>
+        <p class="demo">ContainerControl 表示一个容器组件。一个容器组件肯能包含一个标题栏。其格式如:</p>
 
-        <script class="demo" type="text/html">
+        <script class="demo" type="pre/html">
             <div class="x-control">
                 <div class="x-control-header">
-                    <h2>header</h2>
+                    header
+                </div>
+                <div class="x-control-body">
+                    body
+                </div>
+            </div>
+        </script>
+
+        <p class="demo">在填充内容时，header 需要用h1-h6标签，body 需要 padding，因此实际使用时的格式为：</p>
+
+        <script class="demo" type="pre/html">
+            <div class="x-control">
+                <div class="x-control-header">
+                    <h4>title</h4>
                 </div>
                 <div class="x-control-body">
                     <div class="x-control-content">
-                        body
+                        content
                     </div>
                 </div>
             </div>
         </script>
 
-        <div class="x-control demo-target" id="a">
-            <div class="x-control-header">
-                <h2>header</h2>
-            </div>
-            <div class="x-control-body">
-            </div>
-        </div>
+        <p class="demo">对于某些容器， x-control-header 是可以省略的。x-control-content 是为了提供 padding 提供的，如果容器内放的不是文字，则应该省略这个 div。</p>
 
-        <script>
+        
 
-            // 创建一个容器对象。
-            var a = new ContainerControl('a');
+    </article>
 
-            var b = Dom.parse('<div class="x-control-content">我是一个普通节点</div>');
+    <article class="demo">
 
-            Demo.writeTestCases({
-                '操作标题': '-',
-                '设置标题': 'a.setTitle("<em>value</em>")',
-                '获取标题': 'a.getTitle()',
-                '使用 ScrollableControl 提供的方法操作子控件': '-',
-                '添加子控件到末尾': 'a.add("<div>这是通过 add 插入的</div>");',
-                '添加子控件到指定位置': 'a.addAt(0, "<div>这是通过 addAt 插入的</div>");',
-                '删除指定位置的子控件': 'a.removeAt(0)',
-                '获取某一位置的子控件': 'a.item(0)',
-                '获取一个子控件在当前控件集合中的位置': 'a.indexOf(b)',
-                '遍历子控件': 'a.each(function(item, i){trace("#", i, " => ", item.getText());})',
-                '获取子控件的个数': "a.count()",
-                '使用 Dom 提供的方法操作子节点': '-',
-                '添加子控件到末尾': 'a.append("<div>这是通过 append 插入的</div>");',
-                '添加子控件到第一个节点': 'a.prepend("<div>这是通过 prepend 插入的</div>");',
-                '删除指定子控件': 'a.remove(b);',
-                '清空子控件': 'a.empty()',
-                '获取子控件列表': 'a.children()',
-                '获取指定位置的容器': 'a.child(1)',
-                '判断子控件是否存在于当前控件中': 'a.has(b)'
-            });
-        </script>
+        <h2 class="demo">API</h2>
+
+        <section class="demo demo-control demo-absolute">
+            <aside class="demo">
+                <div class="x-control" id="a">
+                    <div class="x-control-header">
+                        <h4>header</h4>
+                    </div>
+                    <div class="x-control-body">
+                        body
+                    </div>
+                </div>
+
+                <script>
+                    var a = new ContainerControl('a');
+                </script>
+            </aside>
+        </section>
+
+        <section class="demo demo-api">
+            <script>
+
+                // 创建一个容器对象。
+                var a = new ContainerControl('a');
+
+                var b = Dom.parse('<div class="x-control-content">我是一个普通节点</div>');
+
+                Demo.writeTestCases({
+                    '设置标题': {
+                        'a.setTitle("plain text", true)': '-',
+                        'a.setTitle("<em>value</em>")': '-',
+                    },
+                    '获取标题': 'a.getTitle()',
+                    '删除标题': 'a.setTitle(null)',
+
+                    '设置内容':  {
+                        'a.setContent("plain text", true)': '-',
+                        'a.setContent("<em>value</em>")': '-',
+                    },
+                    '获取内容': 'a.getContent()'
+                });
+            </script>
+        </section>
 
     </article>
 
