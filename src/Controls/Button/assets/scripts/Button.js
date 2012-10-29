@@ -19,7 +19,7 @@ var Button = ContentControl.extend({
 	
 	create: function(options){
 		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype).replace('type="button"', 'type="' + (options.type || this.type) + '"'));
-	}
+	},
 	
 }).implement(IInput);
 

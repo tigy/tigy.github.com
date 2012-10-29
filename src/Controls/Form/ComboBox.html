@@ -16,6 +16,7 @@
 
     <script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
     <script src="../../System/Dom/assets/scripts/Base.js" type="text/javascript"></script>
+    <script src="../../System/Dom/assets/scripts/Align.js" type="text/javascript"></script>
     <script src="../../Controls/Core/assets/scripts/Base.js" type="text/javascript"></script>
     <script src="../../Controls/Core/assets/scripts/IDropDownOwner.js" type="text/javascript"></script>
     <script src="../../Controls/Core/assets/scripts/IInput.js" type="text/javascript"></script>
@@ -33,111 +34,165 @@
 
     <article class="demo">
 
+        <p class="demo">ComboBox 用于美化 <a href="Select.html">Select</a> 控件。另参考 <a href="../Button/MenuButton.html">MenuButton</a> 。</p>
+
+        <h2 class="demo">创建控件</h2>
+
+        <section class="demo">
+
+            <h3 class="demo">最简单方式： 基于 &lt;select&gt; 创建</h3>
+
+            <p class="demo">让 ComboBox 成为 Select 的代理， Select 的 placeholder onclick onchange readonly disabled 属性会被复制。</p>
+
+            <script class="demo demo-noformat demo-expand" type="text/html">
+                <select id="demo1" name="demo1-name">
+                    <option value="1">选项1</option>
+                    <option value="2" selected="selected">选项2</option>
+                </select>
+                <\script>
+                    var demo1 = new ComboBox("demo1");
+                <\/script>
+            </script>
+
+        </section>
+
         <section class="demo">
 
             <h3 class="demo">基于 &lt;input&gt; 创建</h3>
 
-            <aside class="demo">
-                <input type="text" class="x-textbox" value="文本框" id="a" />
+            <p class="demo">在此模式下，用户   允许输入额外的文本值，并且 input 本身将被作为表单值提交。</p>
+
+            <script class="demo demo-expand" type="text/html">
+                <input type="text" class="x-textbox" id="demo2" />
+                <\script>
+                    var demo2 = new ComboBox("demo2");
+                    demo2.add("这是通过 add 添加的 0");
+                    demo2.add("这是通过 add 添加的 1");
+                <\/script>
+            </script>
+
+            <p class="demo">&nbsp;</p>
+
+            <p class="demo">&nbsp;</p>
+
+        </section>
+
+        <section class="demo">
+
+            <h3 class="demo">通过完整方式创建</h3>
+
+            <aside class="demo demo-expand">
+                <span class="x-picker" id="demo3">
+                    <a href="javascript:;" class="x-button">B</a>
+                    <button class="x-button"><span class="x-button-menu"></span></button>
+                </span>
 
                 <ul class="x-dropdown x-listbox">
                     <li>预定义的选项</li>
                 </ul>
                 <script>
-                    var a = new ComboBox("a");
-                    a.add("选1");
-                    a.add("选2");
-                    a.add("选3");
+                    var demo3 = new ComboBox("demo3");
                 </script>
             </aside>
-            <script class="demo" type="text/html">
-                <input type="text" class="x-textbox" value="文本框" id="a" />
-                <script>
-                    var a = new ComboBox("a");
-                    a.add("选1");
-                    a.add("选2");
-                    a.add("选3");
-                    <\/script>
-                </script>
-        </section>
 
-        <hr class="demo">
+        </section>
 
         <section class="demo">
 
-            <h2 class="demo">基于 &lt;select&gt; 创建</h2>
+            <h3 class="demo">通过 HTML 方式定义菜单</h3>
 
-            <aside class="demo">
-                <select id="b" name="a" placeholder="AAA">
-                    <option value="1">选项1111111111111111111</option>
+            <script class="demo demo-expand" type="text/html">
+                <input type="text" class="x-textbox" value="文本框" id="demo4" />
 
-                    <option value="2" selected="selected">选项2</option>
-                </select>
-                <script>
-                    var b = new ComboBox("b");
-                </script>
-            </aside>
+                <ul class="x-dropdown x-listbox">
+                    <li>预定义的选项</li>
+                </ul>
+                <\script>
+                    var demo4 = new ComboBox("demo4");
+                <\/script>
+            </script>
+
+        </section>
+
+        <p class="demo">Combobox 完整的创建方法文档参考 <a href="Picker.html">Picker</a>。</p>
+
+    </article>
+    
+    <article class="demo">
+
+        <h2 class="demo">常用 API</h2>
+
+        <section class="demo demo-control demo-absolute">
+
             <script class="demo" type="text/html">
-                <select id="b" name="a">
+
+                <select id="a" name="demo1-name">
                     <option value="1">选项1</option>
-
                     <option value="2" selected="selected">选项2</option>
                 </select>
-                <script>
-                    var b = new ComboBox("b");
-                    <\/script>
-                </script>
-        </section>
+                <\script>
+                    var a = new ComboBox("a");
+                <\/script>
+                
+            </script>
 
-        <hr class="demo">
+            <div class="demo" style="height:340px;"></div>
 
-        <section class="demo">
-
-            <h2 class="demo">完整方式</h2>
-
-            <aside class="demo">
-                <span class="x-picker" id="c">
-                    <input type="text" class="x-textbox" value="文本框" />
-                    <button class="x-button"><span class="x-button-menu"></span></button>
-                </span>
-                <script>
-                    var c = new ComboBox("c");
-                    c.add("选1");
-                    c.add("选2");
-                    c.add("选3");
-                </script>
-            </aside>
             <script class="demo" type="text/html">
-                <span class="x-picker" id="c">
-                    <input type="text" class="x-textbox" value="文本框" />
-                    <button class="x-button"><span class="x-button-menu"></span></button>
-                </span>
-                <script>
-                    var c = new ComboBox("c");
-                    c.add("选1");
-                    c.add("选2");
-                    c.add("选3");
-                    <\/script>
-                </script>
+                <input type="text" class="x-textbox" id="b" />
+                <\script>
+                    var b = new ComboBox("b");
+                <\/script>
+            </script>
+
         </section>
 
-        <script>
-            var a = new ComboBox();
-            var a1 = a.add('选项A');
-            var a2 = a.add('选项B');
-            var a3 = a.add('选项C');
-            var a4 = a.add('选项D');
-            a.appendTo();
-   			
-            Demo.writeTestCases({
-                '新增一项': 'a.add("我是通过 add 增加的")',
-                '在首个位置插入一项': 'a.addAt(0, "我是通过 addAt 增加的")',
-                '获取当前选中的索引': 'a.getSelectedIndex()',
-                '设置当前选中的索引': 'a.setSelectedIndex(1)',
-                '设置被选中后执行': 'a.on("select", trace)',
-                '设置值更改后执行': 'a.on("change", trace)'
-            });
-        </script>
+        <section class="demo demo-api">
+
+            <script>
+
+                Demo.writeTestCases({
+                    '纯按钮形式': '-',
+                    '增加一项': 'a.add("<em>这是通过 add 插入的</em>").setAttr("data-value", "VAL")',
+
+                    '获取选中的值': 'a.getText()',
+                    '获取当前选中的索引': 'a.getSelectedIndex()',
+                    '设置当前选中的索引': 'a.setSelectedIndex(1)',
+                    '设置被选中后执行': 'a.on("select", function(){alert("值被选中了")})',
+                    '设置值更改后执行': 'a.on("change", function(){alert("值被改变了")})',
+
+                    '设置禁用': 'a.setAttr("disabled", true)',
+                    '取消禁用': 'a.setAttr("disabled", false)',
+                    '获取禁用状态': 'a.getAttr("disabled")',
+
+                    '设置只读': 'a.setAttr("readOnly", true)',
+                    '取消只读': 'a.setAttr("readOnly", false)',
+                    '获取只读状态': 'a.getAttr("readOnly")',
+
+                    '自动调整宽度以适应下拉菜单的大小': 'a.resizeToFitItems()'
+                });
+
+                Demo.writeTestCases({
+                    '文本框形式': '-',
+
+                    '增加一项': 'b.add("<em>这是通过 add 插入的</em>")',
+
+                    '获取当前选中的索引': 'b.getSelectedIndex()',
+                    '设置当前选中的索引': 'b.setSelectedIndex(1)',
+                    '设置被选中后执行': 'b.on("select", function(){alert("值被选中了")})',
+                    '设置值更改后执行': 'b.on("change", function(){alert("值被改变了")})',
+
+                    '设置禁用': 'b.setAttr("disabled", true)',
+                    '取消禁用': 'b.setAttr("disabled", false)',
+                    '获取禁用状态': 'b.getAttr("disabled")',
+
+                    '设置只读': 'b.setAttr("readOnly", true)',
+                    '取消只读': 'b.setAttr("readOnly", false)',
+                    '获取只读状态': 'b.getAttr("readOnly")'
+                });
+            </script>
+
+        </section>
 
     </article>
 

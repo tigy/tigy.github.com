@@ -625,8 +625,9 @@
 		 * 获取和设置返回类型是 boolean 的特殊属性的函数。
 		 */
 		boolHook = {
-			get: function(elem, name, type) {
-				return type ? elem[name] ? name.toLowerCase() : null : !!elem[name];
+		    get: function (elem, name, type) {
+		        var value = name in elem ? elem[name] : defaultHook.get(elem, name);
+			    return type ? value ? name.toLowerCase() : null : !!value;
 			},
 			set: function(elem, name, value) {
 				elem[name] = value;

@@ -172,16 +172,16 @@ var ListControl = Control.extend({
 	//    }
     //},
 
-	getItemByText: function(value){
-		for (var c = this.first(), child ; c; c = c.next()) {
-			if (c.getText() === value) {
-				child = c;
-				break;
-			}
-		}
+	//getItemByText: function(value){
+	//	for (var c = this.first(), child ; c; c = c.next()) {
+	//		if (c.getText() === value) {
+	//			child = c;
+	//			break;
+	//		}
+	//	}
 		
-		return child;
-	},
+	//	return child;
+	//},
 
 	/**
 	 * 设置某个事件发生之后，执行某个函数.

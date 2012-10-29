@@ -125,11 +125,7 @@ var ContainerControl = Control.extend({
 		content[valueAsText ? 'setText' : 'setHtml'](value);
 		return this;
 		
-	}
-	
-	/*
-	
-	,
+	},
 	
 	getText: function(){
 		return this.getContent(true);
@@ -146,11 +142,5 @@ var ContainerControl = Control.extend({
 	setHtml: function(value){
 		return this.setContent(value, false);
 	}
-	
-	*/
-
 
 });
-
-
-//.defineMethods('body()', 'insertBefore removeChild first last children child empty');

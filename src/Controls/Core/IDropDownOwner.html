@@ -2,8 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=beta">
-    <title>表单控件接口</title>
+    <title>下拉菜单接口</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
     <link href="../../Controls/Core/assets/styles/IDropDownOwner.css" rel="stylesheet" type="text/css" />
@@ -18,33 +17,40 @@
 </head>
 <body>
     <article class="demo">
-        <p>如果一个控件包含了一个自定义的下拉菜单，则可以让这个控件实现 IDropDown 接口。</p>
+        <p class="demo">如果一个控件包含了一个自定义的下拉菜单，则可以让这个控件实现 IDropDownOwner 接口。</p>
 
-        <p>调用 IDropDown.setMenu 来设置下拉菜单。</p>
-        <p>调用 IDropDown.toggleMenu 来切换下拉菜单的显示状态。</p>
-        <p>子类可以重写 onMenuOpen 和 onMenuClose 来实现菜单打开和关闭时的自定义操作。</p>
+        <input type="button" id="targetBtn" value="按钮 #a" />
 
-        <p>一般地，容器需要在初始化的时候绑定 click 事件后调用 toggleMenu	。</p>
-
-        <input type="button" id="a" value="按钮 #a" />
-
-        <div id="menu">
+        <div id="dropDownMenu1">
             这是菜单
         </div>
 
         <script class="demo">
 
-            // 按钮
-            var a = Dom.get('a');
+            // 获取目标按钮对象。
+            var a = Dom.get('targetBtn');
 
-            // 将 IDropDown 接口的所有方法直接拷贝给 a。
+            // 将 IDropDownOwner 接口的所有方法直接拷贝给 targetBtn，这样可以通过 targetBtn 直接调用下拉菜单的全部方法。
             Object.extend(a, IDropDownOwner);
 
-            // 核心代码， 设置 a 的下拉菜单为 id=menu 的节点。
-            a.setDropDown('menu');
+            // 核心代码， 设置 a 的下拉菜单为 id=dropDownMenu 的节点。
+            // 此操作还会为 #dropDownMenu1 增加 x-dropdown 的 class 。
+            a.setDropDown('dropDownMenu1');
 
-            // 绑定 click 之后，调用 a.toggleMenu 切换菜单。
+            // 绑定 click 之后，调用 a.toggleDropDown 切换菜单。
             a.on('click', a.toggleDropDown);
+        </script>
+
+        <script>
+            Demo.writeTestCases({
+                '手动显示菜单': 'a.showDropDown()',
+                '手动隐藏菜单': 'a.hideDropDown()',
+
+                '获取菜单节点': 'a.getDropDown()',
+                '重新对齐菜单': 'a.realignDropDown()',
+
+                '设置菜单打开后的回调': 'a.on("dropdownshow", function(){alert("菜单打开了")})'
+            });
         </script>
 
     </article>

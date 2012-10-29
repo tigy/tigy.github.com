@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=beta">
     <title>内容控件</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -15,35 +14,47 @@
     <script src="../../../assets/demo/demo.js" type="text/javascript"></script>
 </head>
 <body>
-
-
-
     <article class="demo">
 
-        <p>ContentControl 表示一个包含内联数据的组件。并且它可以设置一个图标。</p>
+        <p class="demo">先看如下示例：</p>
 
-        <script class="demo" type="text/html">
+        <script class="demo" type="pre/html">
 
-            <div>
-                <span class="x-icon"></span>
-                content
+            <div class="x-control">
+                <span class="x-control-content">content</span>
             </div>
 
         </script>
 
-        <div id="a" class="demo-inline-block demo-target">
-        </div>
+        <p class="demo">如上示例，<code class="demo">x-control-content</code> 才是真正的存放内容的节点，这种结构统一使用 ContentControl 处理。</p>
 
-        <script>
-            // 创建一个容器对象。
-            var a = new ContentControl('a');
+    </article>
 
-            Demo.writeTestCases({
-                '设置图标': 'a.setIcon("")',
-                '设置文本': 'a.setText("内容内容内容内容内容内容内容内容内容内容内容")',
-                '设置 HTML': 'a.setHtml("<b>内容</b>")'
-            });
-        </script>
+    <article class="demo">
+
+        <h2 class="demo">API</h2>
+
+        <section class="demo demo-control demo-absolute">
+            <aside class="demo">
+                <div class="x-control" id="a">
+                    <span class="x-control-content">content</span>
+                </div>
+
+                <script>
+                    var a = new ContentControl('a');
+                </script>
+            </aside>
+        </section>
+
+        <section class="demo demo-api">
+            <script>
+                Demo.writeTestCases({
+                    '设置内容 HTML ': 'a.setHtml("<em>这是使用 setHtml 设置的</em>")',
+                    '设置内容 Text': 'a.setText("这是使用 setText 设置的")',
+                    '更新状态（对某些组件有效）': 'a.state("disabled", true)'
+                });
+            </script>
+        </section>
 
     </article>
 

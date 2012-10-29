@@ -50,7 +50,7 @@ var MenuItem = TreeControl.Item.extend({
 	},
 
 	onMouseOver: function() {
-		this.updateState("hover", true);
+		this.state("hover", true);
 		if (this.subControl)
 			this.showSubMenu();
 		else if(this.parentControl)
@@ -64,7 +64,7 @@ var MenuItem = TreeControl.Item.extend({
 		// 因为如果有子菜单，必须在子菜单关闭后才能关闭激活。
 
 		if (!this.subControl)
-			this.updateState("hover", false);
+			this.state("hover", false);
 
 	},
 	
@@ -262,7 +262,7 @@ var Menu = TreeControl.extend({
 		this.hideSubMenu();
 
 		// 激活本项。
-		menuItem.updateState("hover", true);
+		menuItem.state("hover", true);
 
 		// 如果指定的项存在子菜单。
 		if (menuItem.subControl) {
@@ -290,7 +290,7 @@ var Menu = TreeControl.extend({
 			this.currentSubMenu.subControl.hide();
 
 			// 取消激活菜单。
-			this.currentSubMenu.updateState("hover", false);
+			this.currentSubMenu.state("hover", false);
 			this.currentSubMenu = null;
 		}
 		

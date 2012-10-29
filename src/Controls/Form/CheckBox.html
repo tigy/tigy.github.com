@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=beta">
     <title>复选框</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -65,9 +64,9 @@
             <script>
 
                 Demo.writeTestCases({
-                    '获取选中状态': 'a.checked()',
-                    '选中按钮': 'a.checked(true)',
-                    '禁用按钮': 'a.disabled(true)'
+                    '获取选中状态': 'a.getAttr("checked")',
+                    '选中按钮': 'a.setAttr("checked", true)',
+                    '禁用按钮': 'a.setAttr("disabled", true)'
                 });
 
             </script>

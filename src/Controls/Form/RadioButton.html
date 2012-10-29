@@ -2,7 +2,6 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<meta name="dpl-info" content="status=beta">
 		<title>单选框</title>
 		
 		<link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -37,6 +36,42 @@
     		
     		</aside>
     		
+        </article>
+
+        <article class="demo">
+
+            <h2 class="demo">JavaScript 方式创建</h2>
+
+            <section class="demo-control demo-absolute">
+
+                <div id="container1"></div>
+
+                <aside class="demo demo-expand">
+
+                    <script>
+                    var a = new RadioButton({
+                        appendTo: "container1"
+                    });
+                    </script>
+
+                </aside>
+
+            </section>
+
+            <section class="demo-api">
+
+                <script>
+
+                Demo.writeTestCases({
+                    '获取选中状态': 'a.getAttr("checked")',
+                    '选中按钮': 'a.setAttr("checked", true)',
+                    '禁用按钮': 'a.setAttr("disabled", true)'
+                });
+
+                </script>
+
+            </section>
+
         </article>
         
 	</body>

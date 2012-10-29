@@ -10,12 +10,10 @@ var IInput = {
 
     /**
 	 * 获取或设置当前输入域的状态。
-	 * @private
+	 * @protected
 	 */
-    updateState: function (name, value) {
-        value = value !== false;
-        this.toggleClass('x-' + this.xtype + '-' + name, value);
-        return Dom.prototype.setAttr.call(this.input(), name, value);
+    state: function (name, value) {
+        return this.toggleClass('x-' + this.xtype + '-' + name, value);
     },
 
     /**
@@ -79,15 +77,16 @@ var IInput = {
 	
 	setAttr: function (name, value) {
 		var dom = this;
-		if(/^(disabled|readonly|checked|selected|actived)$/i.test(name)){
-			return this.updateState(name.toLowerCase(), value);
-		}
-		
-		if(/^(value|name|form)$/i.test(name)) {
+		if (/^(disabled|readonly|checked|selected|actived)$/i.test(name)) {
+		    value = value !== false;
+		    this.state(name.toLowerCase(), value);
+		    dom = this.input();
+		} else if(/^(value|name|form)$/i.test(name)) {
 			dom = this.input();
 		}
 		
-		return Dom.prototype.setAttr.call(dom, name, value);
+		Dom.prototype.setAttr.call(dom, name, value);
+		return this;
 	},
 	
 	getAttr: function (name, type) {

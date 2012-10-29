@@ -174,10 +174,10 @@
             <script>
 
                 Demo.writeTestCases({
-                    '更改按钮的文字': 'a.setText("按钮的文本")',
-                    '更改按钮的文字（带图标）': 'a.setHtml("<i class=\'x-icon\'></i>按钮的文本")',
+                    '更改按钮的文字': 'a.setText("这是通过 setText 设置的")',
+                    '更改按钮的文字（带图标）': 'a.setHtml("<i class=\'x-icon\'></i>这是通过 setHtml 设置的")',
                     '绑定点击后执行函数': 'a.on("click", function () { alert("我被点了"); })',
-                    '禁用按钮': 'a.disabled(true)'
+                    '禁用按钮': 'a.setAttr("disabled", true)'
                 });
 
             </script>
