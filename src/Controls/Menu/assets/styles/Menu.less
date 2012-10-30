@@ -4,6 +4,9 @@
 
 
 
+@dropDownItemBackgroundHover: @linkColor;
+
+
 // The dropdown menu (ul)
 .x-menu {
  // display: none; // none by default, but block on "open" of the menu
@@ -72,7 +75,8 @@
 }
 
 .x-menuitem-hover {
-  background-color: @linkColor;
+  background-color: @dropDownItemBackgroundHover;
+  #gradient > .vertical(@dropDownItemBackgroundHover, darken(@dropDownItemBackgroundHover, 5%));
 }
 
 .x-menuitem-hover, .x-menuitem-hover a{

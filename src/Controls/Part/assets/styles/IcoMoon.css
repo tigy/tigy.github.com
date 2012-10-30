@@ -22,7 +22,7 @@
   display: inline-block;
   font-size: 21px;
   text-decoration: none;
-  vertical-align: middle;
+  vertical-align: -3px;
   text-align: center;
   padding: 0;
   margin: 0;
@@ -37,16 +37,12 @@
   *top: -1px;
 }
 /* IE ONLY - I know :P */
-.x-icomoon-small {
-  font-size: 21px;
-}
-/* default */
-.x-icomoon-medium {
+.x-icomoon-large {
   font-size: 31px;
 }
-.x-icomoon-large {
+.x-icomoon-larger {
   font-size: 41px;
 }
-.x-icomoon-large {
+.x-icomoon-largest {
   font-size: 61px;
 }

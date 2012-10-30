@@ -1,10 +1,8 @@
 .x-pagination {
-  height: 36px;
   display: inline-block;
+  margin: 0;
   *display: inline;
   *zoom: 1;
-  margin-left: 0;
-  margin-bottom: 0;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
@@ -15,24 +13,27 @@
 .x-pagination li {
   display: inline;
 }
-.x-pagination a {
+.x-pagination a,
+.x-pagination span {
   float: left;
-  padding: 0 14px;
-  line-height: 34px;
+  padding: 4px 12px;
+  line-height: 18px;
   text-decoration: none;
   border: 1px solid #ddd;
   border-left-width: 0;
 }
 .x-pagination a:hover,
-.x-pagination .x-pagination-actived a {
+.x-pagination-selected a,
+.x-pagination-selected span {
   background-color: #f5f5f5;
 }
-.x-pagination .x-pagination-actived a {
-  color: #999999;
+.x-pagination-selected a,
+.x-pagination-selected span {
+  color: #555555;
   cursor: default;
 }
-.x-pagination .x-pagination-disabled a,
-.x-pagination .x-pagination-disabled a:hover {
+.x-pagination-disabled a,
+.x-pagination-disabled a:hover {
   color: #999999;
   background-color: transparent;
   cursor: default;
@@ -48,10 +49,4 @@
   -webkit-border-radius: 0 3px 3px 0;
   -moz-border-radius: 0 3px 3px 0;
   border-radius: 0 3px 3px 0;
-}
-.x-pagination-center {
-  text-align: center;
-}
-.x-pagination-right {
-  text-align: right;
 }
