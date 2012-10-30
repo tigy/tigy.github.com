@@ -193,16 +193,14 @@ var ComboBox = Picker.extend({
 	
     setText: function (value) {
 
-        // 如果有 hiddenField, 设置值。
-        if (this.hiddenField) {
-            this.hiddenField.node.value = value;
-        }
-
         // 如果是 dropDownList 模式，则通过 setSelectedItem 来设置当前文本框的值。
         if (this.dropDownList) {
-            return this.setSelectedItem(this.hiddenField ? this.getSelectedItem() : this.dropDown.child(function (dom) {
-                return Dom.getText(dom) === value;
-            }));
+
+            // 设置 value 。
+            this.input().node.value = value;
+
+            // 根据 value 获得新决定的选中项设置选中项。
+            return this.setSelectedItem(this.getSelectedItem());
         }
 
         // 设置内容。
@@ -219,9 +217,7 @@ var ComboBox = Picker.extend({
     },
 
     getValueOfItem: function (item) {
-        if (!item) {
-            return null;
-        }
+        assert.notNull(item, "ComboBox#getValueOfItem(item): {item} ~", item);
         var option = item.dataField().option;
         return option ? option.value : (item.getAttr('data-value') || item.getText());
     },
@@ -232,20 +228,19 @@ var ComboBox = Picker.extend({
 	 */
     getSelectedItem: function () {
 
-        var elem, value;
-
         // 如果使用了表单模式，则优先查找 value 匹配的项。
-        if (this.dropDownList && this.hiddenField) {
+        if (this.dropDownList) {
 
-            elem = this.hiddenField.node;
+            // 获取 input 字段。
+            var input = this.input(), value;
 
             // 如果隐藏域是 SELECT ，比较方便：
-            if (elem.tagName === 'SELECT') {
+            if (input.node.tagName === 'SELECT') {
                 value = this.hiddenField.getAttr('selectedIndex');
                 return value >= 0 ? this.dropDown.item(value) : null;
             }
 
-            value = elem.value;
+            value = input.node.value;
 
             return this.dropDown.child(function (dom) {
                 return this.getValueOfItem(new Dom(dom)) === value;
@@ -272,43 +267,34 @@ var ComboBox = Picker.extend({
 
                 var oldValue,
                     text,
-                    newValue;
+                    newValue,
+                    input = this.input();
 
-                // 如果有隐藏域，则设置隐藏域。
-                if (this.hiddenField) {
+                if (input.node.tagName === "SELECT") {
 
-                    var elem = this.hiddenField.node;
+                    oldValue = input.getAttr('selectedIndex');
 
-                    if (elem.tagName === "SELECT") {
-
-                        oldValue = this.hiddenField.getAttr('selectedIndex');
-
-                        if (!item) {
-                            elem.selectedIndex = newValue = -1;
-                            text = this.hiddenField.getAttr('placeholder');
-                        } else {
-                            var option = item.dataField().option;
-                            if (!option) {
-                                item.dataField().option = option = new Option(item.getText(), this.getValueOfItem(item));
-                                elem.add(option);
-                            }
-                            option.selected = true;
-                            text = Dom.getText(option);
-                            newValue = elem.selectedIndex;
+                    if (item) {
+                        var option = item.dataField().option;
+                        if (!option) {
+                            item.dataField().option = option = new Option(item.getText(), this.getValueOfItem(item));
+                            input.node.add(option);
                         }
-
+                        option.selected = true;
+                        text = Dom.getText(option);
+                        newValue = input.node.selectedIndex;
                     } else {
-                        oldValue = this.hiddenField.value;
-                        this.hiddenField.value = newValue = item ? this.getValueOfItem(item) : "";
-                        text = item.getText();
+                        input.node.selectedIndex = newValue = -1;
+                        text = input.getAttr('placeholder');
                     }
 
-                // 无隐藏域，仅设置按钮的文本。
                 } else {
-                    oldValue = this.first().getText();
-                    newValue = text = item ? item.getText() : '';
+                    oldValue = input.node.value;
+                    input.node.value = newValue = item ? this.getValueOfItem(item) : "";
+                    text = item ? item.getText() : "";
                 }
 
+                // 无隐藏域，仅设置按钮的文本。
                 this.first().setText(text);
                 if (oldValue !== newValue)
                     this.onChange();
@@ -347,11 +333,6 @@ var ComboBox = Picker.extend({
         dropDown.setStyle('width', oldWidth);
         dropDown.setStyle('display', oldDisplay);
         return this;
-    },
-	
-    _syncSelect: function () {
-        var selected = this.hiddenField.find(':selected');
-        this.first().setText(selected ? selected.getText() : this.hiddenField.getAttr('placeholder'));
     },
 	
     copyItemsFromSelect: function(select) {

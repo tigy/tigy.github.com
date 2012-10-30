@@ -30,17 +30,18 @@ var IInput = {
 	 */
 	hiddenField: null,
 	
-	/**
-	 * 创建用于在表单内保存当前输入值的隐藏域。
-	 * @return {Dom} 隐藏输入域。
-	 */
-	createHiddenField: function(){
-		return Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
-	},
+	///**
+	// * 创建用于在表单内保存当前输入值的隐藏域。
+	// * @return {Dom} 隐藏输入域。
+	// */
+	//createHiddenField: function(){
+	//    return Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
+	//},
 	
 	/**
 	 * 获取当前输入域实际用于提交数据的表单域。
 	 * @return {Dom} 一个用于提交表单的数据域。
+     * @remark 此函数会在当前控件内搜索可用于提交的表单域，如果找不到，则创建返回一个 hidden 表单域。
 	 */
 	input: function(){
 		
@@ -52,7 +53,7 @@ var IInput = {
 				return new Dom(this.node);
 			}
 			
-			this.hiddenField = this.find("input,select,textarea") || this.createHiddenField();
+			this.hiddenField = this.find("input,select,textarea") || Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
 		}
 		
 		return this.hiddenField;
