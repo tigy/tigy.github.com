@@ -1,4 +1,4 @@
-# J+ UI Library 概述      [English](https://github.com/jplusui/jplus-milk/readme-en.md)
+# J+ UI Library 概述      [in English](readme-en.md)
 
 J+ UI Library 是一个Javascript 用户界面组件库。它提供了：
 
