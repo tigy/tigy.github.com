@@ -814,7 +814,6 @@ var DplBuilder = {
         if (dplFile.properties.images) {
             dplFile.properties.images = Path.resolve(dplFileRootPath, dplFile.properties.images);
             dplFile.properties.relativeImages = Path.relative(Path.dirname(dplFile.properties.css), dplFile.properties.images);
-            console.log(dplFile.properties.relativeImages);
             this.infoFile("目标图片文件夹: ", dplFile.properties.images);
         }
 
