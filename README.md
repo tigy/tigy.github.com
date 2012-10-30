@@ -1,4 +1,4 @@
-# J+ UI Library 概述      [in English](readme-en.md)
+# J+ UI Library 概述      [in English](README-en.md)
 
 J+ UI Library 是一个Javascript 用户界面组件库。它提供了：
 
