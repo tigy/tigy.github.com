@@ -2,8 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=beta">
-    <title>有下拉菜单的控件</title>
+    <title>可折叠的控件</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
 
@@ -20,28 +19,41 @@
 </head>
 <body>
     <article class="demo">
-        <p>ICollapsable 是一个可折叠的容器。</p>
-        <aside class="demo">
-            <div id="a" class="demo-target">
-                内容
-            </div>
-        </aside>
+        <p class="demo">ICollapsable 是一个可折叠的容器。</p>
 
-        <script>
+        <section class="demo demo-control">
 
-            // 创建一个容器对象。
-            var a = Dom.get('a');
+            <aside class="demo">
+                <div id="a">
+                    内容
+                </div>
 
-            // 覆盖接口。
-            Object.extend(a, ICollapsable);
+                <script>
 
-            Demo.writeTestCases({
-                '折叠': 'a.collapse(300)',
-                '展开': 'a.expand(300)',
-                '切换折叠': 'a.toggleCollapse(300)',
-                '判断是否折叠': 'a.isCollapsed(300)'
-            });
-        </script>
+                    // 获取上文的节点对象。
+                    var a = Dom.get('a');
+
+                    // 复制 ICollapsable 的接口。
+                    Object.extend(a, ICollapsable);
+
+                </script>
+            </aside>
+
+        </section>
+
+        <section class="demo demo-api">
+
+            <script>
+
+                Demo.writeTestCases({
+                    '折叠': 'a.collapse(300)',
+                    '展开': 'a.expand(300)',
+                    '切换折叠': 'a.toggleCollapse(300)',
+                    '判断是否折叠': 'a.isCollapsed()'
+                });
+            </script>
+
+        </section>
 
     </article>
 </body>
