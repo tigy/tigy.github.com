@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=beta">
     <title>数据表格</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -10,11 +9,12 @@
 
     <script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
     <script src="../../System/Dom/assets/scripts/Base.js" type="text/javascript"></script>
-    <script src="../../System/Fx/assets/scripts/base.js" type="text/javascript"></script>
-    <script src="../../System/Fx/assets/scripts/animate.js" type="text/javascript"></script>
+    <script src="../../System/Utils/assets/scripts/Deferrable.js" type="text/javascript"></script>
+    <script src="../../System/Fx/assets/scripts/Base.js" type="text/javascript"></script>
+    <script src="../../System/Fx/assets/scripts/Tween.js" type="text/javascript"></script>
+    <script src="../../System/Fx/assets/scripts/Animate.js" type="text/javascript"></script>
     <script src="../../Controls/Core/assets/scripts/Base.js" type="text/javascript"></script>
-    <script src="../../Controls/Core/assets/scripts/Icollapsable.js" type="text/javascript"></script>
-    <script src="../../Controls/Core/assets/scripts/Scrollablecontrol.js" type="text/javascript"></script>
+    <script src="../../Controls/Core/assets/scripts/ICollapsable.js" type="text/javascript"></script>
     <script src="../../Controls/Core/assets/scripts/ContentControl.js" type="text/javascript"></script>
     <script src="../../Controls/Core/assets/scripts/ListControl.js" type="text/javascript"></script>
     <script src="../../Controls/Core/assets/scripts/TreeControl.js" type="text/javascript"></script>
@@ -26,50 +26,48 @@
 
     <article class="demo">
 
-        <div id="ct"></div>
+        <section class="demo demo-control">
 
-        <aside class="demo">
+            <script class="demo" type="text/html">
 
+                <div id="container1"></div>
+
+                <\script>
+
+                    var a = new TreeView({
+                        appendTo: 'container1',
+                        set: [
+                            "1",
+                            "2"
+                        ]
+                    });
+
+                <\/script>
+
+            </script>
+
+        </section>
+
+        <section class="demo demo-api">
 
             <script>
 
-                var a = new TreeView().appendTo('ct');
-
-                var b = a.add("1");
-
-                var c = b.add("1-1");
-
-                var d = c.add("1-1-1");
-
-                var e = c.add("1-1-2");
-
-                var f = b.add("1-2");
-
-                a.add("2");
-                // 			
-                // var b = new TreeNode();
-                // b.setText("1");
-                // a.nodes.add(b);
-                // 			
-                // var c = new TreeNode();
-                // c.setText("1-1");
-                // b.nodes.add(c);
-                // 			
-                // var d = new TreeNode();
-                // d.setText("1-2");
-                // b.nodes.add(d);
-                // 			
-                // var e = new TreeNode();
-                // e.setText("2");
-                // a.nodes.add(e);
+                Demo.writeTestCases({
+                    '添加一个子节点': 'a.add("<em>这是使用 add 添加的</em>")',
+                    '在第一个子节点后下一个子节点': 'a.item(0).add("1 后的子节点")',
+                    '删除第一个子节点': 'a.removeAt(0)',
+                    '折叠第一个子节点': 'a.collapse()',
+                    '确保第一个子节点内的第一个子节点可见': 'a.item(0).item(0).ensureVisible()',
+                    '获取选中的节点': 'a.getSelectedNode()'
+                });
 
             </script>
-        </aside>
+
+        </section>
 
         <section class="demo-test">
 
-            <hr>
-
+            <h3 class="demo">无 JavaScript 版</h3>
 
             <ul class="x-treeview" style="width: 100px;">
                 <li class="x-treeview-item">

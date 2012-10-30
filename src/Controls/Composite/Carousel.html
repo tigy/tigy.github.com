@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=beta">
     <title>图片轮播组件</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -10,7 +9,11 @@
 
     <script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
     <script src="../../System/Dom/assets/scripts/Base.js" type="text/javascript"></script>
-    <script src="../../System/Fx/assets/scripts/marquee.js" type="text/javascript"></script>
+    <script src="../../System/Utils/assets/scripts/Deferrable.js" type="text/javascript"></script>
+    <script src="../../System/Fx/assets/scripts/Base.js" type="text/javascript"></script>
+    <script src="../../System/Fx/assets/scripts/Tween.js" type="text/javascript"></script>
+    <script src="../../System/Fx/assets/scripts/Animate.js" type="text/javascript"></script>
+    <script src="../../System/Fx/assets/scripts/Marquee.js" type="text/javascript"></script>
     <script src="../../Controls/Core/assets/scripts/Base.js" type="text/javascript"></script>
     <script src="../../Controls/Composite/assets/scripts/Carousel.js" type="text/javascript"></script>
 
@@ -20,38 +23,54 @@
 
     <article class="demo">
 
-        <aside class="demo">
+        <section class="demo demo-control">
 
-            <div class="x-carousel" id="a" style="width: 260px;">
+            <aside class="demo">
 
-                <ul class="x-carousel-container">
-                    <li class="x-carousel-content">
-                        <img src="../../../assets/demo/images/260x180.gif"></li>
-                    <li class="x-carousel-content">
-                        <img src="../../../assets/demo/images/260x180.gif"></li>
-                    <li class="x-carousel-content">
-                        <img src="../../../assets/demo/images/260x180.gif"></li>
-                </ul>
+                <div class="x-carousel" id="a" style="width: 260px;">
 
-                <ul class="x-carousel-header">
-                    <li class="">11
-                    </li>
-                    <li class="">22
-                    </li>
-                    <li class="">33
-                    </li>
-                </ul>
+                    <ul class="x-carousel-container">
+                        <li class="x-carousel-content">
+                            <img src="../../../assets/demo/images/260x180.gif"></li>
+                        <li class="x-carousel-content">
+                            <img src="../../../assets/demo/images/260x180.gif"></li>
+                        <li class="x-carousel-content">
+                            <img src="../../../assets/demo/images/260x180.gif"></li>
+                    </ul>
 
-            </div>
+                    <ul class="x-carousel-header">
+                        <li class="">11
+                        </li>
+                        <li class="">22
+                        </li>
+                        <li class="">33
+                        </li>
+                    </ul>
 
+                </div>
+
+
+                <script>
+                    var a = new Carousel('a');
+                </script>
+
+            </aside>
+
+        </section>
+
+        <section class="demo demo-api">
 
             <script>
-                var a = new Carousel({
-                    dom: 'a'
+
+                Demo.writeTestCases({
+                    '停止播放': 'a.stop()',
+                    '开始播放': 'a.start()',
+                    '往右移动一张': 'a.moveBy(1)'
                 });
+
             </script>
 
-        </aside>
+        </section>
 
     </article>
 </body>
