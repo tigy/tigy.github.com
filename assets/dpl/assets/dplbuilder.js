@@ -250,6 +250,13 @@ var DplBuilder = {
             source.toggle();
             return;
         }
+		
+		source = div.next(1);
+
+        if (source && source.hasClass('source')) {
+            source.toggle();
+            return;
+        }
 
         Demo.jsonp(Demo.Configs.apiPath + 'dplfilemanager.njs', {
             action: 'getsource',
@@ -283,6 +290,13 @@ var DplBuilder = {
         var div = Dom.get(node.parentNode.parentNode);
         
         var source = div.next();
+
+        if (source && source.hasClass('refs')) {
+            source.toggle();
+            return;
+        }
+        
+        source = div.next(1);
 
         if (source && source.hasClass('refs')) {
             source.toggle();

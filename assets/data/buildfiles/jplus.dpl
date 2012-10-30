@@ -28,3 +28,4 @@ using Controls.Typography.Dl
 using Controls.Typography.Hr
 using Controls.Typography.Misc
 using Controls.Typography.Ol
+using Controls.Core.IToolTip

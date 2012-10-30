@@ -1,5 +1,5 @@
 ﻿/*
- * This file is created by a tool at 2012/10/16 20:51:18
+ * This file is created by a tool at 2012/10/30 21:30:42
  */
 
 
@@ -99,7 +99,7 @@
 			 * 获取当前框架的版本号。
 			 * @getter
 			 */
-			version: /*@VERSION*/3.2
+			version: /*@VERSION*/4
 
 		},
 		
@@ -1922,7 +1922,7 @@ function using(namespace, isStyle) {
 
 	cache.push(namespace);
 
-	namespace = using.resolve(namespace.toLowerCase(), isStyle);
+	namespace = using.resolve(namespace, isStyle);
 
 	var tagName,
     	type,
@@ -1932,12 +1932,9 @@ function using(namespace, isStyle) {
 	if (isStyle) {
 		tagName = "LINK";
 		type = "href";
-		exts = [".less", ".css"];
+		exts = [".css"];
 		callback = using.loadStyle;
 
-		if (!using.useLess) {
-			exts.shift();
-		}
 	} else {
 		tagName = "SCRIPT";
 		type = "src";
@@ -1951,7 +1948,7 @@ function using(namespace, isStyle) {
 		path = namespace.replace(/^[\.\/\\]+/, "");
 
 	for (var i = 0; doms[i]; i++) {
-		var url = ((document.constructor ? doms[i][type] : doms[i].getAttribute(type, 4)) || '').toLowerCase();
+		var url = ((document.constructor ? doms[i][type] : doms[i].getAttribute(type, 4)) || '');
 		for (var j = 0; j < exts.length; j++) {
 			if (url.indexOf(path + exts[j]) >= 0) {
 				return;
@@ -2731,25 +2728,27 @@ function imports(namespace) {
 	extend(using, {
 
 		/**
-    	 * 是否使用 lesscss
-    	 * @config
-    	 */
-		useLess: true,
-
-		/**
          * 同步载入代码。
          * @param {String} uri 地址。
          * @example <pre>
          * JPlus.loadScript('./v.js');
          * </pre>
          */
-		loadScript: function (url) {
-			return using.loadText(url, window.execScript || function (statements) {
+	    loadScript: function (url) {
 
-				// 如果正常浏览器，使用 window.eval 。
-				window["eval"].call(window, statements);
+	        var src = using.loadText(url);
 
-			});
+	        if(src){
+	            try {
+	                if(window.execScript) {
+	                    window.execScript(src);
+	                } else {
+	                    window["eval"].call(window, src);
+	                }
+	            } catch (e) {
+	                trace.error("执行 " + url + " 出现错误: " + e.toString());
+	            } 
+	        }
 		},
 
 		/**
@@ -2764,31 +2763,9 @@ function imports(namespace) {
 			// 在顶部插入一个css，但这样肯能导致css没加载就执行 js 。所以，要保证样式加载后才能继续执行计算。
 			return document.getElementsByTagName("HEAD")[0].appendChild(extend(document.createElement('link'), {
 				href: url,
-				rel: using.useLess ? 'stylesheet/less' : 'stylesheet',
+				rel: 'stylesheet',
 				type: 'text/css'
 			}));
-		},
-
-		/**
-         * 判断一个 HTTP 状态码是否表示正常响应。
-         * @param {Number} status 要判断的状态码。
-         * @return {Boolean} 如果正常则返回true, 否则返回 false 。
-		 * 一般地， 200、304、1223 被认为是正常的状态吗。
-         */
-		checkStatus: function (status) {
-
-			// 获取状态。
-			if (!status) {
-
-				// 获取协议。
-				var protocol = window.location.protocol;
-
-				// 对谷歌浏览器, 在有些协议， status 不存在。
-				return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");
-			}
-
-			// 检查， 各浏览器支持不同。
-			return (status >= 200 && status < 300) || status == 304 || status == 1223;
 		},
 
 		/**
@@ -2800,23 +2777,12 @@ function imports(namespace) {
          * trace(  JPlus.loadText('./v.html')  );
          * </pre>
          */
-		loadText: function (url, callback) {
-
-			assert.notNull(url, "System.loadText(url, callback): {url} ~");
-
-			// assert(window.location.protocol != "file:",
-			// "System.loadText(uri, callback): 当前正使用 file 协议，请使用 http
-			// 协议。 \r\n请求地址: {0}", uri);
+		loadText: function (url) {
 
 			// 新建请求。
 			// 下文对 XMLHttpRequest 对象进行兼容处理。
-			var xmlHttp;
-
-			if (window.XMLHttpRequest) {
-				xmlHttp = new XMLHttpRequest();
-			} else {
-				xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
-			}
+		    var xmlHttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"),
+		        status;
 
 			try {
 
@@ -2826,21 +2792,22 @@ function imports(namespace) {
 				// 发送请求。
 				xmlHttp.send(null);
 
-				// 检查当前的 XMLHttp 是否正常回复。
-				if (!using.checkStatus(xmlHttp.status)) {
-					// 载入失败的处理。
-					throw "请求失败:  \r\n   地址: " + url + " \r\n   状态: " + xmlHttp.status + "   " + xmlHttp.statusText + "  " + (window.location.protocol == "file:" ? '\r\n原因: 当前正使用 file 协议打开文件，请使用 http 协议。' : '');
+                // 获取返回的状态码。
+				status = xmlHttp.status;
+
+                // 判断状态码是否合格。
+				if ((status >= 200 && status < 300) || status == 304 || status == 1223) {
+				    // 返回相应内容。
+				    return xmlHttp.responseText;
+				} else {
+				    throw "服务器返回状态码 " + status;
 				}
-
-				url = xmlHttp.responseText;
-
-				// 运行处理函数。
-				return callback ? callback(url) : url;
 
 			} catch (e) {
 
-				// 调试输出。
-				trace.error(e);
+			    // 调试输出。
+			    trace.error("请求失败: " + url + " \r\n\t原因: " + (window.location.protocol == "file:" ? " 本网页是使用 file 协议打开的，请改用 http 协议。" : e.toString()));
+
 			} finally {
 
 				// 释放资源。
@@ -2878,7 +2845,7 @@ function imports(namespace) {
 				scripts = !document.constructor ? scripts.getAttribute('src', 4) : scripts.src;
 
 				// 设置路径。
-				return (scripts.match(/[\S\s]*\//) || [""])[0];
+				return (scripts.match(/([\S\s]*\/)System\/Core\/assets\/scripts\//) || [0, ""])[1];
 
 			} catch (e) {
 
@@ -2886,7 +2853,7 @@ function imports(namespace) {
 				return "";
 			}
 
-		})().replace("system/core/assets/scripts/", ""),
+		})(),
 
 		/**
          * 将指定的组件全名转为路径。
@@ -3537,8 +3504,9 @@ function imports(namespace) {
 		 * 获取和设置返回类型是 boolean 的特殊属性的函数。
 		 */
 		boolHook = {
-			get: function(elem, name, type) {
-				return type ? elem[name] ? name.toLowerCase() : null : !!elem[name];
+		    get: function (elem, name, type) {
+		        var value = name in elem ? elem[name] : defaultHook.get(elem, name);
+			    return type ? value ? name.toLowerCase() : null : !!value;
 			},
 			set: function(elem, name, value) {
 				elem[name] = value;
@@ -4177,13 +4145,15 @@ function imports(namespace) {
 		has: div.compareDocumentPosition ? function(elem, child) {
 			assert.isNode(elem, "Dom.has(elem, child): {elem} ~");
 			assert.isNode(child, "Dom.has(elem, child): {child} ~");
-			return !!(elem.compareDocumentPosition(child) & 16);
+			return !!(child && (elem.compareDocumentPosition(child) & 16));
 		}: function(elem, child) {
 			assert.isNode(elem, "Dom.has(elem, child): {elem} ~");
 			assert.isNode(child, "Dom.has(elem, child): {child} ~");
-			while(child = child.parentNode)
-				if(elem === child)
-					return true;
+			if (child) {
+			    while (child = child.parentNode)
+			        if (elem === child)
+			            return true;
+			}
 
 			return false;
 		},
@@ -6471,9 +6441,9 @@ function imports(namespace) {
 		
 		mouseEvent = {
 			initEvent: function (e) {
-				if(!e.stop) {
+			    if (!e.getTarget) {
+			        defaultEvent.initEvent(e);
 					var node = getDocument(e.target).node;
-					defaultEvent.initEvent(e);
 					e.relatedTarget = e.fromElement === e.srcElement ? e.toElement: e.fromElement;
 					e.pageX = e.clientX + node.scrollLeft;
 					e.pageY = e.clientY + node.scrollTop;
@@ -7465,121 +7435,121 @@ function imports(namespace) {
  ************************************/
 var Deferrable = Class({
 
-	chain: function (deferrable, args) {
-		var lastTask = [deferrable, args];
+    chain: function (deferrable, args) {
+        var lastTask = [deferrable, args];
 
-		if (this._firstTask) {
-			this._lastTask[2] = lastTask;
-		} else {
-			this._firstTask = lastTask;
-		}
-		this._lastTask = lastTask;
-	},
+        if (this._firstTask) {
+            this._lastTask[2] = lastTask;
+        } else {
+            this._firstTask = lastTask;
+        }
+        this._lastTask = lastTask;
+    },
 
-	progress: function () {
+    progress: function () {
 
-		var firstTask = this._firstTask;
-		this.isRunning = false;
+        var firstTask = this._firstTask;
+        this.isRunning = false;
 
-		if (firstTask) {
-			this._firstTask = firstTask[2];
-			
-			firstTask[0].run(firstTask[1]);
-		}
+        if (firstTask) {
+            this._firstTask = firstTask[2];
 
-		return this;
-		
-	},
+            firstTask[0].run(firstTask[1]);
+        }
 
-	/**
-	 * 多个请求同时发生后的处理方法。
-	 * wait - 等待上个操作完成。
-	 * ignore - 忽略当前操作。
-	 * stop - 正常中断上个操作，上个操作的回调被立即执行，然后执行当前操作。
-	 * abort - 非法停止上个操作，上个操作的回调被忽略，然后执行当前操作。
-	 * replace - 替换上个操作为新的操作，上个操作的回调将被复制。
+        return this;
+
+    },
+
+    /**
+	 * �������ͬʱ������Ĵ��������
+	 * wait - �ȴ��ϸ�������ɡ�
+	 * ignore - ���Ե�ǰ������
+	 * stop - �����ж��ϸ��������ϸ������Ļص�������ִ�У�Ȼ��ִ�е�ǰ������
+	 * abort - �Ƿ�ֹͣ�ϸ��������ϸ������Ļص������ԣ�Ȼ��ִ�е�ǰ������
+	 * replace - �滻�ϸ�����Ϊ�µĲ������ϸ������Ļص��������ơ�
 	 */
-	defer: function (args, link) {
+    defer: function (args, link) {
 
-		var isRunning = this.isRunning;
-		this.isRunning = true;
+        var isRunning = this.isRunning;
+        this.isRunning = true;
 
-		if (!isRunning)
-			return false;
+        if (!isRunning)
+            return false;
 
-		switch (link) {
-			case undefined:
-				break;
-			case "abort":
-			case "stop":
-			case "skip":
-				this[link]();
-				this.isRunning = true;
-				return false;
-			case "replace":
-				this.init(this.options = Object.extend(this.options, args));
-				
-			// fall through
-			case "ignore":
-				return true;
-			default:
-				assert(link === "wait", "Deferred#defer(args, link): 成员 {link} 必须是 wait、abort、stop、ignore、replace 之一。", link);
-		}
+        switch (link) {
+            case undefined:
+                break;
+            case "abort":
+            case "stop":
+            case "skip":
+                this[link]();
+                this.isRunning = true;
+                return false;
+            case "replace":
+                this.init(this.options = Object.extend(this.options, args));
 
-		this.chain(this, args);
-		return true;
-	},
+                // fall through
+            case "ignore":
+                return true;
+            default:
+                assert(link === "wait", "Deferred#defer(args, link): ��Ա {link} ������ wait��abort��stop��ignore��replace ֮һ��", link);
+        }
 
-	/**
-	 * 让当前队列等待指定的 deferred 全部执行完毕后执行。
+        this.chain(this, args);
+        return true;
+    },
+
+    /**
+	 * �õ�ǰ���еȴ�ָ���� deferred ȫ��ִ����Ϻ�ִ�С�
 	 */
-	wait: function (deferred) {
-		if (this.isRunning) {
-			this.stop();
-		}
+    wait: function (deferred) {
+        if (this.isRunning) {
+            this.stop();
+        }
 
-		this.defer = deferred.defer.bind(deferred);
-		this.progress = deferred.progress.bind(deferred);
-		return this;
-	},
+        this.defer = deferred.defer.bind(deferred);
+        this.progress = deferred.progress.bind(deferred);
+        return this;
+    },
 
-	then: function (callback, args) {
-		if (this.isRunning) {
-			this.chain({
-				owner: this,
-				run: function (args) {
-					if(callback.call(this.owner, args) !== false)
-						this.owner.progress();
-				}
-			}, args);
-		} else {
-			callback.call(this, args);
-		}
-		return this;
-	},
-	
-	delay: function(duration){
-		return this.run({duration: duration});
-	},
-	
-	pause: Function.empty,
-	
-	skip: function(){
-		this.pause();
-		this.progress();
-		return this;
-	},
-	
-	abort: function(){
-		this.pause();
-		this._firstTask = this._lastTask = null;
-		this.isRunning = false;
-		return this;
-	},
+    then: function (callback, args) {
+        if (this.isRunning) {
+            this.chain({
+                owner: this,
+                run: function (args) {
+                    if (callback.call(this.owner, args) !== false)
+                        this.owner.progress();
+                }
+            }, args);
+        } else {
+            callback.call(this, args);
+        }
+        return this;
+    },
 
-	stop: function () {
-		return this.abort();
-	}
+    delay: function (duration) {
+        return this.run({ duration: duration });
+    },
+
+    pause: Function.empty,
+
+    skip: function () {
+        this.pause();
+        this.progress();
+        return this;
+    },
+
+    abort: function () {
+        this.pause();
+        this._firstTask = this._lastTask = null;
+        this.isRunning = false;
+        return this;
+    },
+
+    stop: function () {
+        return this.abort();
+    }
 
 });
 /************************************
@@ -7605,9 +7575,6 @@ var Ajax = (function() {
 
 	ajaxLocParts = rUrl.exec(ajaxLoc.toLowerCase()) || [];
 	
-	/**
-	 * 用于发送和接收 AJAX 请求的工具。
-	 */
 	Ajax = Deferrable.extend({
 		
 		/**
@@ -8771,275 +8738,9 @@ var Tpl = {
 	
 };
 /************************************
- * System.Data.Collection
- ************************************/
-var Collection = Class({
-	
-	/**
-	 * 获取当前的项数目。
-	 */
-	length: 0,
-	
-	/**
-	 * 对项初始化。
-	 * @protected
-	 * @virtual
-	 */
-	initItem: function (item) {
-		return item;
-	},
-	
-	onAdd: function(item){
-		this.onInsert(item, this.length);
-	},
-
-	onInsert: Function.empty,
-	
-	onRemove: Function.empty,
-	
-	onBeforeSet: Function.empty,
-	
-	onAfterSet: Function.empty,
-	
-	add: function(item){
-		assert.notNull(item, "Collection.prototype.add(item): 参数 {item} ~。");
-		Array.prototype.push.call(this, item = this.initItem(item));
-		this.onAdd(item);
-		return item;
-	},
-	
-	addRange: function(args){
-		return Array.prototype.forEach.call(args && typeof args.length === 'number' ? args : arguments, this.add, this);
-	},
-	
-	insert: function(index, item){
-		assert.notNull(item, "Collection.prototype.insert(item): 参数 {item} ~。");
-		index = Array.prototype.insert.call(this, index, item = this.initItem(item));
-		this.onInsert(item, index + 1);
-		return item;
-	},
-	
-	clear: function(){
-		var me = this;
-		me.onBeforeSet();
-		while (me.length) {
-			var item = me[--me.length];
-			delete me[me.length];
-			me.onRemove(item, me.length);
-		}
-		me.onAfterSet();
-		return me;
-	},
-	
-	remove: function(item){
-		assert.notNull(item, "Collection.prototype.remove(item): 参数 {item} ~。");
-		var index = this.indexOf(item);
-		this.removeAt(index);
-		return index;
-	},
-	
-	removeAt: function(index){
-		var item = this[index];
-		if(item){
-			Array.prototype.splice.call(this, index, 1);
-			delete this[this.length];
-			this.onRemove(item, index);
-		}
-			
-		return item;
-	},
-		
-	set: function(index, item){
-		var me = this;
-		me.onBeforeSet();
-		
-		if(typeof index === 'number'){
-			item = this.initItem(item);
-			assert.notNull(item, "Collection.prototype.set(item): 参数 {item} ~。");
-			assert(index >= 0 && index < me.length, 'Collection.prototype.set(index, item): 设置的 {index} 超出范围。请确保  0 <= index < ' + this.length, index);
-			item = me.onInsert(item, index);
-			me.onRemove(me[index], index);
-			me[index] = item;
-		} else{
-			if(me.length)
-				me.clear();
-			index.forEach(me.add, me);
-		}
-		
-		me.onAfterSet();
-		return me;
-	}
-	
-});
-
-Object.map("indexOf forEach each invoke lastIndexOf item filter", function(value){
-	return Array.prototype[value];
-}, Collection.prototype);
-
-/************************************
- * System.Dom.HashChange
- ************************************/
-String.htmlEncode = (function() {
-    var entities = {
-        '&': '&amp;',
-        '>': '&gt;',
-        '<': '&lt;',
-        '"': '&quot;'
-    };
-    
-    function match(match, capture){
-    	return entities[capture];
-    }
-    
-    return function(value) {
-        return value ? value.replace(/[&><"]/g, match) : '';
-    };
-})();
-
-location.getHash = function() {
-	var href = location.href,
-	i = href.indexOf("#");
-
-	return i >= 0 ? href.substr(i + 1) : '';
-};
-
-
-(function() {
-
-	var hashchange = 'hashchange',
-		document = window.document,
-		win = Dom.window,
-		getHash = location.getHash;
-
-	/**
-	 * 当 hashchange 事件发生时，执行函数。
-	 */
-	Dom[hashchange] = function(fn) {
-		fn ? win.on(hashchange, fn) && fn.call(win) : win.trigger(hashchange);
-	};
-	
-	// 并不是所有浏览器都支持 hashchange 事件，
-	// 当浏览器不支持的时候，使用自定义的监视器，每隔50ms监听当前hash是否被修改。
-	if ('on' + hashchange in window && !(document.documentMode < 8)) return;
-
-	var currentHash, 
-	
-		timer, 
-		
-		onChange = function() {
-			win.trigger(hashchange);
-		},
-		
-		poll = function() {
-			var newToken = getHash();
-	
-			if (currentHash !== newToken) {
-				currentHash = newToken;
-				onChange();
-			}
-			timer = setTimeout(poll, 50);
-	
-		},
-		
-		start = function() {
-			currentHash = getHash();
-			timer = setTimeout(poll, 50);
-		},
-		
-		stop = function() {
-			clearTimeout(timer);
-		};
-		
-	// 如果是 IE6/7，使用 iframe 模拟成历史记录。
-	if (navigator.isQuirks) {
-
-		var iframe;
-
-		// 初始化的时候，同时创建 iframe
-		start = function() {
-			if (!iframe) {
-				Dom.ready(function(){
-					iframe = Dom.parse('<iframe style="display: none" height="0" width="0" tabindex="-1" title="empty"/>');
-					iframe.once('load', function() {
-						
-						// 绑定当 iframe 内容被重写后处理。
-						this.on("load", function() {
-							// iframe 的 load 载入有 2 个原因：
-							//	1. hashchange 重写 iframe
-							//	2. 用户点击后退按钮
-							
-							// 获取当前保存的 hash
-							var newHash = iframe.contentWindow.document.body.innerText,
-								oldHash = getHash();
-							
-							
-							// 如果是用户点击后退按钮导致的iframe load， 则 oldHash !== newHash
-							if (oldHash != newHash) {
-								
-								// 将当前的 hash 更新为旧的 newHash
-								location.hash = currentHash = newHash;
-								
-								// 手动触发 hashchange 事件。
-								win.trigger(hashchange);
-							}
-							
-						});
-						
-						// 首次执行，先保存状态。
-						currentHash = getHash();
-						poll();
-					});
-					
-					iframe = iframe.node;
-					document.body.appendChild(iframe);
-					
-				});
-			} else {
-				
-				// 开始监听。
-				currentHash = getHash();
-				poll();
-			}
-
-		};
-		// iframe: onChange 时，保存状态到 iframe 。
-		onChange = function() {
-
-			var hash = getHash();
-			
-			// 将历史记录存到 iframe 。
-			var html = "<html><body>" + String.htmlEncode(hash) + "</body></html>";
-
-			try {
-				var doc = iframe.contentWindow.document;
-				doc.open();
-				doc.write(html);
-				doc.close();
-			} catch(e) {}
-
-			win.trigger(hashchange);
-		};
-		
-	}
-
-	Dom.addEvents('hashchange', {
-		add: start,
-
-		remove: stop
-	});
-
-})();
-/************************************
  * Controls.Core.Base
  ************************************/
 var Control = Dom.extend({
-
-	/**
-	 * 存储当前控件的默认配置。
-	 * @getter {Object} options
-	 * @protected
-	 * @virtual
-	 */
 
 	/**
 	 * 存储当前控件的默认模板字符串。
@@ -9056,8 +8757,7 @@ var Control = Dom.extend({
 	 */
 	create: function () {
 
-		assert(this.tpl, "Control#create: 无法获取或创建当前控件所关联的 DOM 节点。请为控件定义 tpl 属性或重写 create 函数。");
-		//assert(this.tpl, "Control.prototype.create(): 当前类不存在 tpl 属性。Control.prototype.create 会调用 tpl 属性，根据这个属性中的 HTML 代码动态地生成节点并返回。子类必须定义 tpl 属性或重写 Control.prototype.create 方法返回节点。");
+		assert.isString(this.tpl, "Control#create: 无法获取或创建当前控件所关联的 DOM 节点。请为控件定义 tpl 属性或重写 create 函数。");
 
 		// 转为对 tpl解析。
 		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype));
@@ -9091,9 +8791,24 @@ var Control = Dom.extend({
 
 			// 如果 options 是纯配置。
 			if (options.constructor === Object) {
+				
 				Object.extend(opt, options);
-				node = Dom.getNode(opt.dom);
-				delete opt.dom;
+				
+				if(opt.node) {
+					node = opt.node;
+					delete opt.node;
+				} else if(opt.selector) {
+					node = Dom.find(opt.selector);
+					delete opt.selector;
+				} else if(opt.dom) {
+					node = opt.dom;
+					delete opt.dom;
+				}
+					
+				if(node){
+					node = Dom.getNode(node);
+				}
+				
 			} else {
 				node = Dom.getNode(options);
 			}
@@ -9103,7 +8818,7 @@ var Control = Dom.extend({
 		// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。
 		me.node = node || me.create(opt);
 
-		assert.isNode(me.node, "Dom#constructor(options): Dom 对象的 {node} 为空。");
+		assert.isNode(me.node, "Dom#constructor(options): Dom 对象的 {node} 不是节点。", me.node);
 
 		// 调用 init 初始化控件。
 		me.init(opt);
@@ -9125,12 +8840,24 @@ var Control = Dom.extend({
 
 });
 /************************************
- * Controls.Core.Common
- ************************************/
-/************************************
  * Controls.Core.IInput
  ************************************/
 var IInput = {
+
+    /**
+	 * 获取或设置当前输入域的状态。
+	 * @protected
+	 */
+    state: function (name, value) {
+        return this.toggleClass('x-' + this.xtype + '-' + name, value);
+    },
+
+    /**
+	 * 当设置文本时执行此函数。
+	 */
+    onChange: function () {
+        this.trigger('change');
+    },
 	
 	/**
 	 * 获取或设置当前表单的实际域。
@@ -9139,24 +8866,18 @@ var IInput = {
 	 */
 	hiddenField: null,
 	
-	/**
-	 * 当设置文本时执行此函数。
-	 */
-	onChange: function(){
-		this.trigger('change');
-	},
-	
-	/**
-	 * 创建用于在表单内保存当前输入值的隐藏域。
-	 * @return {Dom} 隐藏输入域。
-	 */
-	createHiddenField: function(){
-		return Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
-	},
+	///**
+	// * 创建用于在表单内保存当前输入值的隐藏域。
+	// * @return {Dom} 隐藏输入域。
+	// */
+	//createHiddenField: function(){
+	//    return Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
+	//},
 	
 	/**
 	 * 获取当前输入域实际用于提交数据的表单域。
 	 * @return {Dom} 一个用于提交表单的数据域。
+     * @remark 此函数会在当前控件内搜索可用于提交的表单域，如果找不到，则创建返回一个 hidden 表单域。
 	 */
 	input: function(){
 		
@@ -9165,10 +8886,10 @@ var IInput = {
 			
 			// 如果 当前元素是表单元素，直接返回。
 			if(/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(this.node.tagName)){
-				return this;
+				return new Dom(this.node);
 			}
 			
-			this.hiddenField = this.createHiddenField();
+			this.hiddenField = this.find("input,select,textarea") || Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
 		}
 		
 		return this.hiddenField;
@@ -9183,14 +8904,6 @@ var IInput = {
 	},
 	
 	/**
-	 * 清空当前控件的数据。
-	 * @return this
-	 */
-	clear: function(){
-		return this.setText('');
-	},
-	
-	/**
 	 * 选中当前控件。
 	 * @return this
 	 */
@@ -9201,20 +8914,20 @@ var IInput = {
 	
 	setAttr: function (name, value) {
 		var dom = this;
-		if(/^(disabled|readonly|name)$/i.test(name)){
-			if(/^disabled$/i.test(name)) {
-				return this.disabled(value);
-			} else if(/^readonly$/i.test(name)) {
-				return this.readOnly(value);
-			} 
-			
+		if (/^(disabled|readonly|checked|selected|actived)$/i.test(name)) {
+		    value = value !== false;
+		    this.state(name.toLowerCase(), value);
+		    dom = this.input();
+		} else if(/^(value|name|form)$/i.test(name)) {
 			dom = this.input();
 		}
-		return Dom.prototype.setAttr.call(dom, name, value);
+		
+		Dom.prototype.setAttr.call(dom, name, value);
+		return this;
 	},
 	
 	getAttr: function (name, type) {
-		return Dom.getAttr((/^(disabled|readonly|name|form)$/i.test(name) ? this.input() : this).node, name, type);
+		return Dom.getAttr((/^(disabled|readonly|checked|selected|actived|value|name|form)$/i.test(name) ? this.input() : this).node, name, type);
 	},
 	
 	getText: function(){
@@ -9231,14 +8944,6 @@ var IInput = {
 	}
 	
 };
-
-Object.map("disabled readOnly", function(funcName){
-	IInput[funcName] = function(value){
-		value = value !== false;
-		this.toggleClass('x-' + this.xtype + '-' + funcName.toLowerCase(), value);
-		return Dom.prototype.setAttr.call(this.input(), funcName, value);
-	};
-});
 /************************************
  * Controls.Form.TextBox
  ************************************/
@@ -9250,98 +8955,40 @@ var TextBox = Control.extend(IInput).implement({
 	
 });
 /************************************
- * Controls.Core.ScrollableControl
+ * Controls.Core.ContentControl
  ************************************/
-var ScrollableControl = Control.extend({
+var ContentControl = Control.extend({
 	
 	/**
-	 * 获取某一个容器节点封装的子控件。
-	 * @param {Control} container 要获取的容器控件。
-	 * @return {Control} 指定容器控件包装的真实子控件。如果不存在相应的子控件，则返回自身。
+	 * 获取当前控件中显示文字的主 DOM 对象。
+	 */
+	content: function(){
+		return this.find('x-' + this.xtype + '-content') || new Dom(this.node);
+	},
+
+    /**
+	 * 获取或设置当前输入域的状态。
 	 * @protected
 	 */
-	itemOf: function(child) {
-		var data = child.dataField();
-		return data.namedItem || (data.namedItem = child);
-	},
+	state: function (name, value) {
+	    return this.toggleClass('x-' + this.xtype + '-' + name, value);
+	}
+	
+}).defineMethods("content()", "setHtml getHtml setText getText");
 
-	// /**
-	 // * 获取用于包装指定子控件的容器控件。
-	 // * @param {Control} item 要获取的子控件。
-	 // * @return {Control} 用于包装指定子控件的容器控件。
-	 // * @protected virtual
-	 // * @see #itemOf
-	 // */
-	// childOf: function(childControl) {
-		// return childControl;
-	// },
-// 
+
+/************************************
+ * Controls.Core.ListControl
+ ************************************/
+var ListControl = Control.extend({
 	
 	/**
-	 * 当被子类重写时，用于重写添加子控件前的操作。
-	 * @param {Control} childControl 新添加的子控件。
-	 * @return {Control} 实际需要添加的子控件。
-	 * @protected virtual
+	 * 模板。
 	 */
-	initChild: function(childControl){
-		return childControl;
-	},
+	tpl: '<ul class="x-control"/>',
 	
-	/**
- 	 * 当被子类重写时，用于重写删除子控件前的操作。
-	 * @param {Control} childControl 要删除的子控件。
-	 * @return {Control} 实际删除的子控件。
-	 * @protected virtual
-	 */
-	uninitChild: function(childControl){
-		return childControl;
-	},
-
-	/**
-	 * 当被子类重写时，用于重写添加子控件的具体逻辑实现。
-	 * @param {Control} childControl 新添加的子控件。
-	 * @param {Control} refControl=null 用于表面添加的位置的子控件。指定控件会被插入到此控件之前。如果值为 null ，则添加到末尾。
-	 * @protected virtual
-	 */
-	doAdd: Dom.prototype.insertBefore,
-	
-	/**
- 	 * 当被子类重写时，用于重写删除子控件的具体逻辑实现。
-	 * @param {Control} childControl 要删除的子控件。
-	 * @protected virtual
-	 */
-	doRemove: Dom.prototype.removeChild,
-
-	/**
-	 * 当新控件被添加时执行。
-	 * @param {Control} childControl 新添加的子控件。
-	 * @protected virtual
-	 */
-	onAdd: function(item){
-
-		/**
-		 * 当子控件被添加时触发。
-		 * @event add
-		 * @param {Control} childControl 被添加的子控件。
-		 */
-		this.trigger("add", item);
-	},
-	
-	/**
- 	 * 当新控件被移除时执行。
-	 * @param {Control} childControl 要删除的子控件。
-	 * @protected virtual
-	 */
-	onRemove: function(item){
+	// 内部实现的项操作
 		
-		/**
-		 * 当子控件被添加时触发。
-		 * @event remove
-		 * @param {Control} childControl 被删除的子控件。
-		 */
-		this.trigger("remove", item);
-	},
-	
 	/**
 	 * 当新控件被添加时执行。
 	 * @param {Control} childControl 新添加的元素。
@@ -9350,31 +8997,27 @@ var ScrollableControl = Control.extend({
 	 */
 	insertBefore: function(childControl, refControl) {
 		
-		// 初始化一个项。
-		if(childControl = this.initChild(childControl)){
+		// 如果 childControl 不是 <li>, 则包装一个 <li> 标签。
+		if (childControl.node.tagName !== 'LI') {
+
+			// 创建 <li>
+			var li = Dom.create('LI');
 			
-			var item = this.itemOf(childControl);
+			// 复制节点。
+			li.append(childControl);
 			
-			// 如果 childControl 已经属于某 Control 。
-			if(item.parentControl){
-				item.parentControl.removeChild(item);
-			}
-			
-			// 底层的插入操作。
-			this.doAdd(childControl, refControl);
-			
-			// 此  item 属于此容器管理。
-			item.parentControl = this;
-			
-			// 通知当前类节点已添加。
-			this.onAdd(item);
-			
-			// 返回新创建的子控件。
-			return item;
-			
+			// 赋值。
+			childControl = li;
 		}
+
+		// 自动加上 clazz 。
+		childControl.addClass('x-' + this.xtype + '-item');
 		
-		return null;
+		// 插入 DOM 树。
+		childControl.attach(this.node, refControl && refControl.node || null);
+			
+		// 返回新创建的子控件。
+		return childControl;
 	},
 
 	/**
@@ -9384,29 +9027,39 @@ var ScrollableControl = Control.extend({
 	 */
 	removeChild: function(childControl) {
 		
-		// 初始化一个项。
-		if(childControl = this.uninitChild(childControl)){
+		// 如果 childControl 不是 <li>, 则退出 <li> 的包装。
+		if (childControl.node.parentNode !== this.node) {
 			
-			var item = this.itemOf(childControl);
+			// 获取包装的 <li>
+			var li = childControl.parent();
 			
-			// 删除容器的关联。
-			delete childControl.dataField().namedItem;
-				
-			// 实际的删除操作。
-			this.doRemove(childControl);
+			// 不存在 li 。
+			if(!li) {
+				return null;
+			}
 			
-			// 通知当前类节点已删除。
-			this.onRemove(item);
-		
-			item.parentControl = null;
-				
-			// 返回被删除的子控件。
-			return item;
+			// 删除节点。
+			childControl.detach(li.node);
 			
+			// 赋值。
+			childControl = li;
 		}
 		
-		return null;
+		// 从 DOM 树删除。
+		childControl.detach(this.node);
+		
+		// 返回被删除的子控件。
+		return childControl;
 	},
+	
+	/**
+	 * 当被子类重写时，实现初始化 DOM 中已经存在的项。 
+	 */
+	init: function() {
+		this.query('>li').addClass('x-' + this.xtype + '-item');
+	},
+	
+	// 项操作
 
 	/**
 	 * 添加一个子节点到当前控件末尾。
@@ -9421,49 +9074,6 @@ var ScrollableControl = Control.extend({
 
 		Object.each(args, this.append, this);
 		return this;
-	},
-	
-	clear: Dom.prototype.empty,
-	
-	/**
-	 * 获取指定索引的项。
-	 */
-	item: function(index) {
-		var child = this.child(index);
-		return child ? this.itemOf(child) : child;
-	},
-	
-	/**
-	 * 对集合的每一项执行函数。
-	 */
-	each: function(fn, bind) {
-		for (var c = this.first(), i = 0 ; c; c = c.next()) {
-			if (fn.call(bind, this.itemOf(c), i++, this) === false) {
-				return false;
-			}
-		}
-
-		return true;
-	},
-
-	/**
-	 * 获取当前集合中子元素的项。
-	 */
-	count: function(all) {
-		for (var c = this.first(all), i = 0 ; c; c = c.next(all), i++);
-		return i;
-	},
-
-	/**
-	 * 获取某一项在列表中的位置。
-	 */
-	indexOf: function(item) {
-		for (var c = this.first(), i = 0 ; c; c = c.next(), i++) {
-			if (c.equals(item)) {
-				return i;
-			}
-		}
-		return -1;
 	},
 
 	/**
@@ -9484,208 +9094,64 @@ var ScrollableControl = Control.extend({
 	removeAt: function(index) {
 		var child = this.child(index);
 		return child ? this.removeChild(child) : null;
-	}
-
-});
-/************************************
- * Controls.Core.ContentControl
- ************************************/
-var ContentControl = Control.extend({
-	
-	/**
-	 * 获取当前显示的图标。
-	 * @getter {Control} icon
-	 * @proected
-	 */
-	
-	icon: function(){
-		return this.find('.x-icon');
 	},
 	
 	/**
-	 * 获取当前控件中显示文字的主 DOM 对象。
+	 * 批量设置当前的项列表。
 	 */
-	content: function(){
-		return this.last(true) || this;
-	},
-	
-	/**
-	 * 当被子类改写时，实现创建添加和返回一个图标节点。
-	 * @protected
-	 * @virtual
-	 */
-	createIcon: function(){
-		return this.content().before(Dom.create('i', 'x-icon'));
-	},
-	
-	getIcon: function(){
-		var icon = this.icon();
-		return icon ? (/x-icon-(.*?)\b/.test(icon.node.className) || [0, ""])[1] : null;
-	},
-	
-	/**
-	 * 设置图标。
-	 * @param {String} icon 图标。
-	 * @return {Panel} this
-	 */
-	setIcon: function(icon) {
-		
-		if(icon != null){
-			(this.icon() || this.createIcon()).node.className = "x-icon x-icon-" + icon;
-		} else if(icon = this.icon()) {
-			icon.remove();
-		}
-		
-		return this;
-	},
-	
-	setText: function(value){
-		Dom.prototype.setText.call(this.content(), value);
-		return this;
-	},
-	
-	getText: function(){
-		return Dom.getText(this.content().node);
-	}
-	
-});
-/************************************
- * Controls.Core.ListControl
- ************************************/
-var ListControl = ScrollableControl.extend({
-	
-	/**
-	 * 模板。
-	 */
-	tpl: '<ul class="x-control"/>',
-
-	/**
-	 * 获取用于包装指定子控件的容器控件。
-	 * @param {Control} item 要获取的子控件。
-	 * @return {Control} 用于包装指定子控件的容器控件。
-	 * @protected override
-	 * @see #itemOf
-	 */
-	childOf: function(childControl) {
-		return childControl && childControl.node.tagName !== 'LI' ? childControl.parent() : childControl;
-	},
-	
-	/**
-	 * 当被子类重写时，用于初始化新添加的节点。
-	 * @param {Control} childControl 正在添加的节点。
-	 * @return {Control} 需要真正添加的子控件。
-	 * @protected override
-	 */
-	initChild: function(childControl){
-		
-		// <li> 的 class 属性。
-		var clazz = 'x-' + this.xtype + '-item', li;
-
-		// 如果 childControl 不是 <li>, 则包装一个 <li> 标签。
-		if (childControl.node.tagName !== 'LI') {
-
-			// 创建 <li>
-			li = Dom.create('LI', clazz);
-			
-			// 复制节点。
-			li.append(childControl);
-			
-			// 赋值。
-			childControl = li;
-		} else {
-			
-			// 自动加上 clazz 。
-			childControl.addClass(clazz);
-		}
-		
-		return childControl;
-	},
-	
-	/**
- 	 * 当新控件被移除时执行。
-	 * @param {Control} childControl 新添加的元素。
-	 * @return {Control} 需要真正删除的子控件。
-	 * @protected override
-	 */
-	uninitChild: function(childControl) {
-		
-		// 如果 childControl 不是 <li>, 则退出 <li> 的包装。
-		if (childControl.node.parentNode !== this.node) {
-			
-			// 获取包装的 <li>
-			var li = childControl.parent();
-			
-			// 不存在 li 。
-			if(!li) {
-				return null;
-			}
-			
-			// 删除节点。
-			li.removeChild(childControl);
-			
-			// 赋值。
-			childControl = li;
-		}
-		
-		// 返回实际需要删除的组件。
-		return childControl;
-
-	},
-	
-	/**
-	 * 当被子类重写时，实现初始化 DOM 中已经存在的项。 
-	 */
-	initItems: function(){
-		this.query('>li').addClass('x-' + this.xtype + '-item');
-	},
-	
-	init: function() {
-		this.initItems();
-	},
-	
-	// /**
-	 // * 当当前控件在屏幕中显示不下时，由 align 函数触发执行此函数。
-	 // * @param {String} xOry 值为 "x" 或 "y"。
-	 // * @param {Integer} value 设置的最大值。
-	 // * @param {Boolean} isOverflowing 如果值为 true，表示发生了此事件，否则表示恢复此状态。
-	 // */
-	// onOverflow: function(xOry, value, isOverflowing){
-		// var data = this['overflow' + xOry];
-		// if(isOverflowing){
-			// if(!data){
-				// this['overflow' + xOry] = this[xOry === 'x' ? 'getWidth' : 'getHeight']();
-			// }
-			// this[xOry === 'x' ? 'setWidth' : 'setHeight'](value);
-		// } else if(data !== undefined){
-			// this[xOry === 'x' ? 'setWidth' : 'setHeight'](data);
-			// delete this['overflow' + xOry];
-		// }
-	// },
-	
-	indexOf: function(item){
-		return ScrollableControl.prototype.indexOf.call(this, this.childOf(item));
-	},
-
-	getItemByText: function(value){
-		for (var c = this.first(), child ; c; c = c.next()) {
-			if (c.getText() === value) {
-				child = c;
-				break;
-			}
-		}
-		
-		return child ? this.itemOf(child) : null;
-	},
-	
 	set: function(items){
 		if(Object.isArray(items)){
-			this.clear();
+			this.empty();
 			this.add.apply(this, items);
 			return this;
 		}
 		
 		return Dom.prototype.set.apply(this, arguments);
 	},
+	
+	/**
+	 * 获取指定索引的项。
+	 * @param {Integer} container 要获取的容器控件。
+	 * @return {Control} 指定容器控件包装的真实子控件。如果不存在相应的子控件，则返回自身。
+	 */
+	item: Dom.prototype.child,
+
+	/**
+	 * 获取某一项在列表中的位置。
+	 */
+	indexOf: function(item) {
+		return item && item.parent && this.equals(item.parent()) ? item.index() : -1;
+	},
+	
+    ///**
+    //* 当当前控件在屏幕中显示不下时，由 align 函数触发执行此函数。
+    //* @param {String} xOry 值为 "x" 或 "y"。
+    //* @param {Integer} value 设置的最大值。
+    //* @param {Boolean} isOverflowing 如果值为 true，表示发生了此事件，否则表示恢复此状态。
+    //*/
+    //onOverflow: function(xOry, value, isOverflowing){
+	//    var data = this['overflow' + xOry];
+	//    if(isOverflowing){
+	//        if(!data){
+	//    	    this['overflow' + xOry] = this[xOry === 'x' ? 'getWidth' : 'getHeight']();
+	//        }
+	//        this[xOry === 'x' ? 'setWidth' : 'setHeight'](value);
+	//    } else if(data !== undefined){
+	//        this[xOry === 'x' ? 'setWidth' : 'setHeight'](data);
+	//        delete this['overflow' + xOry];
+	//    }
+    //},
+
+	//getItemByText: function(value){
+	//	for (var c = this.first(), child ; c; c = c.next()) {
+	//		if (c.getText() === value) {
+	//			child = c;
+	//			break;
+	//		}
+	//	}
+		
+	//	return child;
+	//},
 
 	/**
 	 * 设置某个事件发生之后，执行某个函数.
@@ -9697,25 +9163,52 @@ var ListControl = ScrollableControl.extend({
 		return this.on(eventName, function(e){
 			for(var c = me.node.firstChild, target = e.target; c; c = c.nextSibling){
 				if(c === target || Dom.has(c, target)){
-					return fn.call(bind, me.itemOf(new Dom(c)), e);
+					return fn.call(bind, new Dom(c), e);
 				}
 			}
 		}, bind);
 	}
-	
+
 });
 
 
+
+/**
+ * 为非 ListControl 对象扩展 ListControl 的6个方法: add addAt remove removeAt set item
+ */
 ListControl.aliasMethods = function(controlClass, targetProperty, removeChildProperty){
-	controlClass.defineMethods(targetProperty, 'add addAt removeAt item indexOf each count');
+    controlClass.defineMethods(targetProperty, 'add addAt removeAt item');
+
+    removeChildProperty = removeChildProperty || targetProperty;
+
+    controlClass.prototype.set = function (items) {
+        if (Object.isArray(items)) {
+
+            // 尝试在代理的列表中删除项。
+            var child = this[removeChildProperty];
+            if (child)
+                child.empty();
+
+            // 通过 this.add 添加项。
+            this.add.apply(this, items);
+
+            return this;
+        }
+
+        return Dom.prototype.set.apply(this, arguments);
+    };
 	
-	removeChildProperty = removeChildProperty || targetProperty;
 	controlClass.prototype.removeChild = function(childControl){
-		childControl.detach(this.node);
 		
+		// 尝试在代理的列表中删除项。
 		var child = this[removeChildProperty];
 		if(child)
-			childControl.detach(child.node);
+			childControl.remove(childControl);
+		
+		// 尝试在当前节点中正常删除。
+		childControl.detach(this.node);
+		
+		return childControl;
 	};
 	
 };
@@ -9724,81 +9217,124 @@ ListControl.aliasMethods = function(controlClass, targetProperty, removeChildPro
  ************************************/
 var TreeControl = ListControl.extend({
 	
+	// 树节点
+	
 	/**
 	 * 将已有的 DOM 节点转为 {@link TreeControl.Item} 对象。
 	 * @param {Dom} childControl 要转换的 DOM 对象。
 	 * @param {Dom} parent=null DOM 对象的父节点。
 	 * @protected virtual
 	 */
-	createTreeItem: function(childControl, parent) {
+	createTreeItem: function(childControl, li) {
 		return new TreeControl.Item(childControl);
 	},
 	
 	/**
-	 * 初始化一个 <li> 对象。
+	 * 初始化并返回每一个 TreeItem 对象。
+	 * @param {Dom} li 包含树节点的 <li> 节点对象。
+	 * @param {Dom} [childControl] 强制指定 <li> 内指定的子节点。
 	 * @private
 	 */
-	initItemContainer: function(li){
+	initTreeItem: function(li, childControl){
 	
 		// 获取第一个子节点。
-		var subControl = li.addClass('x-' + this.xtype + '-item').find('>ul'),
-			item = (subControl ? (subControl.prev() || subControl.prev(true)) : (li.first() || li.first(true))) || Dom.parse('');
+		var subControl = li.addClass('x-' + this.xtype + '-item').find('>ul');
+		
+		// 如果没有指定 childControl，则使用 li.first()作为内容。
+		if(!childControl){
+			childControl = (subControl ? (subControl.prev() || subControl.prev(true)) : (li.first() || li.first(true))) || Dom.parse('');
+		}
 		
 		// 根据节点创建一个 MenuItem 对象。
-		item = this.createTreeItem(item, li);
+		childControl = this.createTreeItem(childControl, li);
+		
+		// 插入创建的菜单项。
+		li.prepend(childControl);
 
 		// 如果存在子菜单，设置子菜单。
 		if (subControl) {
-			item.setSubControl(subControl);
+			childControl.setSubControl(subControl);
 		}
 		
 		// 保存 li -> childControl 的关联。
-		li.dataField().namedItem = item;
+		li.dataField().item = childControl;
 		
-		return item;
-
-	},
-	
-	/**
-	 * 处理一个子控件。
-	 * @protected override
-	 */
-	initChild: function(childControl){
+		// 绑定 parentControl。
+		childControl.parentControl = this;
 		
-		// 如果是添加 <li> 标签，则直接返回。
-		// .add('<li></li>')
-		if (childControl.node.tagName === 'LI') {
-			
-			this.initItemContainer(childControl);
-	
-		// .add(new MenuItem())
-		} else {
-			
-			// 转为 MenuItem 对象。
-			// .add(文本或节点)
-			var item = this.createTreeItem(childControl);
-			
-			// 创建一个新的容器节点。
-			childControl = Dom.create('LI', 'x-' + this.xtype + '-item');
-			
-			// 复制节点。
-			childControl.append(item);
-				
-			// 保存 li -> childControl 的关联。
-			childControl.dataField().namedItem = item;
-		}
-
 		return childControl;
+
 	},
 	
 	/**
 	 * 初始化 DOM 中已经存在的项。 
 	 * @protected override
 	 */
-	initItems: function(){
+	init: function(){
 		for(var c = this.first(); c; c = c.next()){
-			this.initItemContainer(c).parentControl = this;
+			this.initTreeItem(c);
 		}
+	},
+	
+	// 增删节点
+
+	/**
+	 * 当新控件被添加时执行。
+	 * @param {Control} childControl 新添加的元素。
+	 * @param {Control} refControl 元素被添加的位置。
+	 * @protected override
+	 */
+	insertBefore: function(childControl, refControl) {
+		
+		var item;
+		
+		// 如果不是添加 <li> 标签，则创建一个。
+		if (childControl.node.tagName !== 'LI') {
+			
+			// 作为 initTreeItem 的参数。
+			item = childControl;
+			
+			// 生成一个 <li>
+			childControl = Dom.create('LI');
+		}
+		
+		// 插入 DOM 树。
+		childControl.attach(this.node, refControl && refControl.node || null);
+		
+		// 返回 treeItem
+		return this.initTreeItem(childControl, item);
+	},
+
+	/**
+	 * 当新控件被移除时执行。
+	 * @param {Object} childControl 新添加的元素。
+	 * @protected override
+	 */
+	removeChild: function(childControl) {
+		
+		// 取消删除一个项(自动转到 <li>)。
+		if(childControl = ListControl.prototype.removeChild.call(this, childControl)){
+				
+			var data = childControl.dataField();
+			
+			delete data.item.parentControl;
+			
+			delete data.item;
+			
+		}
+		
+		// 返回被删除的子控件。
+		return childControl;
+	},
+	
+	// 项
+	
+	item: function(index){
+		if(index = this.child(index)){
+			index = index.dataField().item;
+		}
+		
+		return index;
 	}
 
 });
@@ -9808,7 +9344,7 @@ var TreeControl = ListControl.extend({
  */
 TreeControl.Item = ContentControl.extend({
 	
-	tpl: '<a class="x-control">&nbsp;</a>',
+	tpl: '<a class="x-control"></a>',
 	
 	/**
 	 * 获取当前菜单管理的子菜单。
@@ -9879,12 +9415,13 @@ TreeControl.Item = ContentControl.extend({
 
 	attach: function(parentNode, refNode) {
 		
-		// 如果有关联的容器，先添加容器。
+	    parentNode.insertBefore(this.node, refNode);
+
+	    // 如果有关联的容器，添加容器。
 		var subControl = this.subControl;
 		if (subControl && !subControl.parent('body')) {
 			parentNode.insertBefore(subControl.node, refNode);
 		}
-		parentNode.insertBefore(this.node, refNode);
 	},
 
 	detach: function(parentNode) {
@@ -9898,36 +9435,11 @@ TreeControl.Item = ContentControl.extend({
 		if (subControl) {
 			parentNode.removeChild(subControl.node);
 		}
-	},
-	
-	setAttr: function(name, value) {
-		if(/^(selected|checked|disabled)$/i.test(name)){
-			return this[name.toLowerCase()](value);
-		}
-		return Dom.prototype.setAttr.call(this, name, value);
-	},
-
-	/**
-	 * 切换显示鼠标是否移到当前项。
-	 */
-	hovering: function(value){
-		return this.toggleClass('x-' + this.xtype + '-hover', value);
 	}
 
 });
 
 ListControl.aliasMethods(TreeControl.Item, 'getSubControl()', 'subControl');
-
-Object.map("selected checked disabled", function(funcName) {
-	TreeControl.Item.prototype[funcName] = function(value) {
-		this.toggleClass('x-' + this.xtype + '-' + funcName, value);
-		return Dom.prototype.setAttr.call(this, funcName, value);
-	};
-});
-
-
-
-
 /************************************
  * Controls.Core.IDropDownOwner
  ************************************/
@@ -9955,13 +9467,28 @@ var IDropDownOwner = {
 	onDropDownHide: function(){
 		this.trigger('dropdownhide');
 	},
+
+	createDropDown: function (existDom) {
+	    return existDom;
+	},
 	
 	/**
 	 * 获取当前控件的下拉菜单。
 	 * @return {Control} 
 	 */
-	getDropDown: function(){
-		return this.dropDown;
+	getDropDown: function () {
+	    var dropDown = this.dropDown;
+
+	    if (!dropDown) {
+	        dropDown = this.next();
+	        if (dropDown && !dropDown.hasClass('x-dropdown')) {
+	            dropDown = null;
+	        }
+
+	        this.dropDown = this.createDropDown(dropDown);
+	    }
+	    
+	    return this.dropDown;
 	},
 	
 	attach: function(parentNode, refNode){
@@ -9978,36 +9505,36 @@ var IDropDownOwner = {
 		}
 	},
 
-	setDropDown: function(dom){
-		
-		// 修正下拉菜单为 Control 对象。
-		dom = dom instanceof Dom ? dom : Dom.get(dom);
-		
-		assert.notNull(dom, "IDropDown.setDropDown(dom): {dom} ~");
-		
-		// 设置下拉菜单。
-		this.dropDown = dom.addClass('x-dropdown').hide();
-		
-		// 如果当前节点已经添加到 DOM 树，则同时添加 dom 。
-		if(!dom.parent('body')){
-			
-			// 给 div 更多关心。
-			if(/^DIV$/.test(this.node.tagName)){
-				this.append(dom);
-			} else {
-				this.after(dom);
-			}
-			
-			// IE6/7 无法自动在父节点无 z-index 时处理 z-index 。
-			if(navigator.isQuirks && dom.parent().getStyle('zIndex') === 0)
-				dom.parent().setStyle('zIndex', 1);
-		}
+	setDropDown: function (dom) {
+
+	    if (dom) {
+
+	        // 修正下拉菜单为 Control 对象。
+	        dom = dom instanceof Dom ? dom : Dom.get(dom);
+
+	        // 设置下拉菜单。
+	        this.dropDown = dom.addClass('x-dropdown').hide();
+
+	        // 如果当前节点已经添加到 DOM 树，则同时添加 dom 。
+	        if (!dom.parent('body')) {
+
+                // 添加菜单到 DOM 树。
+	            this.after(dom);
+
+	            // IE6/7 无法自动在父节点无 z-index 时处理 z-index 。
+	            if (navigator.isQuirks && dom.parent().getStyle('zIndex') === 0)
+	                dom.parent().setStyle('zIndex', 1);
+	        }
+	    } else if (this.dropDown) {
+	        this.dropDown.remove();
+	        this.dropDown = null;
+	    }
 		
 		return this;
 	},
 	
 	dropDownHidden: function () {
-		return Dom.isHidden(this.dropDown.node);
+	    return this.dropDown && Dom.isHidden(this.dropDown.node);
 	},
 	
 	realignDropDown: function (offsetX, offsetY) {
@@ -10015,38 +9542,45 @@ var IDropDownOwner = {
 		return this;
 	},
 	
-	toggleDropDown: function(e){
-		if(e) this._dropDownTrigger = e.target;
+	toggleDropDown: function (e) {
+
+        // 如果是因为 DOM 事件而切换菜单，则测试是否为 disabled 状态。
+	    if (e) {
+	        if (this.getAttr('disabled') || this.getAttr('readonly')) {
+	            return this;
+	        }
+	        this._dropDownTrigger = e.target;
+	    }
 		return this[this.dropDownHidden() ? 'showDropDown' : 'hideDropDown']();
 	},
 	
 	showDropDown: function(){
-		
-		var dropDown = this.dropDown;
-		
-		if(this.dropDownHidden()){
-			dropDown.show();
-			this.realignDropDown(0, -1);
-			
-			var size = this.dropDownWidth;
-			if(size === 'auto') {
-				size = this.getSize().x;
-				
-				// 不覆盖 min-width
-				if(size < Dom.styleNumber(dropDown.node, 'min-width'))
-					size = -1;
-			}
-			
-			if(size >= 0) {
-				dropDown.setSize(size);
-			}
-			
-			this.onDropDownShow();
-			
-			document.on('mouseup', this.hideDropDown, this);
-		} else {
-			this.realignDropDown(0, -1);
-		}
+
+	    var dropDown = this.dropDown;
+
+	    if (this.dropDownHidden()) {
+	        dropDown.show();
+	        this.realignDropDown(0, -1);
+
+	        var size = this.dropDownWidth;
+	        if (size === 'auto') {
+	            size = this.getSize().x;
+
+	            // 不覆盖 min-width
+	            if (size < Dom.styleNumber(dropDown.node, 'min-width'))
+	                size = -1;
+	        }
+
+	        if (size >= 0) {
+	            dropDown.setSize(size);
+	        }
+
+	        this.onDropDownShow();
+
+	        document.on('mouseup', this.hideDropDown, this);
+	    } else {
+	        this.realignDropDown(0, -1);
+	    }
 		
 		return this;
 	},
@@ -10055,7 +9589,7 @@ var IDropDownOwner = {
 		
 		var dropDown = this.dropDown;
 		
-		if(!this.dropDownHidden()){
+		if(dropDown && !this.dropDownHidden()){
 			
 			// 如果是来自事件的关闭，则检测是否需要关闭菜单。
 			if(e){
@@ -10231,320 +9765,7 @@ var Button = ContentControl.extend({
 		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype).replace('type="button"', 'type="' + (options.type || this.type) + '"'));
 	},
 	
-	setAttr: function (name, value) {
-		if(/^disabled$/i.test(name)){
-			return this.disabled(value);
-		}
-		return Dom.prototype.setAttr.call(this, name, value);
-	},
-	
-	actived: function(value){
-		return this.toggleClass('x-button-actived', value !== false);
-	},
-	
-	disabled: IInput.disabled
-	
-});
-
-
-Object.map("disabled", IInput, Button.prototype);
-
-/************************************
- * Controls.Button.Menu
- ************************************/
-var MenuItem = TreeControl.Item.extend({
-
-	xtype: 'menuitem',
-
-	/**
-	 * 当被子类重写时，用于创建子树。
-	 * @param {TreeControl} treeControl 要初始化的子树。
-	 * @return {TreeControl} 新的 {@link TreeControl} 对象。
-	 * @protected override
-	 */
-	createSubControl: function(treeControl){
-		return new Menu(treeControl);
-	},
-	
-	/**
-	 * 当被子类重写时，用于初始化子树。
-	 * @param {TreeControl} treeControl 要初始化的子树。
-	 * @protected override
-	 */
-	initSubControl: function(treeControl){
-		treeControl.hide();
-		treeControl.floating = false;
-		this.addClass('x-menuitem-submenu');
-		this.on('mouseup', this._cancelHideMenu);
-	},
-	
-	/**
-	 * 当被子类重写时，用于删除初始化子树。
-	 * @param {TreeControl} treeControl 要删除初始化的子树。
-	 * @protected override
-	 */
-	uninitSubControl: function(treeControl){
-		treeControl.floating = true;
-		this.removeClass('x-menuitem-submenu');
-		this.un('mouseup', this._cancelHideMenu);
-	},
-
-	onMouseOver: function() {
-		this.hovering(true);
-		if (this.subControl)
-			this.showSubMenu();
-		else if(this.parentControl)
-			this.parentControl.hideSubMenu();
-	},
-	
-	onMouseOut: function() {
-
-		// 没子菜单，需要自取消激活。
-		// 否则，由父菜单取消当前菜单的状态。
-		// 因为如果有子菜单，必须在子菜单关闭后才能关闭激活。
-
-		if (!this.subControl)
-			this.hovering(false);
-
-	},
-	
-	/**
-	 *
-	 */
-	init: function() {
-		if(this.hasClass('x-' + this.xtype)) {
-			this.unselectable();
-			this.on('mouseover', this.onMouseOver);
-			this.on('mouseout', this.onMouseOut);
-		}
-	},
-	
-	_cancelHideMenu: function(e) {
-		e.stopPropagation();
-	},
-
-	_hideTargetMenu: function(e) {
-		var tg = e.relatedTarget;
-		while (tg && !Dom.hasClass(tg, 'x-menu')) {
-			tg = tg.parentNode;
-		}
-
-		if (tg) {
-			new Dom(tg).dataField().control.hideSubMenu();
-		}
-
-	},
-
-	getSubMenu: TreeControl.Item.prototype.getSubControl,
-	
-	setSubMenu: TreeControl.Item.prototype.setSubControl,
-
-	showSubMenu: function(){
-
-		// 使用父菜单打开本菜单，显示子菜单。
-		this.parentControl && this.parentControl.showSubMenu(this);
-		
-		return this;
-	},
-	
-	hideSubMenu: function(){
-
-		// 使用父菜单打开本菜单，显示子菜单。
-		this.parentControl && this.parentControl.hideSubMenu(this);
-		
-		return this;
-	}
-
-});
-
-var MenuSeperator = MenuItem.extend({
-
-	tpl: '<div class="x-menuseperator"></div>',
-
-	init: Function.empty
-
-});
-
-var Menu = TreeControl.extend({
-
-	xtype: 'menu',
-	
-	/**
-	 * 表示当前菜单是否为浮动的菜单。 
-	 */
-	floating: false,
-
-	createTreeItem: function(childControl, parent) {
-		
-		if(!(childControl instanceof MenuItem)){
-	
-			// 如果是文本。
-			if (childControl.node.nodeType === 3) {
-	
-				// - => MenuSeperator
-				if (/^\s*-\s*$/.test(childControl.getText())) {
-	
-					// 删除文本节点。
-					if (parent) {
-						parent.remove(childControl);
-					}
-	
-					childControl = new MenuSeperator;
-	
-					// 其它 => 添加到 MenuItem
-				} else {
-	
-					// 保存原有 childControl 。
-					var t = childControl;
-					childControl = new MenuItem;
-					childControl.content().replaceWith(t);
-				}
-				if (parent) {
-					parent.prepend(childControl);
-				}
-			} else if(childControl.hasClass('x-menuseperator')){
-				childControl = new MenuSeperator;
-			} else {
-	
-				// 创建对应的 MenuItem 。
-				childControl = new MenuItem(childControl);
-			}
-				
-		}
-
-		return childControl;
-
-	},
-
-	init: function() {
-
-		// 绑定节点和控件，方便发生事件后，根据事件源得到控件。
-		this.dataField().control = this;
-
-		// 根据已有的 DOM 结构初始化菜单。
-		this.initItems();
-	},
-
-	onShow: function() {
-		
-		// 如果菜单是浮动的，则点击后关闭菜单，否则，只关闭子菜单。
-		if(this.floating)
-			document.once('mouseup', this.hide, this);
-		this.trigger('show');
-	},
-
-	/**
-	 * 关闭本菜单。
-	 */
-	onHide: function() {
-
-		// 先关闭子菜单。
-		this.hideSubMenu();
-		this.trigger('hide');
-	},
-
-	show: function() {
-		Dom.show(this.node);
-		this.onShow();
-		return this;
-	},
-
-	hide: function() {
-		Dom.hide(this.node);
-		this.onHide();
-		return this;
-	},
-	
-	/**
-	 * 当前菜单依靠某个控件显示。
-	 * @param {Control} ctrl 方向。
-	 */
-	showAt: function(x, y) {
-		
-		// 确保菜单已添加到文档内。
-		if (!this.parent('body')) {
-			this.appendTo();
-		}
-
-		// 显示节点。
-		this.show();
-
-		this.setPosition(x, y);
-
-		return this;
-	},
-
-	/**
-	 * 当前菜单依靠某个控件显示。
-	 * @param {Control} ctrl 方向。
-	 */
-	showBy: function(ctrl, pos, offsetX, offsetY, enableReset) {
-
-		// 确保菜单已添加到文档内。
-		if (!this.parent('body')) {
-			this.appendTo(ctrl.parent());
-		}
-
-		// 显示节点。
-		this.show();
-
-		this.align(ctrl, pos || 'rt', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);
-
-		return this;
-	},
-
-	/**
-	 * 显示指定项的子菜单。
-	 * @param {MenuItem} menuItem 子菜单项。
-	 * @protected
-	 */
-	showSubMenu: function(menuItem) {
-
-		// 如果不是右键的菜单，在打开子菜单后监听点击，并关闭此子菜单。
-		if (!this.floating)
-			document.once('mouseup', this.hideSubMenu, this);
-
-		// 隐藏当前项子菜单。
-		this.hideSubMenu();
-
-		// 激活本项。
-		menuItem.hovering(true);
-
-		// 如果指定的项存在子菜单。
-		if (menuItem.subControl) {
-
-			// 设置当前激活的项。
-			this.currentSubMenu = menuItem;
-
-			// 显示子菜单。
-			menuItem.subControl.showBy(menuItem);
-
-		}
-		
-	},
-
-	/**
-	 * 关闭本菜单打开的子菜单。
-	 * @protected
-	 */
-	hideSubMenu: function() {
-
-		// 如果有子菜单，就隐藏。
-		if (this.currentSubMenu) {
-
-			// 关闭子菜单。
-			this.currentSubMenu.subControl.hide();
-
-			// 取消激活菜单。
-			this.currentSubMenu.hovering(false);
-			this.currentSubMenu = null;
-		}
-		
-	}
-
-});
-
-
+}).implement(IInput);
 
 /************************************
  * Controls.Button.MenuButton
@@ -10553,32 +9774,32 @@ var MenuButton = Button.extend(IDropDownOwner).implement({
 	
 	xtype: 'menubutton',
 	
-	tpl: '<button class="x-button x-control" type="button">&nbsp;<span class="x-button-menu"></span></button>',
-	
-	content: function(){
-		return this.find('.x-button-menu').prev(true);
-	},
+	tpl: '<button class="x-button x-control" type="button"><span class="x-button-menu"></span></button>',
 	
 	createDropDown: function(existDom){
 		if(existDom && !existDom.hasClass('x-menu')){
 			return existDom;
 		}
+		assert(window.Menu, "必须载入 Controls.Menu.Menu 组件才能初始化 x-menu 的菜单项。");
 		return new Menu(existDom).on('click', this.onDropDownClick, this);
+	},
+
+	state: function (name, value) {
+	    return this.toggleClass('x-button-' + name, value);
 	},
 	
 	init: function () {
-		var next = this.next();
-		this.setDropDown(this.createDropDown(next && next.hasClass('x-dropdown') ? next : null));
+		this.setDropDown(this.getDropDown());
 		this.on('click', this.toggleDropDown, this);
 	},
 	
 	onDropDownShow: function(){
-		this.actived(true);
+		this.state('actived', true);
 		return IDropDownOwner.onDropDownShow.apply(this, arguments);
 	},
 	
 	onDropDownHide: function(){
-		this.actived(false);
+	    this.state('actived', false);
 		return IDropDownOwner.onDropDownHide.apply(this, arguments);
 	},
 	
@@ -10593,178 +9814,137 @@ ListControl.aliasMethods(MenuButton, 'dropDown');
  * Controls.Form.Picker
  ************************************/
 var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
-	
-	tpl: '<span class="x-picker">\
+
+    tpl: '<span class="x-picker">\
 			<input type="text" class="x-textbox"/>\
 		</span>',
-	
-	dropDownListTpl: '<span class="x-picker">\
+
+    dropDownListTpl: '<span class="x-picker">\
 			<a href="javascript:;" class="x-button">A</a>\
 		</span>',
-		
-	menuButtonTpl: '<button class="x-button" type="button"><span class="x-button-menu"></span></button>',
-	
-	/**
+
+    menuButtonTpl: '<button class="x-button" type="button"><span class="x-button-menu"></span></button>',
+
+    /**
 	 * 当前控件是否为下拉列表。
 	 */
-	dropDownList: false,
-	
-	/**
+    dropDownList: false,
+
+    /**
 	 * 下拉框的宽度。
 	 */
-	dropDownWidth: 'auto',
-	
-	/**
+    dropDownWidth: 'auto',
+
+    /**
 	 * @config dropDownList 是否允许用户输入自定义的文本值。
 	 */
-	
-	create: function(options){
-		return Dom.parseNode(options.dropDownList ? this.dropDownListTpl : this.tpl);
-	},
-	
-	/**
-	 * 获取当前输入域实际用于提交数据的表单域。
-	 * @return {Dom} 一个用于提交表单的数据域。
-	 */
-	input: function(){
-		
-		// 如果不存在隐藏域。
-	    if (!this.hiddenField) {
 
-	        if(/^(TEXTAREA|INPUT|SELECT)$/.test(this.node.tagName)){
-	            this.hiddenField = new Dom(this.node);
-	        } else {
-                
-			
-	            var textBox = this.find('.x-textbox');
-			
-	            if(textBox){
-	                return textBox;	
-	            }
-			
-	            this.hiddenField = Dom.parse('<input type="hidden">').appendTo(this);
-	            this.hiddenField.setAttr('name', Dom.getAttr(this.node, 'name'));
-	        }
-		}
-		
-		return this.hiddenField;
-	},
-	
-	/**
+    create: function (options) {
+        return Dom.parseNode(options.dropDownList ? this.dropDownListTpl : this.tpl);
+    },
+
+    /**
 	 * 获取当前控件的按钮部分。
 	 */
-	button: function(){
-		return this.find('button');
-	},
-	
-	/**
+    button: function () {
+        return this.find('button');
+    },
+
+    /**
 	 * @protected
 	 * @override
 	 */
-	init: function(){
-		
-		// 如果是 <input> 或 <a> 直接替换为 x-picker
-		if(!this.first() && !this.hasClass('x-picker')) {
-			var elem = this.node;
-			
-			// 创建 x-picker 组件。
-			this.node = Dom.createNode('span', 'x-picker x-' + this.xtype);
-			
-			// 替换当前节点。
-			if(elem.parentNode){
-				elem.parentNode.replaceChild(this.node, elem);
-			}
-			
-			// 插入原始 <input> 节点。
-			this.prepend(elem);
-		}
-		
-		// 如果没有下拉菜单按钮，添加之。
-		if(!this.button()) {
-			this.append(this.menuButtonTpl);	
-		}
-		
-		// 初始化菜单。
-		elem = this.next();
-		if(elem && !elem.hasClass('x-dropdown')) {
-			elem = null;
-		}
-		this.setDropDown(this.createDropDown(elem));
-		
-		// 设置菜单显示的事件。
-		(this.dropDownList ? this : this.button()).on('click', this.toggleDropDown, this);
-		
-	},
-	
-	setWidth: function(value){
-		var first = this.first();
-		if(value >= 0){
-			value -= this.getWidth() - first.getWidth();
-		}
-		first.setWidth(value);
-		return this;
-	},
-	
-	disabled: function(value){
-		value = value !== false;
-		
-		// 子节点全部设置样式。
-		this.children().setAttr("disabled", value);
-		
-		// 为按钮增加 disabled 样式。
-		this.query('.x-textbox').toggleClass("x-textbox-disabled", value);
-		
-		// 为按钮增加 disabled 样式。
-		this.query('.x-button').toggleClass("x-button-disabled", value);
-	},
-	
-	readOnly: function(value){
-		
-		value = value !== false;
-		
-		// 子节点全部设置样式。
-		this.input().setAttr("readonly", value);
-		
-		// 为按钮增加 disabled 样式。
-		this.query('.x-textbox').toggleClass("x-textbox-readonly", value);
-	},
-	
-	// 下拉菜单
-	
-	onDropDownShow: function(){
-		// 默认选择当前值。
-		this.updateDropDown();
-		this.button().addClass('x-button-actived');
-		return IDropDownOwner.onDropDownShow.apply(this, arguments);
-	},
-	
-	onDropDownHide: function(){
-		this.button().removeClass('x-button-actived');
-		return IDropDownOwner.onDropDownHide.apply(this, arguments);
-	},
-	
-	/**
-	 * 创建当前 Picker 的菜单。
-	 * @return {Control} 下拉菜单。
-	 */
-	createDropDown: function(existDom){
-		return existDom || Dom.parse('<div/>');
-	},
-	
-	/**
+    init: function () {
+
+        // 如果是 <input> 或 <a> 直接替换为 x-picker
+        if (!this.first() && !this.hasClass('x-picker')) {
+            var elem = this.node;
+
+            // 创建 x-picker 组件。
+            this.node = Dom.createNode('span', 'x-picker x-' + this.xtype);
+
+            // 替换当前节点。
+            if (elem.parentNode) {
+                elem.parentNode.replaceChild(this.node, elem);
+            }
+
+            // 插入原始 <input> 节点。
+            this.prepend(elem);
+        }
+
+        // 如果没有下拉菜单按钮，添加之。
+        if (!this.button()) {
+            this.append(this.menuButtonTpl);
+        }
+
+        // 初始化菜单。
+        this.setDropDown(this.getDropDown());
+
+        if (!this.hasOwnProperty('dropDownList') && this.first().node.tagName !== 'INPUT') {
+            this.dropDownList = true;
+        }
+
+        // 设置菜单显示的事件。
+        (this.dropDownList ? this : this.button()).on('click', this.toggleDropDown, this);
+
+    },
+
+    setWidth: function (value) {
+        var first = this.first();
+        if (value >= 0) {
+            value -= this.getWidth() - first.getWidth();
+        }
+        first.setWidth(value);
+        return this;
+    },
+
+    state: function (name, value) {
+        value = value !== false;
+        if (name == "disabled" || name == "readonly") {
+
+            // 为按钮增加 disabled 样式。
+            this.query('.x-button,button').setAttr("disabled", value).toggleClass("x-button-disabled", value);
+
+            // 为文本框增加设置样式。
+            this.input().setAttr(name, value).toggleClass("x-textbox-" + name, value);
+
+        } else if (name == "actived") {
+            this.query('.x-button,button').toggleClass("x-button-actived", value);
+        } else {
+            IInput.state.call(this, name, value);
+        }
+
+        return this;
+    },
+
+    // 下拉菜单
+
+    onDropDownShow: function () {
+        // 默认选择当前值。
+        this.updateDropDown();
+        this.state('actived', true);
+        return IDropDownOwner.onDropDownShow.apply(this, arguments);
+    },
+
+    onDropDownHide: function () {
+        this.state('actived', false);
+        return IDropDownOwner.onDropDownHide.apply(this, arguments);
+    },
+
+    /**
 	 * 将当前文本的值同步到下拉菜单。
 	 * @protected virtual
 	 */
-	updateDropDown: Function.empty
-	
+    updateDropDown: Function.empty
+
 })
 .addEvents('change', {
-	add: function(picker, type, fn){
-		Dom.$event.$default.add(picker.input(), type, fn);
-	},
-	remove: function(picker, type, fn){
-		Dom.$event.$default.remove(picker.input(), type, fn);
-	}
+    add: function (picker, type, fn) {
+        Dom.$event.$default.add(picker.input(), type, fn);
+    },
+    remove: function (picker, type, fn) {
+        Dom.$event.$default.remove(picker.input(), type, fn);
+    }
 });
 
 
@@ -10775,319 +9955,353 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
  ************************************/
 var ComboBox = Picker.extend({
 	
-	xtype: 'combobox',
+    xtype: 'combobox',
 	
-	autoResize: true,
+    autoResize: true,
 	
-	// 悬停选中
+    // 悬停选中
 	
-	_getHover: function(){
-		return this._hoverItem;
-	},
+    _getHover: function(){
+        return this._hoverItem;
+    },
 	
-	_setHover: function(item){
-		var clazz = 'x-' + this.dropDown.xtype + '-hover';
+    _setHover: function(item){
+        var clazz = 'x-' + this.dropDown.xtype + '-hover';
 		
-		if(this._hoverItem){
-			this._hoverItem.removeClass(clazz);
-		}
+        if(this._hoverItem){
+            this._hoverItem.removeClass(clazz);
+        }
 		
-		this._hoverItem = item ? item.addClass(clazz) : null;
+        this._hoverItem = item ? item.addClass(clazz) : null;
 		
-	},
+    },
 	
-	/**
+    /**
 	 * 移动当前选中项的位置。
 	 */
-	_moveHover: function(delta){
+    _moveHover: function(delta){
 		
-		// 如果菜单未显示。
-	    if(this.dropDownHidden()){
+        // 如果菜单未显示。
+        if(this.dropDownHidden()){
 	    	
-	    	// 显示菜单。
-	    	this.showDropDown();
-	    } else {
+            // 显示菜单。
+            this.showDropDown();
+        } else {
 	    	
-	    	var item = this._hoverItem || this.selectedItem;
+            var item = this._hoverItem || this.selectedItem;
 	    	
-	    	if(item){
-	    		item = item[delta > 0 ? 'next' : 'prev']();
-	    	}
+            if(item){
+                item = item[delta > 0 ? 'next' : 'prev']();
+            }
 	    	
-	    	if(!item){
-	    		item = this.dropDown.item(delta > 0 ? 0 : -1);
-	    	}
+            if(!item){
+                item = this.dropDown.item(delta > 0 ? 0 : -1);
+            }
 	    	
-	    	this._setHover(item);
+            this._setHover(item);
 	    	
-	    }
-	},
+        }
+    },
 	
-	onSelect: function(item){
-		return this.trigger('select', item);
-	},
+    onSelect: function(item){
+        return this.trigger('select', item);
+    },
 	
-	/**
+    /**
 	 * 处理键盘事件。
 	 */
-	onKeyDown: function(e){
-		switch(e.keyCode) {
+    onKeyDown: function(e){
+        switch(e.keyCode) {
 			
-			// 上下
-			case 40:
-			case 38:
+            // 上下
+            case 40:
+            case 38:
 			
-				// 阻止默认事件。
-			    e.preventDefault();
+                // 阻止默认事件。
+                e.preventDefault();
 			    
-				this._moveHover(e.keyCode === 40 ? 1 : -1);
+                this._moveHover(e.keyCode === 40 ? 1 : -1);
 			    
-			    break;
+                break;
 			    
-			// 回车
-			case 13:
-			case 10:
-				if(!this.dropDownHidden()){
-					var currentItem = this._getHover();
-					if(currentItem != null) {
-						this.selectItem(currentItem);
-						e.preventDefault();
-					}
-				}
-		}
-	},
+                // 回车
+            case 13:
+            case 10:
+                if(!this.dropDownHidden()){
+                    var currentItem = this._getHover();
+                    if(currentItem != null) {
+                        this.selectItem(currentItem);
+                        e.preventDefault();
+                    }
+                }
+        }
+    },
 	
-	/**
+    /**
 	 * 当用户单击某一项时执行。
 	 */
-	onItemClick: function(item, e){
-		
-	    //e.preventDefault();
-	    //e.StopPropogation();
+    onItemClick: function(item, e){
 	
-		// 如果无法更改值，则直接忽略。
-		if(!this.getAttr('disabled') && !this.getAttr('readonly')) {
+        // 如果无法更改值，则直接忽略。
+        if(!this.getAttr('disabled') && !this.getAttr('readonly')) {
 				
-			// 设置当前的选中项。
-			this.selectItem(item);
+            // 设置当前的选中项。
+            this.selectItem(item);
 			
-		}
+        }
 
-		return false;
+        return false;
 		
-	},
+    },
 	
-	/**
+    /**
 	 * 创建当前 Picker 的菜单。
 	 * @return {Control} 下拉菜单。
 	 * @protected virtual
 	 */
-	createDropDown: function(existDom){
-		return new ComboBox.DropDownMenu(existDom);
-	},
+    createDropDown: function(existDom){
+        return new ComboBox.DropDownMenu(existDom);
+    },
 	
-	_syncSelect: function(){
-		var selected = this.hiddenField.find(':selected');
-		this.first().setText(selected ? selected.getText() : this.hiddenField.getAttr('placeholder'));
-	},
-	
-	/**
+    /**
 	 * 将当前文本的值同步到下拉菜单。
 	 */
-	updateDropDown: function(){
-		
-		var item;
-		
-		if(this.dropDownList){
-			item = this.getSelectedItem();
-		} else {
-			item = this.dropDown.getItemByText(this.getText());
-		}
-		
-		this._setHover(item);
-	},
+    updateDropDown: function(){
+        this._setHover(this.getSelectedItem());
+    },
 	
-	updateText: function(item){
+    init: function (options) {
 		
-		// 如果是 dropDownList, 还需要更新 <select> 的值。
-		if(this.dropDownList){
-			var elem = this.hiddenField.node,
-				oldIndex = elem.selectedIndex;
-			if(item == null){
-				elem.selectedIndex = -1;
-			} else {
-				elem.value = item.option.value;
-			}
-			this._syncSelect();
+        // 1. 处理 <select>
+        var selectNode;
+		
+        // 如果初始化的时候传入一个 <select> 则替换 <select>, 并拷贝相关数据。
+        if(this.node.tagName === 'SELECT') {
 			
-			if(oldIndex !== elem.selectedIndex)
-				this.onChange();
-		} else {
-			IInput.setText.call(this, item.getText());
-		}
-		
-	},
-	
-	clear: function(){
-		if(this.dropDownList){
-			this.updateText(null);
-		} else {
-			IInput.clear.call(this, value);
-		}
-	},
-	
-	setText: function(value){
-		
-		IInput.setText.call(this, value);
-		
-		if(this.dropDownList){
-			this._syncSelect();
-		}
-		
-		return this;
-	},
-	
-	init: function (options) {
-		
-		// 1. 处理 <select>
-		var selectNode;
-		
-		// 如果初始化的时候传入一个 <select> 则替换 <select>, 并拷贝相关数据。
-		if(this.node.tagName === 'SELECT') {
+            this.hiddenField = selectNode = new Dom(this.node);
 			
-			selectNode = this.node;
+            // 调用 create 重新生成 dom 。
+            this.node = Dom.parseNode(this.dropDownListTpl);
 			
-			// 调用 create 重新生成 dom 。
-			this.node = Dom.parseNode(this.dropDownListTpl);
+            this.dropDownList = true;
 			
-			this.dropDownList = true;
-			
-		}
+        }
 		
-		// 2. 初始化文本框
+        // 2. 初始化文本框
 		
-		// 初始化文本框
-		this.base('init');
+        // 初始化文本框
+        this.base('init');
 		
-		// 3. 初始化菜单
+        // 3. 初始化菜单
 		
-		// 绑定下拉菜单的点击事件
-		this.dropDown
+        // 绑定下拉菜单的点击事件
+        this.dropDown
 			.itemOn('mouseover', this._setHover, this)
 			.itemOn('click', this.onItemClick, this);
 		
-		// 4. 绑定事件
+        // 4. 绑定事件
 		
-		// 监听键盘事件。
-		this.on('keydown', this.onKeyDown);
+        // 监听键盘事件。
+        this.on('keydown', this.onKeyDown);
 		
-		// IE6 Hack: keydown 无法监听到回车。
-		if(navigator.isIE6) {
-			this.on('keypress', this.onKeyDown);	
-		}
+        // IE6 Hack: keydown 无法监听到回车。
+        if(navigator.isIE6) {
+            this.on('keypress', this.onKeyDown);	
+        }
 		
-		// 4. 设置默认项
+        // 4. 设置默认项
 			
-		if(selectNode) {
+        if(selectNode) {
 			
-			this.hiddenField = selectNode = new Dom(selectNode);
+            // 让 listBox 拷贝 <select> 的成员。
+            this.copyItemsFromSelect(selectNode);
 			
-			// 让 listBox 拷贝 <select> 的成员。
-			this.copyItemsFromSelect(selectNode);
-			
-			// 隐藏 <select> 为新的 dom。
-			selectNode.hide();
-			
-			// 插入当前节点。
-			selectNode.after(this);
-		}
+            // 隐藏 <select> 为新的 dom。
+            selectNode.hide();
+
+            // 插入当前节点。
+            selectNode.after(this);
+        }
 		
-	},
+    },
 	
-	/**
+    setText: function (value) {
+
+        // 如果是 dropDownList 模式，则通过 setSelectedItem 来设置当前文本框的值。
+        if (this.dropDownList) {
+
+            // 设置 value 。
+            this.input().node.value = value;
+
+            // 根据 value 获得新决定的选中项设置选中项。
+            return this.setSelectedItem(this.getSelectedItem());
+        }
+
+        // 设置内容。
+        return IInput.setText.call(this, value);
+            
+    },
+	
+    /**
 	 * 模拟鼠标选择某一个项。
 	 */
-	selectItem: function (item) {
-		this.setSelectedItem(item);
-		return this.hideDropDown();
-	},
+    selectItem: function (item) {
+        this.setSelectedItem(item);
+        return this.hideDropDown();
+    },
+
+    getValueOfItem: function (item) {
+        assert.notNull(item, "ComboBox#getValueOfItem(item): {item} ~", item);
+        var option = item.dataField().option;
+        return option ? option.value : (item.getAttr('data-value') || item.getText());
+    },
 	
-	/**
+    /**
 	 * 获取当前选中的项。如果不存在选中的项，则返回 null 。
 	 * @return {Control} 选中的项。
 	 */
-	getSelectedItem: function(){
-		return this.selectedItem;
-	},
+    getSelectedItem: function () {
+
+        // 如果使用了表单模式，则优先查找 value 匹配的项。
+        if (this.dropDownList) {
+
+            // 获取 input 字段。
+            var input = this.input(), value;
+
+            // 如果隐藏域是 SELECT ，比较方便：
+            if (input.node.tagName === 'SELECT') {
+                value = this.hiddenField.getAttr('selectedIndex');
+                return value >= 0 ? this.dropDown.item(value) : null;
+            }
+
+            value = input.node.value;
+
+            return this.dropDown.child(function (dom) {
+                return this.getValueOfItem(new Dom(dom)) === value;
+            }.bind(this));
+        }
+
+        value = this.getText();
+        return this.dropDown.child(function (dom) {
+            return Dom.getText(dom) === value;
+        });
+    },
 	
-	/**
+    /**
 	 * 设置当前选中的项。
 	 * @param {Control} item 选中的项。
 	 * @return this
 	 */
-	setSelectedItem: function(item){
-		item = this.dropDown.itemOf(item);
-		if(this.onSelect(item) !== false) {
-			this.selectedItem = item;
-			this.updateText(item);
-		}
-		return this;
-	},
+    setSelectedItem: function (item) {
+
+        if (this.onSelect(item) !== false) {
+
+            // 如果有隐藏域，则设置选择的索引。
+            if (this.dropDownList) {
+
+                var oldValue,
+                    text,
+                    newValue,
+                    input = this.input();
+
+                if (input.node.tagName === "SELECT") {
+
+                    oldValue = input.getAttr('selectedIndex');
+
+                    if (item) {
+                        var option = item.dataField().option;
+                        if (!option) {
+                            item.dataField().option = option = new Option(item.getText(), this.getValueOfItem(item));
+                            input.node.add(option);
+                        }
+                        option.selected = true;
+                        text = Dom.getText(option);
+                        newValue = input.node.selectedIndex;
+                    } else {
+                        input.node.selectedIndex = newValue = -1;
+                        text = input.getAttr('placeholder');
+                    }
+
+                } else {
+                    oldValue = input.node.value;
+                    input.node.value = newValue = item ? this.getValueOfItem(item) : "";
+                    text = item ? item.getText() : "";
+                }
+
+                // 无隐藏域，仅设置按钮的文本。
+                this.first().setText(text);
+                if (oldValue !== newValue)
+                    this.onChange();
+
+            // 如果未使用表单模式，则设置当前文本框。
+            } else {
+
+                // 获取 item 的文本并更新值。
+                this.setText(item ? item.getText() : "");
+            }
+
+        }
+        return this;
+    },
 	
-	getSelectedIndex: function(){
-		return this.dropDown.indexOf(this.getSelectedItem());
-	},
+    getSelectedIndex: function(){
+        return this.dropDown.indexOf(this.getSelectedItem());
+    },
 	
-	setSelectedIndex: function(value){
-		return this.setSelectedItem(this.dropDown.item(value));
-	},
+    setSelectedIndex: function(value){
+        return this.setSelectedItem(this.dropDown.item(value));
+    },
+
+    // select
 	
-	set: function(items){
-		if(Object.isArray(items)){
-			this.dropDown.set(items);
-			return this;
-		}
-		
-		return Dom.prototype.set.apply(this, arguments);
-	},
-	
-	resizeToFitItems: function(){
-		var dropDown = this.dropDown,
+    resizeToFitItems: function(){
+        var dropDown = this.dropDown,
 			oldWidth = dropDown.getStyle('width'),
 			oldDisplay = dropDown.getStyle('display');
 			
-		dropDown.setStyle('display', 'inline-block');
-		dropDown.setWidth('auto');
+        dropDown.setStyle('display', 'inline-block');
+        dropDown.setWidth('auto');
 		
-		this.first().setSize(dropDown.getWidth());
+        this.first().setSize(dropDown.getWidth());
 		
-		dropDown.setStyle('width', oldWidth);
-		dropDown.setStyle('display', oldDisplay);
-		return this;
-	},
+        dropDown.setStyle('width', oldWidth);
+        dropDown.setStyle('display', oldDisplay);
+        return this;
+    },
 	
-	copyItemsFromSelect: function(select){
-		for(var node = select.node.firstChild; node; node = node.nextSibling) {
-			if(node.tagName  === 'OPTION') {
-				var item = this.add(Dom.getText(node));
+    copyItemsFromSelect: function(select) {
+		
+        this.dropDown.empty();
+		
+        for(var node = select.node.firstChild; node; node = node.nextSibling) {
+            if(node.tagName  === 'OPTION') {
+                var item = this.dropDown.add(Dom.getText(node));
 				
-				item.option = node;
-				if(node.selected){
-					this.setSelectedItem(item);
-				}
-			}
-		}
+                item.dataField().option = node;
+                if(node.selected){
+                    this.setSelectedItem(item);
+                }
+            }
+        }
 		
-		if(select.onclick)
-			this.node.onclick = select.node.onclick;
+        if(select.node.onclick)
+            this.node.onclick = select.node.onclick;
 		
-		if(select.onchange)
-			this.on('change', select.node.onchange);
+        if(select.node.onchange)
+            this.on('change', select.node.onchange);
 		
-		if(this.autoResize)
-			this.setWidth(select.getWidth());
+        if(this.autoResize)
+            this.setWidth(select.getWidth());
+        
+        if(select.getAttr('disabled')) {
+            this.setAttr('disabled', true);
+        }
+
+        if (select.getAttr('readonly')) {
+            this.setAttr('readonly', true);
+        }
 		
-	}
+    }
 
 }).addEvents('select');
 
@@ -11097,11 +10311,11 @@ ListControl.aliasMethods(ComboBox, 'dropDown');
 
 ComboBox.DropDownMenu = ListControl.extend({
 	
-	xtype: "listbox"
+    xtype: "listbox"
 
 });
 /************************************
- * Controls.Form.Suggest
+ * Controls.Suggest.Suggest
  ************************************/
 var Suggest = ComboBox.extend({
 	
@@ -11198,9 +10412,6 @@ var Suggest = ComboBox.extend({
 
 
 /************************************
- * Controls.Button.ButtonGroup
- ************************************/
-/************************************
  * Controls.Button.SplitButton
  ************************************/
 var SplitButton = MenuButton.extend({
@@ -11208,68 +10419,33 @@ var SplitButton = MenuButton.extend({
 	xtype: 'splitbutton',
 	
 	tpl: '<span class="x-splitbutton x-buttongroup">\
-				<button class="x-button">&nbsp;</button>\
+				<button class="x-button"></button>\
 				<button class="x-button"><span class="x-button-menu x-button-menu-down"></span></button>\
 			</span>',
 			
 	content: function(){
-		return this.find('.x-button').last(true);
+		return this.find('.x-button');
 	},
-	
-	disabled: function(value) {
-		value = value !== false;
-		this.query('x-button').setAttr('disabled', value).toggleClass('x-button-actived', value);
-		return this;
+
+	input: function(){
+	    return this.content();
 	},
-	
-	actived: function(value){
-		return this.last('.x-button').toggleClass('x-button-actived', value !== false);
+
+	state: function (name, value) {
+	    if (name == "disabled") {
+	        this.query('.x-button').setAttr(name, value).toggleClass('x-button-disabled', value);
+	    } else if (name == "actived") {
+	        this.last('.x-button').toggleClass('x-button-actived', value !== false);
+	    } else {
+	        this.base('state');
+	    }
+
+	    return this;
 	},
 	
 	init: function () {
-		var next = this.next();
-		this.setDropDown(this.createDropDown(next && next.hasClass('x-dropdown') ? next : null));
+		this.setDropDown(this.getDropDown());
 		this.find('>.x-button:last-child').on('click', this.toggleDropDown, this);
 	}
 	
 });
-/************************************
- * Controls.Container.Tabbable
- ************************************/
-/************************************
- * Controls.Container.TabbableEx
- ************************************/
-/************************************
- * Controls.Form.Form
- ************************************/
-/************************************
- * Controls.DataView.Table
- ************************************/
-/************************************
- * Controls.Display.Bubble
- ************************************/
-/************************************
- * Controls.Button.LinkButton
- ************************************/
-var LinkButton = Control.extend({
-	
-	xtype: 'linkbutton',
-	
-	tpl: '<a class="x-control" href="javascript://" target="_blank"></a>',
-	
-	setHref: function(value){
-		return this.setAttr('href', value);
-	},
-	
-	getHref: function(){
-		return this.getAttr('href');
-	}
-	
-});
-
-var a = {} || '';
-a.getID = function () {
-    for (key in value) {
-           
-    }
-}

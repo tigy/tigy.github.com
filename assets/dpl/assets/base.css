@@ -1,5 +1,5 @@
 ﻿/*
- * This file is created by a tool at 2012/10/16 20:51:18
+ * This file is created by a tool at 2012/10/30 21:30:42
  */
 
 
@@ -7,7 +7,10 @@
  * Controls.Core.Base
  ************************************/
 /**
- * 最底层�?CSS 样式�?
+ * J+ Library, 4
+ * @projectDescription jPlusUI: 简单灵活的 JS UI 组件库。
+ * @copyright 2011-2012 J+ Team
+ * @license The BSD License
  * @author xuld
  */
 html,
@@ -27,6 +30,13 @@ body,
 a img {
   border: 0;
 }
+ul,
+li {
+  list-style-type: none;
+}
+ol li {
+  list-style-type: decimal;
+}
 table {
   border-collapse: collapse;
   border-spacing: 0;
@@ -36,38 +46,6 @@ th,
 td {
   padding: 0;
   border: 0;
-}
-ul,
-li {
-  list-style-type: none;
-}
-ol li {
-  list-style-type: decimal;
-}
-hr {
-  clear: both;
-  float: none;
-  height: 0px;
-  border: 0;
-  border-top: 1px solid #e5e5e5;
-  display: block;
-  font-size: 0px;
-  line-height: 0px;
-  margin: 12px 0;
-  *margin: 4px 0;
-}
-sub,
-sup {
-  position: relative;
-  font-size: 75%;
-  line-height: 0;
-  vertical-align: baseline;
-}
-sup {
-  top: -0.5em;
-}
-sub {
-  bottom: -0.25em;
 }
 input,
 button,
@@ -91,11 +69,18 @@ textarea {
   vertical-align: baseline;
   *vertical-align: top;
 }
-q:before,
-q:after,
-blockquote:before,
-blockquote:after {
-  content: "";
+sub,
+sup {
+  position: relative;
+  font-size: 75%;
+  line-height: 0;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
 }
 article,
 aside,
@@ -122,7 +107,7 @@ audio:not([controls]) {
 body {
   font-family: Tahoma, Arial, "宋体";
   font-size: 12px;
-  line-height: 1.5em;
+  line-height: 18px;
   color: #333333;
 }
 a {
@@ -143,7 +128,6 @@ h4,
 h5,
 h6 {
   font-weight: bold;
-  color: #333333;
   text-rendering: optimizelegibility;
 }
 h1 small,
@@ -159,123 +143,41 @@ h1,
 h2,
 h3 {
   margin: 10px 0;
+  line-height: 36px;
 }
 h4,
 h5,
 h6 {
   margin: 0;
+  line-height: 18px;
 }
 h1 {
-  font-size: 30px;
-  line-height: 30px;
-}
-h1 small {
-  font-size: 18px;
+  font-size: 36px;
 }
 h2 {
-  font-size: 24px;
-  line-height: 24px;
+  font-size: 30px;
 }
+h3,
+h1 small {
+  font-size: 24px;
+}
+h4,
 h2 small {
   font-size: 18px;
 }
-h3 {
-  line-height: 18px;
-  font-size: 18px;
-}
-h4,
+h5,
 h3 small {
   font-size: 14px;
 }
-h5,
+h6,
 h4 small {
   font-size: 12px;
 }
-h6 {
-  font-size: 10px;
-}
 p {
-  margin: 8px 0 16px;
+  margin: 8px 0;
 }
 p small {
   color: #999999;
-}
-ol {
-  margin: 0 0 9px 25px;
-  padding: 0;
-}
-ol ol {
-  margin-bottom: 0;
-}
-dl {
-  margin-bottom: 18px;
-}
-dt {
-  font-weight: bold;
-  margin-top: 9px;
-}
-dd {
-  margin-left: 18px;
-}
-abbr {
-  font-size: 90%;
-  text-transform: uppercase;
-  border-bottom: 1px dotted #ddd;
-  cursor: help;
-}
-address,
-cite {
-  font-style: normal;
-}
-code {
-  padding: 0 4px;
-  color: #1E347B;
-  background-color: #f7f7f9;
-  border: 1px solid #e1e1e8;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-  font-family: "Courier New", Menlo, Monaco, monospace;
-}
-pre code {
-  padding: 0;
-  border: 0;
-  background-color: transparent;
-  color: inherit;
-  font-family: inherit;
-}
-abbr {
-  font-size: 90%;
-  text-transform: uppercase;
-  border-bottom: 1px dotted #ddd;
-  cursor: help;
-}
-address,
-cite {
-  font-style: normal;
-}
-fieldset {
-  padding: 0;
-  margin: 0;
-  border: 0;
-}
-legend {
-  display: block;
-  width: 100%;
-  padding: 0;
-  margin-bottom: 9px;
-  font-size: 18px;
-  line-height: 36px;
-  color: #333333;
-  border: 0;
-  border-bottom: 1px solid #eee;
-}
-legend small {
-  font-size: 13.5px;
-  color: #999999;
-}
-select {
-  background-color: #ffffff;
 }
 /************************************
  * Controls.Core.Common
@@ -321,14 +223,14 @@ html .x-hide,
 html div.x-hide {
   display: none;
 }
-.x-break-word {
-  word-wrap: break-word;
-  word-break: break-all;
-}
 html .x-plain,
 html div.x-plain {
   margin: 0;
   padding: 0;
+}
+.x-break-word {
+  word-wrap: break-word;
+  word-break: break-all;
 }
 .x-clear {
   *zoom: 1;
@@ -340,22 +242,15 @@ html div.x-plain {
   clear: both;
   visibility: hidden;
 }
-html .x-alt,
-.x-alt a {
-  color: #70a3cd;
-}
 html .x-hint,
-.x-hint a {
+html .x-hint a {
   color: #999999;
-}
-.x-alt a:hover,
-.x-hint a:hover,
-a.x-alt:hover,
-a.x-hint:hover {
-  color: #005580;
 }
 .x-highlight {
   color: #ff6600 !important;
+}
+.x-info {
+  color: #3a87ad !important;
 }
 .x-warning {
   color: #c09853 !important;
@@ -379,6 +274,21 @@ html div.x-row {
 .x-debug {
   background: #C03!important;
   color: #fff!important;
+}
+/************************************
+ * Controls.Typography.Hr
+ ************************************/
+hr {
+  clear: both;
+  float: none;
+  height: 0px;
+  border: 0;
+  border-top: 1px solid #e5e5e5;
+  display: block;
+  font-size: 0px;
+  line-height: 0px;
+  margin: 12px 0;
+  *margin: 4px 0;
 }
 /************************************
  * Controls.Form.TextBox
@@ -418,8 +328,8 @@ input.x-textbox {
   height: 18px;
 }
 textarea.x-textbox {
-  width: 60%;
-  height: 90px;
+  width: 600px;
+  height: 150px;
   line-height: 19px;
 }
 .x-textbox-warning {
@@ -459,35 +369,8 @@ textarea.x-textbox {
   color: #999999;
 }
 /************************************
- * Controls.Core.ScrollableControl
- ************************************/
-/**
- * @author 
- */
-/************************************
- * Controls.Core.ContentControl
- ************************************/
-/**
- * @author 
- */
-/************************************
- * Controls.Core.ListControl
- ************************************/
-/**
- * @author 
- */
-/************************************
- * Controls.Core.TreeControl
- ************************************/
-/**
- * @author 
- */
-/************************************
  * Controls.Core.IDropDownOwner
  ************************************/
-/**
- * @author  xuld
- */
 .x-dropdown {
   -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
@@ -495,6 +378,7 @@ textarea.x-textbox {
   position: absolute;
   z-index: 1000;
   max-height: 300px;
+  background-color: #fff;
 }
 /************************************
  * Controls.Form.ListBox
@@ -535,6 +419,15 @@ textarea.x-textbox {
 }
 .x-listbox-hover {
   background-color: #0088cc;
+  background-color: #0081c2;
+  background-image: -moz-linear-gradient(top, #0088cc, #0077b3);
+  background-image: -ms-linear-gradient(top, #0088cc, #0077b3);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0077b3));
+  background-image: -webkit-linear-gradient(top, #0088cc, #0077b3);
+  background-image: -o-linear-gradient(top, #0088cc, #0077b3);
+  background-image: linear-gradient(top, #0088cc, #0077b3);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#0088cc', endColorstr='#0077b3', GradientType=0);
 }
 .x-listbox-item a:hover {
   text-decoration: none;
@@ -842,69 +735,6 @@ input.x-button-small {
   padding-right: 20px;
 }
 /************************************
- * Controls.Button.Menu
- ************************************/
-.x-menu {
-  background-color: #ffffff;
-  border-color: #ccc;
-  border-color: rgba(0, 0, 0, 0.2);
-  border-style: solid;
-  border-width: 1px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  min-width: 140px;
-  _zoom: 0;
-  _display: block;
-  _width: 160px;
-  position: absolute;
-  z-index: 1000;
-  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  -webkit-background-clip: padding-box;
-  -moz-background-clip: padding;
-  background-clip: padding-box;
-  padding: 4px 0;
-  margin: 0;
-  list-style: none;
-}
-.x-menuitem {
-  display: block;
-  padding: 3px 10px;
-  white-space: nowrap;
-  cursor: default;
-  _width: 100%;
-}
-.x-menuitem,
-.x-menuitem a {
-  color: #555555;
-}
-.x-menuseperator {
-  height: 1px;
-  margin: 1px;
-  overflow: hidden;
-  background-color: #e5e5e5;
-  border-bottom: 1px solid #ffffff;
-  display: block;
-  *font-size: 1px;
-  *width: 100%;
-}
-.x-menuitem-submenu {
-  padding-right: 20px;
-  background: url(images/button/menu-arrow.gif) 100% 7px no-repeat;
-}
-.x-menuitem:hover {
-  text-decoration: none;
-}
-.x-menuitem-hover {
-  background-color: #0088cc;
-}
-.x-menuitem-hover,
-.x-menuitem-hover a {
-  color: #ffffff !important;
-}
-/************************************
  * Controls.Button.MenuButton
  ************************************/
 .x-button-menu {
@@ -945,12 +775,10 @@ input.x-button-small {
 /************************************
  * Controls.Form.Picker
  ************************************/
-/**
- * @author xuld
- */
 .x-picker {
   position: relative;
   display: inline-block;
+  line-height: 18px !important;
   *margin-left: .3em;
 }
 .x-picker:first-child {
@@ -989,26 +817,21 @@ input.x-button-small {
   padding-right: 35px;
 }
 /************************************
- * Controls.Form.ComboBox
+ * Controls.Suggest.Suggest
  ************************************/
-/**
- * @author 
- */
-/************************************
- * Controls.Form.Suggest
- ************************************/
-/**
- * @author  xuld
- */
 .x-suggest {
   margin-top: 2px;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
+.x-suggest .x-list-item {
+  line-height: 18px;
+}
 /************************************
  * Controls.Button.ButtonGroup
  ************************************/
+/** #imports Controls.Button.Button */
 .x-buttongroup {
   display: inline-block;
   vertical-align: middle;
@@ -1067,154 +890,8 @@ input.x-button-small {
   _margin-bottom: 5px;
 }
 /************************************
- * Controls.Container.Tabbable
- ************************************/
-/**
- * @author 
- */
-.x-tabbable {
-  border-bottom: 1px solid #ddd;
-  margin: 0;
-  *zoom: 1;
-}
-.x-tabbable:after {
-  content: ".";
-  display: block;
-  height: 0;
-  clear: both;
-  visibility: hidden;
-}
-.x-tabbable-item {
-  margin: 0 0 -1px;
-  list-style: none;
-  float: left;
-}
-.x-tabbable-item a {
-  display: block;
-  border: 1px solid transparent;
-  _border-color: white;
-  _filter: chroma(color=#ffffff);
-  -webkit-border-radius: 4px 4px 0 0;
-  -moz-border-radius: 4px 4px 0 0;
-  border-radius: 4px 4px 0 0;
-  padding: 7px 12px;
-  text-decoration: none;
-}
-.x-tabbable-item a:hover {
-  border-color: #eeeeee #eeeeee #dddddd;
-  background-color: #eeeeee;
-}
-.x-tabbable-selected a,
-.x-tabbable-selected a:hover {
-  color: #555555;
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-bottom-color: transparent;
-  _border-bottom-color: white;
-  _filter: chroma(color=#ffffff);
-  cursor: default;
-}
-.x-tabbable-alt {
-  border-bottom: none;
-}
-.x-tabbable-alt .x-tabbable-item a,
-.x-tabbable-alt .x-tabbable-item a:hover {
-  border-color: transparent;
-  _border-color: white;
-}
-.x-tabbable-alt .x-tabbable-item a {
-  padding-top: 6px;
-  padding-bottom: 6px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-}
-.x-tabbable-alt .x-tabbable-selected a,
-.x-tabbable-alt .x-tabbable-selected a:hover {
-  color: #ffffff;
-  background-color: #0088cc;
-}
-/************************************
- * Controls.Container.TabbableEx
- ************************************/
-/**
- * @author 
- */
-.x-tabbable-bottom,
-.x-tabbable-right,
-.x-tabbable-left {
-  border-bottom: 0;
-}
-.x-tabbable-bottom {
-  border-top: 1px solid #ddd;
-}
-.x-tabbable-bottom .x-tabbable-item {
-  margin-top: -1px;
-  margin-bottom: 0;
-}
-.x-tabbable-bottom .x-tabbable-item a {
-  -webkit-border-radius: 0 0 4px 4px;
-  -moz-border-radius: 0 0 4px 4px;
-  border-radius: 0 0 4px 4px;
-}
-.x-tabbable-bottom .x-tabbable-item a:hover {
-  border-bottom-color: transparent;
-  border-top-color: #ddd;
-}
-.x-tabbable-bottom .x-tabbable-selected a,
-.x-tabbable-bottom .x-tabbable-selected a:hover {
-  border-color: #ffffff #dddddd #dddddd #dddddd;
-}
-.x-tabbable-left .x-tabbable-item,
-.x-tabbable-right .x-tabbable-item {
-  float: none;
-}
-.x-tabbable-left .x-tabbable-item a,
-.x-tabbable-right .x-tabbable-item a {
-  min-width: 74px;
-  margin-right: 0;
-  margin-bottom: 3px;
-}
-.x-tabbable-left {
-  float: left;
-  border-right: 1px solid #ddd;
-}
-.x-tabbable-left .x-tabbable-item a {
-  margin-right: -1px;
-  -webkit-border-radius: 4px 0 0 4px;
-  -moz-border-radius: 4px 0 0 4px;
-  border-radius: 4px 0 0 4px;
-}
-.x-tabbable-left .x-tabbable-item a:hover {
-  border-color: #eeeeee #dddddd #eeeeee #eeeeee;
-}
-.x-tabbable-left .x-tabbable-selected a,
-.x-tabbable-left .x-tabbable-selected a:hover {
-  border-color: #dddddd #ffffff #dddddd #dddddd;
-}
-.x-tabbable-right {
-  float: right;
-  border-left: 1px solid #ddd;
-}
-.x-tabbable-right .x-tabbable-item a {
-  margin-left: -1px;
-  -webkit-border-radius: 0 4px 4px 0;
-  -moz-border-radius: 0 4px 4px 0;
-  border-radius: 0 4px 4px 0;
-}
-.x-tabbable-right .x-tabbable-item a:hover {
-  border-color: #eeeeee #eeeeee #eeeeee #dddddd;
-}
-.x-tabbable-right .x-tabbable-selected a,
-.x-tabbable-right .x-tabbable-selected a:hover {
-  border-color: #dddddd #dddddd #dddddd #ffffff;
-}
-/************************************
  * Controls.Form.Form
  ************************************/
-/**
- * @author 
- */
 .x-formfield {
   line-height: 28px;
   margin-bottom: 10px;
@@ -1234,7 +911,7 @@ input.x-button-small {
   margin-right: 10px;
   float: left;
 }
-.x-formfield-container {
+.x-formfield-content {
   margin-left: 110px;
 }
 .x-form-vertical .x-formfield-label {
@@ -1243,11 +920,11 @@ input.x-button-small {
   text-align: left;
   margin-right: 0;
 }
-.x-form-vertical .x-formfield-container {
+.x-form-vertical .x-formfield-content {
   margin-left: 0;
 }
 /************************************
- * Controls.DataView.Table
+ * Controls.Display.Table
  ************************************/
 .x-table {
   max-width: 100%;
@@ -1330,30 +1007,9 @@ input.x-button-small {
   background-color: #f3f3f3;
 }
 /************************************
- * Controls.Display.Bubble
- ************************************/
-.x-bubble {
-  padding: 15px;
-  background-color: #f5f5f5;
-  border: 1px solid #eee;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-}
-.x-bubble blockquote {
-  border-color: #ddd;
-  border-color: rgba(0, 0, 0, 0.15);
-}
-/************************************
  * Controls.Button.LinkButton
  ************************************/
-/**
- * @author 
- */
-.x-linkbutton {
-  text-decoration: underline;
+.x-linkbutton,
+.x-linkbutton:hover {
+  color: #333333;
 }
