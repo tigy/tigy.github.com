@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>快速开始</title>
+    <link href="../../../../assets/dpl/assets/base.css" rel="stylesheet">
+    <script src="../../../../assets/demo/demo.js" type="text/javascript"></script>
+</head>
+<body>
+    <article class="demo-all">
+
+        <h2>一点点准备工作</h2>
+
+        <section>
+
+            <h3>1. 下载</h3>
+
+            <p>下载 <a href="http://">jPlusUI-latest.zip</a> , 或者下载 <a href="https://github.com/jplusui/jplus-milk/zipball/master">jPlusUI 源码</a> </p>
+
+            <p>解压zip文件，会得到如下文件结构: </p>
+
+            <script class="demo" type="text/plain">
+            jPlusUI-latest/
+               └── build/
+                    ├── images/
+                    ├── styles/
+                    │     ├── jplus.css
+                    │     ├── jplus.min.css
+                    └── scripts/
+                          ├── jplus.js
+                          └── jplus.min.js
+            </script>
+
+            <p>其中，<code>jplus.*</code> 是已经编译好的源文件，包含了 100 多个常用组件。<code>jplus.min.*</code> 是相应的压缩版。您也可以使用 <a href="/assets/dpl/dplfilelist.html" target="_blank">组件合成工具</a> 来自行编译需要用到的组件。</p>
+
+        </section>
+
+        <section>
+
+            <h3>2. 引入文件</h3>
+
+            <p>新建一个 HTML 文件，内容如下:</p>
+
+            <script class="demo-noformat" type="pre/html">
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>My First Page</title>
+                    ##<link href="__build/styles/jplus.css__" rel="stylesheet">##
+                    ##<script src="__build/scripts/jplus.js__" type="text/javascript"><\/script>##
+                </head>
+                <body>
+                <h1>Hello j+ UI!</h1>
+            </body>
+            </html>
+            </script>
+
+            <p>以上文件已经引入了 jPlusUI 所需要的全部文件。jPlusUI 不支持怪癖(Quirks)模式，因此必须定义&lt;!DocType&gt;, 推荐使用 HTML 5版本的 &lt;!DocType&gt</p>
+
+        </section>
+
+    </article>
+
+    <article class="demo-all">
+
+        <h2>示例</h2>
+
+        <section>
+
+            <h3>3. 插入一个按钮</h3>
+
+            <p>使用如下代码即可插入一个按钮: </p>
+
+            <script class="demo-noformat" type="pre/html">
+            <button class="x-button">我是按钮</button>
+            </script>
+
+            <p>其中, <code>class="x-button"</code> 表明这是一个组件。</p>
+
+            <p>了解更多的组件，可以查看 <a href="/src/index.html" target="_blank">组件列表</a> </p>
+
+        </section>
+
+    </article>
+
+    <article class="demo">
+
+        <h2 class="demo">接下来可以做什么</h2>
+
+        <section class="demo">
+
+            <h4 class="demo">jPlusUI 拥有超过 200 个常用组件, 每个组件都有完整的示例和文档。</h4>
+
+            <p>
+                <a class="x-button x-button-large x-button-fixed" href="/src/index.html">转到组件列表 »</a>
+            </p>
+
+        </section>
+
+    </article>
+</body>
+</html>

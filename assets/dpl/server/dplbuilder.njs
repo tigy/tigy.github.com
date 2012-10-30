@@ -111,6 +111,7 @@ function writeBuildUI(dplFile) {
 	
 	DplBuilderUI.writeDplBuildLog(response, dplFile);
 
+
 	
 	DplBuilderUI.writeFooter(response, true);
 }

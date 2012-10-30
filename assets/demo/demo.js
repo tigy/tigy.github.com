@@ -3195,7 +3195,7 @@ if (typeof module !== 'object') {
              * 增加一个类名。
              */
             addClass: function (elem, className) {
-                elem.className = elem.className ? className : (elem.className + ' ' + className);
+                elem.className = elem.className ? (elem.className + ' ' + className) : className;
             },
 
             /**
@@ -3310,9 +3310,11 @@ if (typeof module !== 'object') {
 
                 	if (space) {
                 	    space = space[0];
-                	    while (sourceCode.indexOf(space) >= 0) {
-                	        sourceCode = sourceCode.replace(space, "");
+                	    sourceCode = sourceCode.split(/[\r\n]/);
+                	    for (var i = sourceCode.length - 1; i >= 0; i--) {
+                	        sourceCode[i] = sourceCode[i].replace(space, "");
                 	    }
+                	    sourceCode = sourceCode.join('\r\n');
                 	}
                 }
 

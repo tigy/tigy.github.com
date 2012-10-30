@@ -286,13 +286,19 @@ HttpApplication.prototype = {
 	
 	},
 	
-	reportError: function(context, statusCode, error){
-		context.response.statusCode = statusCode;
-		context.error = error;
+	reportError: function (context, statusCode, error) {
+	    context.errorCode = statusCode;
+	    context.error = error;
+
+	    if (!context.response.headersSent) {
+	        context.response.statusCode = statusCode;
+
+	        if (this.errorPages[statusCode]) {
+	            return context.response.writeFile(this.errorPages[statusCode]);
+	        }
+	    }
 		
-		if(this.errorPages[statusCode]){
-			context.response.writeFile(this.errorPages[statusCode]);
-		} else if(this.errorHandler){
+		if(this.errorHandler){
 			this.errorHandler.processRequest(context);
 		} else {
 			var desc = require('./httpworkerrequest').getStatusDescription(statusCode);

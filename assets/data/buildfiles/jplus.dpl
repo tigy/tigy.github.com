@@ -1,0 +1,18 @@
+# 基本属性
+title 所有组件
+js scripts/jplus.js
+css styles/jplus.css
+images images
+base ../../../build/assets/
+ 
+
+# 组件依赖
+
+# 组件列表
+using System.Dom.Base
+using System.Ajax.Jsonp
+using System.Fx.Animate
+using Controls.Button.Button
+using Controls.Button.SplitButton
+using Controls.Layout.Grid
+using Controls.Part.Icon

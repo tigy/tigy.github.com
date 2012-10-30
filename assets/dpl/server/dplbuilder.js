@@ -34,6 +34,10 @@ var DplBuilder = {
         console.log(content);
     },
 
+    end: function(){
+
+    },
+
     /**
 	 * 解析一个 DPL 所依赖的 DPL 项。
      * @param {String} dplPath 当前的 DPL 路径。
@@ -619,32 +623,42 @@ var DplBuilder = {
 
 
         if (dplFile.properties.relativeImages) {
-            var f = Path.dirname(path);
+            var cssFolder = Path.dirname(path);
+            var targetName = getParentName(name);
 
-            //  目标 图片文件夹
-            var targetImages = Path.join(this.relativeImages, getParentName(name));
-            var p = Path.join(Path.dirname(this.css), relativeImages);
             var me = this;
 
-            content = content.replace(/url\s*\((['""]?)(.*)\1\)/ig, function (all, c1, c2, c3) {
-                if (c2.indexOf(':') >= 0)
+            if (!me.imageList) {
+                me.imageList = {};
+            }
+
+            content = content.replace(/url\s*\((['""]?)(.*)\1\)/ig, function (all, c1, imgUrl, c3) {
+                if (imgUrl.indexOf(':') >= 0)
                     return all;
 
-                var src = Path.join(f, c2);
-                var destName = Path.basename(c2);
+                // 源图片的原始物理路径。
+                var srcPath = Path.join(cssFolder, imgUrl);
 
-                if (!me.images[src]) {
-                    me.images[src] = true;
+                // 源图片的文件名。
+                var srcName = Path.basename(imgUrl);
 
-                    if (!me.exists(src)) {
-                        me.error('Can\'t Find "' + src + '". (' + path + ')');
+                // 如果这个路径没有拷贝过。
+                if (!me.imageList[srcPath]) {
+                    me.imageList[srcPath] = true;
+
+                    // 不存在，则不处理图片路径。
+                    if (!IO.exists(srcPath)) {
+                        me.error('Can\'t Find "' + srcPath + '". (from ' + path + ')');
 
                         return all;
                     }
 
-                    IO.copyFile(src, Path.join(p, destName));
+                    var destPath =  Path.join(dplFile.properties.images, targetName, srcName);
+                    if (!IO.exists(destPath)) {
+                        IO.copyFile(srcPath, destPath);
+                    }
                 }
-                return "url(" + Path.join(relativeImages, destName).replace(/\\/g, "/") + ")";
+                return "url(" + Path.join(dplFile.properties.relativeImages, targetName, srcName).replace(/\\/g, "/") + ")";
             });
         }
 
@@ -799,7 +813,8 @@ var DplBuilder = {
 
         if (dplFile.properties.images) {
             dplFile.properties.images = Path.resolve(dplFileRootPath, dplFile.properties.images);
-            dplFile.properties.relativeImages = Path.relative(dplFile.properties.css, dplFile.properties.images);
+            dplFile.properties.relativeImages = Path.relative(Path.dirname(dplFile.properties.css), dplFile.properties.images);
+            console.log(dplFile.properties.relativeImages);
             this.infoFile("目标图片文件夹: ", dplFile.properties.images);
         }
 
@@ -817,6 +832,8 @@ var DplBuilder = {
 
         this.info("合成成功!");
 
+        this.end();
+
     }
 
 };
@@ -830,6 +847,19 @@ function removeItem(array, item) {
     }
 }
 
+
+
+function getParentName(name) {
+    var i = name.lastIndexOf('.');
+    if (i > 0) {
+        var j = name.lastIndexOf('.', i - 1);
+
+        if (j >= 0) {
+            name = name.substr(j + 1, i - j - 1);
+        }
+    }
+    return name.toLowerCase();
+}
 
 
 module.exports = DplBuilder;

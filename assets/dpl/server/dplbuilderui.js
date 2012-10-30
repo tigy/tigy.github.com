@@ -221,7 +221,7 @@ function writeDplBuildLog(response, dplFile){
 	};
 	
 	DplBuilder.infoFile = function(content, path){
-		this.log(content + '<a href="file:///' + path.replace(/\\/g, "/") + '" target="_blank">' + path + '</a>'+ '\r\n');
+		this.log(content + '<a href="/explorer:' + path.replace(/\\/g, "/") + '">' + path + '</a>'+ '\r\n');
 	};
 	
 	DplBuilder.log = function(content){
@@ -231,6 +231,11 @@ function writeDplBuildLog(response, dplFile){
 	
 	DplBuilder.error = function(content){
 		response.write('<pre style="color:red">' + content + '</pre>');
+	};
+
+	DplBuilder.end = function () {
+	    writeFooter(response);
+	    response.end();
 	};
 	
 	DplBuilder.build(dplFile);

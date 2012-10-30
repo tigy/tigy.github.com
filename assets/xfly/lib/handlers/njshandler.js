@@ -44,13 +44,17 @@ function initContext(context){
 			return require.call(this, module);
 		},
 		
-		console: console,
-		
 		HttpUtility: require('../server/httputility'),
 		
 		HttpCookie: require('../server/httpcookie'),
 		
-		context: context
+		context: context,
+
+		console: console,
+
+		setTimeout: setTimeout,
+
+		setInterval: setInterval
 		
 	};
 	
