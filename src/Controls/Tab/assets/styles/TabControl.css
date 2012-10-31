@@ -1,7 +1,7 @@
 .x-tabpage-content {
   padding: 10px;
 }
-.x-tabcontrol-alt .x-tabpage {
+.x-tabcontrol-alt .x-tabcontrol-body {
   border-width: 0 1px 1px;
   border-style: solid;
   border-color: #DDD;
