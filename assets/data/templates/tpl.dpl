@@ -3,4 +3,4 @@ js tpl.js
 css tpl.css
 images images
 
-using System.Dom.Base
+using System.Core.Base

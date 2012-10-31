@@ -156,7 +156,7 @@ using("System.Fx.Tween");
 				effect;
 
 			// 如果没有参数，直接隐藏。
-			if (args.length === 0) {
+			if (args[0] == undefined) {
 				Dom.show(me.node);
 			} else {
 
@@ -243,7 +243,7 @@ using("System.Fx.Tween");
 				effect;
 			
 			// 如果没有参数，直接隐藏。
-			if (args.length === 0) {
+			if (args[0] == undefined) {
 				Dom.hide(me.node);
 			} else {
 

@@ -3423,7 +3423,7 @@ if (typeof module !== 'object') {
             toggleSource: function (viewSource, value) {
 
                 // 找到 viewSource 对应的 pre 字段。
-                var code = viewSource.$code, fullMode = viewSource.previousSibling && viewSource.previousSibling.className === 'demo-viewsource-arrow';
+                var code = viewSource.$code, fullMode = viewSource.previousSibling && viewSource.previousSibling.className === 'demo demo-viewsource-arrow';
 
                 // 如果不存在 code，则创建。
                 if (!code) {
@@ -3517,7 +3517,7 @@ if (typeof module !== 'object') {
 
                         var viewSource = document.createElement('div');
                         viewSource.className = 'demo-viewsource';
-                        viewSource.innerHTML = '<span class="demo-viewsource-arrow" onclick="Demo.System.toggleSource(this.nextSibling);return false;">▸</span><a class="demo demo-viewsource-toggle" href="javascript://查看用于创建上文组件的所有源码" onclick="Demo.System.toggleSource(this);return false;">查看源码</a>';
+                        viewSource.innerHTML = '<span class="demo demo-viewsource-arrow" onclick="Demo.System.toggleSource(this.nextSibling);return false;">▸</span><a class="demo demo-viewsource-toggle" href="javascript://查看用于创建上文组件的所有源码" onclick="Demo.System.toggleSource(this);return false;">查看源码</a>';
                         node.parentNode.insertBefore(viewSource, node.nextSibling);
 
                         if (node.className.indexOf('demo-expand') >= 0) {
@@ -3910,7 +3910,7 @@ if (typeof module !== 'object') {
 
                     if (histories = window.localStorage && localStorage.demoDplHistory) {
                         histories = histories.split(';');
-                        for (var i = 0; i < histories.length - 1; i++) {
+                        for (var i = histories.length - 1; i >= 0; i--) {
                             if (histories[i] in DplList) {
                                 html += getTpl(histories[i]);
                             }

@@ -1,6 +1,9 @@
 /**
  * @author xuld
  */
+
+
+using("System.Core.Base");
  
  
 // Core - 核心部分

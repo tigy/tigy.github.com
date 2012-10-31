@@ -2,155 +2,202 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="dpl-info" content="subtitle=简单灵活的 JS UI 组件库" />
+    <link href="assets/web/styles/jplus-welcome.css" rel="stylesheet">
+    <link href="assets/web/styles/index.css" rel="stylesheet">
+    <script src="assets/web/scripts/jplus-welcome.js" type="text/javascript"></script>
+    <script src="assets/web/scripts/index.js" type="text/javascript"></script>
     <title>jPlusUI</title>
-    <script type="text/javascript" src="assets/demo/demo.js"></script>
-    <style>
-
-        body {
-            font-family: "Helvetica Neue", "Microsoft YaHei", Arial, sans-serif
-        }
-       
-        article.demo {
-            margin-bottom: 0;
-        }
-
-        .logo {
-            font-size: 40px;
-            text-align: center;
-            line-height: 60px;
-            margin-top: 45px;
-        }
-
-        .demo .title {
-            color: #999999;
-            text-align: center;
-            font-size: 14px;
-            margin-bottom: 45px;
-        }
-
-        .block {
-            float: left;
-            border-right: 1px solid #DDDDDD;
-            width: 279px;
-            padding-right: 15px;
-            padding-left: 15px;
-            margin-right: 20px;
-        }
-
-        .block-2 {
-            float: left;
-            width: 400px;
-            padding-right: 15px;
-            padding-left: 15px;
-            margin-right: 100px;
-        }
-
-        .block-last {
-            margin-right: 0;
-            border-right: 0;
-        }
-
-        .blocks {
-            margin-bottom: 40px;
-        }
-
-        .site {
-            padding: 0 10px;
-        }
-    </style>
 </head>
 <body>
-
-
-    <article class="demo">
-        <h1 class="logo">jPlusUI 是一个简单灵活的UI组件库</h1>
-        <h2 class="title">快速体验便捷组件开发</h2>
-
-        <div class="blocks demo-clear">
-
-            <div class="block">
-                <h3 class="demo">组件库</h3>
-
-                <p class="demo demo-doc">
-                    组件是<u>可以重用的功能模块</u>。组件化开发可以大幅提高开发效率。磨刀不误砍柴工，拥有一个组件库对团队和个人来说都是非常重要的。
-                </p>
-
-                <ul class="demo">
-                    <li><a class="demo" href="src/index.html#docs/library/introduction.html#what">组件库应该包括什么</a></li>
-                    <li><a class="demo" href="src/index.html#docs/library/introduction.html#how">如何基于 J+ 开发自己的组件库</a></li>
-                </ul>
-            </div>
-
-            <div class="block">
-                <h3 class="demo">开发者中心</h3>
-
-                <p class="demo demo-doc">
-                    没有一个 UI 库能完全符合你的需求，你必须先进行二次开发。
-					开发者中心为组件开发提供了许多工具支持。
-                </p>
-
-                <ul class="demo">
-                    <li><a class="demo" href="src/index.html#docs/library/helloworld.html">快速上手组件开发</a></li>
-                    <li><a class="demo" href="src/index.html#docs/library/dplsystem.html">了解更多开发者中心提供的功能</a></li>
-                </ul>
-            </div>
-
-            <div class="block block-last">
-                <h3 class="demo">如何使用</h3>
-
-                <p class="demo demo-doc">
-                    组件开发完成后，可以使用<a class="demo" href="assets/dpl/dplfilelist.html" target="_blank">组件合成工具</a>将用到的组件合为一个代码，在项目中使用。
-                </p>
-
-                <ul class="demo">
-                    <li><a class="demo" href="src/index.html#docs/jplus/helloworld.html">手把手教你在项目中使用组件</a></li>
-                    <li><a class="demo" href="src/index.html#docs/jplus/usage.html">了解更多关于组件使用的信息</a></li>
-                </ul>
-            </div>
-
+    <a href="http://github.com/jplusui/" id="forkmeongithub">
+        <img src="assets/web/images/fork_me_on_github.png">
+    </a>
+    <div id="topbar">
+        <div class="x-container x-clear">
+            <h1 class="x-left"><a href="./">jPlusUI</a></h1>
+            <ul class="x-left">
+                <li><a href="#" class="selcted">首页</a></li>
+                <li><a href="#">快速上手</a></li>
+                <li><a href="#">设计理念</a></li>
+                <li><a href="#">文档和演示中心</a></li>
+                <li><a href="#">社区</a></li>
+                <li><a href="#">下载</a></li>
+            </ul>
         </div>
+    </div>
+    <div id="main">
+        <div id="header">
 
-        <hr class="demo">
+            <h1><img src="assets/web/images/logo.png" alt="milk" title="jPlusUI" /></h1>
+            <h2>一个简单灵活的UI组件库</h2>
+            <h3>快速体验组件开发乐趣</h3>
+            <div class="buttons">
 
-        <div class="site blocks demo-clear">
-
-            <div class="block-2">
-
-                <h2>关于 J+</h2>
-
-                <p class="demo demo-doc">J+ Library 是一个<strong>简单轻便</strong>、<strong>可定制化</strong>的UI组件库。</p>
-
-                <p class="demo demo-doc">它允许你快速搭建属于自己的组件库。</p>
-
-                <h2>相关网站</h2>
-
-                <p class="demo demo-doc">项目地址： <a class="demo" href="https://github.com/jplusui/jplus-milk" target="_blank">https://github.com/jplusui/jplus-milk</a></p>
-
-                <p class="demo demo-doc">相关信息： <a class="demo" href="https://github.com/jplusui/jplus-milk/graphs/contributors" target="_blank">贡献者列表</a>  <a class="demo" href="https://github.com/jplusui/jplus-milk/issues" target="_blank">讨论话题</a></p>
-
-            </div>
-
-            <div class="block-2 block-last">
-
-                <h2>接下来我可以做什么</h2>
-
-                <ul class="demo">
-                    <li><a class="demo" href="src/index.html" target="_blank">hello world：立即体验使用组件所带来的方便</a></li>
-                    <li><a class="demo" href="src/index.html" target="_blank">浏览全部组件及示例</a></li>
-                    <li><a class="demo" href="src/system/Core/assets/scripts/Base.js" target="_blank">查看组件核心框架源码</a></li>
-                    <li><a class="demo" href="src/index.html" target="_blank">查看组件开发文档</a></li>
-                    <li><a class="demo" href="src/index.html" target="_blank">开发我的第一个组件</a></li>
-                    <li>洗洗睡</li>
-                </ul>
+                <a href="index.html" class="button">5 分钟快速上手</a>
 
             </div>
 
         </div>
-    </article>
+        <div id="body">
+            
+            <div class="features ">
+                <div class="support text">
+                    <div class="x-container">
 
-    <script>
-        Demo.writeFooter();
-    </script>
+                        <a href="">下载 v4.0.0 </a>&nbsp;&nbsp;&nbsp;&nbsp;
+
+                        <a href="">Bug 反馈</a>&nbsp;&nbsp;&nbsp;&nbsp;
+
+                        浏览器: IE6+/FF3+/Chrome/Safari/Opera10+
+
+                        <!--<span class="x-right">支持的浏览器: 
+                            <img src="assets/web/images/ie.gif" />
+                            <img src="assets/web/images/chrome.png" />
+                        </span>
+
+                        <a href="" class="x-button x-button-large x-left">立即下载 v4.0.0</a>-->
+                    </div>
+                </div>
+
+                <h2>jPlus 能做什么</h2>
+
+                <div class="text subtitle">能做什么能做什么能做什么能做什么能做什么能做什么能做什么能做什么能做什么能做什么能做什么能做什么能做什么</div>
+
+                <div class="x-grid x-container">
+                    <div class="x-col x-col-3 x-col-first">
+                        <div class="block">
+                            <img src="assets/web/images/feature-lightweight.png" />
+                            <div class="summary">
+                                <h4>轻量</h4>
+                                <p>AAAA</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <div class="block">
+                            <img src="assets/web/images/feature-stable.png" />
+                            <div class="summary">
+                                <h4>稳定</h4>
+                                <p>AAAA</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <div class="block">
+                            <img src="assets/web/images/feature-easy.png" />
+                            <div class="summary">
+                                <h4>易上手</h4>
+                                <p>AAAA</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <div class="block">
+                            <img src="assets/web/images/feature-flex.png" />
+                            <div class="summary">
+                                <h4>易定制</h4>
+                                <p>AAAA</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="line"></div>
+
+            </div>
+
+            <div class="examples x-container">
+
+                <div class="nav">
+                    <a href="index.html" class="selcted">AAA</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    •&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="index.html">AAA</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </div>
+
+                <div class="x-grid">
+                    <div class="x-col x-col-3 x-col-first">
+                        <a href="index.html" class="x-thumbnail">
+                            <img src="../assets/demo/images/200x200.gif" />
+                        </a>
+                        <h5>111</h5>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <a href="index.html" class="x-thumbnail">
+                            <img src="../assets/demo/images/200x200.gif" />
+                        </a>
+                        <h5>111</h5>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <a href="index.html" class="x-thumbnail">
+                            <img src="../assets/demo/images/200x200.gif" />
+                        </a>
+                        <h5>111</h5>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <a href="index.html" class="x-thumbnail">
+                            <img src="../assets/demo/images/200x200.gif" />
+                        </a>
+                        <h5>111</h5>
+                    </div>
+                </div>
+
+                <div class="x-grid">
+                    <div class="x-col x-col-3 x-col-first">
+                        <a href="index.html" class="x-thumbnail">
+                            <img src="../assets/demo/images/200x200.gif" />
+                        </a>
+                        <h5>111</h5>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <a href="index.html" class="x-thumbnail">
+                            <img src="../assets/demo/images/200x200.gif" />
+                        </a>
+                        <h5>111</h5>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <a href="index.html" class="x-thumbnail">
+                            <img src="../assets/demo/images/200x200.gif" />
+                        </a>
+                        <h5>111</h5>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <a href="index.html" class="x-thumbnail">
+                            <img src="../assets/demo/images/200x200.gif" />
+                        </a>
+                        <h5>111</h5>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="links">
+                <div class="x-container x-grid">
+                    <div class="x-col x-col-7 x-col-first">
+                        <h3>相关链接</h3>
+
+                        <div class="text">
+                            项目地址: <a>AAA</a><br />
+                            项目地址: <a>AAA</a>
+                        </div>
+                    </div>
+
+                    <div class="x-col x-col-5">
+                        <h3>相关链接</h3>
+
+                        <ul class="text">
+                            <li>项目地址: <a>AAA</a></li>
+                            <li>项目地址: <a>AAA</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="footer">
+            <div class="x-container">
+                <span class="x-right">Host By <a href="index.html">XXXX</a></span>
+                Copyright &copy; 2011-2012 jPlusUI Team
+            </div>
+        </div>
+    </div>
 </body>
 </html>

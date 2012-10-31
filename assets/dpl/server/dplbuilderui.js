@@ -211,7 +211,7 @@ function writeDplBuildLog(response, dplFile){
 	
 	var DplBuilder = require('./dplbuilder');
 	
-	response.write('<div class="x-right"><a style="cursor: default" class="x-button x-button-info" href="?action=build&file=' + dplFile.path + '">重新生成</a>  <a style="cursor: default" class="x-button" href="?action=edit&file=' + dplFile.path + '">重新编辑</a>  <a style="cursor: default" class="x-button" href="../dplfilelist.html" title="合法方案列表">返回</a></div>')
+	response.write('<div class="x-right"><a style="cursor: default" class="x-button x-button-info" href="?action=build&file=' + dplFile.path + '">重新生成</a>  <a style="cursor: default" class="x-button" href="../dplfilelist.html" title="合法方案列表">返回列表</a>  <a style="cursor: default" class="x-button" href="?action=edit&file=' + dplFile.path + '">重新编辑</a></div>')
 	
 	response.write('<h2 class="demo">合成日志 <small>合成完成前请勿关闭本页面</small></h2>')
 	
