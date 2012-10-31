@@ -6,7 +6,7 @@
 
 imports("Controls.Form.ListBox");
 using("Controls.Core.ListControl");
-using("Controls.Form.Picker");
+using("Controls.Suggest.Picker");
 
 /**
  * 表示一个组合框。

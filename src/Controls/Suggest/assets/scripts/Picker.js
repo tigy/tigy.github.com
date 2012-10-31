@@ -4,7 +4,7 @@
 
 imports("Controls.Button.Button");
 imports("Controls.Button.MenuButton");
-imports("Controls.Form.Picker");
+imports("Controls.Suggest.Picker");
 using("Controls.Core.IInput");
 using("Controls.Core.IDropDownOwner");
 

@@ -1,7 +1,7 @@
 
 
 
-using("Controls.Form.Picker");
+using("Controls.Suggest.Picker");
 
 
 var SearchTextBox = Picker.extend({
