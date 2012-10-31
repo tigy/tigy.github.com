@@ -102,6 +102,11 @@ a.button {
     font-weight: bold;
 }
 
+a.button-short {
+    background: url(../images/button-short.png);
+    width: 193px;
+}
+
 #forkmeongithub {
 	position: absolute;
 	top: 0;
@@ -131,6 +136,11 @@ a.button {
 
 .support .x-left {
     margin: 20px;
+}
+
+#body h2 a{
+    color: #333;
+    text-decoration: none;
 }
 
 /*特性*/
@@ -180,6 +190,17 @@ a.button {
    
 }
 
+
+
+.x-thumbnail {
+    width: 222px;
+    height: 160px;
+}
+
+.examples h5 a{
+    color: #333;
+    text-decoration: none;
+}
 
 .links {
     margin-top: 60px;

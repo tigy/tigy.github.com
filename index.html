@@ -14,13 +14,13 @@
     </a>
     <div id="topbar">
         <div class="x-container x-clear">
-            <h1 class="x-left"><a href="./">jPlusUI</a></h1>
+            <h1 class="x-left"><a href="./">Milk</a></h1>
             <ul class="x-left">
                 <li><a href="#" class="selcted">首页</a></li>
-                <li><a href="#">快速上手</a></li>
-                <li><a href="#">设计理念</a></li>
-                <li><a href="#">文档和演示中心</a></li>
-                <li><a href="#">社区</a></li>
+                <!--<li><a href="#">快速上手</a></li>
+                <li><a href="#">设计理念</a></li>-->
+                <li><a href="src/">文档和演示中心</a></li>
+                <li><a href="http://github.com/jplusui/jplus-mlik">社区</a></li>
                 <li><a href="#">下载</a></li>
             </ul>
         </div>
@@ -28,12 +28,13 @@
     <div id="main">
         <div id="header">
 
-            <h1><img src="assets/web/images/logo.png" alt="milk" title="jPlusUI" /></h1>
-            <h2>一个简单灵活的UI组件库</h2>
-            <h3>快速体验组件开发乐趣</h3>
+            <h1><img src="assets/web/images/logo.png" alt="milk" title="Milk" /></h1>
+            <h2>一个轻量但完整的UI组件库</h2>
+            <h3>面向互联网页面，快速体验组件化的乐趣</h3>
             <div class="buttons">
 
                 <a href="index.html" class="button">5 分钟快速上手</a>
+                <a href="index.html" class="button button-short">下载 4.0.0 版</a>
 
             </div>
 
@@ -44,24 +45,20 @@
                 <div class="support text">
                     <div class="x-container">
 
-                        <a href="">下载 v4.0.0 </a>&nbsp;&nbsp;&nbsp;&nbsp;
-
-                        <a href="">Bug 反馈</a>&nbsp;&nbsp;&nbsp;&nbsp;
-
-                        浏览器: IE6+/FF3+/Chrome/Safari/Opera10+
+                         支持的浏览器: IE6+/FF3+/Chrome/Safari/Opera10+
 
                         <!--<span class="x-right">支持的浏览器: 
                             <img src="assets/web/images/ie.gif" />
                             <img src="assets/web/images/chrome.png" />
                         </span>
 
-                        <a href="" class="x-button x-button-large x-left">立即下载 v4.0.0</a>-->
+                        <a href="" class="x-button x-button-large x-left">立即下载 4.0.0 版</a>-->
                     </div>
                 </div>
 
-                <h2>jPlus 能做什么</h2>
+                <h2><a href="#body">Milk 介绍</a></h2>
 
-                <div class="text subtitle">能做什么能做什么能做什么能做什么能做什么能做什么能做什么能做什么能做什么能做什么能做什么能做什么能做什么</div>
+                <div class="text subtitle">组件化的开发能有效提升开发效率，降低维护成本。</div>
 
                 <div class="x-grid x-container">
                     <div class="x-col x-col-3 x-col-first">
@@ -69,7 +66,7 @@
                             <img src="assets/web/images/feature-lightweight.png" />
                             <div class="summary">
                                 <h4>轻量</h4>
-                                <p>AAAA</p>
+                                <p>组件底层代码为 34K（Gzipped）, 其它平均每个组件的大小为 1-5 k。</p>
                             </div>
                         </div>
                     </div>
@@ -78,7 +75,7 @@
                             <img src="assets/web/images/feature-stable.png" />
                             <div class="summary">
                                 <h4>稳定</h4>
-                                <p>AAAA</p>
+                                <p>组件底层拥有完整的单元测试，确保各个浏览器的兼容问题。并且每次升级都能保证向下兼容。</p>
                             </div>
                         </div>
                     </div>
@@ -87,7 +84,7 @@
                             <img src="assets/web/images/feature-easy.png" />
                             <div class="summary">
                                 <h4>易上手</h4>
-                                <p>AAAA</p>
+                                <p>本着拿来即用的原则，每个组件只需复制示例代码即可见到效果。</p>
                             </div>
                         </div>
                     </div>
@@ -96,7 +93,7 @@
                             <img src="assets/web/images/feature-flex.png" />
                             <div class="summary">
                                 <h4>易定制</h4>
-                                <p>AAAA</p>
+                                <p>所有组件均按需加载。代码遵循 HTML5 规范，组织构架清晰，容易扩展和定制。</p>
                             </div>
                         </div>
                     </div>
@@ -106,65 +103,67 @@
 
             </div>
 
-            <div class="examples x-container">
+            <div class="examples x-container" id="examples">
 
                 <div class="nav">
-                    <a href="index.html" class="selcted">AAA</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                   <!-- <a href="index.html" class="selcted">AAA</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     •&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <a href="index.html">AAA</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="index.html">AAA</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+                    <a href="#examples" class="selcted">组件精选</a>
                 </div>
 
                 <div class="x-grid">
                     <div class="x-col x-col-3 x-col-first">
-                        <a href="index.html" class="x-thumbnail">
-                            <img src="../assets/demo/images/200x200.gif" />
+                        <a href="src/Controls/Composite/Carousel.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/carousel.png" />
                         </a>
-                        <h5>111</h5>
+                        <h5><a href="src/Controls/Composite/Carousel.html" target="_blank">图片轮播</a></h5>
                     </div>
                     <div class="x-col x-col-3">
-                        <a href="index.html" class="x-thumbnail">
-                            <img src="../assets/demo/images/200x200.gif" />
+                        <a href="src/Controls/Button/Button.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/button.png" />
                         </a>
-                        <h5>111</h5>
+                        <h5><a href="src/Controls/Button/Button.html" target="_blank">按钮</a></h5>
                     </div>
                     <div class="x-col x-col-3">
-                        <a href="index.html" class="x-thumbnail">
-                            <img src="../assets/demo/images/200x200.gif" />
+                        <a href="src/Controls/Form/Form.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/form.png" />
                         </a>
-                        <h5>111</h5>
+                        <h5><a href="src/Controls/Form/Form.html" target="_blank">表单</a></h5>
                     </div>
                     <div class="x-col x-col-3">
-                        <a href="index.html" class="x-thumbnail">
-                            <img src="../assets/demo/images/200x200.gif" />
+                        <a href="src/Controls/Display/Table.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/table.png" />
                         </a>
-                        <h5>111</h5>
+                        <h5><a href="src/Controls/Display/Table.html" target="_blank">表格</a></h5>
                     </div>
                 </div>
 
                 <div class="x-grid">
                     <div class="x-col x-col-3 x-col-first">
-                        <a href="index.html" class="x-thumbnail">
-                            <img src="../assets/demo/images/200x200.gif" />
+                        <a href="src/Controls/Composite/ProgressBar.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/progressbar.png" />
                         </a>
-                        <h5>111</h5>
+                        <h5><a href="src/Controls/Composite/ProgressBar.html" target="_blank">进度条</a></h5>
                     </div>
                     <div class="x-col x-col-3">
-                        <a href="index.html" class="x-thumbnail">
-                            <img src="../assets/demo/images/200x200.gif" />
+                        <a href="src/Controls/Menu/Menu.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/menu.png" />
                         </a>
-                        <h5>111</h5>
+                        <h5><a href="src/Controls/Menu/Menu.html" target="_blank">菜单</a></h5>
                     </div>
                     <div class="x-col x-col-3">
-                        <a href="index.html" class="x-thumbnail">
-                            <img src="../assets/demo/images/200x200.gif" />
+                        <a href="src/Controls/Nav/TreeView.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/treeview.png" />
                         </a>
-                        <h5>111</h5>
+                        <h5><a href="src/Controls/Nav/TreeView.html" target="_blank">树</a></h5>
                     </div>
                     <div class="x-col x-col-3">
-                        <a href="index.html" class="x-thumbnail">
-                            <img src="../assets/demo/images/200x200.gif" />
+                        <a href="src/Controls/Tab/Accordion.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/accordion.png" />
                         </a>
-                        <h5>111</h5>
+                        <h5><a href="src/Controls/Tab/Accordion.html" target="_blank">手风琴</a></h5>
                     </div>
                 </div>
 
@@ -173,20 +172,28 @@
             <div class="links">
                 <div class="x-container x-grid">
                     <div class="x-col x-col-7 x-col-first">
-                        <h3>相关链接</h3>
+                        <h3>4.0 版本新特性</h3>
 
-                        <div class="text">
-                            项目地址: <a>AAA</a><br />
-                            项目地址: <a>AAA</a>
-                        </div>
+                        <ul class="text x-list">
+                            <li>增加大量示例和 API 说明。</li>
+                            <li>重新全面测试浏览器的兼容问题。</li>
+                            <li>全面简化底层构架，减少继承层次。</li>
+                            <li>全面简化 less 引用层次，删除大部分的 @import 。</li>
+                            <li>改进开发和演示界面，并使用 <a href="https://www.github.com/xuld/xfly">xfly</a> 框架重写服务器。</li>
+                        </ul>
+
                     </div>
 
                     <div class="x-col x-col-5">
-                        <h3>相关链接</h3>
+                        <h3>接下来我可以做什么</h3>
 
-                        <ul class="text">
-                            <li>项目地址: <a>AAA</a></li>
-                            <li>项目地址: <a>AAA</a></li>
+                        <ul class="text x-list">
+                            <li><a href="controls/index.html" target="_blank">浏览全部组件及示例</a></li>
+                            <li><a href="src/System/Core/assets/scripts/Base.js" target="_blank">查看组件核心框架源码</a></li>
+                            <li><a href="docs/library/helloworld.html" target="_blank">开发我的第一个组件</a></li>
+                            <li><a href="https://github.com/jplusui/jplus-milk/issues/new" target="_blank">Bug 反馈</a></li>
+                            <li><a href="https://github.com/jplusui/jplus-milk/issues/new" target="_blank">提交需求</a></li>
+                            <li>洗洗睡</li>
                         </ul>
                     </div>
                 </div>
@@ -195,7 +202,7 @@
         <div id="footer">
             <div class="x-container">
                 <span class="x-right">Host By <a href="index.html">XXXX</a></span>
-                Copyright &copy; 2011-2012 jPlusUI Team
+                Copyright &copy; 2011-2012 jPlusUI Team | <a href="LICENSE.txt" target="_blank">The BSD license</a>
             </div>
         </div>
     </div>
