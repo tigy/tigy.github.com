@@ -1,5 +1,5 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/1 13:53
+ * This file is created by a tool at 2012/11/1 14:59
  *********************************************************
  * Contains: 
  *     System.Core.Base
@@ -8428,7 +8428,7 @@ var Button = ContentControl.extend({
 	
 	create: function(options){
 		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype).replace('type="button"', 'type="' + (options.type || this.type) + '"'));
-	},
+	}
 	
 }).implement(IInput);
 
