@@ -1,0 +1,203 @@
+﻿<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
+		<script src="../../System/Dom/assets/scripts/Base.js" type="text/javascript"></script>
+		<script src="../../../assets/demo/demo.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<script>
+		    /**
+             * 表示一个可以延时的操作。
+             */
+		    var DeferredTask = Class({
+            
+                link: function (task) {
+                    task.abort();
+                    if (!task._head) return;
+                    if (!this._head) {
+                        this._head = task._head;
+                        this._last = task._last;
+                    } else {
+                        this._last[2] = task._head;
+                        this._last = task._last;
+                    }
+                },
+            
+		        add: function (deferrable, args) {
+                    if (!this._head) {
+                        this._head = [deferrable, args];
+                        this._last = this._head;
+                    } else {
+                        this._last[2] = [deferrable, args];
+                        this._last = this._last[2]
+                    }
+		        },
+                
+                abort: function () {
+                    if (this._current) {
+                        this._current[0].abort();
+                        this._current = null;
+                    }
+                },
+                
+                clear: function() {
+                    this.abort();
+                    this._head = this._last = null;
+                },
+                
+                play: function () {
+                    if (this._current) return;
+                    this.next();
+                },
+                
+                stop: function () {
+                    this.clear();
+                    if (this.onComplete) this.onComplete();
+                },
+                
+                next: function () {
+                    if (this._head) {
+                        var c = this._current = this._head;
+                        this._head = this._head[2];
+                        c[0]._parent = this;
+                        c[0].run(c[1]);
+                    } else {
+                        this._current = null;
+                        this.stop();
+                    }
+                }
+		    });
+            
+            var Deferred = Class({
+                start: function (args, link) {
+                    if (!this._task) this._task = new DeferredTask();
+                    switch (link) {
+                        case undefined:
+                            break;
+                        case "clear":
+                            this._task.clear();
+                        case "abort":
+                            this._task.abort();
+                            break;
+                        case "stop":
+                            this._task.stop();
+                            break;
+                        case "ignore":
+                            if (this._task._current) return;
+                    }
+                    this._task.add(this, args);
+                    this._task.play();
+                    return this;
+                },
+                
+                then: function (callback, args) {
+                    var dable;
+                    if (Function.isFunction(callback)) {
+                        dable = {run: function (arg) {
+                            callback.call(this, arg);
+                            this._parent.next();
+                            this._parent = null;
+                        }, abort: function () {
+                            this._parent = null;
+                        }};
+                        if (!this._task) this._task = new DeferredTask();
+                        this._task.add(dable, args);
+                        this._task.play();
+                    } else {
+					if(callback === this){
+						return this.start(args, 'wait');
+					}
+                        if (!callback._task) {
+                            if (!this._task) this._task = new DeferredTask();
+							callback._task = this._task;
+                            this._task.add(callback, args);
+                            this._task.play();
+                        } else {
+                            if (!this._task) {
+                                this._task = callback._task;
+                            } else {
+                                this._task.link(callback._task);
+								callback._task = this._task;
+                            }
+                            this._task.play();
+                        }
+                    }
+                },
+                
+                run: function (args) {
+                },
+
+                progress: function () {
+                    if (this._parent) {
+                        this._parent.next();
+                    }
+                },
+                
+                abort: function () {
+                }
+            });
+            
+
+
+
+
+
+            var Fx = Deferred.extend({
+
+                run: function (options) {
+                    var me = this;
+                    me.options = options;
+                    me.resume();
+                },
+
+                done: function () {
+                    var me = this;
+                    trace('fx  done');
+                    me.progress();
+                },
+
+                pause: function () {
+                    var me = this;
+                    clearTimeout(me.timer);
+                },
+
+		        onCallback: function(){
+		            var me = this;
+		            trace(me.options);
+		            me.done();
+		        },
+				
+				resume: function(){
+		            var me = this;
+					 me.timer = setTimeout(me.onCallback.bind(me), 2000);
+				}
+
+		    });
+			
+		    var fx = new Fx();
+
+
+		    fx.start('1', 'wait');
+
+		    fx.start('2', 'wait');
+
+			fx.then(function () {
+				trace('3');
+			});
+	
+			fx.then(fx, '4');
+
+		    var fx2 = new Fx();
+
+			fx.then(fx2, '5');
+
+		    fx2.start('6', 'wait');
+
+
+			
+		</script>
+	</body>
+</html>

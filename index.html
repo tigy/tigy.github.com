@@ -1,74 +1,214 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
-
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Jplus-milk : J+ UI Library - Milk Style" />
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Jplus-milk</title>
-  </head>
-
-  <body>
-
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/jplusui/jplus-milk">View on GitHub</a>
-
-          <h1 id="project_title">Jplus-milk</h1>
-          <h2 id="project_tagline">J+ UI Library - Milk Style</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/jplusui/jplus-milk/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/jplusui/jplus-milk/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
+<head>
+    <meta charset="utf-8">
+    <title>jPlusUI - 一个轻量但完整的UI组件库</title>
+    <link href="assets/web/styles/jplus-welcome.css" rel="stylesheet">
+    <link href="assets/web/styles/index.css" rel="stylesheet">
+</head>
+<body>
+    <a href="https://github.com/jplusui/jplusui/" target="_blank" id="forkmeongithub">
+        <img src="assets/web/images/fork_me_on_github.png">
+    </a>
+    <div id="topbar">
+        <div class="x-container x-clear">
+            <h1 class="x-left"><a href="index.html">jPlusUI</a></h1>
+            <ul class="x-left">
+                <li><a href="index.html" class="selcted">首页</a></li>
+                <li><a href="features.html">设计理念</a></li>
+                <li><a href="src/index.html" target="_blank">文档和演示中心</a></li>
+                <li><a href="http://github.com/jplusui/jplus-mlik">社区</a></li>
+                <li><a href="download.html">下载</a></li>
+            </ul>
+                <a href="getstarted.html" class="button">三分钟快速上手</a>
+        </div>
     </div>
+    <div id="main">
+        <div id="header">
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>Welcome to GitHub Pages.</h3>
+            <h1><img src="assets/web/images/logo.png" alt="jPlusUI" title="jPlusUI" /></h1>
+            <h2>一个轻量但完整的UI组件库</h2>
+            <h3>面向互联网页面，快速体验组件化的乐趣</h3>
+            <div class="buttons">
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+                <a href="index.html" class="button button-short">下载 4.0.0 版</a>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+            </div>
+			
+			<div class="side-nav">
+				<a href="#body">jPlusUI 简介</a>
+				<a href="#examples">组件精选</a>
+				<a href="#links">新特性</a>
+				<a href="#">返回顶部</a>
+			</div>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+        </div>
+        <div id="body">
+            
+            <div class="features ">
+                <div class="support text">
+                    <div class="x-container">
 
-<h3>Designer Templates</h3>
+                         支持的浏览器: IE6+/FF3+/Chrome/Safari/Opera10+
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+                        <!--<span class="x-right">支持的浏览器: 
+                            <img src="assets/web/images/ie.gif" />
+                            <img src="assets/web/images/chrome.png" />
+                        </span>
 
-<h3>Rather Drive Stick?</h3>
+                        <a href="" class="x-button x-button-large x-left">立即下载 4.0.0 版</a>-->
+                    </div>
+                </div>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+                <h2><a href="#body">jPlusUI 介绍</a></h2>
 
-<h3>Authors and Contributors</h3>
+                <div class="text subtitle x-container">组件化的开发能有效提升开发效率，降低维护成本。</div>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+                <div class="x-grid x-container">
+                    <div class="x-col x-col-3 x-col-first">
+                        <div class="block">
+                            <img src="assets/web/images/feature-lightweight.png" />
+                            <div class="summary">
+                                <h4>轻量</h4>
+                                <p>组件底层代码为 34K（Gzipped）, 其它平均每个组件的大小为 1-5 k。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <div class="block">
+                            <img src="assets/web/images/feature-stable.png" />
+                            <div class="summary">
+                                <h4>稳定</h4>
+                                <p>组件底层拥有完整的单元测试，确保各个浏览器的兼容问题。并且每次升级都能保证向下兼容。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <div class="block">
+                            <img src="assets/web/images/feature-easy.png" />
+                            <div class="summary">
+                                <h4>易上手</h4>
+                                <p>本着拿来即用的原则，每个组件只需复制示例代码即可见到效果。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <div class="block">
+                            <img src="assets/web/images/feature-flex.png" />
+                            <div class="summary">
+                                <h4>易定制</h4>
+                                <p>所有组件均按需加载。代码遵循 HTML5 规范，组织构架清晰，容易扩展和定制。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-<h3>Support or Contact</h3>
+                <div class="line"></div>
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
+            </div>
+
+            <div class="examples x-container" id="examples">
+
+                <div class="nav">
+                   <!-- <a href="index.html" class="selcted">AAA</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    •&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="index.html">AAA</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+                    <a href="#examples" class="selcted">组件精选</a>
+                </div>
+
+                <div class="x-grid">
+                    <div class="x-col x-col-3 x-col-first">
+                        <a href="src/Controls/Composite/Carousel.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/carousel.png" />
+                        </a>
+                        <h5><a href="src/Controls/Composite/Carousel.html" target="_blank">图片轮播</a></h5>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <a href="src/Controls/Button/Button.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/button.png" />
+                        </a>
+                        <h5><a href="src/Controls/Button/Button.html" target="_blank">按钮</a></h5>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <a href="src/Controls/Form/Form.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/form.png" />
+                        </a>
+                        <h5><a href="src/Controls/Form/Form.html" target="_blank">表单</a></h5>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <a href="src/Controls/Display/Table.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/table.png" />
+                        </a>
+                        <h5><a href="src/Controls/Display/Table.html" target="_blank">表格</a></h5>
+                    </div>
+                </div>
+
+                <div class="x-grid">
+                    <div class="x-col x-col-3 x-col-first">
+                        <a href="src/Controls/Composite/ProgressBar.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/progressbar.png" />
+                        </a>
+                        <h5><a href="src/Controls/Composite/ProgressBar.html" target="_blank">进度条</a></h5>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <a href="src/Controls/Menu/Menu.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/menu.png" />
+                        </a>
+                        <h5><a href="src/Controls/Menu/Menu.html" target="_blank">菜单</a></h5>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <a href="src/Controls/Nav/TreeView.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/treeview.png" />
+                        </a>
+                        <h5><a href="src/Controls/Nav/TreeView.html" target="_blank">树</a></h5>
+                    </div>
+                    <div class="x-col x-col-3">
+                        <a href="src/Controls/Tab/Accordion.html" class="x-thumbnail" target="_blank">
+                            <img src="assets/thumbnails/accordion.png" />
+                        </a>
+                        <h5><a href="src/Controls/Tab/Accordion.html" target="_blank">手风琴</a></h5>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="links" id="links">
+                <div class="x-container x-grid">
+                    <div class="x-col x-col-7 x-col-first">
+                        <h3>4.0 版本新特性</h3>
+
+                        <ul class="text x-list">
+                            <li>增加大量示例和 API 说明。</li>
+                            <li>重新全面测试浏览器的兼容问题。</li>
+                            <li>全面简化底层构架，减少继承层次。</li>
+                            <li>全面简化 less 引用层次，删除大部分的 @import 。</li>
+                            <li>改进开发和演示界面，并使用 <a href="https://www.github.com/xuld/xfly">xfly</a> 框架重写服务器。</li>
+                        </ul>
+
+                    </div>
+
+                    <div class="x-col x-col-5">
+                        <h3>接下来我可以做什么</h3>
+
+                        <ul class="text x-list">
+                            <li><a href="controls/index.html" target="_blank">浏览全部组件及示例</a></li>
+                            <li><a href="src/System/Core/assets/scripts/Base.js" target="_blank">查看组件核心框架源码</a></li>
+                            <li><a href="docs/library/helloworld.html" target="_blank">开发我的第一个组件</a></li>
+                            <li><a href="https://github.com/jplusui/jplusui/issues/new" target="_blank">Bug 反馈</a></li>
+                            <li><a href="https://github.com/jplusui/jplusui/issues/new" target="_blank">提交需求</a></li>
+                            <li>洗洗睡</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="footer">
+            <div class="x-container">
+                <span class="x-right">Host By <a href="index.html">XXXX</a></span>
+                Copyright &copy; 2011-2012 jPlusUI Team | <a href="LICENSE.txt" target="_blank">The BSD license</a>
+            </div>
+        </div>
     </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Jplus-milk maintained by <a href="https://github.com/jplusui">jplusui</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
-  </body>
+</body>
 </html>

@@ -1,0 +1,9 @@
+F:\wz\dark\xfly\gui\src\UedToolkit\obj\x86\Debug\ResolveAssemblyReference.cache
+F:\wz\dark\xfly\gui\src\UedToolkit\obj\x86\Debug\Xuld.UedToolkit.Properties.Resources.resources
+F:\wz\dark\xfly\gui\src\UedToolkit\obj\x86\Debug\GenerateResource-ResGen.read.1.tlog
+F:\wz\dark\xfly\gui\src\UedToolkit\obj\x86\Debug\GenerateResource-ResGen.write.1.tlog
+F:\wz\dark\xfly\gui\UedToolkit.exe.config
+F:\wz\dark\xfly\gui\src\UedToolkit\obj\x86\Debug\UedToolkit.exe
+F:\wz\dark\xfly\gui\src\UedToolkit\obj\x86\Debug\UedToolkit.pdb
+F:\wz\dark\xfly\gui\UedToolkit.exe
+F:\wz\dark\xfly\gui\UedToolkit.pdb

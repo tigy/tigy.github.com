@@ -1,0 +1,6 @@
+﻿base ../../../../
+js tpl.js
+css tpl.css
+images images
+
+using System.Core.Base

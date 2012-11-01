@@ -1,0 +1,173 @@
+/**
+ * J+ Library, 4
+ * @projectDescription jPlusUI: 简单灵活的 JS UI 组件库。
+ * @copyright 2011-2012 J+ Team
+ * @license The BSD License
+ * @author xuld
+ */
+html,
+body,
+form,
+object,
+iframe,
+img,
+pre,
+ul,
+li {
+  margin: 0;
+  padding: 0;
+}
+html,
+body,
+a img {
+  border: 0;
+}
+ul,
+li {
+  list-style-type: none;
+}
+ol li {
+  list-style-type: decimal;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  empty-cells: show;
+}
+th,
+td {
+  padding: 0;
+  border: 0;
+}
+input,
+button,
+select,
+textarea {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  vertical-align: middle;
+}
+button,
+select,
+textarea {
+  margin: 0;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+textarea {
+  overflow: auto;
+  vertical-align: baseline;
+  *vertical-align: top;
+}
+sub,
+sup {
+  position: relative;
+  font-size: 75%;
+  line-height: 0;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section {
+  display: block;
+}
+audio,
+canvas,
+video {
+  display: inline-block;
+  *display: inline;
+  *zoom: 1;
+}
+audio:not([controls]) {
+  display: none;
+}
+body {
+  font-family: Tahoma, Arial, "宋体";
+  font-size: 12px;
+  line-height: 18px;
+  color: #333333;
+}
+a {
+  color: #0088cc;
+  text-decoration: none;
+}
+a:hover {
+  color: #005580;
+  text-decoration: underline;
+}
+a:focus {
+  outline-offset: -2px;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+  text-rendering: optimizelegibility;
+}
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small {
+  font-weight: normal;
+  color: #999999;
+}
+h1,
+h2,
+h3 {
+  margin: 10px 0;
+  line-height: 36px;
+}
+h4,
+h5,
+h6 {
+  margin: 0;
+  line-height: 18px;
+}
+h1 {
+  font-size: 36px;
+}
+h2 {
+  font-size: 30px;
+}
+h3,
+h1 small {
+  font-size: 24px;
+}
+h4,
+h2 small {
+  font-size: 18px;
+}
+h5,
+h3 small {
+  font-size: 14px;
+}
+h6,
+h4 small {
+  font-size: 12px;
+}
+p {
+  margin: 8px 0;
+}
+p small {
+  color: #999999;
+}

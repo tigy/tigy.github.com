@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'trace.info',"source":'base.js',"sourceFile":'data/source/base.js.html#trace-info',"summary":'<p>\u8f93\u51fa\u4e00\u4e2a\u4fe1\u606f\u3002</p>\n',"params":[{"type":'Object',"name":'msg',"summary":'<p>\u5185\u5bb9\u3002</p>\n'}],"name":'info',"memberOf":'trace',"memberType":'method'});

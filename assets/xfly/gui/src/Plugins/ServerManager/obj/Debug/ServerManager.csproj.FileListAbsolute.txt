@@ -1,0 +1,6 @@
+F:\wz\dark\xfly\gui\src\Plugins\ServerManager\obj\Debug\ResolveAssemblyReference.cache
+F:\wz\dark\xfly\gui\ServerManager.dll.config
+F:\wz\dark\xfly\gui\src\Plugins\ServerManager\obj\Debug\ServerManager.dll
+F:\wz\dark\xfly\gui\src\Plugins\ServerManager\obj\Debug\ServerManager.pdb
+F:\wz\dark\xfly\gui\ServerManager.dll
+F:\wz\dark\xfly\gui\ServerManager.pdb
