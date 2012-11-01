@@ -3567,10 +3567,12 @@ using("System.Core.Base");
 			initEvent: function (e) {
 			    if (!e.getTarget) {
 			        defaultEvent.initEvent(e);
-					var node = getDocument(e.target).node;
-					e.relatedTarget = e.fromElement === e.srcElement ? e.toElement: e.fromElement;
-					e.pageX = e.clientX + node.scrollLeft;
-					e.pageY = e.clientY + node.scrollTop;
+			        e.relatedTarget = e.fromElement === e.srcElement ? e.toElement : e.fromElement;
+
+			        var eventDoc = getDocument(e.target).documentElement;
+			        e.pageX = e.clientX + (eventDoc.scrollLeft || 0) - (eventDoc.clientLeft || 0);
+			        e.pageY = e.clientY + (eventDoc.scrollTop || 0) - (eventDoc.clientTop || 0);
+
 					e.layerX = e.x;
 					e.layerY = e.y;
 					// 1 ： 单击 2 ： 中键点击 3 ： 右击

@@ -8187,7 +8187,9 @@ html.push("</b>")
 };
 this.logRow=function(message,className){var panel=this.getPanel();
 if(panel&&panel.panelNode){this.writeMessage(message,className)
-}else{this.messageQueue.push([message,className])
+} else {
+    if (!this.messageQueue) { this.messageQueue = [] }
+this.messageQueue.push([message,className])
 }return this.LOG_COMMAND
 };
 this.writeMessage=function(message,className){var container=this.getPanel().containerNode;
