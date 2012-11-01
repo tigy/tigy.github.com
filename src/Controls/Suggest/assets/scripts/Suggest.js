@@ -3,10 +3,7 @@
  */
 
 
-
-using("Controls.Core.IDropDownOwner");
-using("Controls.Form.ListBox");
-using("Controls.Form.ComboBox");
+using("Controls.Suggest.ComboBox");
 
 /**
  * 用于提示框的组件。
@@ -18,9 +15,9 @@ var Suggest = ComboBox.extend({
 	getSuggestItems: function(text){
 		if(!this.items){
 			this.items = [];
-			this.dropDown.each(function(item){
-				this.items.push(item.getText());
-			}, this);
+			this.dropDown.child(function(item){
+				this.items.push(Dom.getText(item));
+			}.bind(this));
 		}
 		
 		text = text.toLowerCase();
@@ -33,20 +30,23 @@ var Suggest = ComboBox.extend({
 		this.dropDown.set(value);
 		return this;
 	},
+
+	updateSuggest: function(){
+	    var text = Dom.getText(this.node);
+	    var items = this.getSuggestItems(text);
+
+	    if (!items || !items.length || (items.length === 1 && items[0] === text)) {
+	        return this.hideDropDown();
+	    }
+
+	    this.dropDown.set(items);
+    },
 	
 	/**
 	 * 向用户显示提示项。
 	 */
 	showSuggest: function(){
-		var text = Dom.getText(this.node);
-		var items = this.getSuggestItems(text);
-		
-		if(!items || !items.length || (items.length === 1 && items[0] === text))  {
-			return this.hideDropDown();
-		}
-		
-		this.dropDown.set(items);
-		
+	    this.updateSuggest();
 		this.showDropDown();
 		
 		// 默认选择当前值。
@@ -59,7 +59,8 @@ var Suggest = ComboBox.extend({
 			case 38:
 			case 13:
 			case 36:
-			case 37:
+		    case 37:
+		    case 27:
 			    return;
 		}
 		

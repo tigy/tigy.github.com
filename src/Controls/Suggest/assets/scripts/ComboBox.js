@@ -76,7 +76,7 @@ var ComboBox = Picker.extend({
     /**
 	 * 处理键盘事件。
 	 */
-    onKeyDown: function(e){
+    onKeyDown: function (e) {
         switch(e.keyCode) {
 			
             // 上下
@@ -100,6 +100,11 @@ var ComboBox = Picker.extend({
                         e.preventDefault();
                     }
                 }
+
+            case 27:
+                this.hideDropDown();
+                break;
+
         }
     },
 	
@@ -134,6 +139,56 @@ var ComboBox = Picker.extend({
 	 */
     updateDropDown: function(){
         this._setHover(this.getSelectedItem());
+    },
+
+    /**
+	 * 将指定项同步到当前文本。
+	 */
+    updateText: function (item) {
+
+        // 如果有隐藏域，则设置选择的索引。
+        if (this.dropDownList) {
+
+            var oldValue,
+                text,
+                newValue,
+                input = this.input();
+
+            if (input.node.tagName === "SELECT") {
+
+                oldValue = input.getAttr('selectedIndex');
+
+                if (item) {
+                    var option = item.dataField().option;
+                    if (!option) {
+                        item.dataField().option = option = new Option(item.getText(), this.getValueOfItem(item));
+                        input.node.add(option);
+                    }
+                    option.selected = true;
+                    text = Dom.getText(option);
+                    newValue = input.node.selectedIndex;
+                } else {
+                    input.node.selectedIndex = newValue = -1;
+                    text = input.getAttr('placeholder');
+                }
+
+            } else {
+                oldValue = input.node.value;
+                input.node.value = newValue = item ? this.getValueOfItem(item) : "";
+                text = item ? item.getText() : "";
+            }
+
+            // 无隐藏域，仅设置按钮的文本。
+            this.first().setText(text);
+            if (oldValue !== newValue)
+                this.onChange();
+
+            // 如果未使用表单模式，则设置当前文本框。
+        } else {
+
+            // 获取 item 的文本并更新值。
+            this.setText(item ? item.getText() : "");
+        }
     },
 	
     init: function (options) {
@@ -261,51 +316,7 @@ var ComboBox = Picker.extend({
     setSelectedItem: function (item) {
 
         if (this.onSelect(item) !== false) {
-
-            // 如果有隐藏域，则设置选择的索引。
-            if (this.dropDownList) {
-
-                var oldValue,
-                    text,
-                    newValue,
-                    input = this.input();
-
-                if (input.node.tagName === "SELECT") {
-
-                    oldValue = input.getAttr('selectedIndex');
-
-                    if (item) {
-                        var option = item.dataField().option;
-                        if (!option) {
-                            item.dataField().option = option = new Option(item.getText(), this.getValueOfItem(item));
-                            input.node.add(option);
-                        }
-                        option.selected = true;
-                        text = Dom.getText(option);
-                        newValue = input.node.selectedIndex;
-                    } else {
-                        input.node.selectedIndex = newValue = -1;
-                        text = input.getAttr('placeholder');
-                    }
-
-                } else {
-                    oldValue = input.node.value;
-                    input.node.value = newValue = item ? this.getValueOfItem(item) : "";
-                    text = item ? item.getText() : "";
-                }
-
-                // 无隐藏域，仅设置按钮的文本。
-                this.first().setText(text);
-                if (oldValue !== newValue)
-                    this.onChange();
-
-            // 如果未使用表单模式，则设置当前文本框。
-            } else {
-
-                // 获取 item 的文本并更新值。
-                this.setText(item ? item.getText() : "");
-            }
-
+            this.updateText(item);
         }
         return this;
     },
