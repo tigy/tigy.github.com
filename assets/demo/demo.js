@@ -3567,9 +3567,6 @@ if (typeof module !== 'object') {
              */
             init: function () {
 
-                var configs = Demo.Configs;
-                configs.dev = window.top.document === window.document;
-
                 // 令 IE 支持显示 HTML5 新元素。
                 if (Demo.Dom.isIE) {
                     'article section header footer nav aside details summary menu'.replace(/\w+/g, function (tagName) {
@@ -3578,53 +3575,60 @@ if (typeof module !== 'object') {
                 }
 
                 // 处理当前文件的属性。
+                if (!Demo.web) {
 
-                // 跟目录。
-                var node = document.getElementsByTagName("script");
-                node = node[node.length - 1];
-                node = (!Demo.Dom.isIE || typeof document.constructor !== 'function') ? node.src : node.getAttribute('src', 5);
-                node = node.substr(0, node.length - configs.demoFilePath .length);
-                configs.rootUrl = node;
+                    var configs = Demo.Configs;
 
-                var path = location.href.substr(Demo.Configs.rootUrl.length);
-                var i = path.indexOf('/');
-                configs.basePath = path.substr(0, i);
-                configs.pathInfo = path.substr(i + 1);
+                    configs.dev = window.top.document === window.document;
 
-                if (configs.basePath === configs.examples) {
-                    configs.demo = configs.basePath;
-                }
+                    // 跟目录。
+                    var node = document.getElementsByTagName("script");
+                    node = node[node.length - 1];
+                    node = (!Demo.Dom.isIE || typeof document.constructor !== 'function') ? node.src : node.getAttribute('src', 5);
+                    node = node.substr(0, node.length - configs.demoFilePath.length);
+                    configs.rootUrl = node;
 
-                configs.serverRootUrl = 'http://' + configs.host + ':' + configs.port + '/';
+                    var path = location.href.substr(Demo.Configs.rootUrl.length);
+                    var i = path.indexOf('/');
+                    configs.basePath = path.substr(0, i);
+                    configs.pathInfo = path.substr(i + 1);
 
-                node = document.getElementsByTagName("meta");
-                for (var i = 0; node[i]; i++) {
-                    if (node[i].name === configs.metaDplInfo) {
-                        node = node[i].content;
-                        Demo.Configs.dplInfo = Demo.parseDplInfo(node);
-                        break;
+                    if (configs.basePath === configs.examples) {
+                        configs.demo = configs.basePath;
                     }
+
+                    configs.serverRootUrl = 'http://' + configs.host + ':' + configs.port + '/';
+
+                    node = document.getElementsByTagName("meta");
+                    for (var i = 0; node[i]; i++) {
+                        if (node[i].name === configs.metaDplInfo) {
+                            node = node[i].content;
+                            Demo.Configs.dplInfo = Demo.parseDplInfo(node);
+                            break;
+                        }
+                    }
+
+                    if (!configs.dplInfo) {
+                        configs.dplInfo = {};
+                    }
+
+                    if (!(configs.dplInfo.status in Demo.Configs.status)) {
+                        configs.dplInfo.status = 'ok';
+                    }
+
+                    if (!('name' in configs.dplInfo)) {
+                        configs.dplInfo.name = document.title;
+                    }
+
+                    if (configs.basePath === configs.demo && !/^index\./.test(configs.pathInfo)) {
+                        configs.dplInfo.path = Demo.toDplPath(configs.pathInfo);
+
+                        Demo.System.addDplHistory(configs.dplInfo.path);
+                    }
+
+                    Demo.writeHeader();
+
                 }
-
-                if (!configs.dplInfo) {
-                    configs.dplInfo = {};
-                }
-
-                if (!(configs.dplInfo.status in Demo.Configs.status)) {
-                    configs.dplInfo.status = 'ok';
-                }
-
-                if (!('name' in configs.dplInfo)) {
-                    configs.dplInfo.name = document.title;
-                }
-
-                if (configs.basePath === configs.demo && !/^index\./.test(configs.pathInfo)) {
-                    configs.dplInfo.path = Demo.toDplPath(configs.pathInfo);
-
-                    Demo.System.addDplHistory(configs.dplInfo.path);
-                }
-
-                Demo.writeHeader();
 
                 Demo.Dom.ready(Demo.System.onReady);
             },

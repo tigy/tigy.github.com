@@ -1,5 +1,5 @@
 /**
- * 演示系统的主样式文件�?
+ * 演示系统的主样式文件
  */
 /**
  * @author  xuld
@@ -574,6 +574,10 @@ body.demo .demo-test {
 }
 .demo-tip-hover .demo-toolbar {
   display: block;
+}
+.demo-doc h3.demo {
+  border-bottom: 1px solid #cccccc;
+  padding-bottom: 5px;
 }
 /***************** 组件 ****************/
 /*.demo-nav {

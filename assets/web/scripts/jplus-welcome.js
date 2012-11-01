@@ -1,10 +1,14 @@
 /*********************************************************
- * This file is created by a tool at 2012/10/31 18:27
+ * This file is created by a tool at 2012/11/1 13:53
  *********************************************************
  * Contains: 
- *     Modules.Web.Footer
  *     System.Core.Base
  *     System.Dom.Base
+ *     System.Utils.Deferrable
+ *     System.Fx.Base
+ *     System.Fx.Tween
+ *     System.Fx.Animate
+ *     Modules.Web.Footer
  *     Controls.Core.Base
  *     Controls.Core.ContentControl
  *     Controls.Core.IInput
@@ -12,10 +16,6 @@
  ********************************************************/
 
 
-/*********************************************************
- * Modules.Web.Footer
- ********************************************************/
-/** * @author  */
 /*********************************************************
  * System.Core.Base
  ********************************************************/
@@ -7470,6 +7470,699 @@ function imports(namespace) {
 	
 })(this);
 
+/*********************************************************
+ * System.Utils.Deferrable
+ ********************************************************/
+/**
+ * @author xuld
+ */
+
+/**
+ * �����첽ִ������ʱ��֤�����Ǵ��еġ�
+ */
+var Deferrable = Class({
+
+    chain: function (deferrable, args) {
+        var lastTask = [deferrable, args];
+
+        if (this._firstTask) {
+            this._lastTask[2] = lastTask;
+        } else {
+            this._firstTask = lastTask;
+        }
+        this._lastTask = lastTask;
+    },
+
+    progress: function () {
+
+        var firstTask = this._firstTask;
+        this.isRunning = false;
+
+        if (firstTask) {
+            this._firstTask = firstTask[2];
+
+            firstTask[0].run(firstTask[1]);
+        }
+
+        return this;
+
+    },
+
+    /**
+	 * ��������ͬʱ�������Ĵ���������
+	 * wait - �ȴ��ϸ��������ɡ�
+	 * ignore - ���Ե�ǰ������
+	 * stop - �����ж��ϸ��������ϸ������Ļص�������ִ�У�Ȼ��ִ�е�ǰ������
+	 * abort - �Ƿ�ֹͣ�ϸ��������ϸ������Ļص󱻺��ԣ�Ȼ��ִ�е�ǰ������
+	 * replace - �滻�ϸ�����Ϊ�µĲ������ϸ������Ļص󽫱����ơ�
+	 */
+    defer: function (args, link) {
+
+        var isRunning = this.isRunning;
+        this.isRunning = true;
+
+        if (!isRunning)
+            return false;
+
+        switch (link) {
+            case undefined:
+                break;
+            case "abort":
+            case "stop":
+            case "skip":
+                this[link]();
+                this.isRunning = true;
+                return false;
+            case "replace":
+                this.init(this.options = Object.extend(this.options, args));
+
+                // fall through
+            case "ignore":
+                return true;
+            default:
+                assert(link === "wait", "Deferred#defer(args, link): ��Ա {link} ������ wait��abort��stop��ignore��replace ֮һ��", link);
+        }
+
+        this.chain(this, args);
+        return true;
+    },
+
+    /**
+	 * �õ�ǰ���еȴ�ָ���� deferred ȫ��ִ�����Ϻ�ִ�С�
+	 */
+    wait: function (deferred) {
+        if (this.isRunning) {
+            this.stop();
+        }
+
+        this.defer = deferred.defer.bind(deferred);
+        this.progress = deferred.progress.bind(deferred);
+        return this;
+    },
+
+    then: function (callback, args) {
+        if (this.isRunning) {
+            this.chain({
+                owner: this,
+                run: function (args) {
+                    if (callback.call(this.owner, args) !== false)
+                        this.owner.progress();
+                }
+            }, args);
+        } else {
+            callback.call(this, args);
+        }
+        return this;
+    },
+
+    delay: function (duration) {
+        return this.run({ duration: duration });
+    },
+
+    pause: Function.empty,
+
+    skip: function () {
+        this.pause();
+        this.progress();
+        return this;
+    },
+
+    abort: function () {
+        this.pause();
+        this._firstTask = this._lastTask = null;
+        this.isRunning = false;
+        return this;
+    },
+
+    stop: function () {
+        return this.abort();
+    }
+
+});
+
+/*********************************************************
+ * System.Fx.Base
+ ********************************************************/
+/**
+ * @fileOverview 提供底层的 特效算法支持。
+ * @author xuld
+ */
+
+/**
+ * 特效算法基类。
+ * @class Fx
+ * @extends Deferrable
+ * @abstract
+ */
+var Fx = (function() {
+	
+	
+	/// #region interval
+	
+	var cache = {};
+	
+	/**
+	 * 定时执行的函数。
+	 */
+	function interval(){
+		var i = this.length;
+		while(--i >= 0)
+			this[i].step();
+	}
+	
+	/// #endregion
+		
+	return Deferrable.extend({
+
+		/**
+		 * 当前 FX 对象的默认配置。
+		 */
+		options: {
+
+			/**
+			 * 特效执行毫秒数。
+			 * @type {Number}
+			 */
+			duration: 300,
+
+			/**
+			 * 每秒的运行帧次。
+			 * @type {Number}
+			 */
+			fps: 50,
+
+			/**
+			 * 用于实现渐变曲线的计算函数。函数的参数为：
+			 *
+			 * - @param {Object} p 转换前的数值，0-1 之间。
+			 *
+			 * 返回值是一个数字，表示转换后的值，0-1 之间。
+			 * @field
+			 * @type Function
+			 * @remark
+			 */
+			transition: function(p) {
+				return -(Math.cos(Math.PI * p) - 1) / 2;
+			}
+
+		},
+		
+		/**
+		 * 当被子类重写时，实现生成当前变化所进行的初始状态。
+		 * @param {Object} from 开始位置。
+		 * @param {Object} to 结束位置。
+		 * @return {Base} this
+		 */
+		init: Function.empty,
+		
+		/**
+		 * @event step 当进度改变时触发。
+		 * @param {Number} value 当前进度值。
+		 */
+		
+		/**
+		 * 根据指定变化量设置值。
+		 * @param {Number} delta 变化量。 0 - 1 。
+		 * @abstract
+		 */
+		set: Function.empty,
+		
+		/**
+		 * 进入变换的下步。
+		 */
+		step: function() {
+			var me = this,
+				time = Date.now() - me.time,
+				options = me.options;
+			if (time < options.duration) {
+				me.set(options.transition(time / options.duration));
+			}  else {
+				me.end(false);
+			}
+		},
+		
+		/**
+		 * 开始运行特效。
+		 * @param {Object} from 开始位置。
+		 * @param {Object} to 结束位置。
+		 * @param {Number} duration=-1 变化的时间。
+		 * @param {Function} [onComplete] 停止回调。
+		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 restart 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
+		 * @return {Base} this
+		 */
+		run: function (options, link) {
+			var me = this, defaultOptions, duration;
+			if (!me.defer(options, link)) {
+
+				defaultOptions = me.options;
+
+				// options
+				me.options = options = Object.extend({
+					transition: defaultOptions.transition,
+					fps: defaultOptions.fps
+				}, options);
+
+				// duration
+				duration = options.duration;
+				assert(duration == undefined || duration === 0 || +duration, "Fx#run(options, link): {duration} 必须是数字。如果需要使用默认的时间，使用 -1 。",  duration);
+				options.duration = duration !== -1 && duration != undefined ? duration < 0 ? -defaultOptions.duration / duration : duration : defaultOptions.duration;
+
+				// start
+				if (options.start && options.start.call(options.target, options, me) === false) {
+					me.progress();
+				} else {
+
+					me.init(options);
+					me.set(0);
+					me.time = 0;
+					me.resume();
+				}
+			}
+
+			return me;
+		},
+
+		/**
+		 * 让当前特效执行器等待指定时间。
+		 */
+		delay: function(timeout){
+			return this.run({
+				duration: timeout
+			});
+		},
+
+		/**
+		 * 由应用程序通知当前 Fx 对象特效执行完。
+		 * @param {Boolean} isAbort 如果是强制中止则为 true, 否则是 false 。
+		 */
+		end: function(isAbort) {
+			var me = this;
+			me.pause();
+			me.set(1);
+			try {
+
+				// 调用回调函数。
+				if (me.options.complete) {
+					me.options.complete.call(me.options.target, isAbort, me);
+				}
+			} finally {
+
+				// 删除配置对象。恢复默认的配置对象。
+				delete me.options;
+				me.progress();
+			}
+			return me;
+		},
+		
+		/**
+		 * 中断当前效果。
+		 */
+		stop: function() {
+			this.abort();
+			this.end(true);
+			return this;
+		},
+		
+		/**
+		 * 暂停当前效果。
+		 */
+		pause: function() {
+			var me = this, fps, intervals;
+			if (me.timer) {
+				me.time = Date.now() - me.time;
+				fps = me.options.fps;
+				intervals = cache[fps];
+				intervals.remove(me);
+				if (intervals.length === 0) {
+					clearInterval(me.timer);
+					delete cache[fps];
+				}
+				me.timer = 0;
+			}
+			return me;
+		},
+		
+		/**
+		 * 恢复当前效果。
+		 */
+		resume: function() {
+			var me = this, fps, intervals;
+			if (!me.timer) {
+				me.time = Date.now() - me.time;
+				fps = me.options.fps;
+				intervals = cache[fps];
+				if (intervals) {
+					intervals.push(me);
+					me.timer = intervals[0].timer;
+				} else {
+					me.timer = setInterval(interval.bind(cache[fps] = [me]), Math.round(1000 / fps ));
+				}
+			}
+			return me;
+		}
+		
+	});
+	
+
+})();
+
+/*********************************************************
+ * System.Fx.Tween
+ ********************************************************/
+/** * DOM 补间动画 * @author xuld */Object.extend(Fx, {		/**	 * 用于特定 css 补间动画的引擎。 
+	 */	tweeners: {},		/**	 * 默认的补间动画的引擎。 	 */	defaultTweeners: [],		/**	 * 用于数字的动画引擎。
+	 */	numberTweener: {		get: function(target, name){			return Dom.styleNumber(target.node, name);		},						/**		 * 常用计算。		 * @param {Object} from 开始。		 * @param {Object} to 结束。		 * @param {Object} delta 变化。		 */		compute: function(from, to, delta){			return (to - from) * delta + from;		},				parse: function(value){			return typeof value == "number" ? value : parseFloat(value);		},				set: function(target, name, value){			target.node.style[name] = value;		}	},	/**	 * 补间动画	 * @class Tween	 * @extends Fx	 */	Tween: Fx.extend({				/**		 * 初始化当前特效。		 */		constructor: function(){					},				/**		 * 根据指定变化量设置值。		 * @param {Number} delta 变化量。 0 - 1 。		 * @override		 */		set: function(delta){			var options = this.options,				params = options.params,				target = options.target,				tweener,				key,				value;			// 对当前每个需要执行的特效进行重新计算并赋值。			for (key in params) {				value = params[key];				tweener = value.tweener;				tweener.set(target, key, tweener.compute(value.from, value.to, delta));			}		},				/**		 * 生成当前变化所进行的初始状态。		 * @param {Object} options 开始。		 */		init: function (options) {							// 对每个设置属性			var key,				tweener,				part,				value,				parsed,				i,				// 生成新的 tween 对象。				params = {};						for (key in options.params) {				// value				value = options.params[key];				// 如果 value 是字符串，判断 += -= 或 a-b				if (typeof value === 'string' && (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {					value = part[3];				}				// 找到用于变化指定属性的解析器。				tweener = Fx.tweeners[key = key.toCamelCase()];								// 已经编译过，直接使用， 否则找到合适的解析器。				if (!tweener) {										// 如果是纯数字属性，使用 numberParser 。					if(key in Dom.styleNumbers) {						tweener = Fx.numberTweener;					} else {												i = Fx.defaultTweeners.length;												// 尝试使用每个转换器						while (i-- > 0) {														// 获取转换器							parsed = Fx.defaultTweeners[i].parse(value, key);														// 如果转换后结果合格，证明这个转换器符合此属性。							if (parsed || parsed === 0) {								tweener = Fx.defaultTweeners[i];								break;							}						}						// 找不到合适的解析器。						if (!tweener) {							continue;						}											}					// 缓存 tweeners，下次直接使用。					Fx.tweeners[key] = tweener;				}								// 如果有特殊功能。 ( += -= a-b)				if(part){					parsed = part[2];					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));				} else {					parsed = tweener.parse(value);					i = tweener.get(options.target, key);				}								params[key] = {					tweener: tweener,					from: i,					to: parsed						};								assert(i !== null && parsed !== null, "Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, i, parsed);							}			options.params = params;		}		}),		createTweener: function(tweener){		return Object.extendIf(tweener, Fx.numberTweener);	}	});Object.each(Dom.styleFix, function(value, key){	Fx.tweeners[key] = this;}, Fx.createTweener({	set: function (target, name, value) {		Dom.styleFix[name].call(target, value);	}}));Fx.tweeners.scrollTop = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(null, value);	},	get: function (target) {		return target.getScroll().y;	}});Fx.tweeners.scrollLeft = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(value);	},	get: function (target) {		return target.getScroll().x;	}});Fx.defaultTweeners.push(Fx.createTweener({	set: navigator.isStd ? function (target, name, value) {				target.node.style[name] = value + 'px';	} : function(target, name, value) {		try {						// ie 对某些负属性内容报错			target.node.style[name] = value;		}catch(e){}	}}));
+/*********************************************************
+ * System.Fx.Animate
+ ********************************************************/
+/**
+ * @fileOverview 通过改变CSS实现的变换。
+ * @author xuld
+ */
+
+
+
+(function(){
+	
+	var displayEffects = Fx.displayEffects = {
+			opacity: Function.from({
+				opacity: 0
+			})
+		},
+
+		toggle = Dom.prototype.toggle,
+
+		shift = Array.prototype.shift,
+		
+		height = 'height marginTop paddingTop marginBottom paddingBottom';
+
+	function fixProp(options, elem, prop) {
+		options.orignal[prop] = elem.style[prop];
+		elem.style[prop] = Dom.styleNumber(elem, prop) + 'px';
+	}
+
+	Object.each({
+		all: height + ' opacity width',
+		height: height,
+		width: 'width marginLeft paddingLeft marginRight paddingRight'
+	}, function(value, key){
+		value = Object.map(value, this, {});
+
+		displayEffects[key] = function(options, elem, isShow) {
+
+			// 修复 overflow 。
+			options.orignal.overflow = elem.style.overflow;
+			elem.style.overflow = 'hidden';
+
+			// inline 元素不支持 修改 width 。
+			if (Dom.styleString(elem, 'display') === 'inline') {
+				options.orignal.display = elem.style.display;
+				elem.style.display = 'inline-block';
+			}
+
+			// 如果是 width, 固定 height 。
+			if (key === 'height') {
+				fixProp(options, elem, 'width');
+			} else if (key === 'width') {
+				fixProp(options, elem, 'height');
+			}
+			
+			return value;
+		};
+	}, Function.from(0));
+	
+	Object.map('left right top bottom', function(key, index) {
+		key = 'margin' + key.capitalize();
+		return function(options, elem, isShow) {
+
+			// 将父元素的 overflow 设为 hidden 。
+			elem.parentNode.style.overflow = 'hidden';
+
+			var params = {},
+				fromValue,
+				toValue,
+				key2,
+				delta;
+			
+			if (index <= 1) {
+				key2 = index === 0 ? 'marginRight' : 'marginLeft';
+				fromValue = -elem.offsetWidth - Dom.styleNumber(elem, key2);
+				toValue = Dom.styleNumber(elem, key);
+				params[key] = isShow ? (fromValue + '-' + toValue) : (toValue + '-' + fromValue);
+
+				fixProp(options, elem, 'width');
+				delta = toValue - fromValue;
+				toValue = Dom.styleNumber(elem, key2);
+				fromValue = toValue + delta;
+				params[key2] = isShow ? (fromValue + '-' + toValue) : (toValue + '-' + fromValue);
+
+			} else {
+				key2 = index === 2 ? 'marginBottom' : 'marginTop';
+				fromValue = -elem.offsetHeight - Dom.styleNumber(elem, key2);
+				toValue = Dom.styleNumber(elem, key);
+				params[key] = isShow ? (fromValue + '-' + toValue) : (toValue + '-' + fromValue);
+			}
+
+			return params;
+		
+		};
+		
+	}, displayEffects);
+
+	Dom.implement({
+		
+		/**
+		 * 获取和当前节点有关的 param 实例。
+		 * @return {Animate} 一个 param 的实例。
+		 */
+		fx: function() {
+			var data = this.dataField();
+			return data.$fx || (data.$fx = new Fx.Tween());
+		}
+		
+	}, 2)
+	
+	.implement({
+		
+		/**
+		 * 变化到某值。
+		 * @param {String/Object} [name] 变化的名字或变化的末值或变化的初值。
+		 * @param {Number} duration=-1 变化的时间。
+		 * @param {Function} [oncomplete] 停止回调。
+		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 rerun 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
+		 * @return this
+		 */
+		animate: function (params, duration, oncomplete, link) {
+			assert.notNull(params, "Dom#animate(params, duration, oncomplete, link): {params} ~", params);
+				
+			if(params.params){
+				link = params.link;
+			} else {
+				params = {
+					params: params,
+					duration: duration,
+					complete: oncomplete
+				};
+			}
+			
+			params.target = this;
+
+			assert(!params.duration || typeof params.duration === 'number', "Dom#animate(params, duration, oncomplete, link): {duration} 必须是数字。如果需要制定为默认时间，使用 -1 。", params.duration);
+			assert(!params.oncomplete || Object.isFunction(params.oncomplete), "Dom#animate(params, duration, oncomplete, link): {oncomplete} 必须是函数", params.oncomplete);
+			
+			this.fx().run(params, link);
+			
+			return this;
+		},
+		
+		/**
+		 * 显示当前元素。
+		 * @param {Number} duration=500 时间。
+		 * @param {Function} [callback] 回调。
+		 * @param {String} [type] 方式。
+		 * @return {Element} this
+		 */
+		show: function() {
+			var me = this,
+				args = arguments,
+				callback,
+				effect;
+
+			// 如果没有参数，直接隐藏。
+			if (args[0] == undefined) {
+				Dom.show(me.node);
+			} else {
+
+				// 如果第一个参数是字符串。则表示是显示类型。
+				effect = typeof args[0] === 'string' ? shift.call(args) : 'opacity';
+				assert(Fx.displayEffects[effect], "Dom#show(effect, duration, callback, link): 不支持 {effect} 。", effect);
+				callback = args[1];
+
+				me.fx().run({
+					target: me,
+					duration: args[0],
+					start: function(options, fx) {
+
+						var elem = this.node,
+							t,
+							params,
+							param;
+
+						// 如果元素本来就是显示状态，则不执行后续操作。
+						if (!Dom.isHidden(elem)) {
+							if (callback)
+								callback.call(this, true, true);
+							return false;
+						}
+
+						// 首先显示元素。
+						Dom.show(elem);
+
+						// 保存原有的值。
+						options.orignal = {};
+
+						// 新建一个新的 params 。
+						options.params = params = {};
+
+						// 获取指定特效实际用于展示的css字段。
+						t = Fx.displayEffects[effect](options, elem, true);
+
+						// 保存原有的css值。
+						// 用于在hide的时候可以正常恢复。
+						for (param in t) {
+							options.orignal[param] = elem.style[param];
+						}
+
+						// 因为当前是显示元素，因此将值为 0 的项修复为当前值。
+						for (param in t) {
+							if (t[param] === 0) {
+
+								// 设置变化的目标值。
+								params[param] = Dom.styleNumber(elem, param);
+
+								// 设置变化的初始值。
+								elem.style[param] = 0;
+							} else {
+								params[param] = t[param];
+							}
+						}
+					},
+					complete: function(isAbort, fx) {
+
+						// 拷贝回默认值。
+						Object.extend(this.node.style, fx.options.orignal);
+
+						if (callback)
+							callback.call(this, false, isAbort);
+					}
+				}, args[2]);
+
+			}
+		
+			return me;
+		},
+		
+		/**
+		 * 隐藏当前元素。
+		 * @param {Number} duration=500 时间。
+		 * @param {Function} [callback] 回调。
+		 * @param {String} [type] 方式。
+		 * @return {Element} this
+		 */
+		hide: function () {
+			var me = this,
+				args = arguments,
+				callback,
+				effect;
+			
+			// 如果没有参数，直接隐藏。
+			if (args[0] == undefined) {
+				Dom.hide(me.node);
+			} else {
+
+				// 如果第一个参数是字符串。则表示是显示类型。
+				effect = typeof args[0] === 'string' ? shift.call(args) : 'opacity';
+				assert(Fx.displayEffects[effect], "Dom#hide(effect, duration, callback, link): 不支持 {effect} 。", effect);
+				callback = args[1];
+
+				me.fx().run({
+					target: me,
+					duration: args[0],
+					start: function(options, fx) {
+
+						var elem = this.node,
+							params,
+							param;
+
+						// 如果元素本来就是隐藏状态，则不执行后续操作。
+						if (Dom.isHidden(elem)) {
+							if (callback)
+								callback.call(this, false, true);
+							return false;
+						}
+
+						// 保存原有的值。
+						options.orignal = {};
+
+						// 获取指定特效实际用于展示的css字段。
+						options.params = params = Fx.displayEffects[effect](options, elem, false);
+
+						// 保存原有的css值。
+						// 用于在show的时候可以正常恢复。
+						for (param in params) {
+							options.orignal[param] = elem.style[param];
+						}
+					},
+					complete: function(isAbort, fx) {
+
+						var elem = this.node;
+
+						// 最后显示元素。
+						Dom.hide(elem);
+
+						// 恢复所有属性的默认值。
+						Object.extend(elem.style, fx.options.orignal);
+
+						// callback
+						if (callback)
+							callback.call(this, false, isAbort);
+					}
+				}, args[2]);
+
+			}
+			
+			return this;
+		},
+	
+		toggle: function(){
+			var me = this;
+			me.fx().then(function (args) {
+				toggle.apply(me, args);
+				return false;
+			}, arguments);
+
+			return me;
+		}
+	
+	});
+	
+})();
+
+/// TODO: clear
+
+document.animate = function() {
+	assert.deprected("document.animate 已过时，请改用 Dom.get(document).animate。");
+	var doc = Dom.get(document);
+	doc.animate.apply(doc, arguments);
+	return this;
+};
+
+/// TODO: clear
+
+/*********************************************************
+ * Modules.Web.Footer
+ ********************************************************/
+/** * @author  */
 /*********************************************************
  * Controls.Core.Base
  ********************************************************/
