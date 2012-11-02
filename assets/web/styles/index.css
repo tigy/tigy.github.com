@@ -1,59 +1,7 @@
 ﻿
 
-        /*body {
-            font-family: "Helvetica Neue", "Microsoft YaHei", Arial, sans-serif
-        }
-       
-        article.demo {
-            margin-bottom: 0;
-        }
-
-        .logo {
-            font-size: 40px;
-            text-align: center;
-            line-height: 60px;
-            margin-top: 45px;
-        }
-
-        .demo .title {
-            color: #999999;
-            text-align: center;
-            font-size: 14px;
-            margin-bottom: 45px;
-        }
-
-        .block {
-            float: left;
-            border-right: 1px solid #DDDDDD;
-            width: 279px;
-            padding-right: 15px;
-            padding-left: 15px;
-            margin-right: 20px;
-        }
-
-        .block-2 {
-            float: left;
-            width: 400px;
-            padding-right: 15px;
-            padding-left: 15px;
-            margin-right: 100px;
-        }
-
-        .block-last {
-            margin-right: 0;
-            border-right: 0;
-        }
-
-        .blocks {
-            margin-bottom: 40px;
-        }
-
-        .site {
-            padding: 0 10px;
-        }*/
 
 
- 
 
 /*全局*/
 
@@ -144,18 +92,6 @@ a.button-short {
 
 .support img {
     vertical-align: middle;
-}
-
-.support a.x-button {
-    color: #111;
-}
-
-.support .x-right {
-    margin: 10px;
-}
-
-.support .x-left {
-    margin: 20px;
 }
 
 #body h2 a{
