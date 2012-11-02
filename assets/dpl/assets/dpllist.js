@@ -145,7 +145,7 @@ Demo.writeDplList = function (values) {
     Demo.DplList.tree = Demo.listToTree(DplList);
 
     var list = Demo.DplList.list, tree = Demo.DplList.tree, key, a, ai, b, bi, c, dplInfo, html = '', html2, all, finish,
-    	from = decodeURIComponent((/(&|\?)from=(.*?)(&|$)/.exec(location.href) || [0, 0, ""])[2]),
+    	from = document.referrer || "", // decodeURIComponent((/(&|\?)from=(.*?)(&|$)/.exec(location.href) || [0, 0, ""])[2]),
         counts = {},
     	column = 4;
     

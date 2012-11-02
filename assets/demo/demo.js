@@ -112,7 +112,7 @@ Demo.extend(Demo, {
         footer: '<footer class="demo">\
         <hr class="demo" />\
         <nav class="demo-toolbar">\
-            <a href="http://www.jplusui.com/">J+ 首页</a> | <a href="https://www.github.com/jplusui/jplus-milk">Github</a> | <a href="#">返回顶部</a>\
+            <a href="http://www.jplusui.com/">jPlusUI.com</a> | <a href="https://www.github.com/jplusui/jplusui">Github</a> | <a href="#">返回顶部</a>\
         </nav>\
 <span class="demo-mono">Copyright &copy; 2011-2012 J+ Team</span>\
 </footer>',
@@ -4019,7 +4019,8 @@ if (typeof module !== 'object') {
                 if(Demo.Configs.basePath === Demo.Configs.demo && /^index\.html($|\?|#)/.test(Demo.Configs.pathInfo)){
                     html += '<a href="' + configs.serverRootUrl + configs.apiPath + 'dplmanager.njs?action=updatelist&postback=' + encodeURIComponent(location.href) + ' " title="刷新组件列表缓存" accesskey="H">刷新列表</a>';
                 } else {
-                    html += '<a href="' + configs.rootUrl + configs.demo + '/index.html?from=' + encodeURIComponent(location.href) + ' " title="返回组件列表" accesskey="H">返回列表</a>';
+                    // html += '<a href="' + configs.rootUrl + configs.demo + '/index.html?from=' + encodeURIComponent(location.href) + '" title="返回组件列表" accesskey="H">返回列表</a>';
+                    html += '<a href="' + configs.rootUrl + configs.demo + '/index.html" title="返回组件列表" accesskey="H">返回列表</a>';
                 }
 
                 html += '</nav></aside>';
