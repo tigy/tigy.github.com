@@ -1,4 +1,8 @@
-﻿
+﻿/**
+ * @author xuld
+ */
+
+using("System.Text.Base");
 
 
 /**

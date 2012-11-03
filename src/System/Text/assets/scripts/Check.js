@@ -2,10 +2,9 @@
  * @author aki
  */
 
+using("System.Text.Base");
 
-var Check = Check || {};
-
-Object.extend(Check, {
+Object.extend(Text, {
 	
 	/**
 	 * 测试字符串是否为邮箱格式.
@@ -21,7 +20,7 @@ Object.extend(Check, {
 	 * @param {Object} value
 	 */
 	isInteger:function(value){
-    	return /^[-]?\d+$/.test(val);
+	    return /^[-]?\d+$/.test(value);
 	},
 	
 	isDate: function (value){

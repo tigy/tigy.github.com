@@ -1,4 +1,8 @@
-/** * @author xuld */
+/**
+ * @author xuld
+ */
+
+using("System.Text.Base");
 
 //将utf8转gb2312
 Text.utf8ToGb2312 = function (str) {

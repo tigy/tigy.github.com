@@ -2,7 +2,10 @@
 using("System.Browser.Base");
 
 
-
+/**
+ * 预载入一个地址的资源。
+ * @param {String} src 图片地址。
+ */
 Browser.preload = (function () {
 	
 	var loadings = [], isLoading = false;
@@ -26,10 +29,6 @@ Browser.preload = (function () {
 		};
 	}
 	
-	/**
-	 * 预载入一个地址的资源。
-	 * @param {String} src 图片地址。
-	 */
 	return function(src){
 		loadings.push(src);
 		loadNext();
