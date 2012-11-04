@@ -61,12 +61,8 @@
                 <input type="checkbox" checked="checked" id="packer-shrink" class="x-checkbox"><label for="packer-shrink">压缩变量</label>
 
             </div>
-
-            <span class="x-buttongroup">
-                <button class="x-button" onclick="CodeHelper.string()">
-                    转字符串
-                </button>
-            </span>
+            
+            <hr>
 
             <span class="x-splitbutton x-buttongroup">
                 <button class="x-button" onclick="CodeHelper.obfuscator()">
@@ -111,12 +107,49 @@
                 <input type="checkbox" id="jjencode-palindrome" class="x-checkbox"><label for="jjencode-palindrome">重复加密</label>
 
             </div>
+            
+            <hr>
+
+            <span class="x-buttongroup">
+                <button class="x-button" onclick="CodeHelper.string()">
+                    转 JS 字符串
+                </button>
+            </span>
+
+            <span class="x-splitbutton x-buttongroup">
+                <button class="x-button" onclick="CodeHelper.escapeJs()">
+                    中文编码
+                </button>
+                <button class="x-button" onclick="CodeHelper.unescapeJs()">
+                    解码
+                </button>
+                <button class="x-button">
+                    <span class="x-button-menu x-button-menu-down"></span>
+                </button>
+            </span>
+
+            <div class="x-dropdown button-menu">
+                前缀：
+                <label><input type="radio" name="cnencode-prefix" checked="checked" id="cnencode-prefix-1" class="x-radiobutton" value="\u$2">\u</label>
+                <label><input type="radio" name="cnencode-prefix" id="cnencode-prefix-2" class="x-radiobutton" value="&amp;#x$2;">&amp;#x</label>
+                <label><input type="radio" name="cnencode-prefix" id="cnencode-prefix-3" class="x-radiobutton" value="%u$2">%u</label>
+                
+            </div>
 
             <span class="x-buttongroup">
                 <button class="x-button" onclick="CodeHelper.encode()">
                     URL 编码
                 </button>
                 <button class="x-button" onclick="CodeHelper.decode()">
+                    解码
+                </button>
+            </span>
+
+            <span class="x-buttongroup">
+                <button class="x-button" onclick="CodeHelper.escape()">
+                    HTML 编码
+                </button>
+                <button class="x-button" onclick="CodeHelper.unescape()">
                     解码
                 </button>
             </span>

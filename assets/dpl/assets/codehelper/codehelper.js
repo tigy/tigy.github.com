@@ -133,37 +133,73 @@ var CodeHelper = {
     },
 
     jjencode: function () {
-
         var value = this.getValue();
-
+        
         value = jjencode(Dom.get('jjencode-varname').getText(), value);
+        
         if (Dom.get('jjencode-palindrome').getAttr('checked')) {
             value = value.replace(/[,;]$/, "");
             value = "\"\'\\\"+\'+\"," + value + ",\'," + value.split("").reverse().join("") + ",\"+\'+\"\\\'\"";
         }
-
-
+        
         this.setValue(value);
     },
 
     encode: function () {
-
         var value = this.getValue();
-
         value = encodeURIComponent(value);
-
         this.setValue(value);
-
     },
 
     decode: function () {
-
         var value = this.getValue();
-
         value = decodeURIComponent(value);
-
         this.setValue(value);
-
+    },
+    
+    escape: function () {
+        var value = this.getValue();
+        value = escape(value);
+        this.setValue(value);
+    },
+    
+    unescape: function () {
+        var value = this.getValue();
+        value = unescape(value);
+        this.setValue(value);
+    },
+    
+    escapeJs: function () {
+    	this.unescapeJs();
+        var value = this.getValue();
+        var prefix = "\\u$2";
+        var node = document.getElementById('cnencode-prefix-1');
+        if(node.checked){
+        	prefix = node.value;
+        } else {
+        	node = document.getElementById('cnencode-prefix-2');
+        	if(node.checked){
+        		prefix = node.value;
+        	} else {
+	        	node = document.getElementById('cnencode-prefix-3');
+	        	if(node.checked){
+	        		prefix = node.value;
+	        	}
+	        }
+        }
+        
+        value = value.replace(/[^\u0000-\u00FF]/g,function($0){return escape($0).replace(/(%u)(\w{4})/gi, prefix)});
+        this.setValue(value);
+    },
+    
+    unescapeJs: function () {
+        var value = this.getValue();
+        value = value.replace(/([\\%]u)(\w{4})/gi, function($0){
+            return (String.fromCharCode(parseInt((escape($0).replace(/(%5Cu)(\w{4})/g,"$2")),16)));
+        }).replace(/(&#x)(\w{4});/gi, function($0){
+            return String.fromCharCode(parseInt(escape($0).replace(/(%26%23x)(\w{4})(%3B)/g,"$2"),16));
+        });
+        this.setValue(value);
     }
 
 };
