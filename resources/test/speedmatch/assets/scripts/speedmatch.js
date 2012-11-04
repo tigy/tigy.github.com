@@ -231,18 +231,20 @@ function initTable(current){
 			td.className = 'testcase';
 			tr.appendChild(td);
 		} else {
-			value.forEach(function(testcase, index) {
-				td = document.createElement('td');
-				if(0 === index){
-					td.innerHTML =  htmlEncode(testcase.text);
-					td.className = 'testcase';
-					td.ondblclick = onRowDblClick;
-				} else {
-					td.title = testcase.text;
-					td.ondblclick = onCellDblClick;
-					td.innerHTML = htmlEncode(eclipse(testcase.text, current.options.eclipseLength));
-				}
-				tr.appendChild(td);
+		    value.forEach(function (testcase, index) {
+		        if (testcase) {
+		            td = document.createElement('td');
+		            if (0 === index) {
+		                td.innerHTML = htmlEncode(testcase.text);
+		                td.className = 'testcase';
+		                td.ondblclick = onRowDblClick;
+		            } else {
+		                td.title = testcase.text;
+		                td.ondblclick = onCellDblClick;
+		                td.innerHTML = htmlEncode(eclipse(testcase.text, current.options.eclipseLength));
+		            }
+		            tr.appendChild(td);
+		        }
 			});
 		}
 		table.appendChild(tr);
