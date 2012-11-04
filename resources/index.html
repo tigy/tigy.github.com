@@ -10,7 +10,7 @@
 
     
 
-    <article class="demo demo-grid demo-grid-3 demo-relative">
+    <article class="demo demo-grid demo-grid-4 demo-relative">
 
         <h2 class="demo" id="tool">工具列表</h2>
 
@@ -29,7 +29,7 @@
 
     </article>
 
-    <article class="demo demo-grid demo-grid-3 demo-relative">
+    <article class="demo demo-grid demo-grid-4 demo-relative">
 
         <h2 class="demo" id="doc">文档列表</h2>
 
@@ -40,19 +40,26 @@
                     'J+ API 文档2': 'javascript/advance.html',
                     'J+ API 文档4': 'javascript/advance.html'
                 },
-                '常用手册2': {
-                    'J+ API 文档': 'javascript/advance.html',
-                    'J+ API 文档2': 'javascript/advance.html'
+                '单元测试': {
+                    '全部': 'unittest/index.html',
+                    '底层': 'unittest/base.html',
+                    'DOM': 'unittest/dom.html',
+                    '浏览器': 'unittest/navigator.html',
+                    '属性': 'unittest/attributes.html',
+                    '样式': 'unittest/style.html',
+                    '尺寸': 'unittest/dimension.html',
+                    '操作': 'unittest/manipulation.html',
+                    '转移': 'unittest/traversing.html',
+                    '定位': 'unittest/offset.html'
                 },
-                '常用手册3': {
-                    'J+ API 文档': 'javascript/advance.html',
-                    'J+ API 文档2': 'javascript/advance.html'
+                '速度测试': {
+                    '全部': 'speedmatch/index.html'
                 },
                 '常用手册4': {
                     'J+ API 文档': 'javascript/advance.html',
                     'J+ API 文档2': 'javascript/advance.html'
                 }
-            });
+            }, true);
         </script>
 
     </article>
@@ -77,7 +84,7 @@
     </article>
 
     <script>
-        Demo.waterFall(3);
+        Demo.waterFall(4);
         Demo.writeFooter();
     </script>
 

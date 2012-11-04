@@ -68,7 +68,7 @@ Demo.waterFall = function (column) {
 
 };
 
-Demo.writeList = function (list) {
+Demo.writeList = function (list, newWindow) {
 
     var html = '<style>.list{margin:0;padding:0;} .list li{margin:0;list-style: disc inside;color: #E2E2EB;font-size: 14px;line-height: 21px;height: 23px;overflow: hidden;}</style>', category, data, name;
 
@@ -79,7 +79,7 @@ Demo.writeList = function (list) {
         html += '<section class="demo"><h3 class="demo">' + category + '</h3><ul class="demo-mono list">';
 
         for (name in data) {
-            html += '<li><a class="demo" href="' + data[name] + '" title="' + name + '">' + name + '</a></li>';
+            html += '<li><a ' + (newWindow ? ' target="_blank"' : '') + ' class="demo" href="' + data[name] + '" title="' + name + '">' + name + '</a></li>';
         }
 
         html += '</ul></section>';
