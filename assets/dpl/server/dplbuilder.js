@@ -100,7 +100,9 @@ var DplBuilder = {
      * @return {String} 返回文件路径。
 	 */
     resolveFileName: function (dplPath, isStyle) {
-        var info = this.dplList[dplPath];
+	
+		// 先找大写，再找小写...
+        var info = this.dplList[dplPath] || this.dplList[dplPath.toLowerCase()] ;
         return info && info[isStyle ? 'css' : 'js'];
     },
 
@@ -190,7 +192,6 @@ var DplBuilder = {
         } else {
             list = this._convertToAst(data);
         }
-
         this.applyRequires(dplFile, data);
         this.applyExcludeDpls(data, list);
         this.removeNotExitsItems(list);
@@ -403,7 +404,6 @@ var DplBuilder = {
 
     // 删除不存在的错误组件。
     removeNotExitsItems: function (list) {
-
         for (var i = list.js.length - 1; i >= 0; i--) {
             list.js[i].path = this.getFileName(list.js[i].name, false);
             if (!list.js[i].path) {
@@ -450,9 +450,14 @@ var DplBuilder = {
             // 获取被依赖项的列表。
             // 被依赖的合成方案的组件列表，是此合成方案的排除列表。
             var list = this.getList(dplFile2);
+            
+            for (var j = 0; j < list.js.length; j++) {
+                data.excludeJs.push(list.js[j].name);
+            }
 
-            data.excludeJs.push.apply(data.excludeJs, list.js);
-            data.excludeCss.push.apply(data.excludeCss, list.css);
+            for (var j = 0; j < list.css.length; j++) {
+                data.excludeCss.push(list.css[j].name);
+            }
 
         }
 

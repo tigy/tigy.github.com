@@ -9,15 +9,16 @@ base ../../../build/
 # 组件依赖
 
 # 组件列表
+using System.Core.Base
 using System.Dom.Base
 using System.Ajax.Jsonp
+using Controls.Nav.TreeView
 using System.Fx.Animate
 using Controls.Button.Button
 using Controls.Button.SplitButton
 using Controls.Layout.Grid
 using Controls.Part.Icon
 using Controls.Composite.Carousel
-using Controls.Nav.TreeView
 using Controls.Composite.ProgressBar
 using Controls.Suggest.Suggest
 using Controls.Container.Panel
