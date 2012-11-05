@@ -75,7 +75,18 @@ var DplFileManager = {
 	        if (Path.extname(files[i]) === '.dpl') {
 	            var fullPath = folder + files[i];
 	            var title = (/^title\s+(.*)$/m.exec(IO.readFile(fullPath)) || [0, ""])[1] || files[i];
-	            r[title] = folder + files[i];
+	            if (r[title]) {
+
+	                // 更新原缓存。
+	                r[title + ' (' + r[title] + ')'] = r[title];
+	                delete r[title];
+
+                    // 存入新内容。
+	                r[title + ' (' + folder + files[i] + ')'] = folder + files[i];
+
+	            } else {
+	                r[title] = folder + files[i];
+	            }
 	        }
 	    }
 

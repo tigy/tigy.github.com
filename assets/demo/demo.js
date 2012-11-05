@@ -349,6 +349,22 @@ if (typeof module !== 'object') {
                 '\"': '&quot;'
             }),
 
+            encodeJs: (function (map) {
+                function replaceMap(v) {
+                    return map[v];
+                }
+
+                return function (value) {
+                    return value.replace(/[\\\'\"\r\n]/g, replaceMap);
+                };
+            })({
+                '\\': '\\\\',
+                '\'': '\\\'',
+                '\"': '\\\"',
+                '\r': '\\\r',
+                '\n': '\\\n'
+            }),
+
             /**
              * 反编码 utf-8 字符串。
              * @param {String} s 已使用 UTF-8 编码的字符串。

@@ -77,6 +77,10 @@ DplFile.prototype = {
                 case '-include':
                     this.dpls.push({ type: key, path: value });
                     break;
+                case 'requires':
+                case 'require':
+                    this.requires.push(value);
+                    break;
                 default:
                     if (typeof this.properties[key] === 'boolean') {
                         this.properties[key] = value !== 'false';

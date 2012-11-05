@@ -13,8 +13,8 @@ switch(request.queryString['action']){
 	case 'create':
 		writeEditUI(createNewDplFile());
 		break;
-	case 'clone':
-		writeEditUI(cloneFile(request.queryString));
+	case 'copy':
+		writeEditUI(cloneFile(request.queryString.file));
 		break;
 	case 'save':
 		saveData(getPostData());
