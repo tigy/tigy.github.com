@@ -1,9 +1,0 @@
-F:\wz\dark\xfly\gui\XFly.exe.config
-F:\wz\dark\xfly\gui\src\XFly\obj\x86\Debug\ResolveAssemblyReference.cache
-F:\wz\dark\xfly\gui\src\XFly\obj\x86\Debug\Xuld.XFly.Properties.Resources.resources
-F:\wz\dark\xfly\gui\src\XFly\obj\x86\Debug\GenerateResource-ResGen.read.1.tlog
-F:\wz\dark\xfly\gui\src\XFly\obj\x86\Debug\GenerateResource-ResGen.write.1.tlog
-F:\wz\dark\xfly\gui\src\XFly\obj\x86\Debug\XFly.exe
-F:\wz\dark\xfly\gui\src\XFly\obj\x86\Debug\XFly.pdb
-F:\wz\dark\xfly\gui\XFly.exe
-F:\wz\dark\xfly\gui\XFly.pdb

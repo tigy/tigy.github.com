@@ -1,5 +1,0 @@
-F:\wz\dark\xfly\gui\src\Plugins\HelloWorld\obj\Debug\ResolveAssemblyReference.cache
-F:\wz\dark\xfly\gui\src\Plugins\HelloWorld\obj\Debug\HelloWorld.dll
-F:\wz\dark\xfly\gui\src\Plugins\HelloWorld\obj\Debug\HelloWorld.pdb
-F:\wz\dark\xfly\gui\HelloWorld.dll
-F:\wz\dark\xfly\gui\HelloWorld.pdb
