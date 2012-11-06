@@ -378,24 +378,27 @@ html .demo-plain {
 html .demo-white,
 html .demo-c0 {
   background-color: #ffffff;
-  color: #000000;
+  color: #000;
 }
 html .demo-red,
 html .demo-c1 {
   background-color: #9d261d;
+  color: #fff;
 }
 html .demo-orange,
 html .demo-c2 {
   background-color: #f89406;
-  color: #000000;
+  color: #000;
 }
 html .demo-yellow,
 html .demo-c3 {
   background-color: #ffc40d;
+  color: #fff;
 }
 html .demo-green,
 html .demo-c4 {
   background-color: #B4B900;
+  color: #fff;
 }
 html .demo-indigo,
 html .demo-c5 {
@@ -405,14 +408,17 @@ html .demo-c5 {
 html .demo-blue,
 html .demo-c6 {
   background-color: #285A8F;
+  color: #fff;
 }
 html .demo-purple,
 html .demo-c7 {
   background-color: #B05A89;
+  color: #fff;
 }
 html .demo-black,
 html .demo-c8 {
   background-color: #000000;
+  color: #fff;
 }
 /***************** 元素 ****************/
 .demo-mono,
