@@ -29,6 +29,7 @@
 .x-tabbable-item a:hover {
   border-color: #eeeeee #eeeeee #dddddd;
   background-color: #eeeeee;
+  text-decoration: none;
 }
 .x-tabbable-selected a,
 .x-tabbable-selected a:hover {
@@ -48,9 +49,12 @@
   border-color: transparent;
   _border-color: white;
 }
+.x-tabbable-alt .x-tabbable-item {
+  margin-right: 2px;
+}
 .x-tabbable-alt .x-tabbable-item a {
-  padding-top: 6px;
-  padding-bottom: 6px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;

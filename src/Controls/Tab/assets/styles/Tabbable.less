@@ -32,6 +32,7 @@
   &:hover {
     border-color: @grayLighter @grayLighter #ddd;
     background-color: @grayLighter;
+    text-decoration: none;
   }
 }
 
@@ -47,6 +48,9 @@
   cursor: default;
 }
 
+// Alt
+// -----
+
 .x-tabbable-alt {
   border-bottom: none; 
   
@@ -56,13 +60,14 @@
   }
 }
 
-// Alt
-// -----
+.x-tabbable-alt .x-tabbable-item {
+	margin-right: 2px;
+}
 
 // Links rendered as pills
 .x-tabbable-alt .x-tabbable-item a {
-  padding-top: 6px;
-  padding-bottom: 6px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   .border-radius(5px);
 }
 

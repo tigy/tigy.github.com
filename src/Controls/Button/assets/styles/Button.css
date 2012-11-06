@@ -87,8 +87,9 @@ input.x-button:focus {
   box-shadow: none !important;
 }
 .x-button-large {
-  padding: 9px 14px;
-  font-size: 14px;
+  padding: 9px 24px;
+  line-height: 150%;
+  font-size: 16px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;

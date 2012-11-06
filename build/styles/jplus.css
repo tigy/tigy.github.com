@@ -1,7 +1,10 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/5 15:50
+ * This file is created by a tool at 2012/11/6 10:39
  *********************************************************
  * Contains: 
+ *     Controls.Tab.Tabbable
+ *     Controls.Layout.Grid-Fluid
+ *     Controls.Typography.Heading
  *     Controls.Core.Common
  *     Modules.Web.Topbar
  *     Controls.Typography.Ol
@@ -27,6 +30,176 @@
  *     Controls.Nav.TreeView
  ********************************************************/
 
+
+/*********************************************************
+ * Controls.Tab.Tabbable
+ ********************************************************/
+.x-tabbable {
+  border-bottom: 1px solid #ddd;
+  margin: 0;
+  *zoom: 1;
+}
+.x-tabbable:after {
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+.x-tabbable-item {
+  margin: 0 0 -1px;
+  list-style: none;
+  float: left;
+}
+.x-tabbable-item a {
+  display: block;
+  border: 1px solid transparent;
+  _border-color: white;
+  _filter: chroma(color=#ffffff);
+  -webkit-border-radius: 4px 4px 0 0;
+  -moz-border-radius: 4px 4px 0 0;
+  border-radius: 4px 4px 0 0;
+  padding: 7px 12px;
+  text-decoration: none;
+}
+.x-tabbable-item a:hover {
+  border-color: #eeeeee #eeeeee #dddddd;
+  background-color: #eeeeee;
+  text-decoration: none;
+}
+.x-tabbable-selected a,
+.x-tabbable-selected a:hover {
+  color: #555555;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-bottom-color: transparent;
+  _border-bottom-color: white;
+  _filter: chroma(color=#ffffff);
+  cursor: default;
+}
+.x-tabbable-alt {
+  border-bottom: none;
+}
+.x-tabbable-alt .x-tabbable-item a,
+.x-tabbable-alt .x-tabbable-item a:hover {
+  border-color: transparent;
+  _border-color: white;
+}
+.x-tabbable-alt .x-tabbable-item {
+  margin-right: 2px;
+}
+.x-tabbable-alt .x-tabbable-item a {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+.x-tabbable-alt .x-tabbable-selected a,
+.x-tabbable-alt .x-tabbable-selected a:hover {
+  color: #ffffff;
+  background-color: #0088cc;
+}
+
+/*********************************************************
+ * Controls.Layout.Grid-Fluid
+ ********************************************************/
+.x-grid-fluid .x-col {
+  margin-left: 1.632653061%;
+}
+.x-grid-fluid .x-col-1 {
+  width: 6.836734693%;
+}
+.x-grid-fluid .x-col-2 {
+  width: 15.306122447%;
+}
+.x-grid-fluid .x-col-3 {
+  width: 23.775510201000003%;
+}
+.x-grid-fluid .x-col-4 {
+  width: 32.244897955%;
+}
+.x-grid-fluid .x-col-5 {
+  width: 40.714285708999995%;
+}
+.x-grid-fluid .x-col-6 {
+  width: 49.183673463000005%;
+}
+.x-grid-fluid .x-col-7 {
+  width: 57.65306121700001%;
+}
+.x-grid-fluid .x-col-8 {
+  width: 66.12244897100001%;
+}
+.x-grid-fluid .x-col-9 {
+  width: 74.59183672500001%;
+}
+.x-grid-fluid .x-col-10 {
+  width: 83.061224479%;
+}
+.x-grid-fluid .x-col-11 {
+  width: 91.530612233%;
+}
+.x-grid-fluid .x-col-12 {
+  width: 99.99999998700001%;
+}
+
+/*********************************************************
+ * Controls.Typography.Heading
+ ********************************************************/
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+  font-family: 'Microsoft YaHei';
+  text-rendering: optimizelegibility;
+}
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small {
+  font-weight: normal;
+  color: #999999;
+}
+h1,
+h2,
+h3 {
+  margin: 10px 0;
+  line-height: 36px;
+}
+h4,
+h5,
+h6 {
+  margin: 0;
+  line-height: 18px;
+}
+h1 {
+  font-size: 36px;
+}
+h2 {
+  font-size: 30px;
+}
+h3,
+h1 small {
+  font-size: 24px;
+}
+h4,
+h2 small {
+  font-size: 18px;
+}
+h5,
+h3 small {
+  font-size: 14px;
+}
+h6,
+h4 small {
+  font-size: 12px;
+}
 
 /*********************************************************
  * Controls.Core.Common
@@ -301,13 +474,12 @@ blockquote.x-right small {
  * Controls.Core.Base
  ********************************************************/
 /**
- * J+ Library, 4
- * @projectDescription jPlusUI: 简单灵活的 JS UI 组件库。
+ * J+ Library 1.0
+ * @projectDescription jPlusUI: 一个轻量但完整�?Web UI 库�?
  * @copyright 2011-2012 J+ Team
  * @license The BSD License
  * @author xuld
- */
-html,
+ */html,
 body,
 form,
 object,
@@ -400,8 +572,8 @@ audio:not([controls]) {
 }
 body {
   font-family: Tahoma, Arial, "宋体";
-  font-size: 12px;
-  line-height: 18px;
+  font-size: 14px;
+  line-height: 20px;
   color: #333333;
 }
 a {
@@ -414,64 +586,6 @@ a:hover {
 }
 a:focus {
   outline-offset: -2px;
-}
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: bold;
-  text-rendering: optimizelegibility;
-}
-h1 small,
-h2 small,
-h3 small,
-h4 small,
-h5 small,
-h6 small {
-  font-weight: normal;
-  color: #999999;
-}
-h1,
-h2,
-h3 {
-  margin: 10px 0;
-  line-height: 36px;
-}
-h4,
-h5,
-h6 {
-  margin: 0;
-  line-height: 18px;
-}
-h1 {
-  font-size: 36px;
-}
-h2 {
-  font-size: 30px;
-}
-h3,
-h1 small {
-  font-size: 24px;
-}
-h4,
-h2 small {
-  font-size: 18px;
-}
-h5,
-h3 small {
-  font-size: 14px;
-}
-h6,
-h4 small {
-  font-size: 12px;
-}
-p {
-  margin: 8px 0;
-}
-p small {
-  color: #999999;
 }
 
 /*********************************************************
@@ -619,8 +733,9 @@ input.x-button:focus {
   box-shadow: none !important;
 }
 .x-button-large {
-  padding: 9px 14px;
-  font-size: 14px;
+  padding: 9px 24px;
+  line-height: 150%;
+  font-size: 16px;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
@@ -1696,7 +1811,7 @@ input.x-button-small {
 }
 .x-col-first,
 .x-col:first-child {
-  margin-left: 0;
+  margin-left: 0!important;
 }
 
 /*********************************************************
