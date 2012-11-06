@@ -12,13 +12,14 @@ base ../../../build/
 using System.Core.Base
 using System.Dom.Base
 using System.Ajax.Jsonp
+using Controls.Menu.Menu
 using Controls.Nav.TreeView
 using System.Fx.Animate
 using Controls.Button.Button
 using Controls.Button.SplitButton
 using Controls.Layout.Grid
-using Controls.Part.Icon
 using Controls.Composite.Carousel
+using Controls.Part.Icon
 using Controls.Composite.ProgressBar
 using Controls.Suggest.Suggest
 using Controls.Container.Panel
@@ -35,3 +36,10 @@ using Controls.Core.Common
 using Controls.Typography.Heading
 using Controls.Layout.Grid-Fluid
 using Controls.Tab.Tabbable
+using Controls.Form.Form
+using Controls.Form.TextBox
+using Controls.Form.RadioButton
+using Controls.Form.CheckBox
+using Controls.Form.FileUpload
+using Controls.Form.SearchTextBox
+using Controls.Suggest.ComboBox

@@ -23,6 +23,9 @@
   margin: 0;
   list-style: none;
 }
+.x-menu-item {
+  line-height: 18px;
+}
 .x-menuitem {
   display: block;
   padding: 3px 10px;

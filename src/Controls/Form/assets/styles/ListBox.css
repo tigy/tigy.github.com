@@ -24,6 +24,7 @@
   white-space: nowrap;
   cursor: default;
   _width: 100%;
+  line-height: 18px;
 }
 .x-listbox-item a {
   color: #333333;

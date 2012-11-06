@@ -5,6 +5,7 @@
 imports("Controls.Button.Button");
 imports("Controls.Button.MenuButton");
 imports("Controls.Suggest.Picker");
+using("Controls.Core.Base");
 using("Controls.Core.IInput");
 using("Controls.Core.IDropDownOwner");
 

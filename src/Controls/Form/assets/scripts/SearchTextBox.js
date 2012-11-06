@@ -1,6 +1,8 @@
 
 
 
+imports("Controls.Form.TextBox");
+imports("Controls.Suggest.SearchTextBox");
 using("Controls.Suggest.Picker");
 
 

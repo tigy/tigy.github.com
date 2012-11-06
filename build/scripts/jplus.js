@@ -1,20 +1,25 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/6 10:39
+ * This file is created by a tool at 2012/11/6 13:3
  *********************************************************
  * Contains: 
- *     Controls.Typography.Heading
- *     Controls.Core.IToolTip
  *     System.Core.Base
  *     System.Dom.Base
- *     Controls.Core.Base
- *     Controls.Core.ContainerControl
- *     Controls.Container.Panel
  *     System.Dom.Align
  *     Controls.Core.IDropDownOwner
  *     Controls.Core.IInput
+ *     Controls.Core.Base
  *     Controls.Suggest.Picker
  *     Controls.Core.ListControl
  *     Controls.Suggest.ComboBox
+ *     Controls.Form.SearchTextBox
+ *     Controls.Form.FileUpload
+ *     Controls.Form.CheckBox
+ *     Controls.Form.RadioButton
+ *     Controls.Form.TextBox
+ *     Controls.Typography.Heading
+ *     Controls.Core.IToolTip
+ *     Controls.Core.ContainerControl
+ *     Controls.Container.Panel
  *     Controls.Suggest.Suggest
  *     System.Utils.Deferrable
  *     System.Fx.Base
@@ -29,175 +34,11 @@
  *     Controls.Core.ICollapsable
  *     Controls.Core.TreeControl
  *     Controls.Nav.TreeView
+ *     Controls.Menu.Menu
  *     System.Ajax.Base
  *     System.Ajax.Script
  *     System.Ajax.Jsonp
  ********************************************************/
-
-
-/*********************************************************
- * Controls.Typography.Heading
- ********************************************************/
-/** * @author  */
-/*********************************************************
- * Controls.Core.IToolTip
- ********************************************************/
-/**
- * @author xuld
- */
-
-var IToolTip = {
-	
-	/**
-	 * 当指针在具有指定工具提示文本的控件内保持静止时，工具提示保持可见的时间期限。-1表示不自动隐藏。 0 表示始终不显示。
-	 * @type Number
-	 */
-	autoDelay: -1,
-	
-	/**
-	 * 工具提示显示之前经过的时间。
-	 * @type Number
-	 */
-	initialDelay: 1000,
-	
-	/**
-	 * 指针从一个控件移到另一控件时，必须经过多长时间才会出现后面的工具提示窗口。
-	 * @type Number
-	 */
-	reshowDelay: 100,
-	
-	/**
-	 * 显示时使用的特效持续时间。
-	 */
-	duration: -1,
-	
-	getArrowType: function(){
-		var arrow = this.find('>.x-arrow');
-		return 'top';
-	},
-	
-	setArrowType: Function.empty,
-	
-	getArrowSize: function(){
-		return {
-			x: 0,
-			y: 0	
-		};
-	},
-	
-	getArrowOffset: function(){
-		return {
-			x: 0,
-			y: 0	
-		};
-	},
-	
-	initToolTip: Function.empty,
-	
-	onHide: Function.empty,
-	
-	onShow: function(x, y){
-		
-		if(this.autoDelay > 0) {
-			me.timer = setTimeout(this.hide.bind(this), this.autoDelay);
-		}
-		
-	},
-	
-	showAt: function(x, y){
-		if(!this.parent('body')){
-			this.appendTo();
-		}
-		if(this.autoDelay) {
-			this.show(this.duration, this.onShow);
-			this.setPosition(x, y);
-		}
-		
-		return this;
-	},
-	
-	showBy: function(ctrl, offsetY, offsetX){
-		ctrl = Dom.get(ctrl);
-		if(!this.parent('body')){
-			this.appendTo(ctrl.parent());
-		}
-		var arrowType = this.getArrowType(),
-			targetPosition = ctrl.getPosition(),
-			targetSize = ctrl.getSize();
-		offsetY = offsetY || 0;
-		offsetX = offsetX || 0;
-		
-		if(arrowType !== 'none') {
-			this.show();
-			var arrowOffset = this.getArrowOffset(),
-				arrowSize = this.getArrowSize();
-			switch(arrowType){
-				case 'top':
-					offsetX += (targetSize.x - arrowSize.x) / 2 - arrowOffset.x;
-					offsetY += targetSize.y + arrowSize.y;
-					break;
-				case 'left':
-					offsetX += targetSize.x + arrowSize.x;
-					offsetY += (targetSize.y) / 2 - arrowOffset.y;
-					break;
-				case 'right':
-					offsetX -= this.getSize().x + arrowSize.x;
-					offsetY += (targetSize.y) / 2 - arrowOffset.y;
-					break;
-				case 'bottom':
-					offsetX += (targetSize.x - arrowSize.x) / 2 - arrowOffset.x;
-					offsetY -= arrowSize.y + this.getSize().y;
-					break;
-			}
-			this.hide();
-			
-		}
-		
-		this.initToolTip(ctrl);
-		return this.showAt(targetPosition.x + offsetX, targetPosition.y + offsetY);
-	},
-	
-	/**
-	 * 设置某个控件工具提示。
-	 */
-	setToolTip: function(ctrl, caption, direction, offsetY, offsetX){
-		ctrl = Dom.get(ctrl);
-		ctrl.on('mouseover', function(){
-			var me = this;
-			if(me.timer)
-				clearTimeout(me.timer);
-			if(me.initialDelay >= 0){
-				me.timer = setTimeout(function(){
-					me.timer = 0;
-					if(caption)
-						me.setText(caption);
-					if(direction)
-						me.setArrowType(direction);
-					me.showBy(ctrl, offsetY, offsetX);
-				}, me.initialDelay);
-			}
-		}, this);
-		
-		ctrl.on('mouseout', this.close, this);
-		
-		
-		return this;
-		
-	},
-	
-	close: function(){
-		var me = this;
-		if(me.timer) {
-			clearTimeout(me.timer);
-			me.timer = 0;
-		}
-		me.hide(me.duration, this.onHide, 'opacity');
-		return this;
-	}
-	
-};
-
-
 
 
 /*********************************************************
@@ -7657,275 +7498,6 @@ function imports(namespace) {
 })(this);
 
 /*********************************************************
- * Controls.Core.Base
- ********************************************************/
-/**
- * @author  xuld
- */
-
-
-
-
-/**
- * 所有控件基类。
- * @class Control
- * @abstract
- * 控件的周期：
- * constructor - 创建控件对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。
- * create - 创建本身的 dom 节点。 可重写 - 默认使用 this.tpl 创建。
- * init - 初始化控件本身。 可重写 - 默认为无操作。
- * attach - 渲染控件到文档。不建议重写，如果你希望额外操作渲染事件，则重写。
- * detach - 删除控件。不建议重写，如果一个控件用到多个 dom 内容需重写。
- */
-var Control = Dom.extend({
-
-	/**
-	 * 存储当前控件的默认模板字符串。
-	 * @getter {String} tpl
-	 * @protected
-	 * @virtual
-	 */
-
-	/**
-	 * 当被子类重写时，生成当前控件。
-	 * @param {Object} options 选项。
-	 * @protected
-	 * @virtual
-	 */
-	create: function () {
-
-		assert.isString(this.tpl, "Control#create: 无法获取或创建当前控件所关联的 DOM 节点。请为控件定义 tpl 属性或重写 create 函数。");
-
-		// 转为对 tpl解析。
-		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype));
-	},
-
-	/**
-	 * 当被子类重写时，渲染控件。
-	 * @method
-	 * @param {Object} options 配置。
-	 * @protected virtual
-	 */
-	init: Function.empty,
-
-	/**
-	 * 初始化一个新的控件。
-	 * @param {String/Element/Control/Object} [options] 对象的 id 或对象或各个配置。
-	 */
-	constructor: function (options) {
-
-		// 这是所有控件共用的构造函数。
-		var me = this,
-
-			// 临时的配置对象。
-			opt = {},
-
-			// 当前实际的节点。
-			node;
-
-		// 如果存在配置。
-		if (options) {
-
-			// 如果 options 是纯配置。
-			if (options.constructor === Object) {
-				
-				Object.extend(opt, options);
-				
-				if(opt.node) {
-					node = opt.node;
-					delete opt.node;
-				} else if(opt.selector) {
-					node = Dom.find(opt.selector);
-					delete opt.selector;
-				} else if(opt.dom) {
-					node = opt.dom;
-					delete opt.dom;
-				}
-					
-				if(node){
-					node = Dom.getNode(node);
-				}
-				
-			} else {
-				node = Dom.getNode(options);
-			}
-
-		}
-
-		// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。
-		me.node = node || me.create(opt);
-
-		assert.isNode(me.node, "Dom#constructor(options): Dom 对象的 {node} 不是节点。", me.node);
-
-		// 调用 init 初始化控件。
-		me.init(opt);
-
-		//// 如果指定的节点已经在 DOM 树上，且重写了 attach 方法，则调用之。
-		//if (me.node.parentNode && me.attach !== Control.prototype.attach) {
-		//	me.attach(me.node.parentNode, me.node.nextSibling);
-		//}
-
-		// 复制各个选项。
-		me.set(opt);
-	},
-
-	/**
-	 * xtype 。
-	 * @virtual
-	 */
-	xtype: "control"
-
-});
-/*********************************************************
- * Controls.Core.ContainerControl
- ********************************************************/
-/**
- * @author  xuld
- */
-
-/**
- * 所有容器控件的基类。
- * @abstract class 
- * @extends Control
- */
-var ContainerControl = Control.extend({
-	
-	// 基本属性
-	
-	tpl: '<div class="x-control">\
-			<div class="x-control-body"></div>\
-		</div>',
-		
-	headerTpl: '<div class="x-control-header"><h4></h4></div>',
-	
-	/**
-	 * 获取当前容器的标题部分。
-	 * @return {Control}
-	 */
-	header: function(){
-		return this.find('.x-' + this.xtype + '-header');
-	},
-	
-	/**
-	 * 获取当前容器的内容部分。
-	 * @getter {Control}
-	 */
-	body: function(){
-		return this.find('.x-' + this.xtype + '-body') || this;
-	},
-	
-	// 基本操作
-	
-	/**
-	 * 获取当前容器显示的标题。
-	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
-	 */
-	getTitle: function(valueAsText){
-		
-		// 获取 header 。
-		var header = this.header();
-		
-		// 如果存在 header， 最后一个节点即  title 标签 。
-		return header ? (header.last() || header)[valueAsText ? 'getText' : 'getHtml']() : null;
-	},
-	
-	/**
-	 * 设置当前容器显示的标题。
-	 * @param {String} value 要设置的标题。
-	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
-	 */
-	setTitle: function(value, valueAsText){
-		
-		// 获取 header 。
-		var header = this.header(), title;
-		
-		if(value === null){
-			header && header.remove();
-		} else {
-			
-            // 如果不存在标题，则创建一个。
-			if(!header){
-				header = this.prepend(this.headerTpl.replace(/control/g, this.xtype));
-			}
-			
-			// 获取或创建 title 。
-			title = header.last() || header;
-			
-			// 设置内容。
-			title[valueAsText ? 'setText' : 'setHtml'](value);
-			
-		}
-		return this;
-	},
-	
-	/**
-	 * 获取当前容器显示的内容。
-	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
-	 */
-	getContent: function(valueAsText){
-		
-		// 获取 body 。
-		// 获取 content 。
-		var body = this.body(), content = body.last();
-		
-		// 如果存在多个 content，使用 body 作为 content。
-		if (!content || content.prev()) {
-			content = body;
-		}
-		
-		// 获取实际的内容。
-		return content[valueAsText ? 'getText' : 'getHtml']();
-		
-	},
-	
-	/**
-	 * 设置当前容器显示的内容。
-	 * @param {String} value 要设置的标题。
-	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
-	 */
-	setContent: function(value, valueAsText){
-		
-		// 获取 body 。
-		var body = this.body(), 
-			contentClass = 'x-' + this.xtype + '-content', 
-			
-			// 获取 content 。
-			content = body.find(contentClass);
-
-	    // 如果不存在 content，则创建一个。
-		if (!content) {
-		    body.setHtml('<div class="' + contentClass + '"></div>');
-		    content = body.first();
-		}
-		
-		// 设置文本内容。
-		content[valueAsText ? 'setText' : 'setHtml'](value);
-		return this;
-		
-	},
-	
-	getText: function(){
-		return this.getContent(true);
-	},
-	
-	setText: function(value){
-		return this.setContent(value, true);
-	},
-	
-	getHtml: function(){
-		return this.getContent(false);
-	},
-	
-	setHtml: function(value){
-		return this.setContent(value, false);
-	}
-
-});
-/*********************************************************
- * Controls.Container.Panel
- ********************************************************/
-/** * @author  xuld *//** * 内容显示面板。 * @class Panel * @extends ContainerControl */var Panel = ContainerControl.implement({		/**	 * xtype	 * @type String	 */	xtype: 'panel'	});
-/*********************************************************
  * System.Dom.Align
  ********************************************************/
 /**
@@ -8393,11 +7965,131 @@ var IInput = {
 	
 };
 /*********************************************************
+ * Controls.Core.Base
+ ********************************************************/
+/**
+ * @author  xuld
+ */
+
+
+
+
+/**
+ * 所有控件基类。
+ * @class Control
+ * @abstract
+ * 控件的周期：
+ * constructor - 创建控件对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。
+ * create - 创建本身的 dom 节点。 可重写 - 默认使用 this.tpl 创建。
+ * init - 初始化控件本身。 可重写 - 默认为无操作。
+ * attach - 渲染控件到文档。不建议重写，如果你希望额外操作渲染事件，则重写。
+ * detach - 删除控件。不建议重写，如果一个控件用到多个 dom 内容需重写。
+ */
+var Control = Dom.extend({
+
+	/**
+	 * 存储当前控件的默认模板字符串。
+	 * @getter {String} tpl
+	 * @protected
+	 * @virtual
+	 */
+
+	/**
+	 * 当被子类重写时，生成当前控件。
+	 * @param {Object} options 选项。
+	 * @protected
+	 * @virtual
+	 */
+	create: function () {
+
+		assert.isString(this.tpl, "Control#create: 无法获取或创建当前控件所关联的 DOM 节点。请为控件定义 tpl 属性或重写 create 函数。");
+
+		// 转为对 tpl解析。
+		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype));
+	},
+
+	/**
+	 * 当被子类重写时，渲染控件。
+	 * @method
+	 * @param {Object} options 配置。
+	 * @protected virtual
+	 */
+	init: Function.empty,
+
+	/**
+	 * 初始化一个新的控件。
+	 * @param {String/Element/Control/Object} [options] 对象的 id 或对象或各个配置。
+	 */
+	constructor: function (options) {
+
+		// 这是所有控件共用的构造函数。
+		var me = this,
+
+			// 临时的配置对象。
+			opt = {},
+
+			// 当前实际的节点。
+			node;
+
+		// 如果存在配置。
+		if (options) {
+
+			// 如果 options 是纯配置。
+			if (options.constructor === Object) {
+				
+				Object.extend(opt, options);
+				
+				if(opt.node) {
+					node = opt.node;
+					delete opt.node;
+				} else if(opt.selector) {
+					node = Dom.find(opt.selector);
+					delete opt.selector;
+				} else if(opt.dom) {
+					node = opt.dom;
+					delete opt.dom;
+				}
+					
+				if(node){
+					node = Dom.getNode(node);
+				}
+				
+			} else {
+				node = Dom.getNode(options);
+			}
+
+		}
+
+		// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。
+		me.node = node || me.create(opt);
+
+		assert.isNode(me.node, "Dom#constructor(options): Dom 对象的 {node} 不是节点。", me.node);
+
+		// 调用 init 初始化控件。
+		me.init(opt);
+
+		//// 如果指定的节点已经在 DOM 树上，且重写了 attach 方法，则调用之。
+		//if (me.node.parentNode && me.attach !== Control.prototype.attach) {
+		//	me.attach(me.node.parentNode, me.node.nextSibling);
+		//}
+
+		// 复制各个选项。
+		me.set(opt);
+	},
+
+	/**
+	 * xtype 。
+	 * @virtual
+	 */
+	xtype: "control"
+
+});
+/*********************************************************
  * Controls.Suggest.Picker
  ********************************************************/
 /**
  * @author  xuld
- */
+ */
 
 /**
  * 表示一个数据选择器。
@@ -9178,6 +8870,462 @@ ComboBox.DropDownMenu = ListControl.extend({
     xtype: "listbox"
 
 });
+/*********************************************************
+ * Controls.Form.SearchTextBox
+ ********************************************************/
+
+
+
+var SearchTextBox = Picker.extend({
+	
+	xtype: 'searchtextbox',
+	
+	tpl: '<span class="x-picker">\
+				<input type="text" class="x-textbox x-searchtextbox"/>\
+			</span>',
+		
+	menuButtonTpl: '<button class="x-searchtextbox-search"></button>',
+	
+	onKeyDown: function(e){
+		if(e.keyCode === 10 || e.keyCode === 13){
+		    this.search();
+		}
+	},
+
+	search: function () {
+
+	    var text = this.getText();
+	    if (text) {
+	        this.onSearch(text);
+	    }
+
+
+	},
+	
+	onSearch: function(text){
+	    this.trigger('search', text);
+	},
+	
+	init: function(){
+		
+		// 如果是 <input> 或 <a> 直接替换为 x-picker
+		if(!this.first() && !this.hasClass('x-picker')) {
+			var elem = this.node;
+			
+			// 创建 x-picker 组件。
+			this.node = Dom.createNode('span', 'x-picker');
+			
+			// 替换当前节点。
+			if(elem.parentNode){
+				elem.parentNode.replaceChild(this.node, elem);
+			}
+			
+			// 插入原始 <input> 节点。
+			this.prepend(elem);
+		}
+		
+		// 如果没有下拉菜单按钮，添加之。
+		if(!this.button()) {
+			this.append(this.menuButtonTpl);
+		}
+		
+		var textBox = this.input();
+		textBox.on('focus', textBox.select);
+		
+		this.button().on('click', this.search, this);
+		textBox.on('keydown', this.onKeyDown, this);
+		
+		if(navigator.isIE6){
+			textBox.on('keypress', this.onKeyDown, this);
+		}
+	}
+});
+
+
+
+
+
+/*********************************************************
+ * Controls.Form.FileUpload
+ ********************************************************/
+/**
+ * @author 
+ */
+
+
+var FileUpload = Control.extend(IInput).implement({
+
+    xtype: 'fileupload',
+
+    tpl: '<span class="x-control">\
+			<input type="file" size="1">\
+			<button class="x-button">浏览...</button>\
+    	</span>',
+
+    init: function(){
+        var textBox = this.prev();
+        if (textBox && textBox.node.type === 'text') {
+            this.setTextBox(textBox);
+        }
+    },
+
+    setTextBox: function(textBox){
+        textBox = Dom.get(textBox).setAttr('readonly', true);
+        this.find('[type=file]').node.onchange = function () {
+            textBox.setText(this.value);
+        };
+    },
+
+    state: function (name, value) {
+        if (name === 'disabled' || name === 'readonly') {
+            this.find('[type=file]').setAttr('disabled', value);
+            this.query('.x-button').toggleClass('x-button-disabled', value);
+        } else {
+            IInput.state.call(name, value);
+        }
+
+        return this;
+    }
+
+});
+/*********************************************************
+ * Controls.Form.CheckBox
+ ********************************************************/
+/** * @author  xuld */var CheckBox = Control.extend(IInput).implement({		xtype: 'checkbox',		tpl: '<input type="checkbox" class="x-control">'	});
+/*********************************************************
+ * Controls.Form.RadioButton
+ ********************************************************/
+/**
+ * @author  xuld
+ */
+
+
+var RadioButton = Control.extend(IInput).implement({
+
+    xtype: 'radiobutton',
+
+    tpl: '<input type="radio" class="x-control">'
+
+});
+
+/*********************************************************
+ * Controls.Form.TextBox
+ ********************************************************/
+/** * @author  xuld */var TextBox = Control.extend(IInput).implement({		xtype: 'textbox',		tpl: '<input type="text" class="x-control">'	});
+/*********************************************************
+ * Controls.Typography.Heading
+ ********************************************************/
+/** * @author  */
+/*********************************************************
+ * Controls.Core.IToolTip
+ ********************************************************/
+/**
+ * @author xuld
+ */
+
+var IToolTip = {
+	
+	/**
+	 * 当指针在具有指定工具提示文本的控件内保持静止时，工具提示保持可见的时间期限。-1表示不自动隐藏。 0 表示始终不显示。
+	 * @type Number
+	 */
+	autoDelay: -1,
+	
+	/**
+	 * 工具提示显示之前经过的时间。
+	 * @type Number
+	 */
+	initialDelay: 1000,
+	
+	/**
+	 * 指针从一个控件移到另一控件时，必须经过多长时间才会出现后面的工具提示窗口。
+	 * @type Number
+	 */
+	reshowDelay: 100,
+	
+	/**
+	 * 显示时使用的特效持续时间。
+	 */
+	duration: -1,
+	
+	getArrowType: function(){
+		var arrow = this.find('>.x-arrow');
+		return 'top';
+	},
+	
+	setArrowType: Function.empty,
+	
+	getArrowSize: function(){
+		return {
+			x: 0,
+			y: 0	
+		};
+	},
+	
+	getArrowOffset: function(){
+		return {
+			x: 0,
+			y: 0	
+		};
+	},
+	
+	initToolTip: Function.empty,
+	
+	onHide: Function.empty,
+	
+	onShow: function(x, y){
+		
+		if(this.autoDelay > 0) {
+			me.timer = setTimeout(this.hide.bind(this), this.autoDelay);
+		}
+		
+	},
+	
+	showAt: function(x, y){
+		if(!this.parent('body')){
+			this.appendTo();
+		}
+		if(this.autoDelay) {
+			this.show(this.duration, this.onShow);
+			this.setPosition(x, y);
+		}
+		
+		return this;
+	},
+	
+	showBy: function(ctrl, offsetY, offsetX){
+		ctrl = Dom.get(ctrl);
+		if(!this.parent('body')){
+			this.appendTo(ctrl.parent());
+		}
+		var arrowType = this.getArrowType(),
+			targetPosition = ctrl.getPosition(),
+			targetSize = ctrl.getSize();
+		offsetY = offsetY || 0;
+		offsetX = offsetX || 0;
+		
+		if(arrowType !== 'none') {
+			this.show();
+			var arrowOffset = this.getArrowOffset(),
+				arrowSize = this.getArrowSize();
+			switch(arrowType){
+				case 'top':
+					offsetX += (targetSize.x - arrowSize.x) / 2 - arrowOffset.x;
+					offsetY += targetSize.y + arrowSize.y;
+					break;
+				case 'left':
+					offsetX += targetSize.x + arrowSize.x;
+					offsetY += (targetSize.y) / 2 - arrowOffset.y;
+					break;
+				case 'right':
+					offsetX -= this.getSize().x + arrowSize.x;
+					offsetY += (targetSize.y) / 2 - arrowOffset.y;
+					break;
+				case 'bottom':
+					offsetX += (targetSize.x - arrowSize.x) / 2 - arrowOffset.x;
+					offsetY -= arrowSize.y + this.getSize().y;
+					break;
+			}
+			this.hide();
+			
+		}
+		
+		this.initToolTip(ctrl);
+		return this.showAt(targetPosition.x + offsetX, targetPosition.y + offsetY);
+	},
+	
+	/**
+	 * 设置某个控件工具提示。
+	 */
+	setToolTip: function(ctrl, caption, direction, offsetY, offsetX){
+		ctrl = Dom.get(ctrl);
+		ctrl.on('mouseover', function(){
+			var me = this;
+			if(me.timer)
+				clearTimeout(me.timer);
+			if(me.initialDelay >= 0){
+				me.timer = setTimeout(function(){
+					me.timer = 0;
+					if(caption)
+						me.setText(caption);
+					if(direction)
+						me.setArrowType(direction);
+					me.showBy(ctrl, offsetY, offsetX);
+				}, me.initialDelay);
+			}
+		}, this);
+		
+		ctrl.on('mouseout', this.close, this);
+		
+		
+		return this;
+		
+	},
+	
+	close: function(){
+		var me = this;
+		if(me.timer) {
+			clearTimeout(me.timer);
+			me.timer = 0;
+		}
+		me.hide(me.duration, this.onHide, 'opacity');
+		return this;
+	}
+	
+};
+
+
+
+
+/*********************************************************
+ * Controls.Core.ContainerControl
+ ********************************************************/
+/**
+ * @author  xuld
+ */
+
+/**
+ * 所有容器控件的基类。
+ * @abstract class 
+ * @extends Control
+ */
+var ContainerControl = Control.extend({
+	
+	// 基本属性
+	
+	tpl: '<div class="x-control">\
+			<div class="x-control-body"></div>\
+		</div>',
+		
+	headerTpl: '<div class="x-control-header"><h4></h4></div>',
+	
+	/**
+	 * 获取当前容器的标题部分。
+	 * @return {Control}
+	 */
+	header: function(){
+		return this.find('.x-' + this.xtype + '-header');
+	},
+	
+	/**
+	 * 获取当前容器的内容部分。
+	 * @getter {Control}
+	 */
+	body: function(){
+		return this.find('.x-' + this.xtype + '-body') || this;
+	},
+	
+	// 基本操作
+	
+	/**
+	 * 获取当前容器显示的标题。
+	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
+	 */
+	getTitle: function(valueAsText){
+		
+		// 获取 header 。
+		var header = this.header();
+		
+		// 如果存在 header， 最后一个节点即  title 标签 。
+		return header ? (header.last() || header)[valueAsText ? 'getText' : 'getHtml']() : null;
+	},
+	
+	/**
+	 * 设置当前容器显示的标题。
+	 * @param {String} value 要设置的标题。
+	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
+	 */
+	setTitle: function(value, valueAsText){
+		
+		// 获取 header 。
+		var header = this.header(), title;
+		
+		if(value === null){
+			header && header.remove();
+		} else {
+			
+            // 如果不存在标题，则创建一个。
+			if(!header){
+				header = this.prepend(this.headerTpl.replace(/control/g, this.xtype));
+			}
+			
+			// 获取或创建 title 。
+			title = header.last() || header;
+			
+			// 设置内容。
+			title[valueAsText ? 'setText' : 'setHtml'](value);
+			
+		}
+		return this;
+	},
+	
+	/**
+	 * 获取当前容器显示的内容。
+	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
+	 */
+	getContent: function(valueAsText){
+		
+		// 获取 body 。
+		// 获取 content 。
+		var body = this.body(), content = body.last();
+		
+		// 如果存在多个 content，使用 body 作为 content。
+		if (!content || content.prev()) {
+			content = body;
+		}
+		
+		// 获取实际的内容。
+		return content[valueAsText ? 'getText' : 'getHtml']();
+		
+	},
+	
+	/**
+	 * 设置当前容器显示的内容。
+	 * @param {String} value 要设置的标题。
+	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
+	 */
+	setContent: function(value, valueAsText){
+		
+		// 获取 body 。
+		var body = this.body(), 
+			contentClass = 'x-' + this.xtype + '-content', 
+			
+			// 获取 content 。
+			content = body.find(contentClass);
+
+	    // 如果不存在 content，则创建一个。
+		if (!content) {
+		    body.setHtml('<div class="' + contentClass + '"></div>');
+		    content = body.first();
+		}
+		
+		// 设置文本内容。
+		content[valueAsText ? 'setText' : 'setHtml'](value);
+		return this;
+		
+	},
+	
+	getText: function(){
+		return this.getContent(true);
+	},
+	
+	setText: function(value){
+		return this.setContent(value, true);
+	},
+	
+	getHtml: function(){
+		return this.getContent(false);
+	},
+	
+	setHtml: function(value){
+		return this.setContent(value, false);
+	}
+
+});
+/*********************************************************
+ * Controls.Container.Panel
+ ********************************************************/
+/** * @author  xuld *//** * 内容显示面板。 * @class Panel * @extends ContainerControl */var Panel = ContainerControl.implement({		/**	 * xtype	 * @type String	 */	xtype: 'panel'	});
 /*********************************************************
  * Controls.Suggest.Suggest
  ********************************************************/
@@ -10423,19 +10571,97 @@ var Button = ContentControl.extend({
 /*********************************************************
  * Controls.Button.MenuButton
  ********************************************************/
-/** * @author  xuld */var MenuButton = Button.extend(IDropDownOwner).implement({		xtype: 'menubutton',		tpl: '<button class="x-button x-control" type="button"><span class="x-button-menu"></span></button>',		createDropDown: function(existDom){		if(existDom && !existDom.hasClass('x-menu')){			return existDom;		}		assert(window.Menu, "必须载入 Controls.Menu.Menu 组件才能初始化 x-menu 的菜单项。");		return new Menu(existDom).on('click', this.onDropDownClick, this);	},
+/**
+ * @author  xuld
+ */
+
+
+
+var MenuButton = Button.extend(IDropDownOwner).implement({
+	
+	xtype: 'menubutton',
+	
+	tpl: '<button class="x-button x-control" type="button"><span class="x-button-menu"></span></button>',
+	
+	createDropDown: function(existDom){
+		if(existDom && !existDom.hasClass('x-menu')){
+			return existDom;
+		}
+		assert(window.Menu, "必须载入 Controls.Menu.Menu 组件才能初始化 x-menu 的菜单项。");
+		return new Menu(existDom).on('click', this.onDropDownClick, this);
+	},
 
 	state: function (name, value) {
 	    return this.toggleClass('x-button-' + name, value);
-	},		init: function () {		this.setDropDown(this.getDropDown());		this.on('click', this.toggleDropDown, this);	},		onDropDownShow: function(){		this.state('actived', true);		return IDropDownOwner.onDropDownShow.apply(this, arguments);	},		onDropDownHide: function(){	    this.state('actived', false);		return IDropDownOwner.onDropDownHide.apply(this, arguments);	},		onDropDownClick: function(){		this.hideDropDown();	}	});ListControl.aliasMethods(MenuButton, 'dropDown');
+	},
+	
+	init: function () {
+		this.setDropDown(this.getDropDown());
+		this.on('click', this.toggleDropDown, this);
+	},
+	
+	onDropDownShow: function(){
+		this.state('actived', true);
+		return IDropDownOwner.onDropDownShow.apply(this, arguments);
+	},
+	
+	onDropDownHide: function(){
+	    this.state('actived', false);
+		return IDropDownOwner.onDropDownHide.apply(this, arguments);
+	},
+	
+	onDropDownClick: function(){
+		this.hideDropDown();
+	}
+	
+});
+
+ListControl.aliasMethods(MenuButton, 'dropDown');
+
 /*********************************************************
  * Controls.Button.SplitButton
  ********************************************************/
-/** * @author xuld */var SplitButton = MenuButton.extend({		xtype: 'splitbutton',		tpl: '<span class="x-splitbutton x-buttongroup">\				<button class="x-button"></button>\				<button class="x-button"><span class="x-button-menu x-button-menu-down"></span></button>\			</span>',				content: function(){		return this.find('.x-button');	},	input: function(){	    return this.content();	},	state: function (name, value) {	    if (name == "disabled") {
-	        this.query('.x-button').setAttr(name, value).toggleClass('x-button-disabled', value);	    } else if (name == "actived") {
+/**
+ * @author xuld
+ */
+
+
+var SplitButton = MenuButton.extend({
+	
+	xtype: 'splitbutton',
+	
+	tpl: '<span class="x-splitbutton x-buttongroup">\
+				<button class="x-button"></button>\
+				<button class="x-button"><span class="x-button-menu x-button-menu-down"></span></button>\
+			</span>',
+			
+	content: function(){
+		return this.find('.x-button');
+	},
+
+	input: function(){
+	    return this.content();
+	},
+
+	state: function (name, value) {
+	    if (name == "disabled") {
+	        this.query('.x-button').setAttr(name, value).toggleClass('x-button-disabled', value);
+	    } else if (name == "actived") {
 	        this.last('.x-button').toggleClass('x-button-actived', value !== false);
 	    } else {
-	        this.base('state');	    }	    return this;	},		init: function () {		this.setDropDown(this.getDropDown());		this.find('>.x-button:last-child').on('click', this.toggleDropDown, this);	}	});
+	        this.base('state');
+	    }
+
+	    return this;
+	},
+	
+	init: function () {
+		this.setDropDown(this.getDropDown());
+		this.find('>.x-button:last-child').on('click', this.toggleDropDown, this);
+	}
+	
+});
+
 /*********************************************************
  * Controls.Core.ICollapsable
  ********************************************************/
@@ -10448,6 +10674,307 @@ var Button = ContentControl.extend({
  * Controls.Nav.TreeView
  ********************************************************/
 /** * @author  *//** * 表示是 {@link TreeView} 中的一个节点。 */var TreeNode = TreeControl.Item.extend(ICollapsable).implement({		xtype: 'treenode',		tpl: '<a class="x-control"><span></span></a>',		/**	 * 当前树的深度。	 * @type {Integer}	 */	depth: 0,		/**	 * 获取当前用于折叠的容器对象。	 * @return {Control} 折叠的容器对象。	 * @protected override	 */	body: function () {		return this.subControl;	},		/**	 * 获取当前的文字对象。	 * @return {Control} 文字对象。	 * @protected override	 */	content: function(){		return this.last('span');	},		/**	 * 当被子类重写时，用于创建子树。	 * @param {TreeControl} treeControl 要初始化的子树。	 * @return {TreeControl} 新的 {@link TreeControl} 对象。	 * @protected override	 */	createSubControl: function(control){		return new TreeView(control).removeClass('x-treeview').addClass('x-treeview-subtree');	},		/**	 * 当被子类重写时，用于初始化子树。	 * @param {TreeControl} treeControl 要初始化的子树。	 * @protected override	 */	initSubControl: function(treeControl){		treeControl.depth = this.depth;	},		// 树节点的控制。		/**	 * 更新一个节点前面指定的占位符的类名。	 * @private	 */	_setSpan: function(depth, className){				this.each(function(node){			var first = node.first(depth).node;			if(first.tagName == 'SPAN')				first.className = className;			node._setSpan(depth, className);		});			},		_markAsLastNode: function(){		this.addClass('x-treenode-last');		this._setSpan(this.depth - 1, 'x-treenode-space x-treenode-none');	},		_clearMarkAsLastNode: function(){		this.removeClass('x-treenode-last');		this._setSpan(this.depth - 1, 'x-treenode-space');	},	/**	 * 获取当前节点的占位 span 。	 * @param {Integer} index 要获取的索引， 最靠近右的索引为 0 。	 * @protected	 */	span: function(index){		return this.content().prev(index);	},		/**	 * 由于子节点的改变刷新本节点和子节点状态。	 * @protected	 */	update: function(){				// 更新图标。		this.updateNodeType();				var last = this.subControl.item(-1), lastNode;				// 更新 lastNode		if(last){			lastNode = this._lastNode;			if (!lastNode || lastNode.node !== last.node) {				last._markAsLastNode();				this._lastNode = last;				if (lastNode) lastNode._clearMarkAsLastNode();			}		}			},		/**	 * 根据当前的节点情况更新当前节点的图标。	 * @protected	 */	updateNodeType: function(){		this.setNodeType(this.subControl && this.subControl.first() ? this.isCollapsed() ? 'plus' : 'minus' : 'normal');	},		/**	 * 获取一个值，该值指示当前节点是否为最后一个节点。	 * @return {Boolean}	 * @protected	 */	isLastNode: function(){		return this.parentNode &&  this.parentNode._lastNode === this;	},		onDblClick: function(e){		this.toggleCollapse();		e.preventDefault();		e.stopPropagation();	},		init: function(options){		this.unselectable();		this.on('dblclick', this.onDblClick, this);		// 绑定节点和控件，方便发生事件后，根据事件源得到控件。		this.dataField().control = this;	},		/**	 * 获取当前节点的图标。	 */	getNodeType: function(){		var span = this.span(0);		return span ? (/x-treenode-(.+)/.exec(span.node.className.replace(/\bx-treenode-space\b/, '')) || [0, "line"])[1] : null;	},		/**	 * 设置当前节点的图标。	 * @param {String} type 类型。肯能的值如： 'normal' 'plus' 'minus' 'none' 'loading' 'line'。	 * @return this	 */	setNodeType: function(type){		var span = this.span(0);		if(span) {			span.node.className = 'x-treenode-space x-treenode-' + type;		}		return this;	},		onCollapse: function(){	    this.updateNodeType();	    ICollapsable.onCollapse.call(this);	},		onExpanding: function(){		ICollapsable.onExpanding.call(this);		this.setNodeType(this.subControl && this.subControl.first() ? 'minus' : 'normal');		},		onExpand: function(){		if(this.subControl) {			this.subControl.node.style.height = 'auto';		}				ICollapsable.onExpand.call(this);	},		/**	 * 展开当前节点及子节点。	 * @param {Integer} duration 折叠动画使用的毫米数。	 * @param {Integer} maxDepth=0 最大折叠的深度。默认为 -1 表示全部折叠。	 * @return this	 */	expandAll: function(duration, maxDepth){		if (this.subControl && !(maxDepth === 0)) {			this.expand(duration);			this.invoke('expandAll', [duration, --maxDepth]);		}		return this;	},		/**	 * 折叠当前节点及子节点。	 * @param {Integer} duration 折叠动画使用的毫米数。	 * @param {Integer} maxDepth=0 最大折叠的深度。默认为 -1 表示全部折叠。	 * @return this	 */	collapseAll: function(duration, maxDepth){		if (this.subControl && !(maxDepth === 0)) {			this.invoke('collapseAll', [duration, --maxDepth]);			this.collapse(duration);		}		return this;	},		/**	 * 展开当前节点，但折叠指定深度以后的节点。	 */	collapseTo: function(depth, duration){		duration = duration === undefined ? 0 : duration;		depth = depth === undefined ? 1 : depth;				if(depth > 0){			this.expand(duration);		} else {			this.collapse(duration);		}				this.invoke('collapseTo', [--depth, duration]);	},		invoke: function(funcName, args){		if(this.subControl){			this.subControl.invoke(funcName, args);		}		return this;	},	/**	 * 获取当前节点的深度。	 * @return {Integer} 返回节点深度。	 */	getDepth: function(){		return this.depth;	},	/**	 * 设置当前节点的深度。	 * @param {Integer} value 要设置的深度。	 * @return this	 */	setDepth: function(value){				assert(value >= 0, "TreeNode#setDepth(value): {value} 必须是不小于 0 的整数", value);				var me = this,			currentDepth = me.depth, 			span,			current = me;				// 删除多余的占位符。				while(currentDepth > value){			me.removeChild(elem.first());			currentDepth--;		}			// 补上不够的占位符。				while(currentDepth < value){			me.prepend(Dom.createNode('span', 'x-treenode-space'));			currentDepth++;		}				// 更新深度。				me.depth = value;				// 绑定最后一个 span 的点击事件。				span = this.span(0);				if(currentDepth) {			span.un('click', this.onDblClick).on('click', this.onDblClick, this);		}				// 更新 spans 的 class 状态。				while((current = current.parentNode) && (span = span.prev())){			span.node.className = current.isLastNode() ? 'x-treenode-space x-treenode-none' : 'x-treenode-space';		}				me.updateNodeType();				// 对子节点设置深度+1		me.invoke('setDepth', [++value]);	},		getTreeView: function(){		var n = this;		while(n)			n = n.parentNode;				return n ? n.parentControl : null;	},		ensureVisible: function(duration){		var n = this;		while(n = n.parentNode) {			n.expand(duration);		}		//   this.scrollIntoView();				return this;	}});var TreeView = TreeControl.extend({		xtype: 'treeview',		depth: 0,		createTreeItem: function(childControl) {			    if (!(childControl instanceof TreeNode)) {	        // 保存原有 childControl 。	        var t = childControl;	        childControl = new TreeNode();	        childControl.content().append(t);					}				// 设置子节点的位置。		childControl.setDepth(this.depth + 1);				// 更新当前树的父节点。		if(this.owner){			this.owner.update();			childControl.parentNode = this.owner;		}		return childControl;	},	/**	 * 当用户点击一项时触发。	 */	onNodeClick: function (node) {		return this.trigger('nodeclick', node);	},		/**	 * 获取一个值，该值指示当前节点是否为最后一个节点。	 * @return {Boolean}	 * @protected	 */	isLastNode: function(){		return false;	},		init: function(){		// 根据已有的 DOM 结构初始化菜单。		TreeControl.prototype.init.call(this);				this.on('click', this.onClick);	},		invoke: function(funcName, args){		var subTree = this, c, target;		args = args || [];		for(var c = subTree.first(); c; c = c.next()){			target = c.dataField().item;			target[funcName].apply(target, args);		}		return this;	},		collapse: function(duration){		return this.invoke('collapse', [duration]);	},		collapseAll: function(duration){		return this.invoke('collapseAll', [duration]);	},		expand: function(duration){		return this.invoke('expand', [duration]);	},		expandAll: function(duration){		return this.invoke('expandAll', [duration]);	},		collapseTo: function(depth, duration){		return this.invoke('collapseTo', [--depth, duration]);	},		/**	 * 当一个选项被选中时触发。	 */	onSelect: function(node){		return this.trigger('select', node);	},		/**	 * 当选中的项被更新后触发。	 */	onChange: function (old, item){		return this.trigger('change', old);	},		/**	 * 点击时触发。	 */	onClick: function (e) {				var target = e.target;				if(/\bx-treenode-(minus|plus|loading)\b/.test(target.className))			return;				if((target = new Dom(target).closest('.x-treenode')) && (target = target.dataField().control) && !this.clickNode(target)){			e.stop();		}					},		/**	 * 模拟点击一项。	 */	clickNode: function(node){		if(this.onNodeClick(node)){			this.setSelectedNode(node);			return true;		}				return false;	},		setSelectedNode: function(node){				// 先反选当前选择项。		var old = this.getSelectedNode();		if(old)			old.state('selected', false);			if(this.onSelect(node) !== false){					// 更新选择项。			this.selectedNode = node;						if(node != null){				node.state('selected', true);			}					}					if(old !== node)			this.onChange(old, node);					return this;	},		getSelectedNode: function(){		return this.selectedNode;	}	});
+/*********************************************************
+ * Controls.Menu.Menu
+ ********************************************************/
+/**
+ * @author xuld
+ */
+
+
+
+/**
+ * 表示菜单项。 
+ */
+var MenuItem = TreeControl.Item.extend({
+
+	xtype: 'menuitem',
+
+	/**
+	 * 当被子类重写时，用于创建子树。
+	 * @param {TreeControl} treeControl 要初始化的子树。
+	 * @return {TreeControl} 新的 {@link TreeControl} 对象。
+	 * @protected override
+	 */
+	createSubControl: function(treeControl){
+		return new Menu(treeControl);
+	},
+	
+	/**
+	 * 当被子类重写时，用于初始化子树。
+	 * @param {TreeControl} treeControl 要初始化的子树。
+	 * @protected override
+	 */
+	initSubControl: function(treeControl){
+		treeControl.hide();
+		treeControl.floating = false;
+		this.addClass('x-menuitem-submenu');
+		this.on('mouseup', this._cancelHideMenu);
+	},
+	
+	/**
+	 * 当被子类重写时，用于删除初始化子树。
+	 * @param {TreeControl} treeControl 要删除初始化的子树。
+	 * @protected override
+	 */
+	uninitSubControl: function(treeControl){
+		treeControl.floating = true;
+		this.removeClass('x-menuitem-submenu');
+		this.un('mouseup', this._cancelHideMenu);
+	},
+
+	onMouseOver: function() {
+		this.state("hover", true);
+		if (this.subControl)
+			this.showSubMenu();
+		else if(this.parentControl)
+			this.parentControl.hideSubMenu();
+	},
+	
+	onMouseOut: function() {
+
+		// 没子菜单，需要自取消激活。
+		// 否则，由父菜单取消当前菜单的状态。
+		// 因为如果有子菜单，必须在子菜单关闭后才能关闭激活。
+
+		if (!this.subControl)
+			this.state("hover", false);
+
+	},
+	
+	/**
+	 *
+	 */
+	init: function() {
+		if(this.hasClass('x-' + this.xtype)) {
+			this.unselectable();
+			this.on('mouseover', this.onMouseOver);
+			this.on('mouseout', this.onMouseOut);
+		}
+	},
+	
+	_cancelHideMenu: function(e) {
+		e.stopPropagation();
+	},
+
+	_hideTargetMenu: function(e) {
+		var tg = e.relatedTarget;
+		while (tg && !Dom.hasClass(tg, 'x-menu')) {
+			tg = tg.parentNode;
+		}
+
+		if (tg) {
+			new Dom(tg).dataField().control.hideSubMenu();
+		}
+
+	},
+
+	getSubMenu: TreeControl.Item.prototype.getSubControl,
+	
+	setSubMenu: TreeControl.Item.prototype.setSubControl,
+
+	showSubMenu: function(){
+
+		// 使用父菜单打开本菜单，显示子菜单。
+		this.parentControl && this.parentControl.showSubMenu(this);
+		
+		return this;
+	},
+	
+	hideSubMenu: function(){
+
+		// 使用父菜单打开本菜单，显示子菜单。
+		this.parentControl && this.parentControl.hideSubMenu(this);
+		
+		return this;
+	}
+
+});
+
+var MenuSeperator = MenuItem.extend({
+
+	tpl: '<div class="x-menuseperator"></div>',
+
+	init: Function.empty
+
+});
+
+var Menu = TreeControl.extend({
+
+	xtype: 'menu',
+	
+	/**
+	 * 表示当前菜单是否为浮动的菜单。 
+	 */
+	floating: false,
+
+	createTreeItem: function(childControl) {
+		
+		if(!(childControl instanceof MenuItem)){
+	
+			// 如果是文本。
+			if (childControl.node.nodeType === 3) {
+	
+				// - => MenuSeperator
+				if (/^\s*-\s*$/.test(childControl.getText())) {
+					
+					childControl.remove();
+	
+					childControl = new MenuSeperator;
+	
+					// 其它 => 添加到 MenuItem
+				} else {
+	
+					// 保存原有 childControl 。
+					var t = childControl;
+					childControl = new MenuItem;
+					childControl.append(t);
+				}
+			} else if(childControl.hasClass('x-menuseperator')){
+				childControl = new MenuSeperator(childControl);
+			} else {
+	
+				// 创建对应的 MenuItem 。
+				childControl = new MenuItem(childControl);
+			}
+				
+		}
+
+		return childControl;
+
+	},
+
+	init: function() {
+
+		// 绑定节点和控件，方便发生事件后，根据事件源得到控件。
+		this.dataField().control = this;
+
+		// 根据已有的 DOM 结构初始化菜单。
+		TreeControl.prototype.init.call(this);
+	},
+
+	onShow: function() {
+		
+		// 如果菜单是浮动的，则点击后关闭菜单，否则，只关闭子菜单。
+		if(this.floating)
+			document.once('mouseup', this.hide, this);
+		this.trigger('show');
+	},
+
+	/**
+	 * 关闭本菜单。
+	 */
+	onHide: function() {
+
+		// 先关闭子菜单。
+		this.hideSubMenu();
+		this.trigger('hide');
+	},
+
+	show: function() {
+		Dom.show(this.node);
+		this.onShow();
+		return this;
+	},
+
+	hide: function() {
+		Dom.hide(this.node);
+		this.onHide();
+		return this;
+	},
+	
+	/**
+	 * 当前菜单依靠某个控件显示。
+	 * @param {Control} ctrl 方向。
+	 */
+	showAt: function(x, y) {
+		
+		// 确保菜单已添加到文档内。
+		if (!this.parent('body')) {
+			this.appendTo();
+		}
+
+		// 显示节点。
+		this.show();
+
+		this.setPosition(x, y);
+
+		return this;
+	},
+
+	/**
+	 * 当前菜单依靠某个控件显示。
+	 * @param {Control} ctrl 方向。
+	 */
+	showBy: function(ctrl, pos, offsetX, offsetY, enableReset) {
+
+		// 确保菜单已添加到文档内。
+		if (!this.parent('body')) {
+			this.appendTo(ctrl.parent());
+		}
+
+		// 显示节点。
+		this.show();
+
+		this.align(ctrl, pos || 'rt', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);
+
+		return this;
+	},
+
+	/**
+	 * 显示指定项的子菜单。
+	 * @param {MenuItem} menuItem 子菜单项。
+	 * @protected
+	 */
+	showSubMenu: function(menuItem) {
+
+		// 如果不是右键的菜单，在打开子菜单后监听点击，并关闭此子菜单。
+		if (!this.floating)
+			document.once('mouseup', this.hideSubMenu, this);
+
+		// 隐藏当前项子菜单。
+		this.hideSubMenu();
+
+		// 激活本项。
+		menuItem.state("hover", true);
+
+		// 如果指定的项存在子菜单。
+		if (menuItem.subControl) {
+
+			// 设置当前激活的项。
+			this.currentSubMenu = menuItem;
+
+			// 显示子菜单。
+			menuItem.subControl.showBy(menuItem);
+
+		}
+		
+	},
+
+	/**
+	 * 关闭本菜单打开的子菜单。
+	 * @protected
+	 */
+	hideSubMenu: function() {
+
+		// 如果有子菜单，就隐藏。
+		if (this.currentSubMenu) {
+
+			// 关闭子菜单。
+			this.currentSubMenu.subControl.hide();
+
+			// 取消激活菜单。
+			this.currentSubMenu.state("hover", false);
+			this.currentSubMenu = null;
+		}
+		
+	}
+
+});
+
+
+
+
 /*********************************************************
  * System.Ajax.Base
  ********************************************************/
