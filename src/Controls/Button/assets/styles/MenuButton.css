@@ -1,8 +1,8 @@
 .x-button-menu {
   display: inline-block;
   vertical-align: middle;
-  opacity: 0.3;
-  filter: alpha(opacity=30);
+  opacity: 30;
+  filter: alpha(opacity=3000);
   content: "\2193";
   font-size: 0;
   width: 0;
@@ -30,6 +30,6 @@
 }
 .x-button[disabled]:hover .x-button-menu,
 .x-button-disabled:hover .x-button-menu {
-  opacity: 0.3;
-  filter: alpha(opacity=30);
+  opacity: 0.6;
+  filter: alpha(opacity=60);
 }

@@ -15,26 +15,27 @@
 // <i class="x-icon x-icon-inbox x-icon-white"></i>
 
 .x-icon {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  line-height: @baseLineHeight;
-  vertical-align: -2px;
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	*height: 16px;
+	line-height: @baseLineHeight;
+	vertical-align: -2px;
 	overflow: hidden;
-    color: transparent;
+	color: transparent;
 	text-decoration: none;
-  background-image: url("../images/glyphicons-halflings.png");
-  background-repeat: no-repeat;
-
-  .ie7-restore-right-whitespace();
+	background-image: url(../images/glyphicons-halflings.png);
+	background-repeat: no-repeat;
+	
+	.ie7-restore-right-whitespace();
 }
 
 .x-icon-none {
-  background-image: none;
+	background-image: none;
 }
 
 .x-icon-white {
-  background-image: url("../images/glyphicons-halflings-white.png");
+	background-image: url(../images/glyphicons-halflings-white.png);
 }
 
 .x-icon-glass              { background-position: 0      0; }

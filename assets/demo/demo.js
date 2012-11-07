@@ -324,6 +324,16 @@ if (typeof module !== 'object') {
 
         },
 
+        indexOf: function(arr, value){
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i] === value) {
+                    return i;
+                }
+            }
+
+            return -1;
+        },
+
         /**代码处理模块*/
         Text: {
 
@@ -3600,7 +3610,7 @@ if (typeof module !== 'object') {
                     // 跟目录。
                     var node = document.getElementsByTagName("script");
                     node = node[node.length - 1];
-                    node = (!Demo.Dom.isIE || typeof document.constructor !== 'function') ? node.src : node.getAttribute('src', 5);
+                    node = (!Demo.Dom.isIE || typeof document.constructor === 'function') ? node.src : node.getAttribute('src', 5);
                     node = node.substr(0, node.length - configs.demoFilePath.length);
                     configs.rootUrl = node;
 
@@ -3750,7 +3760,7 @@ if (typeof module !== 'object') {
 
                         for (i = 0; i < Demo.Configs.support.length; i++) {
                             key = Demo.Configs.support[i];
-                            html += '<input name="support" type="checkbox"' + (support.indexOf(key) >= 0 ? ' checked="checked"' : '') + ' id="demo-controlstate-support-' + key + '" value="' + key + '"><label for="demo-controlstate-support-' + key + '">' + Demo.Configs.support[i] + '</label>';
+                            html += '<input name="support" type="checkbox"' + (Demo.indexOf(support, key) >= 0 ? ' checked="checked"' : '') + ' id="demo-controlstate-support-' + key + '" value="' + key + '"><label for="demo-controlstate-support-' + key + '">' + Demo.Configs.support[i] + '</label>';
 
                             if (i === 5) {
                                 html += '<br>';
@@ -3863,11 +3873,18 @@ if (typeof module !== 'object') {
                 if (window.localStorage) {
                     var dplList = localStorage.demoDplHistory;
                     dplList = dplList ? dplList.split(';') : [];
-                    var i = dplList.indexOf(dpl);
-                    if (i >= 0) dplList.splice(i, 1);
+
+                    for (var i = 0; i < dplList.length; i++) {
+                        if (dplList[i] === dpl) {
+                            dplList.splice(i, 1);
+                            break;
+                        }
+                    }
+
                     if (dplList.length > 3) {
                         dplList.shift();
                     }
+
                     dplList.push(dpl);
                     localStorage.demoDplHistory = dplList.join(';');
                 }

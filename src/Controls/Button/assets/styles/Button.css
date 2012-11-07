@@ -231,6 +231,6 @@ input.x-button-small {
   box-shadow: none;
 }
 .x-button-fixed {
-  padding-left: 20px;
-  padding-right: 20px;
+  padding-left: 20px!important;
+  padding-right: 20px!important;
 }

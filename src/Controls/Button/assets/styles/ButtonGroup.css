@@ -22,6 +22,8 @@
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 .x-buttongroup .x-button:first-child {
   margin-left: 0;
