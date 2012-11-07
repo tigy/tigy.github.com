@@ -1,15 +1,13 @@
-// -----------------------------------------------------------------*/
+//
+// Variables
+// --------------------------------------------------
+
 
 // Global values
 // --------------------------------------------------
 
-
-// Links
-@linkColor:             #08c;
-@linkColorHover:        darken(@linkColor, 15%);
-
-
 // Grays
+// -------------------------
 @black:                 #000;
 @grayDarker:            #222;
 @grayDark:              #333;
@@ -21,6 +19,7 @@
 @white:                 #fff;
 
 // Accent colors
+// -------------------------
 @blue:                  #049cdb;
 @blueDark:              #0064cd;
 @blueLight:             #3A87AD;
@@ -31,19 +30,33 @@
 @pink:                  #c3325f;
 @purple:                #7a43b6;
 
-// Typography
-@baseFontSize:          12px;
-@baseFontFamily:        Tahoma, Arial, "宋体";
-@baseLineHeight:        18px;
+// Scaffolding
+// -------------------------
+@bodyBackground:        @white;
 @textColor:             @grayDark;
 
-// Buttons
-@highlight:             #FF6600;
-@highlightButtonBackground:   #4AACCA;
+// Links
+// -------------------------
+@linkColor:             #08c;
+@linkColorHover:        darken(@linkColor, 15%);
+
+// Typography
+// -------------------------
+@sansFontFamily:        Tahoma, Arial, "宋体";
+@serifFontFamily:       "Helvetica Neue", Helvetica, Arial, sans-serif;
+@monoFontFamily:        "Courier New", Menlo, Monaco, monospace;
+
+@baseFontSize:          12px;
+@baseFontFamily:        @sansFontFamily;
+@baseLineHeight:        18px;
 
 
 // COMPONENT VARIABLES
 // --------------------------------------------------
+
+// Buttons
+@highlight:             #FF6600;
+@highlightButtonBackground:   #4AACCA;
 
 // Z-index master list
 // Used for a bird's eye view of components dependent on the z-axis
