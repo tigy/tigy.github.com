@@ -1,100 +1,90 @@
 @import "../../../Core/assets/less/variables.less";
 @import "../../../Core/assets/less/mixins.less";
 
-// Buttons
-// -------------------------
-@btnBackground:                     @white;
-@btnBackgroundHighlight:            darken(@white, 10%);
-@btnBorder:                         darken(@white, 20%);
+@buttonBackgroundColor:					@white;
+@buttonBackgroundColorHover:			darken(@white, 10%);
+@buttonBorder:							darken(@white, 20%);
 
-@btnPrimaryBackground:              @linkColor;
-@btnPrimaryBackgroundHighlight:     spin(@btnPrimaryBackground, 15%);
+@hintButtonBackgroundColor:				#454545;
+@hintButtonBackgroundColorHover:		#262626;
 
-@btnInfoBackground:                 #5bc0de;
-@btnInfoBackgroundHighlight:        #2f96b4;
+@successButtonBackgroundColor:			#62c462;
+@successButtonBackgroundColorHover:		#51a351;
 
-@btnSuccessBackground:              #62c462;
-@btnSuccessBackgroundHighlight:     #51a351;
+@infoButtonBackgroundColor:				#5bc0de;
+@infoButtonBackgroundColorHover:		#2f96b4;
 
-@btnWarningBackground:              lighten(@orange, 15%);
-@btnWarningBackgroundHighlight:     @orange;
+@warningButtonBackgroundColor:			lighten(@orange, 15%);
+@warningButtonBackgroundColorHover:		@orange;
 
-@btnDangerBackground:               #ee5f5b;
-@btnDangerBackgroundHighlight:      #bd362f;
+@errorButtonBackgroundColor:			#ee5f5b;
+@errorButtonBackgroundColorHover:		#bd362f;
 
-@btnInverseBackground:              @gray;
-@btnInverseBackgroundHighlight:     @grayDarker;
+@highlightButtonBackgroundColor:		#4AACCA;
+@highlightButtonBackgroundColorHover:	spin(@highlightButtonBackgroundColor, 20);
 
-// Base styles
-// --------------------------------------------------
+
+// Mixin for generating button BackgroundColors
+// ---------------------------------------
+.buttonBackgroundColor(@startColor, @endColor) {
+    #gradient > .bar(@startColor, @endColor);
+    // in these cases the gradient won't cover the BackgroundColorColor, so we override
+    &:hover, &:active, &.x-button-actived, &[disabled], &.x-button-disabled {
+        background-color: @endColor;
+    }
+}
 
 // Core
+// --------------------------------------------------
+
 .x-button {
-  display: inline-block;
-  .ie7-inline-block();
-  padding: 4px 10px;
-  font-size: @baseFontSize + 1;
-  line-height: @baseLineHeight;
-  color: @grayDark;
-  text-align: center;
-  text-shadow: 0 1px 1px rgba(255,255,255,.75);
-  vertical-align: middle;
-  .buttonBackground(@btnBackground, @btnBackgroundHighlight);
-  border: 1px solid @btnBorder;
-  border-bottom-color: darken(@btnBorder, 10%);
-  .border-radius(4px);
-  @shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05);
-  .box-shadow(@shadow);
-
-  // Give IE7 some love
-  .ie7-restore-left-whitespace();
+	.inline-block();
+	padding: 4px 14px;
+	font-size: @baseFontSize + 1;
+	line-height: @baseLineHeight;
+	color: @grayDark;
+    text-shadow: 0 1px 1px rgba(255,255,255,.75);
+	.buttonBackgroundColor(@buttonBackgroundColor, @buttonBackgroundColorHover);
+	border: 1px solid @buttonBorder;
+	border-bottom-color: darken(@buttonBorder, 10%);
+	text-align: center;
+	vertical-align: middle;
+	
+	.border-radius(@baseBorderRadius);
+	.ie7-restore-left-whitespace();
+	.box-shadow(~"inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05)");
 }
-
+	
 // Hover state
 .x-button:hover {
-  color: @grayDark;
-  text-decoration: none;
-  background-color: darken(@white, 10%);
-  background-position: 0 -15px;
+	color: @grayDark;
+	text-decoration: none;
+	background-color: darken(@white, 10%);
+	background-position: 0 -15px;
 
-  // transition is only when going to hover, otherwise the background
-  // behind the gradient (there for IE<=9 fallback) gets mismatched
-  .transition(background-position .1s linear);
+	// transition is only when going to hover, otherwise the BackgroundColor
+	// behind the gradient (there for IE<=9 fallback) gets mismatched
+	.transition(background-position .1s linear);
 }
-
-a.x-button {
-  cursor: pointer;
-}
-
-// Focus state for keyboard and accessibility
-button.x-button:focus, input.x-button:focus {
-  .tab-focus();
-}
-
-.x-button:focus {
-  outline-offset: -2px;
-}
-
+	
 // Active state
 .x-button:active, .x-button-actived {
-  background-image: none;
-  @shadow: inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05);
-  .box-shadow(@shadow);
   background-color: darken(@white, 10%);
   background-color: darken(@white, 15%) e("\9");
+  background-image: none;
   outline: 0;
+  .box-shadow(~"inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05)");
 }
-
+	
 // Disabled state
 .x-button[disabled], .x-button-disabled {
   cursor: default;
   background-image: none;
-  background-color: @grayLighter!important;
-  .opacity(65);
-  .box-shadow(none)!important;
+  .opacity(0.6);
+  .box-shadow(none);
 }
-
-
+	
+	
 // Button Sizes
 // --------------------------------------------------
 
@@ -122,52 +112,47 @@ button.x-button:focus, input.x-button:focus {
 
 // Alternate buttons
 // --------------------------------------------------
-
+	
 // Set text color
 // -------------------------
-.x-button-highlight,
-.x-button-highlight:hover,
-.x-button-warning,
-.x-button-warning:hover,
-.x-button-error,
-.x-button-error:hover,
-.x-button-success,
-.x-button-success:hover,
-.x-button-info,
-.x-button-info:hover,
-.x-button-inverse,
-.x-button-inverse:hover {
+.x-button-hint, .x-button-hint:hover, .x-button-success, .x-button-success:hover, .x-button-info, .x-button-info:hover, .x-button-warning, .x-button-warning:hover, .x-button-error, .x-button-error:hover, .x-button-highlight, .x-button-highlight:hover {
   text-shadow: 0 -1px 0 rgba(0,0,0,.25);
   color: @white;
 }
 
-// Set the backgrounds
+// Set the BackgroundColors
 // -------------------------
-.x-button-highlight {
-  .buttonBackground(@highlightButtonBackground, spin(@highlightButtonBackground, 20));
+
+// Info appears as a neutral blue
+.x-button-hint {
+  .buttonBackgroundColor(@hintButtonBackgroundColor, @hintButtonBackgroundColorHover);
 }
-// Warning appears are orange
-.x-button-warning {
-  .buttonBackground(lighten(@orange, 15%), @orange);
-}
-// error and error appear as red
-.x-button-error {
-  .buttonBackground(#ee5f5b, #bd362f);
-}
+
 // Success appears as green
 .x-button-success {
-  .buttonBackground(#62c462, #51a351);
+  .buttonBackgroundColor(@successButtonBackgroundColor, @successButtonBackgroundColorHover);
 }
+	
 // Info appears as a neutral blue
 .x-button-info {
-  .buttonBackground(#5bc0de, #2f96b4);
-} 
-// Inverse appears as dark gray
-.x-button-inverse {
-  .buttonBackground(#454545, #262626);
+  .buttonBackgroundColor(@infoButtonBackgroundColor, @infoButtonBackgroundColorHover);
 }
 
+// Warning appears are orange
+.x-button-warning {
+  .buttonBackgroundColor(@warningButtonBackgroundColor, @warningButtonBackgroundColorHover);
+}
 
+// error and error appear as red
+.x-button-error {
+  .buttonBackgroundColor(@errorButtonBackgroundColor, @errorButtonBackgroundColorHover);
+}
+
+.x-button-highlight {
+  .buttonBackgroundColor(@highlightButtonBackgroundColor, @highlightButtonBackgroundColorHover);
+}
+
+	
 // Cross-browser Jank
 // --------------------------------------------------
 
@@ -191,7 +176,9 @@ button, input {
 
 .x-button-plain {
   background: none;
+  color: @grayDark;
   border-color: transparent;
+  _border-color: @backgroundColor;
   .box-shadow(none);
 }
 
@@ -199,3 +186,4 @@ button, input {
   padding-left: 20px;
   padding-right: 20px;
 }
+	

@@ -45,7 +45,9 @@ html div.x-plain {
   padding: 0;
 }
 .x-break-word {
+  -ms-word-wrap: break-word;
   word-wrap: break-word;
+  -ms-word-break: break-all;
   word-break: break-all;
 }
 .x-clear {
@@ -58,12 +60,11 @@ html div.x-plain {
   clear: both;
   visibility: hidden;
 }
-html .x-hint,
-html .x-hint a {
+.x-hint {
   color: #999999;
 }
-.x-highlight {
-  color: #ff6600 !important;
+.x-success {
+  color: #468847 !important;
 }
 .x-info {
   color: #3a87ad !important;
@@ -74,11 +75,10 @@ html .x-hint a {
 .x-error {
   color: #b94a48 !important;
 }
-.x-success {
-  color: #468847 !important;
+.x-highlight {
+  color: #ff6600 !important;
 }
-html .x-row,
-html div.x-row {
+html .x-row {
   margin-bottom: 10px;
 }
 .x-blank {

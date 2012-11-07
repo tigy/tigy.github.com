@@ -4,128 +4,128 @@
 
 // align
 html {
-  
-  .x-left {
-  	float: left;
-  }
-  
-  .x-right {
-  	float: right;
-  }
-  
-  // fix double margin bug for IE6
-  .x-left, .x-right {
-    _display: inline;
-  }
-  
-  .x-middle {
-  	vertical-align: middle;	
-  }
+	
+	.x-left {
+		float: left;
+	}
+	
+	.x-right {
+		float: right;
+	}
+	
+	/// IE6
+	// fix double margin bug for IE6
+	.x-left, .x-right {
+		_display: inline;
+	}
+	
+	.x-middle {
+		vertical-align: middle;	
+	}
 
 }
 
 .x-center {
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 // position
 html {
-    
-  .x-relative, div.x-relative {
-  	position: relative;	
-  }
-  
-  .x-absolute, div.x-absolute {
-  	position: absolute;	
-  }
+		
+	.x-relative, div.x-relative {
+		position: relative;	
+	}
+	
+	.x-absolute, div.x-absolute {
+		position: absolute;	
+	}
 
 }
 
 // display
 html {
-  
-  .x-inline {
-  	display: inline;	
-  }
-  
-  .x-block {
-  	display: block;	
-  }
-  
-  .x-inline-block {
-  	display: inline-block;
-  	
-    // fix for IE6 & IE7
-  	.ie7-inline-block();
-  }
-  
-  .x-hide, div.x-hide{
-  	display: none;
-  }
-  
-  // plain
-  .x-plain, div.x-plain {
-    margin: 0;
-    padding: 0;
-  }
-  
+	
+	.x-inline {
+		display: inline;	
+	}
+	
+	.x-block {
+		display: block;	
+	}
+	
+	.x-inline-block {
+		.inline-block();
+	}
+	
+	.x-hide, div.x-hide{
+		display: none;
+	}
+	
+	// plain
+	.x-plain, div.x-plain {
+		margin: 0;
+		padding: 0;
+	}
+	
 }
 
 // text
 .x-break-word {
-  word-wrap: break-word;
-  word-break: break-all;
+	-ms-word-wrap: break-word;
+	word-wrap: break-word;
+	-ms-word-break: break-all;
+	word-break: break-all;
 }
 
 // clear
 .x-clear {
-  .clear();
+	.clear();
 }
 
 // colors
 
-html .x-hint, html .x-hint a {
-  color: @grayLight;
-}
-
-.x-highlight {
-  color: @highlight!important;
-}
-
-.x-info {
-  color: @blueLight!important;
-}
-
-.x-warning {
-  color: @warningText!important;
-}
-
-.x-error {
-  color: @errorText!important;
+.x-hint {
+	color: @hintTextColor;
 }
 
 .x-success {
-  color: @successText!important;
+	color: @successTextColor!important;
+}
+
+.x-info {
+	color: @infoTextColor!important;
+}
+
+.x-warning {
+	color: @warningTextColor!important;
+}
+
+.x-error {
+	color: @errorTextColor!important;
+}
+
+.x-highlight {
+	color: @highlightTextColor!important;
 }
 
 // misc
 html {
-  .x-row, div.x-row {
-    margin-bottom: 10px;
-  }
+	.x-row {
+		margin-bottom: 10px;
+	}
 }
-  
+	
 .x-blank {
-  height: 10px;
-  display: block;
-  visibility: hidden;
-  color: @white;
+	height: 10px;
+	display: block;
+	visibility: hidden;
+	color: @white;
 }
 
 .x-debug {
-  background: #C03!important;
-  color: #fff!important;
+	background: #C03!important;
+	color: #fff!important;
 }
 
