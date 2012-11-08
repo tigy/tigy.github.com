@@ -101,7 +101,7 @@ Demo.extend(Demo, {
          * 文档的下拉菜单 HTML 模板。
          */
         doc: '<a href="~/resources/books/api/index.html" target="_blank">jPlusUI API 文档</a>\
-                <a href="~/resources/cookbooks/jplusui-core-api/jplusui-core-api.xml" target="_blank">jPlusUI Core 文档</a>\
+                <a href="~/resources/cookbooks/jplusui-core-api/index.html" target="_blank">jPlusUI Core 文档</a>\
                 <a href="~/resources/cookbooks/jquery2jplus.html" target="_blank">jQuery 转 jPlusUI</a>\
                 <a href="~/resources/cookbooks/dplsystem.html" target="_blank">组件系统文档</a>\
                 <a href="~/resources/index.html#doc" target="_blank">更多文档</a>',
