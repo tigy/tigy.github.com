@@ -9,6 +9,7 @@
   color: #000000;
   -webkit-user-select: none;
   -moz-user-select: none;
+  -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
 }
@@ -17,9 +18,6 @@
 }
 .x-arrow-back {
   position: absolute;
-}
-.x-arrow-top {
-  _font-size: 20px;
 }
 .x-arrow-top,
 .x-arrow-bottom {
@@ -68,6 +66,7 @@
   left: 36%;
 }
 .x-arrow-top {
+  _font-size: 20px;
   top: -10px;
   left: 36%;
 }

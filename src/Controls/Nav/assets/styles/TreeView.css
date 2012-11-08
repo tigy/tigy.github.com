@@ -1,11 +1,11 @@
-/* Tree */.x-treeview {
+/* Tree */
+.x-treeview {
   padding: 3px 0;
   overflow: auto;
   border: 1px solid #CCCCCC;
-  overflow: auto;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
 }
 .x-treeview-plain {
   border: 0;
@@ -29,6 +29,7 @@
   display: inline-block;
   width: 19px;
   background-repeat: no-repeat;
+  background-image: url(../images/treeview.gif);
 }
 .x-treenode-none {
   background-image: none!important;
@@ -39,10 +40,6 @@
 .x-treenode:hover {
   background-color: #EEEEEE;
   text-decoration: none;
-}
-.x-treenode-space {
-  background-image: url(../images/treeview.gif);
-  background-repeat: no-repeat;
 }
 .x-treenode-plus {
   background-position: 0 -30px;

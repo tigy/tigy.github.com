@@ -2,6 +2,13 @@
 @import "../../../Core/assets/less/mixins.less";
 
 
+.tipBackgroundColor(@color){
+	background-color: @color;
+
+	&:hover {
+		background-color: darken(@color, 10%);
+	}
+}
 
 
 // LABELS
@@ -9,30 +16,32 @@
 
 // Base
 .x-tip {
-  padding: 2px 4px 3px;
-  font-size: @baseFontSize * .85;
-  font-weight: bold;
-  color: @white;
-  text-shadow: 0 -1px 0 rgba(0,0,0,.25);
-  background-color: @grayLight;
-  .border-radius(3px);
+    padding: 2px 4px 3px;
+    font-size: @baseFontSize * .85;
+    font-weight: bold;
+    color: @white;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+    background-color: @grayLight;
+    .border-radius(@baseBorderRadius - 1);
+
+    &:hover {
+        color: @white;
+        text-decoration: none;
+    }
 }
 
-// Hover state
-.x-tip:hover {
-  color: @white;
-  text-decoration: none;
+.x-tip-info {
+    .tipBackgroundColor(@infoTextColor);
 }
 
-// Colors
-.x-tip-error        { background-color: @errorText; }
-.x-tip-error:hover  { background-color: darken(@errorText, 10%); }
+.x-tip-success {
+    .tipBackgroundColor(@successTextColor);
+}
 
-.x-tip-warning          { background-color: @orange; }
-.x-tip-warning:hover    { background-color: darken(@orange, 10%); }
+.x-tip-warning {
+    .tipBackgroundColor(@warningTextColor);
+}
 
-.x-tip-success          { background-color: @successText; }
-.x-tip-success:hover    { background-color: darken(@successText, 10%); }
-
-.x-tip-info             { background-color: @infoText; }
-.x-tip-info:hover       { background-color: darken(@infoText, 10%); }
+.x-tip-error {
+    .tipBackgroundColor(@errorTextColor);
+}

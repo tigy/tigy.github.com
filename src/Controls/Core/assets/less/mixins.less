@@ -74,6 +74,13 @@
 	}
 }
 
+// IE7 inline-block
+// ----------------
+.ie6-border-transparent(@baseColor: #ffffff) {
+	 _border-color: @baseColor;
+    _filter: chroma(color=@baseColor);
+}
+
 // Sizing shortcuts
 // -------------------------
 .size(@height: 5px, @width: 5px) {

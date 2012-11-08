@@ -22,10 +22,18 @@ var IDropDownOwner = {
 	/**
 	 * 下拉菜单的宽度。
 	 * @config {String}
-	 * @defaultValue -1
-	 * @return 如果值为 'auto', 则和父容器有同样的宽度。如果设为 -1， 表示不处理宽度。
+	 * @defaultValue 'auto'
+	 * @return 如果值为 -1, 则和父容器有同样的宽度。如果设为 'auto'， 表示不处理宽度。
 	 */
-	dropDownWidth: -1,
+	dropDownWidth: 'auto',
+
+    /**
+	 * 下拉菜单的最小宽度。
+	 * @config {dropDownMinWidth}
+	 * @defaultValue 'auto'
+	 * @return 如果值为 -1, 则和父容器有同样的宽度。如果设为 0， 表示无。
+	 */
+    dropDownMinWidth: 100,
 	
 	onDropDownShow: function(){
 		this.trigger('dropdownshow');
@@ -89,7 +97,7 @@ var IDropDownOwner = {
 	            this.after(dom);
 
 	            // IE6/7 无法自动在父节点无 z-index 时处理 z-index 。
-	            if (navigator.isQuirks && dom.parent().getStyle('zIndex') === 0)
+	            if (navigator.isQuirks && dom.parent() && dom.parent().getStyle('zIndex') === 0)
 	                dom.parent().setStyle('zIndex', 1);
 	        }
 	    } else if (this.dropDown) {
@@ -129,17 +137,19 @@ var IDropDownOwner = {
 	        dropDown.show();
 	        this.realignDropDown(0, -1);
 
-	        var size = this.dropDownWidth;
-	        if (size === 'auto') {
-	            size = this.getSize().x;
+	        var width = this.dropDownWidth;
+	        if (width < 0) {
+	            width = this.getSize().x;
+
+	            var minWidth = Dom.styleNumber(dropDown.node, 'min-width') || this.dropDownMinWidth;
 
 	            // 不覆盖 min-width
-	            if (size < Dom.styleNumber(dropDown.node, 'min-width'))
-	                size = -1;
+	            if (width < minWidth)
+	                width = minWidth;
 	        }
 
-	        if (size >= 0) {
-	            dropDown.setSize(size);
+	        if (width !== 'auto') {
+	            dropDown.setSize(width);
 	        }
 
 	        this.onDropDownShow();

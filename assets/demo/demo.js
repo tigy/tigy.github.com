@@ -3610,7 +3610,7 @@ if (typeof module !== 'object') {
                     // 跟目录。
                     var node = document.getElementsByTagName("script");
                     node = node[node.length - 1];
-                    node = (!Demo.Dom.isIE || typeof document.constructor !== 'function' || !(document instanceof document.constructor)) ? node.src : node.getAttribute('src', 5);
+                    node = (!Demo.Dom.isIE || typeof document.constructor === 'object') ? node.src : node.getAttribute('src', 5);
                     node = node.substr(0, node.length - configs.demoFilePath.length);
                     configs.rootUrl = node;
 
@@ -3707,13 +3707,16 @@ if (typeof module !== 'object') {
                         dropDown.defaultButton.onkeydown = function (e) {
                             e = e || window.event;
                             var keyCode = e.keyCode;
-                            if (keyCode == 40) {
-                                Demo.System.gotoMoveListHover(1);
+                            if (keyCode == 40 || keyCode == 38) {
+                                Demo.System.gotoMoveListHover(keyCode == 40);
 
-                            } else if (keyCode == 38) {
-                                Demo.System.gotoMoveListHover(0);
+                            }
+                        };
 
-                            } else if (keyCode == 13 || keyCode == 10) {
+                        dropDown.defaultButton.onkeypress = function (e) {
+                            e = e || window.event;
+                            var keyCode = e.keyCode;
+                            if (keyCode == 13 || keyCode == 10) {
                                 var link = Demo.System.gotoGetCurrent();
 
                                 if (link) {
@@ -3722,6 +3725,7 @@ if (typeof module !== 'object') {
 
                             }
                         };
+
                         dropDown.defaultButton.onkeyup = function (e) {
                             e = e || window.event;
                             var keyCode = e.keyCode;

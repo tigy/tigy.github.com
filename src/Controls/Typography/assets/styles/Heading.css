@@ -5,7 +5,7 @@ h4,
 h5,
 h6 {
   font-weight: bold;
-  font-family: 'Microsoft YaHei';
+  font-family: "Microsoft YaHei", "宋体", Arial;
   text-rendering: optimizelegibility;
 }
 h1 small,

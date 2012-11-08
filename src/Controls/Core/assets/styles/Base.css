@@ -42,7 +42,7 @@ input,
 button,
 select,
 textarea {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, "宋体", Arial, sans-serif;
   vertical-align: middle;
 }
 button,
@@ -59,6 +59,9 @@ textarea {
   overflow: auto;
   vertical-align: baseline;
   *vertical-align: top;
+}
+select {
+  background-color: #ffffff;
 }
 sub,
 sup {
@@ -96,7 +99,7 @@ audio:not([controls]) {
   display: none;
 }
 body {
-  font-family: Tahoma, Arial, "宋体";
+  font-family: Tahoma, Arial;
   font-size: 12px;
   line-height: 18px;
   color: #333333;

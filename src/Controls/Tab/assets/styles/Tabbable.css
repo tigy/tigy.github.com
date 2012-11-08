@@ -1,5 +1,5 @@
 .x-tabbable {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #dddddd;
   margin: 0;
   *zoom: 1;
 }
@@ -18,13 +18,12 @@
 .x-tabbable-item a {
   display: block;
   border: 1px solid transparent;
-  _border-color: white;
+  _border-color: #ffffff;
   _filter: chroma(color=#ffffff);
   -webkit-border-radius: 4px 4px 0 0;
   -moz-border-radius: 4px 4px 0 0;
   border-radius: 4px 4px 0 0;
   padding: 7px 12px;
-  text-decoration: none;
 }
 .x-tabbable-item a:hover {
   border-color: #eeeeee #eeeeee #dddddd;
@@ -35,9 +34,9 @@
 .x-tabbable-selected a:hover {
   color: #555555;
   background-color: #ffffff;
-  border: 1px solid #ddd;
+  border: 1px solid #dddddd;
   border-bottom-color: transparent;
-  _border-bottom-color: white;
+  _border-bottom-color: #ffffff;
   _filter: chroma(color=#ffffff);
   cursor: default;
 }
@@ -47,7 +46,7 @@
 .x-tabbable-alt .x-tabbable-item a,
 .x-tabbable-alt .x-tabbable-item a:hover {
   border-color: transparent;
-  _border-color: white;
+  _border-color: #ffffff;
 }
 .x-tabbable-alt .x-tabbable-item {
   margin-right: 2px;
@@ -55,9 +54,9 @@
 .x-tabbable-alt .x-tabbable-item a {
   padding-top: 5px;
   padding-bottom: 5px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
 }
 .x-tabbable-alt .x-tabbable-selected a,
 .x-tabbable-alt .x-tabbable-selected a:hover {

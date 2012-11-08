@@ -14,17 +14,11 @@
   text-decoration: none;
   cursor: pointer;
 }
-.x-badge-error {
-  background-color: #b94a48;
+.x-badge-info {
+  background-color: #3a87ad;
 }
-.x-badge-error:hover {
-  background-color: #953b39;
-}
-.x-badge-warning {
-  background-color: #f89406;
-}
-.x-badge-warning:hover {
-  background-color: #c67605;
+.x-badge-info:hover {
+  background-color: #2d6987;
 }
 .x-badge-success {
   background-color: #468847;
@@ -32,15 +26,15 @@
 .x-badge-success:hover {
   background-color: #356635;
 }
-.x-badge-info {
-  background-color: #3a87ad;
+.x-badge-warning {
+  background-color: #c09853;
 }
-.x-badge-info:hover {
-  background-color: #2d6987;
+.x-badge-warning:hover {
+  background-color: #a47e3c;
 }
-.x-badge-inverse {
-  background-color: #333333;
+.x-badge-error {
+  background-color: #b94a48;
 }
-.x-badge-inverse:hover {
-  background-color: #1a1a1a;
+.x-badge-error:hover {
+  background-color: #953b39;
 }

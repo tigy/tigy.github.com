@@ -2,23 +2,20 @@
 @import "../../../Core/assets/less/mixins.less";
 
 
-
-// TOOLTIP
-// ------=
-
 .x-tooltip {
-  position: absolute;
-  z-index: @zindexTooltip;
-  display: block;
-  font-size: 11px;
-  .opacity(80);
+    position: absolute;
+    z-index: @zindexTooltip;
+    display: block;
+    font-size: 11px;
+    .opacity(0.8);
 }
+
 .x-tooltip-content {
-  max-width: 200px;
-  padding: 4px 9px;
-  color: @white;
-  text-align: center;
-  text-decoration: none;
-  background-color: @black;
-  .border-radius(4px);
+    max-width: 200px;
+    padding: 4px 9px;
+    color: @white;
+    text-align: center;
+    text-decoration: none;
+    background-color: @black;
+    .border-radius(@baseBorderRadius);
 }

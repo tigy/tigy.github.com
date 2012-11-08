@@ -34,7 +34,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
     /**
 	 * 下拉框的宽度。
 	 */
-    dropDownWidth: 'auto',
+    dropDownWidth: -1,
 
     /**
 	 * @config dropDownList 是否允许用户输入自定义的文本值。

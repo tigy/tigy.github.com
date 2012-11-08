@@ -13,17 +13,11 @@
   color: #ffffff;
   text-decoration: none;
 }
-.x-tip-error {
-  background-color: #b94a48;
+.x-tip-info {
+  background-color: #3a87ad;
 }
-.x-tip-error:hover {
-  background-color: #953b39;
-}
-.x-tip-warning {
-  background-color: #f89406;
-}
-.x-tip-warning:hover {
-  background-color: #c67605;
+.x-tip-info:hover {
+  background-color: #2d6987;
 }
 .x-tip-success {
   background-color: #468847;
@@ -31,9 +25,15 @@
 .x-tip-success:hover {
   background-color: #356635;
 }
-.x-tip-info {
-  background-color: #3a87ad;
+.x-tip-warning {
+  background-color: #c09853;
 }
-.x-tip-info:hover {
-  background-color: #2d6987;
+.x-tip-warning:hover {
+  background-color: #a47e3c;
+}
+.x-tip-error {
+  background-color: #b94a48;
+}
+.x-tip-error:hover {
+  background-color: #953b39;
 }

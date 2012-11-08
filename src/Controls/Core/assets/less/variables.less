@@ -2,11 +2,6 @@
 // Variables
 // --------------------------------------------------
 
-
-
-// Global values
-// --------------------------------------------------
-
 // Grays
 // -------------------------
 @black:                 #000;
@@ -33,7 +28,7 @@
 
 // Scaffolding
 // -------------------------
-@backgroundColor:        @white;
+@backgroundColor:		@white;
 @textColor:             @grayDark;
 
 // Links
@@ -41,21 +36,11 @@
 @linkColor:             #08c;
 @linkColorHover:        darken(@linkColor, 15%);
 
-// Typography
-// -------------------------
-@sansFontFamily:        Tahoma, Arial, "宋体";
-@serifFontFamily:       "Helvetica Neue", Helvetica, Arial, sans-serif;
-@monoFontFamily:        "Courier New", Menlo, Monaco, monospace;
-
-@baseFontSize:          12px;
-@baseFontFamily:        @sansFontFamily;
-@baseLineHeight:        18px;
-
 
 // Form states and alerts
 // -------------------------
 
-@hintTextColor:             @grayLight;
+@hintTextColor:			@grayLight;
 
 @successTextColor:             #468847;
 @successBackgroundColor:       lighten(#dff0d8, 4%);
@@ -73,18 +58,24 @@
 @errorBackgroundColor:         #f2dede;
 @errorBorderColor:             lighten(@errorTextColor, 30%); //darken(spin(@errorBackground, -10), 3%);(@infoBackground, -10), 7%);
 
-@highlightTextColor:             #FF6600;
+@highlightTextColor:			#FF6600;
+
+// Typography
+// -------------------------
+@sansFontFamily:        Tahoma, Arial;
+@serifFontFamily:       "Helvetica Neue", Helvetica, "宋体", Arial, sans-serif;
+@monoFontFamily:        "Courier New", Menlo, Monaco, monospace;
+@systemFontFamily:		"Microsoft YaHei", "宋体", Arial;
+
+@baseFontSize:          12px;
+@baseFontFamily:        @sansFontFamily;
+@baseLineHeight:        18px;
 
 
 // Component sizing
 // -------------------------
 
 @baseBorderRadius:      4px;
-
-// =======
-
-// COMPONENT VARIABLES
-// --------------------------------------------------
 
 // Z-index master list
 // Used for a bird's eye view of components dependent on the z-axis
@@ -93,32 +84,14 @@
 @zindexPopover:           1010;
 @zindexTooltip:           1020;
 @zindexFixedNavbar:       1030;
-@zindexModalBackdrop:     1040;
-@zindexModal:             1050;
-
-// Hr border color
-@hrBorder:                @grayLighter;
-
-// Navbar
-@navbarHeight:                    40px;
-@navbarBackground:                @grayDarker;
-@navbarBackgroundHighlight:       @grayDark;
-@navbarLinkBackgroundHover:       transparent;
-
-@navbarText:                      @grayLight;
-@navbarLinkColor:                 @grayLight;
-@navbarLinkColorHover:            @white;
-
+@zindexDialogBackdrop:    1040;
+@zindexDialog:            1050;
 
 // GRID
-// --------------------------------------------------
+// ------------------------ 
 
 // Default 980px grid
 @gridColumns:             12;
 @gridColumnWidth:         67px;
 @gridGutterWidth:         16px;
 @gridRowWidth:            (@gridColumns * @gridColumnWidth) + (@gridGutterWidth * (@gridColumns - 1));
-
-// Fluid grid
-@fluidGridColumnWidth:    6.836734693%;
-@fluidGridGutterWidth:    1.632653061%;

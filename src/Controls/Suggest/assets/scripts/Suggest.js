@@ -10,8 +10,6 @@ using("Controls.Suggest.ComboBox");
  */
 var Suggest = ComboBox.extend({
 	
-	dropDownWidth: 'auto',
-	
 	getSuggestItems: function(text){
 		if(!this.items){
 			this.items = [];

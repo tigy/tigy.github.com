@@ -162,6 +162,7 @@
 			 * @param {String} targetProperty 要基于的属性名。
 			 * @param {String} setters=undefined 设置函数的方法名数组，用空格隔开。
 			 * @param {String} getters=undefined 获取函数的方法名数组，用空格隔开。
+             * @remark 使用此函数只能传递最多 3 个参数。
 			 * @example <pre>
 			 * MyClass.defineMethods('field', 'fn1 fn2 fn3');
 			 * </pre>
@@ -193,17 +194,20 @@
 				
 				// 最后使用 implement 添加成员。
 				return this.implement(Object.map(methods, function(fnName) {
-					return function() {
+				    return function (arg0, arg1, arg2) {
 						
 						// 获取实际调用的函数目标对象。
 						var target = propertyGetterFunc ? this[propertyGetterFunc]() : this[targetProperty],
 							r;
 							
 						assert(target, "#" + targetProperty + " 不能为空。");
-						assert(!target || Object.isFunction(target[fnName]), "#" + targetProperty + "." + fnName + "(): 不是函数。");
+						assert(!target || target[fnName], "#" + targetProperty + "." + fnName + "(): 不是函数。");
+
+						r = target[fnName];
 						
-						// 调用被代理的实际函数。
-						r = target[fnName].apply(target, arguments);
+				        // 调用被代理的实际函数。
+                        // 不能使用 .apply: IE 6/7 原生函数不是 function 。
+						r = r.apply ? r.apply(target, arguments) : r(arg0, arg1, arg2);
 						
 						// 如果不是 getter，返回 this 链式引用。
 						return target === r || r === undefined ? this : r;
@@ -944,7 +948,7 @@
 			 * @type Boolean
 			 * @remark 就目前浏览器状况， IE6，7 中 isQuirks = true 其它浏览器都为 false 。
 			 */
-			isQuirks: !isStd && !(document instanceof (document.constructor || emptyFn)),
+			isQuirks: !isStd && typeof document.constructor !== 'object',
 
 			/// #endif
 
