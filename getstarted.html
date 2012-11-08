@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>三分钟快速上手 - jPlusUI</title>
+    <link href="assets/web/styles/jplus-welcome.css" rel="stylesheet">
+    <link href="assets/demo/demo.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Microsoft YaHei';
+        }
+        h2.demo {
+            font-size: 24px;
+            line-height: 40px;
+        }
+    </style>
+    <script src="assets/web/scripts/jplus-welcome.js" type="text/javascript"></script>
+    <script>var Demo = {web: true}</script>
+    <script src="assets/demo/demo.js" type="text/javascript"></script>
+</head>
+<body>
+    <div id="topbar">
+        <div class="x-container x-clear">
+            <h1 class="x-left"><a href="index.html" title="jPlusUI - 一个轻量但完整的UI组件库">jPlusUI</a></h1>
+            <ul class="x-left">
+                <li><a href="index.html" title="综合介绍">首页</a></li>
+                <li><a href="features.html" title="设计思路和原则">设计理念</a></li>
+                <li><a href="src/index.html" title="查看组件列表" target="_blank">文档和演示中心</a></li>
+                <li><a href="download.html" title="获取 jPlusUI">下载</a></li>
+                <li><a href="community.html" title="讨论和联系方式">社区</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="main">
+        <div id="body">
+            <article class="demo">
+
+                <h2 class="demo">三分钟快速上手</h2>
+
+                <section class="demo">
+
+                    <h3 class="demo">1. 下载</h3>
+
+                    <p class="demo">下载 <a href="download/jplusui-latest-release.zip">jplusui-latest-release.zip</a> , 或者下载 <a href="https://github.com/jplusui/jplus-milk/zipball/master">jPlusUI 源码</a> </p>
+
+                    <p class="demo">解压zip文件，会得到如下文件结构: </p>
+
+                    <script class="demo" type="text/plain">
+            jPlusUI-latest/
+               └── build/
+                    ├── images/
+                    ├── styles/
+                    │     ├── jplus.css
+                    │     ├── jplus.min.css
+                    └── scripts/
+                          ├── jplus.js
+                          └── jplus.min.js
+                    </script>
+
+                    <p>其中，<code>jplus.*</code> 是已经编译好的源文件，包含了 100 多个常用组件。<code>jplus.min.*</code> 是相应的压缩版。您也可以使用 <a href="/assets/dpl/dplfilelist.html" target="_blank">组件合成工具</a> 来自行编译需要用到的组件。</p>
+
+                </section>
+
+                <section class="demo">
+
+                    <h3 class="demo">2. 引入文件</h3>
+
+                    <p class="demo">新建一个 HTML 文件，内容如下:</p>
+
+                    <script class="demo-noformat" type="pre/html">
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>My First Page</title>
+                    ##<link href="__build/styles/jplus.css__" rel="stylesheet">##
+                    ##<script src="__build/scripts/jplus.js__" type="text/javascript"><\/script>##
+                </head>
+                <body>
+                <h1>Hello j+ UI!</h1>
+            </body>
+            </html>
+                    </script>
+
+                    <p class="demo">以上文件已经引入了 jPlusUI 所需要的全部文件。jPlusUI 不支持怪癖(Quirks)模式，因此必须定义&lt;!DOCTYPE&gt;, 推荐使用 HTML 5版本的 &lt;!DOCTYPE&gt</p>
+
+                </section>
+
+                <section class="demo">
+
+                    <h3 class="demo">3. 插入一个按钮</h3>
+
+                    <p class="demo">如果需要在页面中插入如下按钮: </p>
+
+                    <button class="x-button">我是按钮</button>
+
+                    <p class="demo">只需粘贴如下代码：</p>
+
+                    <script class="demo demo-noformat" type="pre/html">
+            <button class="x-button">我是按钮</button>
+                    </script>
+
+                    <p class="demo">其中, <code>class="x-button"</code> 表明这是一个组件。</p>
+
+                    <p class="demo">所有组件都可以复制示例页中的代码查看效果。</p>
+
+                    <p class="demo"><strong>jPlusUI 拥有超过 200 个常用组件, 每个组件都有完整的示例和文档。</strong></p>
+
+                    <p>
+                        <a class="x-button x-button-large x-button-fixed" href="/src/index.html">转到组件列表 »</a>
+                    </p>
+
+                </section>
+
+            </article>
+
+        </div>
+        <div id="footer">
+            <div class="x-container">
+                <span class="x-right">Host By <a href="index.html">XXXX</a></span>
+                Copyright &copy; 2011-2012 jPlusUI Team | <a href="LICENSE.txt" target="_blank">The BSD license</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

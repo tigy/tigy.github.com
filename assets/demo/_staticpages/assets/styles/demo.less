@@ -1,0 +1,561 @@
+/**
+ * 演示系统的主样式文件
+ */
+
+@import "blue.less";
+
+/***************** 基本 ****************/
+
+// 重置
+
+body {
+	.body();
+	overflow-y: scroll;
+}
+
+.demo {
+  font-size: 12px;
+  line-height: 18px;
+}
+
+article.demo, aside.demo, footer.demo, header.demo, hgroup.demo, nav.demo, section.demo {
+	display: block;
+}
+
+h1.demo, h2.demo, h3.demo, h4.demo, h5.demo, h6.demo{
+    .heading();
+}
+
+// 页面
+
+header.demo, article.demo, footer.demo {
+	width: 980px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+article.demo {
+	margin-bottom: 40px;
+}
+
+section.demo {
+	margin-bottom: 30px;
+	_width: 100%;
+}
+
+aside.demo {
+	margin-bottom: 10px;
+}
+
+footer.demo {
+	margin-top: -30px;
+	margin-bottom: 20px;
+}
+
+h1.demo {
+    .h1();
+}
+
+h2.demo {
+   // color: #3F529C;
+    color: #333333;
+    font-size: 20px;
+    line-height: 20px;
+	margin: 25px 0;
+}
+
+h3.demo {
+    color: #333333;
+    font-size: 16px;
+    line-height: 16px;
+}
+
+h4.demo {
+    .h4();
+}
+
+h5.demo {
+    .h5();
+}
+
+h6.demo {
+    .h6();
+}
+
+a.demo {
+    .a();
+}
+
+hr.demo {
+    .hr();
+}
+
+table.demo {
+    .table();
+	width: 100%;
+
+    th, td {
+        border: 1px solid #ddd;
+	    padding: 5px;
+    }
+}
+
+dl.demo {
+    .dl();
+}
+
+p.demo {
+    .p();
+    text-indent: 2em;
+}
+
+blockquote.demo {
+	.blockquote();
+}
+
+ol.demo, ul.demo {
+  .list();
+}
+
+ul.demo{
+  .ul();
+}
+
+ol.demo  {
+  .ol()
+}
+
+code.demo {
+	.code();
+}
+
+img.demo {
+	.img()
+}
+
+// 发布模式
+body.demo {
+	.doc();
+
+	header.demo, article.demo, footer.demo {
+		width: 100%;
+	}
+}
+    
+/*************** 语法高亮 ***************/
+
+.syntaxhighligher();
+/***************** 工具 ****************/
+
+html {
+	
+	// 布局
+    .demo-inline {
+        display: inline;
+    }
+
+    .demo-block {
+        display: block;
+    }
+
+    .demo-inline-block {
+        display: inline-block;
+        *display: inline;
+        *zoom: 1;
+    }
+
+    .demo-hide {
+        display: none;
+    }
+
+    .demo-left {
+        float: left;
+    }
+
+    .demo-right {
+        float: right;
+    }
+
+    .demo-clear, .demo-grid {
+        .clear();
+    }
+
+    // 定位
+    .demo-absolute {
+        position: absolute;
+    }
+
+    .demo-relative {
+        position: relative;
+    }
+
+    .demo-fixed {
+        position: fixed;
+        _position: absolute;
+    }
+    // 其它
+    .demo-row {
+        margin-bottom: 10px;
+    }
+
+    .demo-plain {
+        margin: 0;
+        padding: 0;
+    }
+    
+    /*// 字体
+    
+    .demo-strong {
+    	font-weight: bold;
+    }
+    
+    .demo-underline {
+    	text-decoration: underline;
+    }
+    
+    .demo-italic {
+    	font-style: italic;
+    }
+    
+    .demo-small {
+    	font-size: x-small;
+    }
+    
+    .demo-large {
+    	font-size: x-large;
+    }*/
+    
+    // 颜色
+    
+    .demo-white, .demo-c0 {
+    	background-color: #ffffff;
+    	color: #000;
+    }
+    
+    .demo-red, .demo-c1 {
+    	background-color: #9d261d;
+    	color: #fff;
+    }
+    
+    .demo-orange, .demo-c2 {
+    	background-color: #f89406;
+    	color: #000;
+    }
+    
+    .demo-yellow, .demo-c3 {
+    	background-color: #ffc40d;
+    	color: #fff;
+    }
+    
+    .demo-green, .demo-c4 {
+    	background-color: #B4B900;
+    	color: #fff;
+    }
+    
+    .demo-indigo, .demo-c5 {
+    	background-color: #90D9E8;
+    	color: #000000;
+    }
+    
+    .demo-blue, .demo-c6 {
+    	background-color: #285A8F;
+    	color: #fff;
+    }
+    
+    .demo-purple, .demo-c7 {
+    	background-color: #B05A89;
+    	color: #fff;
+    }
+    
+    .demo-black, .demo-c8 {
+    	background-color: #000000;
+    	color: #fff;
+    }
+
+}
+    
+/***************** 元素 ****************/
+
+// 工具条
+
+.demo-mono, .demo-toolbar, .demo-toolbar-dropdown {
+	.mono();
+	font-size: 12px;
+}
+
+.demo-toolbar {
+	float: right;
+	color: #999999;
+	
+	a {
+		color: #333333;
+		text-decoration: none;
+	}
+
+	a:hover {
+		text-decoration: underline;
+	}
+}
+
+// 测试模式
+
+body.demo .demo-test {
+  display: none;
+  margin: 10px 0;
+}
+
+// API 展示模式
+
+.demo-control {
+	padding: 10px;
+	position: fixed;
+	_position: absolute;
+}
+
+.demo-api {
+	border-left: 1px solid #E5E5E5;
+	padding-left: 10px;
+	width: 980px * 0.618 - 12;
+	vertical-align: top;
+	margin-left: 980px * (1-0.618) - 10;
+}
+
+// 表格布局
+
+.demo-grid h2.demo {
+	margin-bottom: 14px;
+}
+
+.demo-grid section.demo {
+	float: left;
+	margin-right: 30px;
+}
+
+.demo-grid-6 section.demo{
+	width: 920px / 6;
+	margin-right: 10px;
+}
+
+.demo-grid-5 section.demo{
+	width: 930px / 5;
+	margin-right: 10px;
+}
+
+.demo-grid-4 section.demo{
+	width: 235px;
+	margin-right: 10px;
+}
+
+.demo-grid-3 section.demo{
+	width: 311px;
+	margin-right: 10px;
+}
+
+.demo-grid-2 section.demo{
+	width: 460px;
+	margin-right: 10px;
+}
+
+// 盒子
+
+.demo-box, .demo-box-small, .demo-box-large {
+	position:relative;
+	width: 80px;
+	height: 80px;
+	margin-right: 10px;
+	padding: 10px;
+	text-align: center;
+	line-height: 80px;
+	display: inline-block;
+	*display: inline;
+	*zoom: 1;
+	background-color: #E95C41;
+	color: #ffffff;
+	vertical-align: top;
+}
+
+.demo-box-small {
+	height: 40px;
+	width: 40px;
+	line-height: 40px;
+}
+
+.demo-box-large {
+	height: 200px;
+	width: 200px;
+	line-height: 200px;
+}
+
+.demo-container, .demo-area {
+	position: relative;
+	border: 1px solid #ddd;
+	margin-bottom: 20px;
+}
+
+.demo-container {
+	display: inline-block;
+	padding: 10px;
+}
+
+.demo-area {
+	height: 200px;
+	width: 400px;
+	line-height: 200px;
+	text-align: center;
+}
+
+// 查看源码
+
+.demo-viewsource {
+	margin-bottom: 20px;
+    font-size: 12px;
+
+    .sh {
+        margin-bottom: 30px;
+    }
+}
+
+.demo-viewsource-arrow {
+	float: left;
+	font-size: 20px;
+    margin-right: 1px;
+	cursor: pointer;
+}
+
+// 提示
+
+.demo-tip, .demo-tip-error, .demo-tip-warning, .demo-tip-success {
+	padding: 2px 10px;
+	margin: 2px 0;
+	line-height:16px;
+	border: 2px solid transparent;
+	*border: 2px solid #ffffff;
+	clear: both;
+}
+
+.demo-tip-error {
+	background:#FBE3E4;
+	color:#8a1f11;
+	border-color:#FBC2C4;
+
+	a.demo {
+		color:#8a1f11;
+	}
+}
+
+.demo-tip-warning{
+	background:#FFF6BF;
+	color:#514721;
+	border-color:#FFD324;
+
+	a.demo {
+		color:#514721;
+	}
+}
+
+.demo-tip-success {
+	background:#E6EFC2;
+	color:#264409;
+	border-color:#C6D880;
+
+	a.demo {
+		color:#264409;
+	}
+}
+
+.demo-tip .demo-toolbar {
+	display: none;
+}
+
+.demo-tip-hover {
+	background: #eee;	
+
+	.demo-toolbar {
+		display: block;
+	}
+}
+
+// 文档
+
+.demo-doc {
+
+    h3.demo {
+        border-bottom: 1px solid #cccccc;
+        padding-bottom: 5px;
+    }
+}
+
+
+/***************** 组件 ****************/
+
+/*.demo-nav {
+    .aside();
+    font-size: 12px;
+    line-height: 18px;
+
+    ul {
+        margin: 10px 0;
+        padding: 0;
+    }
+
+    li {
+        list-style: none;
+    }
+}*/
+
+// 问答
+
+.demo-questions {
+
+	li {
+		list-style: none;
+		line-height: 24px;
+		font-size: 14px;
+	}
+
+	input {
+		vertical-align: -1px;
+	}
+}
+
+// 顶部条
+
+#demo-toolbar {
+	line-height: 26px;
+	height: 10px;
+	position: relative;
+}
+
+.demo-toolbar-dropdown {
+	position: absolute;
+	right: 0;
+	top: 26px;
+	border: 1px solid #9B9B9B;
+    -moz-box-shadow: 1px 1px 2px #CCCCCC;
+    -webkit-box-shadow: 1px 1px 2px #CCCCCC;
+    box-shadow: 1px 1px 2px #CCCCCC;
+	z-index: 99999;
+	background-color: #FFFFFF;
+
+	a {
+		cursor: pointer;
+		color: #333;
+	}
+}
+
+.demo-toolbar-dropdown-menu a{
+	-moz-user-select: none;
+	display: block;
+	overflow: hidden;
+	padding-left: 6px;
+	padding-right: 6px;
+	text-decoration: none;
+
+	&:hover {
+		text-decoration: none;
+	}
+}
+
+.demo-toolbar-dropdown-menu-usehover a:hover, a.demo-toolbar-dropdown-menu-hover {
+	background-color: #EBEBEB;
+}

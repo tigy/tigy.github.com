@@ -1,0 +1,470 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>jQuery 和 jPlusUI Core API 参照表</title>
+        <script src="../../assets/demo/demo.js" type="text/javascript"></script>
+        <style>
+	       table td[colspan],table .cat,table th {
+	           text-align: center;
+	       }
+
+	        em {
+	            color:#c4acac;
+	        }
+
+	        .dif {
+	            color: #000;
+	        }
+	    </style>
+    </head>
+	<body>
+        <article class="demo">
+
+            <p class="demo">本表用于展示 jQuery 和 jPlusUI Core 实现同个功能的 API 异同。</p>
+
+			<table class="demo">
+				<tr>
+					<th>分类</th>
+					<th>jQuery</th>
+					<th>jPlusUI Core</th>
+				</tr>
+				<tr>
+					<th rowspan="7" class="cat">核心</th>
+					<td><em>jQuery('#' + id)</em></td>
+					<td>Dom.get(id)</td>
+				</tr>
+                <tr class="dif">
+                    <td>jQuery(selector)</td>
+                    <td>Dom.query(selector)</td>
+                </tr>
+                <tr>
+                    <td><em>jQuery(selector).eq(0)</em></td>
+                    <td>Dom.find(selector)</td>
+                </tr>
+                <tr>
+                    <td>jQuery(html) <br /><small>解析为多个节点时返回列表。</small></td>
+                    <td>Dom.parse(html) <br /><small>解析为多个节点时返回DocumentFragment。</small></td>
+                </tr>
+                <tr>
+                    <td><em>jQuery("&lt;" + tagName + "/&gt;")</em></td>
+                    <td>Dom.create(tagName)</td>
+                </tr>
+                <tr class="dif">
+                    <td>jQuery(readyCallback) <br /><small>jQuery(document).ready(readyCallback)</small></td>
+                    <td>Dom.ready(readyCallback)</td>
+                </tr>
+                <tr>
+                    <td><em>jQuery(window).load(loadCallback)</em></td>
+                    <td>Dom.load(loadCallback)</td>
+                </tr>
+                <tr class="dif">
+                    <th rowspan="6" class="cat">样式</th>
+                    <td rowspan="2">css</td>
+                    <td>getStyle</td>
+                </tr>
+                <tr class="dif">
+                    <td>setStyle</td>
+                </tr>
+                <tr>
+                    <td colspan="2">show</td>
+                </tr>
+                <tr>
+                    <td colspan="2">hide</td>
+                </tr>
+                <tr>
+                    <td colspan="2">toggle</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>unselectable(value)</td>
+                </tr>
+                <tr class="dif">
+                    <th rowspan="16" class="cat">属性</th>
+                    <td rowspan="2">attr</td>
+                    <td>getAttr(name, 1)</td>
+                </tr>
+                <tr class="dif">
+                    <td>setAttr</td>
+                </tr>
+                <tr class="dif">
+                    <td rowspan="2">prop</td>
+                    <td>getAttr</td>
+                </tr>
+                <tr class="dif">
+                    <td>setAttr</td>
+                </tr>
+                <tr class="dif">
+                    <td>removeAttr</td>
+                    <td rowspan="2">setAttr(name, null)</td>
+                </tr>
+                <tr class="dif">
+                    <td>removeProp</td>
+                </tr>
+                <tr>
+                    <td colspan="2">addClass</td>
+                </tr>
+                <tr>
+                    <td colspan="2">removeClass</td>
+                </tr>
+                <tr>
+                    <td colspan="2">toggleClass</td>
+                </tr>
+                <tr>
+                    <td colspan="2">hasClass</td>
+                </tr>
+                <tr class="dif">
+                    <td rowspan="2">text<br />val</td>
+                    <td>getText</td>
+                </tr>
+                <tr class="dif">
+                    <td>setText</td>
+                </tr>
+                <tr class="dif">
+                    <td rowspan="2">html</td>
+                    <td>getHtml</td>
+                </tr>
+                <tr class="dif">
+                    <td>setHtml</td>
+                </tr>
+                <tr>
+                    <td colspan="2">index</td>
+                </tr>
+                <tr class="dif">
+                    <td>is</td>
+                    <td>match</td>
+                </tr>
+                <tr class="dif">
+                    <th rowspan="10" class="cat">尺寸</th>
+                    <td rowspan="2">width</td>
+                    <td>getWidth</td>
+                </tr>
+                <tr class="dif">
+                    <td>setWidth</td>
+                </tr>
+                <tr class="dif">
+                    <td rowspan="2">height</td>
+                    <td>getHeight</td>
+                </tr>
+                <tr class="dif">
+                    <td>setHeight</td>
+                </tr>
+                <tr class="dif">
+                    <td>innerWidth</td>
+                    <td><em>Dom.calc(node, "px+w")</em></td>
+                </tr>
+                <tr class="dif">
+                    <td>innerHeight</td>
+                    <td><em>Dom.calc(node, "py+h")</em></td>
+                </tr>
+                <tr class="dif">
+                    <td>outerWidth</td>
+                    <td rowspan="2">getSize()</td>
+                </tr>
+                <tr class="dif">
+                    <td>outerHeight</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>setSize</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>getScrollSize</td>
+                </tr>
+                <tr class="dif">
+                    <th rowspan="6" class="cat">位置</th>
+                    <td>offset</td>
+                    <td>getPosition</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>setPosition</td>
+                </tr>
+                <tr class="dif">
+                    <td rowspan="2">position</td>
+                    <td>getOffset</td>
+                </tr>
+                <tr class="dif">
+                    <td>setOffset</td>
+                </tr>
+                <tr class="dif">
+                    <td>scrollLeft</td>
+                    <td rowspan="2">getScroll<br />setScroll</td>
+                </tr>
+                <tr class="dif">
+                    <td>scrollTop</td>
+                </tr>
+                <tr class="dif">
+                    <th rowspan="9" class="cat">事件</th>
+                    <td>bind</td>
+                    <td>on</td>
+                </tr>
+                <tr class="dif">
+                    <td>unbind</td>
+                    <td>un</td>
+                </tr>
+                <tr class="dif">
+                    <td>one</td>
+                    <td>once</td>
+                </tr>
+                <tr>
+                    <td colspan="2">trigger</td>
+                </tr>
+                <tr>
+                    <td colspan="2">delegate</td>
+                </tr>
+                <tr>
+                    <td>undelagete</td>
+                    <td><em>un("delegate:click")</em></td>
+                </tr>
+                <tr>
+                    <td>live</td>
+                    <td><em>d.delagete('cssSelector', 'event', fn)</em></td>
+                </tr>
+                <tr>
+                    <td>die</td>
+                    <td><em>d.un('delagete:event', fn)</em></td>
+                </tr>
+                <tr>
+                    <td>on</td>
+                    <td><em>on</em></td>
+                </tr>
+                <tr>
+                    <th rowspan="34" class="cat">节点</th>
+                    <td colspan="2">has</td>
+                </tr>
+                <tr>
+                    <td colspan="2">clone</td>
+                </tr>
+                <tr>
+                    <td colspan="2">append</td>
+                </tr>
+                <tr>
+                    <td colspan="2">prepend</td>
+                </tr>
+                <tr>
+                    <td colspan="2">after</td>
+                </tr>
+                <tr>
+                    <td colspan="2">before</td>
+                </tr>
+                <tr>
+                    <td colspan="2">appendTo</td>
+                </tr>
+                <tr>
+                    <td>prependTo</td>
+                    <td><em>d.prepend(child)</em></td>
+                </tr>
+                <tr>
+                    <td colspan="2">first</td>
+                </tr>
+                <tr>
+                    <td colspan="2">last</td>
+                </tr>
+                <tr>
+                    <td colspan="2">prev</td>
+                </tr>
+                <tr>
+                    <td colspan="2">next</td>
+                </tr>
+                <tr>
+                    <td colspan="2">parent</td>
+                </tr>
+                <tr>
+                    <td colspan="2">closest</td>
+                </tr>
+                <tr>
+                    <td colspan="2">child</td>
+                </tr>
+                <tr>
+                    <td colspan="2">prevAll</td>
+                </tr>
+                <tr>
+                    <td colspan="2">prevAll</td>
+                </tr>
+                <tr>
+                    <td colspan="2">nextAll</td>
+                </tr>
+                <tr>
+                    <td colspan="2">offsetParent</td>
+                </tr>
+                <tr>
+                    <td>prevUtil</td>
+                    <td><em>prev(function(node){return true})</em></td>
+                </tr>
+                <tr>
+                    <td>nextUtil</td>
+                    <td><em>next(function(node){return true})</em></td>
+                </tr>
+                <tr>
+                    <td>parentsUtil</td>
+                    <td><em>parentAll(function(node){return true})</em></td>
+                </tr>
+                <tr class="dif">
+                    <td>parents</td>
+                    <td>parentAll</td>
+                </tr>
+                <tr>
+                    <td colspan="2">children</td>
+                </tr>
+                <tr>
+                    <td colspan="2">siblings</td>
+                </tr>
+                <tr>
+                    <td colspan="2">empty</td>
+                </tr>
+                <tr class="dif">
+                    <td>detach</td>
+                    <td>remove</td>
+                </tr>
+                <tr class="dif">
+                    <td>remove</td>
+                    <td>dispose</td>
+                </tr>
+                <tr>
+                    <td>wrap</td>
+                    <td><em>dom.replaceWith().append(dom)</em></td>
+                </tr>
+                <tr>
+                    <td>wrapAll</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>wrapInner</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>unwrap</td>
+                    <td><em>dom.replaceWith(dom.children())</em></td>
+                </tr>
+                <tr>
+                    <td>replaceAll</td>
+                    <td><em>domlist.replaceWith().append(dom)</em></td>
+                </tr>
+                <tr>
+                    <td colspan="2">replaceWith</td>
+                </tr>
+                <tr>
+                    <th rowspan="9" class="cat">DomList</th>
+                    <td colspan="2">each</td>
+                </tr>
+                <tr>
+                    <td colspan="2">length</td>
+                </tr>
+                <tr>
+                    <td colspan="2">filter</td>
+                </tr>
+                <tr>
+                    <td colspan="2">add</td>
+                </tr>
+                <tr>
+                    <td colspan="2">slice</td>
+                </tr>
+                <tr>
+                    <td colspan="2">splice</td>
+                </tr>
+                <tr>
+                    <td colspan="2">push</td>
+                </tr>
+                <tr class="dif">
+                    <td>eq</td>
+                    <td>item</td>
+                </tr>
+                <tr>
+                    <td>get</td>
+                    <td>domlist[index]</td>
+                </tr>
+                <tr class="dif">
+                    <th rowspan="2" class="cat">数据</th>
+                    <td>jQuery.data('field')</td>
+                    <td>dom.dataField().field</td>
+                </tr>
+                <tr class="dif">
+                    <td>jQuery.removeData('field')</td>
+                    <td>delete dom.dataField().field</td>
+                </tr>
+                <tr>
+                    <th rowspan="14" class="cat">特效</th>
+                    <td colspan="2">animate</td>
+                </tr>
+                <tr class="dif">
+                    <td>fadeIn</td>
+                    <td>show</td>
+                </tr>
+                <tr class="dif">
+                    <td>fadeOut</td>
+                    <td>hide</td>
+                </tr>
+                <tr class="dif">
+                    <td>fadeTo</td>
+                    <td><em>animate({opacity:1})</em></td>
+                </tr>
+                <tr class="dif">
+                    <td>show</td>
+                    <td>show('all')</td>
+                </tr>
+                <tr class="dif">
+                    <td>hide</td>
+                    <td>hide('all')</td>
+                </tr>
+                <tr class="dif">
+                    <td>toggle</td>
+                    <td>toggle('all')</td>
+                </tr>
+                <tr class="dif">
+                    <td>slideDown</td>
+                    <td>show('top')</td>
+                </tr>
+                <tr class="dif">
+                    <td>slideUp</td>
+                    <td>hide('top')</td>
+                </tr>
+                <tr class="dif">
+                    <td>slideToggle</td>
+                    <td>toggle('top')</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>highlight</td>
+                </tr>
+                <tr>
+                    <td>clearQueue</td>
+                    <td><em>fx().abort()</em></td>
+                </tr>
+                <tr>
+                    <td>stop</td>
+                    <td><em>fx().stop()</em></td>
+                </tr>
+                <tr>
+                    <td>delay</td>
+                    <td><em>fx().delay()</em></td>
+                </tr>
+                <tr class="dif">
+                    <th rowspan="6" class="cat">Ajax</th>
+                    <td>jQuery.ajax</td>
+                    <td>Ajax.send</td>
+                </tr>
+                <tr class="dif">
+                    <td>jQuery.get</td>
+                    <td>Ajax.get</td>
+                </tr>
+                <tr class="dif">
+                    <td>jQuery.post</td>
+                    <td>Ajax.post</td>
+                </tr>
+                <tr class="dif">
+                    <td>jQuery.getScript</td>
+                    <td>Ajax.script</td>
+                </tr>
+                <tr class="dif">
+                    <td rowspan="2">jQuery.getJSON</td>
+                    <td>Ajax.json</td>
+                </tr>
+                <tr class="dif">
+                    <td>Ajax.jsonp</td>
+                </tr>
+			</table>
+        </article>
+	</body>
+</html>

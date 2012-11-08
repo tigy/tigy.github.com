@@ -1,0 +1,1 @@
+/** * @author  */using("Controls.Menu.Menu");var ContextMenu = Menu.extend({		floating: true,		setControl: function(ctrl){		ctrl.on('contextmenu', this.onContextMenu, this);				return this;	},		onContextMenu: function(e){ 		this.showAt(e.pageX, e.pageY);		e.preventDefault();		e.stopPropagation();	}	});

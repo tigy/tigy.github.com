@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>设计理念 - jPlusUI</title>
+    <link href="assets/web/styles/jplus-welcome.css" rel="stylesheet">
+    <link href="assets/demo/demo.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Microsoft YaHei';
+        }
+        h2.demo {
+            font-size: 24px;
+            line-height: 40px;
+        }
+    </style>
+    <script src="assets/web/scripts/jplus-welcome.js" type="text/javascript"></script>
+    <script>var Demo = { web: true }</script>
+    <script src="assets/demo/demo.js" type="text/javascript"></script>
+</head>
+<body>
+    <div id="topbar">
+        <div class="x-container x-clear">
+            <h1 class="x-left"><a href="index.html" title="jPlusUI - 一个轻量但完整的UI组件库">jPlusUI</a></h1>
+            <ul class="x-left">
+                <li><a href="index.html" title="综合介绍">首页</a></li>
+                <li><a href="features.html" class="selcted" title="设计思路和原则">设计理念</a></li>
+                <li><a href="src/index.html" title="查看组件列表" target="_blank">文档和演示中心</a></li>
+                <li><a href="download.html" title="获取 jPlusUI">下载</a></li>
+                <li><a href="community.html" title="讨论和联系方式">社区</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="main">
+        <div id="body" class="demo-doc">
+            <article class="demo">
+
+                <h2 class="demo">jPlusUI 设计理念</h2>
+
+                <section class="demo">
+
+                    <h3 class="demo">jPlusUI 目标</h3>
+
+                    <ul class="demo">
+                        <li>面向互联网页面，不面向企业级应用。</li>
+                        <li>可以快速搭建出漂亮、兼容的页面。</li>
+                        <li>轻量、稳定、简单，所有组件一行代码即现效果。</li>
+                    </ul>
+
+                </section>
+
+                <section class="demo">
+
+                    <h3 class="demo">组件的定义</h3>
+
+                    <ul class="demo">
+                        <li>任何单独写出来的可以重用的代码都叫组件。</li>
+                        <li>组件可以只有js文件，也可以只有css文件。</li>
+                        <li>组件之间可以互相依赖，甚至可以依赖比如 jQuery、Understone 等流行框架。</li>
+                    </ul>
+
+                </section>
+
+                <section class="demo">
+
+                    <h3 class="demo">设计原则</h3>
+
+                    <dl class="demo">
+                        <dt>组件一键初始化</dt>
+                        <dd>所有 css 组件都只需加一个 class 即可见到效果。所有 js 组件都只需一行代码即可完成初始化。比如 <code class="demo">new ComboBox(&quot;id&quot;)</code> 。</dd>
+                        <dt>提供常用 API，但不作完美主义</dt>
+                        <dd>jPlusUI 只提供常用的API ，不常见的需求也能通过现有的API组合实现。比如 <code class="demo">comb.setSelectedIndex(0)</code> 。</dd>
+                        <dt>HTML优先</dt>
+                        <dd>jQueryUI 的设计原则是一切以 HTML 为主，然后通过 JavaScript 动态渲染组件。但是这样组件缺乏动态操作的特性（比如很难动态增加一个tab）。<br />
+                            YUI/Ext 的设计原则是一切是 JavaScript 为主，组件API 丰富，因此代码量大，学习成本高，不适合Web应用。<br />
+                            jPlusUI 则是取两者的优点：所有组件以HTML为主，并由JavaScript负责逻辑控制，提供常用（但不全）的API，用于动态操作。</dd>
+                        <dt>适度的继承</dt>
+                        <dd>继承可以减少很多代码量，但是过多的继承会导致模块过细，学习和使用困难。所以原则上继承链不超过 3 个。在有些地方，宁可复制同样的代码，也不提取公共基类。</dd>
+                    </dl>
+
+                </section>
+
+                <section class="demo">
+
+                    <h3 class="demo">jPlusUI 和其它框架的区别</h3>
+
+                    <dl class="demo">
+                        <dt>和 jQuery/Mootools 的区别</dt>
+                        <dd>jQuery/Mootools 的侧重点是 DOM 操作，而 jPlusUI 的侧重点是 UI。jPlusUI 内部也有 DOM 操作的模块，操作上和 jQuery 一样方便，但更重要的是它为UI组件的开发提供了底层支持：
+                            <ol class="demo">
+                                <li>组件本身也是DOM节点，通过继承的方式可直接调用DOM操作的函数。</li>
+                                <li>组件提供的API和DOM操作的API一致，减少每个组件的学习成本。</li>
+                                <li>支持组件的自定义事件，方法重写。</li>
+                            </ol>
+                            用户也可以使用 jQuery + jQuery-Adapter 作为UI底层。甚至可以和 jQuery 一起使用。
+                        </dd>
+                        <dt>和 Bootstrap 的区别</dt>
+                        <dd>jQuery 作为 DOM 操作的框架，已经非常完美了。而在 UI 上，却始终没有一个完整的、像jQuery一样方便的框架出现，直到 Bootstrap 的出现。Bootstrap 确实做的很好，jPlusUI 3.0 版本以后也从 Bootstrap 吸取了很多精华。但是 jPlusUI 仍在以下方面拥有绝对优势：<br />
+                            <ol class="demo">
+                                <li>jPlusUI 的组件数量远超过 Bootstrap 。且包含很多适合国情的组件（如右侧悬浮广告）。</li>
+                                <li>Bootstrap 显示英文更漂亮； jPlusUI 显示中文更漂亮。并且 jPlusUI 可以保证很少出现中文乱码的问题。</li>
+                                <li>jPlusUI 支持 IE6 ，而Bootstrap只支持到 IE7。为了支持IE6， jPlusUI 的部分API 比 Bootstrap更长。 </li>
+                                <li>jPlusUI 在组件class上设计上更统一、易于识别和记忆。</li>
+                                <li>在 JavaScript 上，jPlusUI 使用了面向对象的设计，让组件更灵活。</li>
+                            </ol>
+                        </dd>
+                        <dt>和 YUI/Ext 的区别</dt>
+                        <dd>YUI/Ext 目标在于提高完整 API 的库，它们更适合企业级的应用。而 jPlusUI 轻量小巧，更适合互联网级的应用。</dd>
+                    </dl>
+
+                </section>
+
+                <section class="demo">
+
+                    <h3 class="demo">jPlus 组件思路初探</h3>
+
+                    <p class="demo">先看如下组件: </p>
+
+                    <div class="demo-relative" style="margin-top:30px;">
+                        <div class="mybox demo-box demo-aboslute">会跳的盒子</div>
+                    </div>
+
+                    <script>
+                        function doMove() {
+                            Dom.find('.mybox').animate({ bottom: 30 }).animate({ bottom: 0 });
+                            setTimeout(doMove, 1000);
+                        }
+
+                        doMove();
+                    </script>
+
+                    <p class="demo">根据 jPlusUI 的设计思路，这个组件应该这么使用：</p>
+
+                    <script class="demo" type="pre/javascript">
+                        // 只需一行代码即可初始化组件。
+                        new MyBox({
+
+                            // 绑定的 DOM 节点，如果不传递此参数，将动态生成一个。
+                            selector: ".mybox",
+
+                            // 最高跳到 30 高度的位置, 这是组件提供的配置参数。
+                            top: 30 
+                        });
+                    </script>
+
+                    <p class="demo">这个组件的源码为：</p>
+
+                    <script class="demo demo-noformat" type="pre/javascript">
+
+                        // 创建 MyBox 组件类，所有组件类都应该继承于 Control 类。
+                        var MyBox = Control.extend({
+                            
+                            // 通过重写 init 函数初始化组件。options 是用户传入的配置对象。
+                            init: function(options) {
+
+                                // 注意： 这里为了演示方便，将跳动的逻辑简化了。
+                        
+                                // animate 是从 Dom 类继承下来的用于显示特效的函数。
+                                this.animate({ bottom: 30 }).animate({ bottom: 0 });   
+                            } 
+
+                        });
+
+                    </script>
+
+                    <p class="demo">当然，上面这个写法是比较标准的写法，但不一定每个组件都需要这么开发。一切根据实际需要，以最简单的方式实现功能即可。</p>
+
+                    <p class="demo">为了更好地理解组件设计思路，读者可以阅读 <a href="src/Controls/Container/Dialog.html">对话框（Dialog）组件</a>。</p>
+
+                    <!--<p class="demo">一些字段如 <code class="demo">options.selector</code>、<code class="demo">options.node</code> 和 <code class="demo">options.dom</code> 都会在 Control 类的构造函数中处理成 this.node, 对组件来说，它肯定会对应一个 DOM 节点（通过 <code class="demo">Control#node</code> 属性得到），这个节点可能是用户输入的，也可以是通过 <code class="demo">Control#create</code> 动态生成。如果组件不需要支持动态生成的功能，则不需理会这些函数即可。比如有一个对话框，初始化代码如下：</p>
+
+                    <script class="demo" type="pre/javascript">
+                        var d = new Dialog();
+                        d.setTitle("标题");
+                        d.setContent("内容");
+                        d.show();
+                    </script>
+
+                    <p class="demo"><code class="demo">new Dialog</code> 时未传递任何参数，因此组件将动态生成一个 DIV（通过 <code class="demo">d.node</code> 可得到这个 DIV 原生对象）。</p>-->
+
+                </section>
+
+            </article>
+
+        </div>
+        <div id="footer">
+            <div class="x-container">
+                <span class="x-right">Host By <a href="index.html">XXXX</a></span>
+                Copyright &copy; 2011-2012 jPlusUI Team | <a href="LICENSE.txt" target="_blank">The BSD license</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+# 基本属性
+js untitled.js
+css untitled.css
+images images
+base ../../../../
+ 
+
+# 组件依赖
+require jplus.dpl
+
+# 组件列表
+using System.Dom.Base
