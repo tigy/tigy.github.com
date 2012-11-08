@@ -5,12 +5,12 @@
 Element.implement({
 	
 	 beginMeasure : function(){
-        var el = this.dom;
+	     var el = this.node;
         if(el.offsetWidth || el.offsetHeight){
             return this; 
         }
         var changed = [];
-        var p = this.dom, b = document.body; 
+        var p = this.node, b = document.body;
         while((!el.offsetWidth && !el.offsetHeight) && p && p.tagName && p != b){
             var pe = Ext.get(p);
             if(pe.getStyle('display') == 'none'){

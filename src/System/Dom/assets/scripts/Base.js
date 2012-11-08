@@ -119,10 +119,6 @@ using("System.Core.Base");
 			constructor: function(node) {
 				assert.isNode(node, "Dom#constructor(node): {node} 必须是 DOM 节点。");
 				this.node = node;
-
-				/// TODO: clear
-				this.dom = node;
-				/// TODO: clear
 			},
 		
 			/**
@@ -402,21 +398,6 @@ using("System.Core.Base");
 			preventDefault: function() {
 				this.returnValue = false;
 			},
-			
-			/// TODO: clear
-			
-			/**
-			 * 停止默认事件和冒泡。
-			 * @remark 此函数可以完全撤销事件。 事件处理函数中 return false 和调用 stop() 是不同的， return
-			 *         false 只会阻止当前事件其它函数执行， 而 stop() 只阻止事件冒泡和默认事件，不阻止当前事件其它函数。
-			 */
-			stop: function() {
-				assert.deprected('Dom.Event#stop() 已过时，请改用 return false 实现阻止事件。');
-				this.stopPropagation();
-				this.preventDefault();
-			},
-			
-			/// TODO: clear
 			
 			/**
 			 * 获取当前发生事件 Dom 对象。
@@ -1249,15 +1230,6 @@ using("System.Core.Base");
 			}
 			return match(elem, selector);
 		},
-		
-		/// TODO: clear
-		
-		hasChild: function(elem, child){
-			assert.deprected("Dom.hasChild 已过时，请改用 Dom.has");
-			return Dom.has(elem, child);
-		},
-		
-		/// TODO: clear
 
 		/**
 		 * 判断指定节点之后有无存在子节点。
@@ -1777,14 +1749,6 @@ using("System.Core.Base");
 		implementIf: function(obj, listType) {
 			return this.implement(obj, listType, true);
 		},
-	
-		//// TODO: clear it
-		define: function(ctrl, target, setters, getters) {
-			assert.deprected("Dom.define(ctrl, target, setters, getters) 已过时，请使用 MyClass.defineMethods(target, methods)");
-
-			return ctrl.defineMethods(target, (setters + " " +  getters).trim());
-		},
-		//// TODO: clear it
 
 		/**
 		 * 表示事件的参数。
@@ -3281,15 +3245,6 @@ using("System.Core.Base");
 			return Dom.isHidden(this.node);
 		},
 		
-		/// TODO: clear
-		
-		hasChild: function(dom, allowSelf){
-			assert.deprected("Dom#hasChild 已过时，请改用 Dom#has");
-			return this.has(dom, allowSelf);
-		},
-		
-		/// TODO: clear
-		
 		/**
 		 * 判断一个节点是否有子节点。
 		 * @param {Dom} dom 子节点。
@@ -3537,13 +3492,7 @@ using("System.Core.Base");
 	/// #endif
 
 		domReady = 'DOMContentLoaded';
-		t = Event.prototype;
-		
-		/// TODO: clear
-		t.stop = ep.stop;
-		
-		/// TODO: clear
-		t.getTarget = ep.getTarget;
+		Event.prototype.getTarget = ep.getTarget;
 		
 	/// #if CompactMode
 	
@@ -3553,11 +3502,6 @@ using("System.Core.Base");
 		
 		defaultEvent.initEvent = function (e) {
 			e.target = e.srcElement;
-		
-		/// TODO: clear
-			e.stop = ep.stop;
-		
-		/// TODO: clear
 			e.getTarget = ep.getTarget;
 			e.stopPropagation = ep.stopPropagation;
 			e.preventDefault = ep.preventDefault;

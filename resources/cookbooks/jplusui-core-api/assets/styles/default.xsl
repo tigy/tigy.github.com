@@ -8,7 +8,7 @@
 		<html xmlns="http://www.w3.org/1999/xhtml">
 		<head>
 			<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-			<title>J+ Core <xsl:value-of select="@version"/> API 文档 </title>
+			<title>jPlusUI.Core <xsl:value-of select="@version"/> API 文档 </title>
 			<link type="text/css" rel="stylesheet" rev="stylesheet" href="assets/styles/default.css" media="all" />
 			<script type="text/javascript" src="assets/scripts/jquery.js"></script>
 			<script type="text/javascript" src="assets/scripts/jquery-doc.js"></script>
@@ -19,7 +19,7 @@
 					<h2>文档作者： <a href="http://webin.us/chunterg" target="_blank">chunterg</a> &amp; <a href="http://xuld.cnblogs.com" target="_blank">xuld</a>
           </h2>
 					<h1>
-            J+ Core <xsl:value-of select="@version"/> API 文档</h1>
+            jPlusUI.Core <xsl:value-of select="@version"/> API 文档</h1>
 				</div>
 			</div>
 			<div id="wrapper">

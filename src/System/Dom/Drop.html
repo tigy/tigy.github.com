@@ -60,16 +60,16 @@
 
             // 拖入之后，创建虚位。
             $('drop').query('.zone').on('dragenter', function (e) {
-                this.dom.hover = Dom.create('div', 'demo-box-small hover').setHtml(e.dragTarget.dom.id.substr(1));
+                this.node.hover = Dom.create('div', 'demo-box-small hover').setHtml(e.dragTarget.node.id.substr(1));
                 this.append(this.dom.hover);
 
                 // 拖到外面时，隐藏虚位。
             }).on('dragleave', function (e) {
-                this.dom.hover.remove();
+                this.node.hover.remove();
 
                 // 放置时，隐藏虚位，并添加方块。
             }).on('drop', function (e) {
-                this.dom.hover.remove();
+                this.node.hover.remove();
                 e.dragTarget.setOffset({ x: 0, y: 0 });
                 this.append(e.dragTarget);
             });
