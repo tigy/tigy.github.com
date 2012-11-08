@@ -98,18 +98,10 @@
                             assert.areEqual(value, [5, 4, 2]);
                         }
                     },
-                    // 'Array#insert': {
-                        // 'var ar = [5,4];ar.insert(1, "1"); ar': function (value, assert) {
-                            // assert.areEqual(value, [5, "1", 4]);
-                        // }
-                    // },
                     'Array#remove': {
                         'var ar = [5,4];ar.remove(4); ar': function (value, assert) {
                             assert.areEqual(value, [5]);
                         }
-                    },
-                    'Array.create': {
-                        'Array.create(["a","a",null,"a"], 1)': ["a", null, "a"]
                     },
                     'Function': '-',
                     'Function#bind': {

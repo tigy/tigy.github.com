@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <?xml-stylesheet type='text/xsl' href='assets/styles/default.xsl'?>
 
-<docs version="3.0">
+<docs version="1.0">
   <cat value="核心">
     <subcat value="DOM 核心函数">
       <function name="Dom.get" return="Dom">
@@ -802,6 +802,9 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
         <params name="name" type="String">
           <desc>属性名称</desc>
         </params>
+        <params name="type" type="Integer" optional="true">
+          <desc>属性类型。type = 0 , 则返回用于 JavaScript 处理的属性值（getAttr("checked", 0) = true）。type = 1 , 则返回用于 HTML 处理的属性值（getAttr("checked", 1) = "checked"）。type = 2 , 则返回属性的默认值（getAttr("checked", 2) = true, 无论现在是否被选中，返回值不会变）。默认是 0 。</desc>
+        </params>
         <example>
           <desc>返回文档中第一个图像的src属性值。</desc>
           <html>&lt;img id="img" src="test.jpg"/&gt;</html>
@@ -857,7 +860,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
       <function name="set" return="Dom">
         <desc>快速设置一个元素的样式、属性或事件。</desc>
         <longdesc>此函数相当于调用 setStyle 或 setAttr 。数字将自动转化为像素值。</longdesc>
-        <params name="value" type="Object">
+        <params name="obj" type="Object">
           <desc>属性值，表示 属性名/属性值 的 JSON 对象。</desc>
         </params>
         <example>
@@ -969,7 +972,6 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
     <subcat value="文本/值">
       <function name="getText" return="String">
         <desc>取得元素的内容。对于输入框则获取其输入的值。</desc>
-        <longdesc>结果是由所有匹配元素包含的文本内容组合起来的文本。这个方法对HTML和XML文档都有效。</longdesc>
         <example>
           <desc>获取文本框中的值</desc>
           <html>&lt;input type="text" value="some text"/&gt;</html>
@@ -1022,7 +1024,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
       <function name="first" return="Dom">
         <desc>获取第一个子元素</desc>
         <params name="filter" type="Integer/String/Function/Boolean" optional="true">
-          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
         </params>
         <example>
           <desc>获取匹配的第一个元素</desc>
@@ -1034,7 +1036,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
       <function name="last" return="Dom">
         <desc>获取最后一个子元素</desc>
         <params name="index" type="Integer/String/Function/Boolean" optional="true">
-          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
         </params>
         <example>
           <desc>获取匹配的最后一个元素</desc>
@@ -1046,7 +1048,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
       <function name="child" return="Dom">
         <desc>获取子元素</desc>
         <params name="filter" type="Integer/String/Function/Boolean" optional="true">
-          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
         </params>
         <example>
           <desc>获取匹配的第二个元素</desc>
@@ -1065,7 +1067,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
         <desc>取得一个包含匹配的元素集合中每一个元素的所有子元素的元素集合。</desc>
         <longdesc>可以通过可选的表达式来过滤所匹配的子元素。注意：parents()将查找所有祖辈元素，而children()只考虑子元素而不考虑所有后代元素。</longdesc>
         <params name="filter" type="Integer/String/Function/Boolean" optional="true">
-          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
         </params>
         <example>
           <desc>查找DIV中的每个子元素。</desc>
@@ -1086,7 +1088,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
         <desc>取得一个包含匹配的元素集合中每一个元素紧邻的后面同辈元素的元素集合。</desc>
         <longdesc>这个函数只返回后面那个紧邻的同辈元素，而不是后面所有的同辈元素（可以使用nextAll）。可以用一个可选的表达式进行筛选。</longdesc>
         <params name="filter" type="Integer/String/Function/Boolean" optional="true">
-          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
         </params>
         <example>
           <desc>找到每个段落的后面紧邻的同辈元素。</desc>
@@ -1099,7 +1101,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
         <desc>查找当前元素之后所有的同辈元素。</desc>
         <longdesc>可以用表达式过滤</longdesc>
         <params name="filter" type="Integer/String/Function/Boolean" optional="true">
-          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
         </params>
         <example>
           <desc>给第一个div之后的所有元素加个类</desc>
@@ -1112,7 +1114,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
         <desc>取得一个包含匹配的元素集合中每一个元素紧邻的前一个同辈元素的元素集合。</desc>
         <longdesc>可以用一个可选的表达式进行筛选。只有紧邻的同辈元素会被匹配到，而不是前面所有的同辈元素。</longdesc>
         <params name="filter" type="Integer/String/Function/Boolean" optional="true">
-          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
         </params>
         <example>
           <desc>找到每个段落紧邻的前一个同辈元素。</desc>
@@ -1131,7 +1133,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
         <desc>查找当前元素之前所有的同辈元素</desc>
         <longdesc>可以用表达式过滤。</longdesc>
         <params name="filter" type="Integer/String/Function/Boolean" optional="true">
-          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
         </params>
         <example>
           <desc>给最后一个之前的所有div加上一个类</desc>
@@ -1143,7 +1145,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
       <function name="siblings" return="DomList">
         <desc>取得一个包含匹配的元素集合中每一个元素的所有唯一同辈元素的元素集合。可以用可选的表达式进行筛选。</desc>
         <params name="filter" type="Integer/String/Function/Boolean" optional="true">
-          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
         </params>
         <example>
           <desc>找到每个div的所有同辈元素。</desc>
@@ -1163,7 +1165,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
       <function name="parent" return="Dom">
         <desc>取得一个包含着所有匹配元素的祖先元素。可以通过一个可选的表达式进行筛选。</desc>
         <params name="filter" type="Integer/String/Function/Boolean" optional="true">
-          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
         </params>
         <example>
           <desc>找到每个span元素的所有祖先元素。</desc>
@@ -1174,7 +1176,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
       <function name="parentAll" return="DomList">
         <desc>取得一个包含着所有匹配元素的祖先元素的元素集合（不包含根元素）。可以通过一个可选的表达式进行筛选。</desc>
         <params name="filter" type="Integer/String/Function/Boolean" optional="true">
-          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
         </params>
         <example>
           <desc>找到每个span元素的所有祖先元素。</desc>
@@ -1189,7 +1191,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
 	  <function name="closest" return="Dom">
         <desc>取得一个包含着所有匹配元素的祖先元素。可以通过一个可选的表达式进行筛选。如果当前节点满足要求，则返回当前节点。</desc>
         <params name="filter" type="Integer/String/Function/Boolean" optional="true">
-          <desc>用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
+          <desc>用于查找子元素的 CSS 选择器 或者 元素在Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。</desc>
         </params>
         <example>
           <desc>找到每个span元素的所有祖先元素。</desc>
@@ -1214,18 +1216,14 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
           <result>true</result>
         </example>
       </function>
-      <function name="hasChild" return="Boolean">
+      <function name="has" return="Boolean">
         <desc>判断当前节点是否包含指定子节点。</desc>
         <longdesc>如果没有元素符合，或者表达式无效，都返回'false'。</longdesc>
         <params name="expr" type="String">
           <desc>用于判断的子节点。</desc>
         </params>
-      </function>
-      <function name="contains" return="Boolean">
-        <desc>判断当前节点是否包含指定子节点或当前节点就是被判断的节点。</desc>
-        <longdesc>如果没有元素符合，或者表达式无效，都返回'false'。</longdesc>
-        <params name="expr" type="String">
-          <desc>用于判断的子节点。</desc>
+        <params name="allowSelf" type="Boolean" optional="true">
+          <desc>如果为 true， 则节点本身也返回 true。即： a.has(a, true) 返回 true   。</desc>
         </params>
       </function>
     </subcat>
@@ -1822,109 +1820,46 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
           </code>
         </example>
       </function>
-      <function name="hover*" return="Dom">
-        <desc>一个模仿悬停事件（鼠标移动到一个对象上面及移出这个对象）的方法。这是一个自定义的方法，它为频繁使用的任务提供了一种“保持在其中”的状态。</desc>
-        <longdesc>当鼠标移动到一个匹配的元素上面时，会触发指定的第一个函数。当鼠标移出这个元素时，会触发指定的第二个函数。而且，会伴随着对鼠标是否仍然处在特定元素中的检测（例如，处在div中的图像），如果是，则会继续保持“悬停”状态，而不触发移出事件（修正了使用mouseout事件的一个常见错误）。</longdesc>
-        <params name="over" type="Function">
-          <desc>鼠标移到元素上要触发的函数</desc>
-        </params>
-        <params name="out" type="Function">
-          <desc>鼠标移出元素要触发的函数</desc>
-        </params>
-        <example>
-          <desc>鼠标悬停的表格加上特定的类</desc>
-          <code>
-            Dom.query("td").hover(
-            function () {
-            Dom.query(this).addClass("hover");
-            },
-            function () {
-            Dom.query(this).removeClass("hover");
-            }
-            );
-          </code>
-        </example>
-      </function>
     </subcat>
     <subcat value="事件">
-      <function name="blur" return="Dom">
-        <desc>触发每一个匹配元素的blur事件。</desc>
-        <longdesc>这个函数会调用执行绑定到blur事件的所有函数，包括浏览器的默认行为。可以通过返回false来防止触发浏览器的默认行为。blur事件会在元素失去焦点的时候触发，既可以是鼠标行为，也可以是按tab键离开的</longdesc>
-        <example>
-          <desc>触发所有段落的blur事件</desc>
-          <code>Dom.query("p").blur();</code>
-        </example>
-      </function>
-      <function name="blur" return="Dom">
-        <desc>在每一个匹配元素的blur事件中绑定一个处理函数。</desc>
-        <longdesc>blur事件会在元素失去焦点的时候触发，既可以是鼠标行为，也可以是按tab键离开的</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的blur事件中绑定的处理函数。</desc>
-        </params>
+      <selector name="blur" return="Dom">
+        <sample>blur</sample>
+        <desc>blur事件会在元素失去焦点的时候触发，既可以是鼠标行为，也可以是按tab键离开的</desc>
         <example>
           <desc>任何段落失去焦点时弹出一个 "Hello World!"在每一个匹配元素的blur事件中绑定的处理函数。</desc>
-          <code>Dom.query("p").blur( function () { alert("Hello World!"); } );</code>
+          <code>Dom.query("p").on('blur', function () { alert("Hello World!"); } );</code>
         </example>
-      </function>
-      <function name="change" return="Dom">
-        <desc>触发每个匹配元素的change事件</desc>
-        <longdesc>这个函数会调用执行绑定到change事件的所有函数，包括浏览器的默认行为。可以通过在某个绑定的函数中返回false来防止触发浏览器的默认行为。change事件会在元素失去焦点的时候触发，也会当其值在获得焦点后改变时触发。</longdesc>
-      </function>
-      <function name="change" return="Dom">
-        <desc>在每一个匹配元素的change事件中绑定一个处理函数。</desc>
-        <longdesc>change事件会在元素失去焦点的时候触发，也会当其值在获得焦点后改变时触发。</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的change事件中绑定的处理函数。</desc>
-        </params>
+      </selector>
+      <selector name="change" return="Dom">
+        <sample>change</sample>
+        <desc>change事件会在元素失去焦点的时候触发，也会当其值在获得焦点后改变时触发。</desc>
         <example>
           <desc>给所有的文本框增加输入验证</desc>
           <code>
-            Dom.query("input[type='text']").change( function() {
+            Dom.query("input[type='text']").on("change", function() {
             // 这里可以写些验证代码
             });
           </code>
         </example>
-      </function>
-      <function name="click" return="Dom">
-        <desc>触发每一个匹配元素的click事件。</desc>
-        <longdesc>这个函数会调用执行绑定到click事件的所有函数。</longdesc>
-        <example>
-          <desc>触发页面内所有段落的点击事件</desc>
-          <code>Dom.query("p").click();</code>
-        </example>
-      </function>
-      <function name="click" return="Dom">
-        <desc>在每一个匹配元素的click事件中绑定一个处理函数。</desc>
+      </selector>
+      <selector name="click" return="Dom">
+        <sample>click</sample>
         <longdesc>点击事件会在你的指针设备的按钮在元素上单击时触发。单击的定义是在屏幕的同一点触发了mousedown和mouseup.几个事件触发的顺序是：mousedownmouseupclick</longdesc>
-        <params name="fn" type="Function">
-          <desc>绑定到click事件的函数</desc>
-        </params>
         <example>
           <desc>将页面内所有段落点击后隐藏。</desc>
-          <code>Dom.query("p").click( function () { Dom.query(this).hide(); });</code>
+          <code>Dom.query("p").on('click', function () { Dom.query(this).hide(); });</code>
         </example>
-      </function>
-      <function name="dblclick" return="Dom">
-        <desc>触发每一个匹配元素的dblclick事件。</desc>
-        <longdesc>这个函数会调用执行绑定到dblclick事件的所有函数，包括浏览器的默认行为。可以通过在某个绑定的函数中返回false来防止触发浏览器的默认行为。dblclick事件会在元素的同一点双击时触发。</longdesc>
-      </function>
-      <function name="dblclick" return="Dom">
-        <desc>在每一个匹配元素的dblclick事件中绑定一个处理函数。</desc>
+      </selector>
+      <selector name="dblclick" return="Dom">
+        <sample>dblclick</sample>
         <longdesc>的那个在某个元素上双击的时候就会触发dblclick事件</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的dblclick事件中绑定的处理函数。</desc>
-        </params>
         <example>
           <desc>给页面上每个段落的双击事件绑上 "Hello World!" 警告框</desc>
           <code>Dom.query("p").dblclick( function () { alert("Hello World!"); });</code>
         </example>
-      </function>
-      <function name="error" return="Dom">
-        <desc>触发每一个匹配元素的error事件。</desc>
-        <longdesc>这个函数会调用所有绑定到error事件上的函数，包括在对应元素上的浏览器默认行为。可以通过在某个绑定的函数中返回false来防止触发浏览器的默认行为。error事件通常可以在元素由于点击或者tab导航失去焦点时触发。</longdesc>
-      </function>
-      <function name="error" return="Dom">
-        <desc>在每一个匹配元素的error事件中绑定一个处理函数。</desc>
+      </selector>
+      <selector name="error" return="Dom">
+        <sample>error</sample>
         <longdesc>
           对于error事件，没有一个公众的标准。在大多数浏览器中，当页面的JavaScript发生错误时，window对象会触发error事件;当图像的src属性无效时，比如文件不存在或者图像数据错误时，也会触发图像对象的error事件。
 
@@ -1946,13 +1881,10 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
 
           &lt;a href="http://en.wikipedia.org/wiki/DOM_Events"&gt;Wikipedia: DOM Events&lt;/a&gt;
         </longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的error事件中绑定的处理函数。</desc>
-        </params>
         <example>
           <desc>在服务器端记录JavaScript错误日志:</desc>
           <code>
-            Dom.query(window).error(function(msg, url, line){
+            Dom.query(window).on('error', function(msg, url, line){
             JPlus.post("js_error_log.php", { msg: msg, url: url, line: line });
             });
           </code>
@@ -1960,7 +1892,7 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
         <example>
           <desc>隐藏JavaScript错误:</desc>
           <code>
-            Dom.query(window).error(function(){
+            Dom.query(window).on('error', function(){
             return true;
             });
           </code>
@@ -1968,45 +1900,27 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
         <example>
           <desc>给你IE的用户隐藏无效的图像:</desc>
           <code>
-            Dom.query("img").error(function(){
+            Dom.query("img").on('error', function(){
             Dom.query(this).hide();
             });
           </code>
         </example>
-      </function>
-      <function name="focus" return="Dom">
-        <desc>触发每一个匹配元素的focus事件。</desc>
-        <longdesc>这将触发所有绑定的focus函数，注意，某些对象不支持focus方法。</longdesc>
-        <example>
-          <desc>当页面加载后将 id 为 'login' 的元素设置焦点:</desc>
-          <code>
-            Dom.query(document).ready(function(){
-            Dom.query("#login").focus();
-            });
-          </code>
-        </example>
-      </function>
-      <function name="focus" return="Dom">
-        <desc>在每一个匹配元素的focus事件中绑定一个处理函数。</desc>
-        <longdesc>focus事件可以通过鼠标点击或者键盘上的TAB导航触发</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的focus事件中绑定的处理函数。</desc>
-        </params>
+      </selector>
+      <selector name="focus" return="Dom">
+        <sample>focus</sample>
+        <desc>focus事件可以通过鼠标点击或者键盘上的TAB导航触发</desc>
         <example>
           <desc>使人无法使用文本框:</desc>
           <code>
-            Dom.query("input[type=text]").focus(function(){
+            Dom.query("input[type=text]").on('focus', function(){
             this.blur();
             });
           </code>
         </example>
-      </function>
-      <function name="focusin" return="Dom">
-        <desc>在每一个匹配元素的focusin事件中绑定一个处理函数。</desc>
-        <longdesc>当一个元素，或者其内部任何一个元素获得焦点的时候会触发这个事件。这跟focus事件区别在于，他可以在父元素上检测子元素获取焦点的情况。</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的focusin事件中绑定的处理函数。</desc>
-        </params>
+      </selector>
+      <selector name="focusin" return="Dom">
+        <sample>focusin</sample>
+        <desc>当一个元素，或者其内部任何一个元素获得焦点的时候会触发这个事件。这跟focus事件区别在于，他可以在父元素上检测子元素获取焦点的情况。</desc>
         <example>
           <desc>获得焦点后会触发动画:</desc>
           <html>
@@ -2014,18 +1928,15 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
             &lt;p&gt;&lt;input type=&quot;password&quot; /&gt; &lt;span&gt;focusout fire&lt;/span&gt;&lt;/p&gt;
           </html>
           <code>
-            Dom.query("p").focusin(function() {
-            Dom.query(this).find("span").css('display','inline').fadeOut(1000);
+            Dom.query("p").on('focusin', function() {
+            this.find("span").setStyle('display','inline').hide(1000);
             });
           </code>
         </example>
-      </function>
-      <function name="focusout" return="Dom">
-        <desc>在每一个匹配元素的focusout事件中绑定一个处理函数。</desc>
-        <longdesc>当一个元素，或者其内部任何一个元素失去焦点的时候会触发这个事件。这跟blur事件区别在于，他可以在父元素上检测子元素失去焦点的情况。</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的focusout事件中绑定的处理函数。</desc>
-        </params>
+      </selector>
+      <selector name="focusout" return="Dom">
+        <sample>focusout</sample>
+        <desc>当一个元素，或者其内部任何一个元素失去焦点的时候会触发这个事件。这跟blur事件区别在于，他可以在父元素上检测子元素失去焦点的情况。</desc>
         <example>
           <desc>失去焦点后会触发动画:</desc>
           <html>
@@ -2033,26 +1944,19 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
             &lt;p&gt;&lt;input type=&quot;password&quot; /&gt; &lt;span&gt;focusout fire&lt;/span&gt;&lt;/p&gt;
           </html>
           <code>
-            Dom.query("p").focusout(function() {
-            Dom.query(this).find("span").css('display','inline').fadeOut(1000);
+            Dom.query("p").on('focusout', function() {
+              this.find("span").setStyle('display','inline').hide(1000);
             });
           </code>
         </example>
-      </function>
-      <function name="keydown" return="Dom">
-        <desc>触发每一个匹配元素的keydown事件</desc>
-        <longdesc>这个函数会调用执行绑定到keydown事件的所有函数，包括浏览器的默认行为。可以通过在某个绑定的函数中返回false来防止触发浏览器的默认行为。keydown事件会在键盘按下时触发。</longdesc>
-      </function>
-      <function name="keydown" return="Dom">
-        <desc>在每一个匹配元素的keydown事件中绑定一个处理函数。</desc>
-        <longdesc>keydown事件会在键盘按下时触发。</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的keydown事件中绑定的处理函数。</desc>
-        </params>
+      </selector>
+      <selector name="keydown" return="Dom">
+        <sample>keydown</sample>
+        <desc>keydown事件会在键盘按下时触发。</desc>
         <example>
           <desc>在页面内对键盘按键做出回应，可以使用如下代码:</desc>
           <code>
-            Dom.query(window).keydown(function(event){
+            Dom.query(window).on('keydown', function(event){
             switch(event.keyCode) {
             // ...
             // 不同的按键可以做不同的事情
@@ -2063,159 +1967,104 @@ Dom.parse("&lt;input type='checkbox'&gt;");</code>
             });
           </code>
         </example>
-      </function>
-      <function name="keypress" return="Dom">
-        <desc>触发每一个匹配元素的keypress事件</desc>
-        <longdesc>T这个函数会调用执行绑定到keydown事件的所有函数，包括浏览器的默认行为。可以通过在某个绑定的函数中返回false来防止触发浏览器的默认行为。keydown事件会在键盘按下时触发</longdesc>
-      </function>
-      <function name="keypress" return="Dom">
-        <desc>在每一个匹配元素的keypress事件中绑定一个处理函数。</desc>
-        <longdesc>
+      </selector>
+      <selector name="keypress" return="Dom">
+        <sample>keypress</sample>
+        <desc>
           keypress事件会在敲击按键时触发。 敲击按键的定义为按下并抬起同一个按键。这几个事件发生的顺序是:keydown
 
           keypress
 
           keyup
-        </longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的keypress事件中绑定的处理函数。</desc>
-        </params>
-      </function>
-      <function name="keyup" return="Dom">
-        <desc>触发每一个匹配元素的keyup事件</desc>
-        <longdesc>这个函数会调用执行绑定到keyup事件的所有函数，包括浏览器的默认行为。可以通过在某个绑定的函数中返回false来防止触发浏览器的默认行为。keyup事件会在按键释放时触发。</longdesc>
-      </function>
-      <function name="keyup" return="Dom">
-        <desc>在每一个匹配元素的keyup事件中绑定一个处理函数。</desc>
-        <longdesc>keyup 事件会在键盘按下时触发。</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的keyup事件中绑定的处理函数。</desc>
-        </params>
-      </function>
-      <function name="load" return="Dom">
+        </desc>
+      </selector>
+      <selector name="keyup" return="Dom">
+        <sample>keyup</sample>
+        <desc>keyup 事件会在键盘按下时触发。</desc>
+      </selector>
+      <selector name="load" return="Dom">
+        <sample>load</sample>
         <desc>在每一个匹配元素的load事件中绑定一个处理函数。</desc>
-        <longdesc>
+        <desc>
           如果绑定给window对象，则会在所有内容加载后触发，包括窗口，框架，对象和图像。如果绑定在元素上，则当元素的内容加载完毕后触发。
 
           '''注意:'''只有当在这个元素完全加载完之前绑定load的处理函数,才会在他加载完后触发。如果之后再绑定就永远不会触发了。所以'''不要'''在Dom.query(document).ready()里绑定load事件，因为JPlus会在所有DOM加载完成后再绑定load事件。
-        </longdesc>
+        </desc>
         <params name="fn" type="Function">
           <desc>在每一个匹配元素的load事件中绑定的处理函数。</desc>
         </params>
-      </function>
-      <function name="mousedown" return="Dom">
-        <desc>在每一个匹配元素的mousedown事件中绑定一个处理函数。</desc>
-        <longdesc>mousedown事件在鼠标在元素上点击后会触发</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的mousedown事件中绑定的处理函数。</desc>
-        </params>
-      </function>
-      <function name="mousemove" return="Dom">
-        <desc>在每一个匹配元素的mousemove事件中绑定一个处理函数。</desc>
-        <longdesc>mousemove 事件通过鼠标在元素上移动来触发。事件处理函数会被传递一个变量——事件对象，其.clientX 和 .clientY 属性代表鼠标的坐标</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的mousemove事件中绑定的处理函数。</desc>
-        </params>
-      </function>
-      <function name="mouseout" return="Dom">
-        <desc>在每一个匹配元素的mouseout事件中绑定一个处理函数。</desc>
-        <longdesc>mouseout事件在鼠标从元素上离开后会触发</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的mouseout事件中绑定的处理函数。</desc>
-        </params>
-      </function>
-      <function name="mouseover" return="Dom">
-        <desc>在每一个匹配元素的mouseover事件中绑定一个处理函数。</desc>
-        <longdesc>mouseover事件会在鼠标移入对象时触发</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的mouseover事件中绑定的处理函数。</desc>
-        </params>
-      </function>
-      <function name="mouseup" return="Dom">
-        <desc>在每一个匹配元素的mouseup事件中绑定一个处理函数。</desc>
-        <longdesc>mouseup事件会在鼠标点击对象释放时</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的mouseup事件中绑定的处理函数。</desc>
-        </params>
-      </function>
-      <function name="resize" return="Dom">
-        <desc>在每一个匹配元素的resize事件中绑定一个处理函数。</desc>
-        <longdesc>当文档窗口改变大小时触发</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的resize事件中绑定的处理函数。</desc>
-        </params>
+      </selector>
+      <selector name="mousedown" return="Dom">
+        <sample>mousedown</sample>
+        <desc>mousedown事件在鼠标在元素上点击后会触发</desc>
+      </selector>
+      <selector name="mousemove" return="Dom">
+        <sample>mousemove</sample>
+        <desc>mousemove 事件通过鼠标在元素上移动来触发。事件处理函数会被传递一个变量——事件对象，其.clientX 和 .clientY 属性代表鼠标的坐标</desc>
+      </selector>
+      <selector name="mouseout" return="Dom">
+        <sample>mouseout</sample>
+        <desc>mouseout事件在鼠标从元素上离开后会触发</desc>
+      </selector>
+      <selector name="mouseover" return="Dom">
+        <sample>mouseover</sample>
+        <desc>mouseover事件会在鼠标移入对象时触发</desc>
+    </selector>
+      <selector name="mouseup" return="Dom">
+        <sample>mouseup</sample>
+        <desc>mouseup事件会在鼠标点击对象释放时</desc>
+      </selector>
+      <selector name="resize" return="Dom">
+        <sample>resize</sample>
+        <desc>当文档窗口改变大小时触发</desc>
         <example>
           <desc>让人每次改变页面窗口的大小时很郁闷的方法:</desc>
           <code>
-            Dom.query(window).resize(function(){
+            Dom.get(window).on('resize', function(){
             alert("Stop it!");
             });
           </code>
         </example>
-      </function>
-      <function name="scroll" return="Dom">
-        <desc>在每一个匹配元素的scroll事件中绑定一个处理函数。</desc>
-        <longdesc>当滚动条发生变化时触发</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的resize事件中绑定的处理函数。</desc>
-        </params>
+      </selector>
+      <selector name="scroll" return="Dom">
+        <sample>scroll</sample>
+        <desc>当滚动条发生变化时触发</desc>
         <example>
           <desc>当页面滚动条变化时，执行的函数:</desc>
-          <code>Dom.query(window).scroll( function() { /* ...do something... */ } );</code>
+          <code>Dom.get(window).on('scroll', function() { /* ...do something... */ } );</code>
         </example>
-      </function>
-      <function name="select" return="Dom">
-        <desc>触发每一个匹配元素的select事件</desc>
-        <longdesc>这个函数会调用执行绑定到select事件的所有函数，包括浏览器的默认行为。可以通过在某个绑定的函数中返回false来防止触发浏览器的默认行为。</longdesc>
-        <example>
-          <desc>触发所有input元素的select事件:</desc>
-          <code>Dom.query("input").select();</code>
-        </example>
-      </function>
-      <function name="select" return="Dom">
-        <desc>在每一个匹配元素的select事件中绑定一个处理函数。</desc>
-        <longdesc>当用户在文本框(包括input和textarea)中选中某段文本时会触发select事件。</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的select事件中绑定的处理函数。</desc>
-        </params>
+      </selector>
+      <selector name="select" return="Dom">
+        <sample>select</sample>
+        <desc>当用户在文本框(包括input和textarea)中选中某段文本时会触发select事件。</desc>
         <example>
           <desc>当文本框中文本被选中时执行的函数:</desc>
-          <code>Dom.query(":text").select( function () { /* ...do something... */ } );</code>
+          <code>Dom.query("input[type=text],textarea").on('select', function () { /* ...do something... */ } );</code>
         </example>
-      </function>
-      <function name="submit" return="Dom">
-        <desc>触发每一个匹配元素的submit事件。</desc>
-        <longdesc>这个函数会调用执行绑定到submit事件的所有函数，包括浏览器的默认行为。可以通过在某个绑定的函数中返回false来防止触发浏览器的默认行为。</longdesc>
-        <example>
-          <desc>提交本页的第一个表单:</desc>
-          <code>Dom.query("form:first").submit();</code>
-        </example>
-      </function>
-      <function name="submit" return="Dom">
-        <desc>在每一个匹配元素的submit事件中绑定一个处理函数。</desc>
-        <longdesc>submit事件将会在表单提交时触发</longdesc>
-        <params name="fn" type="Function">
-          <desc>在每一个匹配元素的submit事件中绑定的处理函数</desc>
-        </params>
+      </selector>
+      <selector name="submit" return="Dom">
+        <sample>submit</sample>
+        <desc>submit事件将会在表单提交时触发</desc>
         <example>
           <desc>如果你要阻止表单提交:</desc>
           <code>
-            Dom.query("form").submit( function () {
+            Dom.query("form").on('submit', function () {
             return false;
             } );
           </code>
         </example>
-      </function>
-      <function name="unload" return="Dom">
-        <desc>在每一个匹配元素的unload事件中绑定一个处理函数。</desc>
+      </selector>
+      <selector name="unload" return="Dom">
+        <sample>unload</sample>
+        <desc>页面卸载触发事件。</desc>
         <params name="fn" type="Function">
           <desc>在每一个匹配元素的unload事件中绑定的处理函数。</desc>
         </params>
         <example>
           <desc>页面卸载的时候弹出一个警告框:</desc>
-          <code>Dom.query(window).unload( function () { alert("Bye now!"); } );</code>
+          <code>Dom.query(window).on('unload', function () { alert("Bye now!"); } );</code>
         </example>
-      </function>
+      </selector>
     </subcat>
   </cat>
   <cat value="效果">
@@ -2627,7 +2476,7 @@ Dom.query("#go2").click(function(){
   </cat>
   <cat value="Ajax">
     <subcat value="Ajax 请求">
-      <function name="new Ajax" return="Ajax">
+      <function name="Ajax.send" return="Ajax">
         <desc>通过 HTTP 请求加载远程数据。</desc>
         <longdesc>
           JPlus 底层 AJAX 实现。简单易用的高层实现见 $.get, $.post 等。$.ajax() 返回其创建的 XMLHttpRequest 对象。大多数情况下你无需直接操作该函数，除非你需要操作不常用的选项，以获得更多的灵活性。
@@ -2807,7 +2656,7 @@ Dom.query("#go2").click(function(){
         <example>
           <desc>加载并执行一个 JS 文件。</desc>
           <code>
-            $.ajax({
+            Ajax.send({
             type: "GET",
             url: "test.js",
             dataType: "script"
@@ -2817,7 +2666,7 @@ Dom.query("#go2").click(function(){
         <example>
           <desc>保存数据到服务器，成功时显示信息。</desc>
           <code>
-            $.ajax({
+            Ajax.send({
             type: "POST",
             url: "some.php",
             data: "name=John&amp;location=Boston",
@@ -2830,7 +2679,7 @@ Dom.query("#go2").click(function(){
         <example>
           <desc>装入一个 HTML 网页最新版本。</desc>
           <code>
-            $.ajax({
+            Ajax.send({
             url: "test.html",
             cache: false,
             success: function(html){
@@ -2842,7 +2691,7 @@ Dom.query("#go2").click(function(){
         <example>
           <desc>同步加载数据。发送请求时锁住浏览器。需要锁定用户交互操作时使用同步方式。</desc>
           <code>
-            var html = $.ajax({
+            var html = Ajax.send({
             url: "some.php",
             async: false
             }).responseText;
@@ -2852,7 +2701,7 @@ Dom.query("#go2").click(function(){
           <desc>发送 XML 数据至服务器。设置 processData 选项为 false，防止自动转换数据格式。</desc>
           <code>
             var xmlDocument = [create xml document];
-            $.ajax({
+            Ajax.send({
             url: "page.php",
             processData: false,
             data: xmlDocument,
@@ -2906,9 +2755,9 @@ Dom.query("#go2").click(function(){
           </code>
         </example>
       </function>
-      <function name="Ajax.getJSON" return="Ajax">
-        <desc>通过 HTTP GET 请求载入 JSON 数据。</desc>
-        <longdesc>在 JPlus 1.2 中，您可以通过使用&lt;a href="http://bob.pythonmac.org/archives/2005/12/05/remote-json-jsonp/" class="external text" title="http://bob.pythonmac.org/archives/2005/12/05/remote-json-jsonp/"&gt;JSONP&lt;/a&gt; 形式的回调函数来加载其他网域的JSON数据，如 "myurl?callback=?"。JPlus 将自动替换 ? 为正确的函数名，以执行回调函数。  注意：此行以后的代码将在这个回调函数执行前执行。</longdesc>
+      <function name="Ajax.jsonp" return="Ajax">
+        <desc>通过 HTTP GET 请求载入 JSONP 数据。</desc>
+        <longdesc>您可以通过使用&lt;a href="http://bob.pythonmac.org/archives/2005/12/05/remote-json-jsonp/" class="external text" title="http://bob.pythonmac.org/archives/2005/12/05/remote-json-jsonp/"&gt;JSONP&lt;/a&gt; 形式的回调函数来加载其他网域的JSON数据，如 "myurl?callback=?"。将自动替换 ? 为正确的函数名，以执行回调函数。  注意：此行以后的代码将在这个回调函数执行前执行。</longdesc>
         <params name="url" type="String">
           <desc>发送请求地址。</desc>
         </params>
@@ -2922,18 +2771,18 @@ Dom.query("#go2").click(function(){
           <desc>从 Flickr JSONP API 载入 4 张最新的关于猫的图片。</desc>
           <html>&lt;div id="images"&gt;&lt;/div&gt;</html>
           <code>
-            $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?tags=cat&amp;tagmode=any&amp;format=json&amp;jsoncallback=?", function(data){
-            $.each(data.items, function(i,item){
-            Dom.query("&lt;img/&gt;").attr("src", item.media.m).appendTo("#images");
-            if ( i == 3 ) return false;
-            });
+            Ajax.jsonp("http://api.flickr.com/services/feeds/photos_public.gne?tags=cat&amp;tagmode=any&amp;format=json&amp;jsoncallback=?", function(data){
+            Object.each(data.items, function(item, i){
+              Dom.query("&lt;img/&gt;").attr("src", item.media.m).appendTo("#images");
+              if ( i == 3 ) return false;
+              });
             });
           </code>
         </example>
         <example>
           <desc>从 test.js 载入 JSON 数据并显示 JSON 数据中一个 name 字段数据。</desc>
           <code>
-            $.getJSON("test.js", function(json){
+            $.json("test.js", function(json){
             alert("JSON Data: " + json.users[3].name);
             });
           </code>
@@ -2941,37 +2790,8 @@ Dom.query("#go2").click(function(){
         <example>
           <desc>从 test.js 载入 JSON 数据，附加参数，显示 JSON 数据中一个 name 字段数据。</desc>
           <code>
-            $.getJSON("test.js", { name: "John", time: "2pm" }, function(json){
+            $.json("test.js", { name: "John", time: "2pm" }, function(json){
             alert("JSON Data: " + json.users[3].name);
-            });
-          </code>
-        </example>
-      </function>
-      <function name="Ajax.getScript*" return="Ajax">
-        <desc>通过 HTTP GET 请求载入并执行一个 JavaScript 文件。</desc>
-        <params name="url" type="String">
-          <desc>待载入 JS 文件地址。</desc>
-        </params>
-        <params name="callbacks" type="Function" optional="true">
-          <desc>参见Ajax.get()</desc>
-        </params>
-        <example>
-          <desc>载入js。</desc>
-          <code>
-            JPlus.getScript("script.js", function(){
-
-            });
-          </code>
-        </example>
-        <example>
-          <desc>加载并执行 test.js。</desc>
-          <code>$.getScript("test.js");</code>
-        </example>
-        <example>
-          <desc>加载并执行 test.js ，成功后显示信息。</desc>
-          <code>
-            $.getScript("test.js", function(){
-            alert("Script loaded and executed.");
             });
           </code>
         </example>
@@ -2993,77 +2813,6 @@ Dom.query("#go2").click(function(){
         </params>
       </function>
     </subcat>
-    <!--
-    <subcat value="Ajax 事件">
-      <function name="complete" return="Dom">
-        <desc>AJAX 请求完成时执行函数。Ajax 事件。</desc>
-        <longdesc>XMLHttpRequest 对象和设置作为参数传递给回调函数。</longdesc>
-        <params name="callback" type="Function">
-          <desc>待执行函数</desc>
-        </params>
-        <example>
-          <desc>AJAX 请求完成时执行函数。</desc>
-          <code> Dom.query("#msg").ajaxComplete(function(event,request, settings){
-   Dom.query(this).append("&lt;li&gt;请求完成.&lt;/li&gt;");
- });</code>
-        </example>
-      </function>
-      <function name="error" return="Dom">
-        <desc>AJAX 请求发生错误时执行函数。Ajax 事件。</desc>
-        <longdesc>XMLHttpRequest 对象和设置作为参数传递给回调函数。捕捉到的错误可作为最后一个参数传递。</longdesc>
-        <params name="callback" type="Function">
-          <desc>待执行函数
-&lt;pre&gt;function (event, XMLHttpRequest, ajaxOptions, thrownError) {
-      // thrownError 只有当异常发生时才会被传递
-      this; // 监听的 dom 元素
-}&lt;/pre&gt;</desc>
-        </params>
-        <example>
-          <desc>AJAX 请求失败时显示信息。</desc>
-          <code>Dom.query("#msg").ajaxError(function(event,request, settings){
-     Dom.query(this).append("&lt;li&gt;出错页面:" + settings.url + "&lt;/li&gt;");
-});</code>
-        </example>
-      </function>
-      <function name="start" return="Dom">
-        <desc>AJAX 请求开始时执行函数。Ajax 事件。</desc>
-        <params name="callback" type="Function">
-          <desc>待执行函数</desc>
-        </params>
-        <example>
-          <desc>AJAX 请求开始时显示信息。</desc>
-          <code> Dom.query("#loading").ajaxStart(function(){
-   Dom.query(this).show();
- });</code>
-        </example>
-      </function>
-      <function name="timeout" return="Dom">
-        <desc>AJAX 请求结束时执行函数。Ajax 事件。</desc>
-        <params name="callback" type="Function">
-          <desc>待执行函数</desc>
-        </params>
-        <example>
-          <desc>AJAX 请求结束后隐藏信息。</desc>
-          <code> Dom.query("#loading").ajaxStop(function(){
-   Dom.query(this).hide();
- });</code>
-        </example>
-      </function>
-      <function name="success" return="Dom">
-        <desc>AJAX 请求成功时执行函数。Ajax 事件。</desc>
-        <longdesc>XMLHttpRequest 对象和设置作为参数传递给回调函数。</longdesc>
-        <params name="callback" type="Function">
-          <desc>待执行函数</desc>
-        </params>
-        <example>
-          <desc>当 AJAX 请求成功后显示消息。</desc>
-          <code> Dom.query("#msg").ajaxSuccess(function(evt, request, settings){
-   Dom.query(this).append("&lt;li&gt;请求成功!&lt;/li&gt;");
- });</code>
-        </example>
-      </function>
-    </subcat>
-	-->
   </cat>
   <cat value="工具">
     <subcat value="数组和对象操作">
