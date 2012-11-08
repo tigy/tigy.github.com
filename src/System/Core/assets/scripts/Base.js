@@ -944,7 +944,7 @@
 			 * @type Boolean
 			 * @remark 就目前浏览器状况， IE6，7 中 isQuirks = true 其它浏览器都为 false 。
 			 */
-			isQuirks: !isStd && !Object.isObject(document.constructor),
+			isQuirks: !isStd && !(document instanceof (document.constructor || emptyFn)),
 
 			/// #endif
 

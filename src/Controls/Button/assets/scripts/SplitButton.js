@@ -15,7 +15,7 @@ var SplitButton = MenuButton.extend({
 	
 	tpl: '<span class="x-splitbutton x-buttongroup">\
 				<button class="x-button"></button>\
-				<button class="x-button"><span class="x-button-menu x-button-menu-down"></span></button>\
+				<button class="x-button"><span class="x-menubutton-arrow x-menubutton-arrow-down"></span></button>\
 			</span>',
 			
 	content: function(){

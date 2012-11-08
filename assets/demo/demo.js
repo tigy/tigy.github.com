@@ -3610,7 +3610,7 @@ if (typeof module !== 'object') {
                     // 跟目录。
                     var node = document.getElementsByTagName("script");
                     node = node[node.length - 1];
-                    node = (!Demo.Dom.isIE || typeof document.constructor === 'function') ? node.src : node.getAttribute('src', 5);
+                    node = (!Demo.Dom.isIE || typeof document.constructor !== 'function' || !(document instanceof document.constructor)) ? node.src : node.getAttribute('src', 5);
                     node = node.substr(0, node.length - configs.demoFilePath.length);
                     configs.rootUrl = node;
 

@@ -34,7 +34,7 @@ var MenuItem = TreeControl.Item.extend({
 	initSubControl: function(treeControl){
 		treeControl.hide();
 		treeControl.floating = false;
-		this.addClass('x-menuitem-submenu');
+		this.prepend('<i class="x-menuitem-arrow"></i>');
 		this.on('mouseup', this._cancelHideMenu);
 	},
 	
@@ -45,7 +45,7 @@ var MenuItem = TreeControl.Item.extend({
 	 */
 	uninitSubControl: function(treeControl){
 		treeControl.floating = true;
-		this.removeClass('x-menuitem-submenu');
+		this.remove('x-menuitem-arrow');
 		this.un('mouseup', this._cancelHideMenu);
 	},
 

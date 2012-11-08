@@ -24,7 +24,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 			<a href="javascript:;" class="x-button">A</a>\
 		</span>',
 
-    menuButtonTpl: '<button class="x-button" type="button"><span class="x-button-menu"></span></button>',
+    menuButtonTpl: '<button class="x-button" type="button"><span class="x-menubutton-arrow"></span></button>',
 
     /**
 	 * 当前控件是否为下拉列表。
