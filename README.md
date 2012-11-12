@@ -1,23 +1,24 @@
-# J+ UI Library 概述      [in English](README-en.md)
+# jPlusUI 概述
 
-J+ UI Library 是一个Javascript 用户界面组件库。它提供了：
+jPlusUI 是一个使用 JavaScript 开发的轻量但完整的 Web UI 组件库。它提供了：
 
-* 一套可直接使用的 UI 组件。
-* 一套用于二次开发的底层组件。
-* 一个面向对象的 Javascript 底层开发框架。
-* 一套组件开发的思路、规划、构架和工具。
+* 200个可直接使用的  UI 组件。
+* 100 多个可复用的 CSS 设计。
+* 200 个常用的 JavaScript 代码和案例。
+* 一个轻量的面向对象的 Javascript 开发框架。
+* 一套完善的组件开发思路、方法、构架和工具。
 
 ### 直接使用组件
 
-和传统的UI库一样， 所有组件都能直接在项目中使用。用户可以自定义组件，只引用所需要的组件。J+ 的主要特性有：
+和传统的UI库一样， 所有组件都能直接在项目中使用。用户可以自定义组件，只引用所需要的组件。jPlusUI 的主要特性有：
 	
 * 轻量，但功能丰富，核心部分普通压缩后为20K。
 * 虽然类库自带底层，但也可以使用 jQuery 作为底层支持。
-* 所有UI组件都是轻量级的封装，更符合前端开发人员的习惯，也方便自定义样式。
+* 所有 UI 组件都是轻量级的封装，更符合前端开发人员的习惯，也方便自定义样式。
 * 作为国产类库，对国内的特有需求提供支持。如城市选择器、解决中文乱码问题。
-* 使用HTML5，但对低版本浏览器有降级处理，部分支持移动平台。
+* 使用HTML5，但对低版本浏览器(包括 IE6)有降级处理，部分支持移动平台。
 
-J+ 自带两套组件库，一套更适用于互联网级的网页开发，一套更适用于企业级应用开发。用户可以类似地开发出第三套更适合自己需求的组件库。
+jPlusUI 自带两套组件库，一套更适用于互联网级的网页开发，一套更适用于企业级应用开发。用户可以类似地开发出第三套更适合自己需求的组件库。
 
 ### 组件二次开发
 
@@ -31,18 +32,23 @@ J+本身就是为了二次开发而做的，用户可以轻松地以J+为基础�
 
 ### 如何开始
 
-##### 直接使用
+##### 更多说明
 
-从此处下载最新版本： [https://github.com/jplusui/release](https://github.com/jplusui/release)
+访问项目主页： [http://jplusui.github.com](http://jplusui.github.com)
 
-##### 二次开发
+##### 浏览全部和示例
 
-git fork [https://github.com/jplusui/jplus-milk](https://github.com/jplusui/jplus-milk)
+点此访问： [http://jplusui.github.com/src/](http://jplusui.github.com/src/)
+
+##### 下载
+
+点此下载全部源码： [https://github.com/jplusui/jplusui/zipball/master](https://github.com/jplusui/jplusui/zipball/master)
+git fork [https://github.com/jplusui/jplusui](https://github.com/jplusui/jplusui)
 
 -----
 
-# What’s jplus UI
-JPlus UI is a flexible, Object-Oriented javascript user interface library, which include:
+# What’s jPlusUI
+jPlusUI is a flexible, Object-Oriented javascript user interface library, which include:
 1.	A compact, Object-Oriented javascript base support
 2.	A base UI framework which can re-develop independently
 3.	A full set of powerful user interface widgets
