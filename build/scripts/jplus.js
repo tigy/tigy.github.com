@@ -1,13 +1,16 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/12 13:45
+ * This file is created by a tool at 2012/11/12 14:14
  *********************************************************
  * Contains: 
  *     System.Core.Base
  *     System.Dom.Base
+ *     Controls.Core.Base
+ *     Controls.Core.ContainerControl
+ *     Controls.Container.Dialog
+ *     Controls.Container.MessageBox
  *     System.Dom.Align
  *     Controls.Core.IDropDownOwner
  *     Controls.Core.IInput
- *     Controls.Core.Base
  *     Controls.Suggest.Picker
  *     Controls.Core.ListControl
  *     Controls.Suggest.ComboBox
@@ -17,7 +20,6 @@
  *     Controls.Form.RadioButton
  *     Controls.Form.TextBox
  *     Controls.Core.IToolTip
- *     Controls.Core.ContainerControl
  *     Controls.Container.Panel
  *     Controls.Suggest.Suggest
  *     System.Utils.Deferrable
@@ -7392,6 +7394,575 @@ function imports(namespace) {
 })(this);
 
 /*********************************************************
+ * Controls.Core.Base
+ ********************************************************/
+/**
+ * @author  xuld
+ */
+
+
+
+
+/**
+ * 所有控件基类。
+ * @class Control
+ * @abstract
+ * 控件的周期：
+ * constructor - 创建控件对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。
+ * create - 创建本身的 dom 节点。 可重写 - 默认使用 this.tpl 创建。
+ * init - 初始化控件本身。 可重写 - 默认为无操作。
+ * attach - 渲染控件到文档。不建议重写，如果你希望额外操作渲染事件，则重写。
+ * detach - 删除控件。不建议重写，如果一个控件用到多个 dom 内容需重写。
+ */
+var Control = Dom.extend({
+
+	/**
+	 * 存储当前控件的默认模板字符串。
+	 * @getter {String} tpl
+	 * @protected
+	 * @virtual
+	 */
+
+	/**
+	 * 当被子类重写时，生成当前控件。
+	 * @param {Object} options 选项。
+	 * @protected
+	 * @virtual
+	 */
+	create: function () {
+
+		assert.isString(this.tpl, "Control#create: 无法获取或创建当前控件所关联的 DOM 节点。请为控件定义 tpl 属性或重写 create 函数。");
+
+		// 转为对 tpl解析。
+		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype));
+	},
+
+	/**
+	 * 当被子类重写时，渲染控件。
+	 * @method
+	 * @param {Object} options 配置。
+	 * @protected virtual
+	 */
+	init: Function.empty,
+
+	/**
+	 * 初始化一个新的控件。
+	 * @param {String/Element/Control/Object} [options] 对象的 id 或对象或各个配置。
+	 */
+	constructor: function (options) {
+
+		// 这是所有控件共用的构造函数。
+		var me = this,
+
+			// 临时的配置对象。
+			opt = {},
+
+			// 当前实际的节点。
+			node;
+
+		// 如果存在配置。
+		if (options) {
+
+			// 如果 options 是纯配置。
+			if (options.constructor === Object) {
+				
+				Object.extend(opt, options);
+				
+				if(opt.node) {
+					node = opt.node;
+					delete opt.node;
+				} else if(opt.selector) {
+					node = Dom.find(opt.selector);
+					delete opt.selector;
+				} else if(opt.dom) {
+					node = opt.dom;
+					delete opt.dom;
+				}
+					
+				if(node){
+					node = Dom.getNode(node);
+				}
+				
+			} else {
+				node = Dom.getNode(options);
+			}
+
+		}
+
+		// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。
+		me.node = node || me.create(opt);
+
+		assert.isNode(me.node, "Dom#constructor(options): Dom 对象的 {node} 不是节点。", me.node);
+
+		// 调用 init 初始化控件。
+		me.init(opt);
+
+		//// 如果指定的节点已经在 DOM 树上，且重写了 attach 方法，则调用之。
+		//if (me.node.parentNode && me.attach !== Control.prototype.attach) {
+		//	me.attach(me.node.parentNode, me.node.nextSibling);
+		//}
+
+		// 复制各个选项。
+		me.set(opt);
+	},
+
+	/**
+	 * xtype 。
+	 * @virtual
+	 */
+	xtype: "control"
+
+});
+/*********************************************************
+ * Controls.Core.ContainerControl
+ ********************************************************/
+/**
+ * @author  xuld
+ */
+
+/**
+ * 所有容器控件的基类。
+ * @abstract class 
+ * @extends Control
+ */
+var ContainerControl = Control.extend({
+	
+	// 基本属性
+	
+	tpl: '<div class="x-control">\
+			<div class="x-control-body"></div>\
+		</div>',
+		
+	headerTpl: '<div class="x-control-header"><h4></h4></div>',
+	
+	/**
+	 * 获取当前容器的标题部分。
+	 * @return {Control}
+	 */
+	header: function(){
+		return this.find('.x-' + this.xtype + '-header');
+	},
+	
+	/**
+	 * 获取当前容器的内容部分。
+	 * @getter {Control}
+	 */
+	body: function(){
+		return this.find('.x-' + this.xtype + '-body') || this;
+	},
+	
+	// 基本操作
+	
+	/**
+	 * 获取当前容器显示的标题。
+	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
+	 */
+	getTitle: function(valueAsText){
+		
+		// 获取 header 。
+		var header = this.header();
+		
+		// 如果存在 header， 最后一个节点即  title 标签 。
+		return header ? (header.last() || header)[valueAsText ? 'getText' : 'getHtml']() : null;
+	},
+	
+	/**
+	 * 设置当前容器显示的标题。
+	 * @param {String} value 要设置的标题。
+	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
+	 */
+	setTitle: function(value, valueAsText){
+		
+		// 获取 header 。
+		var header = this.header(), title;
+		
+		if(value === null){
+			header && header.remove();
+		} else {
+			
+            // 如果不存在标题，则创建一个。
+			if(!header){
+				header = this.prepend(this.headerTpl.replace(/control/g, this.xtype));
+			}
+			
+			// 获取或创建 title 。
+			title = header.last() || header;
+			
+			// 设置内容。
+			title[valueAsText ? 'setText' : 'setHtml'](value);
+			
+		}
+		return this;
+	},
+	
+	/**
+	 * 获取当前容器显示的内容。
+	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
+	 */
+	getContent: function(valueAsText){
+		
+		// 获取 body 。
+		// 获取 content 。
+		var body = this.body(), content = body.last();
+		
+		// 如果存在多个 content，使用 body 作为 content。
+		if (!content || content.prev()) {
+			content = body;
+		}
+		
+		// 获取实际的内容。
+		return content[valueAsText ? 'getText' : 'getHtml']();
+		
+	},
+	
+	/**
+	 * 设置当前容器显示的内容。
+	 * @param {String} value 要设置的标题。
+	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
+	 */
+	setContent: function(value, valueAsText){
+		
+		// 获取 body 。
+		var body = this.body(), 
+			contentClass = 'x-' + this.xtype + '-content', 
+			
+			// 获取 content 。
+			content = body.find(contentClass);
+
+	    // 如果不存在 content，则创建一个。
+		if (!content) {
+		    body.setHtml('<div class="' + contentClass + '"></div>');
+		    content = body.first();
+		}
+		
+		// 设置文本内容。
+		content[valueAsText ? 'setText' : 'setHtml'](value);
+		return this;
+		
+	},
+	
+	getText: function(){
+		return this.getContent(true);
+	},
+	
+	setText: function(value){
+		return this.setContent(value, true);
+	},
+	
+	getHtml: function(){
+		return this.getContent(false);
+	},
+	
+	setHtml: function(value){
+		return this.setContent(value, false);
+	}
+
+});
+/*********************************************************
+ * Controls.Container.Dialog
+ ********************************************************/
+/**
+ * @author xuld
+ */
+
+
+var Dialog =  ContainerControl.extend({
+	
+	xtype: 'dialog',
+	
+	autoCenterType: 1 | 2,
+
+    duration: -1,
+	
+	// 基本属性
+		
+	headerTpl: '<div class="x-control-header"><a class="x-dialog-close x-closebutton">×</a><h3></h3></div>',
+	
+	onClosing: function () {
+		return this.trigger('closing');
+	},
+	
+	onClose: function () {
+		this.trigger('close');
+	},
+
+	onClickClose: function(){
+	    this.close();
+	},
+	
+	init: function(options){
+		
+		var t ;
+		
+		// 允许直接传入一个节点。
+		if (!this.hasClass('x-dialog')) {
+            
+		    // 判断节点是否已渲染过。
+		    t = this.parent('.x-dialog');
+
+		    if (t) {
+		        this.node = t.node;
+		        t = null;
+		    } else {
+
+		        // 保存当前节点。
+		        t = this.node;
+		        this.node = this.create(options);
+
+		    }
+		}
+		
+		// 关闭按钮。
+		this.delegate('.x-dialog-close', 'click', this.onClickClose.bind(this));
+
+		this.setStyle('display', 'none');
+		
+		// 移除 script 脚本。
+		this.query('script').remove();
+		
+		if(t){
+			this.body().appendChild(t);
+		}
+
+	},
+	
+	mask: function(opacity){
+		var mask = this.maskDom || (this.maskDom = Dom.find('.x-mask-dialog') || Dom.create('div', 'x-mask x-mask-dialog').appendTo());
+		if (opacity === null) {
+			mask.hide();
+		} else {
+			mask.show();
+			mask.setSize(document.getScrollSize());
+			if (opacity != null)
+				mask.setStyle('opacity', opacity);
+		}
+		return this;
+	},
+	
+	setOffset: function(p){
+		if(p.x != null) {
+			this.autoCenterType &= ~2;
+			this.setStyle('margin-left', 0);
+		}
+		
+		if(p.y != null) {
+			this.autoCenterType &= ~1;
+			this.setStyle('margin-top', 0);
+		}
+		
+		return this.base('setOffset');
+	},
+	
+	setWidth: function(){
+		return this.base('setWidth').center();
+	},
+	
+	setHeight: function(){
+		return this.base('setHeight').center();
+	},
+	
+	setContent: function () {
+	    return this.base('setContent').center();
+	},
+	
+	/**
+	 * 刷新当前对话框的位置以确保居中。
+	 */
+	center: function(){
+		if(this.autoCenterType & 1)
+			this.setStyle('margin-top', - this.getHeight() / 2 + document.getScroll().y);
+			
+		if(this.autoCenterType & 2)
+			this.setStyle('margin-left', - this.getWidth() / 2 + document.getScroll().x);
+			
+		return this;
+	},
+
+	show: function(){
+		
+		if(!this.parent('body')){
+			this.appendTo();	
+		}
+		
+		return this.base('show').center();
+	},
+	
+	showDialog: function(callback){
+		return this.mask().show(this.duration, callback);
+	},
+	
+	hide: function(){
+		this.base('hide');
+		if (this.maskDom) this.maskDom.hide();
+		return this;
+	},
+	
+	dispose: function(){
+		var me = this;
+		this.onClose();
+		if (this.maskDom) this.maskDom.remove();
+	},
+	
+	setBodySize: function(x, y){
+		this.setWidth('auto');
+		this.body().setWidth(x).setHeight(y);
+		this.center();
+		return this;
+	},
+	
+	close: function(){
+		if(this.onClosing() !== false)
+			this.hide(this.duration, this.onClose.bind(this));
+	}
+	
+});
+
+
+/*********************************************************
+ * Controls.Container.MessageBox
+ ********************************************************/
+
+
+var MessageBox = Dialog.extend({
+
+    onClickClose: function(){
+        this.cancel();
+    },
+
+    onOk: function () {
+        return this.trigger('ok');
+    },
+
+    onCancel: function () {
+        return this.trigger('cancel');
+    },
+
+    ok: function(){
+        if (this.onOk()) {
+            this.close();
+        }
+    },
+
+    cancel: function () {
+        if (this.onCancel()) {
+            this.close();
+        }
+    },
+
+    setIcon: function (type) {
+
+        // 获取 body 。
+        // 获取 content 。
+        var body = this.body(), content = body.last();
+
+        // 如果存在多个 content，使用 body 作为 content。
+        if (!content || content.prev()) {
+            content = body;
+        }
+
+        if (type == null) {
+            content.node.className = content.node.className.replace(/x-dialog-iconbox\s+x-dialog-iconbox-\w+/, '');
+        } else {
+            content.addClass('x-dialog-iconbox x-dialog-iconbox-' + type);
+        }
+
+        return this;
+    },
+
+    /**
+	 * 设置按钮。
+	 * options：
+	 * {文字： true} ->  确定按钮
+	 * {文字： false} ->  取消按钮
+	 * {文字： func} ->  自定义按钮
+	 */
+    setButtons: function (options) {
+
+        if (options == null) {
+            this.query('.x-dialog-footer').remove();
+        } else {
+
+            var footer = this.find('.x-dialog-footer') || Dom.create('div', 'x-dialog-footer').appendTo(this),
+                key,
+                value,
+                btn;
+
+            footer.empty();
+
+            for (key in options) {
+                value = options[key];
+                btn = footer.append('<button class="x-button"></button>').setText(key);
+                switch (typeof value) {
+                    case 'boolean':
+                        value = value ? this.ok : this.cancel;
+                    case 'function':
+                        btn.on('click', value, this);
+                        break;
+                    case 'object':
+                        btn.set(value);
+                        break;
+                }
+
+                footer.append('  ');
+            }
+
+        }
+
+        return this;
+    }
+
+});
+
+MessageBox.show = function (text, title, icon, buttons) {
+
+    var messageBox = MessageBox.showInstance || (MessageBox.showInstance = new MessageBox());
+
+    return messageBox
+        .setContent(text)
+        .setTitle(title || "提示")
+        .setIcon(icon || null)
+        .setButtons(buttons || {
+            '确定': true
+        })
+        .showDialog();
+
+};
+
+MessageBox.alert = function (text, title) {
+    return MessageBox.show(text, title, 'warning');
+};
+
+MessageBox.confirm = function (text, title, onOk, onCancel) {
+
+    var messageBox = MessageBox.show(text, title, 'confirm', {
+        '确定': {
+            className: 'x-button x-button-info',
+            onclick: function () {
+                messageBox.ok();
+            }
+        },
+        '取消': false
+    });
+
+    if(onOk)
+        messageBox.on('ok', onOk);
+    if (onCancel)
+        messageBox.on('cancel', onCancel);
+
+    return messageBox;
+};
+
+MessageBox.tip = function (text, icon, timeout) {
+
+    var messageBox = MessageBox.tipInstance || (MessageBox.tipInstance = new MessageBox());
+
+    messageBox.setContent(text).setIcon(icon).showDialog();
+
+    messageBox.timer = setTimeout(messageBox.close.bind(messageBox), timeout || 3000);
+
+    return messageBox;
+};
+/*********************************************************
  * System.Dom.Align
  ********************************************************/
 /**
@@ -7868,126 +8439,6 @@ var IInput = {
 	}
 	
 };
-/*********************************************************
- * Controls.Core.Base
- ********************************************************/
-/**
- * @author  xuld
- */
-
-
-
-
-/**
- * 所有控件基类。
- * @class Control
- * @abstract
- * 控件的周期：
- * constructor - 创建控件对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。
- * create - 创建本身的 dom 节点。 可重写 - 默认使用 this.tpl 创建。
- * init - 初始化控件本身。 可重写 - 默认为无操作。
- * attach - 渲染控件到文档。不建议重写，如果你希望额外操作渲染事件，则重写。
- * detach - 删除控件。不建议重写，如果一个控件用到多个 dom 内容需重写。
- */
-var Control = Dom.extend({
-
-	/**
-	 * 存储当前控件的默认模板字符串。
-	 * @getter {String} tpl
-	 * @protected
-	 * @virtual
-	 */
-
-	/**
-	 * 当被子类重写时，生成当前控件。
-	 * @param {Object} options 选项。
-	 * @protected
-	 * @virtual
-	 */
-	create: function () {
-
-		assert.isString(this.tpl, "Control#create: 无法获取或创建当前控件所关联的 DOM 节点。请为控件定义 tpl 属性或重写 create 函数。");
-
-		// 转为对 tpl解析。
-		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype));
-	},
-
-	/**
-	 * 当被子类重写时，渲染控件。
-	 * @method
-	 * @param {Object} options 配置。
-	 * @protected virtual
-	 */
-	init: Function.empty,
-
-	/**
-	 * 初始化一个新的控件。
-	 * @param {String/Element/Control/Object} [options] 对象的 id 或对象或各个配置。
-	 */
-	constructor: function (options) {
-
-		// 这是所有控件共用的构造函数。
-		var me = this,
-
-			// 临时的配置对象。
-			opt = {},
-
-			// 当前实际的节点。
-			node;
-
-		// 如果存在配置。
-		if (options) {
-
-			// 如果 options 是纯配置。
-			if (options.constructor === Object) {
-				
-				Object.extend(opt, options);
-				
-				if(opt.node) {
-					node = opt.node;
-					delete opt.node;
-				} else if(opt.selector) {
-					node = Dom.find(opt.selector);
-					delete opt.selector;
-				} else if(opt.dom) {
-					node = opt.dom;
-					delete opt.dom;
-				}
-					
-				if(node){
-					node = Dom.getNode(node);
-				}
-				
-			} else {
-				node = Dom.getNode(options);
-			}
-
-		}
-
-		// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。
-		me.node = node || me.create(opt);
-
-		assert.isNode(me.node, "Dom#constructor(options): Dom 对象的 {node} 不是节点。", me.node);
-
-		// 调用 init 初始化控件。
-		me.init(opt);
-
-		//// 如果指定的节点已经在 DOM 树上，且重写了 attach 方法，则调用之。
-		//if (me.node.parentNode && me.attach !== Control.prototype.attach) {
-		//	me.attach(me.node.parentNode, me.node.nextSibling);
-		//}
-
-		// 复制各个选项。
-		me.set(opt);
-	},
-
-	/**
-	 * xtype 。
-	 * @virtual
-	 */
-	xtype: "control"
-
-});
 /*********************************************************
  * Controls.Suggest.Picker
  ********************************************************/
@@ -9077,151 +9528,6 @@ var IToolTip = {
 
 
 
-/*********************************************************
- * Controls.Core.ContainerControl
- ********************************************************/
-/**
- * @author  xuld
- */
-
-/**
- * 所有容器控件的基类。
- * @abstract class 
- * @extends Control
- */
-var ContainerControl = Control.extend({
-	
-	// 基本属性
-	
-	tpl: '<div class="x-control">\
-			<div class="x-control-body"></div>\
-		</div>',
-		
-	headerTpl: '<div class="x-control-header"><h4></h4></div>',
-	
-	/**
-	 * 获取当前容器的标题部分。
-	 * @return {Control}
-	 */
-	header: function(){
-		return this.find('.x-' + this.xtype + '-header');
-	},
-	
-	/**
-	 * 获取当前容器的内容部分。
-	 * @getter {Control}
-	 */
-	body: function(){
-		return this.find('.x-' + this.xtype + '-body') || this;
-	},
-	
-	// 基本操作
-	
-	/**
-	 * 获取当前容器显示的标题。
-	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
-	 */
-	getTitle: function(valueAsText){
-		
-		// 获取 header 。
-		var header = this.header();
-		
-		// 如果存在 header， 最后一个节点即  title 标签 。
-		return header ? (header.last() || header)[valueAsText ? 'getText' : 'getHtml']() : null;
-	},
-	
-	/**
-	 * 设置当前容器显示的标题。
-	 * @param {String} value 要设置的标题。
-	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
-	 */
-	setTitle: function(value, valueAsText){
-		
-		// 获取 header 。
-		var header = this.header(), title;
-		
-		if(value === null){
-			header && header.remove();
-		} else {
-			
-            // 如果不存在标题，则创建一个。
-			if(!header){
-				header = this.prepend(this.headerTpl.replace(/control/g, this.xtype));
-			}
-			
-			// 获取或创建 title 。
-			title = header.last() || header;
-			
-			// 设置内容。
-			title[valueAsText ? 'setText' : 'setHtml'](value);
-			
-		}
-		return this;
-	},
-	
-	/**
-	 * 获取当前容器显示的内容。
-	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
-	 */
-	getContent: function(valueAsText){
-		
-		// 获取 body 。
-		// 获取 content 。
-		var body = this.body(), content = body.last();
-		
-		// 如果存在多个 content，使用 body 作为 content。
-		if (!content || content.prev()) {
-			content = body;
-		}
-		
-		// 获取实际的内容。
-		return content[valueAsText ? 'getText' : 'getHtml']();
-		
-	},
-	
-	/**
-	 * 设置当前容器显示的内容。
-	 * @param {String} value 要设置的标题。
-	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
-	 */
-	setContent: function(value, valueAsText){
-		
-		// 获取 body 。
-		var body = this.body(), 
-			contentClass = 'x-' + this.xtype + '-content', 
-			
-			// 获取 content 。
-			content = body.find(contentClass);
-
-	    // 如果不存在 content，则创建一个。
-		if (!content) {
-		    body.setHtml('<div class="' + contentClass + '"></div>');
-		    content = body.first();
-		}
-		
-		// 设置文本内容。
-		content[valueAsText ? 'setText' : 'setHtml'](value);
-		return this;
-		
-	},
-	
-	getText: function(){
-		return this.getContent(true);
-	},
-	
-	setText: function(value){
-		return this.setContent(value, true);
-	},
-	
-	getHtml: function(){
-		return this.getContent(false);
-	},
-	
-	setHtml: function(value){
-		return this.setContent(value, false);
-	}
-
-});
 /*********************************************************
  * Controls.Container.Panel
  ********************************************************/

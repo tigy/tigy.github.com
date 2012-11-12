@@ -18,7 +18,7 @@ var Dialog =  ContainerControl.extend({
 	
 	// 基本属性
 		
-	headerTpl: '<div class="x-control-header"><a class="x-dialog-close x-closebutton">×</a><h3></h3></div>',
+	headerTpl: '<div class="x-control-header"><a class="x-dialog-close x-closebutton">×</a><h4></h4></div>',
 	
 	onClosing: function () {
 		return this.trigger('closing');
