@@ -3,24 +3,21 @@
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
   border-width: 1px;
   border-style: solid;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
   display: inline-block;
   vertical-align: middle;
+  background-color: #fcf8e3;
+  border-color: #e9dbc3;
+  color: #c09853;
 }
 div.x-tipbox {
   display: block;
 }
-.x-tipbox,
-.x-tipbox-heading {
-  color: #c09853;
-}
-.x-tipbox .x-close {
-  position: relative;
-  top: -2px;
-  right: -21px;
-  line-height: 18px;
+.x-tipbox .x-closebutton {
+  font-size: 16px;
+  margin-left: 10px;
 }
 .x-tipbox-success,
 .x-tipbox-error,
@@ -34,11 +31,6 @@ div.x-tipbox {
   border-color: #b9d99d;
   color: #468847;
   background-image: url(../images/success.png);
-}
-.x-tipbox-warning {
-  background-color: #fcf8e3;
-  border-color: #e9dbc3;
-  color: #c09853;
 }
 .x-tipbox-error {
   background-color: #f2dede;

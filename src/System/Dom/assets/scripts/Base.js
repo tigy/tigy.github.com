@@ -1053,10 +1053,7 @@ using("System.Core.Base");
 	 	 * </pre>        
 		 */
 		parse: function(html, context, cachable) {
-
-			assert.notNull(html, 'Dom.parse(html, context, cachable): {html} ~');
-
-			return html.node ? html: new Dom(Dom.parseNode(html, context, cachable));
+		    return (html = Dom.parseNode(html, context, cachable)) ? html.nodeType ? new Dom(html) : html : null;
 		},
 
 		/**
@@ -1117,20 +1114,21 @@ using("System.Core.Base");
 		 * @return {Element/TextNode/DocumentFragment} 如果 HTML 是纯文本，返回 TextNode。如果 HTML 包含多个节点，返回 DocumentFragment 。否则返回 Element。
 	 	 * @static
 		 */
-		parseNode: function(html, context, cachable) {
+		parseNode: function (html, context, cachable) {
 
 			// 不是 html，直接返回。
 			if( typeof html === 'string') {
 
-				var srcHTML = html;
+			    var srcHTML = html;
+
+                // 仅缓存 512B 以内的 HTML 字符串。
+			    cachable = cachable !== false && srcHTML.length < 512;
+			    context = context && context.ownerDocument || document;
+
+			    assert(context.createElement, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
 
 				// 查找是否存在缓存。
-				html = cache[srcHTML];
-				context = context && context.ownerDocument || document;
-
-				assert(context.createElement, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
-
-				if(html && html.ownerDocument === context) {
+			    if (cachable && (html = cache[srcHTML]) && html.ownerDocument === context) {
 
 					// 复制并返回节点的副本。
 					html = html.cloneNode(true);
@@ -1138,8 +1136,7 @@ using("System.Core.Base");
 				} else {
 
 					// 测试查找 HTML 标签。
-					var tag = /<([\w:]+)/.exec(srcHTML);
-					cachable = cachable !== false;
+					var tag = /<([!\w:]+)/.exec(srcHTML);
 
 					if(tag) {
 
@@ -1173,11 +1170,20 @@ using("System.Core.Base");
 						if (html.previousSibling) {
 							wrap = html.parentNode;
 
-							assert(context.createDocumentFragment, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
-							html = context.createDocumentFragment();
-							while (wrap.firstChild) {
-								html.appendChild(wrap.firstChild);
+							//if (createDocumentFragment) {
+							//    assert(context.createDocumentFragment, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
+							//    html = context.createDocumentFragment();
+							//    while (wrap.firstChild) {
+							//        html.appendChild(wrap.firstChild);
+							//    }
+							//} else {
+							html = new DomList();
+							for (srcHTML = wrap.firstChild; srcHTML; srcHTML = srcHTML.nextSibling) {
+							    html.push(srcHTML);
 							}
+
+							cachable = false;
+							//}
 						} else {
 
 							// 删除用于创建节点的父 DIV 标签。
@@ -2114,7 +2120,7 @@ using("System.Core.Base");
 					
 				// .on(event, value)
 				} else if (/^on(\w+)/.test(key))
-					me.on(RegExp.$1, value);
+				    value && me.on(RegExp.$1, value);
 
 				// .setAttr(attr, value);
 				else
@@ -3346,8 +3352,18 @@ using("System.Core.Base");
 		}
 
 	}, function(value, key) {
-		dp[key] = function(html) {
-			html = Dom.parse(html, this);
+	    dp[key] = function (html) {
+
+	        html = Dom.parse(html, this);
+
+	        if (!html) {
+	            return html;
+	        } else if(html instanceof DomList){
+	            for (var i = 0; i < html.length; i++) {
+	                dp[key].call(this, html[i]);
+	            }
+	            return html;
+	        }
 
 			var scripts,
 				i = 0,
@@ -3365,7 +3381,7 @@ using("System.Core.Base");
 				if (!script.type || /\/(java|ecma)script/i.test(script.type)) {
 
 					if (script.src) {
-						assert(window.Ajax && Ajax.send, "必须载入 System.Request.Script 模块以支持动态执行 <script src=''>");
+						assert(window.Ajax && Ajax.send, "必须载入 System.Ajax.Script 模块以支持动态执行 <script src=''>");
 						Ajax.send({
 							url: script.src,
 							type: "GET",

@@ -1,5 +1,5 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/6 13:3
+ * This file is created by a tool at 2012/11/12 13:45
  *********************************************************
  * Contains: 
  *     System.Core.Base
@@ -16,7 +16,6 @@
  *     Controls.Form.CheckBox
  *     Controls.Form.RadioButton
  *     Controls.Form.TextBox
- *     Controls.Typography.Heading
  *     Controls.Core.IToolTip
  *     Controls.Core.ContainerControl
  *     Controls.Container.Panel
@@ -208,6 +207,7 @@
 			 * @param {String} targetProperty 要基于的属性名。
 			 * @param {String} setters=undefined 设置函数的方法名数组，用空格隔开。
 			 * @param {String} getters=undefined 获取函数的方法名数组，用空格隔开。
+             * @remark 使用此函数只能传递最多 3 个参数。
 			 * @example <pre>
 			 * MyClass.defineMethods('field', 'fn1 fn2 fn3');
 			 * </pre>
@@ -239,17 +239,20 @@
 				
 				// 最后使用 implement 添加成员。
 				return this.implement(Object.map(methods, function(fnName) {
-					return function() {
+				    return function (arg0, arg1, arg2) {
 						
 						// 获取实际调用的函数目标对象。
 						var target = propertyGetterFunc ? this[propertyGetterFunc]() : this[targetProperty],
 							r;
 							
 						assert(target, "#" + targetProperty + " 不能为空。");
-						assert(!target || Object.isFunction(target[fnName]), "#" + targetProperty + "." + fnName + "(): 不是函数。");
+						assert(!target || target[fnName], "#" + targetProperty + "." + fnName + "(): 不是函数。");
+
+						r = target[fnName];
 						
-						// 调用被代理的实际函数。
-						r = target[fnName].apply(target, arguments);
+				        // 调用被代理的实际函数。
+                        // 不能使用 .apply: IE 6/7 原生函数不是 function 。
+						r = r.apply ? r.apply(target, arguments) : r(arg0, arg1, arg2);
 						
 						// 如果不是 getter，返回 this 链式引用。
 						return target === r || r === undefined ? this : r;
@@ -761,45 +764,6 @@
 		}) : "";
 	};
 
-	/**
-	 * 将一个伪数组对象转为原生数组。
-	 * @param {Object} iterable 一个伪数组对象。
-	 * @param {Number} startIndex=0 转换开始的位置。
-	 * @return {Array} 返回新数组，其值和 *value* 一一对应。
-	 * @memberOf Array
-	 * @remark iterable 不支持原生的 DomList 对象。
-	 * @example
-	 * <pre>
-     * // 将 arguments 对象转为数组。
-     * Array.create(arguments); // 返回一个数组
-     *
-     * // 获取数组的子集。
-     * Array.create([4,6], 1); // [6]
-     *
-     * // 处理伪数组。
-     * Array.create({length: 1, "0": "value"}); // ["value"]
-     *
-     * </pre>
-	 */
-	Array.create = function (iterable, startIndex) {
-		// if(!iterable)
-		// return [];
-
-		// [DOM Object] 。
-		// if(iterable.item) {
-		// var r = [], len = iterable.length;
-		// for(startIndex = startIndex || 0; startIndex < len;
-		// startIndex++)
-		// r[startIndex] = iterable[startIndex];
-		// return r;
-		// }
-
-		assert(!iterable || toString.call(iterable) !== '[object HTMLCollection]' || typeof iterable.length !== 'number', 'Array.create(iterable, startIndex): {iterable} 不允许是 NodeList 。', iterable);
-
-		// 调用 slice 实现。
-		return iterable ? ap.slice.call(iterable, startIndex) : [];
-	};
-
 	/// #if CompactMode
 
 	/**
@@ -990,7 +954,7 @@
 			 * @type Boolean
 			 * @remark 就目前浏览器状况， IE6，7 中 isQuirks = true 其它浏览器都为 false 。
 			 */
-			isQuirks: !isStd && !Object.isObject(document.constructor),
+			isQuirks: !isStd && typeof document.constructor !== 'object',
 
 			/// #endif
 
@@ -1554,36 +1518,6 @@
 				this.push(value);
 			return exists;
 		},
-		
-		/// TODO: clear
-
-		/**
-		 * 将指定的 *value* 插入到当前数组的指定位置。
-		 * @param {Number} index 要插入的位置。索引从 0 开始。如果 *index* 大于数组的长度，则插入到末尾。
-		 * @param {Object} value 要插入的内容。
-		 * @return {Number} 返回实际插入到的位置。
-		 * @example
-		 * <pre>
-	     * ["I", "you"].insert(1, "love"); //   ["I", "love", "you"]
-	     * </pre>
-		 */
-		insert: function (index, value) {
-			assert.deprected("Array#insert 即将从 System.Core.Base 移除。要使用此函数，可引用 System.Utils.Array 组件。");
-			assert.isNumber(index, "Array#insert(index, value): {index} ~");
-			var me = this, tmp;
-			if (index < 0 || index >= me.length) {
-				me[index = me.length++] = value;
-			} else {
-				tmp = ap.slice.call(me, index);
-				me.length = index + 1;
-				this[index] = value;
-				ap.push.apply(me, tmp);
-			}
-			return index;
-
-		},
-		
-		/// TODO: clear
 
 		/**
 		 * 对当前数组的每个元素调用其指定属性名的函数，并将返回值放入新的数组返回。
@@ -3059,10 +2993,6 @@ function imports(namespace) {
 			constructor: function(node) {
 				assert.isNode(node, "Dom#constructor(node): {node} 必须是 DOM 节点。");
 				this.node = node;
-
-				/// TODO: clear
-				this.dom = node;
-				/// TODO: clear
 			},
 		
 			/**
@@ -3342,21 +3272,6 @@ function imports(namespace) {
 			preventDefault: function() {
 				this.returnValue = false;
 			},
-			
-			/// TODO: clear
-			
-			/**
-			 * 停止默认事件和冒泡。
-			 * @remark 此函数可以完全撤销事件。 事件处理函数中 return false 和调用 stop() 是不同的， return
-			 *         false 只会阻止当前事件其它函数执行， 而 stop() 只阻止事件冒泡和默认事件，不阻止当前事件其它函数。
-			 */
-			stop: function() {
-				assert.deprected('Dom.Event#stop() 已过时，请改用 return false 实现阻止事件。');
-				this.stopPropagation();
-				this.preventDefault();
-			},
-			
-			/// TODO: clear
 			
 			/**
 			 * 获取当前发生事件 Dom 对象。
@@ -4012,10 +3927,7 @@ function imports(namespace) {
 	 	 * </pre>        
 		 */
 		parse: function(html, context, cachable) {
-
-			assert.notNull(html, 'Dom.parse(html, context, cachable): {html} ~');
-
-			return html.node ? html: new Dom(Dom.parseNode(html, context, cachable));
+		    return (html = Dom.parseNode(html, context, cachable)) ? html.nodeType ? new Dom(html) : html : null;
 		},
 
 		/**
@@ -4076,20 +3988,21 @@ function imports(namespace) {
 		 * @return {Element/TextNode/DocumentFragment} 如果 HTML 是纯文本，返回 TextNode。如果 HTML 包含多个节点，返回 DocumentFragment 。否则返回 Element。
 	 	 * @static
 		 */
-		parseNode: function(html, context, cachable) {
+		parseNode: function (html, context, cachable) {
 
 			// 不是 html，直接返回。
 			if( typeof html === 'string') {
 
-				var srcHTML = html;
+			    var srcHTML = html;
+
+                // 仅缓存 512B 以内的 HTML 字符串。
+			    cachable = cachable !== false && srcHTML.length < 512;
+			    context = context && context.ownerDocument || document;
+
+			    assert(context.createElement, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
 
 				// 查找是否存在缓存。
-				html = cache[srcHTML];
-				context = context && context.ownerDocument || document;
-
-				assert(context.createElement, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
-
-				if(html && html.ownerDocument === context) {
+			    if (cachable && (html = cache[srcHTML]) && html.ownerDocument === context) {
 
 					// 复制并返回节点的副本。
 					html = html.cloneNode(true);
@@ -4097,8 +4010,7 @@ function imports(namespace) {
 				} else {
 
 					// 测试查找 HTML 标签。
-					var tag = /<([\w:]+)/.exec(srcHTML);
-					cachable = cachable !== false;
+					var tag = /<([!\w:]+)/.exec(srcHTML);
 
 					if(tag) {
 
@@ -4132,11 +4044,20 @@ function imports(namespace) {
 						if (html.previousSibling) {
 							wrap = html.parentNode;
 
-							assert(context.createDocumentFragment, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
-							html = context.createDocumentFragment();
-							while (wrap.firstChild) {
-								html.appendChild(wrap.firstChild);
+							//if (createDocumentFragment) {
+							//    assert(context.createDocumentFragment, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
+							//    html = context.createDocumentFragment();
+							//    while (wrap.firstChild) {
+							//        html.appendChild(wrap.firstChild);
+							//    }
+							//} else {
+							html = new DomList();
+							for (srcHTML = wrap.firstChild; srcHTML; srcHTML = srcHTML.nextSibling) {
+							    html.push(srcHTML);
 							}
+
+							cachable = false;
+							//}
 						} else {
 
 							// 删除用于创建节点的父 DIV 标签。
@@ -4189,15 +4110,6 @@ function imports(namespace) {
 			}
 			return match(elem, selector);
 		},
-		
-		/// TODO: clear
-		
-		hasChild: function(elem, child){
-			assert.deprected("Dom.hasChild 已过时，请改用 Dom.has");
-			return Dom.has(elem, child);
-		},
-		
-		/// TODO: clear
 
 		/**
 		 * 判断指定节点之后有无存在子节点。
@@ -4717,14 +4629,6 @@ function imports(namespace) {
 		implementIf: function(obj, listType) {
 			return this.implement(obj, listType, true);
 		},
-	
-		//// TODO: clear it
-		define: function(ctrl, target, setters, getters) {
-			assert.deprected("Dom.define(ctrl, target, setters, getters) 已过时，请使用 MyClass.defineMethods(target, methods)");
-
-			return ctrl.defineMethods(target, (setters + " " +  getters).trim());
-		},
-		//// TODO: clear it
 
 		/**
 		 * 表示事件的参数。
@@ -5090,7 +4994,7 @@ function imports(namespace) {
 					
 				// .on(event, value)
 				} else if (/^on(\w+)/.test(key))
-					me.on(RegExp.$1, value);
+				    value && me.on(RegExp.$1, value);
 
 				// .setAttr(attr, value);
 				else
@@ -6221,15 +6125,6 @@ function imports(namespace) {
 			return Dom.isHidden(this.node);
 		},
 		
-		/// TODO: clear
-		
-		hasChild: function(dom, allowSelf){
-			assert.deprected("Dom#hasChild 已过时，请改用 Dom#has");
-			return this.has(dom, allowSelf);
-		},
-		
-		/// TODO: clear
-		
 		/**
 		 * 判断一个节点是否有子节点。
 		 * @param {Dom} dom 子节点。
@@ -6331,8 +6226,18 @@ function imports(namespace) {
 		}
 
 	}, function(value, key) {
-		dp[key] = function(html) {
-			html = Dom.parse(html, this);
+	    dp[key] = function (html) {
+
+	        html = Dom.parse(html, this);
+
+	        if (!html) {
+	            return html;
+	        } else if(html instanceof DomList){
+	            for (var i = 0; i < html.length; i++) {
+	                dp[key].call(this, html[i]);
+	            }
+	            return html;
+	        }
 
 			var scripts,
 				i = 0,
@@ -6350,7 +6255,7 @@ function imports(namespace) {
 				if (!script.type || /\/(java|ecma)script/i.test(script.type)) {
 
 					if (script.src) {
-						assert(window.Ajax && Ajax.send, "必须载入 System.Request.Script 模块以支持动态执行 <script src=''>");
+						assert(window.Ajax && Ajax.send, "必须载入 System.Ajax.Script 模块以支持动态执行 <script src=''>");
 						Ajax.send({
 							url: script.src,
 							type: "GET",
@@ -6477,13 +6382,7 @@ function imports(namespace) {
 	/// #endif
 
 		domReady = 'DOMContentLoaded';
-		t = Event.prototype;
-		
-		/// TODO: clear
-		t.stop = ep.stop;
-		
-		/// TODO: clear
-		t.getTarget = ep.getTarget;
+		Event.prototype.getTarget = ep.getTarget;
 		
 	/// #if CompactMode
 	
@@ -6493,11 +6392,6 @@ function imports(namespace) {
 		
 		defaultEvent.initEvent = function (e) {
 			e.target = e.srcElement;
-		
-		/// TODO: clear
-			e.stop = ep.stop;
-		
-		/// TODO: clear
 			e.getTarget = ep.getTarget;
 			e.stopPropagation = ep.stopPropagation;
 			e.preventDefault = ep.preventDefault;
@@ -7697,10 +7591,18 @@ var IDropDownOwner = {
 	/**
 	 * 下拉菜单的宽度。
 	 * @config {String}
-	 * @defaultValue -1
-	 * @return 如果值为 'auto', 则和父容器有同样的宽度。如果设为 -1， 表示不处理宽度。
+	 * @defaultValue 'auto'
+	 * @return 如果值为 -1, 则和父容器有同样的宽度。如果设为 'auto'， 表示不处理宽度。
 	 */
-	dropDownWidth: -1,
+	dropDownWidth: 'auto',
+
+    /**
+	 * 下拉菜单的最小宽度。
+	 * @config {dropDownMinWidth}
+	 * @defaultValue 'auto'
+	 * @return 如果值为 -1, 则和父容器有同样的宽度。如果设为 0， 表示无。
+	 */
+    dropDownMinWidth: 100,
 	
 	onDropDownShow: function(){
 		this.trigger('dropdownshow');
@@ -7764,7 +7666,7 @@ var IDropDownOwner = {
 	            this.after(dom);
 
 	            // IE6/7 无法自动在父节点无 z-index 时处理 z-index 。
-	            if (navigator.isQuirks && dom.parent().getStyle('zIndex') === 0)
+	            if (navigator.isQuirks && dom.parent() && dom.parent().getStyle('zIndex') === 0)
 	                dom.parent().setStyle('zIndex', 1);
 	        }
 	    } else if (this.dropDown) {
@@ -7804,17 +7706,19 @@ var IDropDownOwner = {
 	        dropDown.show();
 	        this.realignDropDown(0, -1);
 
-	        var size = this.dropDownWidth;
-	        if (size === 'auto') {
-	            size = this.getSize().x;
+	        var width = this.dropDownWidth;
+	        if (width < 0) {
+	            width = this.getSize().x;
+
+	            var minWidth = Dom.styleNumber(dropDown.node, 'min-width') || this.dropDownMinWidth;
 
 	            // 不覆盖 min-width
-	            if (size < Dom.styleNumber(dropDown.node, 'min-width'))
-	                size = -1;
+	            if (width < minWidth)
+	                width = minWidth;
 	        }
 
-	        if (size >= 0) {
-	            dropDown.setSize(size);
+	        if (width !== 'auto') {
+	            dropDown.setSize(width);
 	        }
 
 	        this.onDropDownShow();
@@ -8106,7 +8010,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 			<a href="javascript:;" class="x-button">A</a>\
 		</span>',
 
-    menuButtonTpl: '<button class="x-button" type="button"><span class="x-button-menu"></span></button>',
+    menuButtonTpl: '<button class="x-button" type="button"><span class="x-menubutton-arrow"></span></button>',
 
     /**
 	 * 当前控件是否为下拉列表。
@@ -8116,7 +8020,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
     /**
 	 * 下拉框的宽度。
 	 */
-    dropDownWidth: 'auto',
+    dropDownWidth: -1,
 
     /**
 	 * @config dropDownList 是否允许用户输入自定义的文本值。
@@ -9013,10 +8917,6 @@ var RadioButton = Control.extend(IInput).implement({
  ********************************************************/
 /** * @author  xuld */var TextBox = Control.extend(IInput).implement({		xtype: 'textbox',		tpl: '<input type="text" class="x-control">'	});
 /*********************************************************
- * Controls.Typography.Heading
- ********************************************************/
-/** * @author  */
-/*********************************************************
  * Controls.Core.IToolTip
  ********************************************************/
 /**
@@ -9338,8 +9238,6 @@ var ContainerControl = Control.extend({
  */
 var Suggest = ComboBox.extend({
 	
-	dropDownWidth: 'auto',
-	
 	getSuggestItems: function(text){
 		if(!this.items){
 			this.items = [];
@@ -9440,7 +9338,7 @@ var Suggest = ComboBox.extend({
  ********************************************************/
 /**
  * @author xuld
- */
+ */
 
 /**
  * �����첽ִ������ʱ��֤�����Ǵ��еġ�
@@ -10581,7 +10479,7 @@ var MenuButton = Button.extend(IDropDownOwner).implement({
 	
 	xtype: 'menubutton',
 	
-	tpl: '<button class="x-button x-control" type="button"><span class="x-button-menu"></span></button>',
+	tpl: '<button class="x-button x-control" type="button"><span class="x-menubutton-arrow"></span></button>',
 	
 	createDropDown: function(existDom){
 		if(existDom && !existDom.hasClass('x-menu')){
@@ -10632,7 +10530,7 @@ var SplitButton = MenuButton.extend({
 	
 	tpl: '<span class="x-splitbutton x-buttongroup">\
 				<button class="x-button"></button>\
-				<button class="x-button"><span class="x-button-menu x-button-menu-down"></span></button>\
+				<button class="x-button"><span class="x-menubutton-arrow x-menubutton-arrow-down"></span></button>\
 			</span>',
 			
 	content: function(){
@@ -10673,7 +10571,7 @@ var SplitButton = MenuButton.extend({
 /*********************************************************
  * Controls.Nav.TreeView
  ********************************************************/
-/** * @author  *//** * 表示是 {@link TreeView} 中的一个节点。 */var TreeNode = TreeControl.Item.extend(ICollapsable).implement({		xtype: 'treenode',		tpl: '<a class="x-control"><span></span></a>',		/**	 * 当前树的深度。	 * @type {Integer}	 */	depth: 0,		/**	 * 获取当前用于折叠的容器对象。	 * @return {Control} 折叠的容器对象。	 * @protected override	 */	body: function () {		return this.subControl;	},		/**	 * 获取当前的文字对象。	 * @return {Control} 文字对象。	 * @protected override	 */	content: function(){		return this.last('span');	},		/**	 * 当被子类重写时，用于创建子树。	 * @param {TreeControl} treeControl 要初始化的子树。	 * @return {TreeControl} 新的 {@link TreeControl} 对象。	 * @protected override	 */	createSubControl: function(control){		return new TreeView(control).removeClass('x-treeview').addClass('x-treeview-subtree');	},		/**	 * 当被子类重写时，用于初始化子树。	 * @param {TreeControl} treeControl 要初始化的子树。	 * @protected override	 */	initSubControl: function(treeControl){		treeControl.depth = this.depth;	},		// 树节点的控制。		/**	 * 更新一个节点前面指定的占位符的类名。	 * @private	 */	_setSpan: function(depth, className){				this.each(function(node){			var first = node.first(depth).node;			if(first.tagName == 'SPAN')				first.className = className;			node._setSpan(depth, className);		});			},		_markAsLastNode: function(){		this.addClass('x-treenode-last');		this._setSpan(this.depth - 1, 'x-treenode-space x-treenode-none');	},		_clearMarkAsLastNode: function(){		this.removeClass('x-treenode-last');		this._setSpan(this.depth - 1, 'x-treenode-space');	},	/**	 * 获取当前节点的占位 span 。	 * @param {Integer} index 要获取的索引， 最靠近右的索引为 0 。	 * @protected	 */	span: function(index){		return this.content().prev(index);	},		/**	 * 由于子节点的改变刷新本节点和子节点状态。	 * @protected	 */	update: function(){				// 更新图标。		this.updateNodeType();				var last = this.subControl.item(-1), lastNode;				// 更新 lastNode		if(last){			lastNode = this._lastNode;			if (!lastNode || lastNode.node !== last.node) {				last._markAsLastNode();				this._lastNode = last;				if (lastNode) lastNode._clearMarkAsLastNode();			}		}			},		/**	 * 根据当前的节点情况更新当前节点的图标。	 * @protected	 */	updateNodeType: function(){		this.setNodeType(this.subControl && this.subControl.first() ? this.isCollapsed() ? 'plus' : 'minus' : 'normal');	},		/**	 * 获取一个值，该值指示当前节点是否为最后一个节点。	 * @return {Boolean}	 * @protected	 */	isLastNode: function(){		return this.parentNode &&  this.parentNode._lastNode === this;	},		onDblClick: function(e){		this.toggleCollapse();		e.preventDefault();		e.stopPropagation();	},		init: function(options){		this.unselectable();		this.on('dblclick', this.onDblClick, this);		// 绑定节点和控件，方便发生事件后，根据事件源得到控件。		this.dataField().control = this;	},		/**	 * 获取当前节点的图标。	 */	getNodeType: function(){		var span = this.span(0);		return span ? (/x-treenode-(.+)/.exec(span.node.className.replace(/\bx-treenode-space\b/, '')) || [0, "line"])[1] : null;	},		/**	 * 设置当前节点的图标。	 * @param {String} type 类型。肯能的值如： 'normal' 'plus' 'minus' 'none' 'loading' 'line'。	 * @return this	 */	setNodeType: function(type){		var span = this.span(0);		if(span) {			span.node.className = 'x-treenode-space x-treenode-' + type;		}		return this;	},		onCollapse: function(){	    this.updateNodeType();	    ICollapsable.onCollapse.call(this);	},		onExpanding: function(){		ICollapsable.onExpanding.call(this);		this.setNodeType(this.subControl && this.subControl.first() ? 'minus' : 'normal');		},		onExpand: function(){		if(this.subControl) {			this.subControl.node.style.height = 'auto';		}				ICollapsable.onExpand.call(this);	},		/**	 * 展开当前节点及子节点。	 * @param {Integer} duration 折叠动画使用的毫米数。	 * @param {Integer} maxDepth=0 最大折叠的深度。默认为 -1 表示全部折叠。	 * @return this	 */	expandAll: function(duration, maxDepth){		if (this.subControl && !(maxDepth === 0)) {			this.expand(duration);			this.invoke('expandAll', [duration, --maxDepth]);		}		return this;	},		/**	 * 折叠当前节点及子节点。	 * @param {Integer} duration 折叠动画使用的毫米数。	 * @param {Integer} maxDepth=0 最大折叠的深度。默认为 -1 表示全部折叠。	 * @return this	 */	collapseAll: function(duration, maxDepth){		if (this.subControl && !(maxDepth === 0)) {			this.invoke('collapseAll', [duration, --maxDepth]);			this.collapse(duration);		}		return this;	},		/**	 * 展开当前节点，但折叠指定深度以后的节点。	 */	collapseTo: function(depth, duration){		duration = duration === undefined ? 0 : duration;		depth = depth === undefined ? 1 : depth;				if(depth > 0){			this.expand(duration);		} else {			this.collapse(duration);		}				this.invoke('collapseTo', [--depth, duration]);	},		invoke: function(funcName, args){		if(this.subControl){			this.subControl.invoke(funcName, args);		}		return this;	},	/**	 * 获取当前节点的深度。	 * @return {Integer} 返回节点深度。	 */	getDepth: function(){		return this.depth;	},	/**	 * 设置当前节点的深度。	 * @param {Integer} value 要设置的深度。	 * @return this	 */	setDepth: function(value){				assert(value >= 0, "TreeNode#setDepth(value): {value} 必须是不小于 0 的整数", value);				var me = this,			currentDepth = me.depth, 			span,			current = me;				// 删除多余的占位符。				while(currentDepth > value){			me.removeChild(elem.first());			currentDepth--;		}			// 补上不够的占位符。				while(currentDepth < value){			me.prepend(Dom.createNode('span', 'x-treenode-space'));			currentDepth++;		}				// 更新深度。				me.depth = value;				// 绑定最后一个 span 的点击事件。				span = this.span(0);				if(currentDepth) {			span.un('click', this.onDblClick).on('click', this.onDblClick, this);		}				// 更新 spans 的 class 状态。				while((current = current.parentNode) && (span = span.prev())){			span.node.className = current.isLastNode() ? 'x-treenode-space x-treenode-none' : 'x-treenode-space';		}				me.updateNodeType();				// 对子节点设置深度+1		me.invoke('setDepth', [++value]);	},		getTreeView: function(){		var n = this;		while(n)			n = n.parentNode;				return n ? n.parentControl : null;	},		ensureVisible: function(duration){		var n = this;		while(n = n.parentNode) {			n.expand(duration);		}		//   this.scrollIntoView();				return this;	}});var TreeView = TreeControl.extend({		xtype: 'treeview',		depth: 0,		createTreeItem: function(childControl) {			    if (!(childControl instanceof TreeNode)) {	        // 保存原有 childControl 。	        var t = childControl;	        childControl = new TreeNode();	        childControl.content().append(t);					}				// 设置子节点的位置。		childControl.setDepth(this.depth + 1);				// 更新当前树的父节点。		if(this.owner){			this.owner.update();			childControl.parentNode = this.owner;		}		return childControl;	},	/**	 * 当用户点击一项时触发。	 */	onNodeClick: function (node) {		return this.trigger('nodeclick', node);	},		/**	 * 获取一个值，该值指示当前节点是否为最后一个节点。	 * @return {Boolean}	 * @protected	 */	isLastNode: function(){		return false;	},		init: function(){		// 根据已有的 DOM 结构初始化菜单。		TreeControl.prototype.init.call(this);				this.on('click', this.onClick);	},		invoke: function(funcName, args){		var subTree = this, c, target;		args = args || [];		for(var c = subTree.first(); c; c = c.next()){			target = c.dataField().item;			target[funcName].apply(target, args);		}		return this;	},		collapse: function(duration){		return this.invoke('collapse', [duration]);	},		collapseAll: function(duration){		return this.invoke('collapseAll', [duration]);	},		expand: function(duration){		return this.invoke('expand', [duration]);	},		expandAll: function(duration){		return this.invoke('expandAll', [duration]);	},		collapseTo: function(depth, duration){		return this.invoke('collapseTo', [--depth, duration]);	},		/**	 * 当一个选项被选中时触发。	 */	onSelect: function(node){		return this.trigger('select', node);	},		/**	 * 当选中的项被更新后触发。	 */	onChange: function (old, item){		return this.trigger('change', old);	},		/**	 * 点击时触发。	 */	onClick: function (e) {				var target = e.target;				if(/\bx-treenode-(minus|plus|loading)\b/.test(target.className))			return;				if((target = new Dom(target).closest('.x-treenode')) && (target = target.dataField().control) && !this.clickNode(target)){			e.stop();		}					},		/**	 * 模拟点击一项。	 */	clickNode: function(node){		if(this.onNodeClick(node)){			this.setSelectedNode(node);			return true;		}				return false;	},		setSelectedNode: function(node){				// 先反选当前选择项。		var old = this.getSelectedNode();		if(old)			old.state('selected', false);			if(this.onSelect(node) !== false){					// 更新选择项。			this.selectedNode = node;						if(node != null){				node.state('selected', true);			}					}					if(old !== node)			this.onChange(old, node);					return this;	},		getSelectedNode: function(){		return this.selectedNode;	}	});
+/** * @author  *//** * 表示是 {@link TreeView} 中的一个节点。 */var TreeNode = TreeControl.Item.extend(ICollapsable).implement({		xtype: 'treenode',		tpl: '<a class="x-control"><span></span></a>',		/**	 * 当前树的深度。	 * @type {Integer}	 */	depth: 0,		/**	 * 获取当前用于折叠的容器对象。	 * @return {Control} 折叠的容器对象。	 * @protected override	 */	body: function () {		return this.subControl;	},		/**	 * 获取当前的文字对象。	 * @return {Control} 文字对象。	 * @protected override	 */	content: function(){		return this.last('span');	},		/**	 * 当被子类重写时，用于创建子树。	 * @param {TreeControl} treeControl 要初始化的子树。	 * @return {TreeControl} 新的 {@link TreeControl} 对象。	 * @protected override	 */	createSubControl: function(control){		return new TreeView(control).removeClass('x-treeview').addClass('x-treeview-subtree');	},		/**	 * 当被子类重写时，用于初始化子树。	 * @param {TreeControl} treeControl 要初始化的子树。	 * @protected override	 */	initSubControl: function(treeControl){		treeControl.depth = this.depth;	},		// 树节点的控制。		/**	 * 更新一个节点前面指定的占位符的类名。	 * @private	 */	_setSpan: function(depth, className){				this.each(function(node){			var first = node.first(depth).node;			if(first.tagName == 'SPAN')				first.className = className;			node._setSpan(depth, className);		});			},		_markAsLastNode: function(){		this.addClass('x-treenode-last');		this._setSpan(this.depth - 1, 'x-treenode-space x-treenode-none');	},		_clearMarkAsLastNode: function(){		this.removeClass('x-treenode-last');		this._setSpan(this.depth - 1, 'x-treenode-space');	},	/**	 * 获取当前节点的占位 span 。	 * @param {Integer} index 要获取的索引， 最靠近右的索引为 0 。	 * @protected	 */	span: function(index){		return this.content().prev(index);	},		/**	 * 由于子节点的改变刷新本节点和子节点状态。	 * @protected	 */	update: function(){				// 更新图标。		this.updateNodeType();				var last = this.subControl.item(-1), lastNode;				// 更新 lastNode		if(last){			lastNode = this._lastNode;			if (!lastNode || lastNode.node !== last.node) {				last._markAsLastNode();				this._lastNode = last;				if (lastNode) lastNode._clearMarkAsLastNode();			}		}			},		/**	 * 根据当前的节点情况更新当前节点的图标。	 * @protected	 */	updateNodeType: function(){		this.setNodeType(this.subControl && this.subControl.first() ? this.isCollapsed() ? 'plus' : 'minus' : 'normal');	},		/**	 * 获取一个值，该值指示当前节点是否为最后一个节点。	 * @return {Boolean}	 * @protected	 */	isLastNode: function(){		return this.parentNode &&  this.parentNode._lastNode === this;	},		onDblClick: function(e){		this.toggleCollapse();		e.preventDefault();		e.stopPropagation();	},		init: function(options){		this.unselectable();		this.on('dblclick', this.onDblClick, this);		// 绑定节点和控件，方便发生事件后，根据事件源得到控件。		this.dataField().control = this;	},		/**	 * 获取当前节点的图标。	 */	getNodeType: function(){		var span = this.span(0);		return span ? (/x-treenode-(.+)/.exec(span.node.className.replace(/\bx-treenode-space\b/, '')) || [0, "line"])[1] : null;	},		/**	 * 设置当前节点的图标。	 * @param {String} type 类型。肯能的值如： 'normal' 'plus' 'minus' 'none' 'loading' 'line'。	 * @return this	 */	setNodeType: function(type){		var span = this.span(0);		if(span) {			span.node.className = 'x-treenode-space x-treenode-' + type;		}		return this;	},		onCollapse: function(){	    this.updateNodeType();	    ICollapsable.onCollapse.call(this);	},		onExpanding: function(){		ICollapsable.onExpanding.call(this);		this.setNodeType(this.subControl && this.subControl.first() ? 'minus' : 'normal');		},		onExpand: function(){		if(this.subControl) {			this.subControl.node.style.height = 'auto';		}				ICollapsable.onExpand.call(this);	},		/**	 * 展开当前节点及子节点。	 * @param {Integer} duration 折叠动画使用的毫米数。	 * @param {Integer} maxDepth=0 最大折叠的深度。默认为 -1 表示全部折叠。	 * @return this	 */	expandAll: function(duration, maxDepth){		if (this.subControl && !(maxDepth === 0)) {			this.expand(duration);			this.invoke('expandAll', [duration, --maxDepth]);		}		return this;	},		/**	 * 折叠当前节点及子节点。	 * @param {Integer} duration 折叠动画使用的毫米数。	 * @param {Integer} maxDepth=0 最大折叠的深度。默认为 -1 表示全部折叠。	 * @return this	 */	collapseAll: function(duration, maxDepth){		if (this.subControl && !(maxDepth === 0)) {			this.invoke('collapseAll', [duration, --maxDepth]);			this.collapse(duration);		}		return this;	},		/**	 * 展开当前节点，但折叠指定深度以后的节点。	 */	collapseTo: function(depth, duration){		duration = duration === undefined ? 0 : duration;		depth = depth === undefined ? 1 : depth;				if(depth > 0){			this.expand(duration);		} else {			this.collapse(duration);		}				this.invoke('collapseTo', [--depth, duration]);	},		invoke: function(funcName, args){		if(this.subControl){			this.subControl.invoke(funcName, args);		}		return this;	},	/**	 * 获取当前节点的深度。	 * @return {Integer} 返回节点深度。	 */	getDepth: function(){		return this.depth;	},	/**	 * 设置当前节点的深度。	 * @param {Integer} value 要设置的深度。	 * @return this	 */	setDepth: function(value){				assert(value >= 0, "TreeNode#setDepth(value): {value} 必须是不小于 0 的整数", value);				var me = this,			currentDepth = me.depth, 			span,			current = me;				// 删除多余的占位符。				while(currentDepth > value){			me.removeChild(elem.first());			currentDepth--;		}			// 补上不够的占位符。				while(currentDepth < value){			me.prepend(Dom.createNode('span', 'x-treenode-space'));			currentDepth++;		}				// 更新深度。				me.depth = value;				// 绑定最后一个 span 的点击事件。				span = this.span(0);				if(currentDepth) {			span.un('click', this.onDblClick).on('click', this.onDblClick, this);		}				// 更新 spans 的 class 状态。				while((current = current.parentNode) && (span = span.prev())){			span.node.className = current.isLastNode() ? 'x-treenode-space x-treenode-none' : 'x-treenode-space';		}				me.updateNodeType();				// 对子节点设置深度+1		me.invoke('setDepth', [++value]);	},		getTreeView: function(){		var n = this;		while(n)			n = n.parentNode;				return n ? n.parentControl : null;	},		ensureVisible: function(duration){		var n = this;		while(n = n.parentNode) {			n.expand(duration);		}		//   this.scrollIntoView();				return this;	}});var TreeView = TreeControl.extend({		xtype: 'treeview',		depth: 0,		createTreeItem: function(childControl) {			    if (!(childControl instanceof TreeNode)) {	        // 保存原有 childControl 。	        var t = childControl;	        childControl = new TreeNode();	        childControl.content().append(t);					}				// 设置子节点的位置。		childControl.setDepth(this.depth + 1);				// 更新当前树的父节点。		if(this.owner){			this.owner.update();			childControl.parentNode = this.owner;		}		return childControl;	},	/**	 * 当用户点击一项时触发。	 */	onNodeClick: function (node) {		return this.trigger('nodeclick', node);	},		/**	 * 获取一个值，该值指示当前节点是否为最后一个节点。	 * @return {Boolean}	 * @protected	 */	isLastNode: function(){		return false;	},		init: function(){		// 根据已有的 DOM 结构初始化菜单。		TreeControl.prototype.init.call(this);				this.on('click', this.onClick);	},		invoke: function(funcName, args){		var subTree = this, c, target;		args = args || [];		for(var c = subTree.first(); c; c = c.next()){			target = c.dataField().item;			target[funcName].apply(target, args);		}		return this;	},		collapse: function(duration){		return this.invoke('collapse', [duration]);	},		collapseAll: function(duration){		return this.invoke('collapseAll', [duration]);	},		expand: function(duration){		return this.invoke('expand', [duration]);	},		expandAll: function(duration){		return this.invoke('expandAll', [duration]);	},		collapseTo: function(depth, duration){		return this.invoke('collapseTo', [--depth, duration]);	},		/**	 * 当一个选项被选中时触发。	 */	onSelect: function(node){		return this.trigger('select', node);	},		/**	 * 当选中的项被更新后触发。	 */	onChange: function (old, item){		return this.trigger('change', old);	},		/**	 * 点击时触发。	 */	onClick: function (e) {				var target = e.target;				if(/\bx-treenode-(minus|plus|loading)\b/.test(target.className))			return;				if((target = new Dom(target).closest('.x-treenode')) && (target = target.dataField().control) && !this.clickNode(target)){		    return false;		}					},		/**	 * 模拟点击一项。	 */	clickNode: function(node){		if(this.onNodeClick(node)){			this.setSelectedNode(node);			return true;		}				return false;	},		setSelectedNode: function(node){				// 先反选当前选择项。		var old = this.getSelectedNode();		if(old)			old.state('selected', false);			if(this.onSelect(node) !== false){					// 更新选择项。			this.selectedNode = node;						if(node != null){				node.state('selected', true);			}					}					if(old !== node)			this.onChange(old, node);					return this;	},		getSelectedNode: function(){		return this.selectedNode;	}	});
 /*********************************************************
  * Controls.Menu.Menu
  ********************************************************/
@@ -10708,7 +10606,7 @@ var MenuItem = TreeControl.Item.extend({
 	initSubControl: function(treeControl){
 		treeControl.hide();
 		treeControl.floating = false;
-		this.addClass('x-menuitem-submenu');
+		this.prepend('<i class="x-menuitem-arrow"></i>');
 		this.on('mouseup', this._cancelHideMenu);
 	},
 	
@@ -10719,7 +10617,7 @@ var MenuItem = TreeControl.Item.extend({
 	 */
 	uninitSubControl: function(treeControl){
 		treeControl.floating = true;
-		this.removeClass('x-menuitem-submenu');
+		this.remove('x-menuitem-arrow');
 		this.un('mouseup', this._cancelHideMenu);
 	},
 
