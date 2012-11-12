@@ -132,10 +132,10 @@ test("Dom.prototype.setAttr", function() {
 	equal( document.getElementById("text1").readOnly, false, "Set readonly attribute" );
 	equal(Dom.get("text1").getAttr("readonly"), false, "Set readonly attribute");
 
-	Dom.get("check2").dom.checked = true;
+	Dom.get("check2").node.checked = true;
 	equal( document.getElementById("check2").checked, true, "Set checked attribute" );
 	equal(Dom.get("check2").getAttr("checked"), true, "Set checked attribute");
-	Dom.get("check2").dom.checked = false;
+	Dom.get("check2").node.checked = false;
 	equal( document.getElementById("check2").checked, false, "Set checked attribute" );
 	equal(Dom.get("check2").getAttr("checked"), false, "Set checked attribute");
 	
@@ -143,11 +143,11 @@ test("Dom.prototype.setAttr", function() {
 	equal( document.getElementById("check2").checked, true, "Set checked attribute with 'checked'" );
 	equal(Dom.get("check2").getAttr("checked"), true, "Set checked attribute");
 	
-	Dom.get("text1").dom.readOnly = true;
+	Dom.get("text1").node.readOnly = true;
 	equal( document.getElementById("text1").readOnly, true, "Set readonly attribute" );
 	equal(Dom.get("text1").getAttr("readOnly"), true, "Set readonly attribute");
 	
-	Dom.get("text1").dom.readOnly = false;
+	Dom.get("text1").node.readOnly = false;
 	equal( document.getElementById("text1").readOnly, false, "Set readonly attribute" );
 	equal(Dom.get("text1").getAttr("readOnly"), false, "Set readonly attribute");
 	
@@ -197,7 +197,7 @@ test("Dom.prototype.setAttr", function() {
 	//    td.setAttr("colspan", "2");
 	//    equal( td.colSpan, 2, "Check colspan is correctly set" );
 	table.setAttr("cellspacing", "2");
-	equal( table.dom.cellSpacing, "2", "Check cellspacing is correctly set" );
+	equal( table.node.cellSpacing, "2", "Check cellspacing is correctly set" );
 	equal( Dom.get("area1").getAttr("value"), "foobar", "Value attribute retrieves the property for backwards compatibility." );
 
 	// for #1070
@@ -258,7 +258,7 @@ test("Dom.prototype.setAttr", function() {
 		+ "<circle cx='200' cy='200' r='150' />"
 	+ "</svg>");
 	
-	if($svg.first().dom.tagName == "SVG"){
+	if($svg.first().node.tagName == "SVG"){
 		$svg = $svg.first(); 	
 	}
 	
@@ -283,14 +283,14 @@ test("Dom.prototype.set", function(){
 
 	// one at a time
 	elem.set({innerHTML: "foo"});
-	equal( elem.dom.innerHTML, "foo", "set(innerHTML)");
+	equal( elem.node.innerHTML, "foo", "set(innerHTML)");
 
 	
 	elem.set({style: "color: red"});
-	ok( /^(#ff0000|red)$/i.test(elem.dom.style.color), "set(css)");
+	ok( /^(#ff0000|red)$/i.test(elem.node.style.color), "set(css)");
 
 	elem.set({height: 10});
-	equal( elem.dom.style.height, "10px", "set(height)");
+	equal( elem.node.style.height, "10px", "set(height)");
 
 	// Multiple attributes
 
@@ -299,9 +299,9 @@ test("Dom.prototype.set", function(){
 		width:10
 	});
 
-	equal( elem.dom.style.width, "10px", "set({...})");
-	equal( elem.dom.style.paddingLeft, "1px", "set({...})");
-	equal( elem.dom.style.paddingRight, "1px", "set({...})");
+	equal( elem.node.style.width, "10px", "set({...})");
+	equal( elem.node.style.paddingLeft, "1px", "set({...})");
+	equal( elem.node.style.paddingRight, "1px", "set({...})");
 });
 
 test("Dom.prototype.getAttr('tabindex')", function() {
@@ -368,7 +368,7 @@ test("Dom.prototype.setAttr(String, null)", function() {
 	equal( Dom.query("#foo").setAttr("style", "position:absolute;").setAttr("style", null).getAttr("style"), undefined, "Check removing style attribute" );
 	equal( Dom.query("#form").setAttr("style", "position:absolute;").setAttr("style", null).getAttr("style"), undefined, "Check removing style attribute on a form" );
 	equal(Dom.parse("<div style='position: absolute'></div>").appendTo("foo").setAttr("style", null).node.style.cssText, "", "Check removing style attribute (#9699 Webkit)");
-	equal( Dom.find("#fx-test-group").setAttr("height", "3px").setAttr("height", null).dom.style.height, "1px", "Removing height attribute has no effect on height set with style attribute" );
+	equal( Dom.find("#fx-test-group").setAttr("height", "3px").setAttr("height", null).node.style.height, "1px", "Removing height attribute has no effect on height set with style attribute" );
 
 	Dom.query("#check1").setAttr("checked", null).setAttr("checked", true).setAttr("checked", null);
 	equal( document.getElementById("check1").checked, false, "removeAttr sets boolean properties to false" );
@@ -423,7 +423,7 @@ test("setText(select) after form.reset()", function() {
 
 	document.kk.reset();
 
-	equal( Dom.get("kkk").dom.value, "cf", "Check value of select after form reset." );
+	equal( Dom.get("kkk").node.value, "cf", "Check value of select after form reset." );
 	equal( Dom.get("kkk").getText(), "cf", "Check value of select after form reset." );
 
 	// re-verify the multi-select is not broken (after form.reset) by our fix for single-select
@@ -537,20 +537,20 @@ test("Dom.prototype.toggleClass", function() {
 
 	// toggleClass storage
 	// e.toggleClass(true);
-	// ok( e.dom.className === "", "Assert class is empty (data was empty)" );
+	// ok( e.node.className === "", "Assert class is empty (data was empty)" );
 	e.addClass("testD testE");
 	ok( e.hasClass("testD") && e.hasClass("testE"), "Assert class present" );
-	//e.toggleClass(e.dom.className);
+	//e.toggleClass(e.node.className);
 	//ok( !e.hasClass("testD") || !e.hasClass("testE"), "Assert class not present" );
-	//e.toggleClass(e.dom.className);
+	//e.toggleClass(e.node.className);
 	//ok( e.hasClass("testD") && e.hasClass("testE"), "Assert class present (restored from data)" );
-	//e.toggleClass(e.dom.className, false);
+	//e.toggleClass(e.node.className, false);
 	//ok( !e.hasClass("testD") || !e.hasClass("testE"), "Assert class not present" );
-	//e.toggleClass(e.dom.className, true);
+	//e.toggleClass(e.node.className, true);
 	//ok( e.hasClass("testD") && e.hasClass("testE"), "Assert class present (restored from data)" );
-	//e.toggleClass(e.dom.className);
-	//e.toggleClass(e.dom.className, false);
-	//e.toggleClass(e.dom.className);
+	//e.toggleClass(e.node.className);
+	//e.toggleClass(e.node.className, false);
+	//e.toggleClass(e.node.className);
 	//ok( e.hasClass("testD") && e.hasClass("testE"), "Assert class present (restored from data)" );
 
 	// Cleanup
@@ -562,17 +562,17 @@ test("addClass, removeClass, hasClass", function() {
 	var x = Dom.parse("<p>Hi</p>");
 
 	x.addClass("hi");
-	equal( x.dom.className, "hi", "Check single added class" );
+	equal( x.node.className, "hi", "Check single added class" );
 
 	x.addClass("foo bar");
-	equal( x.dom.className, "hi foo bar", "Check more added classes" );
+	equal( x.node.className, "hi foo bar", "Check more added classes" );
 
 	x.removeClass();
-	equal( x.dom.className, "", "Remove all classes" );
+	equal( x.node.className, "", "Remove all classes" );
 
 	x.addClass("hi foo bar");
 	x.removeClass("foo");
-	equal( x.dom.className, "hi bar", "Check removal of one class" );
+	equal( x.node.className, "hi bar", "Check removal of one class" );
 
 	ok( x.hasClass("hi"), "Check has1" );
 	ok( x.hasClass("bar"), "Check has2" );

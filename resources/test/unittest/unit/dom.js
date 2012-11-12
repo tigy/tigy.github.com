@@ -6,7 +6,7 @@ test("基本坏境", function () {
 	ok(Dom.get, "Dom.get");
 
 	var el = new Dom(document);
-	equal(el.dom, document, "dom 属性");
+	equal(el.node, document, "node 属性");
 });
 
 test("DomList", function () {
@@ -41,40 +41,40 @@ test("DomList", function () {
 	}
 	ok(pass, "each() 执行");
 
-	equal(el.item(-1).dom, el[el.length - 1], "item(-1) 返回最后的节点。");
+	equal(el.item(-1).node, el[el.length - 1], "item(-1) 返回最后的节点。");
 });
 
 test("Dom.get", function () {
 	Dom.parse('<div id="a"></div>').appendTo("qunit-fixture");
 	var el = Dom.get('a');
-	equal(el.dom.tagName, 'DIV', "成功创建");
+	equal(el.node.tagName, 'DIV', "成功创建");
 	equal(el.append, Dom.prototype.append, "包括 Dom 方法");
 });
 
 test("Dom.parse", function() {
 	var elem = Dom.parse("<div/><hr/><code/><b/>");
-	equal( elem.dom.childNodes.length, 4, "节点个数" );
+	equal( elem.length, 4, "节点个数" );
 
 	for ( var i = 0; i < 3; ++i ) {
 		elem = Dom.parse("<input type='text' value='TEST' />");
 	}
-	equal( elem.dom.value, "TEST", "默认值" );
+	equal( elem.node.value, "TEST", "默认值" );
 
 	elem.remove();
 
-	equal( Dom.parse(" <div/> ").dom.tagName, 'DIV', "确保空白被删除" );
-	equal( Dom.parse(" a<div/>b ").dom.childNodes.length, 3, "确保空白被删除" );
+	equal( Dom.parse(" <div/> ").node.tagName, 'DIV', "确保空白被删除" );
+	equal( Dom.parse(" a<div/>b ").length, 3, "确保空白被删除" );
 
 	var long1 = "";
 	for ( var i = 0; i < 128; i++ ) {
 		long1 += "12345678";
 	}
 
-	equal( Dom.parse(" <div/> ").dom.tagName, 'DIV', "确保空白被删除" );
-	equal( Dom.parse(" a<div/>b ").dom.childNodes.length, 3, "确保空白被删除" );
+	equal( Dom.parse(" <div/> ").node.tagName, 'DIV', "确保空白被删除" );
+	equal( Dom.parse(" a<div/>b ").length, 3, "确保空白被删除" );
 
 	// Test multi-line HTML
-	var div = Dom.parse("<div>\r\nsome text\n<p>some p</p>\nmore text\r\n</div>").dom;
+	var div = Dom.parse("<div>\r\nsome text\n<p>some p</p>\nmore text\r\n</div>").node;
 	equal( div.nodeName.toUpperCase(), "DIV", "Make sure we're getting a div." );
 	equal( div.firstChild.nodeType, 3, "Text node." );
 	equal( div.lastChild.nodeType, 3, "Text node." );
@@ -86,13 +86,13 @@ test("Dom.parse", function() {
 
 	//  ok( Element.parse("<input/>").setAttr("type", "hidden"), "Create an input and set the type." );
 
-	var j = Dom.parse("<span>hi</span> there <!-- mon ami -->").dom;
-	ok( j.childNodes.length >= 2, "Check node,textnode,comment creation (some browsers delete comments)" );
+	var j = Dom.parse("<span>hi</span> there <!-- mon ami -->");
+	ok( j.length >= 2, "Check node,textnode,comment creation (some browsers delete comments)" );
 
-	ok( !Dom.parse("<option>test</option>").dom.selected, "Make sure that options are auto-selected" );
+	ok( !Dom.parse("<option>test</option>").node.selected, "Make sure that options are auto-selected" );
 
-	ok( Dom.parse("<div></div>").dom, "Create a div with closing tag." );
-	ok( Dom.parse("<table></table>").dom, "Create a table with closing tag." );
+	ok( Dom.parse("<div></div>").node, "Create a div with closing tag." );
+	ok( Dom.parse("<table></table>").node, "Create a table with closing tag." );
 
 	// Test very large html string
 	var i;
@@ -102,20 +102,20 @@ test("Dom.parse", function() {
 		html.push(li);
 	}
 	html.push("</ul>");
-	html = Dom.parse(html.join("")).dom;
+	html = Dom.parse(html.join("")).node;
 	equal( html.nodeName.toUpperCase(), "UL");
 	equal( html.firstChild.nodeName.toUpperCase(), "LI");
 	equal( html.childNodes.length, 50000 );
 	
 	
-	var div = Dom.parse("<div/>").dom;
-	var span = Dom.parse("<span/>", div).dom;
+	var div = Dom.parse("<div/>").node;
+	var span = Dom.parse("<span/>", div).node;
 	equal(span.tagName, 'SPAN', "Verify a span created with a div context works");
 
 });
 
 test("Dom.create",  function() {
 	var el = Dom.create('div');
-	equal(el.dom.tagName, 'DIV', "成功创建");
+	equal(el.node.tagName, 'DIV', "成功创建");
 	equal(el.append, Dom.prototype.append, "包括 Element 方法");
 });
