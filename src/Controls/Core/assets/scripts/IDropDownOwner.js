@@ -29,9 +29,10 @@ var IDropDownOwner = {
 
     /**
 	 * 下拉菜单的最小宽度。
-	 * @config {dropDownMinWidth}
+	 * @config {Integer}
 	 * @defaultValue 100
 	 * @return 如果值为 Infinity, 则表示不限制最小宽度。
+	 * @remark 也可以通过 css 的 min-width 属性设置此值。
 	 */
     dropDownMinWidth: 100,
 
@@ -52,17 +53,17 @@ var IDropDownOwner = {
 	},
 
     /**
-	 * 当被子类重写时，根据一个已有的节点创建新的下拉菜单示例。
+	 * 当被子类重写时，根据一个已有的节点初始化新的下拉菜单示例。
      * @param {Dom} existDom=null 一个被认为是下拉菜单的原始 DOM 节点。如果不存在这个节点，则值为 null。
 	 * @return {Dom}
      * @protected virtual
 	 */
-	createDropDown: function (existDom) {
+	initDropDown: function (existDom) {
 	    return existDom;
 	},
 
 	attach: function (parentNode, refNode) {
-	    if (this.dropDown && !this.dropDown.parent('body')) {
+	    if (this.dropDown && !this.dropDown.closest('body')) {
 	        this.dropDown.attach(parentNode, refNode);
 	    }
 	    Dom.prototype.attach.call(this, parentNode, refNode);
@@ -81,22 +82,7 @@ var IDropDownOwner = {
      * @protected virtual
 	 */
 	getDropDown: function () {
-	    var dropDown = this.dropDown;
-
-        // 如果未指定下拉菜单，则查找。
-	    if (!dropDown) {
-
-            /// TODO: 改进 next() 实现
-	        // 如果紧跟了一个 .x-dropdown 的节点，这个节点将被作为下拉菜单被初始化。
-	        dropDown = this.next();
-	        if (dropDown && !dropDown.hasClass('x-dropdown')) {
-	            dropDown = null;
-	        }
-
-	        this.dropDown = dropDown = this.createDropDown(dropDown);
-	    }
-	    
-	    return dropDown;
+	    return this.dropDown || (this.dropDown = this.initDropDown(this.next('.x-dropdown')));
 	},
 
     /**
@@ -116,7 +102,7 @@ var IDropDownOwner = {
 	        this.dropDown = dom.addClass('x-dropdown').hide();
 
 	        // 如果下拉菜单未添加到 DOM 树，则添加到当前节点后。
-	        if (!dom.parent('body')) {
+	        if (!dom.closest('body')) {
 
                 // 添加下拉菜单到 DOM 树。
 	            this.after(dom);
@@ -139,16 +125,6 @@ var IDropDownOwner = {
 	    return this.dropDown && Dom.isHidden(this.dropDown.node);
 	},
 
-    /**
-     * 重对齐当前下拉菜单。
-     * @return {Dom} 
-     * @public virtual
-     */
-	realignDropDown: function (offsetX, offsetY) {
-	    this.dropDown.align(this, 'bl', offsetX, offsetY);
-	    return this;
-	},
-
 	toggleDropDown: function (e) {
 
 	    // 如果是因为 DOM 事件而切换菜单，则测试是否为 disabled 状态。
@@ -168,7 +144,11 @@ var IDropDownOwner = {
         // 如果下拉菜单被隐藏，则先重设大小、定位。
 	    if (this.dropDownHidden()) {
 	        dropDown.show();
-	        this.realignDropDown(0, -1);
+	        
+	        // 重新设置位置。
+	        dropDown.align(this, 'bl', 0, -1);
+	        
+	        // 重新修改宽度。
 
 	        var width = this.dropDownWidth;
 	        if (width < 0) {

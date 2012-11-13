@@ -82,7 +82,7 @@ var Suggest = ComboBox.extend({
 	
 	init: function(options){
 		
-		var suggest = this.createDropDown().addClass('x-suggest');
+		var suggest = this.initDropDown().addClass('x-suggest');
 		
 		// UI 上增加一个下拉框。
 		this.setDropDown(suggest);

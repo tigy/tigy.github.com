@@ -3688,7 +3688,7 @@ if (typeof module !== 'object') {
 
             //},
 
-            createDropDown: function (id) {
+            initDropDown: function (id) {
                 var dropDown = document.createElement('div');
                 dropDown.id = id;
                 document.getElementById('demo-toolbar').appendChild(dropDown);
@@ -3823,7 +3823,7 @@ if (typeof module !== 'object') {
                     var dropDown = document.getElementById(id);
 
                     if (!dropDown) {
-                        dropDown = Demo.System.createDropDown(id);
+                        dropDown = Demo.System.initDropDown(id);
                     }
 
                     // 如果移到了菜单上，则停止关闭菜单的计时器。

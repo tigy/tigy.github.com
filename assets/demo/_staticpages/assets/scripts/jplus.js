@@ -11513,7 +11513,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 		if(elem && !elem.hasClass('x-dropdown')) {
 			elem = null;
 		}
-		this.setDropDown(this.createDropDown(elem));
+		this.setDropDown(this.initDropDown(elem));
 		
 		// 设置菜单显示的事件。
 		(this.dropDownList ? this : this.button()).on('click', this.toggleDropDown, this);
@@ -11571,7 +11571,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 	 * 创建当前 Picker 的菜单。
 	 * @return {Control} 下拉菜单。
 	 */
-	createDropDown: function(existDom){
+	initDropDown: function(existDom){
 		return existDom || Dom.parse('<div/>');
 	},
 	
@@ -12661,7 +12661,7 @@ var ComboBox = Picker.extend({
 	 * @return {Control} 下拉菜单。
 	 * @protected virtual
 	 */
-	createDropDown: function(existDom){
+	initDropDown: function(existDom){
 		return new ComboBox.DropDownMenu(existDom);
 	},
 	
@@ -13121,7 +13121,7 @@ var Suggest = ComboBox.extend({
 	
 	init: function(options){
 		
-		var suggest = this.createDropDown().addClass('x-suggest');
+		var suggest = this.initDropDown().addClass('x-suggest');
 		
 		// UI 上增加一个下拉框。
 		this.setDropDown(suggest);

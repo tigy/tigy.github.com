@@ -9468,7 +9468,7 @@ var IDropDownOwner = {
 		this.trigger('dropdownhide');
 	},
 
-	createDropDown: function (existDom) {
+	initDropDown: function (existDom) {
 	    return existDom;
 	},
 	
@@ -9485,7 +9485,7 @@ var IDropDownOwner = {
 	            dropDown = null;
 	        }
 
-	        this.dropDown = this.createDropDown(dropDown);
+	        this.dropDown = this.initDropDown(dropDown);
 	    }
 	    
 	    return this.dropDown;
@@ -9776,7 +9776,7 @@ var MenuButton = Button.extend(IDropDownOwner).implement({
 	
 	tpl: '<button class="x-button x-control" type="button"><span class="x-button-menu"></span></button>',
 	
-	createDropDown: function(existDom){
+	initDropDown: function(existDom){
 		if(existDom && !existDom.hasClass('x-menu')){
 			return existDom;
 		}
@@ -10064,7 +10064,7 @@ var ComboBox = Picker.extend({
 	 * @return {Control} 下拉菜单。
 	 * @protected virtual
 	 */
-    createDropDown: function(existDom){
+    initDropDown: function(existDom){
         return new ComboBox.DropDownMenu(existDom);
     },
 	
@@ -10404,7 +10404,7 @@ var Suggest = ComboBox.extend({
 	
 	init: function(options){
 		
-		var suggest = this.createDropDown().addClass('x-suggest');
+		var suggest = this.initDropDown().addClass('x-suggest');
 		
 		// UI 上增加一个下拉框。
 		this.setDropDown(suggest);

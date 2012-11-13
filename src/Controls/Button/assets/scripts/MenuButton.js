@@ -16,7 +16,7 @@ var MenuButton = Button.extend(IDropDownOwner).implement({
 	
 	tpl: '<button class="x-button x-control" type="button"><span class="x-menubutton-arrow"></span></button>',
 	
-	createDropDown: function(existDom){
+	initDropDown: function(existDom){
 		if(existDom && !existDom.hasClass('x-menu')){
 			return existDom;
 		}

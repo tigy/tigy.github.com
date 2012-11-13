@@ -2901,18 +2901,29 @@ using("System.Core.Base");
 		 */
 		child: function(index) {
 			
-			assert.isNumber(index, 'Dom#child(index): {index} ~');
+			//assert(typeof index === 'function' || typeof index === 'number' || typeof index === 'string' , 'Dom#child(index): {index} 必须是函数、数字或字符串。');
 			
-			var firstOrLast = 'first';
+			var first = 'firstChild',
+				next = 'nextSibling',
+				isNumber = typeof index === 'number';
 			
 			if(index < 0){
 				index = ~index;
-				firstOrLast = 'last';
+				first = 'lastChild';
+				next = 'previousSibling';
 			}
 			
-			return this[firstOrLast](function(){
-				return index-- >= 0;
-			});
+			first = this.node[first];
+			
+			while(first){
+				if(first.nodeType === 1 && (isNumber ? index-- <= 0 : quickMatch(first, index))){
+					return new Dom(first);
+				}
+				
+				first = first[next];
+			}
+			
+			return null;
 		},
 
 		/**

@@ -216,7 +216,7 @@ var Menu = TreeControl.extend({
 	showAt: function(x, y) {
 		
 		// 确保菜单已添加到文档内。
-		if (!this.parent('body')) {
+		if (!this.closest('body')) {
 			this.appendTo();
 		}
 
@@ -235,7 +235,7 @@ var Menu = TreeControl.extend({
 	showBy: function(ctrl, pos, offsetX, offsetY, enableReset) {
 
 		// 确保菜单已添加到文档内。
-		if (!this.parent('body')) {
+		if (!this.closest('body')) {
 			this.appendTo(ctrl.parent());
 		}
 

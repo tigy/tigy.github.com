@@ -130,7 +130,7 @@ var ComboBox = Picker.extend({
 	 * @return {Control} 下拉菜单。
 	 * @protected virtual
 	 */
-    createDropDown: function(existDom){
+    initDropDown: function(existDom){
         return new ComboBox.DropDownMenu(existDom);
     },
 	

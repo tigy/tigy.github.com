@@ -122,7 +122,7 @@ var Dialog =  ContainerControl.extend({
 
 	show: function(){
 		
-		if(!this.parent('body')){
+		if(!this.closest('body')){
 			this.appendTo();	
 		}
 		
