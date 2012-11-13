@@ -3519,7 +3519,7 @@ using("System.Core.Base");
 	}
 
 	// document 函数。
-	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize first last parent child children has', function (fnName) {
+	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize has', function (fnName) {
 		document[fnName] = dp[fnName];
 	});
 	
