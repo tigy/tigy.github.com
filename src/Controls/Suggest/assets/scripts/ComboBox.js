@@ -111,7 +111,7 @@ var ComboBox = Picker.extend({
     /**
 	 * 当用户单击某一项时执行。
 	 */
-    onItemClick: function(item, e){
+    onItemClick: function(item){
 	
         // 如果无法更改值，则直接忽略。
         if(!this.getAttr('disabled') && !this.getAttr('readonly')) {

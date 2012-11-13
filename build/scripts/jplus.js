@@ -1,10 +1,13 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/12 14:14
+ * This file is created by a tool at 2012/11/12 16:25
  *********************************************************
  * Contains: 
+ *     Controls.Core.IToolTip
  *     System.Core.Base
  *     System.Dom.Base
  *     Controls.Core.Base
+ *     Controls.Core.ContentControl
+ *     Controls.Tip.ToolTip
  *     Controls.Core.ContainerControl
  *     Controls.Container.Dialog
  *     Controls.Container.MessageBox
@@ -19,7 +22,6 @@
  *     Controls.Form.CheckBox
  *     Controls.Form.RadioButton
  *     Controls.Form.TextBox
- *     Controls.Core.IToolTip
  *     Controls.Container.Panel
  *     Controls.Suggest.Suggest
  *     System.Utils.Deferrable
@@ -28,7 +30,6 @@
  *     System.Fx.Animate
  *     System.Fx.Marquee
  *     Controls.Composite.Carousel
- *     Controls.Core.ContentControl
  *     Controls.Button.Button
  *     Controls.Button.MenuButton
  *     Controls.Button.SplitButton
@@ -40,6 +41,167 @@
  *     System.Ajax.Script
  *     System.Ajax.Jsonp
  ********************************************************/
+
+
+/*********************************************************
+ * Controls.Core.IToolTip
+ ********************************************************/
+/**
+ * @author xuld
+ */
+
+var IToolTip = {
+	
+	/**
+	 * 当指针在具有指定工具提示文本的控件内保持静止时，工具提示保持可见的时间期限。-1表示不自动隐藏。 0 表示始终不显示。
+	 * @type Number
+	 */
+	autoDelay: -1,
+	
+	/**
+	 * 工具提示显示之前经过的时间。
+	 * @type Number
+	 */
+	initialDelay: 1000,
+	
+	/**
+	 * 指针从一个控件移到另一控件时，必须经过多长时间才会出现后面的工具提示窗口。
+	 * @type Number
+	 */
+	reshowDelay: 100,
+	
+	/**
+	 * 显示时使用的特效持续时间。
+	 */
+	duration: -1,
+	
+	getArrowType: function(){
+		var arrow = this.find('>.x-arrow');
+		return 'top';
+	},
+	
+	setArrowType: Function.empty,
+	
+	getArrowSize: function(){
+		return {
+			x: 0,
+			y: 0	
+		};
+	},
+	
+	getArrowOffset: function(){
+		return {
+			x: 0,
+			y: 0	
+		};
+	},
+	
+	initToolTip: Function.empty,
+	
+	onHide: Function.empty,
+	
+	onShow: function(x, y){
+		
+		if(this.autoDelay > 0) {
+			me.timer = setTimeout(this.hide.bind(this), this.autoDelay);
+		}
+		
+	},
+	
+	showAt: function(x, y){
+		if(!this.parent('body')){
+			this.appendTo();
+		}
+		if(this.autoDelay) {
+			this.show(this.duration, this.onShow);
+			this.setPosition(x, y);
+		}
+		
+		return this;
+	},
+	
+	showBy: function(ctrl, offsetY, offsetX){
+		ctrl = Dom.get(ctrl);
+		if(!this.parent('body')){
+			this.appendTo(ctrl.parent());
+		}
+		var arrowType = this.getArrowType(),
+			targetPosition = ctrl.getPosition(),
+			targetSize = ctrl.getSize();
+		offsetY = offsetY || 0;
+		offsetX = offsetX || 0;
+		
+		if(arrowType !== 'none') {
+			this.show();
+			var arrowOffset = this.getArrowOffset(),
+				arrowSize = this.getArrowSize();
+			switch(arrowType){
+				case 'top':
+					offsetX += (targetSize.x - arrowSize.x) / 2 - arrowOffset.x;
+					offsetY += targetSize.y + arrowSize.y;
+					break;
+				case 'left':
+					offsetX += targetSize.x + arrowSize.x;
+					offsetY += (targetSize.y) / 2 - arrowOffset.y;
+					break;
+				case 'right':
+					offsetX -= this.getSize().x + arrowSize.x;
+					offsetY += (targetSize.y) / 2 - arrowOffset.y;
+					break;
+				case 'bottom':
+					offsetX += (targetSize.x - arrowSize.x) / 2 - arrowOffset.x;
+					offsetY -= arrowSize.y + this.getSize().y;
+					break;
+			}
+			this.hide();
+			
+		}
+		
+		this.initToolTip(ctrl);
+		return this.showAt(targetPosition.x + offsetX, targetPosition.y + offsetY);
+	},
+	
+	/**
+	 * 设置某个控件工具提示。
+	 */
+	setToolTip: function(ctrl, caption, direction, offsetY, offsetX){
+		ctrl = Dom.get(ctrl);
+		ctrl.on('mouseover', function(){
+			var me = this;
+			if(me.timer)
+				clearTimeout(me.timer);
+			if(me.initialDelay >= 0){
+				me.timer = setTimeout(function(){
+					me.timer = 0;
+					if(caption)
+						me.setText(caption);
+					if(direction)
+						me.setArrowType(direction);
+					me.showBy(ctrl, offsetY, offsetX);
+				}, me.initialDelay);
+			}
+		}, this);
+		
+		ctrl.on('mouseout', this.close, this);
+		
+		
+		return this;
+		
+	},
+	
+	close: function(){
+		var me = this;
+		if(me.timer) {
+			clearTimeout(me.timer);
+			me.timer = 0;
+		}
+		me.hide(me.duration, this.onHide, 'opacity');
+		return this;
+	}
+	
+};
+
+
 
 
 /*********************************************************
@@ -7514,6 +7676,22 @@ var Control = Dom.extend({
 
 });
 /*********************************************************
+ * Controls.Core.ContentControl
+ ********************************************************/
+/** * @fileOverview 表示一个包含文本内容的控件。 * @author xuld *//** * 表示一个有内置呈现的控件。 * @abstract * @class ContentControl * @extends Control *  * <p> * ContentControl 的外元素是一个根据内容自动改变大小的元素。它自身没有设置大小，全部的大小依赖子元素而自动决定。 * 因此，外元素必须满足下列条件的任何一个: *  <ul> * 		<li>外元素的 position 是 absolute<li> * 		<li>外元素的 float 是 left或 right <li> * 		<li>外元素的 display 是  inline-block (在 IE6 下，使用 inline + zoom模拟) <li> *  </ul> * </p> */var ContentControl = Control.extend({		/**	 * 获取当前控件中显示文字的主 DOM 对象。	 */	content: function(){		return this.find('x-' + this.xtype + '-content') || new Dom(this.node);	},
+
+    /**
+	 * 获取或设置当前输入域的状态。
+	 * @protected
+	 */
+	state: function (name, value) {
+	    return this.toggleClass('x-' + this.xtype + '-' + name, value);
+	}	}).defineMethods("content()", "setHtml getHtml setText getText");
+/*********************************************************
+ * Controls.Tip.ToolTip
+ ********************************************************/
+/** * @author  *//** * @class * @extends Control * @author xuld */var ToolTip = ContentControl.extend(IToolTip).implement({		xtype: 'tooltip',		tpl: '<div class="x-control">\			<span class="x-arrow x-arrow-top">\				<span class="x-arrow-fore">◆</span>\			</span>\			<div class="x-control-content"></div>\		</div>',		getArrowType: function(){		var arrow = this.find('.x-arrow'), r = 'none';				if(arrow){			['top', 'bottom', 'left', 'right'].each(function(value){				if(arrow.hasClass('x-arrow-' + value)) {					r = value;					return false;					}			});		}		return r;	},		setArrowType: function(value){		this.find('.x-arrow').node.className = 'x-arrow x-arrow-' + value;		return this;	},		getArrowSize: function(){		return this.find('.x-arrow').getSize();	},		getArrowOffset: function(){		return this.find('.x-arrow').getOffset();	},		content: function(){		return this.find('.x-tooltip-content');	},	init: function(){		this.hide();	}});/** * 显示一个提示。 * @param {Element} elem 用来对齐的元素。 * @param {String} text 显示的文本。 * @param {Number} offsetY=2 Y 的偏移，负值向上。  * @param {Number} offsetX=0 X 的偏移，负值向左。  */ToolTip.show = function(ctrl, text, offsetY, offsetX){	return new ToolTip().setText(text).showBy(Dom.get(ctrl), offsetY === undefined ? 2 : offsetY, offsetX);};
+/*********************************************************
  * Controls.Core.ContainerControl
  ********************************************************/
 /**
@@ -7676,7 +7854,7 @@ var Dialog =  ContainerControl.extend({
 	
 	// 基本属性
 		
-	headerTpl: '<div class="x-control-header"><a class="x-dialog-close x-closebutton">×</a><h3></h3></div>',
+	headerTpl: '<div class="x-control-header"><a class="x-dialog-close x-closebutton">×</a><h4></h4></div>',
 	
 	onClosing: function () {
 		return this.trigger('closing');
@@ -9368,167 +9546,6 @@ var RadioButton = Control.extend(IInput).implement({
  ********************************************************/
 /** * @author  xuld */var TextBox = Control.extend(IInput).implement({		xtype: 'textbox',		tpl: '<input type="text" class="x-control">'	});
 /*********************************************************
- * Controls.Core.IToolTip
- ********************************************************/
-/**
- * @author xuld
- */
-
-var IToolTip = {
-	
-	/**
-	 * 当指针在具有指定工具提示文本的控件内保持静止时，工具提示保持可见的时间期限。-1表示不自动隐藏。 0 表示始终不显示。
-	 * @type Number
-	 */
-	autoDelay: -1,
-	
-	/**
-	 * 工具提示显示之前经过的时间。
-	 * @type Number
-	 */
-	initialDelay: 1000,
-	
-	/**
-	 * 指针从一个控件移到另一控件时，必须经过多长时间才会出现后面的工具提示窗口。
-	 * @type Number
-	 */
-	reshowDelay: 100,
-	
-	/**
-	 * 显示时使用的特效持续时间。
-	 */
-	duration: -1,
-	
-	getArrowType: function(){
-		var arrow = this.find('>.x-arrow');
-		return 'top';
-	},
-	
-	setArrowType: Function.empty,
-	
-	getArrowSize: function(){
-		return {
-			x: 0,
-			y: 0	
-		};
-	},
-	
-	getArrowOffset: function(){
-		return {
-			x: 0,
-			y: 0	
-		};
-	},
-	
-	initToolTip: Function.empty,
-	
-	onHide: Function.empty,
-	
-	onShow: function(x, y){
-		
-		if(this.autoDelay > 0) {
-			me.timer = setTimeout(this.hide.bind(this), this.autoDelay);
-		}
-		
-	},
-	
-	showAt: function(x, y){
-		if(!this.parent('body')){
-			this.appendTo();
-		}
-		if(this.autoDelay) {
-			this.show(this.duration, this.onShow);
-			this.setPosition(x, y);
-		}
-		
-		return this;
-	},
-	
-	showBy: function(ctrl, offsetY, offsetX){
-		ctrl = Dom.get(ctrl);
-		if(!this.parent('body')){
-			this.appendTo(ctrl.parent());
-		}
-		var arrowType = this.getArrowType(),
-			targetPosition = ctrl.getPosition(),
-			targetSize = ctrl.getSize();
-		offsetY = offsetY || 0;
-		offsetX = offsetX || 0;
-		
-		if(arrowType !== 'none') {
-			this.show();
-			var arrowOffset = this.getArrowOffset(),
-				arrowSize = this.getArrowSize();
-			switch(arrowType){
-				case 'top':
-					offsetX += (targetSize.x - arrowSize.x) / 2 - arrowOffset.x;
-					offsetY += targetSize.y + arrowSize.y;
-					break;
-				case 'left':
-					offsetX += targetSize.x + arrowSize.x;
-					offsetY += (targetSize.y) / 2 - arrowOffset.y;
-					break;
-				case 'right':
-					offsetX -= this.getSize().x + arrowSize.x;
-					offsetY += (targetSize.y) / 2 - arrowOffset.y;
-					break;
-				case 'bottom':
-					offsetX += (targetSize.x - arrowSize.x) / 2 - arrowOffset.x;
-					offsetY -= arrowSize.y + this.getSize().y;
-					break;
-			}
-			this.hide();
-			
-		}
-		
-		this.initToolTip(ctrl);
-		return this.showAt(targetPosition.x + offsetX, targetPosition.y + offsetY);
-	},
-	
-	/**
-	 * 设置某个控件工具提示。
-	 */
-	setToolTip: function(ctrl, caption, direction, offsetY, offsetX){
-		ctrl = Dom.get(ctrl);
-		ctrl.on('mouseover', function(){
-			var me = this;
-			if(me.timer)
-				clearTimeout(me.timer);
-			if(me.initialDelay >= 0){
-				me.timer = setTimeout(function(){
-					me.timer = 0;
-					if(caption)
-						me.setText(caption);
-					if(direction)
-						me.setArrowType(direction);
-					me.showBy(ctrl, offsetY, offsetX);
-				}, me.initialDelay);
-			}
-		}, this);
-		
-		ctrl.on('mouseout', this.close, this);
-		
-		
-		return this;
-		
-	},
-	
-	close: function(){
-		var me = this;
-		if(me.timer) {
-			clearTimeout(me.timer);
-			me.timer = 0;
-		}
-		me.hide(me.duration, this.onHide, 'opacity');
-		return this;
-	}
-	
-};
-
-
-
-
-/*********************************************************
  * Controls.Container.Panel
  ********************************************************/
 /** * @author  xuld *//** * 内容显示面板。 * @class Panel * @extends ContainerControl */var Panel = ContainerControl.implement({		/**	 * xtype	 * @type String	 */	xtype: 'panel'	});
@@ -10735,18 +10752,6 @@ var Carousel = Control.extend({
 	}
 
 }).defineMethods("marquee", "moveTo moveBy start stop");
-/*********************************************************
- * Controls.Core.ContentControl
- ********************************************************/
-/** * @fileOverview 表示一个包含文本内容的控件。 * @author xuld *//** * 表示一个有内置呈现的控件。 * @abstract * @class ContentControl * @extends Control *  * <p> * ContentControl 的外元素是一个根据内容自动改变大小的元素。它自身没有设置大小，全部的大小依赖子元素而自动决定。 * 因此，外元素必须满足下列条件的任何一个: *  <ul> * 		<li>外元素的 position 是 absolute<li> * 		<li>外元素的 float 是 left或 right <li> * 		<li>外元素的 display 是  inline-block (在 IE6 下，使用 inline + zoom模拟) <li> *  </ul> * </p> */var ContentControl = Control.extend({		/**	 * 获取当前控件中显示文字的主 DOM 对象。	 */	content: function(){		return this.find('x-' + this.xtype + '-content') || new Dom(this.node);	},
-
-    /**
-	 * 获取或设置当前输入域的状态。
-	 * @protected
-	 */
-	state: function (name, value) {
-	    return this.toggleClass('x-' + this.xtype + '-' + name, value);
-	}	}).defineMethods("content()", "setHtml getHtml setText getText");
 /*********************************************************
  * Controls.Button.Button
  ********************************************************/

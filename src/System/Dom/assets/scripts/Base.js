@@ -2454,16 +2454,16 @@ using("System.Core.Base");
 			
 			if(Object.isObject(eventAndSelector)){
 				for(eventName in eventAndSelector) {
-					this.on(eventName, eventAndSelector[eventName]);
+				    this.bind(eventName, eventAndSelector[eventName]);
 				}
 			} else {
 				
-				eventName = (/^\w+/.match(eventAndSelector) || [''])[0];
+				eventName = (/^\w+/.exec(eventAndSelector) || [''])[0];
 					
 				assert(eventName, "Dom#bind(eventAndSelector, handler): {eventAndSelector} 中不存在事件信息。正确的 eventAndSelector 格式： click.selector")
 				
 				if(selector = eventAndSelector.substr(eventName.length)){
-					this.delegate(eventName, delegateEventName, handler);
+				    this.delegate(selector, eventName, handler);
 				} else {
 					this.on(eventName, handler);
 				}
