@@ -3354,49 +3354,56 @@ using("System.Core.Base");
 	}, function(value, key) {
 	    dp[key] = function (html) {
 
-	        html = Dom.parse(html, this);
-
-	        if (!html) {
-	            return html;
-	        } else if(html instanceof DomList){
-	            for (var i = 0; i < html.length; i++) {
-	                dp[key].call(this, html[i]);
-	            }
-	            return html;
-	        }
-
 			var scripts,
-				i = 0,
+				i,
 				script,
-				r = value(this, html);
+				t;
 
-			if (html.node.tagName === 'SCRIPT') {
-				scripts = [html.node];
-			} else {
-				scripts = html.getElements('SCRIPT');
-			}
-
-			// 如果存在脚本，则一一执行。
-			while (script = scripts[i++]) {
-				if (!script.type || /\/(java|ecma)script/i.test(script.type)) {
-
-					if (script.src) {
-						assert(window.Ajax && Ajax.send, "必须载入 System.Ajax.Script 模块以支持动态执行 <script src=''>");
-						Ajax.send({
-							url: script.src,
-							type: "GET",
-							dataType: 'script',
-							async: false
-						});
-						//    script.parentNode.removeChild(script);
+	        if (html = Dom.parse(html, this)) {
+	        	if(html instanceof DomList){
+		        	t = Dom.getDocument(this.node).createDocumentFragment();
+		            for (i = 0; i < html.length; i++) {
+		                t.appendChild(html[i]);
+		            }
+		            
+		            t = new Dom(t);
+		            scripts = t.getElements('SCRIPT');
+		            value(this, t);
+		        } else {
+		        	t = html;
+		        	if (t.node.tagName === 'SCRIPT') {
+						scripts = [t.node];
 					} else {
-						window.execScript(script.text || script.textContent || script.innerHTML || "");
+						scripts = t.getElements('SCRIPT');
 					}
-
+		        	html = value(this, t);
+		        }
+		        
+		        i = 0;
+	
+				// 如果存在脚本，则一一执行。
+				while (script = scripts[i++]) {
+					if (!script.type || /\/(java|ecma)script/i.test(script.type)) {
+	
+						if (script.src) {
+							assert(window.Ajax && Ajax.send, "必须载入 System.Ajax.Script 模块以支持动态执行 <script src=''>");
+							Ajax.send({
+								url: script.src,
+								type: "GET",
+								dataType: 'script',
+								async: false
+							});
+							//    script.parentNode.removeChild(script);
+						} else {
+							window.execScript(script.text || script.textContent || script.innerHTML || "");
+						}
+	
+					}
 				}
+				
 			}
 
-			return r;
+			return html;
 		};
 
 		DomList.prototype[key] = function(html) {

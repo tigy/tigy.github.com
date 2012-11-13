@@ -182,28 +182,28 @@ test("Object.isArray", function() {
 	document.body.removeChild( a );
 });
 
-test("Array.create", function(){
-
-	// equal( Array.create(document.findAll("head")[0]s)[0].nodeName.toUpperCase(), "HEAD", "Pass makeArray a List object" );
-
-	// equal( Array.create(document.getElementsByName("PWD")).slice(0,1)[0].name, "PWD", "Pass makeArray a nodelist" );
-
-	equal( (function(){ return Array.create(arguments); })(1,2).join(""), "12", "Pass makeArray an arguments array" );
-
-	equal( Array.create([1,2,3]).join(""), "123", "Pass makeArray a real array" );
-
-	equal( Array.create().length, 0, "Pass nothing to makeArray and expect an empty array" );
-
-	equal( Array.create( [0] )[0], 0 , "Pass makeArray a number" );
-	
-	equal( Array.create( {length:2, 0:"a", 1:"b"} ).join(""), "ab", "Pass makeArray an array like map (with length)" );
-
-	// ok( !!Array.create( document.documentElement.childNodes ).slice(0,1)[0].nodeName, "Pass makeArray a childNodes array" );
-
-	// ok( Array.create(document.getElementById("form")).length >= 13, "Pass makeArray a form (treat as elements)" );
-
-	deepEqual( Array.create({length: "0"}), [], "Make sure object is coerced properly.");
-});
+// test("Array.create", function(){
+// 
+	// // equal( Array.create(document.findAll("head")[0]s)[0].nodeName.toUpperCase(), "HEAD", "Pass makeArray a List object" );
+// 
+	// // equal( Array.create(document.getElementsByName("PWD")).slice(0,1)[0].name, "PWD", "Pass makeArray a nodelist" );
+// 
+	// equal( (function(){ return Array.create(arguments); })(1,2).join(""), "12", "Pass makeArray an arguments array" );
+// 
+	// equal( Array.create([1,2,3]).join(""), "123", "Pass makeArray a real array" );
+// 
+	// equal( Array.create().length, 0, "Pass nothing to makeArray and expect an empty array" );
+// 
+	// equal( Array.create( [0] )[0], 0 , "Pass makeArray a number" );
+// 	
+	// equal( Array.create( {length:2, 0:"a", 1:"b"} ).join(""), "ab", "Pass makeArray an array like map (with length)" );
+// 
+	// // ok( !!Array.create( document.documentElement.childNodes ).slice(0,1)[0].nodeName, "Pass makeArray a childNodes array" );
+// 
+	// // ok( Array.create(document.getElementById("form")).length >= 13, "Pass makeArray a form (treat as elements)" );
+// 
+	// deepEqual( Array.create({length: "0"}), [], "Make sure object is coerced properly.");
+// });
 
 test("Function.prototype.bind", function(){
 

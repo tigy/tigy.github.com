@@ -381,21 +381,21 @@ testoffset("body", function( iframe ) {
 test("offsetParent", function(){
 
 	var body = Dom.get(document.body).offsetParent();
-	equal( body.dom, document.body, "The body is its own offsetParent." );
+	equal( body.node, document.body, "The body is its own offsetParent." );
 
 	var header = getDom(document, "qunit-header").offsetParent();
-	equal( header.dom, document.body, "The body is the offsetParent." );
+	equal( header.node, document.body, "The body is the offsetParent." );
 
 	var div = getDom(document, "nothiddendivchild").offsetParent();
-	equal( div.dom, document.body, "The body is the offsetParent." );
+	equal( div.node, document.body, "The body is the offsetParent." );
 
 	getDom(document, "nothiddendiv").setStyle("position", "relative");
 
 	div = getDom(document, "nothiddendivchild").offsetParent();
-	equal( div.dom, getDom(document, "nothiddendiv").dom, "The div is the offsetParent." );
+	equal( div.node, getDom(document, "nothiddendiv").node, "The div is the offsetParent." );
 
 	div = Dom.get(document.body).offsetParent();
-	equal( div.dom, document.body, "The body is the offsetParent." );
+	equal( div.node, document.body, "The body is the offsetParent." );
 });
 
 test("fractions (see #7730 and #7885)", function() {
@@ -448,7 +448,7 @@ function testoffset(name, fn) {
 		var src = "./data/offset/" + name + ".html?" + parseInt( Math.random()*1000, 10 ),
 			iframe = Dom.parse("<iframe />").set({
 				width: 500, height: 500, position: "absolute", top: -600, left: -600, visibility: "hidden"
-			}).appendTo().dom;
+			}).appendTo().node;
 		iframe.contentWindow.location = src;
 		return iframe;
 	}
