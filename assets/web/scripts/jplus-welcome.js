@@ -1842,7 +1842,8 @@ function trace() {
 
 	// 无参数的话，自动补充一个参数。
 	if (arguments.length === 0) {
-		if (!trace.$count)
+		if (!trace.$count)
+
 		return trace('(trace: ' + (trace.$count++) + ')');
 	}
 
@@ -2404,7 +2405,8 @@ function imports(namespace) {
 					new APIInfo(obj, showPredefinedMembers).copyTo(r);
 				} else {
 					r.push('无法对 ' + (obj === null ? "null" : "undefined") + ' 分析');
-				}
+				}
+
 
 			};
 
@@ -2629,7 +2631,8 @@ function imports(namespace) {
 		 * 指示一个函数已过时。
 		 * @param {String} message="此成员已过时" 提示的信息。
 		 */
-		deprected: function(message) {
+		deprected: function(message) {
+
 		},
 
 		/**
@@ -2769,7 +2772,8 @@ function imports(namespace) {
 	                } else {
 	                    window["eval"].call(window, src);
 	                }
-	            } catch (e) {
+	            } catch (e) {
+
 	            } 
 	        }
 		},
@@ -2828,7 +2832,8 @@ function imports(namespace) {
 
 			} catch (e) {
 
-			    // 调试输出。
+			    // 调试输出。
+
 
 			} finally {
 
@@ -2918,7 +2923,8 @@ function imports(namespace) {
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
  
  
 // Core - 核心部分
@@ -7606,7 +7612,8 @@ var Deferrable = Class({
 /**
  * @fileOverview 提供底层的 特效算法支持。
  * @author xuld
- */
+ */
+
 
 /**
  * 特效算法基类。
@@ -7829,16 +7836,232 @@ var Fx = (function() {
 /*********************************************************
  * System.Fx.Tween
  ********************************************************/
-/** * DOM 补间动画 * @author xuld */Object.extend(Fx, {		/**	 * 用于特定 css 补间动画的引擎。 
-	 */	tweeners: {},		/**	 * 默认的补间动画的引擎。 	 */	defaultTweeners: [],		/**	 * 用于数字的动画引擎。
-	 */	numberTweener: {		get: function(target, name){			return Dom.styleNumber(target.node, name);		},						/**		 * 常用计算。		 * @param {Object} from 开始。		 * @param {Object} to 结束。		 * @param {Object} delta 变化。		 */		compute: function(from, to, delta){			return (to - from) * delta + from;		},				parse: function(value){			return typeof value == "number" ? value : parseFloat(value);		},				set: function(target, name, value){			target.node.style[name] = value;		}	},	/**	 * 补间动画	 * @class Tween	 * @extends Fx	 */	Tween: Fx.extend({				/**		 * 初始化当前特效。		 */		constructor: function(){					},				/**		 * 根据指定变化量设置值。		 * @param {Number} delta 变化量。 0 - 1 。		 * @override		 */		set: function(delta){			var options = this.options,				params = options.params,				target = options.target,				tweener,				key,				value;			// 对当前每个需要执行的特效进行重新计算并赋值。			for (key in params) {				value = params[key];				tweener = value.tweener;				tweener.set(target, key, tweener.compute(value.from, value.to, delta));			}		},				/**		 * 生成当前变化所进行的初始状态。		 * @param {Object} options 开始。		 */		init: function (options) {							// 对每个设置属性			var key,				tweener,				part,				value,				parsed,				i,				// 生成新的 tween 对象。				params = {};						for (key in options.params) {				// value				value = options.params[key];				// 如果 value 是字符串，判断 += -= 或 a-b				if (typeof value === 'string' && (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {					value = part[3];				}				// 找到用于变化指定属性的解析器。				tweener = Fx.tweeners[key = key.toCamelCase()];								// 已经编译过，直接使用， 否则找到合适的解析器。				if (!tweener) {										// 如果是纯数字属性，使用 numberParser 。					if(key in Dom.styleNumbers) {						tweener = Fx.numberTweener;					} else {												i = Fx.defaultTweeners.length;												// 尝试使用每个转换器						while (i-- > 0) {														// 获取转换器							parsed = Fx.defaultTweeners[i].parse(value, key);														// 如果转换后结果合格，证明这个转换器符合此属性。							if (parsed || parsed === 0) {								tweener = Fx.defaultTweeners[i];								break;							}						}						// 找不到合适的解析器。						if (!tweener) {							continue;						}											}					// 缓存 tweeners，下次直接使用。					Fx.tweeners[key] = tweener;				}								// 如果有特殊功能。 ( += -= a-b)				if(part){					parsed = part[2];					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));				} else {					parsed = tweener.parse(value);					i = tweener.get(options.target, key);				}								params[key] = {					tweener: tweener,					from: i,					to: parsed						};								assert(i !== null && parsed !== null, "Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, i, parsed);							}			options.params = params;		}		}),		createTweener: function(tweener){		return Object.extendIf(tweener, Fx.numberTweener);	}	});Object.each(Dom.styleFix, function(value, key){	Fx.tweeners[key] = this;}, Fx.createTweener({	set: function (target, name, value) {		Dom.styleFix[name].call(target, value);	}}));Fx.tweeners.scrollTop = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(null, value);	},	get: function (target) {		return target.getScroll().y;	}});Fx.tweeners.scrollLeft = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(value);	},	get: function (target) {		return target.getScroll().x;	}});Fx.defaultTweeners.push(Fx.createTweener({	set: navigator.isStd ? function (target, name, value) {				target.node.style[name] = value + 'px';	} : function(target, name, value) {		try {						// ie 对某些负属性内容报错			target.node.style[name] = value;		}catch(e){}	}}));
+/**
+ * DOM 补间动画
+ * @author xuld
+ */
+
+
+
+
+Object.extend(Fx, {
+	
+	/**
+	 * 用于特定 css 补间动画的引擎。 
+	 */
+	tweeners: {},
+	
+	/**
+	 * 默认的补间动画的引擎。 
+	 */
+	defaultTweeners: [],
+	
+	/**
+	 * 用于数字的动画引擎。
+	 */
+	numberTweener: {
+		get: function(target, name){
+			return Dom.styleNumber(target.node, name);
+		},
+				
+		/**
+		 * 常用计算。
+		 * @param {Object} from 开始。
+		 * @param {Object} to 结束。
+		 * @param {Object} delta 变化。
+		 */
+		compute: function(from, to, delta){
+			return (to - from) * delta + from;
+		},
+		
+		parse: function(value){
+			return typeof value == "number" ? value : parseFloat(value);
+		},
+		
+		set: function(target, name, value){
+			target.node.style[name] = value;
+		}
+	},
+
+	/**
+	 * 补间动画
+	 * @class Tween
+	 * @extends Fx
+	 */
+	Tween: Fx.extend({
+		
+		/**
+		 * 初始化当前特效。
+		 */
+		constructor: function(){
+			
+		},
+		
+		/**
+		 * 根据指定变化量设置值。
+		 * @param {Number} delta 变化量。 0 - 1 。
+		 * @override
+		 */
+		set: function(delta){
+			var options = this.options,
+				params = options.params,
+				target = options.target,
+				tweener,
+				key,
+				value;
+
+			// 对当前每个需要执行的特效进行重新计算并赋值。
+			for (key in params) {
+				value = params[key];
+				tweener = value.tweener;
+				tweener.set(target, key, tweener.compute(value.from, value.to, delta));
+			}
+		},
+		
+		/**
+		 * 生成当前变化所进行的初始状态。
+		 * @param {Object} options 开始。
+		 */
+		init: function (options) {
+				
+			// 对每个设置属性
+			var key,
+				tweener,
+				part,
+				value,
+				parsed,
+				i,
+				// 生成新的 tween 对象。
+				params = {};
+			
+			for (key in options.params) {
+
+				// value
+				value = options.params[key];
+
+				// 如果 value 是字符串，判断 += -= 或 a-b
+				if (typeof value === 'string' && (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {
+					value = part[3];
+				}
+
+				// 找到用于变化指定属性的解析器。
+				tweener = Fx.tweeners[key = key.toCamelCase()];
+				
+				// 已经编译过，直接使用， 否则找到合适的解析器。
+				if (!tweener) {
+					
+					// 如果是纯数字属性，使用 numberParser 。
+					if(key in Dom.styleNumbers) {
+						tweener = Fx.numberTweener;
+					} else {
+						
+						i = Fx.defaultTweeners.length;
+						
+						// 尝试使用每个转换器
+						while (i-- > 0) {
+							
+							// 获取转换器
+							parsed = Fx.defaultTweeners[i].parse(value, key);
+							
+							// 如果转换后结果合格，证明这个转换器符合此属性。
+							if (parsed || parsed === 0) {
+								tweener = Fx.defaultTweeners[i];
+								break;
+							}
+						}
+
+						// 找不到合适的解析器。
+						if (!tweener) {
+							continue;
+						}
+						
+					}
+
+					// 缓存 tweeners，下次直接使用。
+					Fx.tweeners[key] = tweener;
+				}
+				
+				// 如果有特殊功能。 ( += -= a-b)
+				if(part){
+					parsed = part[2];
+					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);
+					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));
+				} else {
+					parsed = tweener.parse(value);
+					i = tweener.get(options.target, key);
+				}
+				
+				params[key] = {
+					tweener: tweener,
+					from: i,
+					to: parsed		
+				};
+				
+				assert(i !== null && parsed !== null, "Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, i, parsed);
+				
+			}
+
+			options.params = params;
+		}
+	
+	}),
+	
+	createTweener: function(tweener){
+		return Object.extendIf(tweener, Fx.numberTweener);
+	}
+	
+});
+
+Object.each(Dom.styleFix, function(value, key){
+	Fx.tweeners[key] = this;
+}, Fx.createTweener({
+	set: function (target, name, value) {
+		Dom.styleFix[name].call(target, value);
+	}
+}));
+
+Fx.tweeners.scrollTop = Fx.createTweener({
+	set: function (target, name, value) {
+		target.setScroll(null, value);
+	},
+	get: function (target) {
+		return target.getScroll().y;
+	}
+});
+
+Fx.tweeners.scrollLeft = Fx.createTweener({
+	set: function (target, name, value) {
+		target.setScroll(value);
+	},
+	get: function (target) {
+		return target.getScroll().x;
+	}
+});
+
+Fx.defaultTweeners.push(Fx.createTweener({
+
+	set: navigator.isStd ? function (target, name, value) {
+		
+		target.node.style[name] = value + 'px';
+	} : function(target, name, value) {
+		try {
+			
+			// ie 对某些负属性内容报错
+			target.node.style[name] = value;
+		}catch(e){}
+	}
+
+}));
+
 /*********************************************************
  * System.Fx.Animate
  ********************************************************/
 /**
  * @fileOverview 通过改变CSS实现的变换。
  * @author xuld
- */
+ */
+
+
 
 
 
@@ -8162,13 +8385,21 @@ document.animate = function() {
 /*********************************************************
  * Modules.Web.Footer
  ********************************************************/
-/** * @author  */
+/**
+ * @author 
+ */
+
+
+
+
 /*********************************************************
  * Controls.Core.Base
  ********************************************************/
 /**
  * @author  xuld
- */
+ */
+
+
 
 
 
@@ -8286,7 +8517,36 @@ var Control = Dom.extend({
 /*********************************************************
  * Controls.Core.ContentControl
  ********************************************************/
-/** * @fileOverview 表示一个包含文本内容的控件。 * @author xuld *//** * 表示一个有内置呈现的控件。 * @abstract * @class ContentControl * @extends Control *  * <p> * ContentControl 的外元素是一个根据内容自动改变大小的元素。它自身没有设置大小，全部的大小依赖子元素而自动决定。 * 因此，外元素必须满足下列条件的任何一个: *  <ul> * 		<li>外元素的 position 是 absolute<li> * 		<li>外元素的 float 是 left或 right <li> * 		<li>外元素的 display 是  inline-block (在 IE6 下，使用 inline + zoom模拟) <li> *  </ul> * </p> */var ContentControl = Control.extend({		/**	 * 获取当前控件中显示文字的主 DOM 对象。	 */	content: function(){		return this.find('x-' + this.xtype + '-content') || new Dom(this.node);	},
+/**
+ * @fileOverview 表示一个包含文本内容的控件。
+ * @author xuld
+ */
+
+
+/**
+ * 表示一个有内置呈现的控件。
+ * @abstract
+ * @class ContentControl
+ * @extends Control
+ * 
+ * <p>
+ * ContentControl 的外元素是一个根据内容自动改变大小的元素。它自身没有设置大小，全部的大小依赖子元素而自动决定。
+ * 因此，外元素必须满足下列条件的任何一个:
+ *  <ul>
+ * 		<li>外元素的 position 是 absolute<li>
+ * 		<li>外元素的 float 是 left或 right <li>
+ * 		<li>外元素的 display 是  inline-block (在 IE6 下，使用 inline + zoom模拟) <li>
+ *  </ul>
+ * </p>
+ */
+var ContentControl = Control.extend({
+	
+	/**
+	 * 获取当前控件中显示文字的主 DOM 对象。
+	 */
+	content: function(){
+		return this.find('x-' + this.xtype + '-content') || new Dom(this.node);
+	},
 
     /**
 	 * 获取或设置当前输入域的状态。
@@ -8294,7 +8554,12 @@ var Control = Dom.extend({
 	 */
 	state: function (name, value) {
 	    return this.toggleClass('x-' + this.xtype + '-' + name, value);
-	}	}).defineMethods("content()", "setHtml getHtml setText getText");
+	}
+	
+}).defineMethods("content()", "setHtml getHtml setText getText");
+
+
+
 /*********************************************************
  * Controls.Core.IInput
  ********************************************************/
@@ -8328,7 +8593,7 @@ var IInput = {
 	 * @protected
 	 * @type {Control}
 	 */
-	hiddenField: null,
+	inputProxy: null,
 	
 	///**
 	// * 创建用于在表单内保存当前输入值的隐藏域。
@@ -8346,17 +8611,17 @@ var IInput = {
 	input: function(){
 		
 		// 如果不存在隐藏域。
-		if(!this.hiddenField) {
+		if(!this.inputProxy) {
 			
 			// 如果 当前元素是表单元素，直接返回。
 			if(/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(this.node.tagName)){
 				return new Dom(this.node);
 			}
 			
-			this.hiddenField = this.find("input,select,textarea") || Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
+			this.inputProxy = this.find("input,select,textarea") || Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
 		}
 		
-		return this.hiddenField;
+		return this.inputProxy;
 	},
 	
 	/**
@@ -8413,7 +8678,10 @@ var IInput = {
  ********************************************************/
 /**
  * @author  xuld
- */
+ */
+
+
+
 
 
 

@@ -199,7 +199,7 @@ var ComboBox = Picker.extend({
         // 如果初始化的时候传入一个 <select> 则替换 <select>, 并拷贝相关数据。
         if(this.node.tagName === 'SELECT') {
 			
-            this.hiddenField = selectNode = new Dom(this.node);
+            this.inputProxy = selectNode = new Dom(this.node);
 			
             // 调用 create 重新生成 dom 。
             this.node = Dom.parseNode(this.dropDownListTpl);
@@ -264,10 +264,14 @@ var ComboBox = Picker.extend({
     },
 	
     /**
-	 * 模拟鼠标选择某一个项。
+	 * 模拟用户选择某一个项。
 	 */
     selectItem: function (item) {
-        this.setSelectedItem(item);
+        
+        if (this.onSelect(item) !== false) {
+            this.setSelectedItem(item);
+        }
+
         return this.hideDropDown();
     },
 
@@ -291,7 +295,7 @@ var ComboBox = Picker.extend({
 
             // 如果隐藏域是 SELECT ，比较方便：
             if (input.node.tagName === 'SELECT') {
-                value = this.hiddenField.getAttr('selectedIndex');
+                value = this.inputProxy.getAttr('selectedIndex');
                 return value >= 0 ? this.dropDown.item(value) : null;
             }
 
@@ -314,11 +318,7 @@ var ComboBox = Picker.extend({
 	 * @return this
 	 */
     setSelectedItem: function (item) {
-
-        if (this.onSelect(item) !== false) {
-            this.updateText(item);
-        }
-        return this;
+        return this.updateText(item);
     },
 	
     getSelectedIndex: function(){

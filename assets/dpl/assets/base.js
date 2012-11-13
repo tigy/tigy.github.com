@@ -8864,7 +8864,7 @@ var IInput = {
 	 * @protected
 	 * @type {Control}
 	 */
-	hiddenField: null,
+	inputProxy: null,
 	
 	///**
 	// * 创建用于在表单内保存当前输入值的隐藏域。
@@ -8882,17 +8882,17 @@ var IInput = {
 	input: function(){
 		
 		// 如果不存在隐藏域。
-		if(!this.hiddenField) {
+		if(!this.inputProxy) {
 			
 			// 如果 当前元素是表单元素，直接返回。
 			if(/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(this.node.tagName)){
 				return new Dom(this.node);
 			}
 			
-			this.hiddenField = this.find("input,select,textarea") || Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
+			this.inputProxy = this.find("input,select,textarea") || Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
 		}
 		
-		return this.hiddenField;
+		return this.inputProxy;
 	},
 	
 	/**
@@ -10133,7 +10133,7 @@ var ComboBox = Picker.extend({
         // 如果初始化的时候传入一个 <select> 则替换 <select>, 并拷贝相关数据。
         if(this.node.tagName === 'SELECT') {
 			
-            this.hiddenField = selectNode = new Dom(this.node);
+            this.inputProxy = selectNode = new Dom(this.node);
 			
             // 调用 create 重新生成 dom 。
             this.node = Dom.parseNode(this.dropDownListTpl);
@@ -10225,7 +10225,7 @@ var ComboBox = Picker.extend({
 
             // 如果隐藏域是 SELECT ，比较方便：
             if (input.node.tagName === 'SELECT') {
-                value = this.hiddenField.getAttr('selectedIndex');
+                value = this.inputProxy.getAttr('selectedIndex');
                 return value >= 0 ? this.dropDown.item(value) : null;
             }
 
