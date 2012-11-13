@@ -1,4 +1,4 @@
-module("traversing");
+module("Traversing");
 
 
 
@@ -129,7 +129,7 @@ test("Dom.prototype.next()", function() {
 	expect(4);
 	equal(Dom.query("#ap").next().node.id, "foo", "Simple next check");
 	equal(Dom.query("#ap").next("div").node.id, "foo", "Filtered next check");
-	equal(!Dom.query("#ap").next("p"), false, "Filtered next check, no match");
+	equal(Dom.query("#ap").next("p"), null, "Filtered next check, no match");
 	equal(Dom.query("#ap").next("div, p").node.id, "foo", "Multiple filters");
 });
 

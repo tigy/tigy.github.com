@@ -1852,7 +1852,7 @@ using("System.Core.Base");
 			var elem = this.node;
 			//if (elem.nodeType == 1)
 			//	each(elem.getElementsByTagName("*"), clean);
-			while (elem = this.last(true))
+			while (elem = this.last(null))
 				this.removeChild(elem);
 			return this;
 		},
@@ -2890,7 +2890,7 @@ using("System.Core.Base");
 
 		/**
 		 * 获取当前 Dom 对象的指定位置的直接子节点。
-		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。如果 args 是小于 0 的数字，则从末尾开始计算。
+		 * @param {Integer} index 用于查找子元素的 CSS 选择器 或者 元素在 Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。如果 args 是小于 0 的数字，则从末尾开始计算。
 		 * @return {Dom} 返回一个节点对象。如果不存在，则返回 null 。
 		 * @example
 		 * 获取第1个子节点。
@@ -2899,8 +2899,20 @@ using("System.Core.Base");
 		 * #####JavaScript:
 		 * <pre>Dom.find("span").child(1)</pre>
 		 */
-		child: function(args) {
-			return ~args >= 0 ? this.last(~args) : this.first(args);
+		child: function(index) {
+			
+			assert.isNumber(index, 'Dom#child(index): {index} ~');
+			
+			var firstOrLast = 'first';
+			
+			if(index < 0){
+				index = ~index;
+				firstOrLast = 'last';
+			}
+			
+			return this[firstOrLast](function(){
+				return index-- >= 0;
+			});
 		},
 
 		/**
@@ -2925,8 +2937,17 @@ using("System.Core.Base");
 		 * closest 和 parent 最大区别就是 closest 会测试当前的元素。
 		 */
 		closest: function(selector, context) {
-			selector = typeof selector === 'function' ? selector(this, this.node) : this.match(selector) ? this : this.parent(selector);
-			return selector && (!context || Dom.get(context).has(selector)) ? selector : null;
+			var node = this.node;
+				
+			while(node) {
+				if(quickMatch(node, selector)){
+					return (!context || Dom.get(context).has(node)) ? new Dom(node) : null;
+				}
+				
+				node = node.parentNode;
+			}
+			
+			return null;
 		},
 
 		/**
@@ -3287,7 +3308,7 @@ using("System.Core.Base");
 		 * @return {Dom} 返回插入的新节点对象。
 		 */
 		prepend: function(ctrl, dom) {
-			return ctrl.insertBefore(dom, ctrl.first(true));
+			return ctrl.insertBefore(dom, ctrl.first(null));
 		},
 
 		/**
@@ -3307,7 +3328,7 @@ using("System.Core.Base");
 		 */
 		after: function(ctrl, dom) {
 			var p = ctrl.parentControl || ctrl.parent();
-			return p ? p.insertBefore(dom, ctrl.next(true)) : null;
+			return p ? p.insertBefore(dom, ctrl.next(null)) : null;
 		},
 
 		/**
@@ -4007,6 +4028,16 @@ using("System.Core.Base");
 		assert.isNode(node, 'Dom.getDocument(node): {node} ~', node);
 		return node.ownerDocument || node.document || node;
 	}
+	
+	/**
+	 * 快速判断一个节点满足制定的过滤器。
+	 * @param {Node} elem 元素。
+	 * @param {String/Function/Undefined} filter 过滤器。
+	 * @return {Boolean} 返回结果。
+	 */
+	function quickMatch(elem, filter){
+		return !filter || (typeof filter === 'string' ? /^(?:[-\w:]|[^\x00-\xa0]|\\.)+$/.test(filter) ? elem.tagName === filter.toUpperCase() : Dom.match(elem, filter) : filter(elem));
+	}
 
 	/**
 	 * 返回简单的遍历函数。
@@ -4016,20 +4047,24 @@ using("System.Core.Base");
 	 */
 	function createTreeWalker(next, first) {
 		first = first || next;
-		return function(args) {
+		return function(filter) {
 			var node = this.node[first];
 			
-			// 如果存在 args 编译为函数。
-			if(args){
-				args = getFilter(args);
+			// 如果 filter === null，则表示获取任意 nodeType 的节点。
+			if(filter === null){
+				return node ? new Dom(node) : node;
 			}
 			
-			while(node) {
-				if(args ? args.call(this, node) : node.nodeType === 1)
-					return new Dom(node);
+			// 找到第一个nodeType == 1 的节点。
+			while(node && node.nodeType !== 1) {
 				node = node[next];
 			}
 			
+			// 如果存在过滤器，执行过滤器。
+			if(node && quickMatch(node, filter)){
+				return new Dom(node);
+			}
+		
 			return null;
 		};
 	}
@@ -4042,63 +4077,19 @@ using("System.Core.Base");
 	 */
 	function createTreeDir(next, first) {
 		first = first || next;
-		return function(args) {
+		return function(filter) {
 			var node = this.node[first],
 				r = new DomList;
 
-			// 如果存在 args 编译为函数。
-			if (args) {
-				args = getFilter(args);
-			}
-
+			// 如果 filter === null，则表示获取任意 nodeType 的节点。
 			while (node) {
-				if (args ? args.call(this, node) : node.nodeType === 1)
+				if ((node.nodeType === 1 && quickMatch(node, filter)) || filter === null)
 					r.push(node);
 				node = node[next];
 			}
 
 			return r;
 		}
-	}
-	
-	/**
-	 * 获取一个选择器。
-	 * @param {Number/Function/String/Boolean} args 参数。
-	 * @return {Funtion} 函数。
-	 */
-	function getFilter(args) {
-		
-		// 如果存在 args，则根据不同的类型返回不同的检查函数。
-		switch (typeof args) {
-			
-			// 数字返回一个计数器函数。
-			case 'number':
-				return function(elem) {
-					return elem.nodeType === 1 && --args < 0;
-				};
-				
-				// 字符串，表示选择器。
-			case 'string':
-				if(/^(?:[-\w:]|[^\x00-\xa0]|\\.)+$/.test(args)) {
-					args = args.toUpperCase();
-					return function(elem) {
-						return elem.nodeType === 1 && elem.tagName === args;
-					};
-				}
-				return args === '*' ? null : function(elem) {
-					return elem.nodeType === 1 && Dom.match(elem, args);
-				};
-				
-				// 布尔类型，而且是 true, 返回 Function.from(true)，  表示不过滤。
-			case 'boolean':
-				args = returnTrue;
-				break;
-			
-		}
-
-		assert.isFunction(args, "Dom#xxxAll(args): {args} 必须是一个 null、函数、数字或字符串。", args);
-		
-		return args;
 	}
 	
 	/**
