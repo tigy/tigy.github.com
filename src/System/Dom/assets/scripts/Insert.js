@@ -1,4 +1,11 @@
-﻿/** * @author  */Dom.implement({
+﻿/**
+ * @author 
+ */
+
+
+
+
+Dom.implement({
 
 	/**
 	 * 在某个位置插入一个HTML 。
@@ -50,4 +57,6 @@
 
 		parentControl.insertBefore(html, refChild);
 		return html;
-	}}, 3);
+	}
+
+}, 3);
