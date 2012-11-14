@@ -172,7 +172,7 @@ var ListControl = Control.extend({
 		return this.on(eventName, function(e){
 		    for (var c = this.node.firstChild, target = e.target; c; c = c.nextSibling) {
 				if(c === target || Dom.has(c, target)){
-				    return fn.call(scope, new Dom(c), e);
+				    return fn.call(scope || this, new Dom(c), e);
 				}
 			}
 		});

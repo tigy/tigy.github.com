@@ -1,106 +1,131 @@
 /**
- * @author 
+ * @author xuld
  */
 
 
-using("Controls.Suggest.ComboBox");
+using("System.Dom.KeyNav");
+using("Controls.Core.IDropDownOwner");
+using("Controls.Form.ListBox");
 
 /**
- * 用于提示框的组件。
+ * 智能提示组件。
  */
-var Suggest = ComboBox.extend({
+var Suggest = Control.extend(IDropDownOwner).implement({
+
+    dropDownWidth: -1,
+
+    /**
+	 * 创建当前 Suggest 的菜单。
+	 * @return {Dom} 下拉菜单。
+	 * @protected virtual
+	 */
+    createSuggest: function () {
+        return new ListBox().addClass('x-suggest');
+    },
+
+    /**
+	 * 刷新智能提示。
+     * @protected override
+	 */
+    showSuggest: function () {        this.updateSuggestItems();
+
+        // 默认选择当前值。
+        this.dropDown.setSelectedItem(this.dropDown.item(0));
+    },
+
+    hideSuggest: function () {        this.hideDropDown();    },
+
+    moveSelectedItem: function (next) {    
+        // 如果菜单未显示。
+        if (this.dropDownHidden()) {
+
+            // 显示菜单。
+            this.showSuggest();
+        } else {
+            this.dropDown.moveSelectedItem(next);        }    },
 	
-	getSuggestItems: function(text){
-		if(!this.items){
-			this.items = [];
-			this.dropDown.child(function(item){
-				this.items.push(Dom.getText(item));
-			}.bind(this));
-		}
+    init: function (options) {
+
+        // UI 上增加一个下拉框。
+        this.setDropDown(this.createSuggest())
+
+            // 关闭原生的智能提示。
+            .setAttr('autocomplete', 'off')
+            .on('focus', this.showSuggest)
+            .on('blur', this.hideSuggest)
+
+            .keyNav({
+
+                up: function () {
+                    this.moveSelectedItem(false);                },
+
+                down: function () {
+                    this.moveSelectedItem(true);
+                },
+
+                enter: function () {
+                    if (this.dropDownHidden()) {
+                        return true;
+                    }
+                    this.selectItem(this.dropDown.getSelectedItem());
+                },
+
+                esc: this.hideSuggest,
+
+                other: this.showSuggest
+
+            });
+
+        // 绑定选中事件。
+        this.dropDown
+            .itemOn('mouseover', this.dropDown.setSelectedItem, this.dropDown)
+			.on('select', this.selectItem, this);
 		
+    },
+
+    /**
+     * 根据当前的文本框值获取智能提示的项。
+     */
+	getSuggestItems: function(text){
+	    if (!text) {
+	        return this.suggestItems;
+	    }
+
 		text = text.toLowerCase();
-		return this.items.filter(function(value){
+		return this.suggestItems.filter(function (value) {
 			return value.toLowerCase().indexOf(text) >= 0;
 		});
 	},
 	
+    /**
+     * 强制设置当前选中的项。
+     */
 	setSuggestItems: function(value){
-		this.dropDown.set(value);
+	    this.suggestItems = value || [];
 		return this;
 	},
 
-	updateSuggest: function(){
-	    var text = Dom.getText(this.node);
+    /**
+     * 更新智能提示的项。
+     */
+	updateSuggestItems: function () {
+        
+	    var text = this.getText();
 	    var items = this.getSuggestItems(text);
 
+        // 如果智能提示的项为空或唯一项就是当前的项，则不提示。
 	    if (!items || !items.length || (items.length === 1 && items[0] === text)) {
 	        return this.hideDropDown();
 	    }
 
 	    this.dropDown.set(items);
-    },
-	
-	/**
-	 * 向用户显示提示项。
-	 */
-	showSuggest: function(){
-	    this.updateSuggest();
-		this.showDropDown();
-		
-		// 默认选择当前值。
-		this._setHover(this.dropDown.item(0));
+	    return this.showDropDown();
 	},
-	
-	onKeyUp: function(e){
-		switch(e.keyCode) {
-			case 40:
-			case 38:
-			case 13:
-			case 36:
-		    case 37:
-		    case 27:
-			    return;
-		}
-		
-		
-		this.showSuggest();
-	},
-	
-	// 重写 onDropDownShow 和 onDropDownHide
-	
-	setText: Dom.prototype.setText,
-	
-	getText: Dom.prototype.getText,
-	
-	onDropDownShow: IDropDownOwner.onDropDownShow,
-	
-	onDropDownHide: IDropDownOwner.onDropDownHide,
-	
-	updateText: function(item){
-		this.setText(item.getText());
-	},
-	
-	init: function(options){
-		
-		var suggest = this.initDropDown().addClass('x-suggest');
-		
-		// UI 上增加一个下拉框。
-		this.setDropDown(suggest);
-		
-		// 绑定下拉菜单的点击事件
-		this.dropDown
-			.itemOn('mouseover', this._setHover, this)
-			.itemOn('mousedown', this.onItemClick, this);
 
-		this.on('keydown', this.onKeyDown);
-		this.on('focus', this.showSuggest);
-		this.on('blur', this.hideDropDown);
-		this.on('keyup', this.onKeyUp);
-		
-		this.setAttr('autocomplete', 'off');
-		
-	}
+    /**
+     * 模拟用户选择一项。
+     */
+	selectItem: function (item) {	    if (item) {
+	        this.setText(item.getText());	    }	    return this.hideDropDown();	}
 	
 });
-
-

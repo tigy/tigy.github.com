@@ -52,16 +52,6 @@ var IDropDownOwner = {
 		this.trigger('dropdownhide');
 	},
 
-    /**
-	 * 当被子类重写时，根据一个已有的节点初始化新的下拉菜单示例。
-     * @param {Dom} existDom=null 一个被认为是下拉菜单的原始 DOM 节点。如果不存在这个节点，则值为 null。
-	 * @return {Dom}
-     * @protected virtual
-	 */
-	initDropDown: function (existDom) {
-	    return existDom;
-	},
-
 	attach: function (parentNode, refNode) {
 	    if (this.dropDown && !this.dropDown.closest('body')) {
 	        this.dropDown.attach(parentNode, refNode);
@@ -82,7 +72,7 @@ var IDropDownOwner = {
      * @protected virtual
 	 */
 	getDropDown: function () {
-	    return this.dropDown || (this.dropDown = this.initDropDown(this.next('.x-dropdown')));
+	    return this.dropDown;
 	},
 
     /**
@@ -175,10 +165,11 @@ var IDropDownOwner = {
 	            dropDown.setSize(width);
 	        }
 
-	        this.onDropDownShow();
-
 	        // 设置 mouseup 后自动隐藏菜单。
 	        document.on('mouseup', this.hideDropDown, this);
+
+	        this.onDropDownShow();
+
 	    }
 		
 		return this;
@@ -204,11 +195,12 @@ var IDropDownOwner = {
 					return this;
 			}
 			
-			this.onDropDownHide();
 			dropDown.hide();
 
             // 删除 mouseup 回调。
 			document.un('mouseup', this.hideDropDown);
+
+			this.onDropDownHide();
 			
 		}
 		

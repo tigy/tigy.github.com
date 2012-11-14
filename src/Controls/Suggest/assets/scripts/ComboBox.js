@@ -395,6 +395,4 @@ ListControl.aliasMethods(ComboBox, 'dropDown');
 
 ComboBox.DropDownMenu = ListControl.extend({
 	
-    xtype: "listbox"
-
 });

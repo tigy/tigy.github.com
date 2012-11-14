@@ -101,6 +101,30 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 
     },
 
+
+    onSelect: function (item) {
+        return this.trigger('select', item);
+    },
+
+    onChange: function () {
+        this.trigger('change');
+    },
+
+    onUp: function () {        },
+
+    onDown: function () {
+    },
+
+    onEnter: function () {
+    },
+
+    /**
+	 * 处理键盘事件。
+	 */
+    onKeyDown: function (e) {
+
+    },
+
     setWidth: function (value) {
         var first = this.first();
         if (value >= 0) {
@@ -149,7 +173,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 	 */
     updateDropDown: Function.empty
 
-})
+}).addEvents('select')
 .addEvents('change', {
     add: function (picker, type, fn) {
         Dom.$event.$default.add(picker.input(), type, fn);
