@@ -1,0 +1,23 @@
+.x-updown .x-updown-button-up {
+  -webkit-border-bottom-right-radius: 0;
+  -moz-border-radius-bottomright: 0;
+  border-bottom-right-radius: 0;
+  line-height: 6px;
+  height: 15px;
+  *padding-top: 0;
+}
+.x-updown-button-up .x-menubutton-arrow {
+  border-top: none;
+  border-bottom: 4px solid #000000;
+}
+.x-updown .x-updown-button-down {
+  -webkit-border-top-right-radius: 0;
+  -moz-border-radius-topright: 0;
+  border-top-right-radius: 0;
+  line-height: 6px;
+  height: 15px;
+  top: auto;
+  bottom: 0;
+  *padding-top: 0;
+  *margin-bottom: 2px;
+}

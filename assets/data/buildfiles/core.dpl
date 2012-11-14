@@ -1,0 +1,16 @@
+# 基本属性
+title 所有组件
+js scripts/core.js
+css styles/core.css
+images images
+base ../../../build/
+ 
+
+# 组件依赖
+
+# 组件列表
+using System.Core.Base
+using System.Dom.Base
+using System.Ajax.Base
+using System.Ajax.Jsonp
+using System.Fx.Animate

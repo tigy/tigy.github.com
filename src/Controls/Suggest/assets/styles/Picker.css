@@ -30,7 +30,7 @@
   *position: relative;
   *top: -1px;
 }
-.x-picker input:focus + button {
+.x-picker input:focus ~ button {
   border-color: rgba(82, 168, 236, 0.8);
 }
 .x-picker a {

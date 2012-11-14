@@ -16,10 +16,20 @@ using("Controls.Core.IDropDownOwner");
  */
 var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 
+    /**
+	 * 当前控件的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */
     tpl: '<span class="x-picker">\
 			<input type="text" class="x-textbox"/>\
 		</span>',
 
+    /**
+	 * 当前控件以下拉形式时的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */
     dropDownListTpl: '<span class="x-picker">\
 			<a href="javascript:;" class="x-button">A</a>\
 		</span>',
@@ -27,7 +37,8 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
     menuButtonTpl: '<button class="x-button" type="button"><span class="x-menubutton-arrow"></span></button>',
 
     /**
-	 * 当前控件是否为下拉列表。
+	 * 当前控件是否为下拉列表形式。
+     * @type {Boolean}
 	 */
     dropDownList: false,
 

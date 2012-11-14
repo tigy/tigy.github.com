@@ -4,7 +4,7 @@
 
 
 imports("Controls.Composite.MonthCalender");
-using("System.Utils.Date")  ;
+using("System.Utils.Date");
 using("System.Fx.Animate");
 
 
@@ -97,7 +97,12 @@ var MonthCalender = Control.extend({
      * @protected virtual
      */
     onItemClick: function (item) {
-        this.selectItem(item);
+
+        // 如果此项是允许点击的。则生成新的日期对象，并设置为当前值。
+        if (!item.hasClass('x-monthcalender-disabled')) {
+            this.selectItem(item);
+        }
+
         return false;
     },
 
@@ -210,26 +215,21 @@ var MonthCalender = Control.extend({
      */
     selectItem: function (item) {
 
-        // 如果此项是允许点击的。则生成新的日期对象，并设置为当前值。
-        if (!item.hasClass('x-monthcalender-disabled')) {
+        // 根据 item 取得 value 。
+        var value = new Date(this.displayedValue.getFullYear(), this.displayedValue.getMonth(), parseInt(item.getText()));
 
-            // 根据 item 取得 value 。
-            var value = new Date(this.displayedValue.getFullYear(), this.displayedValue.getMonth(), parseInt(item.getText()));
+        // 如果允许选中。
+        if (this.onSelect(value) !== false) {
 
-            // 如果允许选中。
-            if (this.onSelect(value) !== false) {
+            // 获取原值。
+            var oldValue = this.getValue();
 
-                // 获取原值。
-                var oldValue = this.getValue();
+            // 设置值。
+            this.setValue(value);
 
-                // 设置值。
-                this.setValue(value);
-
-                // 检测值是否改变。
-                if (value - oldValue > 0) {
-                    this.onChange();
-                }
-
+            // 检测值是否改变。
+            if (value - oldValue > 0) {
+                this.onChange();
             }
 
         }
@@ -407,7 +407,7 @@ Object.extend(MonthCalender, {
         parentView: 'MonthView',
 
         select: function (calender, item) {
-            
+
             // 如果是 alt， 则是上个月或下个月, 则切换为新视图。
             // 否则，设置并更新当前的值。
             if (item.hasClass('x-monthcalender-alt')) {
@@ -434,7 +434,7 @@ Object.extend(MonthCalender, {
          * @param {MonthCalender} calender 要渲染的目标日历对象。
          */
         render: function (calender, useProxy) {
-            
+
             // 获取当前年 。
             var displayedYear = calender.displayedValue.getFullYear(),
 
@@ -517,7 +517,7 @@ Object.extend(MonthCalender, {
 
                 // 需要添加 actived 的日期值。
                 activedYear = calender.getToday().getFullYear(),
-                    
+
                 value = ((displayedYear / 10) | 0) * 10;
 
             // 设置顶部标题。
@@ -571,7 +571,7 @@ Object.extend(MonthCalender, {
     },
 
     DecadeView: {
-        		
+
         render: function (calender, useProxy) {
 
             // 获取当前年 。
@@ -627,34 +627,34 @@ Object.extend(MonthCalender, {
         },
 
         parentView: 'DecadeView',
-			
+
         select: function (calender, item) {
 
             calender.displayedValue.setYear(+item.getAttr('data-value'));
 
             calender.setView(MonthCalender.YearView);
-	
+
         },
 
         move: function (calender, delta) {
             calender.displayedValue.addYear(delta * 100);
         }
     },
-		
-	months: "一月 二月 三月 四月 五月 六月 七月 八月 九月 十月 十一月 十二月".split(' '),
-	
-	weeks: {
-		sunday: '日',
-		monday: '一',
-		tuesday: '二',
-		wednesday: '三',
-		thursday: '四',
-		friday: '五',
-		saturday: '六'
-	},
-	
-	monthFormat: 'yyyy年M月',
-	
-	todayFormat: '今天: yyyy年M月d日'
-	
+
+    months: "一月 二月 三月 四月 五月 六月 七月 八月 九月 十月 十一月 十二月".split(' '),
+
+    weeks: {
+        sunday: '日',
+        monday: '一',
+        tuesday: '二',
+        wednesday: '三',
+        thursday: '四',
+        friday: '五',
+        saturday: '六'
+    },
+
+    monthFormat: 'yyyy年M月',
+
+    todayFormat: '今天: yyyy年M月d日'
+
 });

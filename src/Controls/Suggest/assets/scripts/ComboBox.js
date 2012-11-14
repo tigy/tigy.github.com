@@ -120,7 +120,7 @@ var ComboBox = Picker.extend({
 	
         // 如果无法更改值，则直接忽略。
         if(!this.getAttr('disabled') && !this.getAttr('readonly')) {
-				
+	        
             // 设置当前的选中项。
             this.selectItem(item);
 			
