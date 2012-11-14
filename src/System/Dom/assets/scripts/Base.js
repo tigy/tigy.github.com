@@ -423,7 +423,7 @@ using("System.Core.Base");
 		/**
 		 * 一个返回 true 的函数。
 		 */
-		returnTrue = Function.from(true),
+		returnTrue = function () { return true; },
 
 		/**
 		 * 用于测试的元素。
@@ -2001,7 +2001,7 @@ using("System.Core.Base");
 			return this;
 		} : 'onselectstart' in div ? function(value) {
 			assert.isElement(this.node, "Dom#unselectable(value): 当前 dom 不支持此操作");
-			this.node.onselectstart = value !== false ? Function.from(false) : null;
+			this.node.onselectstart = value !== false ? function () { return false; } : null;
 			return this;
 		} : function(value) {
 			assert.isElement(this.node, "Dom#unselectable(value): 当前 dom 不支持此操作");
@@ -2098,7 +2098,7 @@ using("System.Core.Base");
 					me.setStyle(key, value);
 
 				// .setKey(value)
-				else if (Object.isFunction(me[setter = 'set' + key.capitalize()]))
+				else if (typeof me[setter = 'set' + key.capitalize()] === 'function')
 					me[setter](value);
 
 				// 如果是当前对象的成员。
@@ -2107,7 +2107,7 @@ using("System.Core.Base");
 					setter = me[key];
 
 					// .key(value)
-					if (Object.isFunction(setter))
+					if (typeof setter === 'function')
 						me[key](value);
 
 					// .key.set(value)
@@ -2374,7 +2374,7 @@ using("System.Core.Base");
 		 */
 		setOffset: function(offsetPoint) {
 
-			assert(Object.isObject(offsetPoint), "Dom#setOffset(offsetPoint): {offsetPoint} 必须有 'x' 和 'y' 属性。", offsetPoint);
+		    assert(offsetPoint, "Dom#setOffset(offsetPoint): {offsetPoint} 必须有 'x' 和 'y' 属性。", offsetPoint);
 			var style = this.node.style;
 
 			if (offsetPoint.y != null)
@@ -2452,22 +2452,23 @@ using("System.Core.Base");
 			
 			var eventName, selector;
 			
-			if(Object.isObject(eventAndSelector)){
-				for(eventName in eventAndSelector) {
-				    this.bind(eventName, eventAndSelector[eventName]);
-				}
+			if (typeof eventAndSelector === 'string') {
+
+			    eventName = (/^\w+/.exec(eventAndSelector) || [''])[0];
+
+			    assert(eventName, "Dom#bind(eventAndSelector, handler): {eventAndSelector} 中不存在事件信息。正确的 eventAndSelector 格式： click.selector")
+
+			    if (selector = eventAndSelector.substr(eventName.length)) {
+			        this.delegate(selector, eventName, handler);
+			    } else {
+			        this.on(eventName, handler);
+			    }
 			} else {
-				
-				eventName = (/^\w+/.exec(eventAndSelector) || [''])[0];
-					
-				assert(eventName, "Dom#bind(eventAndSelector, handler): {eventAndSelector} 中不存在事件信息。正确的 eventAndSelector 格式： click.selector")
-				
-				if(selector = eventAndSelector.substr(eventName.length)){
-				    this.delegate(selector, eventName, handler);
-				} else {
-					this.on(eventName, handler);
-				}
-				
+
+			    for (eventName in eventAndSelector) {
+			        this.bind(eventName, eventAndSelector[eventName]);
+			    }
+
 			}
 			
 			return this;
@@ -3859,7 +3860,7 @@ using("System.Core.Base");
 		return function (fn, scope) {
 			
 			// 忽略参数不是函数的调用。
-			var isFn = Object.isFunction(fn);
+		    var isFn = typeof fn === 'function';
 
 			// 如果已载入，则直接执行参数。
 			if(Dom[isReadyOrIsLoad]) {

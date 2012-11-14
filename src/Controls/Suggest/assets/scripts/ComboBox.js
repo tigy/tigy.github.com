@@ -105,6 +105,7 @@ var ComboBox = Picker.extend({
                     }
                 }
 
+            // ESC
             case 27:
                 this.hideDropDown();
                 break;

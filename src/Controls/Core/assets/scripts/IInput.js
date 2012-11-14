@@ -32,17 +32,17 @@ var IInput = {
 
     /**
 	 * 设置当前输入域的状态, 并改变控件的样式。
-     * @param {String} name 状态名。常用的状态如： disabled、readonly、checked、selected、actived
+     * @param {String} name 状态名。常用的状态如： disabled、readonly、checked、selected、actived 。
      * @param {Boolean} value=false 要设置的状态值。
 	 * @protected virtual
 	 */
 	state: function (name, value) {
-	    return this.toggleClass('x-' + this.xtype + '-' + name, value);
+	    this.toggleClass('x-' + this.xtype + '-' + name, value);
 	},
 	
 	/**
 	 * 获取当前控件所在的表单。
-	 * @return {Dom} 表单。
+	 * @return {Dom} 返回当前控件所在的表单的 Dom 对象。
 	 */
 	form: function () {
 		return new Dom(this.input().node.form);

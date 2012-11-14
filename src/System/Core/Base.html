@@ -26,20 +26,6 @@
                             assert.areEqual(value["a"], "g");
                         }
                     },
-                    'Object.isObject': {
-                        'Object.isObject({})': true,
-                        'Object.isObject(null)': false,
-                        'Object.isObject(2)': false
-                    },
-                    'Object.isArray': {
-                        'Object.isArray([])': true,
-                        'Object.isArray()': false
-                    },
-                    'Object.isFunction': {
-                        'Object.isFunction(function(){})': true,
-                        'Object.isFunction(new Function())': true,
-                        'Object.isFunction()': false
-                    },
                     'Object.each': {
                         'var target={a:1, b:2, c:3}; Object.each(target, assert.log)': function (value, assert) {
                             assert.logged("123");
@@ -103,6 +89,10 @@
                             assert.areEqual(value, [5]);
                         }
                     },
+                    'Array.isArray': {
+                        'Array.isArray([])': true,
+                        'Array.isArray()': false
+                    },
                     'Function': '-',
                     'Function#bind': {
                         '(function(){assert.log(this)}).bind(2)': function (value, assert) {
@@ -112,11 +102,6 @@
                     },
                     'Function.empty': {
                         'Function.empty()': undefined
-                    },
-                    'Function.from': {
-                        'Function.from(1)': function (value, assert) {
-                            assert.areEqual(value(), 1);
-                        }
                     },
                     'String': '-',
                     'String#trim': {

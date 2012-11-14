@@ -9,6 +9,24 @@
 Function.implementIf({
 	
 	
+
+    /**
+     * 返回一个新函数，这个函数始终返回 *value*。
+     * @param {Object} value 需要返回的参数。
+     * @return {Function} 执行得到参数的一个函数。
+     * @example
+     * <pre>
+     * var fn = Function.from(0);
+     * fn()    // 0
+     * </pre>
+     */
+    from: function (value) {
+
+        // 返回一个值，这个值是当前的参数。
+        return function () {
+            return value;
+        }
+    },
 	
 	isFunction: jQuery.browser.msie ?
 	        function( fn ) {
@@ -129,7 +147,7 @@ Object.extendIf(Function, {
 	 * @return {Timer} 可用于 clearInterval 的计时器。
 	 */
 	create :  function (statement, time, times){
-		var fn = Object.isFunction(statement) ? statement : new Function(statement);
+	    var fn = typeof statement === 'function' ? statement : new Function(statement);
 		return (time ? (function(){ return fn[times==1 ? "delay" : "periodical"].apply(this, arguments);} ) : fn);
 	},
 	
@@ -237,7 +255,7 @@ Object.extendIf(Function, {
      */
     createInterceptor: function(origFn, newFn, scope, returnValue) {
         var method = origFn;
-        if (!Ext.isFunction(newFn)) {
+        if (typeof newFn !== 'function') {
             return origFn;
         }
         else {

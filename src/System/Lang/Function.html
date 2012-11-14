@@ -5,7 +5,7 @@
     <meta name="dpl-info" content="status=plan">
     <title>函数扩展</title>
     <script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
-    <script src="../../System/Utils/assets/scripts/Function.js" type="text/javascript"></script>
+    <script src="../../System/Lang/assets/scripts/Function.js" type="text/javascript"></script>
 
     <script src="../../../assets/demo/demo.js" type="text/javascript"></script>
 </head>
@@ -13,6 +13,11 @@
     <article class="demo">
         <script>
             var fns = [
+                'Function.from': {
+                    'Function.from(1)': function (value, assert) {
+                        assert.areEqual(value(), 1);
+                    }
+            },
 				["Function.prototype.concat", function () { return function () { }.concat(log)([]) }],
 				["Function.prototype.delay", function () { return log.delay(1000, null, "sss"); }],
 				["Function.prototype.bind", function () { return log.bind(); }],

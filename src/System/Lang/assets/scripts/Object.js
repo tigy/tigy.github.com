@@ -1,9 +1,120 @@
 //===========================================
 //  对象扩展     
 //===========================================
+/** * @author  */Object.map("Array Date RegExp", function (nativeType) {
+    window[nativeType].prototype.xtype = nativeType.toLowerCase();
+});/** * 返回一个变量的类型的字符串形式。 * @param {Object} obj 变量。 * @return {String} 所有可以返回的字符串： string number boolean undefined null *         array function element class date regexp object。 * @example <code>  * Object.type(null); // "null" * Object.type(); // "undefined" * Object.type(new Function); // "function" * Object.type(+'a'); // "number" * Object.type(/a/); // "regexp" * Object.type([]); // "array" * </code> */Object.type = function (obj) {    // 获得类型 。    var typeName = typeof obj;    return typeName === "object" ?		obj === null ?					"null" :					obj.xtype || (						typeof obj.nodeType === "number" ? "node" :						typeName					)		: typeName;
+}/**
+ * @author  xuld
+ */
 
+/**
+ * 一次性为一个对象设置属性。
+ * @param {Object} obj 目标对象。将对这个对象设置属性。
+ * @param {Object} options 要设置的属性列表。 函数会自动分析 *obj*, 以确认一个属性的设置方式。
+ * 比如设置 obj 的 key 属性为 值 value 时，系统会依次检测:
+ *
+ * - 尝试调用 obj.setKey(value)。
+ * - 尝试调用 obj.key(value)
+ * - 尝试调用 obj.key.set(value)
+ * - 尝试调用 obj.set(key, value)
+ * - 最后调用 obj.key = value
+ *
+ * @example <pre>
+ * var target = {
+ *
+ * 		setA: function (value) {
+ * 			assert.log("1");
+ * 			trace("设置 a =  ", value);
+ *		},
+ *
+ * 		b: function (value) {
+ * 			trace(value);
+ *		}
+ *
+ * };
+ *
+ * Object.set(target, {a: 8, b: 6, c: 4});
+ *
+ * </pre>
+ */
+Object.set = function (obj, options) {
+
+    assert.notNull(obj, "Object.set(obj, options): {obj} ~");
+
+    var key, value, setter;
+
+    for (key in options) {
+
+        value = options[key],
+			    setter = 'set' + key.capitalize();
+
+        // obj.setKey(value)
+        if (Object.isFunction(obj[setter]))
+            obj[setter](value);
+
+        else if (key in obj) {
+
+            setter = obj[key];
+
+            // obj.key(value)
+            if (Object.isFunction(setter))
+                obj[key](value);
+
+                // obj.key.set(value)
+            else if (setter && setter.set)
+                setter.set(value);
+
+                // obj.key = value
+            else
+                obj[key] = value;
+
+            // obj.set(key, value)
+        } else if (obj.set)
+            obj.set(key, value);
+
+            // obj.key = value
+        else
+            obj[key] = value;
+
+    }
+
+    return obj;
+
+};
 
 Object.extend(Object, {
+
+    /**
+     * 判断一个变量是否是函数。
+     * @param {Object} obj 要判断的变量。
+     * @return {Boolean} 如果是函数，返回 true， 否则返回 false。
+     * @example
+     * <pre>
+     * Object.isFunction(function () {}); // true
+     * Object.isFunction(null); // false
+     * Object.isFunction(new Function); // true
+     * </pre>
+     */
+    isFunction: function (obj) {
+        return toString.call(obj) === "[object Function]";
+    },
+
+    /**
+     * 判断一个变量是否是引用变量。
+     * @param {Object} obj 变量。
+     * @return {Boolean} 如果 *obj* 是引用变量，则返回 **true**, 否则返回 **false** 。
+     * @remark 此函数等效于 `obj !== null && typeof obj === "object"`
+     * @example
+     * <pre>
+     * Object.isObject({}); // true
+     * Object.isObject(null); // false
+     * </pre>
+     */
+    isObject: function (obj) {
+        // 只检查 null 。
+        return obj !== null && typeof obj === "object";
+    },
 
 	/**
 	 * Get the number of objects in the map
@@ -35,7 +146,7 @@ Object.extend(Object, {
 		
 		//if (object == null) return true;
 		
-		//if (typeof object == "object" && !Object.isArray(object)) for (var name in obj) return false;
+		//if (typeof object == "object" && !Array.isArray(object)) for (var name in obj) return false;
 		
 		return object == null || object.length === 0;
 	},

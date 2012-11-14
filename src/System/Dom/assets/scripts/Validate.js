@@ -102,7 +102,7 @@ var Validator = Class({
 	},
 	
 	set: function(validateType, value, errorMsg){
-		if(Object.isObject(validateType)){
+	    if (typeof validateType !== 'string') {
 			for(value in validateType){
 				this.set(value, validateType[value]);
 			}

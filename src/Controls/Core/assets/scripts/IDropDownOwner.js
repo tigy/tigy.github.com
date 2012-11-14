@@ -121,10 +121,19 @@ var IDropDownOwner = {
 		return this;
 	},
 
+    /**
+     * 判断当前下拉菜单是否被隐藏。
+     * @return this
+     * @protected virtual
+     */
 	dropDownHidden: function () {
 	    return this.dropDown && Dom.isHidden(this.dropDown.node);
 	},
 
+    /**
+     * 切换下拉菜单的显示状态。
+     * @return this
+     */
 	toggleDropDown: function (e) {
 
 	    // 如果是因为 DOM 事件而切换菜单，则测试是否为 disabled 状态。
@@ -137,17 +146,18 @@ var IDropDownOwner = {
 	    return this[this.dropDownHidden() ? 'showDropDown' : 'hideDropDown']();
 	},
 	
+    /**
+     * 展开下拉菜单。
+     * @return this
+     */
 	showDropDown: function(){
-
-	    var dropDown = this.dropDown;
 
         // 如果下拉菜单被隐藏，则先重设大小、定位。
 	    if (this.dropDownHidden()) {
-	        dropDown.show();
-	        
+
 	        // 重新设置位置。
-	        dropDown.align(this, 'bl', 0, -1);
-	        
+	        var dropDown = this.dropDown.show().align(this, 'bl', 0, -1);
+
 	        // 重新修改宽度。
 
 	        var width = this.dropDownWidth;
@@ -169,13 +179,15 @@ var IDropDownOwner = {
 
 	        // 设置 mouseup 后自动隐藏菜单。
 	        document.on('mouseup', this.hideDropDown, this);
-	    } else {
-	        this.realignDropDown(0, -1);
 	    }
 		
 		return this;
 	},
-	
+
+    /**
+     * 关闭下拉菜单。
+     * @return this
+     */
 	hideDropDown: function (e) {
 		
 		var dropDown = this.dropDown;
