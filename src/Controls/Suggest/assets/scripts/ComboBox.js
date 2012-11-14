@@ -387,7 +387,7 @@ var ComboBox = Picker.extend({
 		
     }
 
-}).addEvents('select');
+}).addEvents('select change');
 
 
 ListControl.aliasMethods(ComboBox, 'dropDown');

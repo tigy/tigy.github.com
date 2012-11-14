@@ -8,13 +8,13 @@ imports("Controls.Container.Dialog");
 using("Controls.Core.ContainerControl");
 
 
-var Dialog =  ContainerControl.extend({
+var Dialog = ContainerControl.extend({
+
+    _centerType: 1 | 2,
 	
 	xtype: 'dialog',
-	
-	autoCenterType: 1 | 2,
 
-    duration: -1,
+	showDuration: -1,
 	
 	// 基本属性
 		
@@ -28,7 +28,7 @@ var Dialog =  ContainerControl.extend({
 		this.trigger('close');
 	},
 
-	onClickClose: function(){
+	onCloseButtonClick: function(){
 	    this.close();
 	},
 	
@@ -55,7 +55,7 @@ var Dialog =  ContainerControl.extend({
 		}
 		
 		// 关闭按钮。
-		this.delegate('.x-dialog-close', 'click', this.onClickClose.bind(this));
+		this.delegate('.x-dialog-close', 'click', this.onCloseButtonClick.bind(this));
 
 		this.setStyle('display', 'none');
 		
@@ -83,12 +83,12 @@ var Dialog =  ContainerControl.extend({
 	
 	setOffset: function(p){
 		if(p.x != null) {
-			this.autoCenterType &= ~2;
+			this._centerType &= ~2;
 			this.setStyle('margin-left', 0);
 		}
 		
 		if(p.y != null) {
-			this.autoCenterType &= ~1;
+			this._centerType &= ~1;
 			this.setStyle('margin-top', 0);
 		}
 		
@@ -108,13 +108,13 @@ var Dialog =  ContainerControl.extend({
 	},
 	
 	/**
-	 * 刷新当前对话框的位置以确保居中。
+	 * 重对齐当前对话框的位置以确保居中显示。
 	 */
 	center: function(){
-		if(this.autoCenterType & 1)
+		if(this._centerType & 1)
 			this.setStyle('margin-top', - this.getHeight() / 2 + document.getScroll().y);
 			
-		if(this.autoCenterType & 2)
+		if(this._centerType & 2)
 			this.setStyle('margin-left', - this.getWidth() / 2 + document.getScroll().x);
 			
 		return this;
@@ -130,7 +130,7 @@ var Dialog =  ContainerControl.extend({
 	},
 	
 	showDialog: function(callback){
-		return this.mask().show(this.duration, callback);
+		return this.mask().show(this.showDuration, callback);
 	},
 	
 	hide: function(){
@@ -145,16 +145,16 @@ var Dialog =  ContainerControl.extend({
 		if (this.maskDom) this.maskDom.remove();
 	},
 	
-	setBodySize: function(x, y){
+	setContentSize: function(x, y){
 		this.setWidth('auto');
 		this.body().setWidth(x).setHeight(y);
-		this.center();
-		return this;
+		return this.center();
 	},
 	
 	close: function(){
 		if(this.onClosing() !== false)
-			this.hide(this.duration, this.onClose.bind(this));
+		    this.hide(this.showDuration, this.onClose.bind(this));
+		return this;
 	}
 	
 });
