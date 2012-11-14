@@ -43,11 +43,6 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
     dropDownList: false,
 
     /**
-	 * 下拉框的宽度。
-	 */
-    dropDownWidth: -1,
-
-    /**
 	 * @config dropDownList 是否允许用户输入自定义的文本值。
 	 */
 
@@ -206,11 +201,6 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
     menuButtonTpl: '<button class="x-button" type="button"><span class="x-menubutton-arrow"></span></button>',
 
     /**
-	 * 下拉框的宽度。
-	 */
-    dropDownWidth: -1,
-
-    /**
 	 * 获取当前控件的按钮部分。
 	 */
     button: function () {
@@ -304,6 +294,13 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
         return this;
     }
 
+}).addEvents('selecting', {
+    add: function (picker, type, fn) {
+		picker.dropDown.on(type, fn);
+    },
+    remove: function (picker, type, fn) {
+        picker.dropDown.un(type, fn);
+    }
 }).addEvents('change select', {
     add: function (picker, type, fn) {
         Dom.$event.$default.add(picker.input(), type, fn);

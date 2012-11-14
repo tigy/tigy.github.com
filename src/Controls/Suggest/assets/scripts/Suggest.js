@@ -98,7 +98,7 @@ var Suggest = Control.extend(IDropDownOwner).implement({
             });
             
         // 设置智能提示项选择后的回调。
-        this.dropDown.on('select', this.selectItem, this);
+        this.dropDown.onSelect = this.selectItem.bind(this);
 		
     },
 
