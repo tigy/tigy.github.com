@@ -2,10 +2,8 @@
  * @author xuld
  */
 
-
-
-imports("Controls.Form.ListBox");
-using("Controls.Core.ListControl");
+using("System.Dom.KeyNav");
+using("Controls.Suggest.DropDownMenu");
 using("Controls.Suggest.Picker");
 
 /**
@@ -24,94 +22,6 @@ var ComboBox = Picker.extend({
     xtype: 'combobox',
 	
     autoResize: true,
-	
-    // 悬停选中
-	
-    _getHover: function(){
-        return this._hoverItem;
-    },
-	
-    _setHover: function(item){
-        var clazz = 'x-' + this.dropDown.xtype + '-hover';
-		
-        if(this._hoverItem){
-            this._hoverItem.removeClass(clazz);
-        }
-		
-        this._hoverItem = item ? item.addClass(clazz) : null;
-		
-    },
-	
-    /**
-	 * 移动当前选中项的位置。
-	 */
-    _moveHover: function(delta){
-		
-        // 如果菜单未显示。
-        if(this.dropDownHidden()){
-	    	
-            // 显示菜单。
-            this.showDropDown();
-        } else {
-	    	
-            var item = this._hoverItem || this.selectedItem;
-	    	
-            if(item){
-                item = item[delta > 0 ? 'next' : 'prev']();
-            }
-	    	
-            if(!item){
-                item = this.dropDown.item(delta > 0 ? 0 : -1);
-            }
-	    	
-            this._setHover(item);
-	    	
-        }
-    },
-	
-    onSelect: function(item){
-        return this.trigger('select', item);
-    },
-	
-    onChange: function(){
-        this.trigger('change');
-    },
-	
-    /**
-	 * 处理键盘事件。
-	 */
-    onKeyDown: function (e) {
-        switch(e.keyCode) {
-			
-            // 上下
-            case 40:
-            case 38:
-			
-                // 阻止默认事件。
-                e.preventDefault();
-			    
-                this._moveHover(e.keyCode === 40 ? 1 : -1);
-			    
-                break;
-			    
-                // 回车
-            case 13:
-            case 10:
-                if(!this.dropDownHidden()){
-                    var currentItem = this._getHover();
-                    if(currentItem != null) {
-                        this.selectItem(currentItem);
-                        e.preventDefault();
-                    }
-                }
-
-            // ESC
-            case 27:
-                this.hideDropDown();
-                break;
-
-        }
-    },
 	
     /**
 	 * 当用户单击某一项时执行。
@@ -135,31 +45,50 @@ var ComboBox = Picker.extend({
 	 * @return {Control} 下拉菜单。
 	 * @protected virtual
 	 */
-    initDropDown: function(existDom){
-        return new ComboBox.DropDownMenu(existDom);
+    createDropDown: function(existDom){
+        return new DropDownMenu(existDom);
     },
 	
     /**
 	 * 将当前文本的值同步到下拉菜单。
 	 */
     updateDropDown: function(){
-        this._setHover(this.getSelectedItem());
+        this.dropDown.setHovering(this.getSelectedItem());
     },
 
+    onUpDown: function (next) {
+    
+        // 如果菜单未显示。
+        if (this.dropDownHidden()) {
+
+            // 显示菜单。
+            this.showDropDown();
+        } else {
+            this.dropDown.handlerUpDown(next);
+        }
+    },
+    
+    onEnter: function(){
+    	if (this.dropDownHidden()) {
+            return true;
+        }
+        
+        // 交给下列菜单处理。
+        this.dropDown.handlerEnter();
+    },
+	
     init: function (options) {
 		
         // 1. 处理 <select>
-        var selectNode;
+        var selectDom;
 		
         // 如果初始化的时候传入一个 <select> 则替换 <select>, 并拷贝相关数据。
         if(this.node.tagName === 'SELECT') {
 			
-            this.inputProxy = selectNode = new Dom(this.node);
+            this.selectDom = selectDom = new Dom(this.node);
 			
             // 调用 create 重新生成 dom 。
-            this.node = Dom.parseNode(this.dropDownListTpl);
-			
-            this.dropDownList = true;
+            this.node = this.create();
 			
         }
 		
@@ -168,88 +97,58 @@ var ComboBox = Picker.extend({
         // 初始化文本框
         this.base('init');
 		
-        // 3. 初始化菜单
-		
-        // 绑定下拉菜单的点击事件
-        this.dropDown
-			.itemOn('mouseover', this._setHover, this)
-			.itemOn('click', this.onItemClick, this);
-		
-        // 4. 绑定事件
-		
-        // 监听键盘事件。
-        this.on('keydown', this.onKeyDown);
-		
-        // IE6 Hack: keydown 无法监听到回车。
-        if(navigator.isIE6) {
-            this.on('keypress', this.onKeyDown);	
-        }
-		
-        // 4. 设置默认项
+        // 3. 设置默认项
 			
-        if(selectNode) {
+        if(selectDom) {
 			
             // 让 listBox 拷贝 <select> 的成员。
-            this.copyItemsFromSelect(selectNode);
+            this.copyItemsFromSelect(selectDom);
 			
             // 隐藏 <select> 为新的 dom。
-            selectNode.hide();
+            selectDom.hide();
 
             // 插入当前节点。
-            selectNode.after(this);
+            selectDom.after(this);
         }
 		
-    },
-	
-    setText: function (value) {
+        // 4. 和下拉菜单互相绑定
+		
+        // 监听键盘事件。
+        this.keyNav({
+    	
+            up: function () {
+                this.onUpDown(false);
+            },
 
-        // 如果是 dropDownList 模式，则通过 setSelectedItem 来设置当前文本框的值。
-        if (this.dropDownList) {
+            down: function () {
+                this.onUpDown(true);
+            },
 
-            // 设置 value 。
-            this.input().node.value = value;
+            enter: this.onEnter,
 
-            // 根据 value 获得新决定的选中项设置选中项。
-            return this.setSelectedItem(this.getSelectedItem());
-        }
+            esc: function(){
+            	this.hideDropDown();
+            }
 
-        // 设置内容。
-        return IInput.setText.call(this, value);
+       	});
             
+        // 设置智能提示项选择后的回调。
+        this.dropDown.on('select', this.selectItem, this);
+		
     },
 	
     /**
 	 * 模拟用户选择某一个项。
 	 */
     selectItem: function (item) {
-        
-        if (this.onSelect(item) !== false) {
-        	
-        	var changed, old;
-        	
-        	// 如果是列表形式，判断选中项。
-        	if (this.dropDownList) {
-        		old = this.getSelectedItem();
-            	this.setSelectedItem(item);
-            	changed = !(old ? old.equals(item) : item);
-        	} else {
-        		old = this.getText();
-            	this.setSelectedItem(item);
-            	changed = this.getText() !== old;
-        	}
-        	
-        	if(changed){
-        		this.onChange();
-        	}
-        }
+    	
+    	var old = this.getText();
+    	this.setSelectedItem(item);
+    	if(old !== this.getText()) {
+    		this.trigger('change');
+    	}
 
         return this.hideDropDown();
-    },
-
-    getValueOfItem: function (item) {
-        assert.notNull(item, "ComboBox#getValueOfItem(item): {item} ~", item);
-        var option = item.dataField().option;
-        return option ? option.value : (item.getAttr('data-value') || item.getText());
     },
 	
     /**
@@ -257,27 +156,7 @@ var ComboBox = Picker.extend({
 	 * @return {Control} 选中的项。
 	 */
     getSelectedItem: function () {
-
-        // 如果使用了表单模式，则优先查找 value 匹配的项。
-        if (this.dropDownList) {
-
-            // 获取 input 字段。
-            var input = this.input(), value;
-
-            // 如果隐藏域是 SELECT ，比较方便：
-            if (input.node.tagName === 'SELECT') {
-                value = this.inputProxy.getAttr('selectedIndex');
-                return value >= 0 ? this.dropDown.item(value) : null;
-            }
-
-            value = input.node.value;
-
-            return this.dropDown.child(function (dom) {
-                return this.getValueOfItem(new Dom(dom)) === value;
-            }.bind(this));
-        }
-
-        value = this.getText();
+        var value = this.getText();
         return this.dropDown.child(function (dom) {
             return Dom.getText(dom) === value;
         });
@@ -289,43 +168,7 @@ var ComboBox = Picker.extend({
 	 * @return this
 	 */
     setSelectedItem: function (item) {
-
-        // 如果有隐藏域，则设置选择的索引。
-        if (this.dropDownList) {
-
-            var text,
-                input = this.input();
-
-            if (input.node.tagName === "SELECT") {
-
-                if (item) {
-                    var option = item.dataField().option;
-                    if (!option) {
-                        item.dataField().option = option = new Option(item.getText(), this.getValueOfItem(item));
-                        input.node.add(option);
-                    }
-                    option.selected = true;
-                    text = Dom.getText(option);
-                } else {
-                    input.node.selectedIndex = -1;
-                    text = input.getAttr('placeholder');
-                }
-
-            } else {
-                input.node.value = item ? this.getValueOfItem(item) : "";
-                text = item ? item.getText() : "";
-            }
-
-            // 无隐藏域，仅设置按钮的文本。
-            this.first().setText(text);
-
-        } else {
-
-        	// 如果未使用表单模式，则设置当前文本框。
-            // 获取 item 的文本并更新值。
-            this.setText(item ? item.getText() : "");
-        }
-        
+        return this.setText(item ? item.getText() : "");
     },
 	
     getSelectedIndex: function(){
@@ -387,12 +230,7 @@ var ComboBox = Picker.extend({
 		
     }
 
-}).addEvents('select change');
-
+});
 
 ListControl.aliasMethods(ComboBox, 'dropDown');
 
-
-ComboBox.DropDownMenu = ListControl.extend({
-	
-});

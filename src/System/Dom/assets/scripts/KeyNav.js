@@ -5,7 +5,7 @@
 using("System.Dom.Base");
 
 /**
- * ³£ÓÃ¼üÃûµÄ¼òĞ´¡£
+ * å¸¸ç”¨é”®åçš„ç®€å†™ã€‚
  */
 Dom.keys = {
     '13': 'enter',
@@ -24,14 +24,14 @@ Dom.keys = {
 Dom.implement({
 
     /**
-     * °ó¶¨Ä³°´¼üÖ´ĞĞºóµÄ»Øµ÷º¯Êı¡£
-     * @param {Object} {keyCode: func} ĞÎÊ½µÄ JSON ¶ÔÏó¡£ keyCode ¿ÉÒÔÊ¹ÓÃ Dom.keys µÄ¼òĞ´¡£
+     * ç»‘å®šæŸæŒ‰é”®æ‰§è¡Œåçš„å›è°ƒå‡½æ•°ã€‚
+     * @param {Object} {keyCode: func} å½¢å¼çš„ JSON å¯¹è±¡ã€‚ keyCode å¯ä»¥ä½¿ç”¨ Dom.keys çš„ç®€å†™ã€‚
      * @return this
      */
     keyNav: function (options, scope) {
         var opt = {};
 
-        // °´ÕÕ Dom.keys ÖØĞÂÆ¥Åä¼üÖµ¡£
+        // æŒ‰ç…§ Dom.keys é‡æ–°åŒ¹é…é”®å€¼ã€‚
         for (var key in options) {
             opt[Dom.keys[key] || key] = options[key];
         }
@@ -39,15 +39,15 @@ Dom.implement({
         this.on('keydown', function (e) {
             var keyCode = e.keyCode;
 
-            // Èç¹û°ó¶¨ÁËÖ¸¶¨µÄ¼üÖµ¡£
+            // å¦‚æœç»‘å®šäº†æŒ‡å®šçš„é”®å€¼ã€‚
             if (opt[keyCode]) {
                 return opt[keyCode].call(this, e) !== true;
             }
 
         }, scope);
 
-        // Èç¹û°ó¶¨ÁË»Ø³µÊÂ¼ş¡£
-        // IE 6 Ö»ÄÜÔÚ keypress ¼àÌıµ½»Ø³µÊÂ¼ş¡£
+        // å¦‚æœç»‘å®šäº†å›è½¦äº‹ä»¶ã€‚
+        // IE 6 åªèƒ½åœ¨ keypress ç›‘å¬åˆ°å›è½¦äº‹ä»¶ã€‚
         if (opt.enter) {
             this.on('keypress', function (e) {
                 var keyCode = e.keyCode;
