@@ -2,13 +2,11 @@
  * @author xuld
  */
 
-using("System.Dom.KeyNav");
-using("Controls.Suggest.DropDownMenu");
 using("Controls.Suggest.Picker");
+using("Controls.Suggest.DropDownMenu");
 
 /**
  * 表示一个组合框。
- * @class
  * @extends Picker
  * @example <pre>
  * var comboBox = new ComboBox();
@@ -18,63 +16,36 @@ using("Controls.Suggest.Picker");
  * </pre>
  */
 var ComboBox = Picker.extend({
+
+    /**
+	 * 当前控件是否为列表形式。如果列表模式则优先考虑使用下拉菜单。
+     * @config {Boolean}
+	 */
+    listMode: false,
 	
     xtype: 'combobox',
 	
     autoResize: true,
 	
     /**
-	 * 当用户单击某一项时执行。
-	 */
-    onItemClick: function(item){
-	
-        // 如果无法更改值，则直接忽略。
-        if(!this.getAttr('disabled') && !this.getAttr('readonly')) {
-	        
-            // 设置当前的选中项。
-            this.selectItem(item);
-			
-        }
-
-        return false;
-		
-    },
-	
-    /**
 	 * 创建当前 Picker 的菜单。
 	 * @return {Control} 下拉菜单。
-	 * @protected virtual
+	 * @protected override
 	 */
-    createDropDown: function(existDom){
-        return new DropDownMenu(existDom);
+    createDropDown: function (existDom) {
+        return new DropDownMenu({
+            node: existDom,
+            owner: this,
+            selectCallback: this.selectItem
+        });
     },
 	
     /**
 	 * 将当前文本的值同步到下拉菜单。
+	 * @protected override
 	 */
     updateDropDown: function(){
-        this.dropDown.setHovering(this.getSelectedItem());
-    },
-
-    onUpDown: function (next) {
-    
-        // 如果菜单未显示。
-        if (this.dropDownHidden()) {
-
-            // 显示菜单。
-            this.showDropDown();
-        } else {
-            this.dropDown.handlerUpDown(next);
-        }
-    },
-    
-    onEnter: function(){
-    	if (this.dropDownHidden()) {
-            return true;
-        }
-        
-        // 交给下列菜单处理。
-        this.dropDown.handlerEnter();
+        this.dropDown.hovering(this.getSelectedItem());
     },
 	
     init: function (options) {
@@ -111,46 +82,36 @@ var ComboBox = Picker.extend({
             selectDom.after(this);
         }
 		
-        // 4. 和下拉菜单互相绑定
-		
-        // 监听键盘事件。
-        this.keyNav({
-    	
-            up: function () {
-                this.onUpDown(false);
-            },
-
-            down: function () {
-                this.onUpDown(true);
-            },
-
-            enter: this.onEnter,
-
-            esc: function(){
-            	this.hideDropDown();
-            }
-
-       	});
-            
-        // 设置智能提示项选择后的回调。
-        this.dropDown.onSelect = this.selectItem.bind(this);
-		
     },
 	
     /**
 	 * 模拟用户选择某一个项。
 	 */
     selectItem: function (item) {
-    	
-    	var old = this.getText();
-    	this.setSelectedItem(item);
-    	if(old !== this.getText()) {
-    		this.trigger('change');
-    	}
 
-        return this.hideDropDown();
+        var me = this, old;
+    	
+        if (me.trigger('selecting', item)) {
+            old = me.getText();
+            me.setSelectedItem(item);
+            if (old !== me.getText()) {
+                me.trigger('change');
+            }
+            me.hideDropDown();
+        }
+
+        return me;
     },
 	
+    /**
+	 * 设置当前选中的项。
+	 * @param {Control} item 选中的项。
+	 * @return this
+	 */
+    setSelectedItem: function (item) {
+        return this.setText(item ? item.getText() : "");
+    },
+
     /**
 	 * 获取当前选中的项。如果不存在选中的项，则返回 null 。
 	 * @return {Control} 选中的项。
@@ -162,21 +123,12 @@ var ComboBox = Picker.extend({
         });
     },
 	
-    /**
-	 * 设置当前选中的项。
-	 * @param {Control} item 选中的项。
-	 * @return this
-	 */
-    setSelectedItem: function (item) {
-        return this.setText(item ? item.getText() : "");
-    },
-	
-    getSelectedIndex: function(){
-        return this.dropDown.indexOf(this.getSelectedItem());
-    },
-	
     setSelectedIndex: function(value){
         return this.setSelectedItem(this.dropDown.item(value));
+    },
+
+    getSelectedIndex: function () {
+        return this.dropDown.indexOf(this.getSelectedItem());
     },
 
     // select

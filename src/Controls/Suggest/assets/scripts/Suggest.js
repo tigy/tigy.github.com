@@ -3,31 +3,35 @@
  */
 
 
-using("System.Dom.KeyNav");
 using("Controls.Core.IDropDownOwner");
 using("Controls.Suggest.DropDownMenu");
 
 /**
  * 智能提示组件。
+ * @extends Control
  */
 var Suggest = Control.extend(IDropDownOwner).implement({
-
-    dropDownWidth: -1,
 
     /**
 	 * 创建当前 Suggest 的菜单。
 	 * @return {Dom} 下拉菜单。
 	 * @protected virtual
 	 */
-    createDropDown: function () {
-        return new DropDownMenu().addClass('x-suggest');
+    createDropDown: function (existDom) {
+        return new DropDownMenu({
+            node: existDom,
+            owner: this,
+            selectCallback: this.selectItem,
+            updateCallback: this.showDropDown
+        }).addClass('x-suggest');
     },
 
     /**
-	 * 更新智能提示菜单的状态。
+	 * 当下拉菜单被显示时执行。
      * @protected override
 	 */
-    showSuggest: function () {		
+    onDropDownShow: function () {
+		
 	    var text = this.getText();
 	    var items = this.getSuggestItems(text);
 
@@ -39,30 +43,8 @@ var Suggest = Control.extend(IDropDownOwner).implement({
 	    this.dropDown.set(items);
 
         // 默认选择当前值。
-        this.dropDown.setHovering(this.dropDown.item(0));
-	    return this.showDropDown();
-    },
+	    this.dropDown.hovering(this.dropDown.item(0));
 
-	hideSuggest: function(){
-		return this.hideDropDown();
-	},
-
-    onUpDown: function (next) {    
-        // 如果菜单未显示。
-        if (this.dropDownHidden()) {
-
-            // 显示菜单。
-            this.showSuggest();
-        } else {
-            this.dropDown.handlerUpDown(next);        }    },
-    
-    onEnter: function(){
-    	if (this.dropDownHidden()) {
-            return true;
-        }
-        
-        // 交给下列菜单处理。
-        this.dropDown.handlerEnter();
     },
 	
     init: function(options){
@@ -71,34 +53,15 @@ var Suggest = Control.extend(IDropDownOwner).implement({
         this.setAttr('autocomplete', 'off')
         	
         	// 创建并设置提示的下拉菜单。
-        	.setDropDown(this.createDropDown())
+        	.setDropDown(this.createDropDown(this.next('x-suggest')))
 			
 			// 获取焦点后更新智能提示显示状态。
-            .on('focus', this.showSuggest)
+            .on('focus', this.showDropDown)
             
             // 失去焦点后隐藏菜单。
-            .on('blur', this.hideSuggest)
-			
-			// 绑定一些事件。
-            .keyNav({
-
-                up: function () {
-                    this.onUpDown(false);                },
-
-                down: function () {
-                    this.onUpDown(true);
-                },
-
-                enter: this.onEnter,
-
-                esc: this.hideSuggest,
-
-                other: this.showSuggest
-
+            .on('blur', function () {
+                this.hideDropDown();
             });
-            
-        // 设置智能提示项选择后的回调。
-        this.dropDown.onSelect = this.selectItem.bind(this);
 		
     },
 
@@ -127,7 +90,11 @@ var Suggest = Control.extend(IDropDownOwner).implement({
     /**
      * 模拟用户选择一项。
      */
-	selectItem: function (item) {	    if (item) {
-	        this.setText(item.getText());	    }	    return this.hideDropDown();	}
+	selectItem: function (item) {
+	    if (item) {
+	        this.setText(item.getText());
+	    }
+	    return this.hideDropDown();
+	}
 	
 });

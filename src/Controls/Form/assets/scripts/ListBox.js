@@ -42,9 +42,13 @@ var ListBox = ListControl.extend({
      * 重新设置当前高亮项。
      */
     setSelectedItem: function (item) {
-        var clazz = 'x-' + this.xtype + '-hover';        if (this.selectedItem) {
+        var clazz = 'x-' + this.xtype + '-hover';
+
+        if (this.selectedItem) {
             this.selectedItem.removeClass(clazz);
-        }        this.selectedItem = item ? item.addClass(clazz) : null;
+        }
+
+        this.selectedItem = item ? item.addClass(clazz) : null;
     },
 
     /**
@@ -71,7 +75,10 @@ var ListBox = ListControl.extend({
 	 */
     selectItem: function (item) {
         if (this.onSelect(item) !== false) {
-            var old = this.getSelectedItem();            this.setSelectedItem(item);            if (!(old ? old.equals(item) : item)) {
+            var old = this.getSelectedItem();
+            this.setSelectedItem(item);
+
+            if (!(old ? old.equals(item) : item)) {
                 this.onChange();
             }
         }

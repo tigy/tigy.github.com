@@ -27,34 +27,31 @@ var IDropDownOwner = {
 	 */
 	dropDownWidth: -1,
 
-    /**
-	 * 下拉菜单的最小宽度。
-	 * @config {Integer}
-	 * @defaultValue 100
-	 * @return 如果值为 Infinity, 则表示不限制最小宽度。
-	 * @remark 也可以通过 css 的 min-width 属性设置此值。
-	 */
-    dropDownMinWidth: 100,
+    ///**
+	// * 下拉菜单的最小宽度。
+	// * @config {Integer}
+	// * @defaultValue 100
+	// * @return 如果值为 Infinity, 则表示不限制最小宽度。
+	// * @remark 也可以通过 css 的 min-width 属性设置此值。
+	// */
+    //dropDownMinWidth: 100,
 
     /**
-	 * 当下拉菜单被展开时执行。
+	 * 当下拉菜单被显示时执行。
      * @protected virtail
 	 */
-	onDropDownShow: function(){
-	    this.trigger('dropdownshow');
-	},
+	onDropDownShow: Function.empty,
 
     /**
-	 * 当下拉菜单被折叠时执行。
+	 * 当下拉菜单被隐藏时执行。
      * @protected virtail
 	 */
-	onDropDownHide: function(){
-		this.trigger('dropdownhide');
-	},
+	onDropDownHide: Function.empty,
 
 	attach: function (parentNode, refNode) {
-	    if (this.dropDown && !this.dropDown.closest('body')) {
-	        this.dropDown.attach(parentNode, refNode);
+	    var dropDown = this.dropDown;
+	    if (dropDown && !dropDown.closest('body')) {
+	        dropDown.attach(parentNode, refNode);
 	    }
 	    Dom.prototype.attach.call(this, parentNode, refNode);
 	},
@@ -64,15 +61,6 @@ var IDropDownOwner = {
 	    if (this.dropDown) {
 	        this.dropDown.detach(parentNode);
 	    }
-	},
-	
-	/**
-	 * 获取当前控件的下拉菜单。
-	 * @return {Dom} 
-     * @protected virtual
-	 */
-	getDropDown: function () {
-	    return this.dropDown;
 	},
 
     /**
@@ -98,13 +86,14 @@ var IDropDownOwner = {
 	            this.after(dom);
 
 	            // IE6/7 无法自动在父节点无 z-index 时处理 z-index 。
-	            if (navigator.isQuirks && dom.parent() && dom.parent().getStyle('zIndex') === 0)
-	                dom.parent().setStyle('zIndex', 1);
+	            if (navigator.isQuirks && (dom = dom.parent()) && dom.getStyle('zIndex') === 0){
+	                dom.setStyle('zIndex', 1);
+	            }
 	        }
 
         // dom = null 表示清空下拉菜单。
-	    } else if (this.dropDown) {
-	        this.dropDown.remove();
+	    } else if (dom = this.dropDown) {
+	        dom.remove();
 	        this.dropDown = null;
 	    }
 		
@@ -112,11 +101,20 @@ var IDropDownOwner = {
 	},
 
     /**
+	 * 获取当前控件的下拉菜单。
+	 * @return {Dom} 
+     * @protected virtual
+	 */
+	getDropDown: function () {
+	    return this.dropDown;
+	},
+
+    /**
      * 判断当前下拉菜单是否被隐藏。
-     * @return this
+     * @return {Boolean} 如果下拉菜单已经被隐藏，则返回 true。
      * @protected virtual
      */
-	dropDownHidden: function () {
+	isDropDownHidden: function () {
 	    return this.dropDown && Dom.isHidden(this.dropDown.node);
 	},
 
@@ -126,54 +124,57 @@ var IDropDownOwner = {
      */
 	toggleDropDown: function (e) {
 
-	    // 如果是因为 DOM 事件而切换菜单，则测试是否为 disabled 状态。
-	    if (e) {
-	        if (this.getAttr('disabled') || this.getAttr('readonly')) {
-	            return this;
-	        }
-	        this._dropDownTrigger = e.target;
-	    }
-	    return this[this.dropDownHidden() ? 'showDropDown' : 'hideDropDown']();
+	    // 如果菜单已经隐藏，则使用 showDropDown 显示，否则，强制关闭菜单。
+	    return this.isDropDownHidden() ? this.showDropDown(e) : this.hideDropDown();
 	},
 	
     /**
-     * 展开下拉菜单。
+     * 显示下拉菜单。
      * @return this
      */
-	showDropDown: function(){
+	showDropDown: function(e){
 
-        // 如果下拉菜单被隐藏，则先重设大小、定位。
-	    if (this.dropDownHidden()) {
+	    var me = this;
+        
+	    // 如果是因为 DOM 事件而切换菜单，则测试是否为 disabled 状态。
+	    if(!e || !me.getAttr('disabled') && !me.getAttr('readonly')) {
 
-	        // 重新设置位置。
-	        var dropDown = this.dropDown.show().align(this, 'bl', 0, -1);
+            // 如果下拉菜单被隐藏，则先重设大小、定位。
+	        if (me.isDropDownHidden()) {
 
-	        // 重新修改宽度。
+                // 重新设置位置。
+	            var dropDown = me.dropDown.show().align(me, 'bl', 0, -1), 
+	                dropDownWidth = me.dropDownWidth;
 
-	        var width = this.dropDownWidth;
-	        if (width < 0) {
+                // 重新修改宽度。
 
-	            // 不覆盖 min-width
-	            width = Math.max(this.getSize().x, Dom.styleNumber(dropDown.node, 'min-width'), this.dropDownMinWidth, dropDown.getScrollSize().x);
+                if (dropDownWidth < 0) {
 
-	        }
+                    // 在当前目标元素的宽、下拉菜单的 min-width 属性、下拉菜单自身的宽度中找一个最大值。
+                    dropDownWidth = Math.max(me.getSize().x, Dom.styleNumber(dropDown.node, 'min-width'), dropDown.getScrollSize().x);
 
-	        if (width !== 'auto') {
-	            dropDown.setSize(width);
-	        }
+                }
 
-	        // 设置 mouseup 后自动隐藏菜单。
-	        document.on('mouseup', this.hideDropDown, this);
+                if (dropDownWidth !== 'auto') {
+                    dropDown.setSize(dropDownWidth);
+                }
 
-	        this.onDropDownShow();
+                // 设置 mouseup 后自动隐藏菜单。
+                document.on('mouseup', me.hideDropDown, me);
 
-	    }
+            }
+
+	        me.onDropDownShow();
 		
-		return this;
+	        me.trigger('dropdownshow');
+
+        }
+
+	    return this;
 	},
 
     /**
-     * 关闭下拉菜单。
+     * 隐藏下拉菜单。
      * @return this
      */
 	hideDropDown: function (e) {
@@ -181,14 +182,14 @@ var IDropDownOwner = {
 		var dropDown = this.dropDown;
 		
         // 仅在本来已显示的时候操作。
-		if(dropDown && !this.dropDownHidden()){
+		if(dropDown && !this.isDropDownHidden()){
 			
 			// 如果是来自事件的关闭，则检测是否需要关闭菜单。
 			if(e){
 			    e = e.target;
-
+			    
                 // 如果事件源是来自下拉菜单自身，则不操作。
-				if([this._dropDownTrigger, dropDown.node, this.node].indexOf(e) >= 0 || Dom.has(dropDown.node, e) || Dom.has(this.node, e)) 
+			    if (dropDown.node == e || this.node === e || Dom.has(dropDown.node, e) || Dom.has(this.node, e))
 					return this;
 			}
 			
@@ -196,12 +197,12 @@ var IDropDownOwner = {
 
             // 删除 mouseup 回调。
 			document.un('mouseup', this.hideDropDown);
-
-			this.onDropDownHide();
 			
 		}
+
+		this.onDropDownHide();
 		
-		return this;
+		return this.trigger('dropdownhide');
 	}
 	
 };
