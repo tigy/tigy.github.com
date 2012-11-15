@@ -1,7 +1,6 @@
 /**
- * @author 
+ * @author xuld
  */
-
 
 imports("Controls.Composite.MonthCalender");
 using("System.Utils.Date");
