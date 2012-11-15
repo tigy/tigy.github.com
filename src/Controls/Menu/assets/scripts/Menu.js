@@ -126,7 +126,7 @@ var Menu = TreeControl.extend({
         // 显示节点。
         this.show();
 
-        this.align(ctrl, pos || 'rt', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);
+        this.align(ctrl, pos || 'r', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);
 
         return this;
     },

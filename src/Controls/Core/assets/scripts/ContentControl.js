@@ -1,8 +1,10 @@
 /**
- * @fileOverview 表示一个包含文本内容的控件。
  * @author xuld
  */
+
+
 using("Controls.Core.Base");
+
 
 /**
  * 所有内容控件的基类。

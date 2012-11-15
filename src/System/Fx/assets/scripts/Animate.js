@@ -1,12 +1,9 @@
 /**
- * @fileOverview 通过改变CSS实现的变换。
  * @author xuld
  */
 
 
-using("System.Dom.Base");
 using("System.Fx.Tween");
-
 
 
 (function(){
@@ -318,14 +315,3 @@ using("System.Fx.Tween");
 	});
 	
 })();
-
-/// TODO: clear
-
-document.animate = function() {
-	assert.deprected("document.animate 已过时，请改用 Dom.get(document).animate。");
-	var doc = Dom.get(document);
-	doc.animate.apply(doc, arguments);
-	return this;
-};
-
-/// TODO: clear
