@@ -16,7 +16,7 @@
     border-color: @listBoxBorderColor;
     border-style: solid;
     border-width: 1px;
-    .border-radius(5px);
+    .border-radius(@baseBorderRadius);
 	_display: block;
 	_zoom: 0;
     padding: 4px 0;
@@ -38,17 +38,16 @@
     line-height: @baseLineHeight;
 	*text-indent: -16px;
 	_text-indent: 0;
-}
 
-.x-listbox li a {
-    color: @textColor;
-    cursor: default;
-}
+	a {
+		color: @textColor;
+		cursor: default;
 
-// Hover state
+		&:hover {
+			text-decoration: none;
+		}
+	}
 
-.x-listbox li a:hover {
-    text-decoration: none;
 }
 
 .x-listbox-selected {
@@ -59,7 +58,7 @@
     #gradient > .vertical(@listBoxBackgroundColorHover, darken(@listBoxBackgroundColorHover, 5%));
 }
 
-.x-listbox-selected, .x-listbox-hover {
+.x-listbox .x-listbox-selected, .x-listbox .x-listbox-hover {
     color: @listBoxTextColorHover;
 
     a {

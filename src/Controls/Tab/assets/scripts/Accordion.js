@@ -31,7 +31,7 @@ var Accordion = TabbableControl.extend({
 	    return this.insertBefore(Dom.parse(this.itemTpl.replace("{title}", title).replace("{content}", content)), this.child(index));
 	},
 	
-	baseToggleTab: function (from, to) {
+	onToggleTab: function (from, to) {
 		
 		var me = this, trigger = 2;
 		

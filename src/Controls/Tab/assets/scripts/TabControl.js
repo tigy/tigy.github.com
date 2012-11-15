@@ -64,7 +64,7 @@ var TabControl = TabbableControl.extend({
 
 	},
 
-	baseToggleTab: function (from, to) {
+	onToggleTab: function (from, to) {
 	    if (from) {
 	        from.removeClass('x-tabbable-selected');
 	        var content = this.getContentOf(from);

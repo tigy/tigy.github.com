@@ -4,7 +4,6 @@
 
 imports("Controls.Form.ListBox");
 using("System.Dom.KeyNav");
-using("Controls.Core.ISelectable");
 using("Controls.Core.ListControl");
 
 /**

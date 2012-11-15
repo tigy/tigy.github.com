@@ -39,7 +39,7 @@ var SplitButton = MenuButton.extend({
 	},
 	
 	init: function () {
-		this.setDropDown(this.getDropDown());
+	    this.setDropDown(this.createDropDown(this.next('.x-dropdown')));
 		this.find('>.x-button:last-child').on('click', this.toggleDropDown, this);
 	}
 	

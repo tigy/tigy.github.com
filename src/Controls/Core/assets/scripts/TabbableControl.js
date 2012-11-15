@@ -29,7 +29,7 @@ var TabbableControl = Control.extend({
      * @param {Function} callbacl 切换完成后的回调函数。
      * @protected abstract
      */
-	baseToggleTab: Function.empty,
+	onToggleTab: Function.empty,
 
 	removeAt: function (index) {
 	    if (this.getSelectedIndex() === index) {
@@ -38,13 +38,22 @@ var TabbableControl = Control.extend({
 	    return this.removeChild(this.item(index));
 	},
 
-	selectTab: function (value) {	    var me = this, old;	    if (me.trigger('selecting', value) !== false) {
-	        old = me.getSelectedTab();	        me.baseToggleTab(old, value);	        if(!(old ? old.equals(value) : value)){	            me.trigger('change');	        }	    }	    return me;	},
+	selectTab: function (value) {
+	    var me = this, old;
+	    if (me.trigger('selecting', value) !== false) {
+	        old = me.getSelectedTab();
+	        me.onToggleTab(old, value);
+	        if(!(old ? old.equals(value) : value)){
+	            me.trigger('change');
+	        }
+	    }
+	    return me;
+	},
 
     getSelectedTab: Function.empty,
 	
     setSelectedTab: function (value) {
-        this.baseToggleTab(this.getSelectedTab(), value);
+        this.onToggleTab(this.getSelectedTab(), value);
 		return this;
 	},
 	
