@@ -27,9 +27,41 @@ var DropDownList = ComboBox.extend({
 	 * @protected override
 	 */
     input: function () {
-        return this.selectDom || (this.selectDom = Dom.create('select').setAttr('name', Dom.getAttr(this.node, 'name')).hide().appendTo(this));    },
+        return this.selectDom || (this.selectDom = Dom.create('select').setAttr('name', Dom.getAttr(this.node, 'name')).hide().appendTo(this));
+    },
 
-    init: function (options) {        options.listMode = true;        this.base('init');    },
+    init: function (options) {
+        options.listMode = true;
+        this.base('init');
+    },
+
+    /**
+	 * 设置当前选中的项。
+	 * @param {Dom} item 选中的项。
+	 */
+    setSelectedItem: function (item) {
+
+        var text,
+            input = this.input();
+
+        if (item) {
+            var option = item.dataField().option;
+            if (!option) {
+                item.dataField().option = option = new Option(item.getText(), this.getValueOfItem(item));
+                input.node.add(option);
+            }
+            option.selected = true;
+            text = Dom.getText(option);
+        } else {
+            input.node.selectedIndex = -1;
+            text = input.getAttr('placeholder');
+        }
+
+        // 无隐藏域，仅设置按钮的文本。
+        this.first().setText(text);
+
+        return this;
+    },
 
     getValueOfItem: function (item) {
         assert.notNull(item, "ComboBox#getValueOfItem(item): {item} ~", item);
@@ -64,36 +96,6 @@ var DropDownList = ComboBox.extend({
         }
 
         return me;
-    },
-
-    /**
-	 * 设置当前选中的项。
-	 * @param {Control} item 选中的项。
-	 * @return this
-	 */
-    setSelectedItem: function (item) {
-
-        var text,
-            input = this.input();
-
-        if (item) {
-            var option = item.dataField().option;
-            if (!option) {
-                item.dataField().option = option = new Option(item.getText(), this.getValueOfItem(item));
-                input.node.add(option);
-            }
-            option.selected = true;
-            text = Dom.getText(option);
-        } else {
-            input.node.selectedIndex = -1;
-            text = input.getAttr('placeholder');
-        }
-
-        // 无隐藏域，仅设置按钮的文本。
-        this.first().setText(text);
-
-        return this;
-
     },
 
     /**

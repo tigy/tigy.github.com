@@ -19,7 +19,7 @@
   *overflow-x: hidden;
   text-align: left;
 }
-.x-listbox-item {
+.x-listbox li {
   display: block;
   padding: 3px 10px;
   color: #555555;
@@ -30,11 +30,11 @@
   *text-indent: -16px;
   _text-indent: 0;
 }
-.x-listbox-item a {
+.x-listbox li a {
   color: #333333;
   cursor: default;
 }
-.x-listbox-item a:hover {
+.x-listbox li a:hover {
   text-decoration: none;
 }
 .x-listbox-selected {

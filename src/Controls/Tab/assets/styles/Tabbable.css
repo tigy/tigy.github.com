@@ -10,12 +10,12 @@
   clear: both;
   visibility: hidden;
 }
-.x-tabbable-item {
+.x-tabbable li {
   margin: 0 0 -1px;
   list-style: none;
   float: left;
 }
-.x-tabbable-item a {
+.x-tabbable li a {
   display: block;
   border: 1px solid transparent;
   _border-color: #ffffff;
@@ -25,7 +25,7 @@
   border-radius: 4px 4px 0 0;
   padding: 7px 12px;
 }
-.x-tabbable-item a:hover {
+.x-tabbable li a:hover {
   border-color: #eeeeee #eeeeee #dddddd;
   background-color: #eeeeee;
   text-decoration: none;
@@ -43,15 +43,15 @@
 .x-tabbable-alt {
   border-bottom: none;
 }
-.x-tabbable-alt .x-tabbable-item a,
-.x-tabbable-alt .x-tabbable-item a:hover {
+.x-tabbable-alt li a,
+.x-tabbable-alt li a:hover {
   border-color: transparent;
   _border-color: #ffffff;
 }
-.x-tabbable-alt .x-tabbable-item {
+.x-tabbable-alt li {
   margin-right: 2px;
 }
-.x-tabbable-alt .x-tabbable-item a {
+.x-tabbable-alt li a {
   padding-top: 5px;
   padding-bottom: 5px;
   -webkit-border-radius: 4px;

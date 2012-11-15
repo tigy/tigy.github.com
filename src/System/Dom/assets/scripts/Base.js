@@ -1566,10 +1566,10 @@ using("System.Core.Base");
 					// IE and Opera will allow us to reuse the iframeDoc without re-writing the fake HTML
 					// document to it; WebKit & Firefox won't allow reusing the iframe document.
 					iframeDoc =  ( iframe.contentWindow || iframe.contentDocument ).document;
-					frameDoc.write("<!doctype html><html><body>");
+					iframeDoc.write("<!doctype html><html><body>");
 					iframeDoc.close();
 
-					elem = iframeDoc.body.appendChild( iframeDoc.createElement(nodeName) );
+					elem = iframeDoc.body.appendChild(iframeDoc.createElement(tagName));
 					display = getStyle(elem, 'display');
 					document.body.removeChild( iframe );
 				}

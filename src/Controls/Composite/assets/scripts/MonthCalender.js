@@ -75,31 +75,6 @@ var MonthCalender = Control.extend({
     },
 
     /**
-     * 当选中一个值时执行。
-     * @param {Date} value 即将选中的值。
-     * @protected virtual
-     */
-    onSelecting: function (value) {
-        return this.trigger('selecting', value);
-    },
-
-    /**
-     * 当选中一个值时执行。
-     * @param {Date} newValue 选中的当前值。
-     * @param {Date} oldValue 选中的旧值。
-     * @protected virtual
-     */
-    onSelect: Function.empty,
-
-    /**
-     * 当值被改变时执行。
-     * @protected virtual
-     */
-    onChange: function () {
-        this.trigger('change');
-    },
-
-    /**
      * 当用户点击某一项时执行。
      * @param {Dom} item 正在被点击的项。
      * @protected virtual
@@ -227,7 +202,7 @@ var MonthCalender = Control.extend({
         var value = new Date(this.displayedValue.getFullYear(), this.displayedValue.getMonth(), parseInt(item.getText()));
 
         // 如果允许选中。
-        if (this.onSelecting(value) !== false && this.onSelect(value)) {
+        if (this.trigger('selecting', value)) {
 
             // 获取原值。
             var oldValue = this.getValue();
@@ -237,7 +212,7 @@ var MonthCalender = Control.extend({
 
             // 检测值是否改变。
             if (value - oldValue > 0) {
-                this.onChange();
+                this.trigger('change');
             }
 
         }
@@ -278,7 +253,7 @@ var MonthCalender = Control.extend({
         return this;
     }
 
-}).addEvents('select change');
+}).addEvents('change');
 
 Object.extend(MonthCalender, {
 

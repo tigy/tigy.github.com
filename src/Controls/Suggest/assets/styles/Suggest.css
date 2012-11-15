@@ -4,6 +4,6 @@
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
-.x-suggest .x-list-item {
+.x-suggest li {
   line-height: 18px;
 }

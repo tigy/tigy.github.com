@@ -1,5 +1,5 @@
 /**
- * @author 
+ * @author xuld
  */
 
 
@@ -31,7 +31,7 @@ var Accordion = TabbableControl.extend({
 	    return this.insertBefore(Dom.parse(this.itemTpl.replace("{title}", title).replace("{content}", content)), this.child(index));
 	},
 	
-	toggleTab: function(from, to){
+	baseToggleTab: function (from, to) {
 		
 		var me = this, trigger = 2;
 		
@@ -40,20 +40,18 @@ var Accordion = TabbableControl.extend({
 				return;
 			}
 			
-			from.removeClass('x-accordion-collapsed').last().hide('height', this.collapseDuration, callback);
+			from.removeClass('x-accordion-collapsed').last().hide('height', this.collapseDuration, finish);
 		} else
-			callback();
+		    finish();
 		
 		if(to)
-		    to.removeClass('x-accordion-collapsed').last().show('height', this.collapseDuration, callback);
+		    to.removeClass('x-accordion-collapsed').last().show('height', this.collapseDuration, finish);
 		else
-			callback();
+		    finish();
 			
-		function callback(){
-			if(--trigger <= 0){
-				if(from)
-					from.addClass('x-accordion-collapsed');
-				me.onChange();
+		function finish(){
+			if(--trigger <= 0 && from){
+				from.addClass('x-accordion-collapsed');
 			}
 		}
 		
@@ -64,17 +62,18 @@ var Accordion = TabbableControl.extend({
 	},
 	
 	init:function(options){
-		var me = this;
-		this.delegate('>.x-accordion-header', options.selectEvent || 'click', function() {
-			me.setSelectedTab(this.parent());
+	    var me = this,
+            selecedTab = me.getSelectedTab();
+
+	    me.delegate('>.x-accordion-header', options.selectEvent || 'click', function (e) {
+	        e.preventDefault();
+		    me.selectTab(this.parent());
 		});
-		
-		var selecedTab = me.getSelectedTab();
-		
-		this.query('>.x-accordion-panel').addClass('x-accordion-collapsed');
-		
-		if(selecedTab)
-			selecedTab.removeClass('x-accordion-collapsed');
+
+		me.query('>.x-accordion-panel').addClass('x-accordion-collapsed');
+
+		if (selecedTab)
+		    selecedTab.removeClass('x-accordion-collapsed');
 			
 	}
 	

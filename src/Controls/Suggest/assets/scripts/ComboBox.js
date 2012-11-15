@@ -105,16 +105,17 @@ var ComboBox = Picker.extend({
 	
     /**
 	 * 设置当前选中的项。
-	 * @param {Control} item 选中的项。
+	 * @param {Dom} item 选中的项。
 	 * @return this
 	 */
     setSelectedItem: function (item) {
-        return this.setText(item ? item.getText() : "");
+        this.setText(item ? item.getText() : "");
+        return this;
     },
 
     /**
 	 * 获取当前选中的项。如果不存在选中的项，则返回 null 。
-	 * @return {Control} 选中的项。
+	 * @return {Dom} 选中的项。
 	 */
     getSelectedItem: function () {
         var value = this.getText();
