@@ -25,7 +25,7 @@ var IDropDownOwner = {
 	 * @defaultValue 'auto'
 	 * @return 如果值为 -1, 则和下拉菜单目标节点有同样的宽度。如果值为 'auto'， 表示根据内容自动决定。
 	 */
-	dropDownWidth: 'auto',
+	dropDownWidth: -1,
 
     /**
 	 * 下拉菜单的最小宽度。
@@ -152,13 +152,10 @@ var IDropDownOwner = {
 
 	        var width = this.dropDownWidth;
 	        if (width < 0) {
-	            width = this.getSize().x;
-
-	            var minWidth = Dom.styleNumber(dropDown.node, 'min-width') || this.dropDownMinWidth;
 
 	            // 不覆盖 min-width
-	            if (width < minWidth)
-	                width = minWidth;
+	            width = Math.max(this.getSize().x, Dom.styleNumber(dropDown.node, 'min-width'), this.dropDownMinWidth, dropDown.getScrollSize().x);
+
 	        }
 
 	        if (width !== 'auto') {
