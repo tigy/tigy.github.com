@@ -1,5 +1,5 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/12 16:25
+ * This file is created by a tool at 2012/11/15 20:15
  *********************************************************
  * Contains: 
  *     Controls.Core.IToolTip
@@ -11,11 +11,13 @@
  *     Controls.Core.ContainerControl
  *     Controls.Container.Dialog
  *     Controls.Container.MessageBox
+ *     Controls.Core.ListControl
+ *     System.Dom.KeyNav
+ *     Controls.Suggest.DropDownMenu
  *     System.Dom.Align
  *     Controls.Core.IDropDownOwner
  *     Controls.Core.IInput
  *     Controls.Suggest.Picker
- *     Controls.Core.ListControl
  *     Controls.Suggest.ComboBox
  *     Controls.Form.SearchTextBox
  *     Controls.Form.FileUpload
@@ -24,6 +26,7 @@
  *     Controls.Form.TextBox
  *     Controls.Container.Panel
  *     Controls.Suggest.Suggest
+ *     Controls.Composite.ProgressBar
  *     System.Utils.Deferrable
  *     System.Fx.Base
  *     System.Fx.Tween
@@ -109,7 +112,7 @@ var IToolTip = {
 	},
 	
 	showAt: function(x, y){
-		if(!this.parent('body')){
+		if(!this.closest('body')){
 			this.appendTo();
 		}
 		if(this.autoDelay) {
@@ -122,7 +125,7 @@ var IToolTip = {
 	
 	showBy: function(ctrl, offsetY, offsetX){
 		ctrl = Dom.get(ctrl);
-		if(!this.parent('body')){
+		if(!this.closest('body')){
 			this.appendTo(ctrl.parent());
 		}
 		var arrowType = this.getArrowType(),
@@ -577,12 +580,10 @@ var IToolTip = {
 			 */
 			extend: function (members) {
 
-				// 未指定函数 使用默认构造函数(Object.prototype.constructor);
+			    // 未指定函数 使用默认构造函数(Object.prototype.constructor);
 
 				// 生成子类 。
-				var subClass = hasOwnProperty.call(members = members instanceof Function ? {
-					constructor: members
-				} : (members || {}), "constructor") ? members.constructor : function () {
+			    var subClass = members && members.hasOwnProperty("constructor") ? members.constructor : function () {
 
 					// 调用父类构造函数 。
 					arguments.callee.base.apply(this, arguments);
@@ -707,8 +708,8 @@ var IToolTip = {
 		 */
 		each: function (iterable, fn, scope) {
 
-			assert(!Object.isFunction(iterable), "Object.each(iterable, fn, scope): {iterable} 不能是函数。 ", iterable);
-			assert(Object.isFunction(fn), "Object.each(iterable, fn, scope): {fn} 必须是函数。", fn);
+			assert(typeof iterable !== 'function', "Object.each(iterable, fn, scope): {iterable} 不能是函数。 ", iterable);
+			assert(typeof fn === 'function', "Object.each(iterable, fn, scope): {fn} 必须是函数。", fn);
 			
 			// 如果 iterable 是 null， 无需遍历 。
 			if (iterable != null) {
@@ -796,89 +797,18 @@ var IToolTip = {
 
 			// 返回目标。
 			return dest;
-		},
-
-		/**
-		 * 判断一个变量是否是数组。
-		 * @param {Object} obj 要判断的变量。
-		 * @return {Boolean} 如果是数组，返回 true， 否则返回 false。
-		 * @example
-		 * <pre>
-	     * Object.isArray([]); // true
-	     * Object.isArray(document.getElementsByTagName("div")); // false
-	     * Object.isArray(new Array); // true
-	     * </pre>
-		 */
-		isArray: Array.isArray || function (obj) {
-			return toString.call(obj) === "[object Array]";
-		},
-
-		/**
-		 * 判断一个变量是否是函数。
-		 * @param {Object} obj 要判断的变量。
-		 * @return {Boolean} 如果是函数，返回 true， 否则返回 false。
-		 * @example
-		 * <pre>
-	     * Object.isFunction(function () {}); // true
-	     * Object.isFunction(null); // false
-	     * Object.isFunction(new Function); // true
-	     * </pre>
-		 */
-		isFunction: function (obj) {
-			return toString.call(obj) === "[object Function]";
-		},
-
-		/**
-		 * 判断一个变量是否是引用变量。
-		 * @param {Object} obj 变量。
-		 * @return {Boolean} 如果 *obj* 是引用变量，则返回 **true**, 否则返回 **false** 。
-		 * @remark 此函数等效于 `obj !== null && typeof obj === "object"`
-		 * @example
-		 * <pre>
-	     * Object.isObject({}); // true
-	     * Object.isObject(null); // false
-	     * </pre>
-		 */
-		isObject: function (obj) {
-			// 只检查 null 。
-			return obj !== null && typeof obj === "object";
 		}
 
 	});
 
-	/**
-	 * @static class Function
-	 */
-	extend(Function, {
-
-		/**
-		 * 表示一个空函数。这个函数总是返回 undefined 。
-		 * @property
-		 * @type Function
-		 * @remark
-		 * 在定义一个类的抽象函数时，可以让其成员的值等于 **Function.empty** 。
-		 */
-		empty: emptyFn,
-
-		/**
-		 * 返回一个新函数，这个函数始终返回 *value*。
-		 * @param {Object} value 需要返回的参数。
-		 * @return {Function} 执行得到参数的一个函数。
-		 * @example
-		 * <pre>
-		 * var fn = Function.from(0);
-	     * fn()    // 0
-	     * </pre>
-	 	 */
-		from: function (value) {
-
-			// 返回一个值，这个值是当前的参数。
-			return function () {
-				return value;
-			}
-		}
-
-	});
+    /**
+     * 表示一个空函数。这个函数总是返回 undefined 。
+     * @property
+     * @type Function
+     * @remark
+     * 在定义一个类的抽象函数时，可以让其成员的值等于 **Function.empty** 。
+     */
+	Function.empty = emptyFn;
 
 	/**
 	 * 格式化指定的字符串。
@@ -917,7 +847,7 @@ var IToolTip = {
 		// 支持参数2为数组或对象的直接格式化。
 		var toString = this;
 
-		args = arguments.length === 2 && Object.isObject(args) ? args : ap.slice.call(arguments, 1);
+		args = arguments.length === 2 && args && typeof args === 'object' ? args : ap.slice.call(arguments, 1);
 
 		// 通过格式化返回
 		return formatString ? formatString.replace(/\{+?(\S*?)\}+/g, function (match, name) {
@@ -927,6 +857,30 @@ var IToolTip = {
 			return name in args ? toString(args[name]) : "";
 		}) : "";
 	};
+
+    /**
+	 * 系统原生的数组对象。
+	 * @class Array
+	 */
+	if (!Array.isArray) {
+
+
+	    /**
+		 * 判断一个变量是否是数组。
+		 * @param {Object} obj 要判断的变量。
+		 * @return {Boolean} 如果是数组，返回 true， 否则返回 false。
+		 * @example
+		 * <pre>
+	     * Array.isArray([]); // true
+	     * Array.isArray(document.getElementsByTagName("div")); // false
+	     * Array.isArray(new Array); // true
+	     * </pre>
+		 */
+	    Array.isArray = function (obj) {
+	        return toString.call(obj) === "[object Array]";
+	    }
+
+	}
 
 	/// #if CompactMode
 
@@ -1441,7 +1395,7 @@ var IToolTip = {
 		 */
 		un: function (eventName, eventHandler) {
 
-			assert(!eventHandler || Object.isFunction(eventHandler), 'JPlus.Base#un(eventName, eventHandler): {eventHandler} 必须是函数。', eventHandler);
+			assert(!eventHandler || typeof eventHandler === 'function', 'JPlus.Base#un(eventName, eventHandler): {eventHandler} 必须是函数。', eventHandler);
 
 			// 获取本对象 本对象的数据内容 本事件值
 			var me = this, 
@@ -1884,7 +1838,7 @@ var IToolTip = {
 	 */
 	function each(fn, scope) {
 
-		assert(Object.isFunction(fn), "Array#each(fn, scope): {fn} 必须是一个函数。", fn);
+		assert(typeof fn === 'function', "Array#each(fn, scope): {fn} 必须是一个函数。", fn);
 
 		var i = -1, me = this;
 
@@ -1965,8 +1919,7 @@ function trace() {
 
 	// 无参数的话，自动补充一个参数。
 	if (arguments.length === 0) {
-		if (!trace.$count)
-
+		if (!trace.$count)
 		return trace('(trace: ' + (trace.$count++) + ')');
 	}
 
@@ -2489,7 +2442,7 @@ function imports(namespace) {
 					return !isEmptyObject(obj.prototype) || isUpper(name, 0) ? '类' : '函数';
 
 				// 最后判断对象。
-				if (Object.isObject(obj))
+				if (obj && typeof obj === 'object')
 					return name.charAt(0) === 'I' && isUpper(name, 1) ? '接口' : '对象';
 
 				// 空成员、值类型都作为属性。
@@ -2528,8 +2481,7 @@ function imports(namespace) {
 					new APIInfo(obj, showPredefinedMembers).copyTo(r);
 				} else {
 					r.push('无法对 ' + (obj === null ? "null" : "undefined") + ' 分析');
-				}
-
+				}
 
 			};
 
@@ -2754,8 +2706,7 @@ function imports(namespace) {
 		 * 指示一个函数已过时。
 		 * @param {String} message="此成员已过时" 提示的信息。
 		 */
-		deprected: function(message) {
-
+		deprected: function(message) {
 		},
 
 		/**
@@ -2895,8 +2846,7 @@ function imports(namespace) {
 	                } else {
 	                    window["eval"].call(window, src);
 	                }
-	            } catch (e) {
-
+	            } catch (e) {
 	            } 
 	        }
 		},
@@ -2955,8 +2905,7 @@ function imports(namespace) {
 
 			} catch (e) {
 
-			    // 调试输出。
-
+			    // 调试输出。
 
 			} finally {
 
@@ -3046,8 +2995,7 @@ function imports(namespace) {
  ********************************************************/
 /**
  * @author xuld
- */
-
+ */
  
  
 // Core - 核心部分
@@ -3467,7 +3415,7 @@ function imports(namespace) {
 		/**
 		 * 一个返回 true 的函数。
 		 */
-		returnTrue = Function.from(true),
+		returnTrue = function () { return true; },
 
 		/**
 		 * 用于测试的元素。
@@ -4610,10 +4558,10 @@ function imports(namespace) {
 					// IE and Opera will allow us to reuse the iframeDoc without re-writing the fake HTML
 					// document to it; WebKit & Firefox won't allow reusing the iframe document.
 					iframeDoc =  ( iframe.contentWindow || iframe.contentDocument ).document;
-					frameDoc.write("<!doctype html><html><body>");
+					iframeDoc.write("<!doctype html><html><body>");
 					iframeDoc.close();
 
-					elem = iframeDoc.body.appendChild( iframeDoc.createElement(nodeName) );
+					elem = iframeDoc.body.appendChild(iframeDoc.createElement(tagName));
 					display = getStyle(elem, 'display');
 					document.body.removeChild( iframe );
 				}
@@ -4896,7 +4844,7 @@ function imports(namespace) {
 			var elem = this.node;
 			//if (elem.nodeType == 1)
 			//	each(elem.getElementsByTagName("*"), clean);
-			while (elem = this.last(true))
+			while (elem = this.last(null))
 				this.removeChild(elem);
 			return this;
 		},
@@ -5045,7 +4993,7 @@ function imports(namespace) {
 			return this;
 		} : 'onselectstart' in div ? function(value) {
 			assert.isElement(this.node, "Dom#unselectable(value): 当前 dom 不支持此操作");
-			this.node.onselectstart = value !== false ? Function.from(false) : null;
+			this.node.onselectstart = value !== false ? function () { return false; } : null;
 			return this;
 		} : function(value) {
 			assert.isElement(this.node, "Dom#unselectable(value): 当前 dom 不支持此操作");
@@ -5142,7 +5090,7 @@ function imports(namespace) {
 					me.setStyle(key, value);
 
 				// .setKey(value)
-				else if (Object.isFunction(me[setter = 'set' + key.capitalize()]))
+				else if (typeof me[setter = 'set' + key.capitalize()] === 'function')
 					me[setter](value);
 
 				// 如果是当前对象的成员。
@@ -5151,7 +5099,7 @@ function imports(namespace) {
 					setter = me[key];
 
 					// .key(value)
-					if (Object.isFunction(setter))
+					if (typeof setter === 'function')
 						me[key](value);
 
 					// .key.set(value)
@@ -5418,7 +5366,7 @@ function imports(namespace) {
 		 */
 		setOffset: function(offsetPoint) {
 
-			assert(Object.isObject(offsetPoint), "Dom#setOffset(offsetPoint): {offsetPoint} 必须有 'x' 和 'y' 属性。", offsetPoint);
+		    assert(offsetPoint, "Dom#setOffset(offsetPoint): {offsetPoint} 必须有 'x' 和 'y' 属性。", offsetPoint);
 			var style = this.node.style;
 
 			if (offsetPoint.y != null)
@@ -5496,22 +5444,23 @@ function imports(namespace) {
 			
 			var eventName, selector;
 			
-			if(Object.isObject(eventAndSelector)){
-				for(eventName in eventAndSelector) {
-					this.on(eventName, eventAndSelector[eventName]);
-				}
+			if (typeof eventAndSelector === 'string') {
+
+			    eventName = (/^\w+/.exec(eventAndSelector) || [''])[0];
+
+			    assert(eventName, "Dom#bind(eventAndSelector, handler): {eventAndSelector} 中不存在事件信息。正确的 eventAndSelector 格式： click.selector")
+
+			    if (selector = eventAndSelector.substr(eventName.length)) {
+			        this.delegate(selector, eventName, handler);
+			    } else {
+			        this.on(eventName, handler);
+			    }
 			} else {
-				
-				eventName = (/^\w+/.match(eventAndSelector) || [''])[0];
-					
-				assert(eventName, "Dom#bind(eventAndSelector, handler): {eventAndSelector} 中不存在事件信息。正确的 eventAndSelector 格式： click.selector")
-				
-				if(selector = eventAndSelector.substr(eventName.length)){
-					this.delegate(eventName, delegateEventName, handler);
-				} else {
-					this.on(eventName, handler);
-				}
-				
+
+			    for (eventName in eventAndSelector) {
+			        this.bind(eventName, eventAndSelector[eventName]);
+			    }
+
 			}
 			
 			return this;
@@ -5934,7 +5883,7 @@ function imports(namespace) {
 
 		/**
 		 * 获取当前 Dom 对象的指定位置的直接子节点。
-		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。如果 args 是小于 0 的数字，则从末尾开始计算。
+		 * @param {Integer} index 用于查找子元素的 CSS 选择器 或者 元素在 Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。如果 args 是小于 0 的数字，则从末尾开始计算。
 		 * @return {Dom} 返回一个节点对象。如果不存在，则返回 null 。
 		 * @example
 		 * 获取第1个子节点。
@@ -5943,8 +5892,31 @@ function imports(namespace) {
 		 * #####JavaScript:
 		 * <pre>Dom.find("span").child(1)</pre>
 		 */
-		child: function(args) {
-			return ~args >= 0 ? this.last(~args) : this.first(args);
+		child: function(index) {
+			
+			//assert(typeof index === 'function' || typeof index === 'number' || typeof index === 'string' , 'Dom#child(index): {index} 必须是函数、数字或字符串。');
+			
+			var first = 'firstChild',
+				next = 'nextSibling',
+				isNumber = typeof index === 'number';
+			
+			if(index < 0){
+				index = ~index;
+				first = 'lastChild';
+				next = 'previousSibling';
+			}
+			
+			first = this.node[first];
+			
+			while(first){
+				if(first.nodeType === 1 && (isNumber ? index-- <= 0 : quickMatch(first, index))){
+					return new Dom(first);
+				}
+				
+				first = first[next];
+			}
+			
+			return null;
 		},
 
 		/**
@@ -5969,8 +5941,17 @@ function imports(namespace) {
 		 * closest 和 parent 最大区别就是 closest 会测试当前的元素。
 		 */
 		closest: function(selector, context) {
-			selector = typeof selector === 'function' ? selector(this, this.node) : this.match(selector) ? this : this.parent(selector);
-			return selector && (!context || Dom.get(context).has(selector)) ? selector : null;
+			var node = this.node;
+				
+			while(node) {
+				if(quickMatch(node, selector)){
+					return (!context || Dom.get(context).has(node)) ? new Dom(node) : null;
+				}
+				
+				node = node.parentNode;
+			}
+			
+			return null;
 		},
 
 		/**
@@ -6331,7 +6312,7 @@ function imports(namespace) {
 		 * @return {Dom} 返回插入的新节点对象。
 		 */
 		prepend: function(ctrl, dom) {
-			return ctrl.insertBefore(dom, ctrl.first(true));
+			return ctrl.insertBefore(dom, ctrl.first(null));
 		},
 
 		/**
@@ -6351,7 +6332,7 @@ function imports(namespace) {
 		 */
 		after: function(ctrl, dom) {
 			var p = ctrl.parentControl || ctrl.parent();
-			return p ? p.insertBefore(dom, ctrl.next(true)) : null;
+			return p ? p.insertBefore(dom, ctrl.next(null)) : null;
 		},
 
 		/**
@@ -6398,49 +6379,56 @@ function imports(namespace) {
 	}, function(value, key) {
 	    dp[key] = function (html) {
 
-	        html = Dom.parse(html, this);
-
-	        if (!html) {
-	            return html;
-	        } else if(html instanceof DomList){
-	            for (var i = 0; i < html.length; i++) {
-	                dp[key].call(this, html[i]);
-	            }
-	            return html;
-	        }
-
 			var scripts,
-				i = 0,
+				i,
 				script,
-				r = value(this, html);
+				t;
 
-			if (html.node.tagName === 'SCRIPT') {
-				scripts = [html.node];
-			} else {
-				scripts = html.getElements('SCRIPT');
-			}
-
-			// 如果存在脚本，则一一执行。
-			while (script = scripts[i++]) {
-				if (!script.type || /\/(java|ecma)script/i.test(script.type)) {
-
-					if (script.src) {
-						assert(window.Ajax && Ajax.send, "必须载入 System.Ajax.Script 模块以支持动态执行 <script src=''>");
-						Ajax.send({
-							url: script.src,
-							type: "GET",
-							dataType: 'script',
-							async: false
-						});
-						//    script.parentNode.removeChild(script);
+	        if (html = Dom.parse(html, this)) {
+	        	if(html instanceof DomList){
+		        	t = Dom.getDocument(this.node).createDocumentFragment();
+		            for (i = 0; i < html.length; i++) {
+		                t.appendChild(html[i]);
+		            }
+		            
+		            t = new Dom(t);
+		            scripts = t.getElements('SCRIPT');
+		            value(this, t);
+		        } else {
+		        	t = html;
+		        	if (t.node.tagName === 'SCRIPT') {
+						scripts = [t.node];
 					} else {
-						window.execScript(script.text || script.textContent || script.innerHTML || "");
+						scripts = t.getElements('SCRIPT');
 					}
-
+		        	html = value(this, t);
+		        }
+		        
+		        i = 0;
+	
+				// 如果存在脚本，则一一执行。
+				while (script = scripts[i++]) {
+					if (!script.type || /\/(java|ecma)script/i.test(script.type)) {
+	
+						if (script.src) {
+							assert(window.Ajax && Ajax.send, "必须载入 System.Ajax.Script 模块以支持动态执行 <script src=''>");
+							Ajax.send({
+								url: script.src,
+								type: "GET",
+								dataType: 'script',
+								async: false
+							});
+							//    script.parentNode.removeChild(script);
+						} else {
+							window.execScript(script.text || script.textContent || script.innerHTML || "");
+						}
+	
+					}
 				}
+				
 			}
 
-			return r;
+			return html;
 		};
 
 		DomList.prototype[key] = function(html) {
@@ -6524,7 +6512,7 @@ function imports(namespace) {
 	}
 
 	// document 函数。
-	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize first last parent child children has', function (fnName) {
+	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize has', function (fnName) {
 		document[fnName] = dp[fnName];
 	});
 	
@@ -6864,7 +6852,7 @@ function imports(namespace) {
 		return function (fn, scope) {
 			
 			// 忽略参数不是函数的调用。
-			var isFn = Object.isFunction(fn);
+		    var isFn = typeof fn === 'function';
 
 			// 如果已载入，则直接执行参数。
 			if(Dom[isReadyOrIsLoad]) {
@@ -7044,6 +7032,16 @@ function imports(namespace) {
 		assert.isNode(node, 'Dom.getDocument(node): {node} ~', node);
 		return node.ownerDocument || node.document || node;
 	}
+	
+	/**
+	 * 快速判断一个节点满足制定的过滤器。
+	 * @param {Node} elem 元素。
+	 * @param {String/Function/Undefined} filter 过滤器。
+	 * @return {Boolean} 返回结果。
+	 */
+	function quickMatch(elem, filter){
+		return !filter || (typeof filter === 'string' ? /^(?:[-\w:]|[^\x00-\xa0]|\\.)+$/.test(filter) ? elem.tagName === filter.toUpperCase() : Dom.match(elem, filter) : filter(elem));
+	}
 
 	/**
 	 * 返回简单的遍历函数。
@@ -7053,20 +7051,24 @@ function imports(namespace) {
 	 */
 	function createTreeWalker(next, first) {
 		first = first || next;
-		return function(args) {
+		return function(filter) {
 			var node = this.node[first];
 			
-			// 如果存在 args 编译为函数。
-			if(args){
-				args = getFilter(args);
+			// 如果 filter === null，则表示获取任意 nodeType 的节点。
+			if(filter === null){
+				return node ? new Dom(node) : node;
 			}
 			
-			while(node) {
-				if(args ? args.call(this, node) : node.nodeType === 1)
-					return new Dom(node);
+			// 找到第一个nodeType == 1 的节点。
+			while(node && node.nodeType !== 1) {
 				node = node[next];
 			}
 			
+			// 如果存在过滤器，执行过滤器。
+			if(node && quickMatch(node, filter)){
+				return new Dom(node);
+			}
+		
 			return null;
 		};
 	}
@@ -7079,63 +7081,19 @@ function imports(namespace) {
 	 */
 	function createTreeDir(next, first) {
 		first = first || next;
-		return function(args) {
+		return function(filter) {
 			var node = this.node[first],
 				r = new DomList;
 
-			// 如果存在 args 编译为函数。
-			if (args) {
-				args = getFilter(args);
-			}
-
+			// 如果 filter === null，则表示获取任意 nodeType 的节点。
 			while (node) {
-				if (args ? args.call(this, node) : node.nodeType === 1)
+				if ((node.nodeType === 1 && quickMatch(node, filter)) || filter === null)
 					r.push(node);
 				node = node[next];
 			}
 
 			return r;
 		}
-	}
-	
-	/**
-	 * 获取一个选择器。
-	 * @param {Number/Function/String/Boolean} args 参数。
-	 * @return {Funtion} 函数。
-	 */
-	function getFilter(args) {
-		
-		// 如果存在 args，则根据不同的类型返回不同的检查函数。
-		switch (typeof args) {
-			
-			// 数字返回一个计数器函数。
-			case 'number':
-				return function(elem) {
-					return elem.nodeType === 1 && --args < 0;
-				};
-				
-				// 字符串，表示选择器。
-			case 'string':
-				if(/^(?:[-\w:]|[^\x00-\xa0]|\\.)+$/.test(args)) {
-					args = args.toUpperCase();
-					return function(elem) {
-						return elem.nodeType === 1 && elem.tagName === args;
-					};
-				}
-				return args === '*' ? null : function(elem) {
-					return elem.nodeType === 1 && Dom.match(elem, args);
-				};
-				
-				// 布尔类型，而且是 true, 返回 Function.from(true)，  表示不过滤。
-			case 'boolean':
-				args = returnTrue;
-				break;
-			
-		}
-
-		assert.isFunction(args, "Dom#xxxAll(args): {args} 必须是一个 null、函数、数字或字符串。", args);
-		
-		return args;
 	}
 	
 	/**
@@ -7566,38 +7524,40 @@ function imports(namespace) {
  ********************************************************/
 /**
  * @author  xuld
- */
-
-
-
-
+ */
 
 
 /**
  * 所有控件基类。
  * @class Control
+ * @extends Dom
  * @abstract
- * 控件的周期：
+ * 控件的生命周期：
  * constructor - 创建控件对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。
- * create - 创建本身的 dom 节点。 可重写 - 默认使用 this.tpl 创建。
- * init - 初始化控件本身。 可重写 - 默认为无操作。
- * attach - 渲染控件到文档。不建议重写，如果你希望额外操作渲染事件，则重写。
- * detach - 删除控件。不建议重写，如果一个控件用到多个 dom 内容需重写。
+ * create - 创建本身的 dom 节点。默认为解析 #tpl 对应的 HTML 字符串，返回相应原生节点。
+ * init - 初始化控件本身。默认为空函数。
+ * attach - 添加控件对应的节点到 DOM 树。不建议重写，如果一个控件封装了多个 DOM 节点则需重写本函数。
+ * detach - 删除控件对应的节点。不建议重写，如果一个控件封装了多个 DOM 节点则需重写本函数。
  */
 var Control = Dom.extend({
 
 	/**
-	 * 存储当前控件的默认模板字符串。
+	 * xtype: 用于标记控件的 css 类。
+	 * @protected virtual
+	 */
+    xtype: "control",
+
+	/**
+	 * 当前控件的 HTML 模板字符串。
 	 * @getter {String} tpl
-	 * @protected
-	 * @virtual
+	 * @protected virtual
 	 */
 
 	/**
-	 * 当被子类重写时，生成当前控件。
+	 * 当被子类重写时，生成当前控件对应的原生节点。
 	 * @param {Object} options 选项。
-	 * @protected
-	 * @virtual
+     * @return {Element} 原生的 DOM 节点。
+	 * @protected virtual
 	 */
 	create: function () {
 
@@ -7608,16 +7568,15 @@ var Control = Dom.extend({
 	},
 
 	/**
-	 * 当被子类重写时，渲染控件。
-	 * @method
-	 * @param {Object} options 配置。
+	 * 当被子类重写时，初始化当前控件。
+	 * @param {Object} options 当前控件的初始化配置。
 	 * @protected virtual
 	 */
 	init: Function.empty,
 
 	/**
 	 * 初始化一个新的控件。
-	 * @param {String/Element/Control/Object} [options] 对象的 id 或对象或各个配置。
+	 * @param {String/Element/Dom/Object} [options] 绑定的节点或节点 id 或完整的配置对象，用于初始化当前控件。
 	 */
 	constructor: function (options) {
 
@@ -7636,8 +7595,10 @@ var Control = Dom.extend({
 			// 如果 options 是纯配置。
 			if (options.constructor === Object) {
 				
+                // 将配置拷贝到 opt 对象。
 				Object.extend(opt, options);
 				
+			    // 处理 node、selector、dom 字段
 				if(opt.node) {
 					node = opt.node;
 					delete opt.node;
@@ -7654,12 +7615,14 @@ var Control = Dom.extend({
 				}
 				
 			} else {
+
+			    // 否则，尝试根据 options 找到节点。
 				node = Dom.getNode(options);
 			}
 
 		}
 
-		// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。
+	    // 如果 node 被找到，则使用 node，否则使用 #create(opt)生成节点。
 		me.node = node || me.create(opt);
 
 		assert.isNode(me.node, "Dom#constructor(options): Dom 对象的 {node} 不是节点。", me.node);
@@ -7667,20 +7630,9 @@ var Control = Dom.extend({
 		// 调用 init 初始化控件。
 		me.init(opt);
 
-		//// 如果指定的节点已经在 DOM 树上，且重写了 attach 方法，则调用之。
-		//if (me.node.parentNode && me.attach !== Control.prototype.attach) {
-		//	me.attach(me.node.parentNode, me.node.nextSibling);
-		//}
-
-		// 复制各个选项。
+		// 设置其它的各个选项。
 		me.set(opt);
-	},
-
-	/**
-	 * xtype 。
-	 * @virtual
-	 */
-	xtype: "control"
+	}
 
 });
 /*********************************************************
@@ -7689,40 +7641,32 @@ var Control = Dom.extend({
 /**
  * @fileOverview 表示一个包含文本内容的控件。
  * @author xuld
- */
-
+ */
 
 /**
- * 表示一个有内置呈现的控件。
- * @abstract
- * @class ContentControl
+ * 所有内容控件的基类。
+ * @abstract class
  * @extends Control
- * 
- * <p>
- * ContentControl 的外元素是一个根据内容自动改变大小的元素。它自身没有设置大小，全部的大小依赖子元素而自动决定。
- * 因此，外元素必须满足下列条件的任何一个:
- *  <ul>
- * 		<li>外元素的 position 是 absolute<li>
- * 		<li>外元素的 float 是 left或 right <li>
- * 		<li>外元素的 display 是  inline-block (在 IE6 下，使用 inline + zoom模拟) <li>
- *  </ul>
- * </p>
  */
 var ContentControl = Control.extend({
 	
-	/**
-	 * 获取当前控件中显示文字的主 DOM 对象。
+    /**
+	 * 获取当前容器用于存放内容的 Dom 对象。
+	 * @return {Dom}
+     * @protected virtual
 	 */
 	content: function(){
 		return this.find('x-' + this.xtype + '-content') || new Dom(this.node);
 	},
 
     /**
-	 * 获取或设置当前输入域的状态。
-	 * @protected
+	 * 设置当前输入域的状态, 并改变控件的样式。
+     * @param {String} name 状态名。
+     * @param {Boolean} value=false 要设置的状态值。
+	 * @protected virtual
 	 */
 	state: function (name, value) {
-	    return this.toggleClass('x-' + this.xtype + '-' + name, value);
+	    this.toggleClass('x-' + this.xtype + '-' + name, value);
 	}
 	
 }).defineMethods("content()", "setHtml getHtml setText getText");
@@ -7733,19 +7677,12 @@ var ContentControl = Control.extend({
  * Controls.Tip.ToolTip
  ********************************************************/
 /**
- * @author 
- */
-
-
-
-
-
-
+ * @author xuld
+ */
 
 /**
- * @class
+ * 表示一个工具提示。
  * @extends Control
- * @author xuld
  */
 var ToolTip = ContentControl.extend(IToolTip).implement({
 	
@@ -7757,6 +7694,18 @@ var ToolTip = ContentControl.extend(IToolTip).implement({
 			</span>\
 			<div class="x-control-content"></div>\
 		</div>',
+
+	content: function () {
+	    return this.find('.x-tooltip-content');
+	},
+
+	init: function () {
+	    this.hide();
+
+	    if (!this.closet('body')) {
+	        this.appendTo();
+	    }
+	},
 	
 	getArrowType: function(){
 		var arrow = this.find('.x-arrow'), r = 'none';
@@ -7783,16 +7732,7 @@ var ToolTip = ContentControl.extend(IToolTip).implement({
 	
 	getArrowOffset: function(){
 		return this.find('.x-arrow').getOffset();
-	},
-	
-	content: function(){
-		return this.find('.x-tooltip-content');
-	},
-
-	init: function(){
-		this.hide();
 	}
-
 
 });
 
@@ -7820,8 +7760,7 @@ ToolTip.show = function(ctrl, text, offsetY, offsetX){
  ********************************************************/
 /**
  * @author  xuld
- */
-
+ */
 
 /**
  * 所有容器控件的基类。
@@ -7831,24 +7770,36 @@ ToolTip.show = function(ctrl, text, offsetY, offsetX){
 var ContainerControl = Control.extend({
 	
 	// 基本属性
-	
+
+    /**
+	 * 当前控件的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */
 	tpl: '<div class="x-control">\
 			<div class="x-control-body"></div>\
 		</div>',
-		
+
+    /**
+	 * 当前控件顶部的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */
 	headerTpl: '<div class="x-control-header"><h4></h4></div>',
 	
 	/**
-	 * 获取当前容器的标题部分。
-	 * @return {Control}
+	 * 获取当前容器用于存放标题的 Dom 对象。
+	 * @return {Dom}
+     * @protected virtual
 	 */
 	header: function(){
 		return this.find('.x-' + this.xtype + '-header');
 	},
 	
 	/**
-	 * 获取当前容器的内容部分。
-	 * @getter {Control}
+	 * 获取当前容器用于存放内容的 Dom 对象。
+	 * @return {Dom}
+     * @protected virtual
 	 */
 	body: function(){
 		return this.find('.x-' + this.xtype + '-body') || this;
@@ -7858,7 +7809,7 @@ var ContainerControl = Control.extend({
 	
 	/**
 	 * 获取当前容器显示的标题。
-	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
+	 * @param {Boolean} valueAsText 如果为 true，则编码标题中的 HTML 。否则返回原始的 HTML 源码。
 	 */
 	getTitle: function(valueAsText){
 		
@@ -7871,8 +7822,8 @@ var ContainerControl = Control.extend({
 	
 	/**
 	 * 设置当前容器显示的标题。
-	 * @param {String} value 要设置的标题。
-	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
+	 * @param {String} value 要设置的标题内容。
+	 * @param {Boolean} valueAsText 如果为 true，则编码 *value* 中的 HTML 。否则 *value* 将被直接设置。
 	 */
 	setTitle: function(value, valueAsText){
 		
@@ -7921,7 +7872,7 @@ var ContainerControl = Control.extend({
 	/**
 	 * 设置当前容器显示的内容。
 	 * @param {String} value 要设置的标题。
-	 * @param {Boolean} valueAsText 是否编码 *value* 中的 HTML 字符串。
+	 * @param {Boolean} valueAsText 如果为 true，则编码内容中的 HTML 。否则返回原始的 HTML 源码。
 	 */
 	setContent: function(value, valueAsText){
 		
@@ -7943,7 +7894,7 @@ var ContainerControl = Control.extend({
 		return this;
 		
 	},
-	
+
 	getText: function(){
 		return this.getContent(true);
 	},
@@ -7966,35 +7917,22 @@ var ContainerControl = Control.extend({
  ********************************************************/
 /**
  * @author xuld
- */
+ */
 
 
+var Dialog = ContainerControl.extend({
 
-
-
-
-
-var Dialog =  ContainerControl.extend({
+    _centerType: 1 | 2,
 	
 	xtype: 'dialog',
-	
-	autoCenterType: 1 | 2,
 
-    duration: -1,
+	showDuration: -1,
 	
 	// 基本属性
 		
 	headerTpl: '<div class="x-control-header"><a class="x-dialog-close x-closebutton">×</a><h4></h4></div>',
-	
-	onClosing: function () {
-		return this.trigger('closing');
-	},
-	
-	onClose: function () {
-		this.trigger('close');
-	},
 
-	onClickClose: function(){
+	onCloseButtonClick: function(){
 	    this.close();
 	},
 	
@@ -8021,7 +7959,7 @@ var Dialog =  ContainerControl.extend({
 		}
 		
 		// 关闭按钮。
-		this.delegate('.x-dialog-close', 'click', this.onClickClose.bind(this));
+		this.delegate('.x-dialog-close', 'click', this.onCloseButtonClick.bind(this));
 
 		this.setStyle('display', 'none');
 		
@@ -8049,12 +7987,12 @@ var Dialog =  ContainerControl.extend({
 	
 	setOffset: function(p){
 		if(p.x != null) {
-			this.autoCenterType &= ~2;
+			this._centerType &= ~2;
 			this.setStyle('margin-left', 0);
 		}
 		
 		if(p.y != null) {
-			this.autoCenterType &= ~1;
+			this._centerType &= ~1;
 			this.setStyle('margin-top', 0);
 		}
 		
@@ -8074,13 +8012,13 @@ var Dialog =  ContainerControl.extend({
 	},
 	
 	/**
-	 * 刷新当前对话框的位置以确保居中。
+	 * 重对齐当前对话框的位置以确保居中显示。
 	 */
 	center: function(){
-		if(this.autoCenterType & 1)
+		if(this._centerType & 1)
 			this.setStyle('margin-top', - this.getHeight() / 2 + document.getScroll().y);
 			
-		if(this.autoCenterType & 2)
+		if(this._centerType & 2)
 			this.setStyle('margin-left', - this.getWidth() / 2 + document.getScroll().x);
 			
 		return this;
@@ -8088,7 +8026,7 @@ var Dialog =  ContainerControl.extend({
 
 	show: function(){
 		
-		if(!this.parent('body')){
+		if(!this.closest('body')){
 			this.appendTo();	
 		}
 		
@@ -8096,7 +8034,7 @@ var Dialog =  ContainerControl.extend({
 	},
 	
 	showDialog: function(callback){
-		return this.mask().show(this.duration, callback);
+		return this.mask().show(this.showDuration, callback);
 	},
 	
 	hide: function(){
@@ -8105,22 +8043,19 @@ var Dialog =  ContainerControl.extend({
 		return this;
 	},
 	
-	dispose: function(){
-		var me = this;
-		this.onClose();
-		if (this.maskDom) this.maskDom.remove();
-	},
-	
-	setBodySize: function(x, y){
+	setContentSize: function(x, y){
 		this.setWidth('auto');
 		this.body().setWidth(x).setHeight(y);
-		this.center();
-		return this;
+		return this.center();
 	},
 	
-	close: function(){
-		if(this.onClosing() !== false)
-			this.hide(this.duration, this.onClose.bind(this));
+	close: function () {
+	    var me = this;
+	    if (this.trigger('closing'))
+	        this.hide(this.showDuration, function () {
+	            this.trigger('close');
+	        });
+		return this;
 	}
 	
 });
@@ -8271,12 +8206,425 @@ MessageBox.tip = function (text, icon, timeout) {
     return messageBox;
 };
 /*********************************************************
+ * Controls.Core.ListControl
+ ********************************************************/
+/**
+ * @author  xuld
+ */
+
+
+/**
+ * 表示所有管理多个有序列的子控件的控件基类。
+ * @abstract class
+ * @extends Control
+ */
+var ListControl = Control.extend({
+
+    /**
+	 * 当前控件的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */
+	tpl: '<ul class="x-control"/>',
+	
+	// 内部实现的项操作
+		
+	/**
+	 * 当新控件被添加时执行。
+	 * @param {Dom} childControl 新添加的元素。
+	 * @param {Dom} refControl 元素被添加的位置。
+	 * @protected override
+	 */
+	insertBefore: function(childControl, refControl) {
+		
+		// 如果 childControl 不是 <li>, 则包装一个 <li> 标签。
+		if (childControl.node.tagName !== 'LI') {
+
+			// 创建 <li>
+			var li = Dom.create('LI');
+			
+			// 复制节点。
+			li.append(childControl);
+			
+			// 赋值。
+			childControl = li;
+		}
+
+		//// 自动加上 clazz 。
+		//childControl.addClass('x-' + this.xtype + '-item');
+		
+		// 插入 DOM 树。
+		childControl.attach(this.node, refControl && refControl.node || null);
+			
+		// 返回新创建的子控件。
+		return childControl;
+	},
+
+	/**
+	 * 当新控件被移除时执行。
+	 * @param {Dom} childControl 新添加的元素。
+	 * @protected override
+	 */
+	removeChild: function(childControl) {
+		
+		// 如果 childControl 不是 <li>, 则退出 <li> 的包装。
+		if (childControl.node.parentNode !== this.node) {
+			
+			// 获取包装的 <li>
+			var li = childControl.parent();
+			
+			// 不存在 li 。
+			if(!li) {
+				return null;
+			}
+			
+			// 删除节点。
+			childControl.detach(li.node);
+			
+			// 赋值。
+			childControl = li;
+		}
+		
+		// 从 DOM 树删除。
+		childControl.detach(this.node);
+		
+		// 返回被删除的子控件。
+		return childControl;
+	},
+	
+    ///**
+	// * 当被子类重写时，初始化当前控件。
+	// * @param {Object} options 当前控件的初始化配置。
+	// * @protected override 
+	// */
+	//init: function() {
+	//	this.query('>li').addClass('x-' + this.xtype + '-item');
+	//},
+	
+	// 项操作
+
+	/**
+	 * 添加一个子控件到当前控件末尾。
+	 * @param {Dom} ... 要添加的子控件。
+	 * @return {Dom/this} 返回新添加的子控件，如果有多个参数，则返回 this。
+	 */
+	add: function() {
+		var args = arguments;
+		if (args.length === 1) {
+			return this.append(args[0]);
+		}
+
+		Object.each(args, this.append, this);
+		return this;
+	},
+
+	/**
+	 * 在指定位置插入一个子控件。
+	 * @param {Integer} index 添加的子控件的索引。
+	 * @param {Dom} item 要添加的子控件。
+	 * @return {Dom} 返回新添加的子控件。
+	 */
+	addAt: function(index, item) {
+	    return this.insertBefore(Dom.parse(item), this.child(index));
+	},
+
+	/**
+	 * 删除指定索引的子控件。
+	 * @param {Integer} index 删除的子控件的索引。
+	 * @return {Dom} 返回删除的子控件。如果删除失败（如索引超出范围）则返回 null 。
+	 */
+	removeAt: function(index) {
+		var child = this.child(index);
+		return child ? this.removeChild(child) : null;
+	},
+	
+	/**
+	 * 批量设置当前的项列表。
+     * @param {Array/Object} items 要设置的项的数组。
+     * @return this
+     * @protected override
+	 */
+	set: function(items){
+		if(Array.isArray(items)){
+			this.empty();
+			this.add.apply(this, items);
+			return this;
+		}
+		
+		return Dom.prototype.set.apply(this, arguments);
+	},
+	
+	/**
+	 * 获取指定索引的项。
+	 * @param {Integer} index 索引值。如果值小于 0, 则表示倒数的项。
+	 * @return {Dom} 指定容器控件包装的真实子控件。如果不存在相应的子控件，则返回自身。
+	 */
+	item: Dom.prototype.child,
+
+	/**
+	 * 获取某一项在列表中的索引。
+     * @param {Dom} item 要获取索引的项。
+	 * @return {Integer} 返回索引。如果不存在指定的子控件，则返回 -1 。
+	 */
+	indexOf: function(item) {
+		return item && item.parent && this.equals(item.parent()) ? item.index() : -1;
+	},
+
+	/**
+	 * 设置子控件某个事件发生之后，执行某个函数.
+	 * @param {String} eventName 事件名。
+	 * @param {String} fn 执行的函数。
+	 * @param {Object} scope 函数执行时的作用域。
+     * @return this
+	 */
+	itemOn: function(eventName, fn, scope){
+		return this.on(eventName, function(e){
+		    for (var c = this.node.firstChild, target = e.target; c; c = c.nextSibling) {
+				if(c === target || Dom.has(c, target)){
+				    return fn.call(scope || this, new Dom(c), e);
+				}
+			}
+		});
+	}
+
+});
+
+/**
+ * 为非 ListControl 对象扩展 ListControl 的6个方法: add addAt remove removeAt set item
+ */
+ListControl.aliasMethods = function(controlClass, targetProperty, removeChildProperty){
+    controlClass.defineMethods(targetProperty, 'add addAt removeAt item');
+
+    removeChildProperty = removeChildProperty || targetProperty;
+
+    controlClass.prototype.set = function (items) {
+        if (Array.isArray(items)) {
+
+            // 尝试在代理的列表中删除项。
+            var child = this[removeChildProperty];
+            if (child)
+                child.empty();
+
+            // 通过 this.add 添加项。
+            this.add.apply(this, items);
+
+            return this;
+        }
+
+        return this.base('set');
+    };
+	
+	controlClass.prototype.removeChild = function(childControl){
+		
+		// 尝试在代理的列表中删除项。
+		var child = this[removeChildProperty];
+		if(child)
+			childControl.remove(childControl);
+		
+		// 尝试在当前节点中正常删除。
+		childControl.detach(this.node);
+		
+		return childControl;
+	};
+	
+};
+/*********************************************************
+ * System.Dom.KeyNav
+ ********************************************************/
+/**
+ * @author xuld
+ */
+
+/**
+ * 常用键名的简写。
+ */
+Dom.keys = {
+    '13': 'enter',
+    '10': 'enter',
+    up: 38,
+    down: 40,
+    left: 37,
+    right: 39,
+    esc: 27,
+    tab: 9,
+    backspace: 8,
+    'delete': 46,
+    space: 32
+};
+
+Dom.implement({
+
+    /**
+     * 绑定某按键执行后的回调函数。
+     * @param {Object} {keyCode: func} 形式的 JSON 对象。 keyCode 可以使用 Dom.keys 的简写。
+     * @return this
+     */
+    keyNav: function (options, scope) {
+        var opt = {};
+
+        // 按照 Dom.keys 重新匹配键值。
+        for (var key in options) {
+            opt[Dom.keys[key] || key] = options[key];
+        }
+
+        this.on('keydown', function (e) {
+            var keyCode = e.keyCode;
+
+            // 如果绑定了指定的键值。
+            if (opt[keyCode]) {
+                return opt[keyCode].call(this, e) !== true;
+            }
+
+        }, scope);
+
+        // 如果绑定了回车事件。
+        // IE 6 只能在 keypress 监听到回车事件。
+        if (opt.enter) {
+            this.on('keypress', function (e) {
+                var keyCode = e.keyCode;
+                if (keyCode === 13 || keyCode === 10) {
+                    return opt.enter.call(this, e) !== true;
+                }
+            });
+        }
+
+        if (opt.other) {
+            this.on('keyup', function (e) {
+                var keyCode = e.keyCode;
+                if (!opt[keyCode] && !(opt.enter && (keyCode === 13 || keyCode === 10))) {
+                    return opt.other.call(this, e);
+                }
+            });
+        }
+
+        return this;
+    }
+
+});
+/*********************************************************
+ * Controls.Suggest.DropDownMenu
+ ********************************************************/
+/**
+ * @author xuld
+ */
+
+/**
+ * 表示一个下拉菜单。用于 Suggest 和 ComboBox 组件。
+ * @extends ListControl
+ */
+var DropDownMenu = ListControl.extend({
+
+    xtype: "listbox",
+
+    /**
+	 * 处理上下按键。
+     * @private
+	 */
+    _handlerUpDown: function (next) {
+
+        // 如果菜单未显示。
+        if (this.isDropDownHidden()) {
+
+            // 显示菜单。
+            this.showDropDown();
+        } else {
+
+            var item = this.dropDown._hovering;
+
+            if (item) {
+                item = item[next ? 'next' : 'prev']();
+            }
+
+            if (!item) {
+                item = this.dropDown[next ? 'first' : 'last']();
+            }
+
+            return this.dropDown.hovering(item);
+        }
+    },
+
+    /**
+	 * 处理回车键。
+     * @private
+	 */
+    _handlerEnter: function (next) {
+        if (this.isDropDownHidden()) {
+            return true;
+        }
+
+        // 交给下列菜单处理。
+        this.dropDown.selectCallback(this.dropDown._hovering);
+    },
+
+    onItemClick: function (item) {
+        this.selectCallback(item);
+        return false;
+    },
+
+    /**
+     * 设置当前下拉菜单的所有者。绑定所有者的相关事件。
+     */
+    constructor: function (options) {
+
+        assert(options && options.owner && options.selectCallback, "DropDownMenu#constructor(options): {options} 必须有 owner 和 selectCallback 字段", options);
+        
+	    var me = this;
+
+        // 创建原生节点。
+	    me.node = options.node ? Dom.getNode(options.node) : me.create();
+    	
+    	// 执行父类的构造函数。
+        ListControl.prototype.init.apply(me, arguments);
+    	
+    	// 设置鼠标移到某项后高亮某项。
+        me.itemOn('mouseover', me.hovering);
+        
+        // 绑定下拉菜单的点击事件
+        me.itemOn('mousedown', me.onItemClick);
+
+        options.owner.keyNav({
+
+            up: function () {
+                me._handlerUpDown.call(this, false);
+            },
+
+            down: function () {
+                me._handlerUpDown.call(this, true);
+            },
+
+            enter: me._handlerEnter,
+
+            esc: options.owner.hideDropDown,
+
+            other: options.updateCallback
+
+        });
+
+        me.selectCallback = options.selectCallback.bind(options.owner);
+		
+	},
+
+    /**
+     * 重新设置当前高亮项。
+     */
+	hovering: function (item) {
+	    var clazz = 'x-' + this.xtype + '-hover';
+
+	    if (this._hovering) {
+	        this._hovering.removeClass(clazz);
+	    }
+
+	    this._hovering = item ? item.addClass(clazz) : null;
+	    return this;
+	}
+
+});
+/*********************************************************
  * System.Dom.Align
  ********************************************************/
 /**
  * @author xuld 
- */
-
+ */
 
 
 /**
@@ -8453,9 +8801,7 @@ Dom.implement((function(){
  ********************************************************/
 /**
  * @author xuld
- */
-
-
+ */
 
 /**
  * 所有支持下拉菜单的组件实现的接口。
@@ -8466,7 +8812,7 @@ var IDropDownOwner = {
 	/**
 	 * 获取或设置当前实际的下拉菜单。
 	 * @protected
-	 * @type {Control}
+	 * @type {Dom}
 	 */
 	dropDown: null,
 	
@@ -8474,165 +8820,186 @@ var IDropDownOwner = {
 	 * 下拉菜单的宽度。
 	 * @config {String}
 	 * @defaultValue 'auto'
-	 * @return 如果值为 -1, 则和父容器有同样的宽度。如果设为 'auto'， 表示不处理宽度。
+	 * @return 如果值为 -1, 则和下拉菜单目标节点有同样的宽度。如果值为 'auto'， 表示根据内容自动决定。
 	 */
-	dropDownWidth: 'auto',
+	dropDownWidth: -1,
+
+    ///**
+	// * 下拉菜单的最小宽度。
+	// * @config {Integer}
+	// * @defaultValue 100
+	// * @return 如果值为 Infinity, 则表示不限制最小宽度。
+	// * @remark 也可以通过 css 的 min-width 属性设置此值。
+	// */
+    //dropDownMinWidth: 100,
 
     /**
-	 * 下拉菜单的最小宽度。
-	 * @config {dropDownMinWidth}
-	 * @defaultValue 'auto'
-	 * @return 如果值为 -1, 则和父容器有同样的宽度。如果设为 0， 表示无。
+	 * 当下拉菜单被显示时执行。
+     * @protected virtail
 	 */
-    dropDownMinWidth: 100,
-	
-	onDropDownShow: function(){
-		this.trigger('dropdownshow');
-	},
-	
-	onDropDownHide: function(){
-		this.trigger('dropdownhide');
-	},
+	onDropDownShow: Function.empty,
 
-	initDropDown: function (existDom) {
-	    return existDom;
-	},
-	
-	/**
-	 * 获取当前控件的下拉菜单。
-	 * @return {Control} 
+    /**
+	 * 当下拉菜单被隐藏时执行。
+     * @protected virtail
 	 */
-	getDropDown: function () {
+	onDropDownHide: Function.empty,
+
+	attach: function (parentNode, refNode) {
 	    var dropDown = this.dropDown;
-
-	    if (!dropDown) {
-	        dropDown = this.next();
-	        if (dropDown && !dropDown.hasClass('x-dropdown')) {
-	            dropDown = null;
-	        }
-
-	        this.dropDown = this.initDropDown(dropDown);
+	    if (dropDown && !dropDown.closest('body')) {
+	        dropDown.attach(parentNode, refNode);
 	    }
-	    
-	    return this.dropDown;
-	},
-	
-	attach: function(parentNode, refNode){
-		if(this.dropDown && !this.dropDown.parent('body')) {
-			this.dropDown.attach(parentNode, refNode);
-		}
-		Dom.prototype.attach.call(this, parentNode, refNode);
-	},
-	
-	detach: function(parentNode){
-		Dom.prototype.detach.call(this, parentNode);
-		if(this.dropDown) {
-			this.dropDown.detach(parentNode);
-		}
+	    Dom.prototype.attach.call(this, parentNode, refNode);
 	},
 
+	detach: function (parentNode) {
+	    Dom.prototype.detach.call(this, parentNode);
+	    if (this.dropDown) {
+	        this.dropDown.detach(parentNode);
+	    }
+	},
+
+    /**
+	 * 设置当前控件的下拉菜单。
+     * @param {Dom} dom 要设置的下拉菜单节点。
+	 * @return {Dom} 
+     * @protected virtual
+	 */
 	setDropDown: function (dom) {
 
 	    if (dom) {
 
-	        // 修正下拉菜单为 Control 对象。
+	        // 修正下拉菜单为 Dom 对象。
 	        dom = dom instanceof Dom ? dom : Dom.get(dom);
 
-	        // 设置下拉菜单。
+	        // 初始化并保存下拉菜单。
 	        this.dropDown = dom.addClass('x-dropdown').hide();
 
-	        // 如果当前节点已经添加到 DOM 树，则同时添加 dom 。
-	        if (!dom.parent('body')) {
+	        // 如果下拉菜单未添加到 DOM 树，则添加到当前节点后。
+	        if (!dom.closest('body')) {
 
-                // 添加菜单到 DOM 树。
+                // 添加下拉菜单到 DOM 树。
 	            this.after(dom);
 
 	            // IE6/7 无法自动在父节点无 z-index 时处理 z-index 。
-	            if (navigator.isQuirks && dom.parent() && dom.parent().getStyle('zIndex') === 0)
-	                dom.parent().setStyle('zIndex', 1);
+	            if (navigator.isQuirks && (dom = dom.parent()) && dom.getStyle('zIndex') === 0){
+	                dom.setStyle('zIndex', 1);
+	            }
 	        }
-	    } else if (this.dropDown) {
-	        this.dropDown.remove();
+
+        // dom = null 表示清空下拉菜单。
+	    } else if (dom = this.dropDown) {
+	        dom.remove();
 	        this.dropDown = null;
 	    }
 		
 		return this;
 	},
-	
-	dropDownHidden: function () {
+
+    /**
+	 * 获取当前控件的下拉菜单。
+	 * @return {Dom} 
+     * @protected virtual
+	 */
+	getDropDown: function () {
+	    return this.dropDown;
+	},
+
+    /**
+     * 判断当前下拉菜单是否被隐藏。
+     * @return {Boolean} 如果下拉菜单已经被隐藏，则返回 true。
+     * @protected virtual
+     */
+	isDropDownHidden: function () {
 	    return this.dropDown && Dom.isHidden(this.dropDown.node);
 	},
-	
-	realignDropDown: function (offsetX, offsetY) {
-		this.dropDown.align(this, 'bl', offsetX, offsetY);
-		return this;
-	},
-	
+
+    /**
+     * 切换下拉菜单的显示状态。
+     * @return this
+     */
 	toggleDropDown: function (e) {
 
-        // 如果是因为 DOM 事件而切换菜单，则测试是否为 disabled 状态。
-	    if (e) {
-	        if (this.getAttr('disabled') || this.getAttr('readonly')) {
-	            return this;
-	        }
-	        this._dropDownTrigger = e.target;
-	    }
-		return this[this.dropDownHidden() ? 'showDropDown' : 'hideDropDown']();
+	    // 如果菜单已经隐藏，则使用 showDropDown 显示，否则，强制关闭菜单。
+	    return this.isDropDownHidden() ? this.showDropDown(e) : this.hideDropDown();
 	},
 	
-	showDropDown: function(){
+    /**
+     * 显示下拉菜单。
+     * @return this
+     */
+	showDropDown: function(e){
 
-	    var dropDown = this.dropDown;
+	    var me = this;
+        
+	    // 如果是因为 DOM 事件而切换菜单，则测试是否为 disabled 状态。
+	    if(!e || !me.getAttr('disabled') && !me.getAttr('readonly')) {
 
-	    if (this.dropDownHidden()) {
-	        dropDown.show();
-	        this.realignDropDown(0, -1);
+            // 如果下拉菜单被隐藏，则先重设大小、定位。
+	        if (me.isDropDownHidden()) {
 
-	        var width = this.dropDownWidth;
-	        if (width < 0) {
-	            width = this.getSize().x;
+                // 重新设置位置。
+	            var dropDown = me.dropDown.show().align(me, 'bl', 0, -1), 
+	                dropDownWidth = me.dropDownWidth;
 
-	            var minWidth = Dom.styleNumber(dropDown.node, 'min-width') || this.dropDownMinWidth;
+                // 重新修改宽度。
 
-	            // 不覆盖 min-width
-	            if (width < minWidth)
-	                width = minWidth;
-	        }
+                if (dropDownWidth < 0) {
 
-	        if (width !== 'auto') {
-	            dropDown.setSize(width);
-	        }
+                    // 在当前目标元素的宽、下拉菜单的 min-width 属性、下拉菜单自身的宽度中找一个最大值。
+                    dropDownWidth = Math.max(me.getSize().x, Dom.styleNumber(dropDown.node, 'min-width'), dropDown.getScrollSize().x);
 
-	        this.onDropDownShow();
+                }
 
-	        document.on('mouseup', this.hideDropDown, this);
-	    } else {
-	        this.realignDropDown(0, -1);
-	    }
+                if (dropDownWidth !== 'auto') {
+                    dropDown.setSize(dropDownWidth);
+                }
+
+                // 设置 mouseup 后自动隐藏菜单。
+                document.on('mouseup', me.hideDropDown, me);
+
+            }
+
+	        me.onDropDownShow();
 		
-		return this;
+	        me.trigger('dropdownshow');
+
+        }
+
+	    return this;
 	},
-	
+
+    /**
+     * 隐藏下拉菜单。
+     * @return this
+     */
 	hideDropDown: function (e) {
 		
 		var dropDown = this.dropDown;
 		
-		if(dropDown && !this.dropDownHidden()){
+        // 仅在本来已显示的时候操作。
+		if(dropDown && !this.isDropDownHidden()){
 			
 			// 如果是来自事件的关闭，则检测是否需要关闭菜单。
 			if(e){
-				e = e.target;
-				if([this._dropDownTrigger, dropDown.node, this.node].indexOf(e) >= 0 || Dom.has(dropDown.node, e) || Dom.has(this.node, e)) 
+			    e = e.target;
+			    
+                // 如果事件源是来自下拉菜单自身，则不操作。
+			    if (dropDown.node == e || this.node === e || Dom.has(dropDown.node, e) || Dom.has(this.node, e))
 					return this;
 			}
 			
-			this.onDropDownHide();
 			dropDown.hide();
+
+            // 删除 mouseup 回调。
 			document.un('mouseup', this.hideDropDown);
 			
 		}
+
+		this.onDropDownHide();
 		
-		return this;
+		return this.trigger('dropdownhide');
 	}
 	
 };
@@ -8649,64 +9016,76 @@ var IDropDownOwner = {
  * @interface IInput
  */
 var IInput = {
-
-    /**
-	 * 获取或设置当前输入域的状态。
-	 * @protected
-	 */
-    state: function (name, value) {
-        return this.toggleClass('x-' + this.xtype + '-' + name, value);
-    },
-
-    /**
-	 * 当设置文本时执行此函数。
-	 */
-    onChange: function () {
-        this.trigger('change');
-    },
 	
 	/**
-	 * 获取或设置当前表单的实际域。
+	 * 获取或设置当前表单的代理输入域。
 	 * @protected
-	 * @type {Control}
+	 * @type {Dom}
 	 */
 	inputProxy: null,
-	
-	///**
-	// * 创建用于在表单内保存当前输入值的隐藏域。
-	// * @return {Dom} 隐藏输入域。
-	// */
-	//createHiddenField: function(){
-	//    return Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
-	//},
 	
 	/**
 	 * 获取当前输入域实际用于提交数据的表单域。
 	 * @return {Dom} 一个用于提交表单的数据域。
-     * @remark 此函数会在当前控件内搜索可用于提交的表单域，如果找不到，则创建返回一个 hidden 表单域。
+     * @remark 此函数会在当前控件内搜索可用于提交的表单域，如果找不到，则创建返回一个 input[type=hidden] 表单域。
+	 * @protected virtual
 	 */
-	input: function(){
-		
-		// 如果不存在隐藏域。
-		if(!this.inputProxy) {
-			
-			// 如果 当前元素是表单元素，直接返回。
-			if(/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(this.node.tagName)){
-				return new Dom(this.node);
-			}
-			
-			this.inputProxy = this.find("input,select,textarea") || Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
-		}
-		
-		return this.inputProxy;
+	input: function () {
+        
+	    // 如果不存在隐藏域, 则创建一个。
+	    // 如果当前控件本身就是 INPUT|SELECT|TEXTAREA|BUTTON，则输入域为自身。
+	    // 否则在控件内部查找合适的输入域。
+        // 如果找不到，则创建一个 input:hidden 。
+	    return this.inputProxy || (this.inputProxy = /^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(this.node.tagName) ? new Dom(this.node) : this.find("input,select,textarea") || Dom.parse('<input type="hidden">').setAttr('name', Dom.getAttr(this.node, 'name')).appendTo(this));
+	},
+
+    /**
+	 * 设置当前输入域的状态, 并改变控件的样式。
+     * @param {String} name 状态名。常用的状态如： disabled、readonly、checked、selected、actived 。
+     * @param {Boolean} value=false 要设置的状态值。
+	 * @protected virtual
+	 */
+	state: function (name, value) {
+	    this.toggleClass('x-' + this.xtype + '-' + name, value);
 	},
 	
 	/**
 	 * 获取当前控件所在的表单。
-	 * @return {Dom} 表单。
+	 * @return {Dom} 返回当前控件所在的表单的 Dom 对象。
 	 */
 	form: function () {
-		return Dom.get(this.input().node.form);
+		return new Dom(this.input().node.form);
+	},
+
+	setAttr: function (name, value) {
+	    var dom = this;
+
+	    // 一些状态属性需执行 state() 
+        // 几个特殊属性需要对 input() 操作。
+	    if (/^(disabled|readonly|checked|selected|actived)$/i.test(name)) {
+	        value = value !== false;
+	        this.state(name.toLowerCase(), value);
+	        dom = this.input();
+	    } else if (/^(value|name|form)$/i.test(name)) {
+	        dom = this.input();
+	    }
+
+	    Dom.prototype.setAttr.call(dom, name, value);
+	    return this;
+	},
+
+	getAttr: function (name, type) {
+	    // 几个特殊属性需要对 input() 操作。
+	    return Dom.getAttr((/^(disabled|readonly|checked|selected|actived|value|name|form)$/i.test(name) ? this.input() : this).node, name, type);
+	},
+
+	getText: function () {
+	    return Dom.getText(this.input().node);
+	},
+
+	setText: function () {
+	    Dom.prototype.setText.apply(this.input(), arguments);
+	    return this;
 	},
 	
 	/**
@@ -8716,37 +9095,6 @@ var IInput = {
 	select: function(){
 		Dom.prototype.select.apply(this.input(), arguments);
 		return this;
-	},
-	
-	setAttr: function (name, value) {
-		var dom = this;
-		if (/^(disabled|readonly|checked|selected|actived)$/i.test(name)) {
-		    value = value !== false;
-		    this.state(name.toLowerCase(), value);
-		    dom = this.input();
-		} else if(/^(value|name|form)$/i.test(name)) {
-			dom = this.input();
-		}
-		
-		Dom.prototype.setAttr.call(dom, name, value);
-		return this;
-	},
-	
-	getAttr: function (name, type) {
-		return Dom.getAttr((/^(disabled|readonly|checked|selected|actived|value|name|form)$/i.test(name) ? this.input() : this).node, name, type);
-	},
-	
-	getText: function(){
-		return Dom.getText(this.input().node);
-	},
-	
-	setText: function(value){
-		var old = this.getText();
-		Dom.prototype.setText.call(this.input(), value);
-		if(old !== value)
-			this.onChange();
-			
-		return this;
 	}
 	
 };
@@ -8755,13 +9103,7 @@ var IInput = {
  ********************************************************/
 /**
  * @author  xuld
- */
-
-
-
-
-
-
+ */
 
 /**
  * 表示一个数据选择器。
@@ -8770,33 +9112,27 @@ var IInput = {
  */
 var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 
+    /**
+	 * 当前控件是否为列表形式。如果列表模式则优先考虑使用下拉菜单。
+     * @config {Boolean}
+	 */
+    listMode: true,
+
+    /**
+	 * 当前控件的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */
     tpl: '<span class="x-picker">\
 			<input type="text" class="x-textbox"/>\
 		</span>',
 
-    dropDownListTpl: '<span class="x-picker">\
-			<a href="javascript:;" class="x-button">A</a>\
-		</span>',
-
+    /**
+	 * 当前控件下拉按钮的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */
     menuButtonTpl: '<button class="x-button" type="button"><span class="x-menubutton-arrow"></span></button>',
-
-    /**
-	 * 当前控件是否为下拉列表。
-	 */
-    dropDownList: false,
-
-    /**
-	 * 下拉框的宽度。
-	 */
-    dropDownWidth: -1,
-
-    /**
-	 * @config dropDownList 是否允许用户输入自定义的文本值。
-	 */
-
-    create: function (options) {
-        return Dom.parseNode(options.dropDownList ? this.dropDownListTpl : this.tpl);
-    },
 
     /**
 	 * 获取当前控件的按钮部分。
@@ -8806,53 +9142,35 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
     },
 
     /**
-	 * @protected
-	 * @override
+	 * 将当前文本的值同步到下拉菜单。
+	 * @protected virtual
 	 */
-    init: function () {
+    updateDropDown: Function.empty,
 
-        // 如果是 <input> 或 <a> 直接替换为 x-picker
-        if (!this.first() && !this.hasClass('x-picker')) {
-            var elem = this.node;
-
-            // 创建 x-picker 组件。
-            this.node = Dom.createNode('span', 'x-picker x-' + this.xtype);
-
-            // 替换当前节点。
-            if (elem.parentNode) {
-                elem.parentNode.replaceChild(this.node, elem);
-            }
-
-            // 插入原始 <input> 节点。
-            this.prepend(elem);
-        }
-
-        // 如果没有下拉菜单按钮，添加之。
-        if (!this.button()) {
-            this.append(this.menuButtonTpl);
-        }
-
-        // 初始化菜单。
-        this.setDropDown(this.getDropDown());
-
-        if (!this.hasOwnProperty('dropDownList') && this.first().node.tagName !== 'INPUT') {
-            this.dropDownList = true;
-        }
-
-        // 设置菜单显示的事件。
-        (this.dropDownList ? this : this.button()).on('click', this.toggleDropDown, this);
-
+    /**
+	 * 当下拉菜单被显示时执行。
+     * @protected override
+	 */
+    onDropDownShow: function () {
+        // 默认选择当前值。
+        this.updateDropDown();
+        this.state('actived', true);
     },
 
-    setWidth: function (value) {
-        var first = this.first();
-        if (value >= 0) {
-            value -= this.getWidth() - first.getWidth();
-        }
-        first.setWidth(value);
-        return this;
+    /**
+	 * 当下拉菜单被隐藏时执行。
+     * @protected override
+	 */
+    onDropDownHide: function () {
+        this.state('actived', false);
     },
 
+    /**
+	 * 设置当前输入域的状态, 并改变控件的样式。
+     * @param {String} name 状态名。常用的状态如： disabled、readonly、checked、selected、actived 。
+     * @param {Boolean} value=false 要设置的状态值。
+	 * @protected override
+	 */
     state: function (name, value) {
         value = value !== false;
         if (name == "disabled" || name == "readonly") {
@@ -8869,31 +9187,73 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
             IInput.state.call(this, name, value);
         }
 
-        return this;
-    },
-
-    // 下拉菜单
-
-    onDropDownShow: function () {
-        // 默认选择当前值。
-        this.updateDropDown();
-        this.state('actived', true);
-        return IDropDownOwner.onDropDownShow.apply(this, arguments);
-    },
-
-    onDropDownHide: function () {
-        this.state('actived', false);
-        return IDropDownOwner.onDropDownHide.apply(this, arguments);
     },
 
     /**
-	 * 将当前文本的值同步到下拉菜单。
-	 * @protected virtual
-	 */
-    updateDropDown: Function.empty
+     * 创建当前组件的下拉菜单。
+     * @param {Dom} existDom=null 已存在的 DOM 节点。
+     * @return {Dom} 返回新创建的下拉菜单对象。
+     * @protected virtual
+     */
+    createDropDown: function (existDom) {
+        return existDom;
+    },
 
-})
-.addEvents('change', {
+    /**
+	 * @protected
+	 * @override
+	 */
+    init: function (options) {
+
+        var me = this, elem;
+
+        // 如果是 <input> 或 <a> 直接替换为 x-picker
+        if (!me.first() && !me.hasClass('x-picker')) {
+            elem = me.node;
+
+            // 创建 x-picker 组件。
+            me.node = Dom.createNode('span', 'x-picker x-' + me.xtype);
+
+            // 替换当前节点。
+            if (elem.parentNode) {
+                elem.parentNode.replaceChild(me.node, elem);
+            }
+
+            // 插入原始 <input> 节点。
+            me.prepend(elem);
+
+        }
+
+        // 如果没有下拉菜单按钮，添加之。
+        if (!me.button()) {
+            me.append(me.menuButtonTpl);
+        }
+
+        // 列表形式，则无法手动更改值，必须强制使用 listMode 。
+        if ('listMode' in options) {
+            me.listMode = options.listMode;
+        } else if (me.first().node.tagName !== 'INPUT') {
+            me.listMode = true;
+        }
+
+        // 初始化菜单。
+        me.setDropDown(me.createDropDown(me.next('.x-dropdown')));
+
+        // 设置菜单显示的事件。
+        (me.listMode ? me : me.button()).on('click', me.toggleDropDown, me);
+
+    },
+
+    setWidth: function (value) {
+        var first = this.first();
+        if (value >= 0) {
+            value -= this.getWidth() - first.getWidth();
+        }
+        first.setWidth(value);
+        return this;
+    }
+
+}).addEvents('change select', {
     add: function (picker, type, fn) {
         Dom.$event.$default.add(picker.input(), type, fn);
     },
@@ -8903,269 +9263,15 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 });
 
 
-
-
-
-/*********************************************************
- * Controls.Core.ListControl
- ********************************************************/
-/**
- * @author  xuld
- */
-
-
-
-/**
- * 表示所有管理多个有序列的子控件的控件基类。
- * @class ListControl
- * @extends ScrollableControl
- * ListControl 封装了使用  &lt;ul&gt; 创建列表控件一系列方法。
- */
-var ListControl = Control.extend({
-	
-	/**
-	 * 模板。
-	 */
-	tpl: '<ul class="x-control"/>',
-	
-	// 内部实现的项操作
-		
-	/**
-	 * 当新控件被添加时执行。
-	 * @param {Control} childControl 新添加的元素。
-	 * @param {Control} refControl 元素被添加的位置。
-	 * @protected override
-	 */
-	insertBefore: function(childControl, refControl) {
-		
-		// 如果 childControl 不是 <li>, 则包装一个 <li> 标签。
-		if (childControl.node.tagName !== 'LI') {
-
-			// 创建 <li>
-			var li = Dom.create('LI');
-			
-			// 复制节点。
-			li.append(childControl);
-			
-			// 赋值。
-			childControl = li;
-		}
-
-		// 自动加上 clazz 。
-		childControl.addClass('x-' + this.xtype + '-item');
-		
-		// 插入 DOM 树。
-		childControl.attach(this.node, refControl && refControl.node || null);
-			
-		// 返回新创建的子控件。
-		return childControl;
-	},
-
-	/**
-	 * 当新控件被移除时执行。
-	 * @param {Object} childControl 新添加的元素。
-	 * @protected override
-	 */
-	removeChild: function(childControl) {
-		
-		// 如果 childControl 不是 <li>, 则退出 <li> 的包装。
-		if (childControl.node.parentNode !== this.node) {
-			
-			// 获取包装的 <li>
-			var li = childControl.parent();
-			
-			// 不存在 li 。
-			if(!li) {
-				return null;
-			}
-			
-			// 删除节点。
-			childControl.detach(li.node);
-			
-			// 赋值。
-			childControl = li;
-		}
-		
-		// 从 DOM 树删除。
-		childControl.detach(this.node);
-		
-		// 返回被删除的子控件。
-		return childControl;
-	},
-	
-	/**
-	 * 当被子类重写时，实现初始化 DOM 中已经存在的项。 
-	 */
-	init: function() {
-		this.query('>li').addClass('x-' + this.xtype + '-item');
-	},
-	
-	// 项操作
-
-	/**
-	 * 添加一个子节点到当前控件末尾。
-	 * @param {Control} ... 要添加的子节点。
-	 * @return {Control/this} 返回新添加的子控件。
-	 */
-	add: function() {
-		var args = arguments;
-		if (args.length === 1) {
-			return this.append(args[0]);
-		}
-
-		Object.each(args, this.append, this);
-		return this;
-	},
-
-	/**
-	 * 在指定位置插入一个子节点。
-	 * @param {Integer} index 添加的子控件的索引。
-	 * @param {Control} childControl 要添加的子节点。
-	 * @return {Control} 返回新添加的子控件。
-	 */
-	addAt: function(index, childControl) {
-		return this.insertBefore(Dom.parse(childControl), this.child(index));
-	},
-
-	/**
-	 * 删除指定索引的子节点。
-	 * @param {Integer} index 删除的子控件的索引。
-	 * @return {Control} 返回删除的子控件。如果删除失败（如索引超出范围）则返回 null 。
-	 */
-	removeAt: function(index) {
-		var child = this.child(index);
-		return child ? this.removeChild(child) : null;
-	},
-	
-	/**
-	 * 批量设置当前的项列表。
-	 */
-	set: function(items){
-		if(Object.isArray(items)){
-			this.empty();
-			this.add.apply(this, items);
-			return this;
-		}
-		
-		return Dom.prototype.set.apply(this, arguments);
-	},
-	
-	/**
-	 * 获取指定索引的项。
-	 * @param {Integer} container 要获取的容器控件。
-	 * @return {Control} 指定容器控件包装的真实子控件。如果不存在相应的子控件，则返回自身。
-	 */
-	item: Dom.prototype.child,
-
-	/**
-	 * 获取某一项在列表中的位置。
-	 */
-	indexOf: function(item) {
-		return item && item.parent && this.equals(item.parent()) ? item.index() : -1;
-	},
-	
-    ///**
-    //* 当当前控件在屏幕中显示不下时，由 align 函数触发执行此函数。
-    //* @param {String} xOry 值为 "x" 或 "y"。
-    //* @param {Integer} value 设置的最大值。
-    //* @param {Boolean} isOverflowing 如果值为 true，表示发生了此事件，否则表示恢复此状态。
-    //*/
-    //onOverflow: function(xOry, value, isOverflowing){
-	//    var data = this['overflow' + xOry];
-	//    if(isOverflowing){
-	//        if(!data){
-	//    	    this['overflow' + xOry] = this[xOry === 'x' ? 'getWidth' : 'getHeight']();
-	//        }
-	//        this[xOry === 'x' ? 'setWidth' : 'setHeight'](value);
-	//    } else if(data !== undefined){
-	//        this[xOry === 'x' ? 'setWidth' : 'setHeight'](data);
-	//        delete this['overflow' + xOry];
-	//    }
-    //},
-
-	//getItemByText: function(value){
-	//	for (var c = this.first(), child ; c; c = c.next()) {
-	//		if (c.getText() === value) {
-	//			child = c;
-	//			break;
-	//		}
-	//	}
-		
-	//	return child;
-	//},
-
-	/**
-	 * 设置某个事件发生之后，执行某个函数.
-	 * @param {String} eventName 事件名。
-	 * @param {String} funcName 执行的函数名。
-	 */
-	itemOn: function(eventName, fn, bind){
-		var me = this;
-		return this.on(eventName, function(e){
-			for(var c = me.node.firstChild, target = e.target; c; c = c.nextSibling){
-				if(c === target || Dom.has(c, target)){
-					return fn.call(bind, new Dom(c), e);
-				}
-			}
-		}, bind);
-	}
-
-});
-
-
-
-/**
- * 为非 ListControl 对象扩展 ListControl 的6个方法: add addAt remove removeAt set item
- */
-ListControl.aliasMethods = function(controlClass, targetProperty, removeChildProperty){
-    controlClass.defineMethods(targetProperty, 'add addAt removeAt item');
-
-    removeChildProperty = removeChildProperty || targetProperty;
-
-    controlClass.prototype.set = function (items) {
-        if (Object.isArray(items)) {
-
-            // 尝试在代理的列表中删除项。
-            var child = this[removeChildProperty];
-            if (child)
-                child.empty();
-
-            // 通过 this.add 添加项。
-            this.add.apply(this, items);
-
-            return this;
-        }
-
-        return Dom.prototype.set.apply(this, arguments);
-    };
-	
-	controlClass.prototype.removeChild = function(childControl){
-		
-		// 尝试在代理的列表中删除项。
-		var child = this[removeChildProperty];
-		if(child)
-			childControl.remove(childControl);
-		
-		// 尝试在当前节点中正常删除。
-		childControl.detach(this.node);
-		
-		return childControl;
-	};
-	
-};
 /*********************************************************
  * Controls.Suggest.ComboBox
  ********************************************************/
 /**
  * @author xuld
- */
-
-
-
+ */
 
 /**
  * 表示一个组合框。
- * @class
  * @extends Picker
  * @example <pre>
  * var comboBox = new ComboBox();
@@ -9175,191 +9281,50 @@ ListControl.aliasMethods = function(controlClass, targetProperty, removeChildPro
  * </pre>
  */
 var ComboBox = Picker.extend({
+
+    /**
+	 * 当前控件是否为列表形式。如果列表模式则优先考虑使用下拉菜单。
+     * @config {Boolean}
+	 */
+    listMode: false,
 	
     xtype: 'combobox',
 	
     autoResize: true,
 	
-    // 悬停选中
-	
-    _getHover: function(){
-        return this._hoverItem;
-    },
-	
-    _setHover: function(item){
-        var clazz = 'x-' + this.dropDown.xtype + '-hover';
-		
-        if(this._hoverItem){
-            this._hoverItem.removeClass(clazz);
-        }
-		
-        this._hoverItem = item ? item.addClass(clazz) : null;
-		
-    },
-	
-    /**
-	 * 移动当前选中项的位置。
-	 */
-    _moveHover: function(delta){
-		
-        // 如果菜单未显示。
-        if(this.dropDownHidden()){
-	    	
-            // 显示菜单。
-            this.showDropDown();
-        } else {
-	    	
-            var item = this._hoverItem || this.selectedItem;
-	    	
-            if(item){
-                item = item[delta > 0 ? 'next' : 'prev']();
-            }
-	    	
-            if(!item){
-                item = this.dropDown.item(delta > 0 ? 0 : -1);
-            }
-	    	
-            this._setHover(item);
-	    	
-        }
-    },
-	
-    onSelect: function(item){
-        return this.trigger('select', item);
-    },
-	
-    /**
-	 * 处理键盘事件。
-	 */
-    onKeyDown: function (e) {
-        switch(e.keyCode) {
-			
-            // 上下
-            case 40:
-            case 38:
-			
-                // 阻止默认事件。
-                e.preventDefault();
-			    
-                this._moveHover(e.keyCode === 40 ? 1 : -1);
-			    
-                break;
-			    
-                // 回车
-            case 13:
-            case 10:
-                if(!this.dropDownHidden()){
-                    var currentItem = this._getHover();
-                    if(currentItem != null) {
-                        this.selectItem(currentItem);
-                        e.preventDefault();
-                    }
-                }
-
-            case 27:
-                this.hideDropDown();
-                break;
-
-        }
-    },
-	
-    /**
-	 * 当用户单击某一项时执行。
-	 */
-    onItemClick: function(item, e){
-	
-        // 如果无法更改值，则直接忽略。
-        if(!this.getAttr('disabled') && !this.getAttr('readonly')) {
-				
-            // 设置当前的选中项。
-            this.selectItem(item);
-			
-        }
-
-        return false;
-		
-    },
-	
     /**
 	 * 创建当前 Picker 的菜单。
 	 * @return {Control} 下拉菜单。
-	 * @protected virtual
+	 * @protected override
 	 */
-    initDropDown: function(existDom){
-        return new ComboBox.DropDownMenu(existDom);
+    createDropDown: function (existDom) {
+        return new DropDownMenu({
+            node: existDom,
+            owner: this,
+            selectCallback: this.selectItem
+        });
     },
 	
     /**
 	 * 将当前文本的值同步到下拉菜单。
+	 * @protected override
 	 */
     updateDropDown: function(){
-        this._setHover(this.getSelectedItem());
-    },
-
-    /**
-	 * 将指定项同步到当前文本。
-	 */
-    updateText: function (item) {
-
-        // 如果有隐藏域，则设置选择的索引。
-        if (this.dropDownList) {
-
-            var oldValue,
-                text,
-                newValue,
-                input = this.input();
-
-            if (input.node.tagName === "SELECT") {
-
-                oldValue = input.getAttr('selectedIndex');
-
-                if (item) {
-                    var option = item.dataField().option;
-                    if (!option) {
-                        item.dataField().option = option = new Option(item.getText(), this.getValueOfItem(item));
-                        input.node.add(option);
-                    }
-                    option.selected = true;
-                    text = Dom.getText(option);
-                    newValue = input.node.selectedIndex;
-                } else {
-                    input.node.selectedIndex = newValue = -1;
-                    text = input.getAttr('placeholder');
-                }
-
-            } else {
-                oldValue = input.node.value;
-                input.node.value = newValue = item ? this.getValueOfItem(item) : "";
-                text = item ? item.getText() : "";
-            }
-
-            // 无隐藏域，仅设置按钮的文本。
-            this.first().setText(text);
-            if (oldValue !== newValue)
-                this.onChange();
-
-            // 如果未使用表单模式，则设置当前文本框。
-        } else {
-
-            // 获取 item 的文本并更新值。
-            this.setText(item ? item.getText() : "");
-        }
+        this.dropDown.hovering(this.getSelectedItem());
     },
 	
     init: function (options) {
 		
         // 1. 处理 <select>
-        var selectNode;
+        var selectDom;
 		
         // 如果初始化的时候传入一个 <select> 则替换 <select>, 并拷贝相关数据。
         if(this.node.tagName === 'SELECT') {
 			
-            this.inputProxy = selectNode = new Dom(this.node);
+            this.selectDom = selectDom = new Dom(this.node);
 			
             // 调用 create 重新生成 dom 。
-            this.node = Dom.parseNode(this.dropDownListTpl);
-			
-            this.dropDownList = true;
+            this.node = this.create();
 			
         }
 		
@@ -9368,120 +9333,68 @@ var ComboBox = Picker.extend({
         // 初始化文本框
         this.base('init');
 		
-        // 3. 初始化菜单
-		
-        // 绑定下拉菜单的点击事件
-        this.dropDown
-			.itemOn('mouseover', this._setHover, this)
-			.itemOn('click', this.onItemClick, this);
-		
-        // 4. 绑定事件
-		
-        // 监听键盘事件。
-        this.on('keydown', this.onKeyDown);
-		
-        // IE6 Hack: keydown 无法监听到回车。
-        if(navigator.isIE6) {
-            this.on('keypress', this.onKeyDown);	
-        }
-		
-        // 4. 设置默认项
+        // 3. 设置默认项
 			
-        if(selectNode) {
+        if(selectDom) {
 			
             // 让 listBox 拷贝 <select> 的成员。
-            this.copyItemsFromSelect(selectNode);
+            this.copyItemsFromSelect(selectDom);
 			
             // 隐藏 <select> 为新的 dom。
-            selectNode.hide();
+            selectDom.hide();
 
             // 插入当前节点。
-            selectNode.after(this);
+            selectDom.after(this);
         }
 		
     },
 	
-    setText: function (value) {
-
-        // 如果是 dropDownList 模式，则通过 setSelectedItem 来设置当前文本框的值。
-        if (this.dropDownList) {
-
-            // 设置 value 。
-            this.input().node.value = value;
-
-            // 根据 value 获得新决定的选中项设置选中项。
-            return this.setSelectedItem(this.getSelectedItem());
-        }
-
-        // 设置内容。
-        return IInput.setText.call(this, value);
-            
-    },
-	
     /**
-	 * 模拟鼠标选择某一个项。
+	 * 模拟用户选择某一个项。
 	 */
     selectItem: function (item) {
-        this.setSelectedItem(item);
-        return this.hideDropDown();
-    },
 
-    getValueOfItem: function (item) {
-        assert.notNull(item, "ComboBox#getValueOfItem(item): {item} ~", item);
-        var option = item.dataField().option;
-        return option ? option.value : (item.getAttr('data-value') || item.getText());
+        var me = this, old;
+    	
+        if (me.trigger('selecting', item)) {
+            old = me.getText();
+            me.setSelectedItem(item);
+            if (old !== me.getText()) {
+                me.trigger('change');
+            }
+            me.hideDropDown();
+        }
+
+        return me;
     },
 	
     /**
+	 * 设置当前选中的项。
+	 * @param {Dom} item 选中的项。
+	 * @return this
+	 */
+    setSelectedItem: function (item) {
+        this.setText(item ? item.getText() : "");
+        return this;
+    },
+
+    /**
 	 * 获取当前选中的项。如果不存在选中的项，则返回 null 。
-	 * @return {Control} 选中的项。
+	 * @return {Dom} 选中的项。
 	 */
     getSelectedItem: function () {
-
-        // 如果使用了表单模式，则优先查找 value 匹配的项。
-        if (this.dropDownList) {
-
-            // 获取 input 字段。
-            var input = this.input(), value;
-
-            // 如果隐藏域是 SELECT ，比较方便：
-            if (input.node.tagName === 'SELECT') {
-                value = this.inputProxy.getAttr('selectedIndex');
-                return value >= 0 ? this.dropDown.item(value) : null;
-            }
-
-            value = input.node.value;
-
-            return this.dropDown.child(function (dom) {
-                return this.getValueOfItem(new Dom(dom)) === value;
-            }.bind(this));
-        }
-
-        value = this.getText();
+        var value = this.getText();
         return this.dropDown.child(function (dom) {
             return Dom.getText(dom) === value;
         });
     },
 	
-    /**
-	 * 设置当前选中的项。
-	 * @param {Control} item 选中的项。
-	 * @return this
-	 */
-    setSelectedItem: function (item) {
-
-        if (this.onSelect(item) !== false) {
-            this.updateText(item);
-        }
-        return this;
-    },
-	
-    getSelectedIndex: function(){
-        return this.dropDown.indexOf(this.getSelectedItem());
-    },
-	
     setSelectedIndex: function(value){
         return this.setSelectedItem(this.dropDown.item(value));
+    },
+
+    getSelectedIndex: function () {
+        return this.dropDown.indexOf(this.getSelectedItem());
     },
 
     // select
@@ -9535,23 +9448,15 @@ var ComboBox = Picker.extend({
 		
     }
 
-}).addEvents('select');
-
+});
 
 ListControl.aliasMethods(ComboBox, 'dropDown');
 
 
-ComboBox.DropDownMenu = ListControl.extend({
-	
-    xtype: "listbox"
-
-});
 /*********************************************************
  * Controls.Form.SearchTextBox
  ********************************************************/
-
-
-
+
 
 
 var SearchTextBox = Picker.extend({
@@ -9628,11 +9533,7 @@ var SearchTextBox = Picker.extend({
  ********************************************************/
 /**
  * @author 
- */
-
-
-
-
+ */
 
 
 var FileUpload = Control.extend(IInput).implement({
@@ -9673,31 +9574,13 @@ var FileUpload = Control.extend(IInput).implement({
 /*********************************************************
  * Controls.Form.CheckBox
  ********************************************************/
-/**
- * @author  xuld
- */
-
-
-
-
-
-var CheckBox = Control.extend(IInput).implement({
-	
-	xtype: 'checkbox',
-	
-	tpl: '<input type="checkbox" class="x-control">'
-	
-});
-
+/** * @author  xuld */var CheckBox = Control.extend(IInput).implement({		xtype: 'checkbox',		tpl: '<input type="checkbox" class="x-control">'	});
 /*********************************************************
  * Controls.Form.RadioButton
  ********************************************************/
 /**
  * @author  xuld
- */
-
-
-
+ */
 
 
 var RadioButton = Control.extend(IInput).implement({
@@ -9711,164 +9594,143 @@ var RadioButton = Control.extend(IInput).implement({
 /*********************************************************
  * Controls.Form.TextBox
  ********************************************************/
-/**
- * @author  xuld
- */
-
-
-
-
-
-var TextBox = Control.extend(IInput).implement({
-	
-	xtype: 'textbox',
-	
-	tpl: '<input type="text" class="x-control">'
-	
-});
-
+/** * @author  xuld */var TextBox = Control.extend(IInput).implement({		xtype: 'textbox',		tpl: '<input type="text" class="x-control">'	});
 /*********************************************************
  * Controls.Container.Panel
  ********************************************************/
-/**
- * @author  xuld
- */
-
-
-
-
-/**
- * 内容显示面板。
- * @class Panel
- * @extends ContainerControl
- */
-var Panel = ContainerControl.implement({
-	
-	/**
-	 * xtype
-	 * @type String
-	 */
-	xtype: 'panel'
-	
-});
-
-
-
+/** * @author  xuld *//** * 内容显示面板。 * @class Panel * @extends ContainerControl */var Panel = ContainerControl.extend({		/**	 * xtype	 * @type String	 */	xtype: 'panel'	});
 /*********************************************************
  * Controls.Suggest.Suggest
  ********************************************************/
 /**
- * @author 
- */
-
+ * @author xuld
+ */
 
 /**
- * 用于提示框的组件。
+ * 智能提示组件。
+ * @extends Control
  */
-var Suggest = ComboBox.extend({
-	
-	getSuggestItems: function(text){
-		if(!this.items){
-			this.items = [];
-			this.dropDown.child(function(item){
-				this.items.push(Dom.getText(item));
-			}.bind(this));
-		}
-		
-		text = text.toLowerCase();
-		return this.items.filter(function(value){
-			return value.toLowerCase().indexOf(text) >= 0;
-		});
-	},
-	
-	setSuggestItems: function(value){
-		this.dropDown.set(value);
-		return this;
-	},
+var Suggest = Control.extend(IDropDownOwner).implement({
 
-	updateSuggest: function(){
-	    var text = Dom.getText(this.node);
+    /**
+	 * 创建当前 Suggest 的菜单。
+	 * @return {Dom} 下拉菜单。
+	 * @protected virtual
+	 */
+    createDropDown: function (existDom) {
+        return new DropDownMenu({
+            node: existDom,
+            owner: this,
+            selectCallback: this.selectItem,
+            updateCallback: this.showDropDown
+        }).addClass('x-suggest');
+    },
+
+    /**
+	 * 当下拉菜单被显示时执行。
+     * @protected override
+	 */
+    onDropDownShow: function () {
+		
+	    var text = this.getText();
 	    var items = this.getSuggestItems(text);
 
+        // 如果智能提示的项为空或唯一项就是当前的项，则不提示。
 	    if (!items || !items.length || (items.length === 1 && items[0] === text)) {
 	        return this.hideDropDown();
 	    }
 
 	    this.dropDown.set(items);
+
+        // 默认选择当前值。
+	    this.dropDown.hovering(this.dropDown.item(0));
+
     },
 	
-	/**
-	 * 向用户显示提示项。
-	 */
-	showSuggest: function(){
-	    this.updateSuggest();
-		this.showDropDown();
+    init: function(options){
 		
-		// 默认选择当前值。
-		this._setHover(this.dropDown.item(0));
-	},
-	
-	onKeyUp: function(e){
-		switch(e.keyCode) {
-			case 40:
-			case 38:
-			case 13:
-			case 36:
-		    case 37:
-		    case 27:
-			    return;
-		}
+        // 关闭原生的智能提示。
+        this.setAttr('autocomplete', 'off')
+        	
+        	// 创建并设置提示的下拉菜单。
+        	.setDropDown(this.createDropDown(this.next('x-suggest')))
+			
+			// 获取焦点后更新智能提示显示状态。
+            .on('focus', this.showDropDown)
+            
+            // 失去焦点后隐藏菜单。
+            .on('blur', function () {
+                this.hideDropDown();
+            });
 		
-		
-		this.showSuggest();
-	},
-	
-	// 重写 onDropDownShow 和 onDropDownHide
-	
-	setText: Dom.prototype.setText,
-	
-	getText: Dom.prototype.getText,
-	
-	onDropDownShow: IDropDownOwner.onDropDownShow,
-	
-	onDropDownHide: IDropDownOwner.onDropDownHide,
-	
-	updateText: function(item){
-		this.setText(item.getText());
-	},
-	
-	init: function(options){
-		
-		var suggest = this.initDropDown().addClass('x-suggest');
-		
-		// UI 上增加一个下拉框。
-		this.setDropDown(suggest);
-		
-		// 绑定下拉菜单的点击事件
-		this.dropDown
-			.itemOn('mouseover', this._setHover, this)
-			.itemOn('mousedown', this.onItemClick, this);
+    },
 
-		this.on('keydown', this.onKeyDown);
-		this.on('focus', this.showSuggest);
-		this.on('blur', this.hideDropDown);
-		this.on('keyup', this.onKeyUp);
-		
-		this.setAttr('autocomplete', 'off');
-		
+    /**
+     * 根据当前的文本框值获取智能提示的项。
+     */
+	getSuggestItems: function(text){
+	    if (!text) {
+	        return this.suggestItems;
+	    }
+
+		text = text.toLowerCase();
+		return this.suggestItems.filter(function (value) {
+			return value.toLowerCase().indexOf(text) >= 0;
+		});
+	},
+	
+    /**
+     * 强制设置当前选中的项。
+     */
+	setSuggestItems: function(value){
+	    this.suggestItems = value || [];
+		return this;
+	},
+
+    /**
+     * 模拟用户选择一项。
+     */
+	selectItem: function (item) {
+	    if (item) {
+	        this.setText(item.getText());
+	    }
+	    return this.hideDropDown();
 	}
 	
 });
 
+/*********************************************************
+ * Controls.Composite.ProgressBar
+ ********************************************************/
+/**
+ * @author xuld
+ */
 
 
+var ProgressBar = Control.extend({
+
+    xtype: 'progressbar',
+
+    tpl: '<div class="x-control">\
+                <div class="x-progressbar-fore"></div>\
+            </div>',
+
+    setValue: function (value) {
+        this.find('.x-progressbar-fore').node.style.width = value + '%';
+        return this;
+    },
+
+    getValue: function () {
+        return parseInt(this.find('.x-progressbar-fore').node.style.width);
+    }
+
+});
 /*********************************************************
  * System.Utils.Deferrable
  ********************************************************/
 /**
  * @author xuld
- */
-
+ */
 
 /**
  * �����첽ִ������ʱ��֤�����Ǵ��еġ�
@@ -9902,7 +9764,7 @@ var Deferrable = Class({
     },
 
     /**
-	 * ��������ͬʱ�������Ĵ��?����
+	 * ��������ͬʱ�������Ĵ���������
 	 * wait - �ȴ��ϸ��������ɡ�
 	 * ignore - ���Ե�ǰ������
 	 * stop - �����ж��ϸ��������ϸ������Ļص�������ִ�У�Ȼ��ִ�е�ǰ������
@@ -9999,8 +9861,7 @@ var Deferrable = Class({
 /**
  * @fileOverview 提供底层的 特效算法支持。
  * @author xuld
- */
-
+ */
 
 /**
  * 特效算法基类。
@@ -10223,241 +10084,28 @@ var Fx = (function() {
 /*********************************************************
  * System.Fx.Tween
  ********************************************************/
-/**
- * DOM 补间动画
- * @author xuld
- */
-
-
-
-
-Object.extend(Fx, {
-	
-	/**
-	 * 用于特定 css 补间动画的引擎。 
-	 */
-	tweeners: {},
-	
-	/**
-	 * 默认的补间动画的引擎。 
-	 */
-	defaultTweeners: [],
-	
-	/**
-	 * 用于数字的动画引擎。
-	 */
-	numberTweener: {
-		get: function(target, name){
-			return Dom.styleNumber(target.node, name);
-		},
-				
-		/**
-		 * 常用计算。
-		 * @param {Object} from 开始。
-		 * @param {Object} to 结束。
-		 * @param {Object} delta 变化。
-		 */
-		compute: function(from, to, delta){
-			return (to - from) * delta + from;
-		},
-		
-		parse: function(value){
-			return typeof value == "number" ? value : parseFloat(value);
-		},
-		
-		set: function(target, name, value){
-			target.node.style[name] = value;
-		}
-	},
-
-	/**
-	 * 补间动画
-	 * @class Tween
-	 * @extends Fx
-	 */
-	Tween: Fx.extend({
-		
-		/**
-		 * 初始化当前特效。
-		 */
-		constructor: function(){
-			
-		},
-		
-		/**
-		 * 根据指定变化量设置值。
-		 * @param {Number} delta 变化量。 0 - 1 。
-		 * @override
-		 */
-		set: function(delta){
-			var options = this.options,
-				params = options.params,
-				target = options.target,
-				tweener,
-				key,
-				value;
-
-			// 对当前每个需要执行的特效进行重新计算并赋值。
-			for (key in params) {
-				value = params[key];
-				tweener = value.tweener;
-				tweener.set(target, key, tweener.compute(value.from, value.to, delta));
-			}
-		},
-		
-		/**
-		 * 生成当前变化所进行的初始状态。
-		 * @param {Object} options 开始。
-		 */
-		init: function (options) {
-				
-			// 对每个设置属性
-			var key,
-				tweener,
-				part,
-				value,
-				parsed,
-				i,
-				// 生成新的 tween 对象。
-				params = {};
-			
-			for (key in options.params) {
-
-				// value
-				value = options.params[key];
-
-				// 如果 value 是字符串，判断 += -= 或 a-b
-				if (typeof value === 'string' && (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {
-					value = part[3];
-				}
-
-				// 找到用于变化指定属性的解析器。
-				tweener = Fx.tweeners[key = key.toCamelCase()];
-				
-				// 已经编译过，直接使用， 否则找到合适的解析器。
-				if (!tweener) {
-					
-					// 如果是纯数字属性，使用 numberParser 。
-					if(key in Dom.styleNumbers) {
-						tweener = Fx.numberTweener;
-					} else {
-						
-						i = Fx.defaultTweeners.length;
-						
-						// 尝试使用每个转换器
-						while (i-- > 0) {
-							
-							// 获取转换器
-							parsed = Fx.defaultTweeners[i].parse(value, key);
-							
-							// 如果转换后结果合格，证明这个转换器符合此属性。
-							if (parsed || parsed === 0) {
-								tweener = Fx.defaultTweeners[i];
-								break;
-							}
-						}
-
-						// 找不到合适的解析器。
-						if (!tweener) {
-							continue;
-						}
-						
-					}
-
-					// 缓存 tweeners，下次直接使用。
-					Fx.tweeners[key] = tweener;
-				}
-				
-				// 如果有特殊功能。 ( += -= a-b)
-				if(part){
-					parsed = part[2];
-					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);
-					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));
-				} else {
-					parsed = tweener.parse(value);
-					i = tweener.get(options.target, key);
-				}
-				
-				params[key] = {
-					tweener: tweener,
-					from: i,
-					to: parsed		
-				};
-				
-				assert(i !== null && parsed !== null, "Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, i, parsed);
-				
-			}
-
-			options.params = params;
-		}
-	
-	}),
-	
-	createTweener: function(tweener){
-		return Object.extendIf(tweener, Fx.numberTweener);
-	}
-	
-});
-
-Object.each(Dom.styleFix, function(value, key){
-	Fx.tweeners[key] = this;
-}, Fx.createTweener({
-	set: function (target, name, value) {
-		Dom.styleFix[name].call(target, value);
-	}
-}));
-
-Fx.tweeners.scrollTop = Fx.createTweener({
-	set: function (target, name, value) {
-		target.setScroll(null, value);
-	},
-	get: function (target) {
-		return target.getScroll().y;
-	}
-});
-
-Fx.tweeners.scrollLeft = Fx.createTweener({
-	set: function (target, name, value) {
-		target.setScroll(value);
-	},
-	get: function (target) {
-		return target.getScroll().x;
-	}
-});
-
-Fx.defaultTweeners.push(Fx.createTweener({
-
-	set: navigator.isStd ? function (target, name, value) {
-		
-		target.node.style[name] = value + 'px';
-	} : function(target, name, value) {
-		try {
-			
-			// ie 对某些负属性内容报错
-			target.node.style[name] = value;
-		}catch(e){}
-	}
-
-}));
-
+/** * DOM 补间动画 * @author xuld */Object.extend(Fx, {		/**	 * 用于特定 css 补间动画的引擎。 
+	 */	tweeners: {},		/**	 * 默认的补间动画的引擎。 	 */	defaultTweeners: [],		/**	 * 用于数字的动画引擎。
+	 */	numberTweener: {		get: function(target, name){			return Dom.styleNumber(target.node, name);		},						/**		 * 常用计算。		 * @param {Object} from 开始。		 * @param {Object} to 结束。		 * @param {Object} delta 变化。		 */		compute: function(from, to, delta){			return (to - from) * delta + from;		},				parse: function(value){			return typeof value == "number" ? value : parseFloat(value);		},				set: function(target, name, value){			target.node.style[name] = value;		}	},	/**	 * 补间动画	 * @class Tween	 * @extends Fx	 */	Tween: Fx.extend({				/**		 * 初始化当前特效。		 */		constructor: function(){					},				/**		 * 根据指定变化量设置值。		 * @param {Number} delta 变化量。 0 - 1 。		 * @override		 */		set: function(delta){			var options = this.options,				params = options.params,				target = options.target,				tweener,				key,				value;			// 对当前每个需要执行的特效进行重新计算并赋值。			for (key in params) {				value = params[key];				tweener = value.tweener;				tweener.set(target, key, tweener.compute(value.from, value.to, delta));			}		},				/**		 * 生成当前变化所进行的初始状态。		 * @param {Object} options 开始。		 */		init: function (options) {							// 对每个设置属性			var key,				tweener,				part,				value,				parsed,				i,				// 生成新的 tween 对象。				params = {};						for (key in options.params) {				// value				value = options.params[key];				// 如果 value 是字符串，判断 += -= 或 a-b				if (typeof value === 'string' && (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {					value = part[3];				}				// 找到用于变化指定属性的解析器。				tweener = Fx.tweeners[key = key.toCamelCase()];								// 已经编译过，直接使用， 否则找到合适的解析器。				if (!tweener) {										// 如果是纯数字属性，使用 numberParser 。					if(key in Dom.styleNumbers) {						tweener = Fx.numberTweener;					} else {												i = Fx.defaultTweeners.length;												// 尝试使用每个转换器						while (i-- > 0) {														// 获取转换器							parsed = Fx.defaultTweeners[i].parse(value, key);														// 如果转换后结果合格，证明这个转换器符合此属性。							if (parsed || parsed === 0) {								tweener = Fx.defaultTweeners[i];								break;							}						}						// 找不到合适的解析器。						if (!tweener) {							continue;						}											}					// 缓存 tweeners，下次直接使用。					Fx.tweeners[key] = tweener;				}								// 如果有特殊功能。 ( += -= a-b)				if(part){					parsed = part[2];					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));				} else {					parsed = tweener.parse(value);					i = tweener.get(options.target, key);				}								params[key] = {					tweener: tweener,					from: i,					to: parsed						};								assert(i !== null && parsed !== null, "Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, i, parsed);							}			options.params = params;		}		}),		createTweener: function(tweener){		return Object.extendIf(tweener, Fx.numberTweener);	}	});Object.each(Dom.styleFix, function(value, key){	Fx.tweeners[key] = this;}, Fx.createTweener({	set: function (target, name, value) {		Dom.styleFix[name].call(target, value);	}}));Fx.tweeners.scrollTop = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(null, value);	},	get: function (target) {		return target.getScroll().y;	}});Fx.tweeners.scrollLeft = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(value);	},	get: function (target) {		return target.getScroll().x;	}});Fx.defaultTweeners.push(Fx.createTweener({	set: navigator.isStd ? function (target, name, value) {				target.node.style[name] = value + 'px';	} : function(target, name, value) {		try {						// ie 对某些负属性内容报错			target.node.style[name] = value;		}catch(e){}	}}));
 /*********************************************************
  * System.Fx.Animate
  ********************************************************/
 /**
  * @fileOverview 通过改变CSS实现的变换。
  * @author xuld
- */
-
-
+ */
 
 
 
 (function(){
 	
-	var displayEffects = Fx.displayEffects = {
-			opacity: Function.from({
-				opacity: 0
-			})
+    var opacity0 = {
+            opacity: 0
+        },
+
+        displayEffects = Fx.displayEffects = {
+            opacity: function () {
+                return opacity0;            }
 		},
 
 		toggle = Dom.prototype.toggle,
@@ -10499,7 +10147,8 @@ Fx.defaultTweeners.push(Fx.createTweener({
 			
 			return value;
 		};
-	}, Function.from(0));
+	}, function () {
+	    return 0;	});
 	
 	Object.map('left right top bottom', function(key, index) {
 		key = 'margin' + key.capitalize();
@@ -10578,7 +10227,7 @@ Fx.defaultTweeners.push(Fx.createTweener({
 			params.target = this;
 
 			assert(!params.duration || typeof params.duration === 'number', "Dom#animate(params, duration, oncomplete, link): {duration} 必须是数字。如果需要制定为默认时间，使用 -1 。", params.duration);
-			assert(!params.oncomplete || Object.isFunction(params.oncomplete), "Dom#animate(params, duration, oncomplete, link): {oncomplete} 必须是函数", params.oncomplete);
+			assert(!params.oncomplete || typeof params.oncomplete === 'function', "Dom#animate(params, duration, oncomplete, link): {oncomplete} 必须是函数", params.oncomplete);
 			
 			this.fx().run(params, link);
 			
@@ -10772,8 +10421,7 @@ document.animate = function() {
 /*********************************************************
  * System.Fx.Marquee
  ********************************************************/
-
-
+
 
 var Marquee = Class({
 	
@@ -11145,9 +10793,7 @@ var Marquee = Class({
  ********************************************************/
 /**
  * @author 
- */
-
-
+ */
 
 
 var Carousel = Control.extend({
@@ -11184,10 +10830,7 @@ var Carousel = Control.extend({
  ********************************************************/
 /**
  * @author  xuld
- */
-
-
-
+ */
 
 
 
@@ -11212,11 +10855,7 @@ var Button = ContentControl.extend({
  ********************************************************/
 /**
  * @author  xuld
- */
-
-
-
-
+ */
 
 
 
@@ -11226,7 +10865,7 @@ var MenuButton = Button.extend(IDropDownOwner).implement({
 	
 	tpl: '<button class="x-button x-control" type="button"><span class="x-menubutton-arrow"></span></button>',
 	
-	initDropDown: function(existDom){
+	createDropDown: function (existDom) {
 		if(existDom && !existDom.hasClass('x-menu')){
 			return existDom;
 		}
@@ -11239,18 +10878,16 @@ var MenuButton = Button.extend(IDropDownOwner).implement({
 	},
 	
 	init: function () {
-		this.setDropDown(this.getDropDown());
+	    this.setDropDown(this.createDropDown(this.next('.x-dropdown')));
 		this.on('click', this.toggleDropDown, this);
 	},
 	
 	onDropDownShow: function(){
 		this.state('actived', true);
-		return IDropDownOwner.onDropDownShow.apply(this, arguments);
 	},
 	
 	onDropDownHide: function(){
 	    this.state('actived', false);
-		return IDropDownOwner.onDropDownHide.apply(this, arguments);
 	},
 	
 	onDropDownClick: function(){
@@ -11266,10 +10903,7 @@ ListControl.aliasMethods(MenuButton, 'dropDown');
  ********************************************************/
 /**
  * @author xuld
- */
-
-
-
+ */
 
 
 var SplitButton = MenuButton.extend({
@@ -11302,7 +10936,7 @@ var SplitButton = MenuButton.extend({
 	},
 	
 	init: function () {
-		this.setDropDown(this.getDropDown());
+	    this.setDropDown(this.createDropDown(this.next('.x-dropdown')));
 		this.find('>.x-button:last-child').on('click', this.toggleDropDown, this);
 	}
 	
@@ -11313,351 +10947,284 @@ var SplitButton = MenuButton.extend({
  ********************************************************/
 /**
  * @author  xuld
- */
-
+ */
 
 
 /**
- * 表示一个可折叠的控件。
+ * 表示一个可折叠的控件接口。
  * @interface ICollapsable
+ * @remark ICollapsable 会对 #body() 节点（如果存在）进行折叠和展开效果。
  */
 var ICollapsable = {
 
-    collapseDuration: -1,
-	
-	/**
-	 * 获取目前是否折叠。
+    /**
+	 * 折叠效果的默认使用时间。如果为 0 表示无效果。
+	 * @type {Integer} 
 	 * @virtual
-	 * @return {Boolean} 获取一个值，该值指示当前面板是否折叠。
 	 */
-	isCollapsed: function() {
-	    var body = this.body ? this.body() : this;
-	    return !body || Dom.isHidden(body.node);
-	},
-	
-	onCollapsing: function(duration){
-		return this.trigger('collapsing', duration);
-	},
-	
-	onExpanding: function(duration){
-		return this.trigger('expanding', duration);
-	},
-	
-	onCollapse: function(){
-		this.trigger('collapse');
-	},
-	
-	onExpand: function(){
-		this.trigger('expand');
-	},
+    collapseDuration: -1,
 
-	/**
-	 * 折叠面板。
-	 * @param {Number} duration 折叠效果使用的时间。
+    /**
+	 * 当控件已经被折叠时执行。
+	 * @protected virtual
 	 */
-	collapse: function(duration){
-		var me = this, 
+    onCollapsing: Function.empty,
+
+    /**
+	 * 当控件已经被折叠时执行。
+	 * @protected virtual
+	 */
+    onCollapse: Function.empty,
+
+    /**
+	 * 当控件已经被折叠时执行。
+	 * @protected virtual
+	 */
+    onExpanding: Function.empty,
+
+    /**
+	 * 当控件即将被展开时执行。
+	 * @protected virtual
+	 */
+    onExpand: Function.empty,
+
+    /**
+	 * 当控件即将被展开时执行。
+	 * @protected virtual
+	 */
+    onExpand: Function.empty,
+
+    /**
+	 * 获取目前是否折叠。
+	 * @return {Boolean} 获取一个值，该值指示当前面板是否折叠。
+	 * @virtual
+	 */
+    isCollapsed: function () {
+        var body = this.body ? this.body() : this;
+        return !body || Dom.isHidden(body.node);
+    },
+
+    /**
+	 * 切换面板的折叠。
+	 * @param {Integer} duration=#collapseDuration 折叠效果使用的时间。如果为 0 表示无效果。
+     * @return this
+	 */
+    toggleCollapse: function (duration) {
+        return this[this.isCollapsed() ? 'expand' : 'collapse'](duration);
+    },
+
+    /**
+	 * 折叠面板。
+	 * @param {Integer} duration=#collapseDuration 折叠效果使用的时间。如果为 0 表示无效果。
+     * @return this
+	 */
+    collapse: function (duration) {
+        var me = this,
 			body,
 			callback;
-		if (me.onCollapsing(duration) !== false && (body = me.body ? me.body() : me)) {
-			callback = function(){
-				me.addClass('x-' + me.xtype + '-collapsed');
-				me.onCollapse();
-			};
-			
-			// 如果不加参数，使用同步方式执行。
-			if(duration === 0){
-			    body.hide();
-				callback();
-			} else {
-			    body.hide('height', duration || this.collapseDuration, callback, 'ignore');
-			}
-		}
-		return me;
-	},
 
-	/**
+        // 如果允许折叠，则继续执行。
+        if (me.trigger('collapsing') && (body = me.body ? me.body() : me)) {
+
+            me.onCollapsing();
+
+            // 折叠完成的回调函数。
+            callback = function () {
+                me.addClass('x-' + me.xtype + '-collapsed');
+                me.onCollapse();
+                me.trigger('collapse');
+            };
+
+            // 如果不加参数，使用同步方式执行。
+            if (duration === 0) {
+                body.hide();
+                callback();
+            } else {
+                body.hide('height', duration || me.collapseDuration, callback, 'ignore');
+            }
+        }
+        return me;
+    },
+
+    /**
 	 * 展开面板。
-	 * @param {Number} duration 折叠效果使用的时间。
+	 * @param {Integer} duration=#collapseDuration 折叠效果使用的时间。如果为 0 表示无效果。
+     * @return this
 	 */
-	expand: function(duration){
-		if(this.onExpanding(duration) !== false) {
-		    var body = this.body ? this.body() : this;
-		    if (body) {
-				this.removeClass('x-' + this.xtype + '-collapsed');
-				if(duration === 0){
-				    body.show();
-					this.onExpand();
-				} else {
-				    body.show('height', duration || this.collapseDuration, this.onExpand.bind(this), 'ignore');
-				}
-			}
-		}
-		return this;
-	},
-	
-	/**
-	 * 切换面板的折叠。
-	 * @param {Number} duration 折叠效果使用的时间。
-	 */
-	toggleCollapse: function(duration) {
-		return this[this.isCollapsed() ? 'expand' : 'collapse'](duration);
-	}
-	
+    expand: function (duration) {
+
+        var me = this,
+            body;
+
+        // 如果允许展开，则继续执行。
+        // 获取主体内容。
+        // 仅当存在主体内容时才执行操作。
+        if (me.trigger('expanding') && (body = me.body ? me.body() : me)) {
+
+            me.onExpanding();
+
+            me.removeClass('x-' + me.xtype + '-collapsed');
+
+            if (duration === 0) {
+                body.show();
+                me.onExpand();
+                me.trigger('expand');
+            } else {
+                body.show('height', duration || me.collapseDuration, function () {
+                    me.trigger('expand');
+                }, 'ignore');
+            }
+        }
+
+        return me;
+    }
+
 };
 
 /*********************************************************
  * Controls.Core.TreeControl
  ********************************************************/
-/**
- * @author  xuld
- */
-
-
-
-//  .add
-//  .item(0).add
-//  .add...
-
-/**
- * 表示一个树结构的子组件。
- */
-var TreeControl = ListControl.extend({
-	
-	// 树节点
-	
-	/**
-	 * 将已有的 DOM 节点转为 {@link TreeControl.Item} 对象。
-	 * @param {Dom} childControl 要转换的 DOM 对象。
-	 * @param {Dom} parent=null DOM 对象的父节点。
-	 * @protected virtual
-	 */
-	createTreeItem: function(childControl, li) {
-		return new TreeControl.Item(childControl);
-	},
-	
-	/**
-	 * 初始化并返回每一个 TreeItem 对象。
-	 * @param {Dom} li 包含树节点的 <li> 节点对象。
-	 * @param {Dom} [childControl] 强制指定 <li> 内指定的子节点。
-	 * @private
-	 */
-	initTreeItem: function(li, childControl){
-	
-		// 获取第一个子节点。
-		var subControl = li.addClass('x-' + this.xtype + '-item').find('>ul');
-		
-		// 如果没有指定 childControl，则使用 li.first()作为内容。
-		if(!childControl){
-			childControl = (subControl ? (subControl.prev() || subControl.prev(true)) : (li.first() || li.first(true))) || Dom.parse('');
-		}
-		
-		// 根据节点创建一个 MenuItem 对象。
-		childControl = this.createTreeItem(childControl, li);
-		
-		// 插入创建的菜单项。
-		li.prepend(childControl);
-
-		// 如果存在子菜单，设置子菜单。
-		if (subControl) {
-			childControl.setSubControl(subControl);
-		}
-		
-		// 保存 li -> childControl 的关联。
-		li.dataField().item = childControl;
-		
-		// 绑定 parentControl。
-		childControl.parentControl = this;
-		
-		return childControl;
-
-	},
-	
-	/**
-	 * 初始化 DOM 中已经存在的项。 
-	 * @protected override
-	 */
-	init: function(){
-		for(var c = this.first(); c; c = c.next()){
-			this.initTreeItem(c);
-		}
-	},
-	
-	// 增删节点
-
-	/**
-	 * 当新控件被添加时执行。
-	 * @param {Control} childControl 新添加的元素。
-	 * @param {Control} refControl 元素被添加的位置。
-	 * @protected override
-	 */
-	insertBefore: function(childControl, refControl) {
-		
-		var item;
-		
-		// 如果不是添加 <li> 标签，则创建一个。
-		if (childControl.node.tagName !== 'LI') {
-			
-			// 作为 initTreeItem 的参数。
-			item = childControl;
-			
-			// 生成一个 <li>
-			childControl = Dom.create('LI');
-		}
-		
-		// 插入 DOM 树。
-		childControl.attach(this.node, refControl && refControl.node || null);
-		
-		// 返回 treeItem
-		return this.initTreeItem(childControl, item);
-	},
-
-	/**
-	 * 当新控件被移除时执行。
-	 * @param {Object} childControl 新添加的元素。
-	 * @protected override
-	 */
-	removeChild: function(childControl) {
-		
-		// 取消删除一个项(自动转到 <li>)。
-		if(childControl = ListControl.prototype.removeChild.call(this, childControl)){
-				
-			var data = childControl.dataField();
-			
-			delete data.item.parentControl;
-			
-			delete data.item;
-			
-		}
-		
-		// 返回被删除的子控件。
-		return childControl;
-	},
-	
-	// 项
-	
-	item: function(index){
-		if(index = this.child(index)){
-			index = index.dataField().item;
-		}
-		
-		return index;
-	}
-
-});
-
-/**
- * 表示 TreeControl 中的一项。
- */
-TreeControl.Item = ContentControl.extend({
-	
-	tpl: '<a class="x-control"></a>',
-	
-	/**
-	 * 获取当前菜单管理的子菜单。
-	 * @type {TreeControl}
-	 */
-	subControl: null,
-	
-	/**
-	 * 当被子类重写时，用于创建子树。
-	 * @param {TreeControl} treeControl 要初始化的子树。
-	 * @return {TreeControl} 新的 {@link TreeControl} 对象。
-	 * @protected virtual
-	 */
-	createSubControl: function(control){
-		return new TreeControl(control);
-	},
-	
-	/**
-	 * 当被子类重写时，用于初始化子树。
-	 * @param {TreeControl} treeControl 要初始化的子树。
-	 * @protected virtual
-	 */
-	initSubControl: Function.empty,
-	
-	/**
-	 * 当被子类重写时，用于删除初始化子树。
-	 * @param {TreeControl} treeControl 要删除初始化的子树。
-	 * @protected virtual
-	 */
-	uninitSubControl: Function.empty,
-	
-	/**
-	 * 获取当前项的子树控件。 
-	 */
-	getSubControl: function(){
-		if(!this.subControl){
-			this.setSubControl(this.createSubControl());
-		}
-		return this.subControl;
-	},
-	
-	/**
-	 * 设置当前项的子树控件。
-	 */
-	setSubControl: function(treeControl) {
-		if (treeControl) {
-			
-			if(!(treeControl instanceof TreeControl)){
-				treeControl = this.createSubControl(treeControl);	
-			}
-			
-			// 如果子控件不在 DOM 树中，插入到当前节点后。
-			if (!treeControl.parent('body') && this.node.parentNode) {
-				this.node.parentNode.appendChild(treeControl.node);
-			}
-		
-			this.subControl = treeControl;
-			this.initSubControl(treeControl);
-			treeControl.owner = this;
-		} else if(this.subControl){
-			this.subControl.remove();
-			this.uninitSubControl(this.subControl);
-			delete this.subControl.owner;
-			this.subControl = null;
-		}
-		return this;
-	},
-
-	attach: function(parentNode, refNode) {
-		
-	    parentNode.insertBefore(this.node, refNode);
-
-	    // 如果有关联的容器，添加容器。
-		var subControl = this.subControl;
-		if (subControl && !subControl.parent('body')) {
-			parentNode.insertBefore(subControl.node, refNode);
-		}
-	},
-
-	detach: function(parentNode) {
-		
-		if(this.node.parentNode === parentNode) {
-			parentNode.removeChild(this.node);
-		}
-		
-		// 如果有关联的容器，删除容器。
-		var subControl = this.subControl;
-		if (subControl) {
-			parentNode.removeChild(subControl.node);
-		}
-	}
-
-});
-
-ListControl.aliasMethods(TreeControl.Item, 'getSubControl()', 'subControl');
+/** * @author  xuld *//** * 表示一个树结构的子组件。 */var TreeControl = ListControl.extend({		// 树节点		/**	 * 将已有的 DOM 节点转为 {@link TreeControl.Item} 对象。	 * @param {Dom} childControl 要转换的 DOM 对象。	 * @param {Dom} parent=null DOM 对象的父节点。	 * @protected virtual	 */	createTreeItem: function(childControl, li) {		return new TreeControl.Item(childControl);	},		/**	 * 初始化并返回每一个 TreeItem 对象。	 * @param {Dom} li 包含树节点的 <li> 节点对象。	 * @param {Dom} [childControl] 强制指定 <li> 内指定的子节点。	 * @private	 */	initTreeItem: function(li, childControl){			// 获取第一个子节点。		var subControl = li.addClass('x-' + this.xtype + '-item').find('>ul');				// 如果没有指定 childControl，则使用 li.first()作为内容。		if(!childControl){			childControl = (subControl ? (subControl.prev() || subControl.prev(null)) : (li.first() || li.first(null))) || Dom.parse('');		}				// 根据节点创建一个 MenuItem 对象。		childControl = this.createTreeItem(childControl, li);				// 插入创建的菜单项。		li.prepend(childControl);		// 如果存在子菜单，设置子菜单。		if (subControl) {			childControl.setSubControl(subControl);		}				// 保存 li -> childControl 的关联。		li.dataField().item = childControl;				// 绑定 parentControl。		childControl.parentControl = this;				return childControl;	},		/**	 * 初始化 DOM 中已经存在的项。 	 * @protected override	 */	init: function(){		for(var c = this.first(); c; c = c.next()){			this.initTreeItem(c);		}	},		// 增删节点	/**	 * 当新控件被添加时执行。	 * @param {Control} childControl 新添加的元素。	 * @param {Control} refControl 元素被添加的位置。	 * @protected override	 */	insertBefore: function(childControl, refControl) {				var item;				// 如果不是添加 <li> 标签，则创建一个。		if (childControl.node.tagName !== 'LI') {						// 作为 initTreeItem 的参数。			item = childControl;						// 生成一个 <li>			childControl = Dom.create('LI');		}				// 插入 DOM 树。		childControl.attach(this.node, refControl && refControl.node || null);				// 返回 treeItem		return this.initTreeItem(childControl, item);	},	/**	 * 当新控件被移除时执行。	 * @param {Object} childControl 新添加的元素。	 * @protected override	 */	removeChild: function(childControl) {				// 取消删除一个项(自动转到 <li>)。		if(childControl = ListControl.prototype.removeChild.call(this, childControl)){							var data = childControl.dataField();						delete data.item.parentControl;						delete data.item;					}				// 返回被删除的子控件。		return childControl;	},		// 项		item: function(index){		if(index = this.child(index)){			index = index.dataField().item;		}				return index;	}});/** * 表示 TreeControl 中的一项。 */TreeControl.Item = ContentControl.extend({		tpl: '<a class="x-control"></a>',		/**	 * 获取当前菜单管理的子菜单。	 * @type {TreeControl}	 */	subControl: null,		/**	 * 当被子类重写时，用于创建子树。	 * @param {TreeControl} treeControl 要初始化的子树。	 * @return {TreeControl} 新的 {@link TreeControl} 对象。	 * @protected virtual	 */	createSubControl: function(control){		return new TreeControl(control);	},		/**	 * 当被子类重写时，用于初始化子树。	 * @param {TreeControl} treeControl 要初始化的子树。	 * @protected virtual	 */	initSubControl: Function.empty,		/**	 * 当被子类重写时，用于删除初始化子树。	 * @param {TreeControl} treeControl 要删除初始化的子树。	 * @protected virtual	 */	uninitSubControl: Function.empty,		/**	 * 获取当前项的子树控件。 	 */	getSubControl: function(){		if(!this.subControl){			this.setSubControl(this.createSubControl());		}		return this.subControl;	},		/**	 * 设置当前项的子树控件。	 */	setSubControl: function(treeControl) {		if (treeControl) {						if(!(treeControl instanceof TreeControl)){				treeControl = this.createSubControl(treeControl);				}						// 如果子控件不在 DOM 树中，插入到当前节点后。			if (!treeControl.closest('body') && this.node.parentNode) {				this.node.parentNode.appendChild(treeControl.node);			}					this.subControl = treeControl;			this.initSubControl(treeControl);			treeControl.owner = this;		} else if(this.subControl){			this.subControl.remove();			this.uninitSubControl(this.subControl);			delete this.subControl.owner;			this.subControl = null;		}		return this;	},	attach: function(parentNode, refNode) {			    parentNode.insertBefore(this.node, refNode);	    // 如果有关联的容器，添加容器。		var subControl = this.subControl;		if (subControl && !subControl.closest('body')) {			parentNode.insertBefore(subControl.node, refNode);		}	},	detach: function(parentNode) {				if(this.node.parentNode === parentNode) {			parentNode.removeChild(this.node);		}				// 如果有关联的容器，删除容器。		var subControl = this.subControl;		if (subControl) {			parentNode.removeChild(subControl.node);		}	}});ListControl.aliasMethods(TreeControl.Item, 'getSubControl()', 'subControl');
 /*********************************************************
  * Controls.Nav.TreeView
  ********************************************************/
 /**
  * @author 
- */
+ */
 
 
 
+var TreeView = TreeControl.extend({
+
+    xtype: 'treeview',
+
+    depth: 0,
+
+    createTreeItem: function (childControl) {
+
+        if (!(childControl instanceof TreeNode)) {
+
+            // 保存原有 childControl 。
+            var t = childControl;
+
+            childControl = new TreeNode();
+
+            childControl.content().append(t);
+
+        }
+
+        // 设置子节点的位置。
+        childControl.setDepth(this.depth + 1);
+
+        // 更新当前树的父节点。
+        if (this.owner) {
+            this.owner.update();
+            childControl.parentNode = this.owner;
+        }
+
+        return childControl;
+
+    },
+
+    /**
+	 * 获取一个值，该值指示当前节点是否为最后一个节点。
+	 * @return {Boolean}
+	 * @protected
+	 */
+    isLastNode: function () {
+        return false;
+    },
+
+    init: function () {
+
+        // 根据已有的 DOM 结构初始化菜单。
+        TreeControl.prototype.init.call(this);
+
+        this.on('click', this.onClick);
+    },
+
+    invoke: function (funcName, args) {
+        var subTree = this, c, target;
+        args = args || [];
+        for (var c = subTree.first() ; c; c = c.next()) {
+            target = c.dataField().item;
+            target[funcName].apply(target, args);
+        }
+        return this;
+    },
+
+    collapse: function (duration) {
+        return this.invoke('collapse', [duration]);
+    },
+
+    collapseAll: function (duration) {
+        return this.invoke('collapseAll', [duration]);
+    },
+
+    expand: function (duration) {
+        return this.invoke('expand', [duration]);
+    },
+
+    expandAll: function (duration) {
+        return this.invoke('expandAll', [duration]);
+    },
+
+    collapseTo: function (depth, duration) {
+        return this.invoke('collapseTo', [--depth, duration]);
+    },
+
+    /**
+	 * 点击时触发。
+	 */
+    onClick: function (e) {
+
+        var target = e.target;
+
+        if (/\bx-treenode-(minus|plus|loading)\b/.test(target.className))
+            return;
+
+        if ((target = new Dom(target).closest('.x-treenode')) && (target = target.dataField().control)) {
+            this.selectNode(node);
+            return false;
+        }
 
 
+    },
+
+    /**
+	 * 模拟点击一项。
+	 */
+    selectNode: function (node) {
+        if (this.trigger('selecting', node)) {
+            var old = this.getSelectedNode();
+            this.setSelectedNode(node);
+            if (old !== node)
+                this.trigger('change');
+        }
+        return this;
+    },
+
+    setSelectedNode: function (node) {
+
+        // 先反选当前选择项。
+        if (this.selectedNode)
+            this.selectedNode.state('selected', false);
+
+        // 更新选择项。
+        this.selectedNode = node;
+
+        if (node != null) {
+            node.state('selected', true);
+        }
+
+        return this;
+    },
+
+    getSelectedNode: function () {
+        return this.selectedNode;
+    }
+
+});
 
 /**
  * 表示是 {@link TreeView} 中的一个节点。
@@ -11824,11 +11391,9 @@ var TreeNode = TreeControl.Item.extend(ICollapsable).implement({
 	
 	onCollapse: function(){
 	    this.updateNodeType();
-	    ICollapsable.onCollapse.call(this);
 	},
 	
 	onExpanding: function(){
-		ICollapsable.onExpanding.call(this);
 		this.setNodeType(this.subControl && this.subControl.first() ? 'minus' : 'normal');	
 	},
 	
@@ -11836,8 +11401,6 @@ var TreeNode = TreeControl.Item.extend(ICollapsable).implement({
 		if(this.subControl) {
 			this.subControl.node.style.height = 'auto';
 		}
-		
-		ICollapsable.onExpand.call(this);
 	},
 	
 	/**
@@ -11971,175 +11534,187 @@ var TreeNode = TreeControl.Item.extend(ICollapsable).implement({
 	}
 
 });
-
-var TreeView = TreeControl.extend({
-	
-	xtype: 'treeview',
-	
-	depth: 0,
-	
-	createTreeItem: function(childControl) {
-		
-	    if (!(childControl instanceof TreeNode)) {
-
-	        // 保存原有 childControl 。
-	        var t = childControl;
-
-	        childControl = new TreeNode();
-
-	        childControl.content().append(t);
-			
-		}
-		
-		// 设置子节点的位置。
-		childControl.setDepth(this.depth + 1);
-		
-		// 更新当前树的父节点。
-		if(this.owner){
-			this.owner.update();
-			childControl.parentNode = this.owner;
-		}
-
-		return childControl;
-
-	},
-
-	/**
-	 * 当用户点击一项时触发。
-	 */
-	onNodeClick: function (node) {
-		return this.trigger('nodeclick', node);
-	},
-	
-	/**
-	 * 获取一个值，该值指示当前节点是否为最后一个节点。
-	 * @return {Boolean}
-	 * @protected
-	 */
-	isLastNode: function(){
-		return false;
-	},
-	
-	init: function(){
-
-		// 根据已有的 DOM 结构初始化菜单。
-		TreeControl.prototype.init.call(this);
-		
-		this.on('click', this.onClick);
-	},
-	
-	invoke: function(funcName, args){
-		var subTree = this, c, target;
-		args = args || [];
-		for(var c = subTree.first(); c; c = c.next()){
-			target = c.dataField().item;
-			target[funcName].apply(target, args);
-		}
-		return this;
-	},
-	
-	collapse: function(duration){
-		return this.invoke('collapse', [duration]);
-	},
-	
-	collapseAll: function(duration){
-		return this.invoke('collapseAll', [duration]);
-	},
-	
-	expand: function(duration){
-		return this.invoke('expand', [duration]);
-	},
-	
-	expandAll: function(duration){
-		return this.invoke('expandAll', [duration]);
-	},
-	
-	collapseTo: function(depth, duration){
-		return this.invoke('collapseTo', [--depth, duration]);
-	},
-	
-	/**
-	 * 当一个选项被选中时触发。
-	 */
-	onSelect: function(node){
-		return this.trigger('select', node);
-	},
-	
-	/**
-	 * 当选中的项被更新后触发。
-	 */
-	onChange: function (old, item){
-		return this.trigger('change', old);
-	},
-	
-	/**
-	 * 点击时触发。
-	 */
-	onClick: function (e) {
-		
-		var target = e.target;
-		
-		if(/\bx-treenode-(minus|plus|loading)\b/.test(target.className))
-			return;
-		
-		if((target = new Dom(target).closest('.x-treenode')) && (target = target.dataField().control) && !this.clickNode(target)){
-		    return false;
-		}
-		
-		
-	},
-	
-	/**
-	 * 模拟点击一项。
-	 */
-	clickNode: function(node){
-		if(this.onNodeClick(node)){
-			this.setSelectedNode(node);
-			return true;
-		}
-		
-		return false;
-	},
-	
-	setSelectedNode: function(node){
-		
-		// 先反选当前选择项。
-		var old = this.getSelectedNode();
-		if(old)
-			old.state('selected', false);
-	
-		if(this.onSelect(node) !== false){
-		
-			// 更新选择项。
-			this.selectedNode = node;
-			
-			if(node != null){
-				node.state('selected', true);
-			}
-			
-		}
-			
-		if(old !== node)
-			this.onChange(old, node);
-			
-		return this;
-	},
-	
-	getSelectedNode: function(){
-		return this.selectedNode;
-	}
-	
-});
-
-
-
 /*********************************************************
  * Controls.Menu.Menu
  ********************************************************/
 /**
  * @author xuld
- */
+ */
 
+
+
+var Menu = TreeControl.extend({
+
+    xtype: 'menu',
+
+    /**
+	 * 表示当前菜单是否为浮动的菜单。 
+	 */
+    floating: false,
+
+    createTreeItem: function (childControl) {
+
+        if (!(childControl instanceof MenuItem)) {
+
+            // 如果是文本。
+            if (childControl.node.nodeType === 3) {
+
+                // - => MenuSeperator
+                if (/^\s*-\s*$/.test(childControl.getText())) {
+
+                    childControl.remove();
+
+                    childControl = new MenuSeperator;
+
+                    // 其它 => 添加到 MenuItem
+                } else {
+
+                    // 保存原有 childControl 。
+                    var t = childControl;
+                    childControl = new MenuItem;
+                    childControl.append(t);
+                }
+            } else if (childControl.hasClass('x-menuseperator')) {
+                childControl = new MenuSeperator(childControl);
+            } else {
+
+                // 创建对应的 MenuItem 。
+                childControl = new MenuItem(childControl);
+            }
+
+        }
+
+        return childControl;
+
+    },
+
+    init: function () {
+
+        // 绑定节点和控件，方便发生事件后，根据事件源得到控件。
+        this.dataField().control = this;
+
+        // 根据已有的 DOM 结构初始化菜单。
+        TreeControl.prototype.init.call(this);
+    },
+
+    onShow: function () {
+
+        // 如果菜单是浮动的，则点击后关闭菜单，否则，只关闭子菜单。
+        if (this.floating)
+            document.once('mouseup', this.hide, this);
+        this.trigger('show');
+    },
+
+    /**
+	 * 关闭本菜单。
+	 */
+    onHide: function () {
+
+        // 先关闭子菜单。
+        this.hideSubMenu();
+        this.trigger('hide');
+    },
+
+    show: function () {
+        Dom.show(this.node);
+        this.onShow();
+        return this;
+    },
+
+    hide: function () {
+        Dom.hide(this.node);
+        this.onHide();
+        return this;
+    },
+
+    /**
+	 * 当前菜单依靠某个控件显示。
+	 * @param {Control} ctrl 方向。
+	 */
+    showAt: function (x, y) {
+
+        // 确保菜单已添加到文档内。
+        if (!this.closest('body')) {
+            this.appendTo();
+        }
+
+        // 显示节点。
+        this.show();
+
+        this.setPosition(x, y);
+
+        return this;
+    },
+
+    /**
+	 * 当前菜单依靠某个控件显示。
+	 * @param {Control} ctrl 方向。
+	 */
+    showBy: function (ctrl, pos, offsetX, offsetY, enableReset) {
+
+        // 确保菜单已添加到文档内。
+        if (!this.closest('body')) {
+            this.appendTo(ctrl.parent());
+        }
+
+        // 显示节点。
+        this.show();
+
+        this.align(ctrl, pos || 'rt', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);
+
+        return this;
+    },
+
+    /**
+	 * 显示指定项的子菜单。
+	 * @param {MenuItem} menuItem 子菜单项。
+	 * @protected
+	 */
+    showSubMenu: function (menuItem) {
+
+        // 如果不是右键的菜单，在打开子菜单后监听点击，并关闭此子菜单。
+        if (!this.floating)
+            document.once('mouseup', this.hideSubMenu, this);
+
+        // 隐藏当前项子菜单。
+        this.hideSubMenu();
+
+        // 激活本项。
+        menuItem.state("hover", true);
+
+        // 如果指定的项存在子菜单。
+        if (menuItem.subControl) {
+
+            // 设置当前激活的项。
+            this.currentSubMenu = menuItem;
+
+            // 显示子菜单。
+            menuItem.subControl.showBy(menuItem);
+
+        }
+
+    },
+
+    /**
+	 * 关闭本菜单打开的子菜单。
+	 * @protected
+	 */
+    hideSubMenu: function () {
+
+        // 如果有子菜单，就隐藏。
+        if (this.currentSubMenu) {
+
+            // 关闭子菜单。
+            this.currentSubMenu.subControl.hide();
+
+            // 取消激活菜单。
+            this.currentSubMenu.state("hover", false);
+            this.currentSubMenu = null;
+        }
+
+    }
+
+});
 
 
 
@@ -12260,814 +11835,22 @@ var MenuSeperator = MenuItem.extend({
 	init: Function.empty
 
 });
-
-var Menu = TreeControl.extend({
-
-	xtype: 'menu',
-	
-	/**
-	 * 表示当前菜单是否为浮动的菜单。 
-	 */
-	floating: false,
-
-	createTreeItem: function(childControl) {
-		
-		if(!(childControl instanceof MenuItem)){
-	
-			// 如果是文本。
-			if (childControl.node.nodeType === 3) {
-	
-				// - => MenuSeperator
-				if (/^\s*-\s*$/.test(childControl.getText())) {
-					
-					childControl.remove();
-	
-					childControl = new MenuSeperator;
-	
-					// 其它 => 添加到 MenuItem
-				} else {
-	
-					// 保存原有 childControl 。
-					var t = childControl;
-					childControl = new MenuItem;
-					childControl.append(t);
-				}
-			} else if(childControl.hasClass('x-menuseperator')){
-				childControl = new MenuSeperator(childControl);
-			} else {
-	
-				// 创建对应的 MenuItem 。
-				childControl = new MenuItem(childControl);
-			}
-				
-		}
-
-		return childControl;
-
-	},
-
-	init: function() {
-
-		// 绑定节点和控件，方便发生事件后，根据事件源得到控件。
-		this.dataField().control = this;
-
-		// 根据已有的 DOM 结构初始化菜单。
-		TreeControl.prototype.init.call(this);
-	},
-
-	onShow: function() {
-		
-		// 如果菜单是浮动的，则点击后关闭菜单，否则，只关闭子菜单。
-		if(this.floating)
-			document.once('mouseup', this.hide, this);
-		this.trigger('show');
-	},
-
-	/**
-	 * 关闭本菜单。
-	 */
-	onHide: function() {
-
-		// 先关闭子菜单。
-		this.hideSubMenu();
-		this.trigger('hide');
-	},
-
-	show: function() {
-		Dom.show(this.node);
-		this.onShow();
-		return this;
-	},
-
-	hide: function() {
-		Dom.hide(this.node);
-		this.onHide();
-		return this;
-	},
-	
-	/**
-	 * 当前菜单依靠某个控件显示。
-	 * @param {Control} ctrl 方向。
-	 */
-	showAt: function(x, y) {
-		
-		// 确保菜单已添加到文档内。
-		if (!this.parent('body')) {
-			this.appendTo();
-		}
-
-		// 显示节点。
-		this.show();
-
-		this.setPosition(x, y);
-
-		return this;
-	},
-
-	/**
-	 * 当前菜单依靠某个控件显示。
-	 * @param {Control} ctrl 方向。
-	 */
-	showBy: function(ctrl, pos, offsetX, offsetY, enableReset) {
-
-		// 确保菜单已添加到文档内。
-		if (!this.parent('body')) {
-			this.appendTo(ctrl.parent());
-		}
-
-		// 显示节点。
-		this.show();
-
-		this.align(ctrl, pos || 'rt', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);
-
-		return this;
-	},
-
-	/**
-	 * 显示指定项的子菜单。
-	 * @param {MenuItem} menuItem 子菜单项。
-	 * @protected
-	 */
-	showSubMenu: function(menuItem) {
-
-		// 如果不是右键的菜单，在打开子菜单后监听点击，并关闭此子菜单。
-		if (!this.floating)
-			document.once('mouseup', this.hideSubMenu, this);
-
-		// 隐藏当前项子菜单。
-		this.hideSubMenu();
-
-		// 激活本项。
-		menuItem.state("hover", true);
-
-		// 如果指定的项存在子菜单。
-		if (menuItem.subControl) {
-
-			// 设置当前激活的项。
-			this.currentSubMenu = menuItem;
-
-			// 显示子菜单。
-			menuItem.subControl.showBy(menuItem);
-
-		}
-		
-	},
-
-	/**
-	 * 关闭本菜单打开的子菜单。
-	 * @protected
-	 */
-	hideSubMenu: function() {
-
-		// 如果有子菜单，就隐藏。
-		if (this.currentSubMenu) {
-
-			// 关闭子菜单。
-			this.currentSubMenu.subControl.hide();
-
-			// 取消激活菜单。
-			this.currentSubMenu.state("hover", false);
-			this.currentSubMenu = null;
-		}
-		
-	}
-
-});
-
-
-
-
 /*********************************************************
  * System.Ajax.Base
  ********************************************************/
-/**
- * @author xuld
- */
-
-
-/**
- * 用于发送和接收 AJAX 请求的工具。
- * @class
- * @extends Deferrable
- */
-var Ajax = (function() {
-
-	var ajaxLoc,
-		ajaxLocParts,
-		rUrl = /^([\w\+\.\-]+:)(?:\/\/([^\/?#:]*)(?::(\d+)|)|)/,
-		defaultAccepts = ["*/"] + ["*"],
-		Ajax;
-	
-	// 如果设置了 document.domain, IE 会抛出异常。
-	try {
-		ajaxLoc = location.href;
-	} catch (e) {
-		// 使用 a 的默认属性获取当前地址。
-		ajaxLoc = document.createElement("a");
-		ajaxLoc.href = "";
-		ajaxLoc = ajaxLoc.href;
-	}
-
-	ajaxLocParts = rUrl.exec(ajaxLoc.toLowerCase()) || [];
-	
-	Ajax = Deferrable.extend({
-		
-		/**
-		 * Ajax 默认配置。
-		 */
-		options: {
-
-			///**
-			// * 供 Transport 设置的状态回调。
-			// */
-			//callback: Function.empty,
-			
-			/**
-			 * 传输的数据类型。
-			 * @type String
-			 */
-			dataType: 'text',
-	
-			/**
-			 * 当前 AJAX 发送的地址。
-			 * @field url
-			 */
-			url: ajaxLoc,
-	
-			/**
-			 * 超时的时间大小。 (单位: 毫秒)
-			 * @property timeouts
-			 * @type Number
-			 */
-			timeout: -1,
-
-			/**
-			 * 出现错误后的回调。
-			 */
-			exception: function(e) {
-				this.callback(e.message, -1);
-			},
-	
-			///**
-			// * 获取或设置是否为允许缓存。
-			// * @type Boolean
-			// */
-			//cache: true,
-	
-			///**
-			// * 发送的数据。
-			// * @type Obeject/String
-			// */
-			//data: null,
-	
-			///**
-			// * 发送数据前的回调。
-			// * @type Function
-			// */
-			//start: null,
-	
-			///**
-			// * 发送数据成功的回调。
-			// * @type Function
-			// */
-			//success: null,
-	
-			///**
-			// * 发送数据错误的回调。
-			// * @type Function
-			// */
-			//error: null,
-	
-			///**
-			// * 发送数据完成的回调。
-			// * @type Function
-			// */
-			//complete: null,
-		
-			/**
-			 * 用于格式化原始数据的函数。
-			 * @type Function
-			 */
-			formatData: function(data) {
-				return typeof data === 'string' ? data : Ajax.param(data);
-			}
-
-			///**
-			// * 获取或设置请求类型。
-			// */
-			//type: 'GET',
-
-			///**
-			// * 获取或设置是否为异步请求。
-			// */
-			//async: true,
-
-			///**
-			// * 获取或设置是否为请求使用的用户名。
-			// */
-			//username: null,
-
-			///**
-			// * 获取或设置是否为请求使用的密码。
-			// */
-			//password: null,
-
-			///**
-			// * 获取请求头。
-			// */
-			//headers: null,
-			
-		},
-		
-		/**
-		 * Ajax 对象。
-		 * @constructor Ajax
-		 */
-		constructor: function() {
-
-		},
-
-		/**
-		 * 发送一个 AJAX 请求。
-		 * @param {Object} options 发送的配置。
-		 *
-		 * //  accepts - 请求头的 accept ，默认根据 dataType 生成。
-		 * async - 是否为异步的请求。默认为 true 。
-		 * cache - 是否允许缓存。默认为 true 。
-		 * charset - 请求的字符编码。
-		 * complete(errorCode, xhr) - 请求完成时的回调。
-		 * //  contentType - 请求头的 Content-Type 。默认为 'application/x-www-form-urlencoded; charset=UTF-8'。
-		 * // createNativeRequest() - 创建原生 XHR 对象的函数。
-		 * crossDomain - 指示 AJAX 强制使用跨域方式的请求。默认为 null,表示系统自动判断。
-		 * data - 请求的数据。
-		 * dataType - 请求数据的类型。默认为根据返回内容自动识别。
-		 * errorCode(message, xhr) - 请求失败时的回调。
-		 * formatData(data) - 用于将 data 格式化为字符串的函数。
-		 * headers - 附加的额外请求头信息。
-		 * jsonp - 如果使用 jsonp 请求，则指示 jsonp 参数。如果设为 false，则不添加后缀。默认为 callback。
-		 * jsonpCallback - jsonp请求回调函数名。默认为根据当前时间戳自动生成。
-		 * //  mimeType - 用于覆盖原始 mimeType 的 mimeType 。
-		 * getResponse(data) - 用于解析请求数据用的回调函数。
-		 * password - 请求的密码 。
-		 * start(data, xhr) - 请求开始时的回调。return false 可以终止整个请求。
-		 * success(data, xhr) - 请求成功时的回调。
-		 * timeout - 请求超时时间。单位毫秒。默认为 -1 无超时 。
-		 * type - 请求类型。必须是大写。默认是 "GET" 。
-		 * url - 请求的地址。
-		 * username - 请求的用户名 。
-		 *
-		 * @param {String} link 当出现两次并发的请求后的操作。
-		 */
-		run: function(options, link) {
-			var me = this, defaultOptions, transport;
-			
-			if (!me.defer(options, link)) {
-
-				// defaultOptions
-				defaultOptions = me.options;
-
-				// options
-				me.options = options = Object.extend({
-					target: me,
-					formatData: defaultOptions.formatData,
-					timeout: defaultOptions.timeout,
-					exception: defaultOptions.exception
-				}, options);
-				
-				assert(!options.url || options.url.replace, "Ajax#run(options): {options.url} 必须是字符串。", options.url);
-
-				// dataType
-				options.dataType = options.dataType || defaultOptions.dataType;
-
-				// url
-				options.url = options.url ? options.url.replace(/#.*$/, "") : defaultOptions.url;
-	
-				// data
-				options.data = options.data ? options.formatData(options.data) : null;
-	
-				// crossDomain
-				if (options.crossDomain == null) {
-	
-					var parts = rUrl.exec(options.url.toLowerCase());
-	
-					// from jQuery: 跨域判断。
-					options.crossDomain = !!(parts &&
-						(parts[1] != ajaxLocParts[1] || parts[2] != ajaxLocParts[2] ||
-							(parts[3] || (parts[1] === "http:" ? 80 : 443)) !=
-								(ajaxLocParts[3] || (ajaxLocParts[1] === "http:" ? 80 : 443)))
-					);
-	
-				}
-				
-				// 当前用于传输的工具。
-				transport = Ajax.transports[options.dataType];
-
-				assert(transport, "Ajax#run(options, link): 不支持 {dataType} 的数据格式。", options.dataType);
-				
-				// 实际的发送操作。
-				transport.send(options);
-
-			}
-			
-			return me;
-		},
-
-		/**
-		 * 停止当前的请求。
-		 * @return this
-		 */
-		pause: function() {
-			this.options.callback('Aborted', -3);
-			return this;
-		}
-
-	});
-	
-	Object.extend(Ajax, {
-
-		send: function(options){
-			return new Ajax().run(options);
-		},
-		
-		transports: {
-			
-		},
-		
-		accepts: {
-			
-		},
-		
-		/**
-		 * 返回变量的地址形式。
-		 * @param {Object} obj 变量。
-		 * @return {String} 字符串。
-		 * @example <pre>
-		 * Ajax.param({a: 4, g: 7}); //  a=4&g=7
-		 * </pre>
-		 */
-		param: function(obj, name) {
-	
-			var s;
-			if (Object.isObject(obj)) {
-				s = [];
-				Object.each(obj, function(value, key) {
-					s.push(Ajax.param(value, name ? name + "[" + key + "]" : key));
-				});
-				s = s.join('&');
-			} else {
-				s = encodeURIComponent(name) + "=" + encodeURIComponent(obj);
-			}
-	
-			return s.replace(/%20/g, '+');
-		},
-		
-		concatUrl: function(url, param) {
-			return param ? url + (url.indexOf('?') >= 0 ? '&' : '?') + param : url;
-		},
-		
-		addCachePostfix: function(url){
-			return /[?&]_=/.test(url) ? url : Ajax.concatUrl(url, '_=' + Date.now() + JPlus.id++);
-		},
-
-		/**
-		 * 判断一个 HTTP 状态码是否表示正常响应。
-		 * @param {Number} status 要判断的状态码。
-		 * @return {Boolean} 如果正常则返回true, 否则返回 false 。
-		 * @remark 一般地， 200、304、1223 被认为是正常的状态吗。
-		 */
-		checkStatus: function(status) {
-
-			// 获取状态。
-			if (!status) {
-
-				// 获取协议。
-				var protocol = window.location.protocol;
-
-				// 对谷歌浏览器, 在有些协议， status 不存在。
-				return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");
-			}
-
-			// 检查， 各浏览器支持不同。
-			return (status >= 200 && status < 300) || status == 304 || status == 1223;
-		},
-
-		/**
-		 * 初始化一个 XMLHttpRequest 对象。
-		 * @return {XMLHttpRequest} 请求的对象。
-		 */
-		createNativeRequest: window.XMLHttpRequest ? function() {
-			return new XMLHttpRequest();
-		} : function() {
-			return new ActiveXObject("Microsoft.XMLHTTP");
-		}
-
-	});
-
-	/**
-	 * 公共的 XHR 对象。
-	 */
-	Ajax.transports.text = Ajax.XHR = {
-		
-		/**
-		 * 根据 xhr 获取响应。
-		 * @type {XMLHttpRequest} xhr 要获取的 xhr 。
-		 */
-		getResponse: function(xhr) {
-
-			// 如果请求了一个二进制格式的文件， IE6-9 报错。
-			try {
-				return xhr.responseText;
-			} catch (ieResponseTextError) {
-				return '';
-			}
-
-		},
-
-		/**
-		 * 发送指定配置的 Ajax 对象。
-		 * @type {Ajax} options 要发送的 AJAX 对象。
-		 */
-		send: function(options) {
-
-			// 拷贝配置。
-
-			// options
-			var headers,
-				xhr,
-				key,
-				callback;
-
-			// type
-			options.type = options.type ? options.type.toUpperCase() : 'GET';
-
-			// async
-			options.async = options.async !== false;
-
-			// getResponse
-			options.getResponse = options.getResponse || this.getResponse;
-
-			// data
-			if (options.data && options.type == 'GET') {
-				options.url = Ajax.concatUrl(options.url, options.data);
-				options.data = null;
-			}
-
-			// cache
-			if (options.cache === false) {
-				options.url = Ajax.addCachePostfix(options.url);
-			}
-
-			// headers
-			headers = {};
-
-			// headers['Accept']
-			headers.Accept = options.dataType in Ajax.accepts ? Ajax.accepts[options.dataType] + ", " + defaultAccepts + "; q=0.01" : defaultAccepts;
-
-			// headers['Content-Type']
-			if (options.data) {
-				headers['Content-Type'] = "application/x-www-form-urlencoded; charset=" + (options.charset || "UTF-8");
-			}
-
-			// headers['Accept-Charset']
-			if (options.charset) {
-				headers["Accept-Charset"] = value;
-			}
-
-			// headers['X-Requested-With']
-			if (!options.crossDomain) {
-				headers['X-Requested-With'] = 'XMLHttpRequest';
-			}
-
-			// 如果参数有 headers, 复制到当前 headers 。
-			if (options.headers) {
-				options.headers = Object.extend(headers, options.headers);
-			}
-
-			// 发送请求。
-
-			// 请求对象。
-			options.xhr = xhr = Ajax.createNativeRequest();
-
-			/**
-			 * 由 XHR 负责调用的状态检测函数。
-			 * @param {Object} _ 忽略的参数。
-			 * @param {Integer} errorCode 系统控制的错误码。
-			 *
-			 * - 0: 成功。
-			 * - -1: 程序出现异常，导致进程中止。
-			 * - -2: HTTP 相应超时， 程序自动终止。
-			 * - -3: START 函数返回 false， 程序自动终止。
-			 * - 1: HTTP 成功相应，但返回的状态码被认为是不对的。
-			 * - 2: HTTP 成功相应，但返回的内容格式不对。
-			 */
-			callback = options.callback = function(errorMessage, error) {
-
-				// xhr
-				var xhr = options.xhr;
-
-				try {
-
-					if (xhr && (error || xhr.readyState === 4)) {
-
-						// 删除 readystatechange  。
-						// 删除 options.callback 避免被再次触发。
-						xhr.onreadystatechange = options.callback = Function.empty;
-
-						// 如果存在错误。
-						if (error) {
-
-							// 如果是因为超时引发的，手动中止请求。
-							if (xhr.readyState !== 4) {
-								xhr.abort();
-							}
-
-							// 出现错误 status = error 。
-							options.status = error;
-							options.statusText = "";
-							options.errorMessage = errorMessage;
-						} else {
-
-							options.status = xhr.status;
-
-							// 如果跨域，火狐报错。
-							try {
-								options.statusText = xhr.statusText;
-							} catch (firefoxCrossDomainError) {
-								// 模拟 Webkit: 设为空字符串。
-								options.statusText = "";
-							}
-
-							// 检验状态码是否正确。
-							if (Ajax.checkStatus(options.status)) {
-								// 如果请求合法，且数据返回正常，则使用 getResponse 获取解析的原始数据。
-								error = 0;
-								options.errorMessage = null;
-								try {
-									options.response = options.getResponse(xhr);
-								} catch (getResponseError) {
-									error = 2;
-									options.errorMessage = getResponseError.message;
-								}
-							} else {
-								error = 1;
-								options.errorMessage = options.statusText;
-							}
-
-						}
-
-						// 保存 error 。
-						options.errorCode = error;
-
-						try {
-
-							if (error) {
-								if (options.error)
-									options.error.call(options.target, options.errorMessage, xhr);
-
-							} else {
-								if (options.success)
-									options.success.call(options.target, options.response, xhr);
-							}
-
-							if (options.complete)
-								options.complete.call(options.target, options, xhr);
-
-						} finally {
-
-							// 删除 XHR 以确保 onStateChange 不重复执行。
-							options.xhr = xhr = null;
-
-							// 删除 options 。
-							delete options.target.options;
-
-							// 确保 AJAX 的等待项正常继续。
-							options.target.progress();
-
-						}
-					}
-				} catch (firefoxAccessError) {
-
-					// 赋予新的空对象，避免再次访问 XHR 。
-					options.xhr = {readyState: 4};
-					options.exception(firefoxAccessError);
-				}
-			};
-
-			// 预处理数据。
-			if (options.start && options.start.call(options.target, options, xhr) === false)
-				return callback(0, -3);
-
-			try {
-
-				if (options.username)
-					xhr.open(options.type, options.url, options.async, options.username, options.password);
-				else
-					xhr.open(options.type, options.url, options.async);
-
-			} catch (ieOpenError) {
-
-				//  出现错误地址时  ie 在此产生异常
-				return options.exception(ieOpenError);
-			}
-
-			// 设置文件头。
-			// 如果跨域了， 火狐会报错。
-			for (key in headers)
-				try {
-					xhr.setRequestHeader(key, headers[key]);
-				} catch (firefoxSetHeaderError) {
-				}
-
-			// 监视 提交是否完成。
-			xhr.onreadystatechange = callback;
-
-			try {
-				xhr.send(options.data);
-			} catch (sendError) {
-				return options.exception(sendError);
-			}
-
-			// 同步时，火狐不会自动调用 onreadystatechange
-			if (!options.async) {
-				callback();
-			} else if (xhr.readyState === 4) {
-				// IE6/7： 如果存在缓存，需要手动执行回调函数。
-				setTimeout(callback, 0);
-			} else if (options.timeouts > 0) {
-				setTimeout(function() {
-					callback('Timeout', -2);
-				}, options.timeouts);
-			}
-
-			// 发送完成。
-
-		}
-
-	};
-
-	Object.map("get post", function(type) {
-
-		Ajax[type] = function(url, data, onsuccess, dataType) {
-			if (typeof data == 'function') {
-				dataType = onsuccess;
-				onsuccess = data;
-				data = null;
-			}
-
-			return Ajax.send({
-				url: url,
-				data: data,
-				success: onsuccess,
-				type: type,
-				dataType: dataType
-			});
-		};
-
-	});
-
-	return Ajax;
-
-})();
+/** * @author xuld *//** * 用于发送和接收 AJAX 请求的工具。 * @class * @extends Deferrable */var Ajax = (function() {	var ajaxLoc,		ajaxLocParts,		rUrl = /^([\w\+\.\-]+:)(?:\/\/([^\/?#:]*)(?::(\d+)|)|)/,		defaultAccepts = ["*/"] + ["*"],		Ajax;		// 如果设置了 document.domain, IE 会抛出异常。	try {		ajaxLoc = location.href;	} catch (e) {		// 使用 a 的默认属性获取当前地址。		ajaxLoc = document.createElement("a");		ajaxLoc.href = "";		ajaxLoc = ajaxLoc.href;	}	ajaxLocParts = rUrl.exec(ajaxLoc.toLowerCase()) || [];		Ajax = Deferrable.extend({				/**		 * Ajax 默认配置。		 */		options: {			///**			// * 供 Transport 设置的状态回调。			// */			//callback: Function.empty,						/**			 * 传输的数据类型。			 * @type String			 */			dataType: 'text',				/**			 * 当前 AJAX 发送的地址。			 * @field url			 */			url: ajaxLoc,				/**			 * 超时的时间大小。 (单位: 毫秒)			 * @property timeouts			 * @type Number			 */			timeout: -1,			/**			 * 出现错误后的回调。			 */			exception: function(e) {				this.callback(e.message, -1);			},				///**			// * 获取或设置是否为允许缓存。			// * @type Boolean			// */			//cache: true,				///**			// * 发送的数据。			// * @type Obeject/String			// */			//data: null,				///**			// * 发送数据前的回调。			// * @type Function			// */			//start: null,				///**			// * 发送数据成功的回调。			// * @type Function			// */			//success: null,				///**			// * 发送数据错误的回调。			// * @type Function			// */			//error: null,				///**			// * 发送数据完成的回调。			// * @type Function			// */			//complete: null,					/**			 * 用于格式化原始数据的函数。			 * @type Function			 */			formatData: function(data) {				return typeof data === 'string' ? data : Ajax.param(data);			}			///**			// * 获取或设置请求类型。			// */			//type: 'GET',			///**			// * 获取或设置是否为异步请求。			// */			//async: true,			///**			// * 获取或设置是否为请求使用的用户名。			// */			//username: null,			///**			// * 获取或设置是否为请求使用的密码。			// */			//password: null,			///**			// * 获取请求头。			// */			//headers: null,					},				/**		 * Ajax 对象。		 * @constructor Ajax		 */		constructor: function() {		},		/**		 * 发送一个 AJAX 请求。		 * @param {Object} options 发送的配置。		 *		 * //  accepts - 请求头的 accept ，默认根据 dataType 生成。		 * async - 是否为异步的请求。默认为 true 。		 * cache - 是否允许缓存。默认为 true 。		 * charset - 请求的字符编码。		 * complete(errorCode, xhr) - 请求完成时的回调。		 * //  contentType - 请求头的 Content-Type 。默认为 'application/x-www-form-urlencoded; charset=UTF-8'。		 * // createNativeRequest() - 创建原生 XHR 对象的函数。		 * crossDomain - 指示 AJAX 强制使用跨域方式的请求。默认为 null,表示系统自动判断。		 * data - 请求的数据。		 * dataType - 请求数据的类型。默认为根据返回内容自动识别。		 * errorCode(message, xhr) - 请求失败时的回调。		 * formatData(data) - 用于将 data 格式化为字符串的函数。		 * headers - 附加的额外请求头信息。		 * jsonp - 如果使用 jsonp 请求，则指示 jsonp 参数。如果设为 false，则不添加后缀。默认为 callback。		 * jsonpCallback - jsonp请求回调函数名。默认为根据当前时间戳自动生成。		 * //  mimeType - 用于覆盖原始 mimeType 的 mimeType 。		 * getResponse(data) - 用于解析请求数据用的回调函数。		 * password - 请求的密码 。		 * start(data, xhr) - 请求开始时的回调。return false 可以终止整个请求。		 * success(data, xhr) - 请求成功时的回调。		 * timeout - 请求超时时间。单位毫秒。默认为 -1 无超时 。		 * type - 请求类型。必须是大写。默认是 "GET" 。		 * url - 请求的地址。		 * username - 请求的用户名 。		 *		 * @param {String} link 当出现两次并发的请求后的操作。		 */		run: function(options, link) {			var me = this, defaultOptions, transport;						if (!me.defer(options, link)) {				// defaultOptions				defaultOptions = me.options;				// options				me.options = options = Object.extend({					target: me,					formatData: defaultOptions.formatData,					timeout: defaultOptions.timeout,					exception: defaultOptions.exception				}, options);								assert(!options.url || options.url.replace, "Ajax#run(options): {options.url} 必须是字符串。", options.url);				// dataType				options.dataType = options.dataType || defaultOptions.dataType;				// url				options.url = options.url ? options.url.replace(/#.*$/, "") : defaultOptions.url;					// data				options.data = options.data ? options.formatData(options.data) : null;					// crossDomain				if (options.crossDomain == null) {						var parts = rUrl.exec(options.url.toLowerCase());						// from jQuery: 跨域判断。					options.crossDomain = !!(parts &&						(parts[1] != ajaxLocParts[1] || parts[2] != ajaxLocParts[2] ||							(parts[3] || (parts[1] === "http:" ? 80 : 443)) !=								(ajaxLocParts[3] || (ajaxLocParts[1] === "http:" ? 80 : 443)))					);					}								// 当前用于传输的工具。				transport = Ajax.transports[options.dataType];				assert(transport, "Ajax#run(options, link): 不支持 {dataType} 的数据格式。", options.dataType);								// 实际的发送操作。				transport.send(options);			}						return me;		},		/**		 * 停止当前的请求。		 * @return this		 */		pause: function() {			this.options.callback('Aborted', -3);			return this;		}	});		Object.extend(Ajax, {		send: function(options){			return new Ajax().run(options);		},				transports: {					},				accepts: {					},				/**		 * 返回变量的地址形式。		 * @param {Object} obj 变量。		 * @return {String} 字符串。		 * @example <pre>		 * Ajax.param({a: 4, g: 7}); //  a=4&g=7		 * </pre>		 */		param: function(obj, name) {				var s;			if (obj && typeof obj === 'object') {				s = [];				Object.each(obj, function(value, key) {					s.push(Ajax.param(value, name ? name + "[" + key + "]" : key));				});				s = s.join('&');			} else {				s = encodeURIComponent(name) + "=" + encodeURIComponent(obj);			}				return s.replace(/%20/g, '+');		},				concatUrl: function(url, param) {			return param ? url + (url.indexOf('?') >= 0 ? '&' : '?') + param : url;		},				addCachePostfix: function(url){			return /[?&]_=/.test(url) ? url : Ajax.concatUrl(url, '_=' + Date.now() + JPlus.id++);		},		/**		 * 判断一个 HTTP 状态码是否表示正常响应。		 * @param {Number} status 要判断的状态码。		 * @return {Boolean} 如果正常则返回true, 否则返回 false 。		 * @remark 一般地， 200、304、1223 被认为是正常的状态吗。		 */		checkStatus: function(status) {			// 获取状态。			if (!status) {				// 获取协议。				var protocol = window.location.protocol;				// 对谷歌浏览器, 在有些协议， status 不存在。				return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");			}			// 检查， 各浏览器支持不同。			return (status >= 200 && status < 300) || status == 304 || status == 1223;		},		/**		 * 初始化一个 XMLHttpRequest 对象。		 * @return {XMLHttpRequest} 请求的对象。		 */		createNativeRequest: window.XMLHttpRequest ? function() {			return new XMLHttpRequest();		} : function() {			return new ActiveXObject("Microsoft.XMLHTTP");		}	});	/**	 * 公共的 XHR 对象。	 */	Ajax.transports.text = Ajax.XHR = {				/**		 * 根据 xhr 获取响应。		 * @type {XMLHttpRequest} xhr 要获取的 xhr 。		 */		getResponse: function(xhr) {			// 如果请求了一个二进制格式的文件， IE6-9 报错。			try {				return xhr.responseText;			} catch (ieResponseTextError) {				return '';			}		},		/**		 * 发送指定配置的 Ajax 对象。		 * @type {Ajax} options 要发送的 AJAX 对象。		 */		send: function(options) {			// 拷贝配置。			// options			var headers,				xhr,				key,				callback;			// type			options.type = options.type ? options.type.toUpperCase() : 'GET';			// async			options.async = options.async !== false;			// getResponse			options.getResponse = options.getResponse || this.getResponse;			// data			if (options.data && options.type == 'GET') {				options.url = Ajax.concatUrl(options.url, options.data);				options.data = null;			}			// cache			if (options.cache !== true) {				options.url = Ajax.addCachePostfix(options.url);			}			// headers			headers = {};			// headers['Accept']			headers.Accept = options.dataType in Ajax.accepts ? Ajax.accepts[options.dataType] + ", " + defaultAccepts + "; q=0.01" : defaultAccepts;			// headers['Content-Type']			if (options.data) {				headers['Content-Type'] = "application/x-www-form-urlencoded; charset=" + (options.charset || "UTF-8");			}			// headers['Accept-Charset']			if (options.charset) {				headers["Accept-Charset"] = value;			}			// headers['X-Requested-With']			if (!options.crossDomain) {				headers['X-Requested-With'] = 'XMLHttpRequest';			}			// 如果参数有 headers, 复制到当前 headers 。			if (options.headers) {				options.headers = Object.extend(headers, options.headers);			}			// 发送请求。			// 请求对象。			options.xhr = xhr = Ajax.createNativeRequest();			/**			 * 由 XHR 负责调用的状态检测函数。			 * @param {Object} _ 忽略的参数。			 * @param {Integer} errorCode 系统控制的错误码。			 *			 * - 0: 成功。			 * - -1: 程序出现异常，导致进程中止。			 * - -2: HTTP 相应超时， 程序自动终止。			 * - -3: START 函数返回 false， 程序自动终止。			 * - 1: HTTP 成功相应，但返回的状态码被认为是不对的。			 * - 2: HTTP 成功相应，但返回的内容格式不对。			 */			callback = options.callback = function(errorMessage, error) {				// xhr				var xhr = options.xhr;				try {					if (xhr && (error || xhr.readyState === 4)) {						// 删除 readystatechange  。						// 删除 options.callback 避免被再次触发。						xhr.onreadystatechange = options.callback = Function.empty;						// 如果存在错误。						if (error) {							// 如果是因为超时引发的，手动中止请求。							if (xhr.readyState !== 4) {								xhr.abort();							}							// 出现错误 status = error 。							options.status = error;							options.statusText = "";							options.errorMessage = errorMessage;						} else {							options.status = xhr.status;							// 如果跨域，火狐报错。							try {								options.statusText = xhr.statusText;							} catch (firefoxCrossDomainError) {								// 模拟 Webkit: 设为空字符串。								options.statusText = "";							}							// 检验状态码是否正确。							if (Ajax.checkStatus(options.status)) {								// 如果请求合法，且数据返回正常，则使用 getResponse 获取解析的原始数据。								error = 0;								options.errorMessage = null;								try {									options.response = options.getResponse(xhr);								} catch (getResponseError) {									error = 2;									options.errorMessage = getResponseError.message;								}							} else {								error = 1;								options.errorMessage = options.statusText;							}						}						// 保存 error 。						options.errorCode = error;						try {							if (error) {								if (options.error)									options.error.call(options.target, options.errorMessage, xhr);							} else {								if (options.success)									options.success.call(options.target, options.response, xhr);							}							if (options.complete)								options.complete.call(options.target, options, xhr);						} finally {							// 删除 XHR 以确保 onStateChange 不重复执行。							options.xhr = xhr = null;							// 删除 options 。							delete options.target.options;							// 确保 AJAX 的等待项正常继续。							options.target.progress();						}					}				} catch (firefoxAccessError) {					// 赋予新的空对象，避免再次访问 XHR 。					options.xhr = {readyState: 4};					options.exception(firefoxAccessError);				}			};			// 预处理数据。			if (options.start && options.start.call(options.target, options, xhr) === false)				return callback(0, -3);			try {				if (options.username)					xhr.open(options.type, options.url, options.async, options.username, options.password);				else					xhr.open(options.type, options.url, options.async);			} catch (ieOpenError) {				//  出现错误地址时  ie 在此产生异常				return options.exception(ieOpenError);			}			// 设置文件头。			// 如果跨域了， 火狐会报错。			for (key in headers)				try {					xhr.setRequestHeader(key, headers[key]);				} catch (firefoxSetHeaderError) {				}			// 监视 提交是否完成。			xhr.onreadystatechange = callback;			try {				xhr.send(options.data);			} catch (sendError) {				return options.exception(sendError);			}			// 同步时，火狐不会自动调用 onreadystatechange			if (!options.async) {				callback();			} else if (xhr.readyState === 4) {				// IE6/7： 如果存在缓存，需要手动执行回调函数。				setTimeout(callback, 0);			} else if (options.timeouts > 0) {				setTimeout(function() {					callback('Timeout', -2);				}, options.timeouts);			}			// 发送完成。		}	};	Object.map("get post", function(type) {		Ajax[type] = function(url, data, onsuccess, dataType) {			if (typeof data == 'function') {				dataType = onsuccess;				onsuccess = data;				data = null;			}			return Ajax.send({				url: url,				data: data,				success: onsuccess,				type: type,				dataType: dataType			});		};	});	return Ajax;})();
 /*********************************************************
  * System.Ajax.Script
  ********************************************************/
-/**
- * AJAX 传输 JavaScript 。
- * @author xuld
- */
-
-
-Ajax.accepts.script = "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript";
-
-Ajax.transports.script = {
-
-	getResponse: function(xhr) {
+/** * AJAX 传输 JavaScript 。 * @author xuld */Ajax.accepts.script = "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript";Ajax.transports.script = {
+	getResponse: function(xhr) {
 		var code = Ajax.XHR.getResponse(xhr);
 		window.execScript(code);
 		return code;
-	},
-
-	send: function(options) {
+	},	send: function(options) {
 		if (!options.crossDomain) {
-			return Ajax.XHR.send.call(this, options);
-		}
-
-		options.type = "GET";
-		
-		// cache
-		if (options.cache !== false) {
-			options.cache = false;
-			
-			options.url = Ajax.addCachePostfix(options.url);
-		}
-
-		// data
-		if (options.data) {
-			options.url = Ajax.concatUrl(options.url, options.data);
-			options.data = null;
-		}
-
-		var script = options.script = document.createElement('SCRIPT'),
+			return Ajax.XHR.send.call(this, options);		}		options.type = "GET";				// cache		if (options.cache !== false) {
+			options.cache = false;						options.url = Ajax.addCachePostfix(options.url);		}		// data		if (options.data) {			options.url = Ajax.concatUrl(options.url, options.data);			options.data = null;		}		var script = options.script = document.createElement('SCRIPT'),
 			t,
 			callback = options.callback = function(errorMessage, error) {
 				var script = options.script;
@@ -13082,28 +11865,12 @@ Ajax.transports.script = {
 					// 删除当前脚本。
 					script.parentNode.removeChild(script);
 
-					try {
-						
-						if(error < 0) {
-							options.status = error;
-							options.statusText = "";
-						} else {
-							options.status = 200;
-							options.statusText = "OK";
-						}
+					try {												if(error < 0) {							options.status = error;							options.statusText = "";						} else {							options.status = 200;							options.statusText = "OK";						}
 
-						if (error) {
-							
-							options.errorCode = error;
-							options.errorMessage = errorMessage;
-							
+						if (error) {														options.errorCode = error;							options.errorMessage = errorMessage;							
 							if (options.error)
 								options.error.call(options.target, options.errorMessage, script);
-						} else {
-							
-							options.errorCode = 0;
-							options.errorMessage = null;
-							
+						} else {														options.errorCode = 0;							options.errorMessage = null;							
 							if (options.success)
 								options.success.call(options.target, options.response, script);
 						}
@@ -13136,8 +11903,7 @@ Ajax.transports.script = {
 
 		script.onerror = function(e) {
 			callback('Network Error', 2);
-		};
-		
+		};		
 		if (options.timeouts > 0) {
 			setTimeout(function() {
 				callback('Timeout', -2);
@@ -13145,26 +11911,16 @@ Ajax.transports.script = {
 		}
 
 		t = document.getElementsByTagName("SCRIPT")[0];
-		t.parentNode.insertBefore(script, t);
-	}
-
-};
-
-Ajax.script = function(url, onsuccess) {
+		t.parentNode.insertBefore(script, t);	}};Ajax.script = function(url, onsuccess) {
 	return Ajax.send({
-		url: url,
-		dataType: 'script',
-		success: onsuccess
-	});
-};
+		url: url,		dataType: 'script',		success: onsuccess	});};
 /*********************************************************
  * System.Ajax.Jsonp
  ********************************************************/
 /**
  * AJAX 处理JSON-P数据。
  * @author xuld
- */
-
+ */
 
 Ajax.transports.jsonp = {
 
@@ -13211,18 +11967,13 @@ Ajax.transports.jsonp = {
 		Ajax.transports.script.send.call(this, options);
 	}
 
-};
-
-Ajax.jsonp = function(url, data, onsuccess) {
+};Ajax.jsonp = function(url, data, onsuccess) {
 	if (typeof data === 'function') {
 		onsuccess = data;
 		data = null;
 	}
 
 	return Ajax.send({
-		url: url,
-		dataType: 'jsonp',
-		data: data,
-		success: onsuccess
+		url: url,		dataType: 'jsonp',		data: data,		success: onsuccess
 	});
 };

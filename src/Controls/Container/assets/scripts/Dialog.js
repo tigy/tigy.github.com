@@ -19,14 +19,6 @@ var Dialog = ContainerControl.extend({
 	// 基本属性
 		
 	headerTpl: '<div class="x-control-header"><a class="x-dialog-close x-closebutton">×</a><h4></h4></div>',
-	
-	onClosing: function () {
-		return this.trigger('closing');
-	},
-	
-	onClose: function () {
-		this.trigger('close');
-	},
 
 	onCloseButtonClick: function(){
 	    this.close();
@@ -139,21 +131,18 @@ var Dialog = ContainerControl.extend({
 		return this;
 	},
 	
-	dispose: function(){
-		var me = this;
-		this.onClose();
-		if (this.maskDom) this.maskDom.remove();
-	},
-	
 	setContentSize: function(x, y){
 		this.setWidth('auto');
 		this.body().setWidth(x).setHeight(y);
 		return this.center();
 	},
 	
-	close: function(){
-		if(this.onClosing() !== false)
-		    this.hide(this.showDuration, this.onClose.bind(this));
+	close: function () {
+	    var me = this;
+	    if (this.trigger('closing'))
+	        this.hide(this.showDuration, function () {
+	            this.trigger('close');
+	        });
 		return this;
 	}
 	

@@ -1,5 +1,5 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/14 12:41
+ * This file is created by a tool at 2012/11/15 20:16
  *********************************************************
  * Contains: 
  *     System.Core.Base
@@ -387,12 +387,10 @@
 			 */
 			extend: function (members) {
 
-				// 未指定函数 使用默认构造函数(Object.prototype.constructor);
+			    // 未指定函数 使用默认构造函数(Object.prototype.constructor);
 
 				// 生成子类 。
-				var subClass = hasOwnProperty.call(members = members instanceof Function ? {
-					constructor: members
-				} : (members || {}), "constructor") ? members.constructor : function () {
+			    var subClass = members && members.hasOwnProperty("constructor") ? members.constructor : function () {
 
 					// 调用父类构造函数 。
 					arguments.callee.base.apply(this, arguments);
@@ -4367,10 +4365,10 @@ function imports(namespace) {
 					// IE and Opera will allow us to reuse the iframeDoc without re-writing the fake HTML
 					// document to it; WebKit & Firefox won't allow reusing the iframe document.
 					iframeDoc =  ( iframe.contentWindow || iframe.contentDocument ).document;
-					frameDoc.write("<!doctype html><html><body>");
+					iframeDoc.write("<!doctype html><html><body>");
 					iframeDoc.close();
 
-					elem = iframeDoc.body.appendChild( iframeDoc.createElement(nodeName) );
+					elem = iframeDoc.body.appendChild(iframeDoc.createElement(tagName));
 					display = getStyle(elem, 'display');
 					document.body.removeChild( iframe );
 				}

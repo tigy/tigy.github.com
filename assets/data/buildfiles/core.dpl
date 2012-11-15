@@ -1,8 +1,6 @@
 # 基本属性
-title 所有组件
+title 核心
 js scripts/core.js
-css styles/core.css
-images images
 base ../../../build/
  
 
