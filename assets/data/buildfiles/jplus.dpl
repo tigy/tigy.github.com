@@ -43,3 +43,5 @@ using Controls.Form.CheckBox
 using Controls.Form.FileUpload
 using Controls.Form.SearchTextBox
 using Controls.Suggest.ComboBox
+using Controls.Container.MessageBox
+using Controls.Tip.ToolTip

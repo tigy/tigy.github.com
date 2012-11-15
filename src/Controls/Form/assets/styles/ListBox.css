@@ -7,9 +7,9 @@
   border-color: rgba(0, 0, 0, 0.2);
   border-style: solid;
   border-width: 1px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
   _display: block;
   _zoom: 0;
   padding: 4px 0;
@@ -19,7 +19,7 @@
   *overflow-x: hidden;
   text-align: left;
 }
-.x-listbox-item {
+.x-listbox li {
   display: block;
   padding: 3px 10px;
   color: #555555;
@@ -30,11 +30,11 @@
   *text-indent: -16px;
   _text-indent: 0;
 }
-.x-listbox-item a {
+.x-listbox li a {
   color: #333333;
   cursor: default;
 }
-.x-listbox-item a:hover {
+.x-listbox li a:hover {
   text-decoration: none;
 }
 .x-listbox-selected {
@@ -49,12 +49,12 @@
   background-image: linear-gradient(to bottom, #0088cc, #0077b3);
   background-repeat: repeat-x;
 }
-.x-listbox-selected,
-.x-listbox-hover {
+.x-listbox .x-listbox-selected,
+.x-listbox .x-listbox-hover {
   color: #ffffff;
 }
-.x-listbox-selected a,
-.x-listbox-hover a {
+.x-listbox .x-listbox-selected a,
+.x-listbox .x-listbox-hover a {
   color: #ffffff;
 }
 .x-listbox-readonly {

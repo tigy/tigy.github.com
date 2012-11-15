@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=plan">
+    <meta name="dpl-info" content="status=beta">
     <title>日历</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -10,6 +10,11 @@
 
     <script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
     <script src="../../System/Dom/assets/scripts/Base.js" type="text/javascript"></script>
+    <script src="../../System/Utils/assets/scripts/Date.js" type="text/javascript"></script>
+    <script src="../../System/Utils/assets/scripts/Deferrable.js" type="text/javascript"></script>
+    <script src="../../System/Fx/assets/scripts/Base.js" type="text/javascript"></script>
+    <script src="../../System/Fx/assets/scripts/Tween.js" type="text/javascript"></script>
+    <script src="../../System/Fx/assets/scripts/Animate.js" type="text/javascript"></script>
     <script src="../../Controls/Core/assets/scripts/Base.js" type="text/javascript"></script>
     <script src="../../Controls/Composite/assets/scripts/MonthCalender.js" type="text/javascript"></script>
 
@@ -36,7 +41,7 @@
 
 
             <div class="x-monthcalender">
-                <div class="x-monthcalender-wrap">
+                <div class="x-monthcalender-main">
                     <div class="x-monthcalender-header">
                         <a class="x-monthcalender-previous" href="javascript://上一个">◂
                         </a>
@@ -145,7 +150,7 @@
 
 
             <div class="x-monthcalender">
-                <div class="x-monthcalender-wrap">
+                <div class="x-monthcalender-main">
                     <div class="x-monthcalender-header">
                         <a class="x-monthcalender-previous" href="javascript://上一个">◂
                         </a>

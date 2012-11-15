@@ -61,7 +61,7 @@ var IToolTip = {
 	},
 	
 	showAt: function(x, y){
-		if(!this.parent('body')){
+		if(!this.closest('body')){
 			this.appendTo();
 		}
 		if(this.autoDelay) {
@@ -74,7 +74,7 @@ var IToolTip = {
 	
 	showBy: function(ctrl, offsetY, offsetX){
 		ctrl = Dom.get(ctrl);
-		if(!this.parent('body')){
+		if(!this.closest('body')){
 			this.appendTo(ctrl.parent());
 		}
 		var arrowType = this.getArrowType(),

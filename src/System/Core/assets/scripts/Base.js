@@ -368,12 +368,10 @@
 			 */
 			extend: function (members) {
 
-				// 未指定函数 使用默认构造函数(Object.prototype.constructor);
+			    // 未指定函数 使用默认构造函数(Object.prototype.constructor);
 
 				// 生成子类 。
-				var subClass = hasOwnProperty.call(members = members instanceof Function ? {
-					constructor: members
-				} : (members || {}), "constructor") ? members.constructor : function () {
+			    var subClass = members && members.hasOwnProperty("constructor") ? members.constructor : function () {
 
 					// 调用父类构造函数 。
 					arguments.callee.base.apply(this, arguments);
@@ -498,8 +496,8 @@
 		 */
 		each: function (iterable, fn, scope) {
 
-			assert(!Object.isFunction(iterable), "Object.each(iterable, fn, scope): {iterable} 不能是函数。 ", iterable);
-			assert(Object.isFunction(fn), "Object.each(iterable, fn, scope): {fn} 必须是函数。", fn);
+			assert(typeof iterable !== 'function', "Object.each(iterable, fn, scope): {iterable} 不能是函数。 ", iterable);
+			assert(typeof fn === 'function', "Object.each(iterable, fn, scope): {fn} 必须是函数。", fn);
 			
 			// 如果 iterable 是 null， 无需遍历 。
 			if (iterable != null) {
@@ -587,89 +585,18 @@
 
 			// 返回目标。
 			return dest;
-		},
-
-		/**
-		 * 判断一个变量是否是数组。
-		 * @param {Object} obj 要判断的变量。
-		 * @return {Boolean} 如果是数组，返回 true， 否则返回 false。
-		 * @example
-		 * <pre>
-	     * Object.isArray([]); // true
-	     * Object.isArray(document.getElementsByTagName("div")); // false
-	     * Object.isArray(new Array); // true
-	     * </pre>
-		 */
-		isArray: Array.isArray || function (obj) {
-			return toString.call(obj) === "[object Array]";
-		},
-
-		/**
-		 * 判断一个变量是否是函数。
-		 * @param {Object} obj 要判断的变量。
-		 * @return {Boolean} 如果是函数，返回 true， 否则返回 false。
-		 * @example
-		 * <pre>
-	     * Object.isFunction(function () {}); // true
-	     * Object.isFunction(null); // false
-	     * Object.isFunction(new Function); // true
-	     * </pre>
-		 */
-		isFunction: function (obj) {
-			return toString.call(obj) === "[object Function]";
-		},
-
-		/**
-		 * 判断一个变量是否是引用变量。
-		 * @param {Object} obj 变量。
-		 * @return {Boolean} 如果 *obj* 是引用变量，则返回 **true**, 否则返回 **false** 。
-		 * @remark 此函数等效于 `obj !== null && typeof obj === "object"`
-		 * @example
-		 * <pre>
-	     * Object.isObject({}); // true
-	     * Object.isObject(null); // false
-	     * </pre>
-		 */
-		isObject: function (obj) {
-			// 只检查 null 。
-			return obj !== null && typeof obj === "object";
 		}
 
 	});
 
-	/**
-	 * @static class Function
-	 */
-	extend(Function, {
-
-		/**
-		 * 表示一个空函数。这个函数总是返回 undefined 。
-		 * @property
-		 * @type Function
-		 * @remark
-		 * 在定义一个类的抽象函数时，可以让其成员的值等于 **Function.empty** 。
-		 */
-		empty: emptyFn,
-
-		/**
-		 * 返回一个新函数，这个函数始终返回 *value*。
-		 * @param {Object} value 需要返回的参数。
-		 * @return {Function} 执行得到参数的一个函数。
-		 * @example
-		 * <pre>
-		 * var fn = Function.from(0);
-	     * fn()    // 0
-	     * </pre>
-	 	 */
-		from: function (value) {
-
-			// 返回一个值，这个值是当前的参数。
-			return function () {
-				return value;
-			}
-		}
-
-	});
+    /**
+     * 表示一个空函数。这个函数总是返回 undefined 。
+     * @property
+     * @type Function
+     * @remark
+     * 在定义一个类的抽象函数时，可以让其成员的值等于 **Function.empty** 。
+     */
+	Function.empty = emptyFn;
 
 	/**
 	 * 格式化指定的字符串。
@@ -708,7 +635,7 @@
 		// 支持参数2为数组或对象的直接格式化。
 		var toString = this;
 
-		args = arguments.length === 2 && Object.isObject(args) ? args : ap.slice.call(arguments, 1);
+		args = arguments.length === 2 && args && typeof args === 'object' ? args : ap.slice.call(arguments, 1);
 
 		// 通过格式化返回
 		return formatString ? formatString.replace(/\{+?(\S*?)\}+/g, function (match, name) {
@@ -718,6 +645,30 @@
 			return name in args ? toString(args[name]) : "";
 		}) : "";
 	};
+
+    /**
+	 * 系统原生的数组对象。
+	 * @class Array
+	 */
+	if (!Array.isArray) {
+
+
+	    /**
+		 * 判断一个变量是否是数组。
+		 * @param {Object} obj 要判断的变量。
+		 * @return {Boolean} 如果是数组，返回 true， 否则返回 false。
+		 * @example
+		 * <pre>
+	     * Array.isArray([]); // true
+	     * Array.isArray(document.getElementsByTagName("div")); // false
+	     * Array.isArray(new Array); // true
+	     * </pre>
+		 */
+	    Array.isArray = function (obj) {
+	        return toString.call(obj) === "[object Array]";
+	    }
+
+	}
 
 	/// #if CompactMode
 
@@ -1232,7 +1183,7 @@
 		 */
 		un: function (eventName, eventHandler) {
 
-			assert(!eventHandler || Object.isFunction(eventHandler), 'JPlus.Base#un(eventName, eventHandler): {eventHandler} 必须是函数。', eventHandler);
+			assert(!eventHandler || typeof eventHandler === 'function', 'JPlus.Base#un(eventName, eventHandler): {eventHandler} 必须是函数。', eventHandler);
 
 			// 获取本对象 本对象的数据内容 本事件值
 			var me = this, 
@@ -1675,7 +1626,7 @@
 	 */
 	function each(fn, scope) {
 
-		assert(Object.isFunction(fn), "Array#each(fn, scope): {fn} 必须是一个函数。", fn);
+		assert(typeof fn === 'function', "Array#each(fn, scope): {fn} 必须是一个函数。", fn);
 
 		var i = -1, me = this;
 
@@ -2280,7 +2231,7 @@ function imports(namespace) {
 					return !isEmptyObject(obj.prototype) || isUpper(name, 0) ? '类' : '函数';
 
 				// 最后判断对象。
-				if (Object.isObject(obj))
+				if (obj && typeof obj === 'object')
 					return name.charAt(0) === 'I' && isUpper(name, 1) ? '接口' : '对象';
 
 				// 空成员、值类型都作为属性。

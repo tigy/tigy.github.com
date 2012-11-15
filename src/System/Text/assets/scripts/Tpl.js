@@ -134,7 +134,7 @@ var Tpl = Class({
             case 'while':
                 if (!params)
                     this.throwError("'" + command + "' 语句缺少条件, '" + command + "' 语句的格式为 {" + command + " condition}", macro);
-                macro = command + "(Object.isArray(__TMP__=" + params + ")?__TMP__.length:__TMP__){";
+                macro = command + "(Array.isArray(__TMP__=" + params + ")?__TMP__.length:__TMP__){";
                 break;
             case 'for':
                 if (command = /^\s*(var\s+)?([\w$]+)\s+in\s+/.exec(params)) {

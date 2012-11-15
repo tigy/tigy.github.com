@@ -37,6 +37,50 @@ var TabControl = TabbableControl.extend({
 	    var href = tab.getAttr('href');
 	    return /^#/.test(href) && Dom.get(href.substr(1)) || this.body().child(tab.index());
 	},
+
+	init: function (options) {
+
+	    var me = this;
+
+	    // 委托头部选择信息。
+	    this.header().delegate('>li', options.selectEvent || 'click', function (e) {
+	        e.preventDefault();
+	        me.selectTab(this);
+	    });
+
+	    var tab = me.getSelectedTab() || me.item(0);
+
+	    me.header().children().removeClass('x-tabbable-selected');
+
+	    me.body().children().hide();
+
+	    if (tab) {
+	        tab.addClass('x-tabbable-selected');
+	        var content = me.getContentOf(tab);
+	        if (content) {
+	            content.show();
+	        }
+	    }
+
+	},
+
+	onToggleTab: function (from, to) {
+	    if (from) {
+	        from.removeClass('x-tabbable-selected');
+	        var content = this.getContentOf(from);
+	        if (content) {
+	            content.hide();
+	        }
+	    }
+
+	    if (to) {
+	        to.addClass('x-tabbable-selected');
+	        var content = this.getContentOf(to);
+	        if (content) {
+	            content.show(this.collapseDuration);
+	        }
+	    }
+	},
 	
 	addAt: function (index, title, content) {
 	    var header = this.header();
@@ -65,50 +109,6 @@ var TabControl = TabbableControl.extend({
 
 	getSelectedTab: function () {
 	    return this.header().find('.x-tabbable-selected');
-	},
-
-	init: function (options) {
-
-	    var me = this;
-
-	    // 委托头部选择信息。
-	    this.header().delegate('.x-tabbable-item', options.selectEvent || 'click', function (e) {
-	        e.preventDefault();
-	        me.setSelectedTab(this);
-	    });
-
-	    var tab = this.getSelectedTab() || this.item(0);
-
-	    this.header().children().removeClass('x-tabbable-selected');
-
-	    this.body().children().hide();
-
-	    if (tab) {
-	        tab.addClass('x-tabbable-selected');
-	        var content = this.getContentOf(tab);
-	        if (content) {
-	            content.show();
-	        }
-	    }
-
-	},
-	
-	toggleTab: function (from, to) {
-		if(from){
-		    from.removeClass('x-tabbable-selected');
-		    var content = this.getContentOf(from);
-		    if (content) {
-		        content.hide();
-		    }
-		}
-		
-		if(to){
-		    to.addClass('x-tabbable-selected');
-		    var content = this.getContentOf(to);
-		    if (content) {
-		        content.show(this.collapseDuration);
-		    }
-		}
 	}
 
 });

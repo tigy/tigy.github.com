@@ -7,14 +7,14 @@ var options = {
 
 var framewroks = {
 	'jQuery': {
-	    js: '../../libs/jquery/jquery.js',
+	    js: '../../../libs/jquery/jquery.js',
 		init:  function(window){
 			window.el = window.$("#header");
 			window.fn = fn;
 		}
 	},
 	'Mootools': {
-	    js: '../../libs/mootools/mootools.js',
+	    js: '../../../libs/mootools/mootools.js',
 		init:  function(window){
 			window.el = window.$("header");
 			window.fn = fn;
@@ -22,8 +22,8 @@ var framewroks = {
 	},
 	'jPlusUI': {
 		js: [
-			'../../../src/System/Core/assets/scripts/Base.js',
-			'../../../src/System/Dom/assets/scripts/Base.js'
+			'../../../../src/System/Core/assets/scripts/Base.js',
+			'../../../../src/System/Dom/assets/scripts/Base.js'
 		],
 		init:  function(window){
 			window.el = window.Dom.get("header");
@@ -152,7 +152,7 @@ var cases = {
 		jQuery: '$.isArray([])'
 	},
 	'Array - 生成':{
-		jPlusUI: 'Array.create([2,3])',
+		jPlusUI: '-',
 		Mootools: 'Array.from([2,3])',
 		jQuery: '$.makeArray([2,3])'
 	},

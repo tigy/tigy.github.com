@@ -4,11 +4,11 @@ test("Dom.prototype.getStyle", function() {
 
 	equal( Dom.get("qunit-fixture").getStyle("display"), "block", "Check for css property \"display\"");
 
-	ok( !Dom.isHidden(Dom.get("nothiddendiv").dom), "Modifying CSS display: Assert element is visible");
+	ok( !Dom.isHidden(Dom.get("nothiddendiv").node), "Modifying CSS display: Assert element is visible");
 	Dom.get("nothiddendiv").setStyle('display', "none");
-	ok( Dom.isHidden(Dom.get("nothiddendiv").dom), "Modified CSS display: Assert element is hidden");
+	ok( Dom.isHidden(Dom.get("nothiddendiv").node), "Modified CSS display: Assert element is hidden");
 	Dom.get("nothiddendiv").setStyle('display', "block");
-	ok( ! Dom.isHidden(Dom.get("nothiddendiv").dom), "Modified CSS display: Assert element is visible");
+	ok( ! Dom.isHidden(Dom.get("nothiddendiv").node), "Modified CSS display: Assert element is visible");
 
 	var div = Dom.parse( "<div>" );
 
@@ -56,7 +56,7 @@ test("Dom.prototype.getStyle", function() {
 	equal( Dom.get("empty").getStyle("opacity"), "1", "Assert opacity is taken from style attribute when set vs stylesheet in IE with filters" );
 	eval("-[1,]") ?
 		ok(true, "Requires the same number of tests"):
-		ok( ~Dom.get("empty").dom.currentStyle.filter.indexOf("gradient"), "Assert setting opacity doesn't overwrite other filters of the stylesheet in IE" );
+		ok( ~Dom.get("empty").node.currentStyle.filter.indexOf("gradient"), "Assert setting opacity doesn't overwrite other filters of the stylesheet in IE" );
 
 	var div = Dom.get("nothiddendiv"), child = Dom.get("nothiddendivchild");
 
@@ -66,7 +66,7 @@ test("Dom.prototype.getStyle", function() {
 	equal( parseInt(child.getStyle("font-size")), 16, "Verify fontSize px set." );
 
 	child.setStyle("height", "100%");
-	equal( child.dom.style.height, "100%", "Make sure the height is being set correctly." );
+	equal( child.node.style.height, "100%", "Make sure the height is being set correctly." );
 
 	child.setAttr("class", "em");
 	equal( parseInt(child.getStyle("fontSize")), 32, "Verify fontSize em set." );
@@ -83,7 +83,7 @@ test("Dom.prototype.getStyle", function() {
 
 	equal( typeof child.getStyle("width"), "string", "Make sure that a string width is returned from css('width')." );
 
-	var old = child.dom.style.height;
+	var old = child.node.style.height;
 
 	// Test NaN
 	//child.setStyle("height", parseFloat("zoo"));
@@ -93,7 +93,7 @@ test("Dom.prototype.getStyle", function() {
 	//child.setStyle("height", null);
 	//equal( child.style.height, old, "Make sure height isn't changed on null." );
 
-	old = child.dom.style.fontSize;
+	old = child.node.style.fontSize;
 
 	// Test NaN
 	//child.setStyle("font-size", parseFloat("zoo"));
@@ -101,16 +101,16 @@ test("Dom.prototype.getStyle", function() {
 
 	// Test null
 	child.setStyle("font-size", null);
-	equal( child.dom.style.fontSize, old, "Make sure font-size isn't changed on null." );
+	equal( child.node.style.fontSize, old, "Make sure font-size isn't changed on null." );
 });
 
 test("Dom.prototype.setStyle", function() {
 
-	ok( !Dom.isHidden(Dom.get("nothiddendiv").dom), "Modifying CSS display: Assert element is visible");
+	ok( !Dom.isHidden(Dom.get("nothiddendiv").node), "Modifying CSS display: Assert element is visible");
 	Dom.get("nothiddendiv").setStyle("display", "none");
-	ok( Dom.isHidden(Dom.get("nothiddendiv").dom), "Modified CSS display: Assert element is hidden");
+	ok( Dom.isHidden(Dom.get("nothiddendiv").node), "Modified CSS display: Assert element is hidden");
 	Dom.get("nothiddendiv").setStyle("display", "block");
-	ok( !Dom.isHidden(Dom.get("nothiddendiv").dom), "Modified CSS display: Assert element is visible");
+	ok( !Dom.isHidden(Dom.get("nothiddendiv").node), "Modified CSS display: Assert element is visible");
 
 	Dom.get("nothiddendiv").setStyle("top", "-1em");
 	ok( Dom.get("nothiddendiv").getStyle("top"), -16, "Check negative number in EMs." );
@@ -188,7 +188,7 @@ if ( eval("!-[1,]") ) {
 			test2 = test.find( "div" ).setStyle( "opacity", 1 );
 
 		function hasFilter( elem ) {
-			var match = rfilter.exec( elem.dom.style.cssText );
+			var match = rfilter.exec( elem.node.style.cssText );
 			if ( match ) {
 				return true;
 			}
@@ -205,10 +205,10 @@ test("getStyle('height') doesn't clear radio buttons", function () {
 	var checkedtest = Dom.get("checkedtest");
 	// IE6 was clearing "checked" in getStyle("height");
 	checkedtest.getStyle("height");
-	ok(  checkedtest.find("[type='radio']").dom.checked, "Check first radio still checked." );
-	ok(  !checkedtest.query("[type='radio']").item(-1).dom.checked, "Check last radio still NOT checked." );
-	ok( checkedtest.find("[type='checkbox']").dom.checked, "Check first checkbox still checked." );
-	ok( !checkedtest.query("[type='checkbox']").item(-1).dom.checked, "Check last checkbox still NOT checked." );
+	ok(  checkedtest.find("[type='radio']").node.checked, "Check first radio still checked." );
+	ok(  !checkedtest.query("[type='radio']").item(-1).node.checked, "Check last radio still NOT checked." );
+	ok( checkedtest.find("[type='checkbox']").node.checked, "Check first checkbox still checked." );
+	ok( !checkedtest.query("[type='checkbox']").item(-1).node.checked, "Check last checkbox still NOT checked." );
 });
 
 /*
@@ -280,7 +280,7 @@ test("widows & orphans", function () {
 
 	var p = Dom.parse("<p>").appendTo("qunit-fixture");
 
-	if ( "widows" in p.dom.style ) {
+	if ( "widows" in p.node.style ) {
 		expect(4);	
 		p.setStyle('widows', 0).setStyle('orphans', 0);
 

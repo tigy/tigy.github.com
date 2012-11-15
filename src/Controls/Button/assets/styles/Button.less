@@ -44,9 +44,9 @@
 	line-height: @baseLineHeight;
 	color: @grayDark;
     text-shadow: 0 1px 1px rgba(255,255,255,.75);
-	.buttonBackgroundColor(@buttonBackgroundColor, @buttonBackgroundColorHover);
 	border: 1px solid @buttonBorder;
 	border-bottom-color: darken(@buttonBorder, 10%);
+	.buttonBackgroundColor(@buttonBackgroundColor, @buttonBackgroundColorHover);
 	text-align: center;
 	vertical-align: middle;
 	
@@ -60,7 +60,7 @@
 	color: @grayDark;
 	text-decoration: none;
 	background-color: darken(@white, 10%);
-	background-position: 0 -15px;
+	background-position: 0 -15.3px;
 
 	// transition is only when going to hover, otherwise the BackgroundColor
 	// behind the gradient (there for IE<=9 fallback) gets mismatched
@@ -73,7 +73,7 @@
   background-color: darken(@white, 15%) e("\9");
   background-image: none;
   outline: 0;
-  .box-shadow(~"inset 0 2px 4px rgba(0,0,0,.15), 0 1px 2px rgba(0,0,0,.05)");
+  .box-shadow(~"inset 0 2px 4px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.15)");
 }
 	
 // Disabled state

@@ -8864,7 +8864,7 @@ var IInput = {
 	 * @protected
 	 * @type {Control}
 	 */
-	hiddenField: null,
+	inputProxy: null,
 	
 	///**
 	// * 创建用于在表单内保存当前输入值的隐藏域。
@@ -8882,17 +8882,17 @@ var IInput = {
 	input: function(){
 		
 		// 如果不存在隐藏域。
-		if(!this.hiddenField) {
+		if(!this.inputProxy) {
 			
 			// 如果 当前元素是表单元素，直接返回。
 			if(/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(this.node.tagName)){
 				return new Dom(this.node);
 			}
 			
-			this.hiddenField = this.find("input,select,textarea") || Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
+			this.inputProxy = this.find("input,select,textarea") || Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
 		}
 		
-		return this.hiddenField;
+		return this.inputProxy;
 	},
 	
 	/**
@@ -9468,7 +9468,7 @@ var IDropDownOwner = {
 		this.trigger('dropdownhide');
 	},
 
-	createDropDown: function (existDom) {
+	initDropDown: function (existDom) {
 	    return existDom;
 	},
 	
@@ -9485,7 +9485,7 @@ var IDropDownOwner = {
 	            dropDown = null;
 	        }
 
-	        this.dropDown = this.createDropDown(dropDown);
+	        this.dropDown = this.initDropDown(dropDown);
 	    }
 	    
 	    return this.dropDown;
@@ -9776,7 +9776,7 @@ var MenuButton = Button.extend(IDropDownOwner).implement({
 	
 	tpl: '<button class="x-button x-control" type="button"><span class="x-button-menu"></span></button>',
 	
-	createDropDown: function(existDom){
+	initDropDown: function(existDom){
 		if(existDom && !existDom.hasClass('x-menu')){
 			return existDom;
 		}
@@ -10064,7 +10064,7 @@ var ComboBox = Picker.extend({
 	 * @return {Control} 下拉菜单。
 	 * @protected virtual
 	 */
-    createDropDown: function(existDom){
+    initDropDown: function(existDom){
         return new ComboBox.DropDownMenu(existDom);
     },
 	
@@ -10133,7 +10133,7 @@ var ComboBox = Picker.extend({
         // 如果初始化的时候传入一个 <select> 则替换 <select>, 并拷贝相关数据。
         if(this.node.tagName === 'SELECT') {
 			
-            this.hiddenField = selectNode = new Dom(this.node);
+            this.inputProxy = selectNode = new Dom(this.node);
 			
             // 调用 create 重新生成 dom 。
             this.node = Dom.parseNode(this.dropDownListTpl);
@@ -10225,7 +10225,7 @@ var ComboBox = Picker.extend({
 
             // 如果隐藏域是 SELECT ，比较方便：
             if (input.node.tagName === 'SELECT') {
-                value = this.hiddenField.getAttr('selectedIndex');
+                value = this.inputProxy.getAttr('selectedIndex');
                 return value >= 0 ? this.dropDown.item(value) : null;
             }
 
@@ -10404,7 +10404,7 @@ var Suggest = ComboBox.extend({
 	
 	init: function(options){
 		
-		var suggest = this.createDropDown().addClass('x-suggest');
+		var suggest = this.initDropDown().addClass('x-suggest');
 		
 		// UI 上增加一个下拉框。
 		this.setDropDown(suggest);

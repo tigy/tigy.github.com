@@ -1,4 +1,4 @@
-module("traversing");
+module("Traversing");
 
 
 
@@ -109,11 +109,11 @@ test("Dom.prototype.children()", function() {
 
 test("Dom.prototype.parent()", function() {
 	expect(5);
-	equal(Dom.query("#groups").parent().dom.id, "ap", "Simple parent check");
-	equal(Dom.query("#groups").parent("p").dom.id, "ap", "Filtered parent check");
+	equal(Dom.query("#groups").parent().node.id, "ap", "Simple parent check");
+	equal(Dom.query("#groups").parent("p").node.id, "ap", "Filtered parent check");
 	equal(Dom.query("#groups").parent("div2"), null, "Filtered parent check, no match");
-	equal(Dom.query("#groups").parent("div, p").dom.id, "ap", "Check for multiple filters");
-	deepEqual(Dom.query("#en, #sndp").parent().dom, q("foo")[0], "Check for unique results from parent");
+	equal(Dom.query("#groups").parent("div, p").node.id, "ap", "Check for multiple filters");
+	deepEqual(Dom.query("#en, #sndp").parent().node, q("foo")[0], "Check for unique results from parent");
 });
 
 test("Dom.prototype.parentAll", function() {
@@ -127,18 +127,18 @@ test("Dom.prototype.parentAll", function() {
 
 test("Dom.prototype.next()", function() {
 	expect(4);
-	equal(Dom.query("#ap").next().dom.id, "foo", "Simple next check");
-	equal(Dom.query("#ap").next("div").dom.id, "foo", "Filtered next check");
-	equal(!Dom.query("#ap").next("p"), false, "Filtered next check, no match");
-	equal(Dom.query("#ap").next("div, p").dom.id, "foo", "Multiple filters");
+	equal(Dom.query("#ap").next().node.id, "foo", "Simple next check");
+	equal(Dom.query("#ap").next("div").node.id, "foo", "Filtered next check");
+	equal(Dom.query("#ap").next("p"), null, "Filtered next check, no match");
+	equal(Dom.query("#ap").next("div, p").node.id, "foo", "Multiple filters");
 });
 
 test("Dom.prototype.prev()", function() {
 	expect(4);
-	equal(Dom.query("#foo").prev().dom.id, "ap", "Simple prev check");
-	equal(Dom.query("#foo").prev("p").dom.id, "ap", "Filtered prev check");
+	equal(Dom.query("#foo").prev().node.id, "ap", "Simple prev check");
+	equal(Dom.query("#foo").prev("p").node.id, "ap", "Filtered prev check");
 	equal(Dom.query("#foo").prev("div"), null, "Filtered prev check, no match");
-	equal(Dom.query("#foo").prev("p, div").dom.id, "ap", "Multiple filters");
+	equal(Dom.query("#foo").prev("p, div").node.id, "ap", "Multiple filters");
 });
 
 test("Dom.prototype.nextAll()", function() {

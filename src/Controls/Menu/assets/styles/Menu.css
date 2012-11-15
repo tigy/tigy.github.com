@@ -22,7 +22,7 @@
   _zoom: 0;
   text-align: left;
 }
-.x-menu-item {
+.x-menu li {
   line-height: 18px;
   _height: 18px;
 }

@@ -1,1 +1,642 @@
-/** * @author  */imports("Controls.Composite.MonthCalender");using("System.Utils.Date")  ;using("System.Fx.Animate");using("Controls.Core.IInput");var MonthCalender = (function(){		function getDateIn(date, fullYear, month){		return date.getFullYear() == fullYear && date.getMonth() == month ? date.getDate() : 0 		}		// 显示天。	var DecadeView = {						render: function(calender, container) {											// 初始化容器 -> days 。				calender._renderContainerOfMonthsAndYears(container);								// 目前的月。				var date = calender.currentDate,									// 目前的月。					year = date.getFullYear(),										cyear = year;									year = ((year / 100) | 0) * 100;								// 设置顶部标题。				calender.header.setText(year + '-' + (year + 99));								year--;								Object.each(container.node.getElementsByTagName('a'), function(a, i){										a.className = i === 0 || i === 11 ? 'x-monthcalender-decade x-monthcalender-alt' : 'x-monthcalender-decade';										if(cyear >= year && cyear <= year + 9){						a.className += ' x-monthcalender-selected';						}					a.tag = year + 5;										a.innerHTML = year + '-<br>' + (year + 9) + '&nbsp;';										year += 10;				});			},						top: function(calender){				YearView.top(calender);			},						switchTo: function(View, calender){								// 显示月。				View.render(calender, calender.contentProxy);								// 设置当前视图。				calender.currentView = View;								// 特效显示。				calender._switchContentFromFade();			},						select: function(calender, node){								calender.currentDate.setYear(node.tag);				DecadeView.switchTo(YearView, calender);				},						next: function(calender){								// 重新计算月。				calender.currentDate.addYear(100);			},						previous: function(calender){								// 重新计算月。				calender.currentDate.addYear(-100);							}		},				YearView = {						render: function(calender, container) {											// 初始化容器 -> days 。				calender._renderContainerOfMonthsAndYears(container);								// 目前的月。				var date = calender.currentDate,									// 目前的年。					year = date.getFullYear(),										cyear = year;									year = ((year / 10) | 0) * 10;								// 设置顶部标题。				calender.header.setText(year + '-' + (year + 9));								year--;								Object.each(container.node.getElementsByTagName('a'), function(a, i){										a.className = i === 0 || i === 11 ? 'x-monthcalender-alt' : '';										if(cyear === year){						a.className += ' x-monthcalender-selected';						}										a.innerHTML = a.tag = year++;				});			},						select: function(calender, node){								calender.currentDate.setYear(node.tag);									DecadeView.switchTo(MonthView, calender);				},						parent: DecadeView,						next: function(calender){								// 重新计算月。				calender.currentDate.addYear(10);								},						previous: function(calender){								// 重新计算月。				calender.currentDate.addYear(-10);				}					},				MonthView = {						render: function(calender, container) {												// 初始化容器 -> days 。				calender._renderContainerOfMonthsAndYears(container);								// 目前的月。				var date = calender.currentDate,									// 目前的月。					month = date.getMonth(),								// 显示所有月 。					months = MonthCalender.months;								Object.each(container.node.getElementsByTagName('a'), function(a, i){										a.tag = i;										a.className = i === month ? 'x-monthcalender-selected' : '';															a.innerHTML = months[i];				});								// 设置顶部标题。				calender.header.setText(date.getFullYear());			},						parent: YearView,						select: function(calender, node){								calender.currentDate.setMonth(node.tag);									DecadeView.switchTo(DayView, calender);							},						next: function(calender){								// 重新计算月。				calender.currentDate.addYear(1);				},						previous: function(calender){								// 重新计算月。				calender.currentDate.addYear(-1);				}					},				DayView = {						render: function(calender, container){								// 初始化容器 -> days 。				calender._renderContainerOfDays(container);								// 目前的时间。				var date = calender.currentDate,									// 每项的样式，对于非当前月显示时需要 disabled。					cls = 'x-monthcalender-alt',									// 获取当前年 。					fullYear = date.getFullYear(),										// 获取当前月。					month = date.getMonth(),										// 对选择的项 添加 selected					// 下面对日期判断, 如果 = v 或 cd 则表示特殊日。					// 由于只对某月有关，因此，如果不是当前的页，直接等于 0 。					v = getDateIn(calender.value, fullYear, month),					cd = getDateIn(calender.today, fullYear, month);								// 设置顶部标题。				calender.header.setText(date.toString(MonthCalender.current));								// 先获得月初。				date = new Date(fullYear, month, 1);								// 调整为星期天。 节约变量。				month = date.getDay();				date.addDay(month === 0 ? -7 : -month);								// 对每个 a 绑定，共 6 * 7  。				Object.each(container.node.getElementsByTagName('a'), function(a){										// 获取当前日期。					var day = date.getDate();										// 显示。					a.innerHTML = day;										// 如果是第一天，切换 是否当前月 。					if(day == 1){						cls = cls ? '' : 'x-monthcalender-alt';					}										// 设置属性。					a.className = cls;										// 如果是本日。					if(cd == day && !cls)						a.className += ' x-monthcalender-actived';										// 如果是选择的。					if(v == day && !cls)						a.className += ' x-monthcalender-selected';										// 计算下一天。					date.setDate(day + 1);									});							},						parent: MonthView,						select: function(calender, node, e){								var newValue = calender.currentDate.clone(), date = parseInt(node.innerHTML);								// 如果是disbaled， 则是上个月或下个月				if (node.className == 'x-monthcalender-alt') {					newValue.addMonth(date < 15 ? 1 : -1);					newValue.setDate(date);					calender.value = newValue;					if(date < 15){						calender.onNext();					} else {						calender.onPrevious();					}				} else {					newValue.setDate(date);					calender.onItemClick(e, newValue);				}			},						next: function(calender){								// 重新计算月。				calender.currentDate.addMonth(1);				},						previous: function(calender){								// 重新计算月。				calender.currentDate.addMonth(-1);				}					};		DecadeView.parent = DecadeView;		return Control.extend({				width: 172,				xtype: 'monthcalender',			tpl: '<div class="x-monthcalender">\		       <div class="x-monthcalender-wrap">\		        <div class="x-monthcalender-header">\		            <a class="x-monthcalender-previous" href="javascript://上一个">\		                ◂\		            </a>\		            <a href="javascript://更改时间" class="x-monthcalender-title">\		            </a>\		            <a class="x-monthcalender-next" href="javascript://下一个">\		                ▸\		            </a>\		        </div>\		        <div class="x-monthcalender-body">\		            <div class="x-monthcalender-content">\		                <div style="left:1px; top:1px;"></div>\						<div style="left:172px; top:1px;"></div>\					</div>\		        </div>\		    	<div class="x-monthcalender-footer">\		    		<a href="javascript://今天"></a>\		    	</div>\		      </div>\			</div>',					currentView: DayView,				duration: -1,				_renderContainer: function(container, className, width, height){						if(container.node.className == className)				return false;						container.empty();			container.node.className = className;			for(var i = 0, j, c, a; i < width; i++){				container.node.appendChild(c = document.createElement('div'));				for(j = 0; j < height; j++) {					a = document.createElement('a');					a.href = 'javascript:;';					c.appendChild(a);				}			}						return true;		},				// 创建容纳 days 的节点。		_renderContainerOfDays: function(container){						if (this._renderContainer(container, 'x-monthcalender-days', 6, 7)) {							var weeks = container.prepend(Dom.create('div', 'x-monthcalender-week'));								Object.each(MonthCalender.weeks, function(name, week) {					weeks.append(Dom.create('span', 'x-monthcalender-' + week).setHtml(name));				});							}		},				_renderContainerOfMonthsAndYears: function(container){			this._renderContainer(container, 'x-monthcalender-monthyears', 3, 4);		},				_switchContent: function(oldLeft, sliderLeft, newLeft, tweenLeft){			var oldContent = this.content,				newContent = this.contentProxy,				slider = newContent.parent();						oldContent.node.style.left = oldLeft + 'px';			slider.node.style.left = sliderLeft + 'px';			newContent.node.style.left = newLeft + 'px';			slider.animate({left: tweenLeft }, this.duration, null, 'abort');						this.content = newContent;			this.contentProxy = oldContent;		},				_switchContentFromRight: function(){			return this._switchContent(1, 1, this.width, -this.width);		},				_switchContentFromLeft: function(){			return this._switchContent(this.width, -this.width, 1, 1);		},				_switchContentFromFade: function(){			var me = this,				oldContent = me.content,				newContent = me.contentProxy,				slider = newContent.node.parentNode,				duration = me.duration / 2,				newStyle = newContent.node.style,				oldStyle = oldContent.node.style;						newContent.setStyle('opacity', 0);			slider.style.left = oldStyle.left = newStyle.left = '1px';			newStyle.zIndex = 2;			oldStyle.zIndex = 1;			newContent.animate({opacity: 1}, duration, null, 'replace');			oldContent.animate({opacity: 0}, duration, function(){				newStyle.left = '1px';				oldStyle.left =  me.width + 'px';				oldContent.setStyle('opacity', 1);			}, 'replace');						me.content = newContent;			me.contentProxy = oldContent;		},				onPrevious: function(){						var me = this,				scr = this.currentView;						scr.previous(this);						// 渲染到代理。			scr.render(me, me.contentProxy);						// 特效显示。			me._switchContentFromLeft();		},				onNext: function(){						var me = this,				scr = this.currentView;						scr.next(this);						// 渲染到代理。			scr.render(me, me.contentProxy);						// 特效显示。			me._switchContentFromRight();		},				onTop: function(){						var me = this,				p = me.currentView.parent;						// 显示月。			p.render(me, me.contentProxy);						// 设置当前视图。			me.currentView = p;						// 特效显示。			me._switchContentFromFade();					},				onClick: function(e){			var target = e.target;			if (target.tagName === 'A') {				this.currentView.select(this, target, e);			}		},				onItemClick: function(e, value){			if(this.onSelect(value)) {				if (this.value - value !== 0) {					this.value = value;										// 触发内容改变。					this.onChange(value);										// 更新页面。					this.currentView.render(this, this.content);									}			} else {			    e.stopPropagation();			    e.preventDefault();			}		},				onSelectTodayClick: function (e) {			this.onItemClick(e, this.today);		},				onSelect: function (value) {			return this.trigger('select', value);		},				onChange: function(value){			return this.trigger('change', value);		},				init: function(options){			var me = this.unselectable();			me.header = me.find('.x-monthcalender-title').on('click', me.onTop, me);						me.find('.x-monthcalender-previous').on('click', me.onPrevious, me);			me.find('.x-monthcalender-next').on('click', me.onNext, me);						var container = this.find('.x-monthcalender-content');			me.content = container.first(0).on('click', me.onClick, me);			me.contentProxy = container.first(1).on('click', me.onClick, me);						me.find('.x-monthcalender-footer a').on('click', me.onSelectTodayClick, me);						options.today = options.today || new Date();					options.value = options.value || new Date();			},				setToday: function(value){			this.find('.x-monthcalender-footer a').setHtml(value.toString(MonthCalender.today));			this.today = value;		},				// 切换当前显示的界面。		setView: function(name){			var scr;			switch(name){				case 'day':					scr = DayView;					break;				case 'month':					scr = MonthView;					break;				case 'year':					scr = YearView;					break;				case 'decade':					scr = DecadeView;					break;			}						this.currentView = scr;			scr.render(this, this.content);		},				setValue: function(value){ 					var changed = this.value !== value;						// 设置值。			this.value = value;						// 设置目前显示的时间。			this.currentDate = new Date(value.getFullYear(), value.getMonth());						this.setView('day');						if(changed)				this.onChange(value);			return this;		},			getValue: function(fn){			return this.value;		}	}).implement(IInput).addEvents('select change');			})();Object.extend(MonthCalender, {			months: "一月 二月 三月 四月 五月 六月 七月 八月 九月 十月 十一月 十二月".split(' '),		weeks: {		sunday: '日',		monday: '一',		tuesday: '二',		wednesday: '三',		thursday: '四',		friday: '五',		saturday: '六'	},		current: 'yyyy年M月',		today: '今天: yyyy年M月d日'	});
+/**
+ * @author xuld
+ */
+
+imports("Controls.Composite.MonthCalender");
+using("System.Utils.Date");
+using("System.Fx.Animate");
+
+
+var MonthCalender = Control.extend({
+
+    xtype: 'monthcalender',
+
+    tpl: '<div class="x-monthcalender">\
+		       <div class="x-monthcalender-main">\
+		        <div class="x-monthcalender-header">\
+		            <a class="x-monthcalender-previous" href="javascript://上一页">◂</a>\
+		            <a class="x-monthcalender-title" href="javascript://返回上一级"></a>\
+		            <a class="x-monthcalender-next" href="javascript://下一页">▸</a>\
+		        </div>\
+		        <div class="x-monthcalender-body">\
+		            <div class="x-monthcalender-content">\
+		                <div style="left:1px; top:1px;"></div>\
+						<div style="left:172px; top:1px;"></div>\
+					</div>\
+		        </div>\
+		    	<div class="x-monthcalender-footer">\
+		    		<a href="javascript://选择今天"></a>\
+		    	</div>\
+		      </div>\
+			</div>',
+
+    duration: -1,
+
+    /**
+     * 渐变切换视图。
+     */
+    _toggleContentBySlide: function (oldLeft, sliderLeft, newLeft, tweenLeft, duration) {
+        var oldContent = this.content,
+            newContent = this.contentProxy,
+            slider = newContent.parent();
+
+        oldContent.node.style.left = oldLeft + 'px';
+        slider.node.style.left = sliderLeft + 'px';
+        newContent.node.style.left = newLeft + 'px';
+        slider.animate({ left: tweenLeft }, duration, null, 'replace');
+
+        this.content = newContent;
+        this.contentProxy = oldContent;
+    },
+
+    _toggleContentByFade: function (duration) {
+        var me = this,
+            oldContent = me.content,
+            newContent = me.contentProxy,
+            slider = newContent.node.parentNode,
+            newStyle = newContent.node.style,
+            oldStyle = oldContent.node.style;
+
+        duration /= 2;
+        newContent.setStyle('opacity', 0);
+        slider.style.left = oldStyle.left = newStyle.left = '1px';
+        newStyle.zIndex = 2;
+        oldStyle.zIndex = 1;
+        newContent.animate({ opacity: 1 }, duration, null, 'replace');
+        oldContent.animate({ opacity: 0 }, duration, function () {
+            newStyle.left = '1px';
+            oldStyle.left = me._widthCache + 'px';
+            oldContent.setStyle('opacity', 1);
+        }, 'replace');
+
+        me.content = newContent;
+        me.contentProxy = oldContent;
+    },
+
+    /**
+     * 当用户点击某一项时执行。
+     * @param {Dom} item 正在被点击的项。
+     * @protected virtual
+     */
+    onItemClick: function (item) {
+
+        // 如果此项是允许点击的。则生成新的日期对象，并设置为当前值。
+        if (!item.hasClass('x-monthcalender-disabled')) {
+            this.selectItem(item);
+        }
+
+        return false;
+    },
+
+    onPrevClick: function () {
+
+        var me = this;
+
+        me.view.move(me, -1);
+
+        // 渲染到代理。
+        me.view.render(me, true);
+
+        // 特效显示。
+        me._toggleContentBySlide(me._widthCache, -me._widthCache, 1, 1, this.duration);
+
+        return false;
+    },
+
+    onNextClick: function () {
+
+        var me = this;
+
+        me.view.move(me, 1);
+
+        // 渲染到代理。
+        me.view.render(me, true);
+
+        // 特效显示。
+        me._toggleContentBySlide(1, 1, me._widthCache, -me._widthCache, this.duration);
+
+        return false;
+    },
+
+    onTitleClick: function () {
+
+        // 切换显示到父视图。
+        this.setView(MonthCalender[this.view.parentView]);
+    },
+
+    onTodayClick: function () {
+
+        // 获取今天的日期。
+        var today = this.getToday();
+
+        // 如果是在范围内。
+        if (!(today < this.minValue || today > this.maxValue)) {
+
+            // 更新 UI，显示当前值。
+            this.setValue(today);
+
+            // 触发相关的点击事件。
+            this.onItemClick(this.find('.x-monthcalender-selected'));
+        }
+
+        return this;
+    },
+
+    init: function (options) {
+        var me = this.unselectable();
+        me.bind({
+            'click.x-monthcalender-title': me.onTitleClick.bind(me),
+            'click.x-monthcalender-previous': me.onPrevClick.bind(me),
+            'click.x-monthcalender-next': me.onNextClick.bind(me),
+            'click.x-monthcalender-footer a': me.onTodayClick.bind(me),
+            'click.x-monthcalender-content a': function () {
+                return me.view.select(me, this);
+            }
+        });
+
+        var contents = me.find('.x-monthcalender-content');
+        me.content = contents.first();
+        me.contentProxy = contents.last();
+
+        options.today = options.today || new Date();
+
+        options.value = options.value || new Date();
+
+        me._widthCache = this.getWidth() || 172;
+
+        this.displayedValue = options.value;
+
+    },
+
+    setToday: function (value) {
+        this.find('.x-monthcalender-footer a').setHtml(value.toString(MonthCalender.todayFormat));
+        this.today = value;
+    },
+
+    getToday: function () {
+        return this.today;
+    },
+
+    // 切换当前显示的界面。
+    setView: function (view, duration) {
+        if (duration !== 0) {
+            view.render(this, true);
+            this.view = view;
+            this._toggleContentByFade(duration || this.duration);
+        } else {
+            view.render(this);
+            this.view = view;
+        }
+
+        return this;
+    },
+
+    /**
+     * 模拟用户选中某一项。
+     * @param {Dom} item 需要选中的项。
+     */
+    selectItem: function (item) {
+
+        // 根据 item 取得 value 。
+        var value = new Date(this.displayedValue.getFullYear(), this.displayedValue.getMonth(), parseInt(item.getText()));
+
+        // 如果允许选中。
+        if (this.trigger('selecting', value)) {
+
+            // 获取原值。
+            var oldValue = this.getValue();
+
+            // 设置值。
+            this.setValue(value);
+
+            // 检测值是否改变。
+            if (value - oldValue > 0) {
+                this.trigger('change');
+            }
+
+        }
+
+        return this;
+
+    },
+
+    /**
+     * 设置当前日历的值。
+     * @param {Date} value 要设置的值。
+     */
+    setValue: function (value) {
+
+        // 设置值。
+        this.value = value;
+
+        // 当前正在显示的值。
+        this.displayedValue = value.clone();
+
+        // 更新视图。
+        this.setView(MonthCalender.DayView, 0);
+
+        return this;
+    },
+
+    /**
+     * 获取当前日历的值。
+     */
+    getValue: function (fn) {
+        return this.value;
+    },
+
+    limit: function (minValue, maxValue) {
+        this.minValue = minValue;
+        this.maxValue = maxValue;
+        this.view.render(this);
+        return this;
+    }
+
+}).addEvents('change');
+
+Object.extend(MonthCalender, {
+
+    _isMonthOf: function (date, displayedYear, displayedMonth) {
+        return date.getFullYear() === displayedYear && date.getMonth() === displayedMonth;
+    },
+
+    _renderContentOfMonthYears: function (calender, useProxy, contentGetter) {
+
+        var html = '',
+
+            c = 0,
+
+            i = 0,
+
+            j;
+
+        while (i++ < 3) {
+            html += '<div>';
+            for (j = 0; j < 4; j++) {
+                html += contentGetter(c++);
+            }
+            html += '</div>';
+        }
+
+        // 设置内容。
+        calender[useProxy ? 'contentProxy' : 'content'].setHtml(html).node.className = 'x-monthcalender-monthyears';
+
+    },
+
+    DayView: {
+
+        /**
+         * 向指定的 *calender* 内的 *content* 节点渲染日视图。
+         * @param {MonthCalender} calender 要渲染的目标日历对象。
+         */
+        render: function (calender, useProxy) {
+
+            // 获取当前的值。用于添加 selected 属性。
+            var currentValue = calender.getValue(),
+
+                // 获取今天。用于添加 actived 属性。
+                today = calender.getToday(),
+
+                // 获取当前年 。
+                displayedYear = calender.displayedValue.getFullYear(),
+
+                // 获取当前月。
+                displayedMonth = calender.displayedValue.getMonth(),
+
+                // 要渲染的日期的最小值。
+                minValue = calender.minValue,
+
+                // 要渲染的日期的最大值。
+                maxValue = calender.maxValue,
+
+                // 需要添加 selected 的日期值。
+                selectedDate = MonthCalender._isMonthOf(currentValue, displayedYear, displayedMonth) ? currentValue.getDate() : 0,
+
+                // 需要添加 actived 的日期值。
+                activedDate = MonthCalender._isMonthOf(today, displayedYear, displayedMonth) ? today.getDate() : 0,
+
+                html = '',
+
+                i = 0,
+
+                j,
+
+                day,
+
+                // 每项的样式，对于非当前月显示时需要 disabled。
+                altClassType = -1,
+
+                // 先获得月初。
+                value = new Date(displayedYear, displayedMonth, 1);
+
+            // 绘制星期。
+            html += '<div class="x-monthcalender-week">';
+            for (j in MonthCalender.weeks) {
+                html += '<span class="x-monthcalender-' + j + '">' + MonthCalender.weeks[j] + '</span>';
+            }
+            html += '</div>';
+
+            // 调整为星期天。
+            day = value.getDay();
+            value.addDay(day === 0 ? -7 : -day);
+
+            // 绘制日。
+
+            while (i++ < 6) {
+                html += '<div>';
+                for (j = 0; j < 7; j++) {
+                    html += '<a href="javascript:;" class="';
+
+                    // 获取当前日期。
+                    day = value.getDate();
+
+                    // 如果是第一天，切换 是否当前月 。
+                    if (day == 1) {
+                        altClassType++;
+                    }
+
+                    if (value < minValue || value > maxValue) {
+                        html += 'x-monthcalender-disabled ';
+                    } else if (altClassType !== 0) {
+                        html += 'x-monthcalender-alt ' + (altClassType ? 'x-monthcalender-alt-prev ' : 'x-monthcalender-alt-next ');
+                    } else {
+
+                        if (activedDate == day) {
+                            html += 'x-monthcalender-actived ';
+                        }
+
+                        if (selectedDate == day) {
+                            html += 'x-monthcalender-selected ';
+                        }
+
+                    }
+
+                    html += '">' + day + '</a>';
+
+                    // 计算下一天。
+                    value.setDate(day + 1);
+                }
+                html += '</div>';
+            }
+
+            // 设置内容。
+            calender[useProxy ? 'contentProxy' : 'content'].setHtml(html).node.className = 'x-monthcalender-days';
+
+            // 设置顶部标题。
+            calender.query('.x-monthcalender-title').setText(calender.displayedValue.toString(MonthCalender.monthFormat));
+        },
+
+        parentView: 'MonthView',
+
+        select: function (calender, item) {
+
+            // 如果是 alt， 则是上个月或下个月, 则切换为新视图。
+            // 否则，设置并更新当前的值。
+            if (item.hasClass('x-monthcalender-alt')) {
+
+                var day = parseInt(item.getText());
+                calender.value = new Date(calender.displayedValue.getFullYear(), calender.displayedValue.getMonth() + (day < 15 ? 1 : -1), day);
+                return calender[day < 15 ? 'onNextClick' : 'onPrevClick']();
+
+            }
+
+            return calender.onItemClick(item);
+        },
+
+        move: function (calender, delta) {
+            calender.displayedValue.addMonth(delta);
+        }
+
+    },
+
+    MonthView: {
+
+        /**
+         * 向指定的 *calender* 内的 *content* 节点渲染日视图。
+         * @param {MonthCalender} calender 要渲染的目标日历对象。
+         */
+        render: function (calender, useProxy) {
+
+            // 获取当前年 。
+            var displayedYear = calender.displayedValue.getFullYear(),
+
+                // 获取当前月。
+                displayedMonth = calender.displayedValue.getMonth(),
+
+                // 要渲染的日期的最小值。
+                minValue = calender.minValue,
+
+                // 要渲染的日期的最大值。
+                maxValue = calender.maxValue,
+
+                // 需要添加 selected 的日期值。
+                selectedMonth = MonthCalender._isMonthOf(calender.getValue(), displayedYear, displayedMonth) ? displayedMonth : -1,
+
+                // 需要添加 actived 的日期值。
+                activedMonth = MonthCalender._isMonthOf(calender.getToday(), displayedYear, displayedMonth) ? displayedMonth : -1,
+
+                // 显示所有月 。
+                months = MonthCalender.months,
+
+                // 用于第一个月的值。
+                value = new Date(displayedYear, 0);
+
+            MonthCalender._renderContentOfMonthYears(calender, useProxy, function (c) {
+
+                value.setMonth(c);
+
+                var html = '<a href="javascript:;" data-value="' + c + '" class="';
+
+                if (value < minValue || value > maxValue) {
+                    html += 'x-monthcalender-disabled ';
+                }
+
+                if (selectedMonth == c) {
+                    html += 'x-monthcalender-selected ';
+                }
+
+                html += '">' + months[c] + '</a>';
+
+                return html;
+
+            });
+
+            // 设置顶部标题。
+            calender.query('.x-monthcalender-title').setText(displayedYear);
+        },
+
+        select: function (calender, item) {
+
+            calender.displayedValue.setMonth(+item.getAttr('data-value'));
+
+            calender.setView(MonthCalender.DayView);
+
+        },
+
+        parentView: 'YearView',
+
+        move: function (calender, delta) {
+            calender.displayedValue.addYear(delta);
+        }
+
+    },
+
+    YearView: {
+
+        render: function (calender, useProxy) {
+
+            // 获取当前年 。
+            var displayedYear = calender.displayedValue.getFullYear(),
+
+                // 要渲染的日期的最小值。
+                minValue = calender.minValue && calender.minValue.getFullYear(),
+
+                // 要渲染的日期的最大值。
+                maxValue = calender.maxValue && calender.maxValue.getFullYear(),
+
+                // 需要添加 selected 的日期值。
+                selectedYear = calender.getValue().getFullYear(),
+
+                // 需要添加 actived 的日期值。
+                activedYear = calender.getToday().getFullYear(),
+
+                value = ((displayedYear / 10) | 0) * 10;
+
+            // 设置顶部标题。
+            calender.query('.x-monthcalender-title').setText(value + '-' + (value + 9));
+
+            value--;
+
+            MonthCalender._renderContentOfMonthYears(calender, useProxy, function (c) {
+
+                var html = '<a href="javascript:;" class="';
+
+                if (value < minValue || value > maxValue) {
+                    html += 'x-monthcalender-disabled ';
+                }
+
+                if (c === 0 || c === 11) {
+                    html += 'x-monthcalender-alt ';
+                }
+
+                if (selectedYear == value) {
+                    html += 'x-monthcalender-selected ';
+                }
+
+                if (activedYear == value) {
+                    html += 'x-monthcalender-selected ';
+                }
+
+                html += '">' + value + '</a>';
+
+                value++;
+
+                return html;
+
+            });
+        },
+
+        select: function (calender, item) {
+
+            calender.displayedValue.setYear(+item.getText());
+
+            calender.setView(MonthCalender.MonthView);
+
+        },
+
+        parentView: 'DecadeView',
+
+        move: function (calender, delta) {
+            calender.displayedValue.addYear(delta * 10);
+        }
+
+    },
+
+    DecadeView: {
+
+        render: function (calender, useProxy) {
+
+            // 获取当前年 。
+            var displayedYear = calender.displayedValue.getFullYear(),
+
+                // 要渲染的日期的最小值。
+                minValue = calender.minValue && calender.minValue.getFullYear(),
+
+                // 要渲染的日期的最大值。
+                maxValue = calender.maxValue && calender.maxValue.getFullYear(),
+
+                // 需要添加 selected 的日期值。
+                selectedYear = calender.getValue().getFullYear(),
+
+                // 需要添加 actived 的日期值。
+                activedYear = calender.getToday().getFullYear(),
+
+                value = ((displayedYear / 100) | 0) * 100;
+
+            // 设置顶部标题。
+            calender.query('.x-monthcalender-title').setText(value + '-' + (value + 99));
+
+            value--;
+
+            MonthCalender._renderContentOfMonthYears(calender, useProxy, function (c) {
+
+                var html = '<a href="javascript:;" data-value="' + (value + 5) + '" class="x-monthcalender-decade ';
+
+                if (value + 10 < minValue || value > maxValue) {
+                    html += 'x-monthcalender-disabled ';
+                }
+
+                if (c === 0 || c === 11) {
+                    html += 'x-monthcalender-alt ';
+                }
+
+                if (selectedYear >= value && selectedYear <= value + 9) {
+                    html += 'x-monthcalender-selected ';
+                }
+
+                if (activedYear >= value && activedYear <= value + 9) {
+                    html += 'x-monthcalender-selected ';
+                }
+
+                html += '">' + value + '-<br>' + (value + 9) + '&nbsp;</a>';
+
+                value += 10;
+
+                return html;
+
+            });
+
+        },
+
+        parentView: 'DecadeView',
+
+        select: function (calender, item) {
+
+            calender.displayedValue.setYear(+item.getAttr('data-value'));
+
+            calender.setView(MonthCalender.YearView);
+
+        },
+
+        move: function (calender, delta) {
+            calender.displayedValue.addYear(delta * 100);
+        }
+    },
+
+    months: "一月 二月 三月 四月 五月 六月 七月 八月 九月 十月 十一月 十二月".split(' '),
+
+    weeks: {
+        sunday: '日',
+        monday: '一',
+        tuesday: '二',
+        wednesday: '三',
+        thursday: '四',
+        friday: '五',
+        saturday: '六'
+    },
+
+    monthFormat: 'yyyy年M月',
+
+    todayFormat: '今天: yyyy年M月d日'
+
+});

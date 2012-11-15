@@ -10,7 +10,7 @@
 .x-treeview-plain {
   border: 0;
 }
-.x-treeview-item {
+.x-treeview li {
   white-space: nowrap;
 }
 .x-treenode,

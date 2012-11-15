@@ -8,7 +8,7 @@
   margin: 0px;
   padding: 2.8px;
 }
-.x-menu-item {
+.x-menu li {
   outline-color: -moz-use-text-color;
   outline-style: none;
   outline-width: 0;
@@ -51,7 +51,7 @@
   border-color: transparent;
   margin-left: -1px;
 }
-.x-menu-item,
+.x-menu li,
 .x-menuitem,
 .x-menu-handle-top,
 .x-menu-handle-bottom {
@@ -82,7 +82,7 @@
   border-bottom: 1px solid #FFFFFF;
   *font-size: expression(this.runtimeStyle.fontSize = this.parentNode.runtimeStyle.lineHeight = this.parentNode.runtimeStyle.fontSize = 0);
 }
-.x-menu-item .x-icon {
+.x-menu li .x-icon {
   margin-left: 3px;
   margin-right: 10px;
 }

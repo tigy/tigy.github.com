@@ -423,7 +423,7 @@ using("System.Core.Base");
 		/**
 		 * 一个返回 true 的函数。
 		 */
-		returnTrue = Function.from(true),
+		returnTrue = function () { return true; },
 
 		/**
 		 * 用于测试的元素。
@@ -1053,10 +1053,7 @@ using("System.Core.Base");
 	 	 * </pre>        
 		 */
 		parse: function(html, context, cachable) {
-
-			assert.notNull(html, 'Dom.parse(html, context, cachable): {html} ~');
-
-			return html.node ? html: new Dom(Dom.parseNode(html, context, cachable));
+		    return (html = Dom.parseNode(html, context, cachable)) ? html.nodeType ? new Dom(html) : html : null;
 		},
 
 		/**
@@ -1117,20 +1114,21 @@ using("System.Core.Base");
 		 * @return {Element/TextNode/DocumentFragment} 如果 HTML 是纯文本，返回 TextNode。如果 HTML 包含多个节点，返回 DocumentFragment 。否则返回 Element。
 	 	 * @static
 		 */
-		parseNode: function(html, context, cachable) {
+		parseNode: function (html, context, cachable) {
 
 			// 不是 html，直接返回。
 			if( typeof html === 'string') {
 
-				var srcHTML = html;
+			    var srcHTML = html;
+
+                // 仅缓存 512B 以内的 HTML 字符串。
+			    cachable = cachable !== false && srcHTML.length < 512;
+			    context = context && context.ownerDocument || document;
+
+			    assert(context.createElement, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
 
 				// 查找是否存在缓存。
-				html = cache[srcHTML];
-				context = context && context.ownerDocument || document;
-
-				assert(context.createElement, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
-
-				if(html && html.ownerDocument === context) {
+			    if (cachable && (html = cache[srcHTML]) && html.ownerDocument === context) {
 
 					// 复制并返回节点的副本。
 					html = html.cloneNode(true);
@@ -1138,8 +1136,7 @@ using("System.Core.Base");
 				} else {
 
 					// 测试查找 HTML 标签。
-					var tag = /<([\w:]+)/.exec(srcHTML);
-					cachable = cachable !== false;
+					var tag = /<([!\w:]+)/.exec(srcHTML);
 
 					if(tag) {
 
@@ -1173,11 +1170,20 @@ using("System.Core.Base");
 						if (html.previousSibling) {
 							wrap = html.parentNode;
 
-							assert(context.createDocumentFragment, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
-							html = context.createDocumentFragment();
-							while (wrap.firstChild) {
-								html.appendChild(wrap.firstChild);
+							//if (createDocumentFragment) {
+							//    assert(context.createDocumentFragment, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
+							//    html = context.createDocumentFragment();
+							//    while (wrap.firstChild) {
+							//        html.appendChild(wrap.firstChild);
+							//    }
+							//} else {
+							html = new DomList();
+							for (srcHTML = wrap.firstChild; srcHTML; srcHTML = srcHTML.nextSibling) {
+							    html.push(srcHTML);
 							}
+
+							cachable = false;
+							//}
 						} else {
 
 							// 删除用于创建节点的父 DIV 标签。
@@ -1560,10 +1566,10 @@ using("System.Core.Base");
 					// IE and Opera will allow us to reuse the iframeDoc without re-writing the fake HTML
 					// document to it; WebKit & Firefox won't allow reusing the iframe document.
 					iframeDoc =  ( iframe.contentWindow || iframe.contentDocument ).document;
-					frameDoc.write("<!doctype html><html><body>");
+					iframeDoc.write("<!doctype html><html><body>");
 					iframeDoc.close();
 
-					elem = iframeDoc.body.appendChild( iframeDoc.createElement(nodeName) );
+					elem = iframeDoc.body.appendChild(iframeDoc.createElement(tagName));
 					display = getStyle(elem, 'display');
 					document.body.removeChild( iframe );
 				}
@@ -1846,7 +1852,7 @@ using("System.Core.Base");
 			var elem = this.node;
 			//if (elem.nodeType == 1)
 			//	each(elem.getElementsByTagName("*"), clean);
-			while (elem = this.last(true))
+			while (elem = this.last(null))
 				this.removeChild(elem);
 			return this;
 		},
@@ -1995,7 +2001,7 @@ using("System.Core.Base");
 			return this;
 		} : 'onselectstart' in div ? function(value) {
 			assert.isElement(this.node, "Dom#unselectable(value): 当前 dom 不支持此操作");
-			this.node.onselectstart = value !== false ? Function.from(false) : null;
+			this.node.onselectstart = value !== false ? function () { return false; } : null;
 			return this;
 		} : function(value) {
 			assert.isElement(this.node, "Dom#unselectable(value): 当前 dom 不支持此操作");
@@ -2092,7 +2098,7 @@ using("System.Core.Base");
 					me.setStyle(key, value);
 
 				// .setKey(value)
-				else if (Object.isFunction(me[setter = 'set' + key.capitalize()]))
+				else if (typeof me[setter = 'set' + key.capitalize()] === 'function')
 					me[setter](value);
 
 				// 如果是当前对象的成员。
@@ -2101,7 +2107,7 @@ using("System.Core.Base");
 					setter = me[key];
 
 					// .key(value)
-					if (Object.isFunction(setter))
+					if (typeof setter === 'function')
 						me[key](value);
 
 					// .key.set(value)
@@ -2114,7 +2120,7 @@ using("System.Core.Base");
 					
 				// .on(event, value)
 				} else if (/^on(\w+)/.test(key))
-					me.on(RegExp.$1, value);
+				    value && me.on(RegExp.$1, value);
 
 				// .setAttr(attr, value);
 				else
@@ -2368,7 +2374,7 @@ using("System.Core.Base");
 		 */
 		setOffset: function(offsetPoint) {
 
-			assert(Object.isObject(offsetPoint), "Dom#setOffset(offsetPoint): {offsetPoint} 必须有 'x' 和 'y' 属性。", offsetPoint);
+		    assert(offsetPoint, "Dom#setOffset(offsetPoint): {offsetPoint} 必须有 'x' 和 'y' 属性。", offsetPoint);
 			var style = this.node.style;
 
 			if (offsetPoint.y != null)
@@ -2446,22 +2452,23 @@ using("System.Core.Base");
 			
 			var eventName, selector;
 			
-			if(Object.isObject(eventAndSelector)){
-				for(eventName in eventAndSelector) {
-					this.on(eventName, eventAndSelector[eventName]);
-				}
+			if (typeof eventAndSelector === 'string') {
+
+			    eventName = (/^\w+/.exec(eventAndSelector) || [''])[0];
+
+			    assert(eventName, "Dom#bind(eventAndSelector, handler): {eventAndSelector} 中不存在事件信息。正确的 eventAndSelector 格式： click.selector")
+
+			    if (selector = eventAndSelector.substr(eventName.length)) {
+			        this.delegate(selector, eventName, handler);
+			    } else {
+			        this.on(eventName, handler);
+			    }
 			} else {
-				
-				eventName = (/^\w+/.match(eventAndSelector) || [''])[0];
-					
-				assert(eventName, "Dom#bind(eventAndSelector, handler): {eventAndSelector} 中不存在事件信息。正确的 eventAndSelector 格式： click.selector")
-				
-				if(selector = eventAndSelector.substr(eventName.length)){
-					this.delegate(eventName, delegateEventName, handler);
-				} else {
-					this.on(eventName, handler);
-				}
-				
+
+			    for (eventName in eventAndSelector) {
+			        this.bind(eventName, eventAndSelector[eventName]);
+			    }
+
 			}
 			
 			return this;
@@ -2884,7 +2891,7 @@ using("System.Core.Base");
 
 		/**
 		 * 获取当前 Dom 对象的指定位置的直接子节点。
-		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。如果 args 是小于 0 的数字，则从末尾开始计算。
+		 * @param {Integer} index 用于查找子元素的 CSS 选择器 或者 元素在 Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。如果 args 是小于 0 的数字，则从末尾开始计算。
 		 * @return {Dom} 返回一个节点对象。如果不存在，则返回 null 。
 		 * @example
 		 * 获取第1个子节点。
@@ -2893,8 +2900,31 @@ using("System.Core.Base");
 		 * #####JavaScript:
 		 * <pre>Dom.find("span").child(1)</pre>
 		 */
-		child: function(args) {
-			return ~args >= 0 ? this.last(~args) : this.first(args);
+		child: function(index) {
+			
+			//assert(typeof index === 'function' || typeof index === 'number' || typeof index === 'string' , 'Dom#child(index): {index} 必须是函数、数字或字符串。');
+			
+			var first = 'firstChild',
+				next = 'nextSibling',
+				isNumber = typeof index === 'number';
+			
+			if(index < 0){
+				index = ~index;
+				first = 'lastChild';
+				next = 'previousSibling';
+			}
+			
+			first = this.node[first];
+			
+			while(first){
+				if(first.nodeType === 1 && (isNumber ? index-- <= 0 : quickMatch(first, index))){
+					return new Dom(first);
+				}
+				
+				first = first[next];
+			}
+			
+			return null;
 		},
 
 		/**
@@ -2919,8 +2949,17 @@ using("System.Core.Base");
 		 * closest 和 parent 最大区别就是 closest 会测试当前的元素。
 		 */
 		closest: function(selector, context) {
-			selector = typeof selector === 'function' ? selector(this, this.node) : this.match(selector) ? this : this.parent(selector);
-			return selector && (!context || Dom.get(context).has(selector)) ? selector : null;
+			var node = this.node;
+				
+			while(node) {
+				if(quickMatch(node, selector)){
+					return (!context || Dom.get(context).has(node)) ? new Dom(node) : null;
+				}
+				
+				node = node.parentNode;
+			}
+			
+			return null;
 		},
 
 		/**
@@ -3281,7 +3320,7 @@ using("System.Core.Base");
 		 * @return {Dom} 返回插入的新节点对象。
 		 */
 		prepend: function(ctrl, dom) {
-			return ctrl.insertBefore(dom, ctrl.first(true));
+			return ctrl.insertBefore(dom, ctrl.first(null));
 		},
 
 		/**
@@ -3301,7 +3340,7 @@ using("System.Core.Base");
 		 */
 		after: function(ctrl, dom) {
 			var p = ctrl.parentControl || ctrl.parent();
-			return p ? p.insertBefore(dom, ctrl.next(true)) : null;
+			return p ? p.insertBefore(dom, ctrl.next(null)) : null;
 		},
 
 		/**
@@ -3346,41 +3385,58 @@ using("System.Core.Base");
 		}
 
 	}, function(value, key) {
-		dp[key] = function(html) {
-			html = Dom.parse(html, this);
+	    dp[key] = function (html) {
 
 			var scripts,
-				i = 0,
+				i,
 				script,
-				r = value(this, html);
+				t;
 
-			if (html.node.tagName === 'SCRIPT') {
-				scripts = [html.node];
-			} else {
-				scripts = html.getElements('SCRIPT');
-			}
-
-			// 如果存在脚本，则一一执行。
-			while (script = scripts[i++]) {
-				if (!script.type || /\/(java|ecma)script/i.test(script.type)) {
-
-					if (script.src) {
-						assert(window.Ajax && Ajax.send, "必须载入 System.Request.Script 模块以支持动态执行 <script src=''>");
-						Ajax.send({
-							url: script.src,
-							type: "GET",
-							dataType: 'script',
-							async: false
-						});
-						//    script.parentNode.removeChild(script);
+	        if (html = Dom.parse(html, this)) {
+	        	if(html instanceof DomList){
+		        	t = Dom.getDocument(this.node).createDocumentFragment();
+		            for (i = 0; i < html.length; i++) {
+		                t.appendChild(html[i]);
+		            }
+		            
+		            t = new Dom(t);
+		            scripts = t.getElements('SCRIPT');
+		            value(this, t);
+		        } else {
+		        	t = html;
+		        	if (t.node.tagName === 'SCRIPT') {
+						scripts = [t.node];
 					} else {
-						window.execScript(script.text || script.textContent || script.innerHTML || "");
+						scripts = t.getElements('SCRIPT');
 					}
-
+		        	html = value(this, t);
+		        }
+		        
+		        i = 0;
+	
+				// 如果存在脚本，则一一执行。
+				while (script = scripts[i++]) {
+					if (!script.type || /\/(java|ecma)script/i.test(script.type)) {
+	
+						if (script.src) {
+							assert(window.Ajax && Ajax.send, "必须载入 System.Ajax.Script 模块以支持动态执行 <script src=''>");
+							Ajax.send({
+								url: script.src,
+								type: "GET",
+								dataType: 'script',
+								async: false
+							});
+							//    script.parentNode.removeChild(script);
+						} else {
+							window.execScript(script.text || script.textContent || script.innerHTML || "");
+						}
+	
+					}
 				}
+				
 			}
 
-			return r;
+			return html;
 		};
 
 		DomList.prototype[key] = function(html) {
@@ -3464,7 +3520,7 @@ using("System.Core.Base");
 	}
 
 	// document 函数。
-	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize first last parent child children has', function (fnName) {
+	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize has', function (fnName) {
 		document[fnName] = dp[fnName];
 	});
 	
@@ -3804,7 +3860,7 @@ using("System.Core.Base");
 		return function (fn, scope) {
 			
 			// 忽略参数不是函数的调用。
-			var isFn = Object.isFunction(fn);
+		    var isFn = typeof fn === 'function';
 
 			// 如果已载入，则直接执行参数。
 			if(Dom[isReadyOrIsLoad]) {
@@ -3984,6 +4040,16 @@ using("System.Core.Base");
 		assert.isNode(node, 'Dom.getDocument(node): {node} ~', node);
 		return node.ownerDocument || node.document || node;
 	}
+	
+	/**
+	 * 快速判断一个节点满足制定的过滤器。
+	 * @param {Node} elem 元素。
+	 * @param {String/Function/Undefined} filter 过滤器。
+	 * @return {Boolean} 返回结果。
+	 */
+	function quickMatch(elem, filter){
+		return !filter || (typeof filter === 'string' ? /^(?:[-\w:]|[^\x00-\xa0]|\\.)+$/.test(filter) ? elem.tagName === filter.toUpperCase() : Dom.match(elem, filter) : filter(elem));
+	}
 
 	/**
 	 * 返回简单的遍历函数。
@@ -3993,20 +4059,24 @@ using("System.Core.Base");
 	 */
 	function createTreeWalker(next, first) {
 		first = first || next;
-		return function(args) {
+		return function(filter) {
 			var node = this.node[first];
 			
-			// 如果存在 args 编译为函数。
-			if(args){
-				args = getFilter(args);
+			// 如果 filter === null，则表示获取任意 nodeType 的节点。
+			if(filter === null){
+				return node ? new Dom(node) : node;
 			}
 			
-			while(node) {
-				if(args ? args.call(this, node) : node.nodeType === 1)
-					return new Dom(node);
+			// 找到第一个nodeType == 1 的节点。
+			while(node && node.nodeType !== 1) {
 				node = node[next];
 			}
 			
+			// 如果存在过滤器，执行过滤器。
+			if(node && quickMatch(node, filter)){
+				return new Dom(node);
+			}
+		
 			return null;
 		};
 	}
@@ -4019,63 +4089,19 @@ using("System.Core.Base");
 	 */
 	function createTreeDir(next, first) {
 		first = first || next;
-		return function(args) {
+		return function(filter) {
 			var node = this.node[first],
 				r = new DomList;
 
-			// 如果存在 args 编译为函数。
-			if (args) {
-				args = getFilter(args);
-			}
-
+			// 如果 filter === null，则表示获取任意 nodeType 的节点。
 			while (node) {
-				if (args ? args.call(this, node) : node.nodeType === 1)
+				if ((node.nodeType === 1 && quickMatch(node, filter)) || filter === null)
 					r.push(node);
 				node = node[next];
 			}
 
 			return r;
 		}
-	}
-	
-	/**
-	 * 获取一个选择器。
-	 * @param {Number/Function/String/Boolean} args 参数。
-	 * @return {Funtion} 函数。
-	 */
-	function getFilter(args) {
-		
-		// 如果存在 args，则根据不同的类型返回不同的检查函数。
-		switch (typeof args) {
-			
-			// 数字返回一个计数器函数。
-			case 'number':
-				return function(elem) {
-					return elem.nodeType === 1 && --args < 0;
-				};
-				
-				// 字符串，表示选择器。
-			case 'string':
-				if(/^(?:[-\w:]|[^\x00-\xa0]|\\.)+$/.test(args)) {
-					args = args.toUpperCase();
-					return function(elem) {
-						return elem.nodeType === 1 && elem.tagName === args;
-					};
-				}
-				return args === '*' ? null : function(elem) {
-					return elem.nodeType === 1 && Dom.match(elem, args);
-				};
-				
-				// 布尔类型，而且是 true, 返回 Function.from(true)，  表示不过滤。
-			case 'boolean':
-				args = returnTrue;
-				break;
-			
-		}
-
-		assert.isFunction(args, "Dom#xxxAll(args): {args} 必须是一个 null、函数、数字或字符串。", args);
-		
-		return args;
 	}
 	
 	/**

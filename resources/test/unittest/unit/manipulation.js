@@ -12,7 +12,7 @@ test("Dom.prototype.getText", function() {
 	equal( new Dom(document.createTextNode("foo")).getText(), "foo", "Text node was retreived from .getText()." );
 
 	var val = "<div><b>Hello</b> cruel world!</div>";
-	equal( Dom.get("foo").setText(val).dom.innerHTML.replace(/>/g, "&gt;"), "&lt;div&gt;&lt;b&gt;Hello&lt;/b&gt; cruel world!&lt;/div&gt;", "Check escaped text" );
+	equal( Dom.get("foo").setText(val).node.innerHTML.replace(/>/g, "&gt;"), "&lt;div&gt;&lt;b&gt;Hello&lt;/b&gt; cruel world!&lt;/div&gt;", "Check escaped text" );
 
 	document.getElementById("text1").value = "bla";
 	equal( Dom.get("text1").getText(), "bla", "Check for modified value of input element" );
@@ -240,11 +240,11 @@ test("Dom.prototype.append", function() {
 	
 	// QUnit.reset();
 	// Dom.get("sap").append( 5 );
-	// ok( Dom.get("sap").dom.innerHTML.match( /5$/ ), "Check for appending a number" );
+	// ok( Dom.get("sap").node.innerHTML.match( /5$/ ), "Check for appending a number" );
 
 	QUnit.reset();
 	Dom.get("sap").append(  " text with spaces " );
-	ok( Dom.get("sap").dom.innerHTML.match(/ text with spaces $/), "Check for appending text with spaces" );
+	ok( Dom.get("sap").node.innerHTML.match(/ text with spaces $/), "Check for appending text with spaces" );
 
 	QUnit.reset();
 	ok( Dom.get("sap").append("" ), "Check for appending an empty string." );
@@ -284,7 +284,7 @@ test("Dom.prototype.append", function() {
 	QUnit.reset();
 	var pass = true;
 	try {
-		var body = Dom.get("iframe").dom.contentWindow.document.body;
+		var body = Dom.get("iframe").node.contentWindow.document.body;
 	
 		if(body !== null) {
 			pass = false;
@@ -308,7 +308,7 @@ test("Dom.prototype.append", function() {
 	// equal( Dom.get("table").get("last").tagName.toLowerCase(), "colgroup", "Append colgroup" );
 
 	colgroup.append ( "<col/>" );
-	equal( colgroup.last().dom.tagName, "COL", "Append col" );
+	equal( colgroup.last().node.tagName, "COL", "Append col" );
 	
 	// QUnit.reset();
 	// Dom.get("table").append( "<caption></caption>" );
@@ -399,10 +399,10 @@ test("Dom.prototype.append(xml)", function() {
 		// Initialize DOM based upon latest installed MSXML or Netscape
 		var elem,
 			aActiveX =
-				[ "MSXML6.DomDocument",
-				"MSXML3.DomDocument",
-				"MSXML2.DomDocument",
-				"MSXML.DomDocument",
+				[ "MSXML6.nodeDocument",
+				"MSXML3.nodeDocument",
+				"MSXML2.nodeDocument",
+				"MSXML.nodeDocument",
 				"Microsoft.XmlDom" ];
 
 		if ( document.implementation && "createDocument" in document.implementation ) {
@@ -572,7 +572,7 @@ test("Dom.prototype.append(html)", function() {
 	equal( Dom.get("en").getText().replace(/[\r\n]/g, ""), expected, "Insert Dom.parse after" );
 
 	var set = Dom.parse("<div/>").append(   "<span>test</span>");
-	equal( set.dom.nodeName.toLowerCase(), "span", "Insert the element after the disconnected node." );
+	equal( set.node.nodeName.toLowerCase(), "span", "Insert the element after the disconnected node." );
 });
 
 test("Dom.prototype.replaceWith", function() {
@@ -629,7 +629,7 @@ test("Dom.prototype.replaceWith", function() {
 	QUnit.reset();
 
 	var set = Dom.parse("<div/>").replaceWith( "<span>test</span>" );
-	equal( set.dom.nodeName.toLowerCase(), "span", "Replace the disconnected node." );
+	equal( set.node.nodeName.toLowerCase(), "span", "Replace the disconnected node." );
 
 	var div = Dom.parse("<div class='replacewith'></div>").appendTo();
 	// TODO: Work on Dom.parse(...) inline script execution
@@ -666,7 +666,7 @@ test("Dom.parse.clone() (#8017)", function() {
 	var main = Dom.get("qunit-fixture"),
 			clone = main.clone();
 
-	equal( main.dom.childNodes.length, clone.dom.childNodes.length, "Simple child length to ensure a large dom tree copies correctly" );
+	equal( main.node.childNodes.length, clone.node.childNodes.length, "Simple child length to ensure a large dom tree copies correctly" );
 
 	
 	Dom.get("qunit-fixture").append("<select class='test8070'></select><select class='test8070'></select>");
@@ -696,7 +696,7 @@ test("Dom.prototype.clone", function() {
 	];
 	for (var i = 0; i < cloneTags.length; i++) {
 		var j = Dom.parse(cloneTags[i]);
-		equal( j.dom.tagName, j.clone().dom.tagName, "Clone a " + cloneTags[i]);
+		equal( j.node.tagName, j.clone().node.tagName, "Clone a " + cloneTags[i]);
 	}
 	
 	var div = Dom.parse("<div><ul><li>test</li></ul></div>").on('click' ,function(){
@@ -713,7 +713,7 @@ test("Dom.prototype.clone", function() {
 	// manually clean up detached elements
 	clone.remove();
 
-	equal( div.dom.nodeName.toUpperCase(), "DIV", "DIV element cloned" );
+	equal( div.node.nodeName.toUpperCase(), "DIV", "DIV element cloned" );
 	div.trigger("click");
 
 	// manually clean up detached elements
@@ -726,7 +726,7 @@ test("Dom.prototype.clone", function() {
 	});
 
 	clone = div.clone(true);
-	equal( clone.dom.nodeName.toUpperCase(), "DIV", "DIV element cloned" );
+	equal( clone.node.nodeName.toUpperCase(), "DIV", "DIV element cloned" );
 	clone.find("table").trigger("click");
 
 	// manually clean up detached elements
@@ -759,7 +759,7 @@ test("Dom.prototype.clone", function() {
 
 	clone = div.clone(true);
 	equal( clone.getHtml(), div.getHtml(), "Element contents cloned" );
-	equal( clone.dom.nodeName.toUpperCase(), "DIV", "DIV element cloned" );
+	equal( clone.node.nodeName.toUpperCase(), "DIV", "DIV element cloned" );
 
 	// manually clean up detached elements
 	div.remove();
@@ -784,7 +784,7 @@ test("clone(form element) (Bug #3879, #6655)", function() {
 	element = Dom.parse("<input type='checkbox' value='foo'>").setAttr("checked", "checked");
 	clone = element.clone();
 
-	equal( clone.dom.defaultValue, "foo", "Checked input defaultValue cloned correctly" );
+	equal( clone.node.defaultValue, "foo", "Checked input defaultValue cloned correctly" );
 
 	// defaultChecked also gets set now due to setAttribute in attr, is this check still valid?
 	// equal( clone[0].defaultChecked, !Dom.parse.support.noCloneChecked, "Checked input defaultChecked cloned correctly" );
@@ -823,9 +823,9 @@ test("Dom.prototype.setHtml", function() {
 	equal( div.children().length, 2, "Make sure two child nodes exist." );
 	equal( div.children().children().length, 1, "Make sure that a grandchild exists." );
 
-	var space = Dom.parse("<div/>").setHtml( "&#160;" ).dom.innerHTML;
+	var space = Dom.parse("<div/>").setHtml( "&#160;" ).node.innerHTML;
 	ok( /^\xA0$|^&nbsp;$/.test( space ), "Make sure entities are passed through correctly." );
-	equal( Dom.parse("<div/>").setHtml( "&amp;" ).dom.innerHTML, "&amp;", "Make sure entities are passed through correctly." );
+	equal( Dom.parse("<div/>").setHtml( "&amp;" ).node.innerHTML, "&amp;", "Make sure entities are passed through correctly." );
 
 	Dom.get("qunit-fixture").setHtml( "<style>.foobar{color:green;}</style>" );
 
@@ -848,8 +848,8 @@ test("Dom.prototype.setHtml", function() {
 
 	var map = Dom.parse("<map/>").setHtml("<area id='map01' shape='rect' coords='50,50,150,150' href='http://www.jquery.com/' alt='Dom.parse'>");
 
-	equal( map.dom.childNodes.length, 1, "The area was inserted." );
-	equal( map.dom.firstChild.nodeName.toLowerCase(), "area", "The area was inserted." );
+	equal( map.node.childNodes.length, 1, "The area was inserted." );
+	equal( map.node.firstChild.nodeName.toLowerCase(), "area", "The area was inserted." );
 
 	QUnit.reset();
 
@@ -858,8 +858,8 @@ test("Dom.prototype.setHtml", function() {
 	var child = Dom.get("qunit-fixture").query("script");
 
 	equal( child.length, 6, "Make sure that two non-JavaScript script tags are left." );
-	equal( child.item(0).dom.type, "something/else", "Verify type of script tag." );
-	equal( child.item(-1).dom.type, "something/else", "Verify type of script tag." );
+	equal( child.item(0).node.type, "something/else", "Verify type of script tag." );
+	equal( child.item(-1).node.type, "something/else", "Verify type of script tag." );
 
 	Dom.get("qunit-fixture").setHtml("<script>ok( true, 'Test repeated injection of script.' );</script>");
 	Dom.get("qunit-fixture").setHtml("<script>ok( true, 'Test repeated injection of script.' );</script>");

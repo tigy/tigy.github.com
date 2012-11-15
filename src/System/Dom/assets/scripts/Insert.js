@@ -1,4 +1,11 @@
-﻿/** * @author  */Dom.implement({
+﻿/**
+ * @author 
+ */
+
+
+
+
+Dom.implement({
 
 	/**
 	 * 在某个位置插入一个HTML 。
@@ -33,7 +40,7 @@
 
 		switch (where) {
 			case "afterEnd":
-				refChild = me.next(true);
+				refChild = me.next(null);
 
 				// 继续。
 			case "beforeBegin":
@@ -41,7 +48,7 @@
 				assert(parentControl, "Dom.prototype.insert(where, html): 节点无父节点时无法执行 insert({where})。", where);
 				break;
 			case "afterBegin":
-				refChild = me.first(true);
+				refChild = me.first(null);
 				break;
 			default:
 				refChild = null;
@@ -50,4 +57,6 @@
 
 		parentControl.insertBefore(html, refChild);
 		return html;
-	}}, 3);
+	}
+
+}, 3);

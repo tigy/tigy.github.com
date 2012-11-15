@@ -13,11 +13,11 @@ var DatePicker = Picker.extend({
 	
 	format: 'yyyy/M/d',
 	
-	dropDownWidth: -1,
+	dropDownWidth: 'auto',
 	
 	dropDownButtonTpl: '<button class="x-button"><span class="x-icon x-icon-calendar"></span></button>',
 	
-	createDropDown: function(existDom){
+	initDropDown: function(existDom){
 		return new MonthCalender(existDom).on('select', this.selectItem, this);
 	},
 	

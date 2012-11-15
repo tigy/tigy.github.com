@@ -1,6 +1,8 @@
 /**
  * @author xuld
  */
+ 
+using("System.Core.Base");
 
 /**
  * 用于异步执行任务时保证任务是串行的。

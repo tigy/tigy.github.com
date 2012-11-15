@@ -11128,7 +11128,7 @@ var IInput = {
 	 * @protected
 	 * @type {Control}
 	 */
-	hiddenField: null,
+	inputProxy: null,
 	
 	/**
 	 * 当设置文本时执行此函数。
@@ -11152,17 +11152,17 @@ var IInput = {
 	input: function(){
 		
 		// 如果不存在隐藏域。
-		if(!this.hiddenField) {
+		if(!this.inputProxy) {
 			
 			// 如果 当前元素是表单元素，直接返回。
 			if(/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(this.node.tagName)){
 				return this;
 			}
 			
-			this.hiddenField = this.createHiddenField();
+			this.inputProxy = this.createHiddenField();
 		}
 		
-		return this.hiddenField;
+		return this.inputProxy;
 	},
 	
 	/**
@@ -11459,7 +11459,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 	input: function(){
 		
 		// 如果不存在隐藏域。
-		if(!this.hiddenField) {
+		if(!this.inputProxy) {
 			
 			var textBox = this.find('.x-textbox');
 			
@@ -11467,11 +11467,11 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 				return textBox;	
 			}
 			
-			this.hiddenField = Dom.parse('<input type="hidden">').appendTo(this);
-			this.hiddenField.setAttr('name', Dom.getAttr(this.node, 'name'));
+			this.inputProxy = Dom.parse('<input type="hidden">').appendTo(this);
+			this.inputProxy.setAttr('name', Dom.getAttr(this.node, 'name'));
 		}
 		
-		return this.hiddenField;
+		return this.inputProxy;
 	},
 	
 	/**
@@ -11513,7 +11513,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 		if(elem && !elem.hasClass('x-dropdown')) {
 			elem = null;
 		}
-		this.setDropDown(this.createDropDown(elem));
+		this.setDropDown(this.initDropDown(elem));
 		
 		// 设置菜单显示的事件。
 		(this.dropDownList ? this : this.button()).on('click', this.toggleDropDown, this);
@@ -11571,7 +11571,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 	 * 创建当前 Picker 的菜单。
 	 * @return {Control} 下拉菜单。
 	 */
-	createDropDown: function(existDom){
+	initDropDown: function(existDom){
 		return existDom || Dom.parse('<div/>');
 	},
 	
@@ -12661,13 +12661,13 @@ var ComboBox = Picker.extend({
 	 * @return {Control} 下拉菜单。
 	 * @protected virtual
 	 */
-	createDropDown: function(existDom){
+	initDropDown: function(existDom){
 		return new ComboBox.DropDownMenu(existDom);
 	},
 	
 	_syncSelect: function(){
-		var selected = this.hiddenField.find(':selected');
-		this.first().setText(selected ? selected.getText() : this.hiddenField.getAttr('placeholder'));
+		var selected = this.inputProxy.find(':selected');
+		this.first().setText(selected ? selected.getText() : this.inputProxy.getAttr('placeholder'));
 	},
 	
 	/**
@@ -12690,7 +12690,7 @@ var ComboBox = Picker.extend({
 		
 		// 如果是 dropDownList, 还需要更新 <select> 的值。
 		if(this.dropDownList){
-			var elem = this.hiddenField.node,
+			var elem = this.inputProxy.node,
 				oldIndex = elem.selectedIndex;
 			if(item == null){
 				elem.selectedIndex = -1;
@@ -12769,7 +12769,7 @@ var ComboBox = Picker.extend({
 			
 		if(selectNode) {
 			
-			this.hiddenField = selectNode = new Dom(selectNode);
+			this.inputProxy = selectNode = new Dom(selectNode);
 			
 			// 让 listBox 拷贝 <select> 的成员。
 			this.copyItemsFromSelect(selectNode);
@@ -13121,7 +13121,7 @@ var Suggest = ComboBox.extend({
 	
 	init: function(options){
 		
-		var suggest = this.createDropDown().addClass('x-suggest');
+		var suggest = this.initDropDown().addClass('x-suggest');
 		
 		// UI 上增加一个下拉框。
 		this.setDropDown(suggest);

@@ -16,7 +16,7 @@ var MenuButton = Button.extend(IDropDownOwner).implement({
 	
 	tpl: '<button class="x-button x-control" type="button"><span class="x-menubutton-arrow"></span></button>',
 	
-	createDropDown: function(existDom){
+	createDropDown: function (existDom) {
 		if(existDom && !existDom.hasClass('x-menu')){
 			return existDom;
 		}
@@ -29,18 +29,16 @@ var MenuButton = Button.extend(IDropDownOwner).implement({
 	},
 	
 	init: function () {
-		this.setDropDown(this.getDropDown());
+	    this.setDropDown(this.createDropDown(this.next('.x-dropdown')));
 		this.on('click', this.toggleDropDown, this);
 	},
 	
 	onDropDownShow: function(){
 		this.state('actived', true);
-		return IDropDownOwner.onDropDownShow.apply(this, arguments);
 	},
 	
 	onDropDownHide: function(){
 	    this.state('actived', false);
-		return IDropDownOwner.onDropDownHide.apply(this, arguments);
 	},
 	
 	onDropDownClick: function(){

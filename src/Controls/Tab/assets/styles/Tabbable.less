@@ -10,14 +10,14 @@
 }
 
 // Make the list-items overlay the bottom border
-.x-tabbable-item {
+.x-tabbable li {
     margin: 0 0 -1px;
     list-style: none;
     float: left;
 }
 
 // Make links block level
-.x-tabbable-item a {
+.x-tabbable a {
     display: block;
     border: 1px solid transparent;
 	.ie6-border-transparent(@backgroundColor);
@@ -48,18 +48,18 @@
 .x-tabbable-alt {
     border-bottom: none;
 
-    .x-tabbable-item a, .x-tabbable-item a:hover {
+    li a, li a:hover {
         border-color: transparent;
         _border-color: @backgroundColor;
     }
 }
 
-.x-tabbable-alt .x-tabbable-item {
+.x-tabbable-alt li {
     margin-right: 2px;
 }
 
 // Links rendered as pills
-.x-tabbable-alt .x-tabbable-item a {
+.x-tabbable-alt  li a {
     padding-top: 5px;
     padding-bottom: 5px;
     .border-radius(@baseBorderRadius);

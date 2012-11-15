@@ -537,7 +537,7 @@ function imports(namespace) {
                     return !isEmptyObject(obj.prototype) || isUpper(name, 0) ? '类' : '函数';
 
                 // 最后判断对象。
-                if (Object.isObject(obj))
+                if (obj && typeof obj === 'object')
                     return name.charAt(0) === 'I' && isUpper(name, 1) ? '接口' : '对象';
 
                 // 空成员、值类型都作为属性。

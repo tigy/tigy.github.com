@@ -11,10 +11,13 @@ using("System.Fx.Tween");
 
 (function(){
 	
-	var displayEffects = Fx.displayEffects = {
-			opacity: Function.from({
-				opacity: 0
-			})
+    var opacity0 = {
+            opacity: 0
+        },
+
+        displayEffects = Fx.displayEffects = {
+            opacity: function () {
+                return opacity0;            }
 		},
 
 		toggle = Dom.prototype.toggle,
@@ -56,7 +59,8 @@ using("System.Fx.Tween");
 			
 			return value;
 		};
-	}, Function.from(0));
+	}, function () {
+	    return 0;	});
 	
 	Object.map('left right top bottom', function(key, index) {
 		key = 'margin' + key.capitalize();
@@ -135,7 +139,7 @@ using("System.Fx.Tween");
 			params.target = this;
 
 			assert(!params.duration || typeof params.duration === 'number', "Dom#animate(params, duration, oncomplete, link): {duration} 必须是数字。如果需要制定为默认时间，使用 -1 。", params.duration);
-			assert(!params.oncomplete || Object.isFunction(params.oncomplete), "Dom#animate(params, duration, oncomplete, link): {oncomplete} 必须是函数", params.oncomplete);
+			assert(!params.oncomplete || typeof params.oncomplete === 'function', "Dom#animate(params, duration, oncomplete, link): {oncomplete} 必须是函数", params.oncomplete);
 			
 			this.fx().run(params, link);
 			
