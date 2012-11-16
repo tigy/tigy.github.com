@@ -57,7 +57,6 @@ var MonthCalender = Control.extend({
             newStyle = newContent.node.style,
             oldStyle = oldContent.node.style;
 
-        duration /= 2;
         newContent.setStyle('opacity', 0);
         slider.style.left = oldStyle.left = newStyle.left = '1px';
         newStyle.zIndex = 2;

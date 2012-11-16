@@ -13,6 +13,17 @@ using("Controls.Core.Base");
  */
 var ContentControl = Control.extend({
 	
+	// 基本属性
+
+    /**
+	 * 当前控件的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */
+	tpl: '<div class="x-control">\
+			<div class="x-control-content"></div>\
+		</div>',
+	
     /**
 	 * 获取当前容器用于存放内容的 Dom 对象。
 	 * @return {Dom}
