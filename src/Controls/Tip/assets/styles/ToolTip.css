@@ -1,7 +1,7 @@
 .x-tooltip {
   position: absolute;
   z-index: 1020;
-  display: block;
+  display: none;
   font-size: 11px;
   opacity: 0.8;
   filter: alpha(opacity=80);

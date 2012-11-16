@@ -313,7 +313,9 @@
 	}
 	.border(@color: #fff, @alpha: 1) {
 		border-color: hsla(hue(@color), saturation(@color), lightness(@color), @alpha);
-		.background-clip(padding-box);
+		-webkit-background-clip: padding-box;
+		-moz-background-clip: padding;
+		background-clip: padding-box;
 	}
 }
 

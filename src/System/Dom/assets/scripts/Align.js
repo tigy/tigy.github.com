@@ -46,8 +46,8 @@ Dom.implement({
 				tp: dom.getPosition(),
 				ds: document.getSize(),
 				dp: document.getPosition(),
-				ox: offsetX,
-				oy: offsetY
+				ox: offsetX || 0,
+				oy: offsetY || 0
 			}, r = enableReset === false ? 0 : 2, x, y;
 			
 			if(position.length <= 1){

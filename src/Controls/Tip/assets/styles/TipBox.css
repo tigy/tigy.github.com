@@ -18,13 +18,18 @@ div.x-tipbox {
 .x-tipbox .x-closebutton {
   font-size: 16px;
   margin-left: 10px;
+  color: #AAA6A1;
 }
 .x-tipbox-success,
 .x-tipbox-error,
-.x-tipbox-info {
+.x-tipbox-info,
+.x-tipbox-warning {
   background-repeat: no-repeat;
   background-position: 8px 50%;
   padding-left: 30px;
+}
+.x-tipbox-warning {
+  background-image: url(../images/warning.png);
 }
 .x-tipbox-success {
   background-color: #ebf6e7;
@@ -33,7 +38,7 @@ div.x-tipbox {
   background-image: url(../images/success.png);
 }
 .x-tipbox-error {
-  background-color: #f2dede;
+  background-color: #f8e6e6;
   border-color: #e3b7b7;
   color: #b94a48;
   background-image: url(../images/error.png);
