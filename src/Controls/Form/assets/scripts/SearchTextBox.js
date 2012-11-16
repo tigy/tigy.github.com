@@ -27,14 +27,13 @@ var SearchTextBox = Picker.extend({
 	    var text = this.getText();
 	    if (text) {
 	        this.onSearch(text);
+	        this.trigger('search', text);
 	    }
 
 
 	},
 	
-	onSearch: function(text){
-	    this.trigger('search', text);
-	},
+	onSearch: Function.empty,
 	
 	init: function(){
 		

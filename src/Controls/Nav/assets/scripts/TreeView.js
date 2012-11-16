@@ -1,12 +1,11 @@
 /**
- * @author 
+ * @author xuld
  */
 
 
 imports("Controls.Nav.TreeView");
 using("Controls.Core.TreeControl");
 using("Controls.Core.ICollapsable");
-
 
 
 var TreeView = TreeControl.extend({
@@ -99,7 +98,7 @@ var TreeView = TreeControl.extend({
             return;
 
         if ((target = new Dom(target).closest('.x-treenode')) && (target = target.dataField().control)) {
-            this.selectNode(node);
+            this.selectNode(target);
             return false;
         }
 
@@ -190,7 +189,10 @@ var TreeNode = TreeControl.Item.extend(ICollapsable).implement({
 	 * @protected override
 	 */
 	initSubControl: function(treeControl){
-		treeControl.depth = this.depth;
+	    treeControl.depth = this.depth;
+
+        // 子树不需要选择节点的功能。
+	    treeControl.un('click', treeControl.onClick);
 	},
 	
 	// 树节点的控制。
