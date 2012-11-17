@@ -52,7 +52,7 @@ function getPostData() {
 
 function writeEditUI(dplFile) {
 
-	DplBuilderUI.writeHeader(response, '合法方案编辑');
+	DplBuilderUI.writeHeader(response, '合成方案编辑');
 	
 	DplBuilderUI.writeDplFileBuilder(response, dplFile);
 	

@@ -20,8 +20,84 @@ Dom.implement({
 	 * @param {Number} offsetY=0 偏移的y大小。
 	 * @param {Boolean} enableReset=true 如果元素超出屏幕范围，是否自动更新节点位置。
 	 */
-	align: (function(aligners){
+	align: (function(){
+
+		var aligners = {
+			
+			xc: function (opt) {
+				opt.x = opt.tp.x + (opt.ts.x - opt.s.x) / 2 + opt.ox;
+			},
+			
+			ll: function(opt, r){
+				opt.x = opt.tp.x - opt.s.x - opt.ox;
 				
+				if(r > 0 && opt.x <= opt.dp.x) {
+					aligners.rr(opt, --r);
+				}
+			},
+			
+			rr: function(opt, r){
+				opt.x = opt.tp.x + opt.ts.x + opt.ox;
+				
+				if(r > 0 && opt.x + opt.s.x >= opt.dp.x + opt.ds.x) {
+					aligners.ll(opt, --r);
+				}
+			},
+			
+			lr: function (opt, r) {
+				opt.x = opt.tp.x + opt.ox;
+				
+				if(r > 0 && opt.x + opt.s.x >= opt.dp.x + opt.ds.x) {
+					aligners.rl(opt, --r);
+				}
+			},
+			
+			rl: function (opt, r) {
+				opt.x = opt.tp.x + opt.ts.x - opt.s.x - opt.ox;
+				
+				if(r > 0 && opt.x <= opt.dp.x) {
+					aligners.lr(opt, --r);
+				}
+			},
+			
+			yc: function (opt) {
+				opt.y = opt.tp.y + (opt.ts.y - opt.s.y) / 2 + opt.oy;
+			},
+			
+			tt: function(opt, r){
+				opt.y = opt.tp.y - opt.s.y - opt.oy;
+				
+				if(r > 0 && opt.y <= opt.dp.y) {
+					aligners.bb(opt, --r);
+				}
+			},
+			
+			bb: function(opt, r){
+				opt.y = opt.tp.y + opt.ts.y + opt.oy;
+				
+				if(r > 0 && opt.y + opt.s.y >= opt.dp.y + opt.ds.y) {
+					aligners.tt(opt, --r);
+				}
+			},
+			
+			tb: function (opt, r) {
+				opt.y = opt.tp.y + opt.oy;
+				
+				if(r > 0 && opt.y + opt.s.y >= opt.dp.y + opt.ds.y) {
+					aligners.bt(opt, --r);
+				}
+			},
+			
+			bt: function (opt, r) {
+				opt.y = opt.tp.y + opt.ts.y - opt.s.y - opt.oy;
+				
+				if(r > 0 && opt.y <= opt.dp.y) {
+					aligners.tb(opt, --r);
+				}
+			}
+
+		};
+	
 		/*
 		 *      tl        tr
 		 *      ------------
@@ -71,81 +147,7 @@ Dom.implement({
 			return this.setPosition(opt);
 		};
 		
-	})({
-		
-		xc: function (opt) {
-			opt.x = opt.tp.x + (opt.ts.x - opt.s.x) / 2 + opt.ox;
-		},
-		
-		ll: function(opt, r){
-			opt.x = opt.tp.x - opt.s.x - opt.ox;
-			
-			if(r > 0 && opt.x <= opt.dp.x) {
-				aligners.rr(opt, --r);
-			}
-		},
-		
-		rr: function(opt, r){
-			opt.x = opt.tp.x + opt.ts.x + opt.ox;
-			
-			if(r > 0 && opt.x + opt.s.x >= opt.dp.x + opt.ds.x) {
-				aligners.ll(opt, --r);
-			}
-		},
-		
-		lr: function (opt, r) {
-			opt.x = opt.tp.x + opt.ox;
-			
-			if(r > 0 && opt.x + opt.s.x >= opt.dp.x + opt.ds.x) {
-				aligners.rl(opt, --r);
-			}
-		},
-		
-		rl: function (opt, r) {
-			opt.x = opt.tp.x + opt.ts.x - opt.s.x - opt.ox;
-			
-			if(r > 0 && opt.x <= opt.dp.x) {
-				aligners.lr(opt, --r);
-			}
-		},
-		
-		yc: function (opt) {
-			opt.y = opt.tp.y + (opt.ts.y - opt.s.y) / 2 + opt.oy;
-		},
-		
-		tt: function(opt, r){
-			opt.y = opt.tp.y - opt.s.y - opt.oy;
-			
-			if(r > 0 && opt.y <= opt.dp.y) {
-				aligners.bb(opt, --r);
-			}
-		},
-		
-		bb: function(opt, r){
-			opt.y = opt.tp.y + opt.ts.y + opt.oy;
-			
-			if(r > 0 && opt.y + opt.s.y >= opt.dp.y + opt.ds.y) {
-				aligners.tt(opt, --r);
-			}
-		},
-		
-		tb: function (opt, r) {
-			opt.y = opt.tp.y + opt.oy;
-			
-			if(r > 0 && opt.y + opt.s.y >= opt.dp.y + opt.ds.y) {
-				aligners.bt(opt, --r);
-			}
-		},
-		
-		bt: function (opt, r) {
-			opt.y = opt.tp.y + opt.ts.y - opt.s.y - opt.oy;
-			
-			if(r > 0 && opt.y <= opt.dp.y) {
-				aligners.tb(opt, --r);
-			}
-		}
-		
-	})
+	})()
 	
 });
 

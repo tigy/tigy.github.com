@@ -8,7 +8,7 @@ using('System.Fx.Animate');
 
 var ScrollToTop = Control.extend({
 
-    tpl: '<a href="#" class="x-scrolltotop">»Øµ½¶¥²¿</a>',
+    tpl: '<a href="#" class="x-scrolltotop">å›žåˆ°é¡¶éƒ¨</a>',
 
     showDuration: -1,
 
