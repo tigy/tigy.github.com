@@ -1613,8 +1613,8 @@
 		assert(dest != null, "Object.extend(dest, src): {dest} 不可为空。", dest);
 
 		// 直接遍历，不判断是否为真实成员还是原型的成员。
-		for (var b in src)
-			dest[b] = src[b];
+		for (var key in src)
+		    dest[key] = src[key];
 		return dest;
 	}
 
