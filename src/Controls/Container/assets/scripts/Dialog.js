@@ -5,6 +5,7 @@ imports("Controls.Part.Icon");
 imports("Controls.Part.Mask");
 imports("Controls.Part.CloseButton");
 imports("Controls.Container.Dialog");
+using("System.Fx.Animate");
 using("Controls.Core.ContainerControl");
 
 
