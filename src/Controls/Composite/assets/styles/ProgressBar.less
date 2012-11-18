@@ -12,33 +12,33 @@
 // Webkit
 @-webkit-keyframes progress-bar-stripes {
     from {
-        foreground-position: 0 0;
+        background-position: 0 0;
     }
 
     to {
-        foreground-position: 40px 0;
+        background-position: 40px 0;
     }
 }
 
 // Firefox
 @-moz-keyframes progress-bar-stripes {
     from {
-        foreground-position: 0 0;
+        background-position: 0 0;
     }
 
     to {
-        foreground-position: 40px 0;
+        background-position: 40px 0;
     }
 }
 
 // Spec
 @keyframes progress-bar-stripes {
     from {
-        foreground-position: 0 0;
+        background-position: 0 0;
     }
 
     to {
-        foreground-position: 40px 0;
+        background-position: 40px 0;
     }
 }
 
@@ -74,7 +74,7 @@
 }
 
 // Call animation for the active one
-.x-progressbar-actived .x-progressbar-fore {
+.x-progressbar-actived .x-progressbar-fore  {
     -webkit-animation: progress-bar-stripes 2s linear infinite;
     -moz-animation: progress-bar-stripes 2s linear infinite;
     animation: progress-bar-stripes 2s linear infinite;
