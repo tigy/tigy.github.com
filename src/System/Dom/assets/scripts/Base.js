@@ -3400,14 +3400,14 @@ using("System.Core.Base");
 		            }
 		            
 		            t = new Dom(t);
-		            scripts = t.getElements('SCRIPT');
+		            scripts = new DomList(t.getElements('SCRIPT'));
 		            value(this, t);
 		        } else {
 		        	t = html;
 		        	if (t.node.tagName === 'SCRIPT') {
 						scripts = [t.node];
 					} else {
-						scripts = t.getElements('SCRIPT');
+						scripts = new DomList(t.getElements('SCRIPT'));
 					}
 		        	html = value(this, t);
 		        }
