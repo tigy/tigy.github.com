@@ -3,8 +3,9 @@
 
 
 .x-placeholder {
-  color: #999999;
-  position: absolute;
-  line-height: 28px;
-  cursor: text;
+    position: absolute;
+    color: #999999;
+    position: absolute;
+    cursor: text;
+    display: inline-block;
 }

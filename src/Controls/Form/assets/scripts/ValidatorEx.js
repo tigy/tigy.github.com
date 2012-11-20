@@ -75,76 +75,7 @@ Object.extend(Validator, {
             }
 
             validator.set(attrName, val, validator.target.getAttr('msg-' + attrName));
-        }   
-
-        function initPlaceholder(validator) {
-            var placeholderContainer = getContainer('placeholder', validator);
-            var placeholder = validator.target.getAttr('placeholder');
-
-            if (!placeholderContainer) {
-                if (!placeholder)
-                    return;
-
-                // 生成自定义的 placeholderContainer 。
-                var newId = 'placeholderContainer-' + JPlus.id++;
-                validator.target.setAttr('placeholderContainer', newId);
-                placeholderContainer = Dom.create('span', 'x-placeholder');
-                placeholderContainer.setAttr('id', newId);
-
-                // var tid = validator.target.getAttr('id');
-                // if(!tid) {
-                // tid = 'placeholder-' + JPlus.id++;
-                // validator.target.setAttr('id', tid);
-                // }
-                // placeholderContainer.setAttr('for', tid);
-
-                var p = validator.target.parent().node;
-
-                Dom.movable(p);
-
-                validator.target.after(placeholderContainer);
-                placeholderContainer.setOffset(validator.target.getOffset().add(Dom.calc(validator.target.node, '{x:ml + pl + bl, y:mt}')));
-            }
-
-            if (placeholder) {
-                validator.target.setAttr('placeholder', null);
-                placeholderContainer.setHtml(placeholder);
-            }
-
-            validator.showPlaceholder = showPlaceholderContainer;
-            validator.hidePlaceholder = hidePlaceholderContainer;
-            validator.resetPlaceholder = showPlaceholderContainer;
-
-            validator.target.on('focus', hidePlaceholderContainer, validator).on('blur', showPlaceholderContainer, validator);
-
-            placeholderContainer.on(navigator.isIE6 ? 'click' : 'mousedown', clickPlaceholderContainer, validator.target);
-
-            validator.resetPlaceholder();
-        }
-
-        function clickPlaceholderContainer(e) {
-            try {
-                this.focus();
-            } catch (e) {
-
-            }
-            return false;
-        }
-
-        function hidePlaceholderContainer() {
-            if (this.target.getAttr('readonly') && !this.getText())
-                return;
-            getContainer('placeholder', this).hide();
-        }
-
-        function showPlaceholderContainer() {
-            var placeholderContainer = getContainer('placeholder', this);
-            if (this.getText()) {
-                placeholderContainer.hide();
-            } else {
-                placeholderContainer.show();
-            }
-        }
+        }  
 
         function createFormValidator(formElement) {
             var group = new Validator.Group();
