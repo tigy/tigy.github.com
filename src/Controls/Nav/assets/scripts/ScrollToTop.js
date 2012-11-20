@@ -4,11 +4,12 @@
 
 
 using('System.Fx.Animate');
+using('Controls.Core.Base');
 
 
 var ScrollToTop = Control.extend({
 
-    tpl: '<a href="#" class="x-scrolltotop">回到顶部</a>',
+    tpl: '<a href="#" class="x-scrolltotop" title="返回顶部">返回顶部</a>',
 
     showDuration: -1,
 
@@ -31,6 +32,10 @@ var ScrollToTop = Control.extend({
             }
         });
         this.on('click', this.onClick);
+		
+		if(!this.closest('body')){
+			this.appendTo();
+		}
     }
 
 });

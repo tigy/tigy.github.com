@@ -1,12 +1,41 @@
-﻿/** * AJAX 传输 JavaScript 。 * @author xuld */using("System.Ajax.Base");Ajax.accepts.script = "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript";Ajax.transports.script = {
-	getResponse: function(xhr) {
+﻿/**
+ * AJAX 传输 JavaScript 。
+ * @author xuld
+ */
+
+using("System.Ajax.Base");
+
+Ajax.accepts.script = "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript";
+
+Ajax.transports.script = {
+
+	getResponse: function(xhr) {
 		var code = Ajax.XHR.getResponse(xhr);
 		window.execScript(code);
 		return code;
-	},	send: function(options) {
+	},
+
+	send: function(options) {
 		if (!options.crossDomain) {
-			return Ajax.XHR.send.call(this, options);		}		options.type = "GET";				// cache		if (options.cache !== false) {
-			options.cache = false;						options.url = Ajax.addCachePostfix(options.url);		}		// data		if (options.data) {			options.url = Ajax.concatUrl(options.url, options.data);			options.data = null;		}		var script = options.script = document.createElement('SCRIPT'),
+			return Ajax.XHR.send.call(this, options);
+		}
+
+		options.type = "GET";
+		
+		// cache
+		if (options.cache !== false) {
+			options.cache = false;
+			
+			options.url = Ajax.addCachePostfix(options.url);
+		}
+
+		// data
+		if (options.data) {
+			options.url = Ajax.concatUrl(options.url, options.data);
+			options.data = null;
+		}
+
+		var script = options.script = document.createElement('SCRIPT'),
 			t,
 			callback = options.callback = function(errorMessage, error) {
 				var script = options.script;
@@ -21,12 +50,28 @@
 					// 删除当前脚本。
 					script.parentNode.removeChild(script);
 
-					try {												if(error < 0) {							options.status = error;							options.statusText = "";						} else {							options.status = 200;							options.statusText = "OK";						}
+					try {
+						
+						if(error < 0) {
+							options.status = error;
+							options.statusText = "";
+						} else {
+							options.status = 200;
+							options.statusText = "OK";
+						}
 
-						if (error) {														options.errorCode = error;							options.errorMessage = errorMessage;							
+						if (error) {
+							
+							options.errorCode = error;
+							options.errorMessage = errorMessage;
+							
 							if (options.error)
 								options.error.call(options.target, options.errorMessage, script);
-						} else {														options.errorCode = 0;							options.errorMessage = null;							
+						} else {
+							
+							options.errorCode = 0;
+							options.errorMessage = null;
+							
 							if (options.success)
 								options.success.call(options.target, options.response, script);
 						}
@@ -59,7 +104,8 @@
 
 		script.onerror = function(e) {
 			callback('Network Error', 2);
-		};		
+		};
+		
 		if (options.timeouts > 0) {
 			setTimeout(function() {
 				callback('Timeout', -2);
@@ -67,6 +113,15 @@
 		}
 
 		t = document.getElementsByTagName("SCRIPT")[0];
-		t.parentNode.insertBefore(script, t);	}};Ajax.script = function(url, onsuccess) {
+		t.parentNode.insertBefore(script, t);
+	}
+
+};
+
+Ajax.script = function(url, onsuccess) {
 	return Ajax.send({
-		url: url,		dataType: 'script',		success: onsuccess	});};
+		url: url,
+		dataType: 'script',
+		success: onsuccess
+	});
+};

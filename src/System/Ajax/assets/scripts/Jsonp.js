@@ -1,7 +1,8 @@
 ﻿/**
  * AJAX 处理JSON-P数据。
  * @author xuld
- */
+ */
+
 using("System.Ajax.Script");
 
 Ajax.transports.jsonp = {
@@ -49,13 +50,18 @@ Ajax.transports.jsonp = {
 		Ajax.transports.script.send.call(this, options);
 	}
 
-};Ajax.jsonp = function(url, data, onsuccess) {
+};
+
+Ajax.jsonp = function(url, data, onsuccess) {
 	if (typeof data === 'function') {
 		onsuccess = data;
 		data = null;
 	}
 
 	return Ajax.send({
-		url: url,		dataType: 'jsonp',		data: data,		success: onsuccess
+		url: url,
+		dataType: 'jsonp',
+		data: data,
+		success: onsuccess
 	});
 };
