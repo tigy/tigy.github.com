@@ -1,5 +1,6 @@
-
-
+/**
+ * @author xuld
+ */
 
 
 using("System.Fx.Animate");
@@ -40,8 +41,11 @@ var Marquee = Class({
 	 * @config
 	 */
 	flow: true,
-	
-	_currentIndex: 0,
+
+    /**
+     * 当前正在显示的索引。
+     */
+	currentIndex: 0,
 	
 	/**
 	 * 是否循环。
@@ -53,7 +57,7 @@ var Marquee = Class({
 	},
 	
 	_getScrollByIndex: function (value) {
-		return this._getWidthBefore(this.target.first(value), this._horizonal ? 'mx+sx' : 'my+sy');
+		return this._getWidthBefore(this.target.child(value), this._horizonal ? 'mx+sx' : 'my+sy');
 	},
 	
 	_getTotalSize: function(){
@@ -71,16 +75,16 @@ var Marquee = Class({
 	_animateToWithoutLoop: function (index, lt) {
 
 		var me = this,
-			oldIndex = me._fixIndex(me._currentIndex),
+			oldIndex = me._fixIndex(me.currentIndex),
 			obj;
 
-		if (me.onChanging(index, oldIndex) !== false) {
+		if (me.beforeChange(index, oldIndex) !== false) {
 
 			// 暂停自动播放，防止出现抢资源问题。
 			me.pause();
 
 			// 记录当前正在转向的目标索引。
-			me._currentIndex = index;
+			me.currentIndex = index;
 
 			// 计算滚动坐标。
 
@@ -89,7 +93,7 @@ var Marquee = Class({
 			me.target.animate(obj, me.duration, function () {
 
 				// 滚动完成后触发事件。
-				me.onChanged(index, oldIndex);
+				me.afterChange(index, oldIndex);
 
 				// 如果本来正在自动播放中，这里恢复自动播放。
 				if (me.step)
@@ -107,9 +111,9 @@ var Marquee = Class({
 	_animateToWithLoop: function (index, lt) {
 
 		var me = this,
-			oldIndex = me._fixIndex(me._currentIndex);
+			oldIndex = me._fixIndex(me.currentIndex);
 
-		if (me.onChanging(index, oldIndex) !== false) {
+		if (me.beforeChange(index, oldIndex) !== false) {
 
 			// 暂停自动播放，防止出现抢资源问题。
 			me.pause();
@@ -123,7 +127,7 @@ var Marquee = Class({
 					me._animatingTargetIndex = null;
 	
 					// 滚动完成后触发事件。
-					me.onChanged(index, oldIndex);
+					me.afterChange(index, oldIndex);
 	
 					// 如果本来正在自动播放中，这里恢复自动播放。
 					if (me.step)
@@ -161,7 +165,7 @@ var Marquee = Class({
 					options.params[prop] = from + '-' + to;
 	
 					// 记录当前正在转向的目标索引。
-					me._currentIndex = index;
+					me.currentIndex = index;
 				},
 				link: 'stop'
 			});
@@ -174,14 +178,14 @@ var Marquee = Class({
 		return index = index >= 0 ? index % this.length : index + this.length;
 	},
 	
-	onChanging: function (newIndex, oldIndex) {
+	beforeChange: function (newIndex, oldIndex) {
 		return !this.disabled && this.trigger('changing', {
 			from: oldIndex,
 			to: newIndex
 		});
 	},
 	
-	onChanged: function(newIndex, oldIndex){
+	afterChange: function(newIndex, oldIndex){
 		this.trigger('changed', {
 			from: oldIndex,
 			to: newIndex
@@ -216,7 +220,7 @@ var Marquee = Class({
 		this._size = this.cloned ? size / 3 : size;
 		
 		this.target['set' + xy](size);
-		this.set(this._currentIndex);
+		this.set(this.currentIndex);
 	},
 
 	pause: function () {
@@ -326,7 +330,7 @@ var Marquee = Class({
 
 			// 设置单步的执行函数。
 			me.step = function() {
-				var index = me._currentIndex + delta;
+				var index = me.currentIndex + delta;
 				index = me._fixIndex(index);
 				me[me.loop ? '_animateToWithLoop' : '_animateToWithoutLoop'](index, me._lt);
 				me.timer = setTimeout(me.step, me.delay);
@@ -346,27 +350,27 @@ var Marquee = Class({
 			index += this.length;
 		}
 		this.target.setStyle(this._horizonal ? 'marginLeft' : 'marginTop', -this._getScrollByIndex(index));
-		this.onChanged(index, this._currentIndex);
-		this._currentIndex = newIndex;
+		this.afterChange(index, this.currentIndex);
+		this.currentIndex = newIndex;
 		return this;
 	},
 
 	moveTo: function (index, lt) {
 		index = this._fixIndex(index);
-		this[this.loop ? '_animateToWithLoop' : '_animateToWithoutLoop'](index, lt === undefined ? index < this._currentIndex : lt);
+		this[this.loop ? '_animateToWithLoop' : '_animateToWithoutLoop'](index, lt === undefined ? index < this.currentIndex : lt);
 		return this;
 	},
 
 	moveBy: function (index) {
-		return this.moveTo(this._currentIndex + index % this.length, index < 0);
+		return this.moveTo(this.currentIndex + index % this.length, index < 0);
 	},
 
 	prev: function () {
-		return this.moveTo(this._currentIndex - 1, true);
+		return this.moveTo(this.currentIndex - 1, true);
 	},
 
 	next: function () {
-		return this.moveTo(this._currentIndex + 1, false);
+		return this.moveTo(this.currentIndex + 1, false);
 	}
 	
 });
