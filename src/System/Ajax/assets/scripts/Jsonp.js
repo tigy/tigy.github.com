@@ -1,55 +1,48 @@
 ﻿/**
- * AJAX 处理JSON-P数据。
  * @author xuld
  */
 
 using("System.Ajax.Script");
 
-Ajax.transports.jsonp = {
+Ajax.transports.jsonp = function (xhrObject, parseData) {
 
-	jsonp: 'callback',
+    if (xhrObject.jsonp === undefined) {
+        xhrObject.jsonp = 'callback';
+    }
 
-	getResponse: function(xhr) {
-		window.execScript(Ajax.XHR.getResponse(xhr));
-		return this.response;
-	},
+    // callback=?
+    var jsonpCallback = xhrObject.jsonpCallback || (xhrObject.jsonpCallback = 'jsonp' + Date.now() + JPlus.id++),
+        jsonpCallbackOverwritten = window[jsonpCallback],
+        responseData;
 
-	send: function(options) {
+    // callback=jsonp123
+    if (xhrObject.jsonp) {
+        if (xhrObject.url.indexOf(xhrObject.jsonp + '=?') >= 0) {
+            xhrObject.url = xhrObject.url.replace(xhrObject.jsonp + '=?', xhrObject.jsonp + '=' + jsonpCallback);
+        } else {
+            xhrObject.url = Ajax.concatUrl(xhrObject.url, xhrObject.jsonp + "=" + jsonpCallback);
+        }
+    }
 
-		if (options.jsonp === undefined) {
-			options.jsonp = this.jsonp;
-		}
+    // 插入 JSONP 回调。
+    window[jsonpCallback] = function () {
+        responseData = arguments;
+    };
 
-		// callback=?
-		var jsonpCallback = options.jsonpCallback || (options.jsonpCallback = 'jsonp' + Date.now() + JPlus.id++);
+    // 最后使用 Script 协议发送。
+    Ajax.transports.script(xhrObject, function (xhrObject) {
+        
+        if (!responseData) {
+            throw new Error(jsonpCallback + ' was not called');
+        }
 
-		// callback=jsonp123
-		if (options.jsonp) {
-			if (options.url.indexOf(options.jsonp + '=?') >= 0) {
-				options.url = options.url.replace(options.jsonp + '=?', options.jsonp + '=' + jsonpCallback);
-			} else {
-				options.url = Ajax.concatUrl(options.url, options.jsonp + "=" + jsonpCallback);
-			}
-		}
+        return responseData[0];
 
-		var oldMethod = window[jsonpCallback];
+    }, function () {
 
-		window[jsonpCallback] = function(data) {
-
-			// 回复初始的 jsonpCallback 函数。
-			window[jsonpCallback] = oldMethod;
-
-			// 保存 response 数据。
-			options.response = data;
-
-			// 通知 onStateChange 已完成请求。
-			options.callback();
-		};
-
-		// 最后使用 Script 协议发送。
-		Ajax.transports.script.send.call(this, options);
-	}
-
+        // 回复初始的 jsonpCallback 函数。
+        window[jsonpCallback] = jsonpCallbackOverwritten;
+    });
 };
 
 Ajax.jsonp = function(url, data, onsuccess) {

@@ -29,7 +29,7 @@
                                 "参数1" : "值1"
                             },
                             
-                            start : function(options) {
+                            start : function(data, options) {
                                 alert("准备请求 " + options.url);
                             },
                             success : function(data) {
@@ -41,30 +41,7 @@
                             error : function(error) {
                                 alert("请求已失败 => 错误: " + error);
                             },
-                            complete : function(options) {
-                                alert("请求结束 " + options.url);
-                            }
-                        });
-                        
-                        ajax.run({
-                            url : "../../../assets/demo/ajax/test.html",
-                            data : {
-                                "参数1" : "值1"
-                            },
-                            
-                            start : function(options) {
-                                alert("准备请求 " + options.url);
-                            },
-                            success : function(data) {
-                                alert("请求已成功 =>" + data);
-                            },
-                            timeout : function(errorNo) {
-                                alert("请求已超时 =>" + errorNo);
-                            },
-                            error : function(error) {
-                                alert("请求已失败 => 错误: " + error);
-                            },
-                            complete : function(options) {
+                            complete: function (error, options) {
                                 alert("请求结束 " + options.url);
                             }
                         });

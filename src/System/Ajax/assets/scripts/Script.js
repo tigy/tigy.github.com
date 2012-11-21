@@ -7,121 +7,85 @@ using("System.Ajax.Base");
 
 Ajax.accepts.script = "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript";
 
-Ajax.transports.script = {
-
-	getResponse: function(xhr) {
-		var code = Ajax.XHR.getResponse(xhr);
-		window.execScript(code);
-		return code;
-	},
-
-	send: function(options) {
-		if (!options.crossDomain) {
-			return Ajax.XHR.send.call(this, options);
-		}
-
-		options.type = "GET";
-		
-		// cache
-		if (options.cache !== false) {
-			options.cache = false;
-			
-			options.url = Ajax.addCachePostfix(options.url);
-		}
-
-		// data
-		if (options.data) {
-			options.url = Ajax.concatUrl(options.url, options.data);
-			options.data = null;
-		}
-
-		var script = options.script = document.createElement('SCRIPT'),
-			t,
-			callback = options.callback = function(errorMessage, error) {
-				var script = options.script;
-				if (script && (error || !script.readyState || !/in/.test(script.readyState))) {
-
-					// 删除 callback 避免再次执行。
-					options.callback = Function.empty;
-
-					// 删除全部绑定的函数。
-					script.onerror = script.onload = script.onreadystatechange = null;
-
-					// 删除当前脚本。
-					script.parentNode.removeChild(script);
-
-					try {
-						
-						if(error < 0) {
-							options.status = error;
-							options.statusText = "";
-						} else {
-							options.status = 200;
-							options.statusText = "OK";
-						}
-
-						if (error) {
-							
-							options.errorCode = error;
-							options.errorMessage = errorMessage;
-							
-							if (options.error)
-								options.error.call(options.target, options.errorMessage, script);
-						} else {
-							
-							options.errorCode = 0;
-							options.errorMessage = null;
-							
-							if (options.success)
-								options.success.call(options.target, options.response, script);
-						}
-
-						if (options.complete)
-							options.complete.call(options.target, options, script);
-
-					} finally {
-
-						options.script = script = null;
-
-						delete options.target.options;
-
-						options.target.progress();
-					}
-				}
-			};
-
-		script.src = options.url;
-		script.type = "text/javascript";
-		script.async = "async";
-		if (options.charset)
-			script.charset = options.charset;
-		
-		// 预处理数据。
-		if (options.start && options.start.call(options.target, options, xhr) === false)
-			return callback(0, -3);
-
-		script.onload = script.onreadystatechange = callback;
-
-		script.onerror = function(e) {
-			callback('Network Error', 2);
-		};
-		
-		if (options.timeouts > 0) {
-			setTimeout(function() {
-				callback('Timeout', -2);
-			}, options.timeouts);
-		}
-
-		t = document.getElementsByTagName("SCRIPT")[0];
-		t.parentNode.insertBefore(script, t);
-	}
-
+Ajax.dataParsers.script = function (xhrObject) {
+    window.execScript(this.text(xhrObject));
 };
 
-Ajax.script = function(url, onsuccess) {
-	return Ajax.send({
-		url: url,
-		dataType: 'script',
-		success: onsuccess
-	});
+Ajax.transports.script = function (xhrObject, parseData, done) {
+    if (!xhrObject.crossDomain) {
+        return Ajax.transports.text(xhrObject, parseData && function (xhrObject) {
+            this.script(xhrObject);
+            return parseData(xhrObject);
+        }, done);
+    }
+
+    var script, t, callback;
+
+    xhrObject.type = "GET";
+
+    // cache
+    if (xhrObject.cache !== false) {
+        xhrObject.cache = false;
+
+        xhrObject.url = Ajax.addCachePostfix(xhrObject.url);
+    }
+
+    // data
+    if (xhrObject.data) {
+        xhrObject.url = Ajax.concatUrl(xhrObject.url, xhrObject.data);
+        xhrObject.data = null;
+    }
+
+    xhrObject.xhr = script = document.createElement('SCRIPT');
+
+    xhrObject.owner.callback = callback = function (eventArgs, error) {
+        var script = xhrObject.xhr;
+        if (script && (error || !script.readyState || !/in/.test(script.readyState))) {
+
+            // 删除 callback 避免再次执行。
+            xhrObject.owner.callback = Function.empty;
+
+            // 删除全部绑定的函数。
+            script.onerror = script.onload = script.onreadystatechange = null;
+
+            // 删除当前脚本。
+            script.parentNode.removeChild(script);
+
+            // 清空对 script 的引用。
+            script = null;
+
+            // 执行全部回调。
+            if (error) {
+                Ajax.done(xhrObject, error, error, "", eventArgs, done);
+            } else {
+                Ajax.done(xhrObject, 0, 200, "OK", parseData || Function.empty, done);
+            }
+
+        }
+    };
+
+    script.src = xhrObject.url;
+    script.type = "text/javascript";
+    script.async = "async";
+    if (xhrObject.charset)
+        script.charset = xhrObject.charset;
+
+    // 预处理数据。
+    if (xhrObject.start && xhrObject.start.call(xhrObject.owner, xhrObject.data, xhrObject) === false)
+        return callback('Prevented', -3);
+
+    script.onload = script.onreadystatechange = callback;
+
+    script.onerror = function (e) {
+        callback('Script Execute Error', 2);
+    };
+
+    if (xhrObject.timeouts > 0) {
+        setTimeout(function () {
+            callback('Timeout', -2);
+        }, xhrObject.timeouts);
+    }
+
+    t = document.getElementsByTagName("SCRIPT")[0];
+    t.parentNode.insertBefore(script, t);
 };
