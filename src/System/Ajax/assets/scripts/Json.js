@@ -11,8 +11,9 @@ Ajax.dataParsers.json = function (xhrObject) {
     return JSON.parse(this.text(xhrObject));
 };
 
-Ajax.json = function (url, data, onsuccess) {
+Ajax.json = function (url, data, onsuccess, onerror) {
     if (typeof data === 'function') {
+        onerror = onsuccess;
         onsuccess = data;
         data = null;
     }
@@ -21,7 +22,8 @@ Ajax.json = function (url, data, onsuccess) {
         url: url,
         dataType: 'json',
         data: data,
-        success: onsuccess
+        success: onsuccess,
+        error: onerror
     });
 };
 

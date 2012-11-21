@@ -53,7 +53,7 @@ var Validator = Class({
 
     },
 
-    _handlerValidate: function () {
+    onValidate: function () {
         var me = this;
         if (me._timer) {
             clearTimeout(me._timer);
@@ -82,11 +82,11 @@ var Validator = Class({
 
         // 验证类型。
         if (t) {
-            target.on(t, this._handlerValidate, this);
+            target.on(t, this.onValidate, this);
 
             // 如果是 keyup 进行的验证，还需要在 blur 时执行。
             if (t === 'keyup') {
-                target.on('blur', this._handlerValidate, this);
+                target.on('blur', this.onValidate, this);
             }
         }
 
@@ -200,7 +200,7 @@ Validator.Form = Class({
 
     delaySubmit: true,
 
-    _handlerValidate: function () {
+    onValidate: function () {
         return this.validate().length === 0;
     },
 
@@ -219,7 +219,7 @@ Validator.Form = Class({
         }
 
         if (this.event) {
-            target.on(this.event, this._handlerValidate, this);
+            target.on(this.event, this.onValidate, this);
         }
 
     },

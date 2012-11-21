@@ -45,8 +45,9 @@ Ajax.transports.jsonp = function (xhrObject, parseData) {
     });
 };
 
-Ajax.jsonp = function(url, data, onsuccess) {
-	if (typeof data === 'function') {
+Ajax.jsonp = function(url, data, onsuccess, onerror) {
+    if (typeof data === 'function') {
+        onerror = onsuccess;
 		onsuccess = data;
 		data = null;
 	}
@@ -55,6 +56,7 @@ Ajax.jsonp = function(url, data, onsuccess) {
 		url: url,
 		dataType: 'jsonp',
 		data: data,
-		success: onsuccess
+		success: onsuccess,
+		error: onerror
 	});
 };

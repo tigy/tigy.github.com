@@ -1,15 +1,14 @@
 .x-tipbox {
-  padding: 5px 14px;
+  padding: 4px 14px;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
-  border-width: 1px;
-  border-style: solid;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
   display: inline-block;
   vertical-align: middle;
+  line-height: 18px;
+  border: 1px solid #e9dbc3;
   background-color: #fcf8e3;
-  border-color: #e9dbc3;
   color: #c09853;
 }
 div.x-tipbox {
@@ -26,7 +25,7 @@ div.x-tipbox {
 .x-tipbox-warning {
   background-repeat: no-repeat;
   background-position: 8px 50%;
-  padding-left: 30px;
+  padding-left: 28px;
 }
 .x-tipbox-warning {
   background-image: url(../images/warning.png);
