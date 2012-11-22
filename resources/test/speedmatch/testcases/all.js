@@ -147,7 +147,7 @@ var cases = {
 		jQuery: '$.each([2,3], function(i, n){fn(n)})'
 	},
 	'Array - 数组判断':{
-		jPlusUI: 'Object.isArray([])',
+		jPlusUI: 'Array.isArray([])',
 		Mootools: '-',
 		jQuery: '$.isArray([])'
 	},
@@ -187,7 +187,7 @@ var cases = {
 		jQuery: '$.proxy(fn, this)'
 	},
 	'Function - 函数判断':{
-		jPlusUI: 'Object.isFunction(function(){})',
+		jPlusUI: '-',
 		Mootools: 'typeOf(function(){}) == "function"',
 		jQuery: '$.isFunction(function(){})'
 	},

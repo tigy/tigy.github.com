@@ -1,12 +1,9 @@
 /**
- * @fileOverview 通过改变CSS实现的变换。
  * @author xuld
  */
 
 
-using("System.Dom.Base");
 using("System.Fx.Tween");
-
 
 
 (function(){
@@ -17,7 +14,8 @@ using("System.Fx.Tween");
 
         displayEffects = Fx.displayEffects = {
             opacity: function () {
-                return opacity0;            }
+                return opacity0;
+            }
 		},
 
 		toggle = Dom.prototype.toggle,
@@ -60,7 +58,8 @@ using("System.Fx.Tween");
 			return value;
 		};
 	}, function () {
-	    return 0;	});
+	    return 0;
+	});
 	
 	Object.map('left right top bottom', function(key, index) {
 		key = 'margin' + key.capitalize();
@@ -160,7 +159,7 @@ using("System.Fx.Tween");
 				effect;
 
 			// 如果没有参数，直接隐藏。
-			if (args[0] == undefined) {
+			if (typeof args[0] !== 'number') {
 				Dom.show(me.node);
 			} else {
 
@@ -247,7 +246,7 @@ using("System.Fx.Tween");
 				effect;
 			
 			// 如果没有参数，直接隐藏。
-			if (args[0] == undefined) {
+			if (typeof args[0] !== 'number') {
 				Dom.hide(me.node);
 			} else {
 
@@ -318,14 +317,3 @@ using("System.Fx.Tween");
 	});
 	
 })();
-
-/// TODO: clear
-
-document.animate = function() {
-	assert.deprected("document.animate 已过时，请改用 Dom.get(document).animate。");
-	var doc = Dom.get(document);
-	doc.animate.apply(doc, arguments);
-	return this;
-};
-
-/// TODO: clear

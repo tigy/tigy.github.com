@@ -5,16 +5,15 @@
 
 // Base x-tipbox styles
 .x-tipbox {
-    padding: 5px 14px;
+    padding: 4px 14px;
     text-shadow: 0 1px 0 rgba(255,255,255,.5);
-    border-width: 1px;
-    border-style: solid;
     .border-radius(@baseBorderRadius / 2);
     display: inline-block;
     vertical-align: middle;
+	line-height: @baseLineHeight;
 	
+    border: 1px solid @warningBorderColor;
     background-color: @warningBackgroundColor;
-    border-color: @warningBorderColor;
     color: @warningTextColor;
 }
 
@@ -25,15 +24,20 @@ div.x-tipbox {
 .x-tipbox .x-closebutton{
 	font-size: 16px;
 	margin-left: 10px;
+	color: #AAA6A1;
 }
 
 // Alternate styles
 // ----------------
 
-.x-tipbox-success, .x-tipbox-error, .x-tipbox-info {
+.x-tipbox-success, .x-tipbox-error, .x-tipbox-info, .x-tipbox-warning {
     background-repeat: no-repeat;
     background-position: 8px 50%;
-    padding-left: 30px;
+    padding-left: 28px;
+}
+
+.x-tipbox-warning {
+    background-image: url(../images/warning.png);
 }
 
 .x-tipbox-success {

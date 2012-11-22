@@ -1,5 +1,8 @@
 .x-carousel {
   position: relative;
+  height: 200px;
+  width: 100%;
+  overflow: hidden;
 }
 .x-carousel-header {
   position: absolute;
@@ -19,21 +22,14 @@
   color: #ffffff;
   cursor: pointer;
 }
-.x-carousel-header .x-carousel-header-selected {
+.x-carousel-header .x-carousel-selected {
   font-weight: bold;
   background-color: #F2F2F2;
   color: #000000;
 }
-.x-carousel-container {
-  *zoom: 1;
-}
-.x-carousel-container:after {
-  content: ".";
-  display: block;
-  height: 0;
-  clear: both;
-  visibility: hidden;
-}
-.x-carousel-content {
-  float: left;
+.x-carousel-body,
+.x-carousel-body li {
+  position: absolute;
+  top: 0;
+  left: 0;
 }

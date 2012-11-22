@@ -1,6 +1,8 @@
 /**
  * @author  xuld
  */
+
+
 using("Controls.Core.Base");
 
 
@@ -40,9 +42,6 @@ var ListControl = Control.extend({
 			// 赋值。
 			childControl = li;
 		}
-
-		//// 自动加上 clazz 。
-		//childControl.addClass('x-' + this.xtype + '-item');
 		
 		// 插入 DOM 树。
 		childControl.attach(this.node, refControl && refControl.node || null);
@@ -82,15 +81,6 @@ var ListControl = Control.extend({
 		// 返回被删除的子控件。
 		return childControl;
 	},
-	
-    ///**
-	// * 当被子类重写时，初始化当前控件。
-	// * @param {Object} options 当前控件的初始化配置。
-	// * @protected override 
-	// */
-	//init: function() {
-	//	this.query('>li').addClass('x-' + this.xtype + '-item');
-	//},
 	
 	// 项操作
 

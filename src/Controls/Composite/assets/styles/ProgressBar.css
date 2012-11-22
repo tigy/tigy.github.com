@@ -1,25 +1,25 @@
 @-webkit-keyframes progress-bar-stripes {
   from {
-    foreground-position: 0 0;
+    background-position: 0 0;
   }
   to {
-    foreground-position: 40px 0;
+    background-position: 40px 0;
   }
 }
 @-moz-keyframes progress-bar-stripes {
   from {
-    foreground-position: 0 0;
+    background-position: 0 0;
   }
   to {
-    foreground-position: 40px 0;
+    background-position: 40px 0;
   }
 }
 @keyframes progress-bar-stripes {
   from {
-    foreground-position: 0 0;
+    background-position: 0 0;
   }
   to {
-    foreground-position: 40px 0;
+    background-position: 40px 0;
   }
 }
 .x-progressbar {

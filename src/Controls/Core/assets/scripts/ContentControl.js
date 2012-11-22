@@ -1,8 +1,10 @@
 /**
- * @fileOverview 表示一个包含文本内容的控件。
  * @author xuld
  */
+
+
 using("Controls.Core.Base");
+
 
 /**
  * 所有内容控件的基类。
@@ -10,6 +12,17 @@ using("Controls.Core.Base");
  * @extends Control
  */
 var ContentControl = Control.extend({
+	
+	// 基本属性
+
+    /**
+	 * 当前控件的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */
+	tpl: '<div class="x-control">\
+			<div class="x-control-content"></div>\
+		</div>',
 	
     /**
 	 * 获取当前容器用于存放内容的 Dom 对象。

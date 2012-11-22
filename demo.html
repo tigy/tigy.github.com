@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>社区 - jPlusUI</title>
+    <link href="assets/web/styles/jplus-welcome.css" rel="stylesheet">
+    <link href="assets/web/styles/index.css" rel="stylesheet">
+    <link href="assets/demo/demo.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Microsoft YaHei';
+        }
+ 
+        h2.demo {
+            font-size: 24px;
+            line-height: 40px;
+            text-align: left;
+        }
+
+        .nav {
+            margin-top: 0;
+        }
+
+        .x-grid {
+            margin-bottom: 40px;
+        }
+
+    </style>
+    <script src="assets/web/scripts/jplus-welcome.js" type="text/javascript"></script>
+    <script src="assets/web/scripts/controls.js" type="text/javascript"></script>
+    <script>var Demo = { web: true }</script>
+    <script src="assets/demo/demo.js" type="text/javascript"></script>
+
+</head>
+<body>
+    <div id="topbar">
+        <div class="x-container x-clear">
+            <h1 class="x-left"><a href="index.html" title="jPlusUI - 一个轻量但完整的UI组件库">jPlusUI</a></h1>
+            <ul class="x-left">
+                <li><a href="index.html" title="综合介绍">首页</a></li>
+                <li><a href="features.html" title="设计思路和原则">设计理念</a></li>
+                <li><a href="demo.html" class="selcted" title="查看组件列表">文档和演示中心</a></li>
+                <li><a href="download.html" title="获取 jPlusUI">下载</a></li>
+                <li><a href="community.html" title="讨论和联系方式">社区</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="main">
+        <div id="body" class="demo-doc">
+            <div class="examples x-container" id="examples">
+                <h2 class="demo">UI 组件演示中心</h2>
+
+                <div class="nav">
+
+                    <script>
+
+                        var first = true;
+                        for (var category in Controls) {
+                            if (first) {
+                                first = false;
+                            } else {
+                                document.write('&nbsp;&nbsp;&nbsp; •&nbsp;&nbsp;&nbsp;');
+                            }
+                            document.write('<a href="#" data-value="' + category + '" title="' + category + '">' + category + '</a>');
+                        }
+
+                    </script>
+
+                </div>
+
+                <div id="items">
+
+                </div>
+
+                <script>
+
+                    function toggleTab(controls) {
+
+                        controls = Controls[controls];
+
+                        var html = '';
+                        var i = 0;
+
+                        for (var control in controls) {
+                            if (i === 0) {
+                                html += '<div class="x-grid">';
+                            }
+
+                            if (i === 0) {
+                                html += '<div class="x-col x-col-3 x-col-first">';
+                            } else {
+                                html += '<div class="x-col x-col-3">';
+                            }
+
+                            html += '<a href="' + controls[control].url + '" class="x-thumbnail" target="_blank" title="' + (controls[control].title || '') + '"><img src="assets/web/thumbnails/' + controls[control].thumbnail + '" /></a><h5><a href="' + controls[control].url + '" target="_blank" title="' + (controls[control].title || '') + '">' + control + '</a></h5>';
+
+                            html += '</div>';
+
+                            if (i === 3) {
+                                html += '</div>';
+                            }
+
+                            if (++i === 4) {
+                                i = 0;
+                            }
+                        }
+
+                        Dom.get('items').setHtml(html);
+                    }
+
+                    Dom.query('.nav a').on('click', function () {
+                        Dom.query('.nav a').removeClass('selected');
+                        this.addClass('selected');
+                        toggleTab(this.getAttr('data-value'));
+                        return false;
+                    });
+
+                    Dom.query('.nav a').item(0).trigger('click');
+
+                </script>
+            </div>
+        </div>
+        <div id="footer">
+            <div class="x-container">
+                <span class="x-right">Host By <a href="index.html">XXXX</a></span>
+                Copyright &copy; 2011-2012 jPlusUI Team | <a href="LICENSE.txt" target="_blank">The BSD license</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

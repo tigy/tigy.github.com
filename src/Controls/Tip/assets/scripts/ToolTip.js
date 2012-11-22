@@ -3,83 +3,46 @@
  */
 
 
-
 imports("Controls.Part.Arrow");
 imports("Controls.Tip.ToolTip");
 using("Controls.Core.ContentControl");
 using("Controls.Core.IToolTip");
 
+
+	
 /**
  * 表示一个工具提示。
- * @extends Control
+ * @extends ContentControl
  */
 var ToolTip = ContentControl.extend(IToolTip).implement({
+		
+	///**
+	// * 当指针在具有指定工具提示文本的控件内保持静止时，工具提示保持可见的时间期限。-1表示不自动隐藏。 0 表示始终不显示。
+	// * @type Number
+	// */
+	//autoDelay: -1,
+
+    /**
+     * 工具提示显示之前经过的时间。
+     * @type Integer
+     */
+    initialDelay: 500,
+
+    /**
+     * 指针从一个控件移到另一控件时，必须经过多长时间才会出现后面的工具提示窗口。
+     * @type Integer
+     */
+    reshowDelay: 100,
 	
 	xtype: 'tooltip',
 	
-	tpl: '<div class="x-control">\
-			<span class="x-arrow x-arrow-top">\
+	menuTpl: '<span>\
 				<span class="x-arrow-fore">◆</span>\
-			</span>\
-			<div class="x-control-content"></div>\
-		</div>',
+			</span>',
 
 	content: function () {
 	    return this.find('.x-tooltip-content');
-	},
-
-	init: function () {
-	    this.hide();
-
-	    if (!this.closet('body')) {
-	        this.appendTo();
-	    }
-	},
-	
-	getArrowType: function(){
-		var arrow = this.find('.x-arrow'), r = 'none';
-		
-		if(arrow){
-			['top', 'bottom', 'left', 'right'].each(function(value){
-				if(arrow.hasClass('x-arrow-' + value)) {
-					r = value;
-					return false;	
-				}
-			});
-		}
-		return r;
-	},
-	
-	setArrowType: function(value){
-		this.find('.x-arrow').node.className = 'x-arrow x-arrow-' + value;
-		return this;
-	},
-	
-	getArrowSize: function(){
-		return this.find('.x-arrow').getSize();
-	},
-	
-	getArrowOffset: function(){
-		return this.find('.x-arrow').getOffset();
 	}
 
 });
-
-/**
- * 显示一个提示。
- * @param {Element} elem 用来对齐的元素。
- * @param {String} text 显示的文本。
- * @param {Number} offsetY=2 Y 的偏移，负值向上。 
- * @param {Number} offsetX=0 X 的偏移，负值向左。 
- */
-ToolTip.show = function(ctrl, text, offsetY, offsetX){
-	return new ToolTip().setText(text).showBy(Dom.get(ctrl), offsetY === undefined ? 2 : offsetY, offsetX);
-};
-
-
-
-
-
-
-
 

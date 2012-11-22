@@ -100,7 +100,7 @@ Demo.extend(Demo, {
         /**
          * 文档的下拉菜单 HTML 模板。
          */
-        doc: '<a href="~/resources/books/api/index.html" target="_blank">jPlusUI API 文档</a>\
+        doc: '<a href="~/resources/cookbooks/jplusui-full-api/index.html" target="_blank">jPlusUI API 文档</a>\
                 <a href="~/resources/cookbooks/jplusui-core-api/index.html" target="_blank">jPlusUI Core 文档</a>\
                 <a href="~/resources/cookbooks/jquery2jplus.html" target="_blank">jQuery 转 jPlusUI</a>\
                 <a href="~/resources/cookbooks/dplsystem.html" target="_blank">组件系统文档</a>\
@@ -3383,8 +3383,8 @@ if (typeof module !== 'object') {
                 // 处理 script.demo 。
                 // script.demo[type=text/html] => aside.demo
                 // script.demo[type=text/javascript] => 插入 pre.demo
-                // script.demo[type=pre/html] => pre.demo
-                // script.demo[type=pre/javascript] => pre.demo
+                // script.demo[type=code/html] => pre.demo
+                // script.demo[type=code/javascript] => pre.demo
                 Demo.Dom.iterate('SCRIPT', function (node) {
                     var code, noForamt = node.className.indexOf('demo-noformat') >= 0;
                     switch (node.type) {
@@ -3409,13 +3409,13 @@ if (typeof module !== 'object') {
                                 }
                             }
                             break;
-                        case 'pre/javascript':
+                        case 'code/javascript':
                             code = Demo.System.createCode(node.innerHTML, 'js', false, true, noForamt);
                             node.parentNode.replaceChild(code, node);
                             break;
                         default:
-                        	if(/^pre\//.test(node.type)){
-                        		code = Demo.System.createCode(node.innerHTML, node.type.substr(4), false, true, noForamt);
+                            if (/^code\//.test(node.type)) {
+                        		code = Demo.System.createCode(node.innerHTML, node.type.substr(5), false, true, noForamt);
                         	} else {
 	                            code = Demo.System.createCode(node.innerHTML, null, false, true, noForamt);
 	                        }
@@ -3939,6 +3939,7 @@ if (typeof module !== 'object') {
                     sep = false;
                 
                 if (filter) {
+                    filter = filter.replace(/^\s+|\s+$/g, "");
                     for (var path in DplList) {
                         pathLower = path.toLowerCase();
                         if (pathLower.indexOf('.' + filter) >= 0) {
@@ -3971,7 +3972,7 @@ if (typeof module !== 'object') {
                         tpl = ' style="border-top: 1px solid #EBEBEB"';
                         sep = false;
                     }
-                    return '<a' + tpl + ' onmouseover="Demo.System.gotoSetListHover(this)" href="' + Demo.getDemoUrl(path) + '">' + path + '(' + DplList[path].name + ')</a>';
+                    return '<a' + tpl + ' onmouseover="Demo.System.gotoSetListHover(this)" href="' + Demo.getDemoUrl(path) + '">' + path + '<small style="color: #999"> - ' + DplList[path].name + '</small></a>';
                 }
 
                 dropDown.lastChild.innerHTML = html + html2;

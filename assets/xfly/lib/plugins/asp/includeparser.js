@@ -1,7 +1,0 @@
-
-
-exports.parseFile = function(path){
-
-
-
-};

@@ -8,7 +8,6 @@ using("System.Dom.Align");
 using("Controls.Core.TreeControl");
 
 
-
 var Menu = TreeControl.extend({
 
     xtype: 'menu',
@@ -63,33 +62,24 @@ var Menu = TreeControl.extend({
         TreeControl.prototype.init.call(this);
     },
 
-    onShow: function () {
+    show: function () {
+        Dom.show(this.node);
 
         // 如果菜单是浮动的，则点击后关闭菜单，否则，只关闭子菜单。
         if (this.floating)
             document.once('mouseup', this.hide, this);
-        this.trigger('show');
+        return this.trigger('show');
     },
 
     /**
 	 * 关闭本菜单。
 	 */
-    onHide: function () {
+    hide: function () {
+        Dom.hide(this.node);
 
         // 先关闭子菜单。
         this.hideSubMenu();
         this.trigger('hide');
-    },
-
-    show: function () {
-        Dom.show(this.node);
-        this.onShow();
-        return this;
-    },
-
-    hide: function () {
-        Dom.hide(this.node);
-        this.onHide();
         return this;
     },
 
@@ -126,7 +116,7 @@ var Menu = TreeControl.extend({
         // 显示节点。
         this.show();
 
-        this.align(ctrl, pos || 'rt', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);
+        this.align(ctrl, pos || 'r', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);
 
         return this;
     },
@@ -181,8 +171,6 @@ var Menu = TreeControl.extend({
     }
 
 });
-
-
 
 
 

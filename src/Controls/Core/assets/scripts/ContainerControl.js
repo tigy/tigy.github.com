@@ -2,7 +2,9 @@
  * @author  xuld
  */
 
+
 using("Controls.Core.Base");
+
 
 /**
  * 所有容器控件的基类。

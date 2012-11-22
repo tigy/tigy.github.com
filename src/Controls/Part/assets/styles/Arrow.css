@@ -63,12 +63,14 @@
 }
 .x-arrow-bottom {
   bottom: -10px;
-  left: 36%;
+  left: 50%;
+  margin-left: -10px;
 }
 .x-arrow-top {
   _font-size: 20px;
   top: -10px;
-  left: 36%;
+  left: 50%;
+  margin-left: -10px;
 }
 .x-arrow-left {
   left: -10px;

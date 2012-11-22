@@ -324,6 +324,10 @@ var DplBuilder = {
         var result = [];
         var resultCss = [];
         var resultJs = [];
+
+        tempObj.js.reverse();
+        tempObj.css.reverse();
+
         map['.'] = {
             isStyle: false,
             name: '.',

@@ -2,6 +2,10 @@
  * @author xuld
  */
 
+
+using("System.Dom.Base");
+
+
 /**
  * 所有表单输入控件实现的接口。
  * @interface IInput

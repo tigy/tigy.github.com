@@ -10,78 +10,50 @@ using("Controls.Core.ListControl");
  * 表示一个列表框。
  * @extends ListControl
  */
-var ListBox = ListControl.extend({
+var ListBox = ListControl.implement({
 
     xtype: "listbox",
 
     /**
-     * 当选中一个值时执行。
-     * @param {Dom} item 即将选中的项。
-     * @protected virtual
+     * 重新设置当前高亮项。
      */
-    onSelect: function (item) {
-        return this.trigger('select', item);
-    },
+    setSelectedItem: function (item) {
+        var clazz = 'x-' + this.xtype + '-selected';
+        this.query('.' + clazz).removeClass(clazz);
 
-    /**
-     * 当值被改变时执行。
-     * @protected virtual
-     */
-    onChange: function () {
-        this.trigger('change');
+        if(item) {
+            item.addClass(clazz);
+        }
+
+        return this;
     },
 
     /**
      * 获取当前高亮项。
      */
     getSelectedItem: function () {
-        return this.selectedItem;
-    },
-
-    /**
-     * 重新设置当前高亮项。
-     */
-    setSelectedItem: function (item) {
-        var clazz = 'x-' + this.xtype + '-hover';
-
-        if (this.selectedItem) {
-            this.selectedItem.removeClass(clazz);
-        }
-
-        this.selectedItem = item ? item.addClass(clazz) : null;
-    },
-
-    /**
-	 * 移动当前选中项的位置。
-	 */
-    moveSelectedItem: function (next) {
-
-        var item = this.selectedItem;
-
-        if (item) {
-            item = item[next ? 'next' : 'prev']();
-        }
-
-        if (!item) {
-            item = this[next ? 'first' : 'last']();
-        }
-
-        this.setSelectedItem(item);
-
+        return this.find('.x-' + this.xtype + '-selected');
     },
 
     /**
 	 * 模拟用户选择某一项。
 	 */
     selectItem: function (item) {
-        if (this.onSelect(item) !== false) {
+        if (this.trigger('selecting', item) !== false) {
             var old = this.getSelectedItem();
             this.setSelectedItem(item);
 
             if (!(old ? old.equals(item) : item)) {
-                this.onChange();
+                this.trigger('change');
             }
         }
+    },
+
+    onItemClick: function(item){
+        if(!this.getAttr('disabled') && !this.getAttr('readonly')) {
+            this.selectItem(item);
+        }
+        return false;
     },
 
     /**
@@ -89,13 +61,12 @@ var ListBox = ListControl.extend({
      */
     init: function () {
 
-        ListControl.prototype.init.apply(this, arguments);
-
         // 绑定下拉菜单的点击事件
-        this.itemOn('mousedown', this.selectItem, this);
+        this.itemOn('mousedown', this.onItemClick, this);
+
     }
 
-}).addEvents('select change');
+});
 
 
 

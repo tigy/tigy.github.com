@@ -3401,16 +3401,22 @@ using("System.Core.Base");
 		            
 		            t = new Dom(t);
 		            scripts = t.getElements('SCRIPT');
+		            if (!navigator.isStd) {
+		                scripts = new DomList(scripts);
+		            }
 		            value(this, t);
 		        } else {
 		        	t = html;
 		        	if (t.node.tagName === 'SCRIPT') {
 						scripts = [t.node];
 					} else {
-						scripts = t.getElements('SCRIPT');
+		        	    scripts = t.getElements('SCRIPT');
+		        	    if (!navigator.isStd) {
+		        	        scripts = new DomList(scripts);
+		        	    }
 					}
 		        	html = value(this, t);
-		        }
+	            }
 		        
 		        i = 0;
 	

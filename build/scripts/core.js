@@ -1,16 +1,16 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/15 20:16
+ * This file is created by a tool at 2012/11/22 11:8
  *********************************************************
  * Contains: 
  *     System.Core.Base
  *     System.Dom.Base
  *     System.Utils.Deferrable
- *     System.Fx.Base
- *     System.Fx.Tween
- *     System.Fx.Animate
  *     System.Ajax.Base
  *     System.Ajax.Script
  *     System.Ajax.Jsonp
+ *     System.Fx.Base
+ *     System.Fx.Tween
+ *     System.Fx.Animate
  ********************************************************/
 
 
@@ -1632,8 +1632,8 @@
 		assert(dest != null, "Object.extend(dest, src): {dest} 不可为空。", dest);
 
 		// 直接遍历，不判断是否为真实成员还是原型的成员。
-		for (var b in src)
-			dest[b] = src[b];
+		for (var key in src)
+		    dest[key] = src[key];
 		return dest;
 	}
 
@@ -6200,16 +6200,22 @@ function imports(namespace) {
 		            
 		            t = new Dom(t);
 		            scripts = t.getElements('SCRIPT');
+		            if (!navigator.isStd) {
+		                scripts = new DomList(scripts);
+		            }
 		            value(this, t);
 		        } else {
 		        	t = html;
 		        	if (t.node.tagName === 'SCRIPT') {
 						scripts = [t.node];
 					} else {
-						scripts = t.getElements('SCRIPT');
+		        	    scripts = t.getElements('SCRIPT');
+		        	    if (!navigator.isStd) {
+		        	        scripts = new DomList(scripts);
+		        	    }
 					}
 		        	html = value(this, t);
-		        }
+	            }
 		        
 		        i = 0;
 	
@@ -7333,8 +7339,9 @@ function imports(namespace) {
  * @author xuld
  */
 
+
 /**
- * �����첽ִ������ʱ��֤�����Ǵ��еġ�
+ * 用于异步执行任务时保证任务是串行的。
  */
 var Deferrable = Class({
 
@@ -7365,12 +7372,12 @@ var Deferrable = Class({
     },
 
     /**
-	 * ��������ͬʱ�������Ĵ���������
-	 * wait - �ȴ��ϸ��������ɡ�
-	 * ignore - ���Ե�ǰ������
-	 * stop - �����ж��ϸ��������ϸ������Ļص�������ִ�У�Ȼ��ִ�е�ǰ������
-	 * abort - �Ƿ�ֹͣ�ϸ��������ϸ������Ļص󱻺��ԣ�Ȼ��ִ�е�ǰ������
-	 * replace - �滻�ϸ�����Ϊ�µĲ������ϸ������Ļص󽫱����ơ�
+	 * 多个请求同时发生后的处理方法。
+	 * wait - 等待上个操作完成。
+	 * ignore - 忽略当前操作。
+	 * stop - 正常中断上个操作，上个操作的回调被立即执行，然后执行当前操作。
+	 * abort - 非法停止上个操作，上个操作的回调被忽略，然后执行当前操作。
+	 * replace - 替换上个操作为新的操作，上个操作的回调将被复制。
 	 */
     defer: function (args, link) {
 
@@ -7396,7 +7403,7 @@ var Deferrable = Class({
             case "ignore":
                 return true;
             default:
-                assert(link === "wait", "Deferred#defer(args, link): ��Ա {link} ������ wait��abort��stop��ignore��replace ֮һ��", link);
+                assert(link === "wait", "Deferred#defer(args, link): 成员 {link} 必须是 wait、abort、stop、ignore、replace 之一。", link);
         }
 
         this.chain(this, args);
@@ -7404,7 +7411,7 @@ var Deferrable = Class({
     },
 
     /**
-	 * �õ�ǰ���еȴ�ָ���� deferred ȫ��ִ�����Ϻ�ִ�С�
+	 * 让当前队列等待指定的 deferred 全部执行完毕后执行。
 	 */
     wait: function (deferred) {
         if (this.isRunning) {
@@ -7456,6 +7463,655 @@ var Deferrable = Class({
 
 });
 
+/*********************************************************
+ * System.Ajax.Base
+ ********************************************************/
+/**
+ * @author xuld
+ */
+
+/**
+ * 用于发送和接收 AJAX 请求的工具。
+ * @class
+ * @extends Deferrable
+ */
+var Ajax = (function () {
+
+    var ajaxLoc,
+		ajaxLocParts,
+		rUrl = /^([\w\+\.\-]+:)(?:\/\/([^\/?#:]*)(?::(\d+)|)|)/,
+		defaultAccepts = ["*/"] + ["*"],
+		Ajax;
+
+    // 如果设置了 document.domain, IE 会抛出异常。
+    try {
+        ajaxLoc = location.href;
+    } catch (e) {
+        // 使用 a 的默认属性获取当前地址。
+        ajaxLoc = document.createElement("a");
+        ajaxLoc.href = "";
+        ajaxLoc = ajaxLoc.href;
+    }
+
+    ajaxLocParts = rUrl.exec(ajaxLoc.toLowerCase()) || [];
+
+    Ajax = Deferrable.extend({
+
+        /**
+		 * Ajax 对象。
+		 * @constructor Ajax
+		 */
+        constructor: function () {
+
+        },
+
+        /**
+		 * 发送一个 AJAX 请求。
+		 * @param {Object} xhrObject 发送的配置。
+		 *
+		 * //  accepts - 请求头的 accept ，默认根据 dataType 生成。
+		 * async - 是否为异步的请求。默认为 true 。
+		 * cache - 是否允许缓存。默认为 true 。
+		 * charset - 请求的字符编码。
+		 * complete(statusCode, xhrObject) - 请求完成时的回调。
+		 * //  contentType - 请求头的 Content-Type 。默认为 'application/x-www-form-urlencoded; charset=UTF-8'。
+		 * // createNativeRequest() - 创建原生 XHR 对象的函数。
+		 * crossDomain - 指示 AJAX 强制使用跨域方式的请求。默认为 null,表示系统自动判断。
+		 * data - 请求的数据。
+		 * dataType - 请求数据的类型。默认为根据返回内容自动识别。
+		 * error(message, xhrObject) - 请求失败时的回调。
+		 * headers - 附加的额外请求头信息。
+		 * jsonp - 如果使用 jsonp 请求，则指示 jsonp 参数。如果设为 false，则不添加后缀。默认为 callback。
+		 * jsonpCallback - jsonp请求回调函数名。默认为根据当前时间戳自动生成。
+		 * //  mimeType - 用于覆盖原始 mimeType 的 mimeType 。
+		 * //  getResponse(data) - 用于解析请求数据用的回调函数。
+		 * password - 请求的密码 。
+		 * start(data, xhrObject) - 请求开始时的回调。return false 可以终止整个请求。
+		 * success(data, xhrObject) - 请求成功时的回调。
+		 * timeout - 请求超时时间。单位毫秒。默认为 -1 无超时 。
+		 * type - 请求类型。默认是 "GET" 。
+		 * url - 请求的地址。
+		 * username - 请求的用户名 。
+		 *
+		 * @param {String} link='wait' 当出现两次并发的请求后的操作。
+		 */
+        run: function (xhrObject, link) {
+            var me = this, parts;
+
+            // 串联请求。
+            if (!me.defer(xhrObject, link)) {
+
+                // 首先复制默认配置，然后复制用户对应的配置。
+                xhrObject = Object.extend({
+                    owner: me,
+                    timeout: -1
+                }, xhrObject);
+
+                assert(!xhrObject.url || xhrObject.url.replace, "Ajax#run(xhrObject): {xhrObject.url} 必须是字符串。", xhrObject.url);
+
+                // url
+                xhrObject.url = xhrObject.url ? xhrObject.url.replace(/#.*$/, "") : ajaxLoc;
+
+                // data
+                xhrObject.data = xhrObject.data ? typeof xhrObject.data !== 'string' ? Ajax.param(xhrObject.data) : xhrObject.data : null;
+
+                // crossDomain
+                if (xhrObject.crossDomain == null) {
+
+                    parts = rUrl.exec(xhrObject.url.toLowerCase());
+
+                    // from jQuery: 跨域判断。
+                    xhrObject.crossDomain = !!(parts &&
+						(parts[1] != ajaxLocParts[1] || parts[2] != ajaxLocParts[2] ||
+							(parts[3] || (parts[1] === "http:" ? 80 : 443)) !=
+								(ajaxLocParts[3] || (ajaxLocParts[1] === "http:" ? 80 : 443)))
+					);
+
+                }
+
+                // 根据 dataType 获取当前用于传输的工具。
+                // 实际的发送操作。
+                (Ajax.transports[xhrObject.dataType] || Ajax.transports.text)(xhrObject);
+
+            }
+
+            return me;
+        },
+
+        /**
+		 * 停止当前的请求。
+		 * @return this
+		 */
+        pause: function () {
+            if (this.callback)
+                this.callback('Aborted', -3);
+            return this;
+        }
+
+    });
+
+    Object.extend(Ajax, {
+
+        send: function (xhrObject) {
+            return new Ajax().run(xhrObject);
+        },
+
+        transports: {},
+
+        accepts: {},
+
+        dataParsers: {},
+
+        /**
+		 * 返回变量的地址形式。
+		 * @param {Object} obj 变量。
+		 * @return {String} 字符串。
+		 * @example <pre>
+		 * Ajax.param({a: 4, g: 7}); //  a=4&g=7
+		 * </pre>
+		 */
+        param: function (obj, name) {
+
+            var s;
+            if (obj && typeof obj === 'object') {
+                s = [];
+                Object.each(obj, function (value, key) {
+                    s.push(Ajax.param(value, name ? name + "[" + key + "]" : key));
+                });
+                s = s.join('&');
+            } else {
+                s = encodeURIComponent(name) + "=" + encodeURIComponent(obj);
+            }
+
+            return s.replace(/%20/g, '+');
+        },
+
+        concatUrl: function (url, param) {
+            return param ? url + (url.indexOf('?') >= 0 ? '&' : '?') + param : url;
+        },
+
+        addCachePostfix: function (url) {
+            return /[?&]_=/.test(url) ? url : Ajax.concatUrl(url, '_=' + Date.now() + JPlus.id++);
+        },
+
+        /**
+		 * 判断一个 HTTP 状态码是否表示正常响应。
+		 * @param {Number} status 要判断的状态码。
+		 * @return {Boolean} 如果正常则返回true, 否则返回 false 。
+		 * @remark 一般地， 200、304、1223 被认为是正常的状态吗。
+		 */
+        checkStatus: function (status) {
+
+            // 获取状态。
+            if (!status) {
+
+                // 获取协议。
+                var protocol = window.location.protocol;
+
+                // 对谷歌浏览器, 在有些协议， status 不存在。
+                return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");
+            }
+
+            // 检查， 各浏览器支持不同。
+            return (status >= 200 && status < 300) || status == 304 || status == 1223;
+        },
+
+        /**
+		 * 初始化一个 XMLHttpRequest 对象。
+		 * @return {XMLHttpRequest} 请求的对象。
+		 */
+        createNativeRequest: window.ActiveXObject ? function () {
+            return new ActiveXObject("Microsoft.XMLHTTP");
+        } : function () {
+            return new XMLHttpRequest();
+        },
+
+        /**
+		 * 用于让 transport 直接调用的回调函数。
+		 * @type Boolean
+		 */
+        done: function (xhrObject, error, status, statusText, eventArgs, done) {
+
+            var eventName;
+
+            if (error) {
+                xhrObject.errorMessage = eventArgs;
+                eventName = 'error';
+            } else {
+
+                try {
+                    eventArgs = eventArgs.call(Ajax.dataParsers, xhrObject);
+                } catch (parseDataError) {
+                    return Ajax.done(xhrObject, 2, status, statusText, parseDataError.message, done);
+                }
+
+                eventName = 'success';
+            }
+
+            xhrObject.errorCode = error;
+            xhrObject.status = status;
+            xhrObject.statusText = statusText;
+
+            // 系统内置的全部完成后的回调。
+            if (done) {
+                done();
+            }
+
+            try {
+
+                if (xhrObject[eventName]) {
+                    xhrObject[eventName].call(xhrObject.owner, eventArgs, xhrObject);
+                }
+
+                if (xhrObject.complete)
+                    xhrObject.complete.call(xhrObject.owner, error, xhrObject);
+
+            } finally {
+
+                xhrObject.xhr = null;
+
+                xhrObject.owner.progress();
+
+            }
+
+        },
+
+        error: function (xhrObject, errorThrown) {
+            // 赋予新的空对象，避免再次访问 XHR 。
+            xhrObject.xhr = { readyState: 4 };
+            xhrObject.errorThrown = errorThrown;
+            xhrObject.owner.callback(errorThrown.message, -1);
+        }
+
+    });
+
+    /**
+     * 根据 xhr 获取响应。
+     * @type {Object} xhrObject 要处理的原始 xhrObject。
+     */
+    Ajax.dataParsers.text = function (xhrObject) {
+
+        var responseText;
+
+        // 如果请求了一个二进制格式的文件， IE6-9 报错。
+        try {
+            responseText = xhrObject.xhr.responseText;
+        } catch (ieResponseTextError) {
+            responseText = '';
+        }
+
+        return xhrObject.responseText = responseText;
+    };
+
+    /**
+     * 发送指定配置的 Ajax 对象。
+     * @type {Object} xhrObject 要发送的 AJAX 对象。
+     * @type {Function} parseData 使用当前发送器发送数据后的回调函数。
+     */
+    Ajax.transports.text = function (xhrObject, parseData, done) {
+
+        var headers = {}, xhr, key, callback;
+
+        // type
+        xhrObject.type = xhrObject.type ? xhrObject.type.toUpperCase() : 'GET';
+
+        // async
+        xhrObject.async = xhrObject.async !== false;
+
+        // data
+        if (xhrObject.data && xhrObject.type === 'GET') {
+            xhrObject.url = Ajax.concatUrl(xhrObject.url, xhrObject.data);
+            xhrObject.data = null;
+        }
+
+        // cache
+        if (xhrObject.cache !== true) {
+            xhrObject.url = Ajax.addCachePostfix(xhrObject.url);
+        }
+
+        // headers['Accept']
+        headers.Accept = xhrObject.dataType in Ajax.accepts ? Ajax.accepts[xhrObject.dataType] + ", " + defaultAccepts + "; q=0.01" : defaultAccepts;
+
+        // headers['Content-Type']
+        if (xhrObject.data) {
+            headers['Content-Type'] = "application/x-www-form-urlencoded; charset=" + (xhrObject.charset || "UTF-8");
+        }
+
+        // headers['Accept-Charset']
+        if (xhrObject.charset) {
+            headers["Accept-Charset"] = value;
+        }
+
+        // headers['X-Requested-With']
+        if (!xhrObject.crossDomain) {
+            headers['X-Requested-With'] = 'XMLHttpRequest';
+        }
+
+        // 如果参数有 headers, 复制到当前 headers 。
+        for (key in xhrObject.headers) {
+            headers[key] = xhrObject.headers[key];
+        }
+
+        // 发送请求。
+
+        // 请求对象。
+        xhrObject.xhr = xhr = Ajax.createNativeRequest();
+
+        /**
+         * 由 XHR 负责调用的状态检测函数。
+         * @param {Object} _ 忽略的参数。
+         * @param {Integer} errorCode 系统控制的错误码。
+         *
+         * - 0: 成功。
+         * - -1: 程序出现异常，导致进程中止。
+         * - -2: HTTP 相应超时， 程序自动终止。
+         * - -3: 用户强制中止操作。
+         * - 1: HTTP 成功相应，但返回的状态码被认为是不对的。
+         * - 2: HTTP 成功相应，但返回的内容格式不对。
+         */
+        xhrObject.owner.callback = callback = function (eventArgs, error) {
+
+            // xhr
+            var xhr = xhrObject.xhr, status, statusText;
+
+            try {
+
+                if (!xhr || (!error && xhr.readyState !== 4)) {
+                    return;
+                }
+
+                // 删除 readystatechange  。
+                // 删除 xhrObject.callback 避免被再次触发。
+                xhr.onreadystatechange = xhrObject.owner.callback = Function.empty;
+
+                // 如果存在错误。
+                if (error) {
+
+                    // 如果是因为超时引发的，手动中止请求。
+                    if (xhr.readyState !== 4) {
+                        xhr.abort();
+                    }
+
+                    status = error;
+                    statusText = "";
+
+                } else {
+
+                    // 正确的状态码。
+                    status = xhr.status;
+
+                    // 如果跨域，火狐报错。
+                    try {
+                        statusText = xhr.statusText;
+                    } catch (firefoxCrossDomainError) {
+                        // 模拟 Webkit: 设为空字符串。
+                        statusText = "";
+                    }
+
+                    // 检验状态码是否正确。
+                    if (Ajax.checkStatus(status)) {
+                        eventArgs = parseData || Ajax.dataParsers[xhrObject.dataType] || Ajax.dataParsers.text;
+                    } else {
+                        error = 1;
+                        eventArgs = statusText;
+                    }
+
+                }
+
+                // 清空变量的引用。
+                xhr = null;
+
+            } catch (firefoxAccessError) {
+                return Ajax.error(xhrObject, firefoxAccessError);
+            }
+
+            // 统一处理回调。
+            Ajax.done(xhrObject, error, status, statusText, eventArgs, done);
+        };
+
+        // 预处理数据。
+        if (xhrObject.start && xhrObject.start.call(xhrObject.owner, xhrObject.data, xhrObject) === false)
+            return callback('Prevented', -3);
+
+        try {
+
+            if (xhrObject.username)
+                xhr.open(xhrObject.type, xhrObject.url, xhrObject.async, xhrObject.username, xhrObject.password);
+            else
+                xhr.open(xhrObject.type, xhrObject.url, xhrObject.async);
+
+        } catch (ieOpenError) {
+
+            //  出现错误地址时  ie 在此产生异常 。
+            return Ajax.error(xhrObject, ieOpenError);
+        }
+
+        // 设置文件头。
+        // 如果跨域了， 火狐会报错。
+        for (key in headers)
+            try {
+                xhr.setRequestHeader(key, headers[key]);
+            } catch (firefoxSetHeaderError) {
+            }
+
+        // 进行真实的发送。
+
+        try {
+            xhr.send(xhrObject.data);
+        } catch (sendError) {
+
+            //  出现 ajax 地址时，在此产生异常 。
+            return Ajax.error(xhrObject, sendError);
+        }
+
+        // 同步时，火狐不会自动调用 onreadystatechange
+        if (!xhrObject.async) {
+            callback();
+        } else if (xhr.readyState === 4) {
+            // IE6/7： 如果存在缓存，需要手动执行回调函数。
+            setTimeout(callback, 0);
+        } else {
+
+            // 绑定 onreadystatechange， 让 xhr 根据请求情况调用 callback。
+            xhr.onreadystatechange = callback;
+
+            // 监听超时功能。
+            if (xhrObject.timeouts > 0) {
+                setTimeout(function () {
+                    callback('Timeout', -2);
+                }, xhrObject.timeouts);
+            }
+        }
+
+        // 发送完成。
+
+    };
+
+    Object.map("get post", function (type) {
+
+        Ajax[type] = function (url, data, onsuccess, onerror, dataType) {
+            if (typeof data == 'function') {
+                dataType = onerror;
+                onerror = onsuccess;
+                onsuccess = data;
+                data = null;
+            }
+
+            return Ajax.send({
+                url: url,
+                data: data,
+                success: onsuccess,
+                error: onerror,
+                type: type,
+                dataType: dataType
+            });
+        };
+
+    });
+
+    return Ajax;
+
+})();
+
+
+
+
+/*********************************************************
+ * System.Ajax.Script
+ ********************************************************/
+/**
+ * AJAX 传输 JavaScript 。
+ * @author xuld
+ */
+
+Ajax.accepts.script = "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript";
+
+Ajax.dataParsers.script = function (xhrObject) {
+    window.execScript(this.text(xhrObject));
+};
+
+Ajax.transports.script = function (xhrObject, parseData, done) {
+    if (!xhrObject.crossDomain) {
+        return Ajax.transports.text(xhrObject, parseData && function (xhrObject) {
+            this.script(xhrObject);
+            return parseData(xhrObject);
+        }, done);
+    }
+
+    var script, t, callback;
+
+    xhrObject.type = "GET";
+
+    // cache
+    if (xhrObject.cache !== false) {
+        xhrObject.cache = false;
+
+        xhrObject.url = Ajax.addCachePostfix(xhrObject.url);
+    }
+
+    // data
+    if (xhrObject.data) {
+        xhrObject.url = Ajax.concatUrl(xhrObject.url, xhrObject.data);
+        xhrObject.data = null;
+    }
+
+    xhrObject.xhr = script = document.createElement('SCRIPT');
+
+    xhrObject.owner.callback = callback = function (eventArgs, error) {
+        var script = xhrObject.xhr;
+        if (script && (error || !script.readyState || !/in/.test(script.readyState))) {
+
+            // 删除 callback 避免再次执行。
+            xhrObject.owner.callback = Function.empty;
+
+            // 删除全部绑定的函数。
+            script.onerror = script.onload = script.onreadystatechange = null;
+
+            // 删除当前脚本。
+            script.parentNode.removeChild(script);
+
+            // 清空对 script 的引用。
+            script = null;
+
+            // 执行全部回调。
+            if (error) {
+                Ajax.done(xhrObject, error, error, "", eventArgs, done);
+            } else {
+                Ajax.done(xhrObject, 0, 200, "OK", parseData || Function.empty, done);
+            }
+
+        }
+    };
+
+    script.src = xhrObject.url;
+    script.type = "text/javascript";
+    script.async = "async";
+    if (xhrObject.charset)
+        script.charset = xhrObject.charset;
+
+    // 预处理数据。
+    if (xhrObject.start && xhrObject.start.call(xhrObject.owner, xhrObject.data, xhrObject) === false)
+        return callback('Prevented', -3);
+
+    script.onload = script.onreadystatechange = callback;
+
+    script.onerror = function (e) {
+        callback('Script Execute Error', 2);
+    };
+
+    if (xhrObject.timeouts > 0) {
+        setTimeout(function () {
+            callback('Timeout', -2);
+        }, xhrObject.timeouts);
+    }
+
+    t = document.getElementsByTagName("SCRIPT")[0];
+    t.parentNode.insertBefore(script, t);
+};
+
+/*********************************************************
+ * System.Ajax.Jsonp
+ ********************************************************/
+/**
+ * @author xuld
+ */
+
+Ajax.transports.jsonp = function (xhrObject, parseData) {
+
+    if (xhrObject.jsonp === undefined) {
+        xhrObject.jsonp = 'callback';
+    }
+
+    // callback=?
+    var jsonpCallback = xhrObject.jsonpCallback || (xhrObject.jsonpCallback = 'jsonp' + Date.now() + JPlus.id++),
+        jsonpCallbackOverwritten = window[jsonpCallback],
+        responseData;
+
+    // callback=jsonp123
+    if (xhrObject.jsonp) {
+        if (xhrObject.url.indexOf(xhrObject.jsonp + '=?') >= 0) {
+            xhrObject.url = xhrObject.url.replace(xhrObject.jsonp + '=?', xhrObject.jsonp + '=' + jsonpCallback);
+        } else {
+            xhrObject.url = Ajax.concatUrl(xhrObject.url, xhrObject.jsonp + "=" + jsonpCallback);
+        }
+    }
+
+    // 插入 JSONP 回调。
+    window[jsonpCallback] = function () {
+        responseData = arguments;
+    };
+
+    // 最后使用 Script 协议发送。
+    Ajax.transports.script(xhrObject, function (xhrObject) {
+        
+        if (!responseData) {
+            throw new Error(jsonpCallback + ' was not called');
+        }
+
+        return responseData[0];
+
+    }, function () {
+
+        // 回复初始的 jsonpCallback 函数。
+        window[jsonpCallback] = jsonpCallbackOverwritten;
+    });
+};
+
+Ajax.jsonp = function(url, data, onsuccess, onerror) {
+    if (typeof data === 'function') {
+        onerror = onsuccess;
+		onsuccess = data;
+		data = null;
+	}
+
+	return Ajax.send({
+		url: url,
+		dataType: 'jsonp',
+		data: data,
+		success: onsuccess,
+		error: onerror
+	});
+};
 /*********************************************************
  * System.Fx.Base
  ********************************************************/
@@ -7685,17 +8341,15 @@ var Fx = (function() {
 /*********************************************************
  * System.Fx.Tween
  ********************************************************/
-/** * DOM 补间动画 * @author xuld */Object.extend(Fx, {		/**	 * 用于特定 css 补间动画的引擎。 
+/** * @author xuld */Object.extend(Fx, {		/**	 * 用于特定 css 补间动画的引擎。 
 	 */	tweeners: {},		/**	 * 默认的补间动画的引擎。 	 */	defaultTweeners: [],		/**	 * 用于数字的动画引擎。
 	 */	numberTweener: {		get: function(target, name){			return Dom.styleNumber(target.node, name);		},						/**		 * 常用计算。		 * @param {Object} from 开始。		 * @param {Object} to 结束。		 * @param {Object} delta 变化。		 */		compute: function(from, to, delta){			return (to - from) * delta + from;		},				parse: function(value){			return typeof value == "number" ? value : parseFloat(value);		},				set: function(target, name, value){			target.node.style[name] = value;		}	},	/**	 * 补间动画	 * @class Tween	 * @extends Fx	 */	Tween: Fx.extend({				/**		 * 初始化当前特效。		 */		constructor: function(){					},				/**		 * 根据指定变化量设置值。		 * @param {Number} delta 变化量。 0 - 1 。		 * @override		 */		set: function(delta){			var options = this.options,				params = options.params,				target = options.target,				tweener,				key,				value;			// 对当前每个需要执行的特效进行重新计算并赋值。			for (key in params) {				value = params[key];				tweener = value.tweener;				tweener.set(target, key, tweener.compute(value.from, value.to, delta));			}		},				/**		 * 生成当前变化所进行的初始状态。		 * @param {Object} options 开始。		 */		init: function (options) {							// 对每个设置属性			var key,				tweener,				part,				value,				parsed,				i,				// 生成新的 tween 对象。				params = {};						for (key in options.params) {				// value				value = options.params[key];				// 如果 value 是字符串，判断 += -= 或 a-b				if (typeof value === 'string' && (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {					value = part[3];				}				// 找到用于变化指定属性的解析器。				tweener = Fx.tweeners[key = key.toCamelCase()];								// 已经编译过，直接使用， 否则找到合适的解析器。				if (!tweener) {										// 如果是纯数字属性，使用 numberParser 。					if(key in Dom.styleNumbers) {						tweener = Fx.numberTweener;					} else {												i = Fx.defaultTweeners.length;												// 尝试使用每个转换器						while (i-- > 0) {														// 获取转换器							parsed = Fx.defaultTweeners[i].parse(value, key);														// 如果转换后结果合格，证明这个转换器符合此属性。							if (parsed || parsed === 0) {								tweener = Fx.defaultTweeners[i];								break;							}						}						// 找不到合适的解析器。						if (!tweener) {							continue;						}											}					// 缓存 tweeners，下次直接使用。					Fx.tweeners[key] = tweener;				}								// 如果有特殊功能。 ( += -= a-b)				if(part){					parsed = part[2];					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));				} else {					parsed = tweener.parse(value);					i = tweener.get(options.target, key);				}								params[key] = {					tweener: tweener,					from: i,					to: parsed						};								assert(i !== null && parsed !== null, "Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, i, parsed);							}			options.params = params;		}		}),		createTweener: function(tweener){		return Object.extendIf(tweener, Fx.numberTweener);	}	});Object.each(Dom.styleFix, function(value, key){	Fx.tweeners[key] = this;}, Fx.createTweener({	set: function (target, name, value) {		Dom.styleFix[name].call(target, value);	}}));Fx.tweeners.scrollTop = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(null, value);	},	get: function (target) {		return target.getScroll().y;	}});Fx.tweeners.scrollLeft = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(value);	},	get: function (target) {		return target.getScroll().x;	}});Fx.defaultTweeners.push(Fx.createTweener({	set: navigator.isStd ? function (target, name, value) {				target.node.style[name] = value + 'px';	} : function(target, name, value) {		try {						// ie 对某些负属性内容报错			target.node.style[name] = value;		}catch(e){}	}}));
 /*********************************************************
  * System.Fx.Animate
  ********************************************************/
 /**
- * @fileOverview 通过改变CSS实现的变换。
  * @author xuld
- */
-
+ */
 
 
 (function(){
@@ -7706,7 +8360,8 @@ var Fx = (function() {
 
         displayEffects = Fx.displayEffects = {
             opacity: function () {
-                return opacity0;            }
+                return opacity0;
+            }
 		},
 
 		toggle = Dom.prototype.toggle,
@@ -7749,7 +8404,8 @@ var Fx = (function() {
 			return value;
 		};
 	}, function () {
-	    return 0;	});
+	    return 0;
+	});
 	
 	Object.map('left right top bottom', function(key, index) {
 		key = 'margin' + key.capitalize();
@@ -7849,7 +8505,7 @@ var Fx = (function() {
 				effect;
 
 			// 如果没有参数，直接隐藏。
-			if (args[0] == undefined) {
+			if (typeof args[0] !== 'number') {
 				Dom.show(me.node);
 			} else {
 
@@ -7936,7 +8592,7 @@ var Fx = (function() {
 				effect;
 			
 			// 如果没有参数，直接隐藏。
-			if (args[0] == undefined) {
+			if (typeof args[0] !== 'number') {
 				Dom.hide(me.node);
 			} else {
 
@@ -8007,157 +8663,3 @@ var Fx = (function() {
 	});
 	
 })();
-
-/// TODO: clear
-
-document.animate = function() {
-	assert.deprected("document.animate 已过时，请改用 Dom.get(document).animate。");
-	var doc = Dom.get(document);
-	doc.animate.apply(doc, arguments);
-	return this;
-};
-
-/// TODO: clear
-
-/*********************************************************
- * System.Ajax.Base
- ********************************************************/
-/** * @author xuld *//** * 用于发送和接收 AJAX 请求的工具。 * @class * @extends Deferrable */var Ajax = (function() {	var ajaxLoc,		ajaxLocParts,		rUrl = /^([\w\+\.\-]+:)(?:\/\/([^\/?#:]*)(?::(\d+)|)|)/,		defaultAccepts = ["*/"] + ["*"],		Ajax;		// 如果设置了 document.domain, IE 会抛出异常。	try {		ajaxLoc = location.href;	} catch (e) {		// 使用 a 的默认属性获取当前地址。		ajaxLoc = document.createElement("a");		ajaxLoc.href = "";		ajaxLoc = ajaxLoc.href;	}	ajaxLocParts = rUrl.exec(ajaxLoc.toLowerCase()) || [];		Ajax = Deferrable.extend({				/**		 * Ajax 默认配置。		 */		options: {			///**			// * 供 Transport 设置的状态回调。			// */			//callback: Function.empty,						/**			 * 传输的数据类型。			 * @type String			 */			dataType: 'text',				/**			 * 当前 AJAX 发送的地址。			 * @field url			 */			url: ajaxLoc,				/**			 * 超时的时间大小。 (单位: 毫秒)			 * @property timeouts			 * @type Number			 */			timeout: -1,			/**			 * 出现错误后的回调。			 */			exception: function(e) {				this.callback(e.message, -1);			},				///**			// * 获取或设置是否为允许缓存。			// * @type Boolean			// */			//cache: true,				///**			// * 发送的数据。			// * @type Obeject/String			// */			//data: null,				///**			// * 发送数据前的回调。			// * @type Function			// */			//start: null,				///**			// * 发送数据成功的回调。			// * @type Function			// */			//success: null,				///**			// * 发送数据错误的回调。			// * @type Function			// */			//error: null,				///**			// * 发送数据完成的回调。			// * @type Function			// */			//complete: null,					/**			 * 用于格式化原始数据的函数。			 * @type Function			 */			formatData: function(data) {				return typeof data === 'string' ? data : Ajax.param(data);			}			///**			// * 获取或设置请求类型。			// */			//type: 'GET',			///**			// * 获取或设置是否为异步请求。			// */			//async: true,			///**			// * 获取或设置是否为请求使用的用户名。			// */			//username: null,			///**			// * 获取或设置是否为请求使用的密码。			// */			//password: null,			///**			// * 获取请求头。			// */			//headers: null,					},				/**		 * Ajax 对象。		 * @constructor Ajax		 */		constructor: function() {		},		/**		 * 发送一个 AJAX 请求。		 * @param {Object} options 发送的配置。		 *		 * //  accepts - 请求头的 accept ，默认根据 dataType 生成。		 * async - 是否为异步的请求。默认为 true 。		 * cache - 是否允许缓存。默认为 true 。		 * charset - 请求的字符编码。		 * complete(errorCode, xhr) - 请求完成时的回调。		 * //  contentType - 请求头的 Content-Type 。默认为 'application/x-www-form-urlencoded; charset=UTF-8'。		 * // createNativeRequest() - 创建原生 XHR 对象的函数。		 * crossDomain - 指示 AJAX 强制使用跨域方式的请求。默认为 null,表示系统自动判断。		 * data - 请求的数据。		 * dataType - 请求数据的类型。默认为根据返回内容自动识别。		 * errorCode(message, xhr) - 请求失败时的回调。		 * formatData(data) - 用于将 data 格式化为字符串的函数。		 * headers - 附加的额外请求头信息。		 * jsonp - 如果使用 jsonp 请求，则指示 jsonp 参数。如果设为 false，则不添加后缀。默认为 callback。		 * jsonpCallback - jsonp请求回调函数名。默认为根据当前时间戳自动生成。		 * //  mimeType - 用于覆盖原始 mimeType 的 mimeType 。		 * getResponse(data) - 用于解析请求数据用的回调函数。		 * password - 请求的密码 。		 * start(data, xhr) - 请求开始时的回调。return false 可以终止整个请求。		 * success(data, xhr) - 请求成功时的回调。		 * timeout - 请求超时时间。单位毫秒。默认为 -1 无超时 。		 * type - 请求类型。必须是大写。默认是 "GET" 。		 * url - 请求的地址。		 * username - 请求的用户名 。		 *		 * @param {String} link 当出现两次并发的请求后的操作。		 */		run: function(options, link) {			var me = this, defaultOptions, transport;						if (!me.defer(options, link)) {				// defaultOptions				defaultOptions = me.options;				// options				me.options = options = Object.extend({					target: me,					formatData: defaultOptions.formatData,					timeout: defaultOptions.timeout,					exception: defaultOptions.exception				}, options);								assert(!options.url || options.url.replace, "Ajax#run(options): {options.url} 必须是字符串。", options.url);				// dataType				options.dataType = options.dataType || defaultOptions.dataType;				// url				options.url = options.url ? options.url.replace(/#.*$/, "") : defaultOptions.url;					// data				options.data = options.data ? options.formatData(options.data) : null;					// crossDomain				if (options.crossDomain == null) {						var parts = rUrl.exec(options.url.toLowerCase());						// from jQuery: 跨域判断。					options.crossDomain = !!(parts &&						(parts[1] != ajaxLocParts[1] || parts[2] != ajaxLocParts[2] ||							(parts[3] || (parts[1] === "http:" ? 80 : 443)) !=								(ajaxLocParts[3] || (ajaxLocParts[1] === "http:" ? 80 : 443)))					);					}								// 当前用于传输的工具。				transport = Ajax.transports[options.dataType];				assert(transport, "Ajax#run(options, link): 不支持 {dataType} 的数据格式。", options.dataType);								// 实际的发送操作。				transport.send(options);			}						return me;		},		/**		 * 停止当前的请求。		 * @return this		 */		pause: function() {			this.options.callback('Aborted', -3);			return this;		}	});		Object.extend(Ajax, {		send: function(options){			return new Ajax().run(options);		},				transports: {					},				accepts: {					},				/**		 * 返回变量的地址形式。		 * @param {Object} obj 变量。		 * @return {String} 字符串。		 * @example <pre>		 * Ajax.param({a: 4, g: 7}); //  a=4&g=7		 * </pre>		 */		param: function(obj, name) {				var s;			if (obj && typeof obj === 'object') {				s = [];				Object.each(obj, function(value, key) {					s.push(Ajax.param(value, name ? name + "[" + key + "]" : key));				});				s = s.join('&');			} else {				s = encodeURIComponent(name) + "=" + encodeURIComponent(obj);			}				return s.replace(/%20/g, '+');		},				concatUrl: function(url, param) {			return param ? url + (url.indexOf('?') >= 0 ? '&' : '?') + param : url;		},				addCachePostfix: function(url){			return /[?&]_=/.test(url) ? url : Ajax.concatUrl(url, '_=' + Date.now() + JPlus.id++);		},		/**		 * 判断一个 HTTP 状态码是否表示正常响应。		 * @param {Number} status 要判断的状态码。		 * @return {Boolean} 如果正常则返回true, 否则返回 false 。		 * @remark 一般地， 200、304、1223 被认为是正常的状态吗。		 */		checkStatus: function(status) {			// 获取状态。			if (!status) {				// 获取协议。				var protocol = window.location.protocol;				// 对谷歌浏览器, 在有些协议， status 不存在。				return (protocol == "file: " || protocol == "chrome: " || protocol == "app: ");			}			// 检查， 各浏览器支持不同。			return (status >= 200 && status < 300) || status == 304 || status == 1223;		},		/**		 * 初始化一个 XMLHttpRequest 对象。		 * @return {XMLHttpRequest} 请求的对象。		 */		createNativeRequest: window.XMLHttpRequest ? function() {			return new XMLHttpRequest();		} : function() {			return new ActiveXObject("Microsoft.XMLHTTP");		}	});	/**	 * 公共的 XHR 对象。	 */	Ajax.transports.text = Ajax.XHR = {				/**		 * 根据 xhr 获取响应。		 * @type {XMLHttpRequest} xhr 要获取的 xhr 。		 */		getResponse: function(xhr) {			// 如果请求了一个二进制格式的文件， IE6-9 报错。			try {				return xhr.responseText;			} catch (ieResponseTextError) {				return '';			}		},		/**		 * 发送指定配置的 Ajax 对象。		 * @type {Ajax} options 要发送的 AJAX 对象。		 */		send: function(options) {			// 拷贝配置。			// options			var headers,				xhr,				key,				callback;			// type			options.type = options.type ? options.type.toUpperCase() : 'GET';			// async			options.async = options.async !== false;			// getResponse			options.getResponse = options.getResponse || this.getResponse;			// data			if (options.data && options.type == 'GET') {				options.url = Ajax.concatUrl(options.url, options.data);				options.data = null;			}			// cache			if (options.cache !== true) {				options.url = Ajax.addCachePostfix(options.url);			}			// headers			headers = {};			// headers['Accept']			headers.Accept = options.dataType in Ajax.accepts ? Ajax.accepts[options.dataType] + ", " + defaultAccepts + "; q=0.01" : defaultAccepts;			// headers['Content-Type']			if (options.data) {				headers['Content-Type'] = "application/x-www-form-urlencoded; charset=" + (options.charset || "UTF-8");			}			// headers['Accept-Charset']			if (options.charset) {				headers["Accept-Charset"] = value;			}			// headers['X-Requested-With']			if (!options.crossDomain) {				headers['X-Requested-With'] = 'XMLHttpRequest';			}			// 如果参数有 headers, 复制到当前 headers 。			if (options.headers) {				options.headers = Object.extend(headers, options.headers);			}			// 发送请求。			// 请求对象。			options.xhr = xhr = Ajax.createNativeRequest();			/**			 * 由 XHR 负责调用的状态检测函数。			 * @param {Object} _ 忽略的参数。			 * @param {Integer} errorCode 系统控制的错误码。			 *			 * - 0: 成功。			 * - -1: 程序出现异常，导致进程中止。			 * - -2: HTTP 相应超时， 程序自动终止。			 * - -3: START 函数返回 false， 程序自动终止。			 * - 1: HTTP 成功相应，但返回的状态码被认为是不对的。			 * - 2: HTTP 成功相应，但返回的内容格式不对。			 */			callback = options.callback = function(errorMessage, error) {				// xhr				var xhr = options.xhr;				try {					if (xhr && (error || xhr.readyState === 4)) {						// 删除 readystatechange  。						// 删除 options.callback 避免被再次触发。						xhr.onreadystatechange = options.callback = Function.empty;						// 如果存在错误。						if (error) {							// 如果是因为超时引发的，手动中止请求。							if (xhr.readyState !== 4) {								xhr.abort();							}							// 出现错误 status = error 。							options.status = error;							options.statusText = "";							options.errorMessage = errorMessage;						} else {							options.status = xhr.status;							// 如果跨域，火狐报错。							try {								options.statusText = xhr.statusText;							} catch (firefoxCrossDomainError) {								// 模拟 Webkit: 设为空字符串。								options.statusText = "";							}							// 检验状态码是否正确。							if (Ajax.checkStatus(options.status)) {								// 如果请求合法，且数据返回正常，则使用 getResponse 获取解析的原始数据。								error = 0;								options.errorMessage = null;								try {									options.response = options.getResponse(xhr);								} catch (getResponseError) {									error = 2;									options.errorMessage = getResponseError.message;								}							} else {								error = 1;								options.errorMessage = options.statusText;							}						}						// 保存 error 。						options.errorCode = error;						try {							if (error) {								if (options.error)									options.error.call(options.target, options.errorMessage, xhr);							} else {								if (options.success)									options.success.call(options.target, options.response, xhr);							}							if (options.complete)								options.complete.call(options.target, options, xhr);						} finally {							// 删除 XHR 以确保 onStateChange 不重复执行。							options.xhr = xhr = null;							// 删除 options 。							delete options.target.options;							// 确保 AJAX 的等待项正常继续。							options.target.progress();						}					}				} catch (firefoxAccessError) {					// 赋予新的空对象，避免再次访问 XHR 。					options.xhr = {readyState: 4};					options.exception(firefoxAccessError);				}			};			// 预处理数据。			if (options.start && options.start.call(options.target, options, xhr) === false)				return callback(0, -3);			try {				if (options.username)					xhr.open(options.type, options.url, options.async, options.username, options.password);				else					xhr.open(options.type, options.url, options.async);			} catch (ieOpenError) {				//  出现错误地址时  ie 在此产生异常				return options.exception(ieOpenError);			}			// 设置文件头。			// 如果跨域了， 火狐会报错。			for (key in headers)				try {					xhr.setRequestHeader(key, headers[key]);				} catch (firefoxSetHeaderError) {				}			// 监视 提交是否完成。			xhr.onreadystatechange = callback;			try {				xhr.send(options.data);			} catch (sendError) {				return options.exception(sendError);			}			// 同步时，火狐不会自动调用 onreadystatechange			if (!options.async) {				callback();			} else if (xhr.readyState === 4) {				// IE6/7： 如果存在缓存，需要手动执行回调函数。				setTimeout(callback, 0);			} else if (options.timeouts > 0) {				setTimeout(function() {					callback('Timeout', -2);				}, options.timeouts);			}			// 发送完成。		}	};	Object.map("get post", function(type) {		Ajax[type] = function(url, data, onsuccess, dataType) {			if (typeof data == 'function') {				dataType = onsuccess;				onsuccess = data;				data = null;			}			return Ajax.send({				url: url,				data: data,				success: onsuccess,				type: type,				dataType: dataType			});		};	});	return Ajax;})();
-/*********************************************************
- * System.Ajax.Script
- ********************************************************/
-/** * AJAX 传输 JavaScript 。 * @author xuld */Ajax.accepts.script = "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript";Ajax.transports.script = {
-	getResponse: function(xhr) {
-		var code = Ajax.XHR.getResponse(xhr);
-		window.execScript(code);
-		return code;
-	},	send: function(options) {
-		if (!options.crossDomain) {
-			return Ajax.XHR.send.call(this, options);		}		options.type = "GET";				// cache		if (options.cache !== false) {
-			options.cache = false;						options.url = Ajax.addCachePostfix(options.url);		}		// data		if (options.data) {			options.url = Ajax.concatUrl(options.url, options.data);			options.data = null;		}		var script = options.script = document.createElement('SCRIPT'),
-			t,
-			callback = options.callback = function(errorMessage, error) {
-				var script = options.script;
-				if (script && (error || !script.readyState || !/in/.test(script.readyState))) {
-
-					// 删除 callback 避免再次执行。
-					options.callback = Function.empty;
-
-					// 删除全部绑定的函数。
-					script.onerror = script.onload = script.onreadystatechange = null;
-
-					// 删除当前脚本。
-					script.parentNode.removeChild(script);
-
-					try {												if(error < 0) {							options.status = error;							options.statusText = "";						} else {							options.status = 200;							options.statusText = "OK";						}
-
-						if (error) {														options.errorCode = error;							options.errorMessage = errorMessage;							
-							if (options.error)
-								options.error.call(options.target, options.errorMessage, script);
-						} else {														options.errorCode = 0;							options.errorMessage = null;							
-							if (options.success)
-								options.success.call(options.target, options.response, script);
-						}
-
-						if (options.complete)
-							options.complete.call(options.target, options, script);
-
-					} finally {
-
-						options.script = script = null;
-
-						delete options.target.options;
-
-						options.target.progress();
-					}
-				}
-			};
-
-		script.src = options.url;
-		script.type = "text/javascript";
-		script.async = "async";
-		if (options.charset)
-			script.charset = options.charset;
-		
-		// 预处理数据。
-		if (options.start && options.start.call(options.target, options, xhr) === false)
-			return callback(0, -3);
-
-		script.onload = script.onreadystatechange = callback;
-
-		script.onerror = function(e) {
-			callback('Network Error', 2);
-		};		
-		if (options.timeouts > 0) {
-			setTimeout(function() {
-				callback('Timeout', -2);
-			}, options.timeouts);
-		}
-
-		t = document.getElementsByTagName("SCRIPT")[0];
-		t.parentNode.insertBefore(script, t);	}};Ajax.script = function(url, onsuccess) {
-	return Ajax.send({
-		url: url,		dataType: 'script',		success: onsuccess	});};
-/*********************************************************
- * System.Ajax.Jsonp
- ********************************************************/
-/**
- * AJAX 处理JSON-P数据。
- * @author xuld
- */
-
-Ajax.transports.jsonp = {
-
-	jsonp: 'callback',
-
-	getResponse: function(xhr) {
-		window.execScript(Ajax.XHR.getResponse(xhr));
-		return this.response;
-	},
-
-	send: function(options) {
-
-		if (options.jsonp === undefined) {
-			options.jsonp = this.jsonp;
-		}
-
-		// callback=?
-		var jsonpCallback = options.jsonpCallback || (options.jsonpCallback = 'jsonp' + Date.now() + JPlus.id++);
-
-		// callback=jsonp123
-		if (options.jsonp) {
-			if (options.url.indexOf(options.jsonp + '=?') >= 0) {
-				options.url = options.url.replace(options.jsonp + '=?', options.jsonp + '=' + jsonpCallback);
-			} else {
-				options.url = Ajax.concatUrl(options.url, options.jsonp + "=" + jsonpCallback);
-			}
-		}
-
-		var oldMethod = window[jsonpCallback];
-
-		window[jsonpCallback] = function(data) {
-
-			// 回复初始的 jsonpCallback 函数。
-			window[jsonpCallback] = oldMethod;
-
-			// 保存 response 数据。
-			options.response = data;
-
-			// 通知 onStateChange 已完成请求。
-			options.callback();
-		};
-
-		// 最后使用 Script 协议发送。
-		Ajax.transports.script.send.call(this, options);
-	}
-
-};Ajax.jsonp = function(url, data, onsuccess) {
-	if (typeof data === 'function') {
-		onsuccess = data;
-		data = null;
-	}
-
-	return Ajax.send({
-		url: url,		dataType: 'jsonp',		data: data,		success: onsuccess
-	});
-};

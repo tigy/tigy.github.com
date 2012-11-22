@@ -14,9 +14,9 @@ var MonthCalender = Control.extend({
     tpl: '<div class="x-monthcalender">\
 		       <div class="x-monthcalender-main">\
 		        <div class="x-monthcalender-header">\
+		            <a class="x-monthcalender-next" href="javascript://下一页">▸</a>\
 		            <a class="x-monthcalender-previous" href="javascript://上一页">◂</a>\
 		            <a class="x-monthcalender-title" href="javascript://返回上一级"></a>\
-		            <a class="x-monthcalender-next" href="javascript://下一页">▸</a>\
 		        </div>\
 		        <div class="x-monthcalender-body">\
 		            <div class="x-monthcalender-content">\
@@ -57,7 +57,6 @@ var MonthCalender = Control.extend({
             newStyle = newContent.node.style,
             oldStyle = oldContent.node.style;
 
-        duration /= 2;
         newContent.setStyle('opacity', 0);
         slider.style.left = oldStyle.left = newStyle.left = '1px';
         newStyle.zIndex = 2;

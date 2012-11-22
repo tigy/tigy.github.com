@@ -11,25 +11,18 @@ using("Controls.Composite.MonthCalender");
 
 var DatePicker = Picker.extend({
 	
-	format: 'yyyy/M/d',
+	dataStringFormat: 'yyyy/M/d',
 	
 	dropDownWidth: 'auto',
 	
-	dropDownButtonTpl: '<button class="x-button"><span class="x-icon x-icon-calendar"></span></button>',
+	menuButtonTpl: '<button class="x-button"><span class="x-icon x-icon-calendar"></span></button>',
 	
-	initDropDown: function(existDom){
-		return new MonthCalender(existDom).on('select', this.selectItem, this);
+	createDropDown: function(existDom){
+		return new MonthCalender(existDom).on('selecting', this.selectItem, this);
 	},
 	
-	init: function (options) {
-		Picker.prototype.init.call(this, options);
-		this.input().on('focus', this.showDropDown, this);
-		this.input().on('blur', this.hideDropDown, this);
-	}, 
-	
-	selectItem: function (item) {
-		this.setValue(this.dropDown.getValue());
-		this.hideDropDown();
+	selectItem: function (value) {
+		return this.setValue(value).hideDropDown();
 	},
 	
 	updateDropDown: function(){
@@ -39,13 +32,11 @@ var DatePicker = Picker.extend({
 	},
 	
 	getValue: function(){
-		return this.dropDown.getValue();
+		return new Date(this.getText());
 	},
 	
 	setValue: function(value){
-		this.setText(value.toString(this.format));
-		this.dropDown.setValue(value);
-		return this;
+		return this.setText(value.toString(this.dataStringFormat));
 	}
 
 });
