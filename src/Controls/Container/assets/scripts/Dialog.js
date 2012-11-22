@@ -33,16 +33,16 @@ var Dialog = ContainerControl.extend({
 		if (!this.hasClass('x-dialog')) {
             
 		    // 判断节点是否已渲染过。
-		    t = this.parent('.x-dialog');
+		    t = this.parent();
 
-		    if (t) {
-		        this.node = t.node;
-		        t = null;
+		    if (t && t.hasClass('x-dialog-body')) {
+		        this.node = t.node.parentNode;
 		    } else {
 
 		        // 保存当前节点。
 		        t = this.node;
 		        this.node = this.create(options);
+		        this.body().append(t);
 
 		    }
 		}
@@ -54,10 +54,6 @@ var Dialog = ContainerControl.extend({
 		
 		// 移除 script 脚本。
 		this.query('script').remove();
-		
-		if(t){
-			this.body().appendChild(t);
-		}
 
 	},
 	

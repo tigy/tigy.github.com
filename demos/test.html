@@ -49,5 +49,77 @@
         // 2. 无论变量是否被使用，都存在闭包现象。只是浏览器会自动回收不会被使用的变量。
 
     </script>
+
+
+    比如现在我需要在页面添加个按钮
+
+    <a href="#" class="x-button">按钮</a> 这样就可以了。
+
+    当然这只是简单组件。万一碰到复杂的，只能从文档上拷贝，比如一个面板。
+
+   
+
+    <div class="x-panel">
+        <div class="x-panel-header">
+            <h2>顶部
+            </h2>
+        </div>
+        <div class="x-panel-body">
+            <div class="x-panel-container">
+                内容
+            </div>
+        </div> 
+    </div>
+
+    比如现在要做个面板，我现在用的方案是： 组件的示例页面会给出demo代码， 用的 时候复制即可。
+
+    你觉得应该改进为： 用 node生成， 然后粘贴上面的代码？ 单个面板这样是不合适  但我是写的整个页面
+
+    为啥整个页面不能先做成模板，以后直接复制代码呢那怎么搞
+
+     我是这个意思
+
+
+
+    <%
+      new Panel()
+    
+
+    <%
+      new Panel()
+    %>
+    <%
+      new Panel()
+    %>
+    <%
+      new Panel()
+    %>
+    <%
+      new Panel()
+    %>
+
+    比如现在我需要一个没标题的面板
+
+
+
+     其实现在就2种方案，一种是html：
+   
+
+    <div class="x-panel x-panel-collapsed">
+        <div class="x-panel-header">
+            <h2>顶部
+            </h2>
+        </div>
+    </div>
+
+    还有一种是nodejs:
+    
+   <%
+      =new Panel(...)
+    
+    %>
+
+    如果是拖动生成代码，其实生成上面或下面的代码是一样的。
+
 </body>
 </html>

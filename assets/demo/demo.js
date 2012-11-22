@@ -3383,8 +3383,8 @@ if (typeof module !== 'object') {
                 // 处理 script.demo 。
                 // script.demo[type=text/html] => aside.demo
                 // script.demo[type=text/javascript] => 插入 pre.demo
-                // script.demo[type=pre/html] => pre.demo
-                // script.demo[type=pre/javascript] => pre.demo
+                // script.demo[type=code/html] => pre.demo
+                // script.demo[type=code/javascript] => pre.demo
                 Demo.Dom.iterate('SCRIPT', function (node) {
                     var code, noForamt = node.className.indexOf('demo-noformat') >= 0;
                     switch (node.type) {
@@ -3409,13 +3409,13 @@ if (typeof module !== 'object') {
                                 }
                             }
                             break;
-                        case 'pre/javascript':
+                        case 'code/javascript':
                             code = Demo.System.createCode(node.innerHTML, 'js', false, true, noForamt);
                             node.parentNode.replaceChild(code, node);
                             break;
                         default:
-                        	if(/^pre\//.test(node.type)){
-                        		code = Demo.System.createCode(node.innerHTML, node.type.substr(4), false, true, noForamt);
+                            if (/^code\//.test(node.type)) {
+                        		code = Demo.System.createCode(node.innerHTML, node.type.substr(5), false, true, noForamt);
                         	} else {
 	                            code = Demo.System.createCode(node.innerHTML, null, false, true, noForamt);
 	                        }

@@ -143,19 +143,21 @@ a.button-short {
 }
 
 .examples {
-   
-}
-
-
-
-.x-thumbnail {
-    width: 222px;
-    height: 160px;
+    margin-bottom: 40px;
 }
 
 .examples h5 a{
     color: #333;
     text-decoration: none;
+}
+
+.examples .x-grid {
+    margin-bottom: 20px;
+}
+
+.examples .x-thumbnail {
+    width: 216px;
+    height: 160px;
 }
 
 .links {
@@ -181,7 +183,7 @@ a.button-short {
     color: #A3A3A3;
 }
 
-.nav a.selcted {
+.nav a.selected {
     font-weight: bold;
     color: #353535;
 }

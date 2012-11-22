@@ -140,19 +140,19 @@
                 
                 <p class="demo">比如网页上需要有一个按钮，点击按钮后弹出 Hello world 字样，只需如下代码:</p>
                 
-                <script class="demo" type="pre/html">
+                <script class="demo" type="code/html">
                     <button onclick="alert('Hello world')">我是代码</button>
                 </script>
                     
                 <p class="demo">大部分网站都不喜欢使用默认的按钮风格，而是自定义一些样式(比如设置边框颜色)。因此代码变成了:</p>
                 
-                <script class="demo" type="pre/html">
+                <script class="demo" type="code/html">
                     <button style="border: 1px solid #999" onclick="alert('Hello world')">我是代码</button>
                 </script>
                   
                 <p class="demo">一个网页很可能需要很多个按钮，因此上面的代码需要复制很多次，但这样会导致重复的代码很多。一旦需要变更代码风格，就需要改动很多地方，因此我们需要将这个组件的样式和脚本都分离出来，因此代码变成:</p>
                 
-                <script class="demo" type="pre/html">
+                <script class="demo" type="code/html">
                     <style>
                         .btn {
                             border: 1px solid #999;
@@ -225,7 +225,7 @@
             
                 <p class="demo">根据控件生命周期可知，要想开发一个控件，只需重新定义它的生命周期每一步的操作。以下提供创建一个按钮控件(有样式、点击后弹出 Hello world 字样)的示例代码:</p>
                 
-                <script class="demo" type="pre/javascript">
+                <script class="demo" type="code/javascript">
                     // 继承 Control 类创建新的控件。
                     var MyBtn = Control.extend({ 
                         
