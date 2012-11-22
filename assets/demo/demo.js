@@ -3939,6 +3939,7 @@ if (typeof module !== 'object') {
                     sep = false;
                 
                 if (filter) {
+                    filter = filter.replace(/^\s+|\s+$/g, "");
                     for (var path in DplList) {
                         pathLower = path.toLowerCase();
                         if (pathLower.indexOf('.' + filter) >= 0) {
@@ -3971,7 +3972,7 @@ if (typeof module !== 'object') {
                         tpl = ' style="border-top: 1px solid #EBEBEB"';
                         sep = false;
                     }
-                    return '<a' + tpl + ' onmouseover="Demo.System.gotoSetListHover(this)" href="' + Demo.getDemoUrl(path) + '">' + path + '(' + DplList[path].name + ')</a>';
+                    return '<a' + tpl + ' onmouseover="Demo.System.gotoSetListHover(this)" href="' + Demo.getDemoUrl(path) + '">' + path + '<small style="color: #999"> - ' + DplList[path].name + '</small></a>';
                 }
 
                 dropDown.lastChild.innerHTML = html + html2;

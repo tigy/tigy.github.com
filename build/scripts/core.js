@@ -1,5 +1,5 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/21 21:49
+ * This file is created by a tool at 2012/11/22 11:8
  *********************************************************
  * Contains: 
  *     System.Core.Base

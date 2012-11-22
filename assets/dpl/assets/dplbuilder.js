@@ -469,9 +469,14 @@ var PathSuggest = Suggest.extend({
         return this._getModules(split.module);
     },
 
+    /**
+     * 模拟用户选择一项。
+     */
     selectItem: function (item) {
-        this.setSelectedItem(item);
-        return this.showSuggest();
+        if (item) {
+            this.setText(item.getText());
+        }
+        return this.showDropDown();
     }
 
 });
