@@ -213,14 +213,6 @@ Demo.extend(Demo, {
     toDplPath: function (fileName) {
 
         return fileName.replace('/assets/', '/').replace('/scripts/', '/').replace('/styles/', '/').replace(/\.html([#?].*)?$/, '').replace(/\.\w+$/, '').replace(/\//g, '.');
-
-        //filePath = filePath.replace(/\.html.*$/, '');
-
-        //filePath = ('/' + filePath).replace(/\/(\w)/, function(_, first){
-        //    return first.toUpperCase();
-        //}).substr(1);
-
-        //return filePath.replace(/\//g, '.');
     },
 
     /**
@@ -805,6 +797,7 @@ if (typeof module !== 'object') {
                 };
 
                 return function (html, indentCharacter, indentSize) {
+                    return html;
                     return new HtmlFormater().parse(html, indentCharacter, indentSize); //wrapping functions HtmlFormater
                 };
             })(),
@@ -3184,31 +3177,6 @@ if (typeof module !== 'object') {
              */
             isIE: !+"\v1",
 
-            //walk: function (node, next, first) {
-            //    node = node[first || next];
-            //    while (node && node.nodeType !== 1) {
-            //        node = node[next];
-            //    }
-
-            //    return node;
-            //},
-
-            //prev: function (node) {
-            //    return this.walk(node, 'previousSibling');
-            //},
-
-            //next: function (node) {
-            //    return this.walk(node, 'nextSibling');
-            //},
-
-            //first: function (node) {
-            //    return this.walk(node, 'nextSibling', 'firstChild');
-            //},
-
-            //last: function (node) {
-            //    return this.walk(node, 'previousSibling', 'lastChild');
-            //},
-
             /**
              * 获取一个节点的下一个元素。
              */
@@ -3271,22 +3239,6 @@ if (typeof module !== 'object') {
                     fn(r[i]);
                 }
             },
-
-            //addEvent: function (obj, event, fn) {
-            //    if (obj.addEventListener)
-            //        obj.addEventListener(event, fn, false);
-            //    else
-            //        obj.attachEvent('on' + event, fn);
-
-            //},
-
-            //removeEvent: function (obj, event, fn) {
-            //    if (obj.removeEventListener)
-            //        obj.removeEventListener(event, fn, false);
-            //    else
-            //        obj.detachEvent('on' + event, fn);
-
-            //},
 
             /**
              * 设置 DOM ready 后的回调。
@@ -3658,35 +3610,6 @@ if (typeof module !== 'object') {
 
                 Demo.Dom.ready(Demo.System.onReady);
             },
-
-            //createNav: function () {
-            //    var ul = [], nodes = [], id = 1, leval = 1;
-
-            //    function iterateAll(node) {
-            //        for (node = node.firstChild; node; node = node.nextSibling) {
-            //            if (node.nodeType === 1) {
-
-            //                if (/^H[23]$/.test(node.tagName)) {
-            //                    ul.push('<li>' + (node.tagName === "H2" ? "" : "&nbsp;&nbsp;&nbsp;&nbsp;") + '<a class="demo" href="#' + (node.id || (node.id = 'demo-anchor' + id++)) + '">' + node.innerHTML + '</a></li>');
-            //                } else if (leval < 4) {
-            //                    leval++;
-            //                    iterateAll(node);
-            //                    leval--;
-            //                }
-            //            }
-            //        }
-            //    }
-
-            //    Demo.Dom.iterate('article', iterateAll);
-
-            //    if (ul.length > 0) {
-            //        var nav = document.createElement('nav');
-            //        nav.className = 'demo-nav';
-            //        nav.innerHTML = '<ul>' + ul.join('') + '</ul>';
-            //        document.getElementById('demo-toolbar').parentNode.appendChild(nav);
-            //    }
-
-            //},
 
             initDropDown: function (id) {
                 var dropDown = document.createElement('div');
@@ -4097,6 +4020,64 @@ if (typeof module !== 'object') {
          */
         writeFooter: function () {
             document.write(Demo.Configs.footer.replace(/~\//g, Demo.Configs.rootUrl));
+        },
+
+        writeExamples: function (testcases, options) {
+
+            document.write('<div class="demo-clear">');
+
+            var globalTestCases = Demo.TestCase.data;
+
+            // 如果第一次使用测试。则写入全部测试和效率。
+            if (!globalTestCases) {
+                Demo.TestCase.data = globalTestCases = [];
+                document.write('<div class="demo-toolbar">\
+    <a onclick="Demo.TestCase.runTestAll();" href="javascript://按顺序执行全部测试用例">全部执行</a> | \
+    <a onclick="Demo.TestCase.speedTestAll();" href="javascript://查看每个测试用例的执行效率">全部效率</a> | \
+    <a onclick="Demo.System.toggleSources();" href="javascript://查看每个测试用例的源码">展开全部源码</a>\
+</div><h2 class="demo">常用 API</h2>');
+            }
+
+            document.write('<section class="demo demo-clear">');
+
+            var hasContent = false;
+
+            for (var name in testcases) {
+                var id = globalTestCases.length, testcase = testcases[name];
+
+                if (testcase === '-') {
+
+                    if (hasContent) {
+                        document.write('</section><section class="demo demo-testcases demo-clear">');
+                    }
+
+                    document.write('<h3 class="demo">' + Demo.Text.encodeHTML(name) + '</h3>');
+                    continue;
+                }
+
+                hasContent = true;
+                globalTestCases.push(testcase = new Demo.TestCase(id, name, testcase, options));
+
+                var text = [];
+
+                for (var i = 0; i < testcase.data.length; i++) {
+                    text.push(testcase.data[i].text);
+                }
+
+                text = Demo.Text.encodeHTML(text.join('\r\n').replace(/^\s+/gm, ""));
+
+                document.write(['<div id="demo-testcase-', id, '" class="demo-tip" onmouseover="this.className += \' demo-tip-hover\'" onmouseout="this.className = this.className.replace(\' demo-tip-hover\', \'\');" title="', text, '">\
+						    <span class="demo-toolbar">\
+							    <a href="javascript://执行函数并在控制台显示结果" onclick="Demo.TestCase.runTest(', id, ');return false;">执行</a> | \
+							    <a href="javascript://测试函数执行的速度" onclick="Demo.TestCase.speedTest(', id, ');return false;">效率</a> | \
+							    <a class="demo-viewsource-toggle" href="javascript://查看当前测试用例的源码" onclick="Demo.System.toggleSource(this); return false;">查看源码</a>\
+						    </span>\
+						    <strong class="demo">', Demo.Text.encodeHTML(name), '</strong>\
+						    </div>'].join(''));
+
+            }
+
+            document.write('</section>');
         },
 
         /**
