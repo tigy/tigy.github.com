@@ -167,8 +167,7 @@
 
         <h2 class="demo">JavaScript 方式创建</h2>
 
-        <section class="demo-control demo-relative">
-            <div class="demo-absolute">
+        <section class="demo-sample">
 
             <div id="container1"></div>
 
@@ -184,24 +183,18 @@
                 </script>
             </aside>
 
-            </div>
-
         </section>
 
-        <section class="demo-api">
+        <script>
 
-            <script>
+            Demo.writeExamples({
+                '更改按钮的文字': 'a.setText("这是通过 setText 设置的")',
+                '更改按钮的文字（带图标）': 'a.setHtml("<i class=\'x-icon\'></i>这是通过 setHtml 设置的")',
+                '绑定点击后执行函数': 'a.on("click", function () { alert("我被点了"); })',
+                '禁用按钮': 'a.setAttr("disabled", true)'
+            });
 
-                Demo.writeTestCases({
-                    '更改按钮的文字': 'a.setText("这是通过 setText 设置的")',
-                    '更改按钮的文字（带图标）': 'a.setHtml("<i class=\'x-icon\'></i>这是通过 setHtml 设置的")',
-                    '绑定点击后执行函数': 'a.on("click", function () { alert("我被点了"); })',
-                    '禁用按钮': 'a.setAttr("disabled", true)'
-                });
-
-            </script>
-
-        </section>
+        </script>
 
 
     </article>

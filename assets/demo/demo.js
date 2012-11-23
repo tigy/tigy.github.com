@@ -3691,8 +3691,6 @@ if (typeof module !== 'object') {
          */
         writeExamples: function (examples, options) {
 
-            document.write('<div class="demo-clear">');
-
             var globalExamples = Demo.Example.data,
                 html = '',
                 key,
@@ -3704,7 +3702,7 @@ if (typeof module !== 'object') {
             // 如果第一次使用测试。则写入全部测试和效率。
             if (!globalExamples) {
                 Demo.Example.data = globalExamples = [];
-                html = '<nav class="demo demo-toolbar"><a onclick="Demo.System.toggleSources();" href="javascript://切换显示或隐藏全部源码">折叠代码</a> | <a onclick="Demo.Example.speedTestAll();" href="javascript://查看全部代码的执行效率">全部效率</a> | <a onclick="Demo.Example.runAll();" href="javascript://按顺序执行全部代码">全部执行</a></nav>';
+                html = '<nav class="demo demo-toolbar">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="Demo.System.toggleSources();" href="javascript://切换显示或隐藏全部源码">折叠代码</a> | <a onclick="Demo.Example.speedTestAll();" href="javascript://查看全部代码的执行效率">全部效率</a> | <a onclick="Demo.Example.runAll();" href="javascript://按顺序执行全部代码">全部执行</a></nav>';
             }
 
             for (key in examples) {

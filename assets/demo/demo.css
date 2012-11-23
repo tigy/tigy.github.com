@@ -376,6 +376,8 @@ html .demo-c8 {
 }
 .demo-sample {
   float: right;
+  margin-left: 10px;
+  margin-bottom: 10px;
 }
 .demo-box,
 .demo-box-small,
