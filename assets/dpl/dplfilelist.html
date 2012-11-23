@@ -54,6 +54,10 @@
 
     <script>
 
+        if (!Demo.Configs.dev) {
+            Dom.find("article.demo").prepend("<blockquote class='demo'>本工具仅限本地使用，请先 <a href='http://github.com/jplusui/jplusui'>下载</a> 项目并执行 startserver.bat 。</blockquote>");
+        }
+
         Demo.jsonp(Demo.Configs.apiPath + 'dplfilemanager.njs?action=get', null, function (data) {
             var html = '';
             for (var dpl in data) {

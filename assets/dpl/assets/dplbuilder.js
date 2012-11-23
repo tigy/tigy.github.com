@@ -28,7 +28,7 @@ var DplBuilder = {
         for (var i = 0; i < t.length; i++) {
             var dpl = t[i];
 
-            html += '<div class="demo-tip" onmouseover="this.className += \' demo-tip-hover\'" onmouseout="this.className = this.className.replace(\' demo-tip-hover\', \'\');"><span class="demo-toolbar"><a href="javascript://查看关联的源文件" onclick="DplBuilder.viewSource(this, \'' + dpl.type + '\', \'' + dpl.path + '\');return false;">源文件</a> | <a href="javascript://查看当前模块引用的项" onclick="DplBuilder.viewRefs(this, \'' + dpl.type + '\', \'' + dpl.path + '\');return false;">查看引用</a>';
+            html += '<div class="demo-tip" onmouseover="this.className += \' demo-tip-hover\'" onmouseout="this.className = this.className.replace(\' demo-tip-hover\', \'\');"><nav class="demo demo-toolbar"><a href="javascript://查看关联的源文件" onclick="DplBuilder.viewSource(this, \'' + dpl.type + '\', \'' + dpl.path + '\');return false;">源文件</a> | <a href="javascript://查看当前模块引用的项" onclick="DplBuilder.viewRefs(this, \'' + dpl.type + '\', \'' + dpl.path + '\');return false;">查看引用</a>';
 
             if (i > 0)
                 html += ' | <a class="demo-viewsource-toggle" href="javascript://上移生成的位置" onclick="DplBuilder.moveDpl(' + i + ', false); return false;">上移</a>';
@@ -36,7 +36,7 @@ var DplBuilder = {
             if (i < t.length - 1)
                 html += ' | <a class="demo-viewsource-toggle" href="javascript://下移生成的位置" onclick="DplBuilder.moveDpl(' + i + ', true);">下移</a>';
 
-            html += ' | <a class="demo-viewsource-toggle" href="javascript://删除对当前模块的引用" onclick="DplBuilder.deleteDpl(' + i + '); return false;">删除</a></span><a class="demo demo-mono" target="_blank" href="' + Demo.getDemoUrl(dpl.path) + '">';
+            html += ' | <a class="demo-viewsource-toggle" href="javascript://删除对当前模块的引用" onclick="DplBuilder.deleteDpl(' + i + '); return false;">删除</a></nav><a class="demo demo-mono" target="_blank" href="' + Demo.getDemoUrl(dpl.path) + '">';
 
             if (/^-/.test(dpl.type)) {
                 html += '<del>';

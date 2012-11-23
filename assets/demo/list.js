@@ -5,6 +5,8 @@
  * @param {Integer} column 列号。
  */
 Demo.waterFall = function (column) {
+    
+    document.write('<style>.list{margin:0!important;padding:0;} .list li{margin:0;list-style: disc inside;color: #E2E2EB;font-size: 12.5px;line-height: 24px;height: 24px;overflow: hidden;}h2.demo{border:0;}.list small {color: #999999;}.demo-grid h2.demo {margin-bottom: 14px;}.demo-grid section.demo { float: left; margin-right: 30px;}.demo-grid-6 section.demo {   width: 153.33333333333334px; margin-right: 10px;}.demo-grid-5 section.demo { width: 186px; margin-right: 10px;}.demo-grid-4 section.demo {width: 235px;margin-right: 10px;}.demo-grid-3 section.demo { width: 311px; margin-right: 10px;}</style>');
 
     var articles = document.getElementsByTagName("ARTICLE"),
         articlesIndex,
@@ -70,8 +72,7 @@ Demo.waterFall = function (column) {
 
 Demo.writeList = function (list, newWindow) {
 
-    var html = '<style>.list{margin:0;padding:0;} .list li{margin:0;list-style: disc inside;color: #E2E2EB;font-size: 14px;line-height: 21px;height: 23px;overflow: hidden;}</style>', category, data, name;
-
+    var html = '', category, data, name;
     for (category in list) {
 
         data = list[category];
