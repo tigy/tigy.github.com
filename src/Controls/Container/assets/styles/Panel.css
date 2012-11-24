@@ -37,7 +37,7 @@
   clear: both;
   visibility: hidden;
 }
-.x-panel-container {
+.x-panel-content {
   padding: 10px;
 }
 .x-panel-collapsed .x-panel-header {

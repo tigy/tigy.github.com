@@ -146,7 +146,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
         // 设置菜单显示的事件。
         (me.listMode ? me : me.button()).on('click', me.toggleDropDown, me);
         
-        if(me.listMode){
+        if(me.listMode && me.input().node.tagName === 'INPUT'){
         	me.on('keyup', function(){
         		this.updateDropDown();
         	}, this);

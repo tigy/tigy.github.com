@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=ok">
+    <meta name="dpl-info" content="status=complete">
     <title>标签选择器</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -23,7 +23,7 @@
     <article class="demo">
 
         <script class="demo" type="text/html">
-            文字：<input type="text" class="x-textbox" id="a" />
+            文字：<input type="text" class="x-textbox" id="tagchooser" />
 
             <a class="x-tagchooser x-tagchooser-selected" href="javascript:;">选项1</a>
             <a class="x-tagchooser" href="javascript:;">选项2</a>
@@ -31,10 +31,13 @@
 
 
             <\script>
-                var a = new TagChooser('a', '.x-tagchooser');
+                var tagchooser = new TagChooser('tagchooser', '.x-tagchooser');
             <\/script>
 			
         </script>
+        
+        <blockquote class="demo">注意: TagChooser 不是一个标准组件(不继承于 Control)。</blockquote>
+    
     </article>
 </body>
 </html>

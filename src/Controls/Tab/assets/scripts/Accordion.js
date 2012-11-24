@@ -43,7 +43,7 @@ var Accordion = TabbableControl.extend({
 			from.removeClass('x-accordion-collapsed').last().hide({
 		    	effect: 'height',
 		    	duration: this.collapseDuration,
-		    	complete: finish
+		    	callback: finish
 		    });
 		} else
 		    finish();
@@ -52,7 +52,7 @@ var Accordion = TabbableControl.extend({
 		    to.removeClass('x-accordion-collapsed').last().show({
 		    	effect: 'height',
 		    	duration: this.collapseDuration,
-		    	complete: finish
+		    	callback: finish
 		    });
 		else
 		    finish();

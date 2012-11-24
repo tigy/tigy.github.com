@@ -92,7 +92,9 @@ var DropDownMenu = ListControl.extend({
 
             enter: me._handleEnter,
 
-            esc: options.owner.hideDropDown,
+            esc: function(){
+            	this.hideDropDown();
+            },
 
             other: options.updateCallback
 
@@ -105,7 +107,7 @@ var DropDownMenu = ListControl.extend({
     /**
      * 重新设置当前高亮项。
      */
-	hovering: function (item) {
+	hovering: function (item) {if(window.aa++ >= 2)debugger
 	    var clazz = 'x-' + this.xtype + '-hover';
 
 	    if (this._hovering) {

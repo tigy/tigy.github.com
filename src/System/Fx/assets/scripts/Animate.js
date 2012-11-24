@@ -120,13 +120,11 @@ using("System.Fx.Tween");
 		}
 		
 		// 转换为真实的配置对象。
-		if(!args[0] || typeof args[0] !== 'object') {
-			args = {
-				duration: args[0],
-				callback: args[1],
-				link: args[2]
-			};
-		}
+		args = !args[0] || typeof args[0] !== 'object' ? {
+			duration: args[0],
+			callback: args[1],
+			link: args[2]
+		} : args[0];
 		
 		// 拷贝默认事件。
 		Object.extendIf(args, defaultConfigs);

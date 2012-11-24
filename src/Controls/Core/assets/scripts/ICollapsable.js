@@ -121,7 +121,7 @@ var ICollapsable = {
 			body.show(arguments, {
 				effect: 'height', 
 				duration: me.collapseDuration, 
-				complete: function () {
+				callback: function () {
 	            	me.onExpand(); 
 	                me.trigger('expand');
 	            }, 
