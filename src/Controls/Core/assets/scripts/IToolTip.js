@@ -42,10 +42,10 @@ var IToolTip = {
 	    return this.show().setPosition(x, y);
 	},	showBy: function (ctrl, offsetX, offsetY, e) {
 			    var configs = ({
-	        left: ['rr-yc', 15, 0],	        right: ['ll-yc', 15, 0],	        top: ['xc-bb', 0, 15],	        bottom: ['xc-tt', 0, 15],	        'null': ['xc-bb', 0, 5]
+	        left: ['rr-yc', 15, 0],	        right: ['ll-yc', 15, 0],	        top: ['xc-bb', 0, 15],	        bottom: ['xc-tt', 0, 15],	        'null': ['xc-bb', 0, 5, 1]
 	    }[this.getArrow()]);	    this.show().align(ctrl, configs[0], offsetX === undefined ? configs[1] : offsetX, offsetY === undefined ? configs[2] : offsetY);
 		
-		if(e){
+		if(configs[3] && e){
 			this.setPosition(e.pageX + (offsetX || 0));
 		}
 
@@ -91,7 +91,7 @@ var IToolTip = {
 	            clearTimeout(me.showTimer);
 	        }
 
-	        this.close();
+	        this.hide();
 	    }, this);
 		
 		
