@@ -74,7 +74,7 @@ var ICollapsable = {
 	 * @param {Integer} duration=#collapseDuration 折叠效果使用的时间。如果为 0 表示无效果。
      * @return this
 	 */
-    collapse: function (duration) {
+    collapse: function () {
         var me = this,
 			body,
 			callback;
@@ -83,21 +83,18 @@ var ICollapsable = {
         if (me.trigger('collapsing') && (body = me.body ? me.body() : me)) {
 
             me.onCollapsing();
+            
+			body.hide(arguments, {
+				effect: 'height', 
+				duration: me.collapseDuration, 
+				callback: function () {
+	                me.addClass('x-' + me.xtype + '-collapsed');
+	                me.onCollapse();
+	                me.trigger('collapse');
+	            }, 
+	            link: 'ignore'
+	        });
 
-            // 折叠完成的回调函数。
-            callback = function () {
-                me.addClass('x-' + me.xtype + '-collapsed');
-                me.onCollapse();
-                me.trigger('collapse');
-            };
-
-            // 如果不加参数，使用同步方式执行。
-            if (duration === 0) {
-                body.hide();
-                callback();
-            } else {
-                body.hide('height', duration || me.collapseDuration, callback, 'ignore');
-            }
         }
         return me;
     },
@@ -107,7 +104,7 @@ var ICollapsable = {
 	 * @param {Integer} duration=#collapseDuration 折叠效果使用的时间。如果为 0 表示无效果。
      * @return this
 	 */
-    expand: function (duration) {
+    expand: function () {
 
         var me = this,
             body;
@@ -120,16 +117,17 @@ var ICollapsable = {
             me.onExpanding();
 
             me.removeClass('x-' + me.xtype + '-collapsed');
+			
+			body.show(arguments, {
+				effect: 'height', 
+				duration: me.collapseDuration, 
+				complete: function () {
+	            	me.onExpand(); 
+	                me.trigger('expand');
+	            }, 
+	            link: 'ignore'
+	        });
 
-            if (duration === 0) {
-                body.show();
-                me.onExpand();
-                me.trigger('expand');
-            } else {
-                body.show('height', duration || me.collapseDuration, function () {
-                    me.trigger('expand');
-                }, 'ignore');
-            }
         }
 
         return me;

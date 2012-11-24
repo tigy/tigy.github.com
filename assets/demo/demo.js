@@ -335,7 +335,7 @@ if (typeof module !== 'object') {
                         singleToken: 'br input link meta !doctype basefont base area hr wbr param img isindex ?xml embed'.split(' '),
 
                         // inlines
-                        simple: 'a li button p span strong em i b u title textarea'.split(' '),
+                        simple: 'a li button p span strong option em i b u title textarea'.split(' '),
                         //all the single tags for HTML
                         extra_liners: [],
                         //for tags that need a line of whitespace before them
@@ -671,7 +671,7 @@ if (typeof module !== 'object') {
                         me.printer(htmlSource, indentCharacter, indentSize); //initialize starting values
                         var hasContent = true;
                         var lastIsInline = false;
-
+                        
                         while (true) {
                             var t = me.getToken();
                             me.tokenText = t[0];
@@ -684,13 +684,15 @@ if (typeof module !== 'object') {
                                 case 'TK_TAG_START':
                                 case 'TK_TAG_SCRIPT':
                                 case 'TK_TAG_STYLE':
-                                    me.printNewline(false, me.output);
+	                                me.printNewline(false, me.output);
                                     me.printToken(me.tokenText);
                                     me.indent();
                                     me.currentMode = 'CONTENT';
                                     lastIsInline = false;
                                     break;
                                 case 'TK_TAG_INLINE_START':
+                                	if(!lastIsInline)
+                                   		me.printNewline(false, me.output);
                                     me.printToken(me.tokenText);
                                     me.currentMode = 'CONTENT';
                                     lastIsInline = true;
@@ -708,6 +710,7 @@ if (typeof module !== 'object') {
                                 case 'TK_TAG_INLINE_END':
                                     me.printToken(me.tokenText);
                                     me.currentMode = 'CONTENT';
+                                    lastIsInline = false;
                                     break;
                                 case 'TK_TAG_SINGLE':
                                     me.printNewline(false, me.output);
@@ -3059,6 +3062,7 @@ if (typeof module !== 'object') {
                 // script.demo[type=code/html] => pre.demo
                 // script.demo[type=code/javascript] => pre.demo
                 Demo.Dom.iterate('SCRIPT', function (node) {
+                	var value = node.innerHTML.replace(/<\\(\/?)script>/g, "<$1script>");
                     switch (node.type) {
                         case '':
                         case 'text/javascript':
@@ -3068,7 +3072,7 @@ if (typeof module !== 'object') {
                             var code = document.createElement('ASIDE');
                             code.className = node.className;
                             node.parentNode.replaceChild(code, node);
-                            code.innerHTML = node.innerHTML.replace(/<\\(\/?)script>/g, "<$1script>");;
+                            code.innerHTML = code.$code = value;
 
                             // 模拟执行全部脚本。
                             var scripts = code.getElementsByTagName('SCRIPT');
@@ -3081,13 +3085,13 @@ if (typeof module !== 'object') {
                             }
                             break;
                         case 'code/javascript':
-                            insertCode(node, node.innerHTML, 'js');
+                            insertCode(node, value, 'js');
                             break;
                         default:
                             if (/^code\//.test(node.type)) {
-                                insertCode(node, node.innerHTML, node.type.substr(5));
+                                insertCode(node, value, node.type.substr(5));
                             } else {
-                                insertCode(node, node.innerHTML, 'text');
+                                insertCode(node, value, 'text');
                             }
 
                             break;
@@ -3096,12 +3100,12 @@ if (typeof module !== 'object') {
 
                 // 处理 aside.demo 。
                 Demo.Dom.iterate('ASIDE', function (node) {
-                    insertCode(node, node.innerHTML, 'html', true);
+                    insertCode(node, node.$code || node.innerHTML, 'html', true);
                 });
 
-                Demo.Dom.iterate('PRE', function (node) {
-                    Demo.SyntaxHighligher.one(node);
-                })
+				setTimeout(function(){
+                	Demo.Dom.iterate('PRE', Demo.SyntaxHighligher.one);
+				}, 0);
 
                 function insertCode(node, value, language, canHide) {
 

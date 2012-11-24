@@ -18,11 +18,26 @@ var DatePicker = Picker.extend({
 	menuButtonTpl: '<button class="x-button"><span class="x-icon x-icon-calendar"></span></button>',
 	
 	createDropDown: function(existDom){
-		return new MonthCalender(existDom).on('selecting', this.selectItem, this);
+		return new MonthCalender(existDom).on('selecting', this.onItemClick, this);
+	},
+	
+	onItemClick: function(value) {
+		if(this.trigger('selecting', value)) {
+			var old = this.getValue();
+			this.setValue(value).hideDropDown();
+			if(old !== value){
+				this.trigger('change');
+			}
+			
+			return;
+		}
+		
+		return false;
 	},
 	
 	selectItem: function (value) {
-		return this.setValue(value).hideDropDown();
+		this.onItemClick(value);
+		return this;
 	},
 	
 	updateDropDown: function(){

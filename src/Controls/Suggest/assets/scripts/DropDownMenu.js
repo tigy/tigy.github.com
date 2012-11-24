@@ -18,7 +18,7 @@ var DropDownMenu = ListControl.extend({
 	 * 处理上下按键。
      * @private
 	 */
-    _handlerUpDown: function (next) {
+    _handleUpDown: function (next) {
 
         // 如果菜单未显示。
         if (this.isDropDownHidden()) {
@@ -37,7 +37,7 @@ var DropDownMenu = ListControl.extend({
                 item = this.dropDown[next ? 'first' : 'last']();
             }
 
-            return this.dropDown.hovering(item);
+            this.dropDown.hovering(item);
         }
     },
 
@@ -45,7 +45,7 @@ var DropDownMenu = ListControl.extend({
 	 * 处理回车键。
      * @private
 	 */
-    _handlerEnter: function (next) {
+    _handleEnter: function (next) {
         if (this.isDropDownHidden()) {
             return true;
         }
@@ -83,14 +83,14 @@ var DropDownMenu = ListControl.extend({
         options.owner.keyNav({
 
             up: function () {
-                me._handlerUpDown.call(this, false);
+                me._handleUpDown.call(this, false);
             },
 
             down: function () {
-                me._handlerUpDown.call(this, true);
+                me._handleUpDown.call(this, true);
             },
 
-            enter: me._handlerEnter,
+            enter: me._handleEnter,
 
             esc: options.owner.hideDropDown,
 

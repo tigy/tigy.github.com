@@ -90,15 +90,20 @@ var Marquee = Class({
 
 			obj = {};
 			obj[me._horizonal ? 'marginLeft' : 'marginTop'] = -me._getScrollByIndex(index);
-			me.target.animate(obj, me.duration, function () {
-
-				// 滚动完成后触发事件。
-				me.afterChange(index, oldIndex);
-
-				// 如果本来正在自动播放中，这里恢复自动播放。
-				if (me.step)
-					me.resume();
-			}, 'abort');
+			me.target.animate({
+				params: obj, 
+				duration: me.duration, 
+				complete: function () {
+	
+					// 滚动完成后触发事件。
+					me.afterChange(index, oldIndex);
+	
+					// 如果本来正在自动播放中，这里恢复自动播放。
+					if (me.step)
+						me.resume();
+				}, 
+				link: 'abort'
+			});
 		}
 
 	},

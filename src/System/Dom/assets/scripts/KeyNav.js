@@ -43,7 +43,7 @@ Dom.implement({
 
             // 如果绑定了指定的键值。
             if (opt[keyCode]) {
-                return opt[keyCode].call(this, e) !== true;
+                return opt[keyCode].call(this, e) === true;
             }
 
         }, scope);
@@ -54,7 +54,7 @@ Dom.implement({
             this.on('keypress', function (e) {
                 var keyCode = e.keyCode;
                 if (keyCode === 13 || keyCode === 10) {
-                    return opt.enter.call(this, e) !== true;
+                    return opt.enter.call(this, e) === true;
                 }
             });
         }

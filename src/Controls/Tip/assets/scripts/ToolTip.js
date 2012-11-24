@@ -21,18 +21,6 @@ var ToolTip = ContentControl.extend(IToolTip).implement({
 	// * @type Number
 	// */
 	//autoDelay: -1,
-
-    /**
-     * 工具提示显示之前经过的时间。
-     * @type Integer
-     */
-    initialDelay: 500,
-
-    /**
-     * 指针从一个控件移到另一控件时，必须经过多长时间才会出现后面的工具提示窗口。
-     * @type Integer
-     */
-    reshowDelay: 100,
 	
 	xtype: 'tooltip',
 	

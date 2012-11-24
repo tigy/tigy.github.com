@@ -21,14 +21,14 @@ var Carousel = Control.extend({
 	},
 
     /**
-     * µ±Ç°±êÌâÕıÔÚÏÔÊ¾µÄË÷Òı¡£
+     * å½“å‰æ ‡é¢˜æ­£åœ¨æ˜¾ç¤ºçš„ç´¢å¼•ã€‚
      */
 	currentIndex: 0,
 
     duration: -1,
 
     /**
-	 * ×Ô¶¯¹ö¶¯µÄÑÓÊ±Ê±¼ä¡£
+	 * è‡ªåŠ¨æ»šåŠ¨çš„å»¶æ—¶æ—¶é—´ã€‚
 	 */
 	delay: 4000,
 	
@@ -54,15 +54,15 @@ var Carousel = Control.extend({
             body = me.find('.x-carousel-body'),
             width = me.getWidth();
 
-	    // Èç¹ûÕıÔÚÖ´ĞĞ½¥±ä£¬Ôò¼ÇÂ¼ toIndex Îª finalIndex ¡£µ±Ç°ÌØĞ§Ö´ĞĞ½áÊøºó»Øµ÷º¯Êı¼ÌĞø´¦Àí oldIndex ¡£
+	    // å¦‚æœæ­£åœ¨æ‰§è¡Œæ¸å˜ï¼Œåˆ™è®°å½• toIndex ä¸º finalIndex ã€‚å½“å‰ç‰¹æ•ˆæ‰§è¡Œç»“æŸåå›è°ƒå‡½æ•°ç»§ç»­å¤„ç† oldIndex ã€‚
 	    if (me.animatingIndex == null) {
 
-	        // Èç¹ûÄ¿Ç°Ã»ÓĞÖ´ĞĞÌØĞ§¡£¼ÇÂ¼µ±Ç°ÕıÔÚ½¥±äµ½Ö¸¶¨µÄË÷Òı¡£ÏÂ´ÎÖ´ĞĞº¯ÊıÊ±£¬¿ÉÒÔ¼à²âµ½µ±Ç°ÕıÔÚÖ´ĞĞ½¥±ä¡£
+	        // å¦‚æœç›®å‰æ²¡æœ‰æ‰§è¡Œç‰¹æ•ˆã€‚è®°å½•å½“å‰æ­£åœ¨æ¸å˜åˆ°æŒ‡å®šçš„ç´¢å¼•ã€‚ä¸‹æ¬¡æ‰§è¡Œå‡½æ•°æ—¶ï¼Œå¯ä»¥ç›‘æµ‹åˆ°å½“å‰æ­£åœ¨æ‰§è¡Œæ¸å˜ã€‚
 	        me.animatingIndex = toIndex;
 
 	        me.children.hide();
 
-	        // Èç¹ûĞèÒª´Ó×ó½¥±äÖÁÓÒ¡£
+	        // å¦‚æœéœ€è¦ä»å·¦æ¸å˜è‡³å³ã€‚
 	        if (!ltr) {
 	            width = -width;
 	        }
@@ -77,10 +77,10 @@ var Carousel = Control.extend({
 	            var animatingIndex = me.animatingIndex;
 	            var finalIndex = me.finalIndex;
 
-	            // Ğ§¹ûÖ´ĞĞÍê³É¡£
+	            // æ•ˆæœæ‰§è¡Œå®Œæˆã€‚
 	            me.animatingIndex = null;
 
-	            // Èç¹ûÕıÔÚÖ´ĞĞÌØĞ§Ê±ÓÖÖØĞÂÖ´ĞĞÁË _slideTo Ôò finalIndex ·Ç¿Õ¡£
+	            // å¦‚æœæ­£åœ¨æ‰§è¡Œç‰¹æ•ˆæ—¶åˆé‡æ–°æ‰§è¡Œäº† _slideTo åˆ™ finalIndex éç©ºã€‚
 	            if (finalIndex != null && finalIndex !== animatingIndex) {
 	                me.finalIndex = null;
 	                me._slideTo(animatingIndex, finalIndex, animatingIndex < finalIndex);

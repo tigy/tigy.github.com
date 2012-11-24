@@ -128,7 +128,7 @@ var Fx = (function() {
 				if (options.start && options.start.call(options.target, options, me) === false) {
 					me.progress();
 				} else {
-
+					
 					me.init(options);
 					me.set(0);
 					me.time = 0;

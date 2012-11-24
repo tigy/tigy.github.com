@@ -115,17 +115,21 @@ var Dialog = ContainerControl.extend({
 			this.appendTo();	
 		}
 		
-		return this.base('show').center();
+		return Dom.prototype.show.call(this, arguments, {
+			duration: this.showDuration
+		}).center();
+		
 	},
 	
-	showDialog: function(callback){
-		return this.mask().show(this.showDuration, callback);
+	showDialog: function(){
+		return this.show.apply(this.mask(), arguments);
 	},
 	
 	hide: function(){
-		this.base('hide');
 		if (this.maskDom) this.maskDom.hide();
-		return this;
+		return Dom.prototype.hide.call(this, arguments, {
+			duration: this.showDuration
+		});
 	},
 	
 	setContentSize: function(x, y){
@@ -137,9 +141,11 @@ var Dialog = ContainerControl.extend({
 	close: function () {
 	    var me = this;
 	    if (this.trigger('closing'))
-	        this.hide(this.showDuration, function () {
-	            this.trigger('close');
-	        });
+	        this.hide({
+	        	callback: function () {
+		            this.trigger('close');
+		        }
+		    });
 		return this;
 	}
 	

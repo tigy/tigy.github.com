@@ -147,9 +147,17 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
         (me.listMode ? me : me.button()).on('click', me.toggleDropDown, me);
         
         if(me.listMode){
-        	me.on('keyup', this.updateDropDown, this);
+        	me.on('keyup', function(){
+        		this.updateDropDown();
+        	}, this);
         }
 
+    },
+    
+    setText: function (value){
+    	this.input().setText(value);
+    	this.updateDropDown();
+    	return this;
     },
 
     setWidth: function (value) {

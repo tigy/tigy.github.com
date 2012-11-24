@@ -11,6 +11,8 @@ using("Controls.Core.TreeControl");
 var Menu = TreeControl.extend({
 
     xtype: 'menu',
+    
+    showDuration: null,
 
     /**
 	 * 表示当前菜单是否为浮动的菜单。 
@@ -63,7 +65,9 @@ var Menu = TreeControl.extend({
     },
 
     show: function () {
-        Dom.show(this.node);
+        Dom.prototype.show.call(this, arguments, {
+        	duration: this.showDuration	
+        });
 
         // 如果菜单是浮动的，则点击后关闭菜单，否则，只关闭子菜单。
         if (this.floating)
@@ -75,7 +79,9 @@ var Menu = TreeControl.extend({
 	 * 关闭本菜单。
 	 */
     hide: function () {
-        Dom.hide(this.node);
+        Dom.prototype.hide.call(this, arguments, {
+        	duration: this.showDuration	
+        });
 
         // 先关闭子菜单。
         this.hideSubMenu();

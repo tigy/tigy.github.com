@@ -32,6 +32,21 @@ var Ajax = (function () {
 
     Ajax = Deferrable.extend({
 
+		/**
+		 * 当前 Ajax 对象的默认配置。
+		 */
+		options: {
+			
+			url: ajaxLoc,
+
+			/**
+			 * 默认超时数。
+			 * @type {Number}
+			 */
+			timeout: -1,
+
+		},
+
         /**
 		 * Ajax 对象。
 		 * @constructor Ajax
@@ -79,13 +94,13 @@ var Ajax = (function () {
                 // 首先复制默认配置，然后复制用户对应的配置。
                 xhrObject = Object.extend({
                     owner: me,
-                    timeout: -1
+                    timeout: me.options.timeout
                 }, xhrObject);
 
                 assert(!xhrObject.url || xhrObject.url.replace, "Ajax#run(xhrObject): {xhrObject.url} 必须是字符串。", xhrObject.url);
 
                 // url
-                xhrObject.url = xhrObject.url ? xhrObject.url.replace(/#.*$/, "") : ajaxLoc;
+                xhrObject.url = xhrObject.url ? xhrObject.url.replace(/#.*$/, "") : me.options.url;
 
                 // data
                 xhrObject.data = xhrObject.data ? typeof xhrObject.data !== 'string' ? Ajax.param(xhrObject.data) : xhrObject.data : null;
