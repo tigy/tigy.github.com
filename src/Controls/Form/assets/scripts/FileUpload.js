@@ -1,9 +1,6 @@
 /**
- * @author 
+ * @author xuld
  */
-
-
-
 
 
 imports("Controls.Button.Button");
@@ -22,8 +19,8 @@ var FileUpload = Control.extend(IInput).implement({
     	</span>',
 
     init: function(){
-        var textBox = this.prev();
-        if (textBox && textBox.node.type === 'text') {
+        var textBox = this.prev('[type=text]') || this.next('[type=text]');
+        if (textBox) {
             this.setTextBox(textBox);
         }
     },

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=ok">
+    <meta name="dpl-info" content="status=complete">
     <title>按钮</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css" />
@@ -25,102 +25,93 @@
 
     <article class="demo">
 
-        <h2 class="demo">HTML 方式创建</h2>
+        <h2 class="demo">使用 HTML 创建</h2>
 
-        <section class="demo">
+        <h3 class="demo">使用不同的标签</h3>
+        
+        <aside class="demo demo-noformat">
+            <a href="javascript:;" class="x-button">a 按钮</a>
 
-            <h3 class="demo">使用不同的标签</h3>
-            <aside class="demo demo-noformat">
-                <a href="#" class="x-button">a 按钮</a>
+            <input type="button" class="x-button" value="input 按钮">
 
-                <input type="button" class="x-button" value="input 按钮">
+            <button type="button" class="x-button">button 按钮</button>
 
-                <button type="button" class="x-button">button 按钮</button>
+            <span class="x-button">span 按钮</span>
+        </aside>
 
-                <span class="x-button">span 按钮</span>
-            </aside>
-        </section>
+        <h3 class="demo">使用不同的尺寸</h3>
+        
+        <aside class="demo demo-noformat">
+            <button class="x-button x-button-large">大</button>
 
-        <section class="demo">
+            <button class="x-button">正常</button>
 
-            <h3 class="demo">使用不同的尺寸</h3>
-            <aside class="demo demo-noformat">
-                <button class="x-button x-button-large">大</button>
+            <button class="x-button x-button-small">小</button>
 
-                <button class="x-button">正常</button>
+            <button class="x-button x-button-smallest">迷你</button>
+        </aside>
 
-                <button class="x-button x-button-small">小</button>
+        <h3 class="demo">使用不同的颜色</h3>
+        
+        <aside class="demo demo-noformat">
+            <button class="x-button">正常</button>
 
-                <button class="x-button x-button-smallest">迷你</button>
-            </aside>
-        </section>
+            <button class="x-button x-button-hint">提示</button>
 
-        <section class="demo">
+            <button class="x-button x-button-highlight">高亮</button>
 
-            <h3 class="demo">使用不同的颜色</h3>
-            <aside class="demo demo-noformat">
-                <button class="x-button">正常</button>
+            <button class="x-button x-button-success">成功</button>
 
-                <button class="x-button x-button-hint">提示</button>
+            <button class="x-button x-button-warning">警告</button>
 
-                <button class="x-button x-button-highlight">高亮</button>
+            <button class="x-button x-button-error">错误</button>
 
-                <button class="x-button x-button-success">成功</button>
+            <button class="x-button x-button-info">信息</button>
+        </aside>
+        
+        <aside class="demo demo-noformat">
+            <button class="x-button" disabled="disabled">正常</button>
 
-                <button class="x-button x-button-warning">警告</button>
+            <button class="x-button x-button-hint" disabled="disabled">提示</button>
 
-                <button class="x-button x-button-error">错误</button>
+            <button class="x-button x-button-highlight" disabled="disabled">高亮</button>
 
-                <button class="x-button x-button-info">信息</button>
-            </aside>
-            <aside class="demo demo-noformat">
-                <button class="x-button" disabled="disabled">正常</button>
+            <button class="x-button x-button-success" disabled="disabled">成功</button>
 
-                <button class="x-button x-button-hint" disabled="disabled">提示</button>
+            <button class="x-button x-button-warning" disabled="disabled">警告</button>
 
-                <button class="x-button x-button-highlight" disabled="disabled">高亮</button>
+            <button class="x-button x-button-error" disabled="disabled">错误</button>
 
-                <button class="x-button x-button-success" disabled="disabled">成功</button>
+            <button class="x-button x-button-info" disabled="disabled">信息</button>
+        </aside>
 
-                <button class="x-button x-button-warning" disabled="disabled">警告</button>
+        <h3 class="demo">使用不同的状态</h3>
+        
+        <aside class="demo demo-noformat">
+            <button class="x-button">正常</button>
 
-                <button class="x-button x-button-error" disabled="disabled">错误</button>
+            <button class="x-button x-button-actived">按下状态</button>
 
-                <button class="x-button x-button-info" disabled="disabled">信息</button>
-            </aside>
-        </section>
+            <button class="x-button x-button-plain">平板</button>
 
-        <section class="demo">
+            <button class="x-button x-button-disabled" type="button" disabled="disabled">禁用</button>
 
-            <h3 class="demo">使用不同的状态</h3>
-            <aside class="demo demo-noformat">
-                <button class="x-button">正常</button>
+            <button class="x-button x-button-fixed">固定边距</button>
+        </aside>
 
-                <button class="x-button x-button-actived">按下状态</button>
+        <h3 class="demo">使用不同的图标</h3>
+        
+        <aside class="demo demo-noformat">
+            <button class="x-button x-button-large"><i class="x-icon"></i>固定</button>
 
-                <button class="x-button x-button-plain">平板</button>
+            <button class="x-button"><i class="x-icon"></i>固定</button>
 
-                <button class="x-button x-button-disabled" type="button" disabled="disabled">禁用</button>
+            <button class="x-button x-button-small"><i class="x-icon"></i>固定</button>
 
-                <button class="x-button x-button-fixed">固定边距</button>
-            </aside>
-        </section>
+            <button class="x-button x-button-smallest"><i class="x-icon"></i>固定</button>
+        </aside>
 
-        <section class="demo">
-
-            <h3 class="demo">使用不同的图标</h3>
-            <aside class="demo demo-noformat">
-                <button class="x-button x-button-large"><i class="x-icon"></i>固定</button>
-
-                <button class="x-button"><i class="x-icon"></i>固定</button>
-
-                <button class="x-button x-button-small"><i class="x-icon"></i>固定</button>
-
-                <button class="x-button x-button-smallest"><i class="x-icon"></i>固定</button>
-            </aside>
-        </section>
-
-        <section class="demo-test">
+       <!--  <section class="demo-test">
             <h3 class="demo">垂直居中问题</h3>
             文字: <a class="x-button x-button-large"><i class="x-icon"></i>固定</a>
             <a class="x-button"><i class="x-icon"></i>固定</a>
@@ -159,23 +150,23 @@
                 </button>
             <a class="x-button">按钮B</a>
             <input type="button" class="x-button" value="按钮B">
-        </section>
+        </section> -->
 
     </article>
 
     <article class="demo">
 
-        <h2 class="demo">JavaScript 方式创建</h2>
+        <h2 class="demo">使用 JavaScript 创建</h2>
 
         <section class="demo-sample">
 
-            <div id="container1"></div>
+            <div id="ct"></div>
 
             <aside class="demo demo-expand">
                 <script>
-                    var a = new Button({
+                    var button = new Button({
                         text: "这是动态创建的按钮",
-                        appendTo: "container1",
+                        appendTo: "ct",
                         onclick: function () {
                             alert("点击了");
                         }
@@ -188,10 +179,10 @@
         <script>
 
             Demo.writeExamples({
-                '更改按钮的文字': 'a.setText("这是通过 setText 设置的")',
-                '更改按钮的文字（带图标）': 'a.setHtml("<i class=\'x-icon\'></i>这是通过 setHtml 设置的")',
-                '绑定点击后执行函数': 'a.on("click", function () { alert("我被点了"); })',
-                '禁用按钮': 'a.setAttr("disabled", true)'
+                '更改按钮的文字': 'button.setText("这是通过 setText 设置的");',
+                '更改按钮的文字（带图标）': 'button.setHtml("<i class=\'x-icon\'></i>这是通过 setHtml 设置的");',
+                '绑定点击后执行函数': 'button.on("click", function () { alert("我被点了"); });',
+                '禁用按钮': 'button.setAttr("disabled", true);'
             });
 
         </script>

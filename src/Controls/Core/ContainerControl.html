@@ -18,7 +18,7 @@
 
     <article class="demo">
 
-        <p class="demo">ContainerControl 表示一个容器组件。一个容器组件肯能包含一个标题栏。其格式如:</p>
+        <p class="demo">ContainerControl 是容器底层组件。一个容器组件肯能包含一个标题栏。其格式如: (其中 control 应该被替换成实际的组件名)</p>
 
         <script class="demo" type="code/html">
             <div class="x-control">
@@ -46,19 +46,17 @@
             </div>
         </script>
 
-        <p class="demo">对于某些容器， x-control-header 是可以省略的。x-control-content 是为了提供 padding 提供的，如果容器内放的不是文字，则应该省略这个 div。</p>
-
-        
+        <p class="demo">对于某些容器， x-control-header 是可以省略的。x-control-content 是为了提供 padding 提供的，如果容器内放的不是文字，则应该省略  x-control-header。</p>
 
     </article>
 
     <article class="demo">
 
-        <h2 class="demo">API</h2>
+        <h2 class="demo">常用 API</h2>
 
-        <section class="demo demo-control demo-absolute">
+        <section class="demo demo-sample">
             <aside class="demo">
-                <div class="x-control" id="a">
+                <div class="x-control" id="containerControl">
                     <div class="x-control-header">
                         <h4>header</h4>
                     </div>
@@ -68,35 +66,38 @@
                 </div>
 
                 <script>
-                    var a = new ContainerControl('a');
+                    var containerControl = new ContainerControl('containerControl');
                 </script>
             </aside>
         </section>
 
-        <section class="demo demo-api">
-            <script>
+        <script>
 
-                // 创建一个容器对象。
-                var a = new ContainerControl('a');
+            // 创建一个容器对象。
+            var a = new ContainerControl('a');
 
-                var b = Dom.parse('<div class="x-control-content">我是一个普通节点</div>');
+            var b = Dom.parse('<div class="x-control-content">我是一个普通节点</div>');
 
-                Demo.writeExamples({
-                    '设置标题': 'a.setTitle("<em>这是使用 setTitle 设置的</em>")',
-                    '获取标题': 'a.getTitle()',
-                    '删除标题': 'a.setTitle(null)',
+            Demo.writeExamples({
+                '设置标题': 'containerControl.setTitle("<em>这是使用 setTitle 设置的</em>")',
+                '获取标题': 'containerControl.getTitle()',
+                '删除标题': 'containerControl.setTitle(null)',
 
-                    '设置内容': 'a.setContent("<em>这是使用 setContent 设置的</em>")',
-                    '获取内容': 'a.getContent()',
+                '设置内容': 'containerControl.setContent("<em>这是使用 setContent 设置的</em>")',
+                '获取内容': 'containerControl.getContent()',
 
-                    '设置内容 HTML (即 setContent("", false)': 'a.setHtml("<em>这是使用 setHtml 设置的</em>")',
-                    '设置内容 Text (即 setContent("", true)': 'a.setText("这是使用 setText 设置的")'
-                });
-            </script>
-        </section>
+                '设置内容 HTML (即 setContent("", false)': 'containerControl.setHtml("<em>这是使用 setHtml 设置的</em>")',
+                '设置内容 Text (即 setContent("", true)': 'containerControl.setText("这是使用 setText 设置的")'
+            });
+        </script>
 
     </article>
 
+    <article class="demo">
+
+        <h2 class="demo">扩展 ContainerControl</h2>
+        
+    </article>
 
 </body>
 </html>

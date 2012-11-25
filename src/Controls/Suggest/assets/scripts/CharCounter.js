@@ -9,9 +9,13 @@ var CharCounter = Control.extend({
 
     tpl: '<span class="x-charcounter"></span>',
 
-    message: '还可以输入<span class="x-charcounter-success"> {0} </span> 个字',
+    message: '还可以输入<span class="x-charcounter-success"> {0} </span>个字符',
 
-    errorMessage: '已超过<span class="x-charcounter-error"> {0} </span>个字',
+    errorMessage: '已超过<span class="x-charcounter-error"> {0} </span>个字符',
+    
+    isValidated: function(){
+    	return this.target.getText().length <= this.maxLength;
+    },
 
     update: function () {
         var len = this.target.getText().length - this.maxLength;

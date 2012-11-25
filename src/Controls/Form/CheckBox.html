@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=ok">
+    <meta name="dpl-info" content="status=complete">
     <title>复选框</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -20,7 +20,7 @@
 
     <article class="demo">
 
-        <h2 class="demo">HTML 方式创建</h2>
+        <h2 class="demo">使用 HTML 创建</h2>
 
         <aside class="demo">
 
@@ -42,37 +42,27 @@
 
     <article class="demo">
 
-        <h2 class="demo">JavaScript 方式创建</h2>
+        <h2 class="demo">使用 JavaScript 创建</h2>
 
-        <section class="demo-control demo-absolute">
+        <div id="ct"></div>
 
-            <div id="container1"></div>
+        <script  class="demo">
+            var checkBox = new CheckBox({
+                appendTo: "ct"
+            });
+        </script>
 
-            <aside class="demo demo-expand">
+        <script>
 
-                <script>
-                    var a = new CheckBox({
-                        appendTo: "container1"
-                    });
-                </script>
+            Demo.writeExamples({
+                '获取选中状态': 'checkBox.getAttr("checked")',
+                '选中按钮': 'checkBox.setAttr("checked", true)',
+                '禁用按钮': 'checkBox.setAttr("disabled", true)'
+            });
 
-            </aside>
+        </script>
 
-        </section>
-
-        <section class="demo-api">
-
-            <script>
-
-                Demo.writeExamples({
-                    '获取选中状态': 'a.getAttr("checked")',
-                    '选中按钮': 'a.setAttr("checked", true)',
-                    '禁用按钮': 'a.setAttr("disabled", true)'
-                });
-
-            </script>
-
-        </section>
+        <blockquote class="demo">关于输入框操作的 API 参考 <a href="../Core/IInput.html">IInput</a>。(CheckBox 实现了 IInput 接口)</blockquote>
 
     </article>
 

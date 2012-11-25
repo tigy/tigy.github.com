@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=beta">
     <title>QueryString</title>
     <script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
     <script src="../../System/data/assets/scripts/QueryString.js" type="text/javascript"></script>
@@ -13,12 +12,8 @@
     <article class="demo">
         <script>
             Demo.writeExamples({
-                "解析查询字符串": {
-                    'QueryString.parse("a=2&c=4")': { a: "2", c: "4" }
-                },
-                "格式化查询字符串": {
-                    'QueryString.stringify({ a: "2", c: "4" })': "a=2&c=4"
-                }
+                "解析查询字符串": 'QueryString.parse("a=2&c=4")',
+                "格式化查询字符串": 'QueryString.stringify({ a: "2", c: "4" })'
             });
         </script>
     </article>
