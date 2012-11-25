@@ -1,0 +1,220 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Core\assets\scripts\IDropDownOwner.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+
+imports(&quot;Controls.Core.IDropDownOwner&quot;);
+using(&quot;System.Dom.Align&quot;);
+
+
+<span id="IDropDownOwner">/**
+ * 所有支持下拉菜单的组件实现的接口。
+ * @interface IDropDownOwner
+ */</span>
+var IDropDownOwner = {
+	
+	<span id="IDropDownOwner-dropDown">/**
+	 * 获取或设置当前实际的下拉菜单。
+	 * @protected
+	 * @type {Dom}
+	 */</span>
+	dropDown: null,
+	
+	<span id="IDropDownOwner-dropDownWidth">/**
+	 * 下拉菜单的宽度。
+	 * @config {String}
+	 * @defaultValue 'auto'
+	 * @return 如果值为 -1, 则和下拉菜单目标节点有同样的宽度。如果值为 'auto'， 表示根据内容自动决定。
+	 */</span>
+	dropDownWidth: -1,
+
+    ///**
+	// * 下拉菜单的最小宽度。
+	// * @config {Integer}
+	// * @defaultValue 100
+	// * @return 如果值为 Infinity, 则表示不限制最小宽度。
+	// * @remark 也可以通过 css 的 min-width 属性设置此值。
+	// */
+    //dropDownMinWidth: 100,
+
+    <span id="IDropDownOwner-onDropDownShow">/**
+	 * 当下拉菜单被显示时执行。
+     * @protected virtail
+	 */</span>
+	onDropDownShow: Function.empty,
+
+    <span id="IDropDownOwner-onDropDownHide">/**
+	 * 当下拉菜单被隐藏时执行。
+     * @protected virtail
+	 */</span>
+	onDropDownHide: Function.empty,
+
+	attach: function (parentNode, refNode) {
+	    var dropDown = this.dropDown;
+	    if (dropDown &amp;&amp; !dropDown.closest('body')) {
+	        dropDown.attach(parentNode, refNode);
+	    }
+	    Dom.prototype.attach.call(this, parentNode, refNode);
+	},
+
+	detach: function (parentNode) {
+	    Dom.prototype.detach.call(this, parentNode);
+	    if (this.dropDown) {
+	        this.dropDown.detach(parentNode);
+	    }
+	},
+
+    <span id="IDropDownOwner-setDropDown">/**
+	 * 设置当前控件的下拉菜单。
+     * @param {Dom} dom 要设置的下拉菜单节点。
+	 * @return {Dom} 
+     * @protected virtual
+	 */</span>
+	setDropDown: function (dom) {
+
+	    if (dom) {
+
+	        // 修正下拉菜单为 Dom 对象。
+	        dom = dom instanceof Dom ? dom : Dom.get(dom);
+
+	        // 初始化并保存下拉菜单。
+	        this.dropDown = dom.addClass('x-dropdown').hide();
+
+	        // 如果下拉菜单未添加到 DOM 树，则添加到当前节点后。
+	        if (!dom.closest('body')) {
+
+                // 添加下拉菜单到 DOM 树。
+	            this.after(dom);
+
+	            // IE6/7 无法自动在父节点无 z-index 时处理 z-index 。
+	            if (navigator.isQuirks &amp;&amp; (dom = dom.parent()) &amp;&amp; dom.getStyle('zIndex') === 0){
+	                dom.setStyle('zIndex', 1);
+	            }
+	        }
+
+        // dom = null 表示清空下拉菜单。
+	    } else if (dom = this.dropDown) {
+	        dom.remove();
+	        this.dropDown = null;
+	    }
+		
+		return this;
+	},
+
+    <span id="IDropDownOwner-getDropDown">/**
+	 * 获取当前控件的下拉菜单。
+	 * @return {Dom} 
+     * @protected virtual
+	 */</span>
+	getDropDown: function () {
+	    return this.dropDown;
+	},
+
+    <span id="IDropDownOwner-isDropDownHidden">/**
+     * 判断当前下拉菜单是否被隐藏。
+     * @return {Boolean} 如果下拉菜单已经被隐藏，则返回 true。
+     * @protected virtual
+     */</span>
+	isDropDownHidden: function () {
+	    return this.dropDown &amp;&amp; Dom.isHidden(this.dropDown.node);
+	},
+
+    <span id="IDropDownOwner-toggleDropDown">/**
+     * 切换下拉菜单的显示状态。
+     * @return this
+     */</span>
+	toggleDropDown: function (e) {
+
+	    // 如果菜单已经隐藏，则使用 showDropDown 显示，否则，强制关闭菜单。
+	    return this.isDropDownHidden() ? this.showDropDown(e) : this.hideDropDown();
+	},
+	
+    <span id="IDropDownOwner-showDropDown">/**
+     * 显示下拉菜单。
+     * @return this
+     */</span>
+	showDropDown: function(e){
+
+	    var me = this;
+        
+	    // 如果是因为 DOM 事件而切换菜单，则测试是否为 disabled 状态。
+	    if(!e || !me.getAttr('disabled') &amp;&amp; !me.getAttr('readonly')) {
+
+            // 如果下拉菜单被隐藏，则先重设大小、定位。
+	        if (me.isDropDownHidden()) {
+
+                // 重新设置位置。
+	            var dropDown = me.dropDown.show().align(me, 'b', 0, -1), 
+	                dropDownWidth = me.dropDownWidth;
+
+                // 重新修改宽度。
+
+                if (dropDownWidth &lt; 0) {
+
+                    // 在当前目标元素的宽、下拉菜单的 min-width 属性、下拉菜单自身的宽度中找一个最大值。
+                    dropDownWidth = Math.max(me.getSize().x, Dom.styleNumber(dropDown.node, 'min-width'), dropDown.getScrollSize().x);
+
+                }
+
+                if (dropDownWidth !== 'auto') {
+                    dropDown.setSize(dropDownWidth);
+                }
+
+                // 设置 mouseup 后自动隐藏菜单。
+                document.on('mouseup', me.hideDropDown, me);
+
+            }
+
+	        me.onDropDownShow();
+		
+	        me.trigger('dropdownshow');
+
+        }
+
+	    return this;
+	},
+
+    <span id="IDropDownOwner-hideDropDown">/**
+     * 隐藏下拉菜单。
+     * @return this
+     */</span>
+	hideDropDown: function (e) {
+		
+		var dropDown = this.dropDown;
+		
+        // 仅在本来已显示的时候操作。
+		if(dropDown &amp;&amp; !this.isDropDownHidden()){
+			
+			// 如果是来自事件的关闭，则检测是否需要关闭菜单。
+			if(e){
+			    e = e.target;
+			    
+                // 如果事件源是来自下拉菜单自身，则不操作。
+			    if (dropDown.node == e || this.node === e || Dom.has(dropDown.node, e) || Dom.has(this.node, e))
+					return this;
+			}
+			
+			dropDown.hide();
+
+            // 删除 mouseup 回调。
+			document.un('mouseup', this.hideDropDown);
+			
+		}
+
+		this.onDropDownHide();
+		
+		return this.trigger('dropdownhide');
+	}
+	
+};</pre>
+</body>
+</html>

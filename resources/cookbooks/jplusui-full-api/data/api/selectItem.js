@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'selectItem',"source":'Controls\\Suggest\\assets\\scripts\\ComboBox.js',"sourceFile":'data/source/Controls\\Suggest\\assets\\scripts\\ComboBox.js.html#selectItem',"summary":'<p>\u6a21\u62df\u7528\u6237\u9009\u62e9\u67d0\u4e00\u9879\u3002</p>\n',"name":'selectItem',"memberOf":'',"memberType":'method',"params":[{"type":'',"name":'item',"summary":''}]});

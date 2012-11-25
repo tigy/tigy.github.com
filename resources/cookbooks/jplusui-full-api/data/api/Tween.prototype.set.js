@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Tween.prototype.set',"source":'Tween.js',"sourceFile":'data/source/Tween.js.html#Tween-prototype-set',"summary":'<p>\u6839\u636e\u6307\u5b9a\u53d8\u5316\u91cf\u8bbe\u7f6e\u503c\u3002</p>\n',"params":[{"type":'Number',"name":'delta',"summary":'<p>\u53d8\u5316\u91cf\u3002 0 - 1 \u3002</p>\n'}],"name":'set',"memberOf":'Tween',"memberType":'method'});

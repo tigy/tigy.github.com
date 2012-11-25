@@ -1,0 +1,496 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Lang\assets\scripts\Array.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">//===========================================
+//  数组扩展        A
+//===========================================
+
+
+/**
+ * 将一个伪数组对象转为原生数组。
+ * @param {Object} iterable 一个伪数组对象。
+ * @param {Number} startIndex=0 转换开始的位置。
+ * @return {Array} 返回新数组，其值和 *value* 一一对应。
+ * @memberOf Array
+ * @remark iterable 不支持原生的 DomList 对象。
+ * @example
+ * &lt;pre&gt;
+ * // 将 arguments 对象转为数组。
+ * Array.create(arguments); // 返回一个数组
+ *
+ * // 获取数组的子集。
+ * Array.create([4,6], 1); // [6]
+ *
+ * // 处理伪数组。
+ * Array.create({length: 1, &quot;0&quot;: &quot;value&quot;}); // [&quot;value&quot;]
+ *
+ * &lt;/pre&gt;
+ */
+Array.create = function (iterable, startIndex) {
+    // if(!iterable)
+    // return [];
+
+    // [DOM Object] 。
+    // if(iterable.item) {
+    // var r = [], len = iterable.length;
+    // for(startIndex = startIndex || 0; startIndex &lt; len;
+    // startIndex++)
+    // r[startIndex] = iterable[startIndex];
+    // return r;
+    // }
+
+    assert(!iterable || toString.call(iterable) !== '[object HTMLCollection]' || typeof iterable.length !== 'number', 'Array.create(iterable, startIndex): {iterable} 不允许是 NodeList 。', iterable);
+
+    // 调用 slice 实现。
+    return iterable ? Array.prototype.slice.call(iterable, startIndex) : [];
+};
+
+/**
+ * 数组。
+ * @class Array
+ */
+Array.implementIf({
+		
+    /// TODO: clear
+
+    /**
+     * 将指定的 *value* 插入到当前数组的指定位置。
+     * @param {Number} index 要插入的位置。索引从 0 开始。如果 *index* 大于数组的长度，则插入到末尾。
+     * @param {Object} value 要插入的内容。
+     * @return {Number} 返回实际插入到的位置。
+     * @example
+     * &lt;pre&gt;
+     * [&quot;I&quot;, &quot;you&quot;].insert(1, &quot;love&quot;); //   [&quot;I&quot;, &quot;love&quot;, &quot;you&quot;]
+     * &lt;/pre&gt;
+     */
+    insert: function (index, value) {
+        assert.deprected(&quot;Array#insert 即将从 System.Core.Base 移除。要使用此函数，可引用 System.Utils.Array 组件。&quot;);
+        assert.isNumber(index, &quot;Array#insert(index, value): {index} ~&quot;);
+        var me = this, tmp;
+        if (index &lt; 0 || index &gt;= me.length) {
+            me[index = me.length++] = value;
+        } else {
+            tmp = ap.slice.call(me, index);
+            me.length = index + 1;
+            this[index] = value;
+            ap.push.apply(me, tmp);
+        }
+        return index;
+
+    },
+		
+    /// TODO: clear
+	
+	/// #if SupportIE8
+
+	/// &lt;summary&gt;
+	/// 对数组每个元素判断一个函数返回true。
+	/// &lt;/summary&gt;
+	/// &lt;params name=&quot;fn&quot; type=&quot;Function&quot;&gt;函数。参数 value, index, this&lt;/params&gt;
+	/// &lt;params name=&quot;bind&quot; type=&quot;Object&quot; optional=&quot;true&quot;&gt;绑定的对象&lt;/params&gt;
+	/// &lt;returns type=&quot;Boolean&quot;&gt;全部返回 true则返回 true。&lt;/returns&gt;
+	every: function(fn, bind){
+		bind = bind || this;
+		for (var i = 0, l = this.length; i &lt; l; i++){
+			if (!fn.call(bind, this[i], i, this)) return false;
+		}
+		return true;
+	},
+	
+	map: function(fn, bind){
+		var results = [];
+		for (var i = 0, l = this.length; i &lt; l; i++){
+			//i 本来就是小于 this.length 还用判断么？
+			if (i in this) results[i] = fn.call(bind, this[i], i, this);
+		}
+		return results;
+	},
+
+	some: function(fn, bind){
+		for (var i = 0, l = this.length; i &lt; l; i++){//跟上边一样
+			if ((i in this) &amp;&amp; fn.call(bind, this[i], i, this)) return true;
+		}
+		return false;
+	},
+
+	/// &lt;summary&gt;
+	/// 合并2个数组，第2个数组不覆盖原成员。
+	/// &lt;/summary&gt;
+	/// &lt;params name=&quot;array&quot; type=&quot;Array&quot;&gt;数组&lt;/params&gt;
+	/// &lt;returns type=&quot;Array&quot;&gt;数组&lt;/returns&gt;
+	concat: function(array){
+		for (var i = 0, l = array.length; i &lt; l; i++) this.include(array[i]);
+		return this;
+	},
+	
+	/// #endif
+
+	/// &lt;summary&gt;
+	/// 返回数组的副本
+	/// &lt;/summary&gt;
+	/// &lt;params name=&quot;start&quot; type=&quot;Number&quot; optional=&quot;true&quot;&gt;位置&lt;/params&gt;
+	/// &lt;params name=&quot;length&quot; type=&quot;Number&quot; optional=&quot;true&quot;&gt;长度&lt;/params&gt;
+	/// &lt;returns type=&quot;Array&quot; &gt; 拷贝的数组 &lt;/returns&gt;
+	clone : function(start,length){
+//		var m = [];
+//		for(var i = start || 0,len = length || this.length - i;i&lt;len;i++)
+//			m[i] = Object.clone(this[i]);
+//		return m;
+		var start = start || 0, len = length || 0;
+		return len === 0 ? this.slice(start) : this.slice(start,start+len);
+	},
+	
+	/// &lt;summary&gt;
+	/// 删除数组中等价false的内容。
+	/// &lt;/summary&gt;
+	/// &lt;returns type=&quot;Boolean&quot;&gt;全部返回 true则返回 true。&lt;/returns&gt;
+	clean: function(){
+		return this.filter(function(x){return !x;});
+	},
+
+	/// &lt;summary&gt;
+	/// 对数组链至对象
+	/// &lt;/summary&gt;
+	/// &lt;params name=&quot;fn&quot; type=&quot;Function&quot;&gt;函数。参数 value, index, this&lt;/params&gt;
+	/// &lt;params name=&quot;bind&quot; type=&quot;Object&quot; optional=&quot;true&quot;&gt;绑定的对象&lt;/params&gt;
+	/// &lt;returns type=&quot;Array&quot;&gt;数组&lt;/returns&gt;
+	link: function(object){
+		var result = [];
+		for (var i = 0, l = this.length; i &lt; l; i++){
+			for (var key in object){
+				if (object[key](this[i])){
+					result[key] = this[i];
+					delete object[key];
+					break;
+				}
+			}
+		}
+		return result;
+	},
+
+	/// &lt;summary&gt;
+	/// 返回数组的随机位置的值。
+	/// &lt;/summary&gt;
+	/// &lt;returns type=&quot;Object&quot;&gt;内容&lt;/returns&gt;
+	random : function(){
+		return this.length &gt; 0 ? this[Math.rand(0, this.length - 1)] : null;
+	},
+
+	/**
+     * 没看懂这个函数的意义
+     * sortFn:排序规则
+     */
+    sortByRandom: function(sortFn) {
+        var result = [], array = this , sortFn = sortFn || function(){return Math.rand(0, array.length - 1);};
+		while(array.length &gt; 0){
+			var index = sortFn();
+			result.push(array[index]);
+			array.remove(index);
+		}
+		return result;
+    },
+	
+	// 是否包含某项
+	contains:function(item){
+		return RegExp(&quot;\\b&quot;+item+&quot;\\b&quot;).test(this);
+	},
+
+	associate: function(keys){
+		var obj = {}, length = Math.min(this.length, keys.length);
+		for (var i = 0; i &lt; length; i++) obj[keys[i]] = this[i];
+		return obj;
+	},
+
+	clear: function(){
+		this.length = 0;
+		return this;
+	},
+
+	flatten: function(){
+		var array = [];
+		for (var i = 0, l = this.length; i &lt; l; i++){
+			var type = typeOf(this[i]);
+			if (type == 'null') continue;
+			array = array.concat((type == 'array' || type == 'collection' || type == 'arguments' || instanceOf(this[i], Array)) ? Array.flatten(this[i]) : this[i]);
+		}
+		return array;
+	},
+
+	pick: function(){
+		for (var i = 0, l = this.length; i &lt; l; i++){
+			if (this[i] != null) return this[i];
+		}
+		return null;
+	},
+	
+	/**
+     * Perform a set difference A-B by subtracting all items in array B from array A.
+     *
+     * @param {Array} arrayA
+     * @param {Array} arrayB
+     * @return {Array} difference
+     */
+    difference: function(array) {
+        var clone = slice.call(arrayA),
+            ln = clone.length,
+            i, j, lnB;
+
+        for (i = 0,lnB = arrayB.length; i &lt; lnB; i++) {
+            for (j = 0; j &lt; ln; j++) {
+                if (clone[j] === arrayB[i]) {
+                    erase(clone, j, 1);
+                    j--;
+                    ln--;
+                }
+            }
+        }
+
+        return clone;
+    },
+
+///&lt;summary&gt;获取数组中的最小值。语法：min()&lt;/summary&gt;
+		///&lt;returns type=&quot;number&quot;&gt;返回数组中的最小值。&lt;/returns&gt;
+	min: function(){
+		return Math.min.apply(null, this);
+	},
+
+///&lt;summary&gt;获取数组中的最大值。语法：max()&lt;/summary&gt;
+		///&lt;returns type=&quot;number&quot;&gt;返回数组中的最大值。&lt;/returns&gt;
+	max: function(){
+		return Math.max.apply(null, this);
+	},
+
+	average: function(){
+		return this.length ? this.sum() / this.length : 0;
+	},
+
+	sum: function(){
+		var result = 0, l = this.length;
+		if (l){
+			while (l--) result += this[l];
+		}
+		return result;
+	},
+
+	checkRepeat : function() {
+		///&lt;summary&gt;检查数组中是否存在重复值。语法：checkRepeat()&lt;/summary&gt;
+		///&lt;returns type=&quot;boolean&quot;&gt;若数组中存在重复值，则返回 true，否则返回 false。&lt;/returns&gt;
+	    for (var i = 0; i &lt; this.length - 1; i++) {
+	        for (var j = i + 1; j &lt; this.length; j++) {
+	            if (this[i] == this[j]) {
+	                return true;
+	            }
+	        }
+	    }
+	
+	    return false;
+	},
+	
+	findFirstNotOf : function(a){
+		var o = this;
+		for ( var i=0,length=o.length; i&lt;length; i++)
+			if(o[i] != a)
+				return i;
+		return -1;
+	},
+
+	findLastNotOf : function(a){
+		var o = this;
+		for ( var i=o.length-1; i&gt;=0; i--)
+			if(o[i] != a)
+				return i;
+		return -1;
+	},
+
+	shuffle: function(){
+		for (var i = this.length; i &amp;&amp; --i;){
+			var temp = this[i], r = Math.floor(Math.random() * ( i + 1 ));
+			this[i] = this[r];
+			this[r] = temp;
+		}
+		return this;
+	},
+
+	/**
+	 * 复制到另一个数组。
+	 * @param {Object} o 位置。
+	 * @return {Array} 参数的内容。
+	 */
+	copyTo: function(o) {
+		var i = o.length;
+		forEach.call(this, function(x) {
+			o[i++] = x;
+		});
+		return o;
+	}
+		
+
+});
+
+
+// 
+// 
+// 		
+		// /**
+		 // * 如果目标数组不存在值，则拷贝，否则忽略。
+		 // * @static
+		 // * @param {Array} src 来源数组。
+		 // * @param {Array} dest 目标数组。
+		 // * @example
+		 // * &lt;code&gt;
+		 // * Array.copyIf([4,6], [4, 7]); // [4, 7, 6]
+		 // * &lt;/code&gt;
+		 // */
+		// copyIf: function(src, dest) {
+// 			
+			// for(var i = 0; i &lt; src.length; i++)
+				// dest.include(src[i]);
+		// },
+// 		
+// 
+		// /**
+		 // * 把传入的值连接为新的数组。如果元素本身是数组，则合并。此函数会过滤存在的值。
+		 // * @static
+		 // * @param {Object} ... 数据成员。
+		 // * @return {Array} 新数组。
+		 // * @example
+		 // * &lt;code&gt;
+		 // * Array.plain([4,6], [[4], 7]); // [4, 7, 6]
+		 // * &lt;/code&gt;
+		 // */
+		// plain: function() {
+// 
+			// var r = [];
+// 			
+			// // 对每个参数
+			// ap.forEach.call(arguments, function(d) {
+// 				
+// 				
+				// // 如果数组，把内部元素压入r。
+				// if (Array.isArray(d)) Array.copyIf(d, r);
+// 				
+				// // 不是数组，直接压入 r 。
+				// else r.include(d);
+			// });
+// 
+			// return r;
+		// },
+// 
+// 
+// ,
+// 		
+		// /**
+		 // * 创建当前 Object 的浅表副本。
+		 // * @return {Object} 当前变量的副本。
+		 // * @protected
+		 // * @example
+		 // * &lt;code&gt;
+		 // * var MyBa = new Class({
+		 // *    clone: function() {
+		 // * 	     return this.memberwiseClone();
+		 // *    }
+		 // * });
+		 // * &lt;/code&gt;
+		 // */
+		// memberwiseClone : function() {
+// 			
+			// // 创建一个同类。
+			// var me = this, newObject = new me.constructor(), i;
+// 			
+			// // 复制自身。
+			// for(i in me) {
+				// if(hasOwnProperty.call(me, i)) {
+					// newObject[i] = me[i];
+				// }
+			// }
+// 			
+			// return newObject;
+		// }
+// 
+
+
+
+		
+/**
+		 * 如果目标数组不存在值，则拷贝，否则忽略。
+		 * @static
+		 * @param {Array} src 来源数组。
+		 * @param {Array} dest 目标数组。
+		 * @example
+		 * &lt;code&gt;
+		 * Array.copyIf([4,6], [4, 7]); // [4, 7, 6]
+		 * &lt;/code&gt;
+		 */
+copyIf: function(src, dest) {
+			
+	for(var i = 0; i &lt; src.length; i++)
+		dest.include(src[i]);
+},
+		
+
+/**
+		 * 把传入的值连接为新的数组。如果元素本身是数组，则合并。此函数会过滤存在的值。
+		 * @static
+		 * @param {Object} ... 数据成员。
+		 * @return {Array} 新数组。
+		 * @example
+		 * &lt;code&gt;
+		 * Array.plain([4,6], [[4], 7]); // [4, 7, 6]
+		 * &lt;/code&gt;
+		 */
+plain: function() {
+
+	var r = [];
+			
+	// 对每个参数
+	ap.forEach.call(arguments, function(d) {
+				
+				
+		// 如果数组，把内部元素压入r。
+		if (Array.isArray(d)) Array.copyIf(d, r);
+				
+			// 不是数组，直接压入 r 。
+		else r.include(d);
+	});
+
+	return r;
+},
+
+
+,
+		
+/**
+		 * 创建当前 Object 的浅表副本。
+		 * @return {Object} 当前变量的副本。
+		 * @protected
+		 * @example
+		 * &lt;code&gt;
+		 * var MyBa = new Class({
+		 *    clone: function() {
+		 * 	     return this.memberwiseClone();
+		 *    }
+		 * });
+		 * &lt;/code&gt;
+		 */
+memberwiseClone : function() {
+			
+		// 创建一个同类。
+	var me = this, newObject = new me.constructor(), i;
+			
+	// 复制自身。
+	for(i in me) {
+		if(hasOwnProperty.call(me, i)) {
+			newObject[i] = me[i];
+		}
+	}
+			
+	return newObject;
+}</pre>
+</body>
+</html>

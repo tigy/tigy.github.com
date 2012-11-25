@@ -1,0 +1,61 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Button\assets\scripts\MenuButton.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author  xuld
+ */
+
+
+imports(&quot;Controls.Button.MenuButton&quot;);
+using(&quot;Controls.Core.IDropDownOwner&quot;);
+using(&quot;Controls.Button.Button&quot;);
+using(&quot;Controls.Core.ListControl&quot;);
+
+
+
+var MenuButton = Button.extend(IDropDownOwner).implement({
+	
+	xtype: 'menubutton',
+	
+	tpl: '&lt;button class=&quot;x-button x-control&quot; type=&quot;button&quot;&gt;&lt;span class=&quot;x-menubutton-arrow&quot;&gt;&lt;/span&gt;&lt;/button&gt;',
+	
+	createDropDown: function (existDom) {
+		if(existDom &amp;&amp; !existDom.hasClass('x-menu')){
+			return existDom;
+		}
+		assert(window.Menu, &quot;必须载入 Controls.Menu.Menu 组件才能初始化 x-menu 的菜单项。&quot;);
+		return new Menu(existDom).on('click', this.onDropDownClick, this);
+	},
+
+	state: function (name, value) {
+	    return this.toggleClass('x-button-' + name, value);
+	},
+	
+	init: function () {
+	    this.setDropDown(this.createDropDown(this.next('.x-dropdown')));
+		this.on('click', this.toggleDropDown, this);
+	},
+	
+	onDropDownShow: function(){
+		this.state('actived', true);
+	},
+	
+	onDropDownHide: function(){
+	    this.state('actived', false);
+	},
+	
+	onDropDownClick: function(){
+		this.hideDropDown();
+	}
+	
+});
+
+ListControl.aliasMethods(MenuButton, 'dropDown');</pre>
+</body>
+</html>

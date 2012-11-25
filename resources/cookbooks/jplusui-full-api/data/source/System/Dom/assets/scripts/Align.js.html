@@ -1,0 +1,164 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Dom\assets\scripts\Align.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld 
+ */
+
+
+using(&quot;System.Dom.Base&quot;);
+
+
+<span id="Dom">/**
+ * 为控件提供按控件定位的方法。
+ * @class Dom
+ */</span>
+Dom.implement({
+
+	<span id="Dom-prototype-align">/**
+	 * 基于某个控件，设置当前控件的位置。改函数让控件显示都目标的右侧。
+	 * @param {Dom} dom 目标的控件。
+	 * @param {String} align 设置的位置。如 ll-bb 。完整的说明见备注。
+	 * @param {Number} offsetX=0 偏移的X大小。
+	 * @param {Number} offsetY=0 偏移的y大小。
+	 * @param {Boolean} enableReset=true 如果元素超出屏幕范围，是否自动更新节点位置。
+	 */</span>
+	align: (function(){
+
+		var aligners = {
+			
+			xc: function (opt) {
+				opt.x = opt.tp.x + (opt.ts.x - opt.s.x) / 2 + opt.ox;
+			},
+			
+			ll: function(opt, r){
+				opt.x = opt.tp.x - opt.s.x - opt.ox;
+				
+				if(r &gt; 0 &amp;&amp; opt.x &lt;= opt.dp.x) {
+					aligners.rr(opt, --r);
+				}
+			},
+			
+			rr: function(opt, r){
+				opt.x = opt.tp.x + opt.ts.x + opt.ox;
+				
+				if(r &gt; 0 &amp;&amp; opt.x + opt.s.x &gt;= opt.dp.x + opt.ds.x) {
+					aligners.ll(opt, --r);
+				}
+			},
+			
+			lr: function (opt, r) {
+				opt.x = opt.tp.x + opt.ox;
+				
+				if(r &gt; 0 &amp;&amp; opt.x + opt.s.x &gt;= opt.dp.x + opt.ds.x) {
+					aligners.rl(opt, --r);
+				}
+			},
+			
+			rl: function (opt, r) {
+				opt.x = opt.tp.x + opt.ts.x - opt.s.x - opt.ox;
+				
+				if(r &gt; 0 &amp;&amp; opt.x &lt;= opt.dp.x) {
+					aligners.lr(opt, --r);
+				}
+			},
+			
+			yc: function (opt) {
+				opt.y = opt.tp.y + (opt.ts.y - opt.s.y) / 2 + opt.oy;
+			},
+			
+			tt: function(opt, r){
+				opt.y = opt.tp.y - opt.s.y - opt.oy;
+				
+				if(r &gt; 0 &amp;&amp; opt.y &lt;= opt.dp.y) {
+					aligners.bb(opt, --r);
+				}
+			},
+			
+			bb: function(opt, r){
+				opt.y = opt.tp.y + opt.ts.y + opt.oy;
+				
+				if(r &gt; 0 &amp;&amp; opt.y + opt.s.y &gt;= opt.dp.y + opt.ds.y) {
+					aligners.tt(opt, --r);
+				}
+			},
+			
+			tb: function (opt, r) {
+				opt.y = opt.tp.y + opt.oy;
+				
+				if(r &gt; 0 &amp;&amp; opt.y + opt.s.y &gt;= opt.dp.y + opt.ds.y) {
+					aligners.bt(opt, --r);
+				}
+			},
+			
+			bt: function (opt, r) {
+				opt.y = opt.tp.y + opt.ts.y - opt.s.y - opt.oy;
+				
+				if(r &gt; 0 &amp;&amp; opt.y &lt;= opt.dp.y) {
+					aligners.tb(opt, --r);
+				}
+			}
+
+		};
+	
+		/*
+		 *      tl        tr
+		 *      ------------
+		 *   lt |          | rt
+		 *      |          |
+		 *      |    cc    | 
+		 *      |          |
+		 *   lb |          | rb
+		 *      ------------
+		 *      bl        br
+		 */
+	
+		return function(dom, position, offsetX, offsetY, enableReset) {
+					
+			assert(position, &quot;Dom#align(ctrl, position,  offsetX, offsetY): {position} 格式不正确。正确的格式如 lt&quot;, position);
+			
+			dom = dom instanceof Dom ? dom : Dom.get(dom);
+			
+			var opt = {
+				s: this.getSize(),
+				ts: dom.getSize(),
+				tp: dom.getPosition(),
+				ds: document.getSize(),
+				dp: document.getPosition(),
+				ox: offsetX || 0,
+				oy: offsetY || 0
+			}, r = enableReset === false ? 0 : 2, x, y;
+			
+			if(position.length &lt;= 1){
+				if(position === 'r'){
+					x = 'rr';
+					y = 'tb';
+				} else {
+					x = 'lr';
+					y = 'bb';
+				}
+			} else {
+				x = position.substr(0, 2);
+				y = position.substr(3);
+			}	
+			
+			assert(aligners[x] &amp;&amp; aligners[y], &quot;Dom#align(ctrl, position,  offsetX, offsetY): {position} 格式不正确。正确的格式如 lt&quot;, position);
+			
+			aligners[x](opt, r);
+			aligners[y](opt, r);
+			
+			return this.setPosition(opt);
+		};
+		
+	})()
+	
+});
+</pre>
+</body>
+</html>

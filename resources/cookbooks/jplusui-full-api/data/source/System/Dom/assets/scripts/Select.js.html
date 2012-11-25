@@ -1,0 +1,209 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Dom\assets\scripts\Select.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">
+using(&quot;System.Dom.Base&quot;);
+
+
+var HtmlSelect = Dom.extend({
+
+	constructor: function(id){
+		this.node = Dom.getNode(id);
+	},
+
+	add: function(option){
+
+	},
+
+	addItem: function (text, value, selected) {
+
+	},
+
+	removeItem: function () {
+
+	},
+
+	clearItems: function () {
+
+	},
+
+	getSelectedItem: function () {
+
+	},
+
+	setSelectedItem: function () {
+
+	},
+
+	getValue: function () {
+
+	},
+
+	setValue: function () {
+
+	},
+
+	getSelectedIndex: function () {
+
+	},
+
+	getSelected: function (item) {
+
+	},
+
+	setSelected: function (item, value) {
+
+	},
+
+	setSelectedIndex: function () {
+
+	}
+
+
+});
+
+
+// //===============================================
+// // class - select
+// // 使锟矫凤拷锟斤拷:
+// // var Select=new cls_select(
+// //					id,     // id
+// //					arr,    // 锟叫憋拷 [array]  arr[0][0] 值 arr[0][1]  value
+// //					size,   // 锟叫憋拷 锟斤拷小
+// //					multi,  // 锟斤拷选
+// //					cf      //  锟侥憋拷锟叫憋拷锟斤拷执锟叫的猴拷锟斤拷锟斤拷  锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷  默锟斤拷为选锟斤拷锟斤拷锟斤拷锟?  cf=alert    锟斤拷锟斤拷锟斤拷锟窖★拷锟斤拷锟斤拷锟斤拷
+// //                          //  锟斤拷锟斤拷锟揭拷锟斤拷掳锟脚? cf=state('锟斤拷删','锟斤拷锟斤拷','锟斤拷锟斤拷');
+// //			  );
+// // Select.creat()           //  锟斤拷锟斤拷
+// // Select.add(o,t,i)        //  锟斤拷锟? o  为 锟侥憋拷   t 为值    i为顺锟斤拷  默锟斤拷锟斤拷锟?// // Select.del(i)            //   删锟斤拷  i  锟斤拷锟斤拷为  锟斤拷锟斤拷   值
+// // Select.dels()            //   删锟斤拷选锟斤拷
+// // Select.gets()            //  锟斤拷取 锟斤拷锟斤拷:选锟叫碉拷锟斤拷 锟叫憋拷 [array]   锟斤拷锟斤拷  选锟叫碉拷锟叫憋拷
+// // Select.state()           //  锟斤拷锟斤拷状态( Select.hc ; 选锟斤拷?  Select.canup  :  锟斤拷锟斤拷锟斤拷    Select.candown  :  锟斤拷锟斤拷锟斤拷   锟斤拷 
+// //							    锟斤拷锟斤拷锟?锟斤拷锟斤拷锟斤拷使锟斤拷3锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷id锟侥讹拷锟襟不匡拷锟斤拷
+// // Select.moveon(k,i)       // 锟狡讹拷 锟斤拷i锟斤拷 默锟斤拷选锟斤拷 k位  锟斤拷k==0 锟斤拷锟狡讹拷 k==1 锟斤拷锟斤拷一锟斤拷  k==-1 锟斤拷锟斤拷 锟斤拷
+// // Select.movetop(i)        // 锟狡讹拷 锟斤拷i锟斤拷 默锟斤拷选锟斤拷  锟斤拷锟斤拷
+// // Select.movedown(i)       // 锟狡讹拷 锟斤拷i锟斤拷 默锟斤拷选锟斤拷  锟斤拷锟?// // Select.getall()          //  全锟斤拷锟斤拷锟斤拷
+// // Select.getsall ()        //    锟斤拷锟斤拷:选锟叫碉拷锟斤拷 锟叫憋拷 [array] 值  锟斤拷锟斤拷  选锟叫碉拷值
+// //===============================================
+// try{
+	// var Select=new cls_select(&quot;objselect&quot;);
+// }catch(e){
+// }
+// function cls_select(id,arr,size,multi,cf){
+	// var objselect=document.getElementById(id);
+	// size=size||9;
+	// if(typeof cf==&quot;undefined&quot;)cf=&quot;&quot;
+	// else if(cf.indexOf(&quot;state&quot;)&lt;0)cf+=&quot;(this.value)&quot;;
+	// if(typeof multi==&quot;undefined&quot;) multi=true;
+	// var al=!arr?0:arr.length;
+	// this.creat=function(){
+		// document.write(&quot;&lt;select name='&quot;+id+&quot;' size='&quot;+size+&quot;'&quot;)
+		// if(multi) document.write(&quot; multiple='multiple'&quot;);
+		// document.write(&quot; id='&quot;+id+&quot;' onchange='&quot;+cf+&quot;'&gt;&quot;);
+		// for(i=0;i&lt;al;i++){
+			// document.write(&quot;&lt;option value='&quot;+al[i][1]+&quot;'&gt;&quot;+al[i][0]+&quot;&lt;/option&gt;&quot;);
+		// }
+		// document.write(&quot;&lt;/select&gt;&quot;);
+		// objselect=document.getElementById(id);
+	// }
+	// this.add=function(o,t,i){
+		// if(typeof i==&quot;undefined&quot;) i=objselect.length;
+		// if (window.navigator.userAgent.indexOf(&quot;MSIE&quot;) &gt; 0) {
+				// var option = document.createElement(&quot;option&quot;);
+				// option.innerText = o;
+				// option.value =t;
+				// objselect.insertBefore(option, objselect.options[i]);
+		// }else{              // for Firefox
+				// objselect.insertBefore(new Option(o, t), selectCtl.options[0]);
+		// }
+	// }
+// 	
+	// this.del=function(i){
+		// if(isNaN(i)){
+			// for(var k=0;k&lt;objselect.length;k++)
+				// if(objselect.item(i).value==i) return this.del(k);
+		// }else{
+			// objselect.remove(i);
+			// try{
+				// objselect.selectedIndex=i;
+			// }catch(e){
+				// };
+		// }
+		// return true;
+	// }
+	// this.gets=function(){
+		// if(multi){
+			// al=objselect.length;
+			// var arr=new Array(al);
+			// for(i=0;i&lt;al;i++)
+				// if(objselect.item(i).selected) arr[k++]=i;
+			// return arr;
+		// }else{
+			// return objselect.selectedIndex;
+		// }
+// 	
+	// }
+	// this.state=function(){
+		// this.hc=objselect.selectedIndex&gt;=0;
+		// this.canup=objselect.selectedIndex&gt;0;
+		// this.candown=objselect.selectedIndex&gt;0 &amp;&amp; objselect.selectedIndex&lt;objselect.length;
+		// if(arguments.length){
+			// try{
+				// document.getElementById(arguments[0]).disabled=!this.hc;
+				// document.getElementById(arguments[1]).disabled=!this.canup;
+				// document.getElementById(arguments[2]).disabled=!this.candown;
+			// }catch(e){}
+		// }
+// 	
+	// }
+// 	
+	// this.dels=function(){
+		// if(multi){
+			// pc=-1;
+			// for(i=0;i&lt;objselect.length;i++)
+				// if(objselect.item(i).selected) objselect.remove(pc=i--);
+			// if(pc&gt;=0)objselect.selectedIndex=pc&gt;=objselect.length?pc-1:pc;
+		// }else{
+			// this.del(objselect.selectedIndex);
+		// }
+	// }
+	// this.moveon=function(k,i){
+	  // if(typeof i==&quot;undefined&quot;) i=objselect.selectedIndex;
+	  // if(i&lt;0 || i+k&gt;=objselect.length || i+k&lt;0) return false;
+	  // option_value=objselect.item(i).value;
+	  // option_text=objselect.item(i).text;
+	  // objselect.item(i).value=objselect.item(i+k).value;
+	  // objselect.item(i).text=objselect.item(i+k).text;
+	  // objselect.item(i+k).value=option_value;
+	  // objselect.item(i+k).text=option_text;
+	  // objselect.selectedIndex=i+k;
+    // }
+	// this.movetop=function(i){this.moveon(-objselect.selectedIndex,i);}
+	// this.movetbottom=function(i){this.moveon(objselect.length-objselect.selectedIndex-1,i);}
+	// this.getall=function(){
+		// var arr=new Array(objselect.length);
+		// for(i=0;i&lt;objselect.length;i++)
+			 // arr[i]=objselect.item(i).value;
+		// return arr;
+// 	
+	// }
+	// this.getsall=function(){
+		// if(multi){
+			// var k=0;
+			// var arr=new Array();
+			// for(i=0;i&lt;objselect.length;i++)
+				// if(objselect.item(i).selected) arr[k++]=objselect.item(i).value;
+			// return arr;
+		// }else{
+			// return objselect.item(objselect.selectedIndex) .value;
+		// }
+	// }
+// }</pre>
+</body>
+</html>

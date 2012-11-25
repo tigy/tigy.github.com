@@ -1,0 +1,356 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Lang\assets\scripts\String.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">//===========================================
+//  字符串     
+//===========================================
+
+,
+		  	
+/**
+		 * 将字符串限定在指定长度内，超出部分用 ... 代替。
+		 * @param {String} value 要处理的字符串。
+		 * @param {Number} length 需要的最大长度。
+		 * @example 
+		 * &lt;pre&gt;
+	     * String.ellipsis(&quot;1234567&quot;, 6); //   &quot;123...&quot;
+	     * String.ellipsis(&quot;1234567&quot;, 9); //   &quot;1234567&quot;
+	     * &lt;/pre&gt;
+		 */
+ellipsis: function(value, length) {
+	assert.isString(value, &quot;String.ellipsis(value, length): 参数  {value} ~&quot;);
+	assert.isNumber(length, &quot;String.ellipsis(value, length): 参数  {length} ~&quot;);
+	return value.length &gt; length ? value.substr(0, length - 3) + &quot;...&quot; : value;
+}
+
+/**
+ * @class String
+ */
+String.implementIf({
+	
+	/**
+	 * 字符串正则测试。
+	 * @param {RegExp,params}RegExp:正则，params：i,g,m匹配方式。
+	 * @return {String} 返回是否匹配结果 true or false。
+	 */
+	test: function(regex, params){
+		return ((typeOf(regex) == 'regexp') ? regex : new RegExp('' + regex, params)).test(this);
+	},
+
+	clean: function(){
+		return this.replace(/\s+/g, ' ').trim();
+	},
+	
+	/**
+	 * 去除字符串左边空格。
+	 * @param none。
+	 * @return {String} 格式化后的字符串。
+	 */
+	trimLeft:function(){
+		return this.replace(/^\s+/,'');
+	},
+	
+	/**
+	 * 去除字符串右边空格。
+	 * @param none。
+	 * @return {String} 格式化后的字符串。
+	 */
+	trimRight:function(){
+		return this.replace(/\s+$/,'')
+	},
+
+	/**
+	 * 字符串是否以某个特定字符串开头。
+	 * @param {String}开头的字符串。
+	 * @return {String} 返回是否匹配结果 true or false。
+	 */
+	startWith:function(str){
+		return this.substr(0,value.length) == value;
+	},
+	
+	/**
+	 * 字符串是否以某个特定字符串结尾。
+	 * @param {String}结尾的字符串。
+	 * @return {String} 返回是否匹配结果 true or false。
+	 */
+	endWith:function(str){
+		return this.substr(this.length - value.length) == value;
+	},
+	
+	/**
+	 * 字符串是否包含某个特定字符串。
+	 * @param {String}要包含的字符串。
+	 * @return {String} 返回是否匹配结果 true or false。
+	 */
+	contains:function(str,separator){
+		return (separator?(separator+this+separator):this).indexOf(str)&gt;-1;
+	},
+	
+	///	&lt;summary&gt;
+	/// 获得长度,中文算2个字符。
+	/// &lt;/summary&gt;
+	///	&lt;returns type=&quot;Number&quot; &gt;长度值&lt;/returns&gt;
+	/// &lt;examples&gt;&quot;中文&quot;.wLength();  //  4&lt;/examples&gt;
+	wLength : function(){
+		
+		var arr=this.match(/[^\x00-\xff]/ig);
+		
+		return this.length + (arr==null ? 0 : arr.length);
+	},
+	
+	/**
+	 * 将字符串中的重复单词去掉。
+	 * @param {}。
+	 * @return {String} 返回重复单词去掉后的字符串。
+	 */
+	unique:function(){
+		return this.replace(/(^|\s)(\S+)(?=\s(?:\S+\s)*\2(?:\s|$))/g,'');
+	},
+	times:function(n){
+		return new Array(n+1).join(this);
+	} ,
+	
+	/**
+	 * 首字母小写。
+	 */
+	uncapitalize: function(){
+		
+	},
+	
+	left : function(length) {
+        ///&lt;summary&gt;获取字符串左边 length 长度的子字符串。语法：left(length)&lt;/summary&gt;
+        ///&lt;param name=&quot;length&quot; type=&quot;int&quot;&gt;要获取的子字符串长度。&lt;/param&gt;
+        ///&lt;returns type=&quot;string&quot;&gt;返回字符串左边 length 长度的子字符串。&lt;/returns&gt;
+            return this.substr(0, length);
+        },
+
+	
+	/**
+	 * @param 
+	 */
+    right : function(length) {
+        ///&lt;summary&gt;获取字符串右边 length 长度的子字符串。语法：right(length)&lt;/summary&gt;
+        ///&lt;param name=&quot;length&quot; type=&quot;int&quot;&gt;要获取的子字符串长度。&lt;/param&gt;
+        ///&lt;returns type=&quot;string&quot;&gt;返回字符串右边 length 长度的子字符串。&lt;/returns&gt;
+            return this.substr(this.length - length, length);
+        },
+		
+		
+	/// &lt;summary&gt;
+	/// 对齐
+	/// &lt;/summary&gt;
+	///	&lt;param name=&quot;length&quot; type=&quot;Number&quot; &gt; 长度 &lt;/param&gt;
+	///	&lt;param name=&quot;sub&quot; type=&quot;String&quot; &gt; 填补空白的字符 &lt;/param&gt;
+	///	&lt;returns type=&quot;String&quot; &gt; 字符串 &lt;/returns&gt;
+	padLeft : function(totalWidth, chr) {
+        ///&lt;summary&gt;向字符串左端追加一定数量的字符并返回。语法：padLeft(totalWidth, chr)&lt;/summary&gt;
+        ///&lt;param name=&quot;totalWidth&quot; type=&quot;int&quot;&gt;追加字符后要达到的总长度。&lt;/param&gt;
+        ///&lt;param name=&quot;chr&quot; type=&quot;char&quot;&gt;要追加的字符。&lt;/param&gt;
+        ///&lt;returns type=&quot;string&quot;&gt;返回追加字符后的字符串。&lt;/returns&gt;
+        var str = &quot;&quot;;
+        for (var i = 0; i &lt; totalWidth - this.length; i++) {
+            str += chr;
+        }
+
+        return str + this;
+    },
+
+
+    padRight : function(totalWidth, chr) {
+        ///&lt;summary&gt;向字符串右端追加一定数量的字符并返回。语法：padRight(totalWidth, chr)&lt;/summary&gt;
+        ///&lt;param name=&quot;totalWidth&quot; type=&quot;int&quot;&gt;追加字符后要达到的总长度。&lt;/param&gt;
+        ///&lt;param name=&quot;chr&quot; type=&quot;char&quot;&gt;要追加的字符。&lt;/param&gt;
+        ///&lt;returns type=&quot;string&quot;&gt;返回追加字符后的字符串。&lt;/returns&gt;
+        var str = &quot;&quot;;
+        for (var i = 0; i &lt; totalWidth - this.length; i++) {
+            str += chr;
+        }
+
+        return this + str;
+    }
+	
+	
+});
+
+
+Object.extend(String, {
+	
+	quote:function(str){
+		var  metaObject = {
+                    '\b': '\\b',
+                    '\t': '\\t',
+                    '\n': '\\n',
+                    '\f': '\\f',
+                    '\r': '\\r',
+                    '\\': '\\\\'
+                },
+		str = this.replace(/[\x00-\x1f\\]/g, function (chr) {
+                            var special = metaObject[chr];
+                            return special ? special : '\\u' + ('0000' + chr.charCodeAt(0).toString(16)).slice(-4)
+                        });
+        return '&quot;' + str.replace(/&quot;/g, '\\&quot;') + '&quot;';
+	},
+	
+	encodeJs : function (str) {
+		
+		// TODO  效率不高
+		
+	    return this.replace(/\\/g,&quot;\\\\&quot;).replace(/\&quot;/g,&quot;\\\&quot;&quot;).replace(/\'/,&quot;\\'&quot;);
+	},
+	
+    /**
+     * Convert certain characters (&amp;, &lt;, &gt;, and ') to their HTML character equivalents for literal display in web pages.
+     * @param {String} value The string to encode
+     * @return {String} The encoded text
+     * @method
+     */
+    encodeHtml: (function() {
+        var entities = {
+            '&amp;': '&amp;amp;',
+            '&gt;': '&amp;gt;',
+            '&lt;': '&amp;lt;',
+            '&quot;': '&amp;quot;'
+        }, keys = [], p, regex;
+        
+        for (p in entities) {
+            keys.push(p);
+        }
+        
+        regex = new RegExp('(' + keys.join('|') + ')', 'g');
+        
+        return function(value) {
+            return (!value) ? value : String(value).replace(regex, function(match, capture) {
+                return entities[capture];    
+            });
+        };
+    })(),
+
+    /**
+     * Convert certain characters (&amp;, &lt;, &gt;, and ') from their HTML character equivalents.
+     * @param {String} value The string to decode
+     * @return {String} The decoded text
+     * @method
+     */
+    decodeHtml: (function() {
+        var entities = {
+            '&amp;amp;': '&amp;',
+            '&amp;gt;': '&gt;',
+            '&amp;lt;': '&lt;',
+            '&amp;quot;': '&quot;'
+        }, keys = [], p, regex;
+        
+        for (p in entities) {
+            keys.push(p);
+        }
+        
+        regex = new RegExp('(' + keys.join('|') + '|&amp;#[0-9]{1,5};' + ')', 'g');
+        
+        return function(value) {
+            return (!value) ? value : String(value).replace(regex, function(match, capture) {
+                if (capture in entities) {
+                    return entities[capture];
+                } else {
+                    return String.fromCharCode(parseInt(capture.substr(2), 10));
+                }
+            });
+        };
+    })(),
+
+    /**
+     * Appends content to the query string of a URL, handling logic for whether to place
+     * a question mark or ampersand.
+     * @param {String} url The URL to append to.
+     * @param {String} string The content to append to the URL.
+     * @return (String) The resulting URL
+     */
+    urlAppend : function(url, string) {
+        if (!Ext.isEmpty(string)) {
+            return url + (url.indexOf('?') === -1 ? '?' : '&amp;') + string;
+        }
+
+        return url;
+    },
+	
+	/**
+	 * 将字符串转为指定长度。超出部分用 ... 表示， 这个函数分割单词。
+	 */
+	ellipsisByWord: function(str, len){
+		if (str.length &gt; len) {
+			var p = value.indexOf(' ', len);
+			if (p !== -1 &amp;&amp; p - len &gt; 15) len = p;
+			
+			str = str.substr(0, len) + '...';
+		}
+          
+		return str;
+	},
+	
+	removeHtml : function(str) {
+        ///&lt;summary&gt;去除字符串中的 HTML 标签并返回。语法：removeHtml()&lt;/summary&gt;
+        ///&lt;returns type=&quot;string&quot;&gt;返回去除了 HTML 标签的字符串。&lt;/returns&gt;
+        return str.replace(/&lt;(.|\n)+?&gt;/g, &quot;&quot;);
+    },
+	
+	removeRepeats: function (value) {
+		return value.replace(/(\w)(?=.*\1)/g, &quot;&quot;);
+	},
+
+    /**
+     * Utility function that allows you to easily switch a string between two alternating values.  The passed value
+     * is compared to the current string, and if they are equal, the other value that was passed in is returned.  If
+     * they are already different, the first value passed in is returned.  Note that this method returns the new value
+     * but does not change the current string.
+     * &lt;pre&gt;&lt;code&gt;
+    // alternate sort directions
+    sort = Ext.String.toggle(sort, 'ASC', 'DESC');
+
+    // instead of conditional logic:
+    sort = (sort == 'ASC' ? 'DESC' : 'ASC');
+       &lt;/code&gt;&lt;/pre&gt;
+     * @param {String} string The current string
+     * @param {String} value The value to compare to the current string
+     * @param {String} other The new value to use if the string already equals the first value passed in
+     * @return {String} The new value
+     */
+    toggle: function(string, value, other) {
+        return string === value ? other : value;
+    },
+    
+	/**
+	 * 使  HTML 代码更标准，比如添加注释。
+	 */
+	toXHTML: function (value) {
+		return value.replace(/( [^\=]*\=)(\s?[^\&quot;\s\&gt;]*)/ig,function(a,b,c,d,e){return (c)?(new RegExp(&quot;&lt;[^&gt;]*&quot;+c.replace(/(\^|\(|\)|\[|\]|\{|\}|\?|\-|\\|\/|\||\$)/g,'\\$1')+&quot;[^&gt;]*&gt;&quot;,&quot;i&quot;).test(e))?b+'&quot;'+c+'&quot;':b+c:b});
+	},
+	
+	compare: function (a, b) {
+ if(a.length==b.length) return a.split(&quot;&quot;).sort().join(&quot;&quot;)==b.split(&quot;&quot;).sort().join(&quot;&quot;);
+    a = a.split(&quot;&quot;).sort().join(&quot;&quot;).replace(/(.)\1+/g,&quot;$1&quot;);
+    b = b.split(&quot;&quot;).sort().join(&quot;&quot;).replace(/(.)\1+/g,&quot;$1&quot;);
+    var arr = a.split(&quot;&quot;);
+    var re = new RegExp(arr.join(&quot;|&quot;),&quot;g&quot;);
+    return (b.length - b.replace(re,&quot;&quot;).length == a.length || b.replace(re,&quot;&quot;).length==0)
+	},
+	
+	stripScripts:  function(exec){
+		var scripts = '';
+		var text = this.replace(/&lt;script[^&gt;]*&gt;([\s\S]*?)&lt;\/script&gt;/gi, function(all, code){
+			scripts += code + '\n';
+			return '';
+		});
+		if (exec === true) Browser.exec(scripts);
+		else if (typeOf(exec) == 'function') exec(scripts, text);
+		return text;
+	}
+	
+	
+});
+</pre>
+</body>
+</html>

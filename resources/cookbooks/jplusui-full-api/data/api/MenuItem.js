@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'MenuItem',"source":'Controls\\Menu\\assets\\scripts\\Menu.js',"sourceFile":'data/source/Controls\\Menu\\assets\\scripts\\Menu.js.html#MenuItem',"summary":'<p>\u8868\u793a\u83dc\u5355\u9879\u3002</p>\n',"name":'MenuItem',"memberOf":'',"memberType":'field'});

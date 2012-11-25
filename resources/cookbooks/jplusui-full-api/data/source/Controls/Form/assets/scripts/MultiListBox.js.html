@@ -1,0 +1,55 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Form\assets\scripts\MultiListBox.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+using(&quot;Controls.Form.ListBox&quot;);
+
+
+<span id="MultiListBox">/**
+ * 表示一个列表框。
+ * @extends ListBox
+ */</span>
+var MultiListBox = ListBox.implement({
+
+    <span id="setSelectedItems">/**
+     * 重新设置当前高亮项。
+     */</span>
+    setSelectedItems: function (items) {
+        if(items) {
+            items.addClass(clazz);
+        } else {
+            this.query('.x-' + this.xtype + '-selected').removeClasss('x-' + this.xtype + '-selected');
+        }
+
+        return this;
+    },
+
+    /**
+     * 获取当前高亮项。
+     */
+    getSelectedItem: function () {
+        return this.query('.x-' + this.xtype + '-selected');
+    },
+
+    /**
+	 * 模拟用户选择某一项。
+	 */
+    selectItem: function (item) {
+        if (this.trigger('selecting', item) !== false) {
+            this.setSelectedItems(item);
+            this.trigger('change');
+        }
+    }
+
+});</pre>
+</body>
+</html>

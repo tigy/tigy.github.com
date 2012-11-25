@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Fx.prototype.pause',"source":'Base_3.js',"sourceFile":'data/source/Base_3.js.html#Fx-prototype-pause',"summary":'<p>\u6682\u505c\u5f53\u524d\u6548\u679c\u3002</p>\n',"memberAccess":'protected',"name":'pause',"memberOf":'Fx',"memberType":'method',"params":[]});

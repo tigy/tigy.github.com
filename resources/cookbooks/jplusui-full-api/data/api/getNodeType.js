@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'getNodeType',"source":'Controls\\Nav\\assets\\scripts\\TreeView.js',"sourceFile":'data/source/Controls\\Nav\\assets\\scripts\\TreeView.js.html#getNodeType',"summary":'<p>\u83b7\u53d6\u5f53\u524d\u8282\u70b9\u7684\u56fe\u6807\u3002</p>\n',"name":'getNodeType',"memberOf":'',"memberType":'method',"params":[]});

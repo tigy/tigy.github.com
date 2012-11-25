@@ -1,0 +1,108 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Suggest\assets\scripts\CityChooser.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+
+using(&quot;Controls.Suggest.ComboBox&quot;);
+
+var CityChooser = Class({
+
+    constructor: function (provinces, cities) {
+
+        provinces = Dom.get(provinces);
+        cities = Dom.get(cities);
+
+        var value1 = provinces.getText();
+        var value2 = cities.getText();
+
+        provinces = this.provinces = new ComboBox(provinces).addClass('x-citychooser').setDropDownList(true);
+        cities = this.cities = new ComboBox(cities).addClass('x-citychooser').setDropDownList(true);
+
+        if (CityChooser.cdata == null) {
+            CityChooser.cdata = {};
+            for (var city in CityChooser.data) {
+                var zz = city.split('@');
+                CityChooser.cdata[zz[1]] = CityChooser.data[city];
+                provinces.items.add(zz[0]).value = zz[1];
+            }
+        }
+
+        provinces.on('change', function () {
+            var value = this.getValue();
+            cities.items.clear();
+            cities.setText('��ѡ��');
+            cities.setValue(0);
+            if (CityChooser.cdata[value])
+                Object.each(CityChooser.cdata[value], function (value) {
+                    var val = value.split('@');
+                    cities.items.add(val[0]).value = val[1];
+                });
+        });
+
+        if (!CityChooser.cdata[value1]) {
+            provinces.setValue(0);
+            provinces.setText('��ѡ��');
+        } else {
+            provinces.setValue(value1);
+        }
+
+        if (value2 != '0') {
+            cities.setValue(value2);
+        }
+
+        provinces.selectedItem = cities.selectedItem = null;
+    }
+
+});
+
+
+
+CityChooser.data = {
+    &quot;������@1&quot;: [&quot;������@1&quot;, &quot;������@2&quot;, &quot;������@3&quot;, &quot;������@4&quot;, &quot;������@5&quot;, &quot;��̨��@6&quot;, &quot;ʯ��ɽ��@7&quot;, &quot;������@8&quot;, &quot;��ͷ����@9&quot;, &quot;��ɽ��@10&quot;, &quot;ͨ����@11&quot;, &quot;˳����@12&quot;, &quot;������@13&quot;, &quot;��ƽ��@14&quot;, &quot;������@15&quot;, &quot;������@16&quot;, &quot;ƽ����@17&quot;, &quot;������@18&quot;, &quot;��������@19&quot;],
+    &quot;�����@2&quot;: [&quot;��ƽ��@20&quot;, &quot;�Ӷ���@21&quot;, &quot;������@22&quot;, &quot;�Ͽ���@23&quot;, &quot;�ӱ���@24&quot;, &quot;������@25&quot;, &quot;������@26&quot;, &quot;�����@27&quot;, &quot;������@28&quot;, &quot;������@29&quot;, &quot;������@30&quot;, &quot;������@31&quot;, &quot;����@32&quot;, &quot;������@33&quot;, &quot;������@34&quot;, &quot;������@35&quot;, &quot;������@36&quot;, &quot;������@541&quot;, &quot;��������@37&quot;],
+    &quot;�ӱ�ʡ@3&quot;: [&quot;ʯ��ׯ��@38&quot;, &quot;�żҿ���@39&quot;, &quot;�е���@40&quot;, &quot;�ػʵ���@41&quot;, &quot;��ɽ��@42&quot;, &quot;�ȷ���@43&quot;, &quot;������@44&quot;, &quot;������@45&quot;, &quot;��ˮ��@46&quot;, &quot;��̨��@47&quot;, &quot;������@48&quot;, &quot;��������@49&quot;],
+    &quot;ɽ��ʡ@4&quot;: [&quot;̫ԭ��@50&quot;, &quot;��ͬ��@51&quot;, &quot;˷����@52&quot;, &quot;��Ȫ��@53&quot;, &quot;������@54&quot;, &quot;������@55&quot;, &quot;������@56&quot;, &quot;������@57&quot;, &quot;������@58&quot;, &quot;�ٷ���@59&quot;, &quot;�˳���@60&quot;, &quot;��������@61&quot;],
+    &quot;����ʡ@5&quot;: [&quot;������@75&quot;, &quot;������@76&quot;, &quot;������@77&quot;, &quot;������@78&quot;, &quot;��˳��@79&quot;, &quot;��Ϫ��@80&quot;, &quot;������@81&quot;, &quot;��ɽ��@82&quot;, &quot;������@83&quot;, &quot;������@84&quot;, &quot;Ӫ����@85&quot;, &quot;�̽���@86&quot;, &quot;������@87&quot;, &quot;��&#171;����@88&quot;, &quot;��������@89&quot;],
+    &quot;����ʡ@6&quot;: [&quot;������@90&quot;, &quot;�׳���@91&quot;, &quot;��ԭ��@92&quot;, &quot;������@93&quot;, &quot;��ƽ��@94&quot;, &quot;��Դ��@95&quot;, &quot;ͨ����@96&quot;, &quot;��ɽ��@97&quot;, &quot;�ӱ߳�����������@98&quot;, &quot;��������@99&quot;],
+    &quot;�Ϻ���@7&quot;: [&quot;������@114&quot;, &quot;&#172;����@116&quot;, &quot;�����@117&quot;, &quot;������@118&quot;, &quot;������@119&quot;, &quot;������@120&quot;, &quot;բ����@121&quot;, &quot;�����@122&quot;, &quot;������@123&quot;, &quot;������@124&quot;, &quot;��ɽ��@125&quot;, &quot;�ζ���@126&quot;, &quot;�ֶ�����@127&quot;, &quot;��ɽ��@128&quot;, &quot;�ɽ���@129&quot;, &quot;������@130&quot;, &quot;������@131&quot;, &quot;�ϻ���@132&quot;, &quot;������@133&quot;, &quot;��������@134&quot;],
+    &quot;����ʡ@8&quot;: [&quot;�Ͼ���@135&quot;, &quot;������@136&quot;, &quot;���Ƹ���@137&quot;, &quot;��Ǩ��@138&quot;, &quot;������@139&quot;, &quot;�γ���@140&quot;, &quot;������@141&quot;, &quot;̩����@142&quot;, &quot;��ͨ��@143&quot;, &quot;����@144&quot;, &quot;������@145&quot;, &quot;������@146&quot;, &quot;������@147&quot;, &quot;��������@148&quot;],
+    &quot;�㽭ʡ@9&quot;: [&quot;������@149&quot;, &quot;������@150&quot;, &quot;������@151&quot;, &quot;��ɽ��@152&quot;, &quot;������@153&quot;, &quot;������@154&quot;, &quot;����@155&quot;, &quot;̨����@156&quot;, &quot;������@157&quot;, &quot;��ˮ��@158&quot;, &quot;������@538&quot;, &quot;��������@159&quot;],
+    &quot;����ʡ@10&quot;: [&quot;�Ϸ���@160&quot;, &quot;������@161&quot;, &quot;������@162&quot;, &quot;������@163&quot;, &quot;������@164&quot;, &quot;������@165&quot;, &quot;������@166&quot;, &quot;���ɽ��@167&quot;, &quot;�ߺ���@168&quot;, &quot;ͭ����@169&quot;, &quot;������@170&quot;, &quot;��ɽ��@171&quot;, &quot;������@172&quot;, &quot;������@173&quot;, &quot;������@174&quot;, &quot;������@175&quot;, &quot;������@540&quot;, &quot;��������@176&quot;],
+    &quot;����ʡ@11&quot;: [&quot;������@177&quot;, &quot;��ƽ��@178&quot;, &quot;������@179&quot;, &quot;������@180&quot;, &quot;Ȫ����@181&quot;, &quot;������@182&quot;, &quot;������@183&quot;, &quot;������@184&quot;, &quot;������@185&quot;, &quot;��������@186&quot;],
+    &quot;����ʡ@12&quot;: [&quot;�ϲ���@187&quot;, &quot;�Ž���@188&quot;, &quot;��������@189&quot;, &quot;ӥ̶��@190&quot;, &quot;������@191&quot;, &quot;Ƽ����@192&quot;, &quot;������@193&quot;, &quot;������@194&quot;, &quot;������@195&quot;, &quot;�˴���@196&quot;, &quot;������@197&quot;, &quot;��������@198&quot;],
+    &quot;ɽ��ʡ@13&quot;: [&quot;������@199&quot;, &quot;�ĳ���@200&quot;, &quot;������@201&quot;, &quot;��Ӫ��@202&quot;, &quot;�Ͳ���@203&quot;, &quot;Ϋ����@204&quot;, &quot;��̨��@205&quot;, &quot;������@206&quot;, &quot;�ൺ��@207&quot;, &quot;������@208&quot;, &quot;������@209&quot;, &quot;��ׯ��@210&quot;, &quot;������@211&quot;, &quot;̩����@212&quot;, &quot;������@213&quot;, &quot;������@214&quot;, &quot;������@215&quot;, &quot;��������@216&quot;],
+    &quot;����ʡ@14&quot;: [&quot;֣����@217&quot;, &quot;����Ͽ��@218&quot;, &quot;������@219&quot;, &quot;������@220&quot;, &quot;������@221&quot;, &quot;�ױ���@222&quot;, &quot;������@223&quot;, &quot;�����@224&quot;, &quot;������@225&quot;, &quot;������@226&quot;, &quot;�����@227&quot;, &quot;�����@228&quot;, &quot;ƽ��ɽ��@229&quot;, &quot;������@230&quot;, &quot;������@231&quot;, &quot;��Դ��@232&quot;, &quot;�ܿ���@233&quot;, &quot;פ�����@234&quot;, &quot;��������@235&quot;],
+    &quot;���ɹ�@15&quot;: [&quot;��ͺ�����@62&quot;, &quot;��ͷ��@63&quot;, &quot;�ں���@64&quot;, &quot;�����@65&quot;, &quot;���ױ���@66&quot;, &quot;�˰���@67&quot;, &quot;���ֹ�����@69&quot;, &quot;�����첼��@70&quot;, &quot;�����׶���@72&quot;, &quot;��������@73&quot;, &quot;������˹��@555&quot;, &quot;ͨ����@556&quot;, &quot;��������@74&quot;],
+    &quot;������ʡ@16&quot;: [&quot;��������@100&quot;, &quot;���������@101&quot;, &quot;�ں���@102&quot;, &quot;������@103&quot;, &quot;������@104&quot;, &quot;�׸���@105&quot;, &quot;��ľ˹��@106&quot;, &quot;˫Ѽɽ��@107&quot;, &quot;��̨����@108&quot;, &quot;������@109&quot;, &quot;ĵ������@110&quot;, &quot;�绯����@111&quot;, &quot;���˰������@112&quot;, &quot;��������@113&quot;],
+    &quot;����ʡ@17&quot;: [&quot;�人��@236&quot;, &quot;ʮ����@237&quot;, &quot;�差��@238&quot;, &quot;������@239&quot;, &quot;Т����@240&quot;, &quot;�Ƹ���@241&quot;, &quot;������@242&quot;, &quot;��ʯ��@243&quot;, &quot;������@244&quot;, &quot;������@245&quot;, &quot;�˲���@246&quot;, &quot;������@247&quot;, &quot;������@248&quot;, &quot;������@249&quot;, &quot;Ǳ����@250&quot;, &quot;��ũ������@251&quot;, &quot;��ʩ����������������@252&quot;, &quot;��������@253&quot;],
+    &quot;����ʡ@18&quot;: [&quot;��ɳ��@254&quot;, &quot;�żҽ���@255&quot;, &quot;������@256&quot;, &quot;������@257&quot;, &quot;������@258&quot;, &quot;������@259&quot;, &quot;��̶��@260&quot;, &quot;������@261&quot;, &quot;������@262&quot;, &quot;������@263&quot;, &quot;������@264&quot;, &quot;������@265&quot;, &quot;&#166;����@266&quot;, &quot;��������������������@267&quot;, &quot;��������@268&quot;],
+    &quot;�㶫ʡ@19&quot;: [&quot;������@269&quot;, &quot;��Զ��@270&quot;, &quot;�ع���@271&quot;, &quot;��Դ��@272&quot;, &quot;&#247;����@273&quot;, &quot;������@274&quot;, &quot;��ͷ��@275&quot;, &quot;������@276&quot;, &quot;��β��@277&quot;, &quot;������@278&quot;, &quot;��ݸ��@279&quot;, &quot;������@280&quot;, &quot;�麣��@281&quot;, &quot;��ɽ��@282&quot;, &quot;������@283&quot;, &quot;��ɽ��@284&quot;, &quot;������@285&quot;, &quot;�Ƹ���@286&quot;, &quot;�����@287&quot;, &quot;&#239;����@288&quot;, &quot;տ����@289&quot;, &quot;��������@290&quot;],
+    &quot;����@20&quot;: [&quot;������@291&quot;, &quot;������@292&quot;, &quot;������@293&quot;, &quot;������@294&quot;, &quot;�����@295&quot;, &quot;������@296&quot;, &quot;������@297&quot;, &quot;������@298&quot;, &quot;���Ǹ���@299&quot;, &quot;��ɫ��@301&quot;, &quot;�ӳ���@302&quot;, &quot;������@304&quot;, &quot;������@542&quot;, &quot;ƾ����@543&quot;, &quot;������@544&quot;, &quot;��������@305&quot;],
+    &quot;����ʡ@21&quot;: [&quot;������@306&quot;, &quot;������@307&quot;, &quot;��ɽ��@308&quot;, &quot;�Ĳ���@309&quot;, &quot;�����@310&quot;, &quot;������@311&quot;, &quot;������@313&quot;, &quot;������@314&quot;, &quot;�ٸ���@315&quot;, &quot;������@316&quot;, &quot;������@317&quot;, &quot;�Ͳ���@318&quot;, &quot;��������������@319&quot;, &quot;��ɳ����������@320&quot;, &quot;������������������@321&quot;, &quot;��ˮ����������@322&quot;, &quot;��ͤ��������������@323&quot;, &quot;�ֶ�����������@324&quot;, &quot;��ָɽ��@539&quot;, &quot;��������@326&quot;],
+    &quot;�Ĵ�ʡ@22&quot;: [&quot;�ɶ���@359&quot;, &quot;��Ԫ��@360&quot;, &quot;������@361&quot;, &quot;������@362&quot;, &quot;�ϳ���@363&quot;, &quot;�㰲��@364&quot;, &quot;������@365&quot;, &quot;�ڽ���@366&quot;, &quot;��ɽ��@367&quot;, &quot;�Թ���@368&quot;, &quot;������@369&quot;, &quot;�˱���@370&quot;, &quot;��֦����@371&quot;, &quot;������@372&quot;, &quot;������@373&quot;, &quot;������@374&quot;, &quot;&#252;ɽ��@375&quot;, &quot;�Ű���@376&quot;, &quot;���Ӳ���Ǽ��������@377&quot;, &quot;���β���������@378&quot;, &quot;��ɽ����������@379&quot;, &quot;��������@380&quot;],
+    &quot;������@23&quot;: [&quot;������@327&quot;, &quot;��ɿ���@328&quot;, &quot;������@329&quot;, &quot;ɳƺ����@330&quot;, &quot;��������@331&quot;, &quot;�ϰ���@332&quot;, &quot;������@333&quot;, &quot;��ʢ��@334&quot;, &quot;˫����@335&quot;, &quot;�山��@336&quot;, &quot;������@337&quot;, &quot;������@338&quot;, &quot;������@339&quot;, &quot;�ϴ���@340&quot;, &quot;������@341&quot;, &quot;������@342&quot;, &quot;�ϴ���@343&quot;, &quot;������@344&quot;, &quot;�뽭��@345&quot;, &quot;������@346&quot;, &quot;ͭ����@347&quot;, &quot;������@348&quot;, &quot;�ٲ���@349&quot;, &quot;�ɽ��@350&quot;, &quot;�潭��@351&quot;, &quot;��&#161;��@352&quot;, &quot;�ᶼ��@353&quot;, &quot;�ǿ���@354&quot;, &quot;��ƽ��@355&quot;, &quot;ǭ����@357&quot;, &quot;�����@545&quot;, &quot;����@546&quot;, &quot;������@547&quot;, &quot;����@548&quot;, &quot;��Ϫ��@549&quot;, &quot;��ɽ��@550&quot;, &quot;ʯ��������������@551&quot;, &quot;��ɽ����������������@552&quot;, &quot;��������������������@553&quot;, &quot;��ˮ����������������@554&quot;, &quot;��������@358&quot;],
+    &quot;̨��ʡ@24&quot;: [&quot;̨����@479&quot;, &quot;������@480&quot;, &quot;̨����@481&quot;, &quot;̨����@482&quot;, &quot;��������@484&quot;, &quot;��&#161;��@579&quot;, &quot;������@580&quot;, &quot;������@581&quot;, &quot;̨����@582&quot;, &quot;������@583&quot;, &quot;������@584&quot;, &quot;��԰��@585&quot;, &quot;������@586&quot;, &quot;̨����@587&quot;, &quot;�&#251;���@588&quot;, &quot;��Ͷ��@589&quot;, &quot;������@590&quot;, &quot;������@591&quot;, &quot;̨����@592&quot;, &quot;������@593&quot;, &quot;������@594&quot;, &quot;̨����@595&quot;, &quot;������@596&quot;, &quot;�����@597&quot;, &quot;���㵺@602&quot;],
+    &quot;����ʡ@25&quot;: [&quot;������@381&quot;, &quot;����ˮ��@382&quot;, &quot;������@383&quot;, &quot;�Ͻڵ���@384&quot;, &quot;ͭ�ʵ���@385&quot;, &quot;��˳��@386&quot;, &quot;ǭ�������嶱��������@387&quot;, &quot;ǭ�ϲ���������������@388&quot;, &quot;ǭ���ϲ���������������@389&quot;, &quot;��������@390&quot;],
+    &quot;����ʡ@26&quot;: [&quot;������@391&quot;, &quot;������@392&quot;, &quot;��Ϫ��@393&quot;, &quot;������@394&quot;, &quot;��ͨ��@395&quot;, &quot;�ն���@396&quot;, &quot;�ٲ���@397&quot;, &quot;��ɽ��@398&quot;, &quot;�&#186;���徰����������@399&quot;, &quot;ŭ��������������@400&quot;, &quot;�������������@401&quot;, &quot;�������������@402&quot;, &quot;��������������@403&quot;, &quot;��ӹ���������������@404&quot;, &quot;��ɽ׳������������@405&quot;, &quot;��˫���ɴ���������@406&quot;, &quot;��������@407&quot;],
+    &quot;����@27&quot;: [&quot;������@408&quot;, &quot;��������@409&quot;, &quot;��������@410&quot;, &quot;��֥����@411&quot;, &quot;ɽ�ϵ���@412&quot;, &quot;�տ������@413&quot;, &quot;�������@414&quot;, &quot;��������@415&quot;],
+    &quot;����ʡ@28&quot;: [&quot;������@416&quot;, &quot;�Ӱ���@417&quot;, &quot;ͭ����@418&quot;, &quot;μ����@419&quot;, &quot;������@420&quot;, &quot;������@421&quot;, &quot;������@422&quot;, &quot;������@423&quot;, &quot;������@424&quot;, &quot;������@425&quot;, &quot;��������@426&quot;],
+    &quot;����ʡ@29&quot;: [&quot;������@427&quot;, &quot;��������@428&quot;, &quot;�����@429&quot;, &quot;������@430&quot;, &quot;��ˮ��@431&quot;, &quot;��Ȫ��@432&quot;, &quot;��Ҵ��@433&quot;, &quot;������@434&quot;, &quot;������@435&quot;, &quot;ƽ����@436&quot;, &quot;������@437&quot;, &quot;&#164;�ϵ���@438&quot;, &quot;���Ļ���������@439&quot;, &quot;���ϲ���������@440&quot;, &quot;������@557&quot;, &quot;�ػ���@558&quot;, &quot;��������@441&quot;],
+    &quot;�ຣʡ@30&quot;: [&quot;������@442&quot;, &quot;��������@443&quot;, &quot;��������������@444&quot;, &quot;���ϲ���������@445&quot;, &quot;���ϲ���������@446&quot;, &quot;�������������@447&quot;, &quot;��������������@448&quot;, &quot;�����ɹ������������@449&quot;, &quot;�ຣʡ��������@450&quot;],
+    &quot;����@31&quot;: [&quot;������@451&quot;, &quot;ʯ��ɽ��@452&quot;, &quot;������@453&quot;, &quot;��ԭ��@454&quot;, &quot;������@599&quot;, &quot;��������@455&quot;],
+    &quot;�&#189;�@32&quot;: [&quot;��&#179;ľ����@456&quot;, &quot;����������@457&quot;, &quot;ʯ������@458&quot;, &quot;��ʲ����@459&quot;, &quot;�����յ���@460&quot;, &quot;�������@461&quot;, &quot;��&#179;������@462&quot;, &quot;���ܵ���@463&quot;, &quot;�������տ&#182;�����������@464&quot;, &quot;���������ɹ�������@465&quot;, &quot;��������������@466&quot;, &quot;��������ɹ�������@467&quot;, &quot;���������������@468&quot;, &quot;��������@469&quot;, &quot;���ǵ���@470&quot;, &quot;����̩����@471&quot;, &quot;ͼľ�����@600&quot;, &quot;�������@601&quot;, &quot;��������@472&quot;],
+    &quot;���@33&quot;: [&quot;��������@474&quot;, &quot;������@559&quot;, &quot;����@560&quot;, &quot;������@561&quot;, &quot;����@562&quot;, &quot;��ˮ����@563&quot;, &quot;�ƴ�����@564&quot;, &quot;������@565&quot;, &quot;�ͼ�����@566&quot;, &quot;�뵺��@567&quot;, &quot;������@568&quot;, &quot;����@569&quot;, &quot;������@570&quot;, &quot;ɳ����@571&quot;, &quot;������@572&quot;, &quot;������@573&quot;, &quot;������@574&quot;, &quot;Ԫ����@575&quot;, &quot;��������@476&quot;],
+    &quot;����@34&quot;: [&quot;����������@603&quot;, &quot;ʥ����������@604&quot;, &quot;������@605&quot;, &quot;��������@606&quot;, &quot;��˳����@607&quot;, &quot;��ģ����@608&quot;, &quot;ʥ���&#248;�����@609&quot;]
+};
+
+</pre>
+</body>
+</html>

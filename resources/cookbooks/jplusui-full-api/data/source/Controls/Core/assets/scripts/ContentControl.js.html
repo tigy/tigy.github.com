@@ -1,0 +1,59 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Core\assets\scripts\ContentControl.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+
+using(&quot;Controls.Core.Base&quot;);
+
+
+<span id="ContentControl">/**
+ * 所有内容控件的基类。
+ * @abstract class
+ * @extends Control
+ */</span>
+var ContentControl = Control.extend({
+	
+	// 基本属性
+
+    <span id="ContentControl-prototype-tpl">/**
+	 * 当前控件的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */</span>
+	tpl: '&lt;div class=&quot;x-control&quot;&gt;\
+			&lt;div class=&quot;x-control-content&quot;&gt;&lt;/div&gt;\
+		&lt;/div&gt;',
+	
+    <span id="ContentControl-prototype-content">/**
+	 * 获取当前容器用于存放内容的 Dom 对象。
+	 * @return {Dom}
+     * @protected virtual
+	 */</span>
+	content: function(){
+		return this.find('x-' + this.xtype + '-content') || new Dom(this.node);
+	},
+
+    <span id="ContentControl-prototype-state">/**
+	 * 设置当前输入域的状态, 并改变控件的样式。
+     * @param {String} name 状态名。
+     * @param {Boolean} value=false 要设置的状态值。
+	 * @protected virtual
+	 */</span>
+	state: function (name, value) {
+	    this.toggleClass('x-' + this.xtype + '-' + name, value);
+	}
+	
+}).defineMethods(&quot;content()&quot;, &quot;setHtml getHtml setText getText&quot;);
+
+</pre>
+</body>
+</html>

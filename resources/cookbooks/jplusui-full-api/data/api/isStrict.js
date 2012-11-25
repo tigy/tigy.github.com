@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'isStrict',"source":'System\\Browser\\assets\\scripts\\Navigator.js',"sourceFile":'data/source/System\\Browser\\assets\\scripts\\Navigator.js.html#isStrict',"summary":'<p>\u662f\u5426\u662f\u6807\u51c6CSS\u6a21\u5f0f\u3002</p>\n',"type":'Boolean',"name":'isStrict',"memberOf":'',"memberType":'field'});

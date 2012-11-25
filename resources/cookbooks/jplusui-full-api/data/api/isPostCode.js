@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'isPostCode',"source":'System\\Text\\assets\\scripts\\CheckChinese.js',"sourceFile":'data/source/System\\Text\\assets\\scripts\\CheckChinese.js.html#isPostCode',"summary":'<p>\u662f\u5426\u4e3a\u90ae\u653f\u7f16\u7801\u3002</p>\n',"params":[{"type":'Object',"name":'value',"summary":''}],"name":'isPostCode',"memberOf":'',"memberType":'method'});

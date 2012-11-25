@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'TabControl',"source":'Controls\\Tab\\assets\\scripts\\TabControl.js',"sourceFile":'data/source/Controls\\Tab\\assets\\scripts\\TabControl.js.html#TabControl',"summary":'<p>TAB \u9009\u9879\u5361\u3002</p>\n',"name":'TabControl',"memberOf":'',"memberType":'field'});

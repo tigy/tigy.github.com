@@ -1,0 +1,142 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Dom\assets\scripts\GetElementsByClassName.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">
+
+
+/*
+	Developed by Robert Nyman, http://www.robertnyman.com
+	Code/licensing: http://code.google.com/p/getelementsbyclassname/
+*/	
+var getElementsByClassName = function (className, tag, elm){
+	if (document.getElementsByClassName) {
+		getElementsByClassName = function (className, tag, elm) {
+			elm = elm || document;
+			var elements = elm.getElementsByClassName(className),
+				nodeName = (tag)? new RegExp(&quot;\\b&quot; + tag + &quot;\\b&quot;, &quot;i&quot;) : null,
+				returnElements = [],
+				current;
+			for(var i=0, il=elements.length; i&lt;il; i+=1){
+				current = elements[i];
+				if(!nodeName || nodeName.test(current.nodeName)) {
+					returnElements.push(current);
+				}
+			}
+			return returnElements;
+		};
+	}
+	else if (document.evaluate) {
+		getElementsByClassName = function (className, tag, elm) {
+			tag = tag || &quot;*&quot;;
+			elm = elm || document;
+			var classes = className.split(&quot; &quot;),
+				classesToCheck = &quot;&quot;,
+				xhtmlNamespace = &quot;http://www.w3.org/1999/xhtml&quot;,
+				namespaceResolver = (document.documentElement.namespaceURI === xhtmlNamespace)? xhtmlNamespace : null,
+				returnElements = [],
+				elements,
+				node;
+			for(var j=0, jl=classes.length; j&lt;jl; j+=1){
+				classesToCheck += &quot;[contains(concat(' ', @class, ' '), ' &quot; + classes[j] + &quot; ')]&quot;;
+			}
+			try	{
+				elements = document.evaluate(&quot;.//&quot; + tag + classesToCheck, elm, namespaceResolver, 0, null);
+			}
+			catch (e) {
+				elements = document.evaluate(&quot;.//&quot; + tag + classesToCheck, elm, null, 0, null);
+			}
+			while ((node = elements.iterateNext())) {
+				returnElements.push(node);
+			}
+			return returnElements;
+		};
+	}
+	else {
+		getElementsByClassName = function (className, tag, elm) {
+			tag = tag || &quot;*&quot;;
+			elm = elm || document;
+			var classes = className.split(&quot; &quot;),
+				classesToCheck = [],
+				elements = (tag === &quot;*&quot; &amp;&amp; elm.all)? elm.all : elm.getElementsByTagName(tag),
+				current,
+				returnElements = [],
+				match;
+			for(var k=0, kl=classes.length; k&lt;kl; k+=1){
+				classesToCheck.push(new RegExp(&quot;(^|\\s)&quot; + classes[k] + &quot;(\\s|$)&quot;));
+			}
+			for(var l=0, ll=elements.length; l&lt;ll; l+=1){
+				current = elements[l];
+				match = false;
+				for(var m=0, ml=classesToCheck.length; m&lt;ml; m+=1){
+					match = classesToCheck[m].test(current.className);
+					if (!match) {
+						break;
+					}
+				}
+				if (match) {
+					returnElements.push(current);
+				}
+			}
+			return returnElements;
+		};
+	}
+	return getElementsByClassName(className, tag, elm);
+};
+
+
+
+ function getPosition (elem) {
+			var p = new Point(0, 0), t = elem.parentNode;
+		
+			if(styleString(elem, 'position') === 'fixed')
+				return new Point(elem.offsetLeft, elem.offsetTop).add(document.getScroll());
+		
+			while(t &amp;&amp; !rBody.test(t.nodeName)) {
+				p.x -= t.scrollLeft;
+				p.y -= t.scrollTop;
+				t = t.parentNode;
+			}
+			t = elem;
+		
+			while(elem &amp;&amp; !rBody.test(elem.nodeName)) {
+				p.x += elem.offsetLeft;
+				p.y += elem.offsetTop;
+				if(navigator.isFirefox) {
+					if(styleString(elem, 'MozBoxSizing') !== 'border-box') {
+						add(elem);
+					}
+					var parent = elem.parentNode;
+					if(parent &amp;&amp; styleString(parent, 'overflow') !== 'visible') {
+						add(parent);
+					}
+				} else if(elem !== t &amp;&amp; navigator.isSafari) {
+					add(elem);
+				}
+		
+				if(styleString(elem, 'position') === 'fixed') {
+					p = p.add(document.getScroll());
+					break;
+				}
+				elem = elem.offsetParent;
+			}
+			if(navigator.isFirefox &amp;&amp; styleString(t, 'MozBoxSizing') !== 'border-box') {
+				p.x -= styleNumber(t, 'borderLeftWidth');
+				p.y -= styleNumber(t, 'borderTopWidth');
+			}
+		
+			function add(elem) {
+				p.x += styleNumber(elem, 'borderLeftWidth');
+				p.y += styleNumber(elem, 'borderTopWidth');
+			}
+		
+			return p;
+
+		}</pre>
+</body>
+</html>

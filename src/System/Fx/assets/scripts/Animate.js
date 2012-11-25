@@ -146,11 +146,14 @@ using("System.Fx.Tween");
 	
 	}
 
+	/**
+	 * @class Dom
+	 */
 	Dom.implement({
 		
 		/**
 		 * 获取和当前节点有关的 param 实例。
-		 * @return {Animate} 一个 param 的实例。
+		 * @return {Fx.Tween} 一个 Fx.Tween 对象。
 		 */
 		fx: function() {
 			var data = this.dataField();

@@ -1,0 +1,70 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Suggest\assets\scripts\DatePicker.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author 
+ */
+
+
+
+imports(&quot;Controls.Part.Icon&quot;);
+using(&quot;Controls.Suggest.Picker&quot;);
+using(&quot;Controls.Composite.MonthCalender&quot;);
+
+
+var DatePicker = Picker.extend({
+	
+	dataStringFormat: 'yyyy/M/d',
+	
+	dropDownWidth: 'auto',
+	
+	menuButtonTpl: '&lt;button class=&quot;x-button&quot;&gt;&lt;span class=&quot;x-icon x-icon-calendar&quot;&gt;&lt;/span&gt;&lt;/button&gt;',
+	
+	createDropDown: function(existDom){
+		return new MonthCalender(existDom).on('selecting', this.onItemClick, this);
+	},
+	
+	onItemClick: function(value) {
+		if(this.trigger('selecting', value)) {
+			var old = this.getValue();
+			this.setValue(value).hideDropDown();
+			if(old !== value){
+				this.trigger('change');
+			}
+			
+			return;
+		}
+		
+		return false;
+	},
+	
+	selectItem: function (value) {
+		this.onItemClick(value);
+		return this;
+	},
+	
+	updateDropDown: function(){
+		var d = new Date(this.getText());
+		if(!isNaN(d.getYear()))
+			this.dropDown.setValue(d);
+	},
+	
+	getValue: function(){
+		return new Date(this.getText());
+	},
+	
+	setValue: function(value){
+		return this.setText(value.toString(this.dataStringFormat));
+	}
+
+});
+
+</pre>
+</body>
+</html>

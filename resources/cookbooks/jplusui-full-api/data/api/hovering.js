@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'hovering',"source":'Controls\\Suggest\\assets\\scripts\\DropDownMenu.js',"sourceFile":'data/source/Controls\\Suggest\\assets\\scripts\\DropDownMenu.js.html#hovering',"summary":'<p>\u91cd\u65b0\u8bbe\u7f6e\u5f53\u524d\u9ad8\u4eae\u9879\u3002</p>\n',"name":'hovering',"memberOf":'',"memberType":'method',"params":[{"type":'',"name":'item',"summary":''}]});

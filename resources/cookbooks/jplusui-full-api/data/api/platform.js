@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'platform',"source":'System\\Browser\\assets\\scripts\\Navigator.js',"sourceFile":'data/source/System\\Browser\\assets\\scripts\\Navigator.js.html#platform',"summary":'<p>\u6d4f\u89c8\u5668\u5e73\u53f0\u3002</p>\n',"type":'String',"name":'platform',"memberOf":'',"memberType":'field'});

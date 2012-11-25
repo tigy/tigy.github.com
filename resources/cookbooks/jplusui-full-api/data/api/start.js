@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'start',"source":'System\\Fx\\assets\\scripts\\Marquee.js',"sourceFile":'data/source/System\\Fx\\assets\\scripts\\Marquee.js.html#start',"summary":'<p>(\u91cd\u65b0)\u5f00\u59cb\u6eda\u52a8</p>\n',"memberType":'method',"name":'start',"memberOf":''});

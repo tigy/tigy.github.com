@@ -1,0 +1,48 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Browser\assets\scripts\Navigator.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">
+
+Object.extendIf(navigator, (function(ua) {
+
+	var w = this,
+	
+		//检查信息
+		engine = window.opera ? 'Presto' : w.ActiveXObject ? 'Trident' : document.getBoxObjectFor != null || w.mozInnerScreenX != null ? 'Gecko' : document.childNodes &amp;&amp; !document.all &amp;&amp; !navigator.taintEnabled ? 'Webkit' : 'Other',
+
+		//平台
+		platform = (ua.match(/(?:Webos|Android)/i) || [window.orientation ? 'Ipod' : navigator.platform])[0];
+	
+	navigator[&quot;is&quot; + platform] = navigator[&quot;is&quot; + engine] = true;
+	
+	//结果
+	return {
+		
+		<span id="isStrict">/**
+		 * 是否是标准CSS模式。
+		 * @type {Boolean}
+		 */</span>
+		isStrict: document.compatMode == &quot;CSS1Compat&quot;,
+
+		<span id="platform">/**
+		 * 浏览器平台。
+		 * @type String
+		 */</span>
+		platform: platform,
+		
+		<span id="engine">/**
+		 * 浏览器引擎名。
+		 * @type String
+		 */</span>
+		engine: engine
+		
+	}
+})(navigator.userAgent));</pre>
+</body>
+</html>

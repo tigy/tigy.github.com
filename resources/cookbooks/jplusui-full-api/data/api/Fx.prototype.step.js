@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Fx.prototype.step',"source":'Base_3.js',"sourceFile":'data/source/Base_3.js.html#Fx-prototype-step',"summary":'<p>\u8fdb\u5165\u53d8\u6362\u7684\u4e0b\u6b65\u3002</p>\n',"memberAccess":'protected',"name":'step',"memberOf":'Fx',"memberType":'method',"params":[]});

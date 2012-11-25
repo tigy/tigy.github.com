@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'sort',"source":'System\\Data\\assets\\scripts\\CollectionEx.js',"sourceFile":'data/source/System\\Data\\assets\\scripts\\CollectionEx.js.html#sort',"summary":'<p>\u6392\u5e8f\u5f53\u524d\u96c6\u5408\u5143\u7d20\u3002</p>\n',"name":'sort',"memberOf":'',"memberType":'method',"params":[]});

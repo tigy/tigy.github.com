@@ -1,0 +1,99 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Tab\assets\scripts\Accordion.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+
+
+imports(&quot;Controls.Tab.Accordion&quot;);
+using(&quot;Controls.Core.TabbableControl&quot;);
+
+
+var Accordion = TabbableControl.extend({
+	
+	/**
+	 * xtype
+	 * @type String
+	 */
+	xtype: 'accordion',
+	
+	tpl: '&lt;div class=&quot;x-control&quot;&gt;&lt;/div&gt;',
+
+	itemTpl: '&lt;div class=&quot;x-accordion-panel x-accordion-collapsed&quot;&gt;\
+                    &lt;div class=&quot;x-accordion-header&quot;&gt;\
+                        &lt;a href=&quot;javascript:;&quot;&gt;{title}&lt;/a&gt;\
+                    &lt;/div&gt;\
+                    &lt;div class=&quot;x-accordion-body&quot;&gt;\
+                        &lt;div class=&quot;x-accordion-content&quot;&gt;{content}&lt;/div&gt;\
+                    &lt;/div&gt;\
+                &lt;/div&gt;',
+
+	addAt: function (index, title, content) {
+	    return this.insertBefore(Dom.parse(this.itemTpl.replace(&quot;{title}&quot;, title).replace(&quot;{content}&quot;, content)), this.child(index));
+	},
+	
+	onToggleTab: function (from, to) {
+		
+		var me = this, trigger = 2;
+		
+		if(from) {
+			if(to &amp;&amp; from.node === to.node) {
+				return;
+			}
+			
+			from.removeClass('x-accordion-collapsed').last().hide({
+		    	effect: 'height',
+		    	duration: this.collapseDuration,
+		    	callback: finish
+		    });
+		} else
+		    finish();
+		
+		if(to)
+		    to.removeClass('x-accordion-collapsed').last().show({
+		    	effect: 'height',
+		    	duration: this.collapseDuration,
+		    	callback: finish
+		    });
+		else
+		    finish();
+			
+		function finish(){
+			if(--trigger &lt;= 0 &amp;&amp; from){
+				from.addClass('x-accordion-collapsed');
+			}
+		}
+		
+	},
+	
+	getSelectedTab: function(){
+		return this.find('.x-accordion-panel:not(.x-accordion-collapsed)');
+	},
+	
+	init:function(options){
+	    var me = this,
+            selecedTab = me.getSelectedTab();
+
+	    me.delegate('&gt;.x-accordion-header', options.selectEvent || 'click', function (e) {
+	        e.preventDefault();
+		    me.selectTab(this.parent());
+		});
+
+		me.query('&gt;.x-accordion-panel').addClass('x-accordion-collapsed');
+
+		if (selecedTab)
+		    selecedTab.removeClass('x-accordion-collapsed');
+			
+	}
+	
+});</pre>
+</body>
+</html>

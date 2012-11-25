@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'IInput.inputProxy',"source":'IInput.js',"sourceFile":'data/source/IInput.js.html#IInput-inputProxy',"summary":'<p>\u83b7\u53d6\u6216\u8bbe\u7f6e\u5f53\u524d\u8868\u5355\u7684\u4ee3\u7406\u8f93\u5165\u57df\u3002</p>\n',"memberAccess":'protected',"type":'Dom',"name":'inputProxy',"memberOf":'IInput',"memberType":'field'});

@@ -1,0 +1,123 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Data\assets\scripts\Collection.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @fileOverview 集合的基类。
+ * @author xuld
+ */	
+	
+<span id="Collection">/**
+ * 集合。
+ * @class Collection
+ */</span>
+var Collection = Class({
+	
+	<span id="Collection-prototype-length">/**
+	 * 获取当前的项数目。
+	 */</span>
+	length: 0,
+	
+	<span id="Collection-prototype-initItem">/**
+	 * 对项初始化。
+	 * @protected
+	 * @virtual
+	 */</span>
+	initItem: function (item) {
+		return item;
+	},
+	
+	onAdd: function(item){
+		this.onInsert(item, this.length);
+	},
+
+	onInsert: Function.empty,
+	
+	onRemove: Function.empty,
+	
+	onBeforeSet: Function.empty,
+	
+	onAfterSet: Function.empty,
+	
+	add: function(item){
+		assert.notNull(item, &quot;Collection.prototype.add(item): 参数 {item} ~。&quot;);
+		Array.prototype.push.call(this, item = this.initItem(item));
+		this.onAdd(item);
+		return item;
+	},
+	
+	addRange: function(args){
+		return Array.prototype.forEach.call(args &amp;&amp; typeof args.length === 'number' ? args : arguments, this.add, this);
+	},
+	
+	insert: function(index, item){
+		assert.notNull(item, &quot;Collection.prototype.insert(item): 参数 {item} ~。&quot;);
+		index = Array.prototype.insert.call(this, index, item = this.initItem(item));
+		this.onInsert(item, index + 1);
+		return item;
+	},
+	
+	clear: function(){
+		var me = this;
+		me.onBeforeSet();
+		while (me.length) {
+			var item = me[--me.length];
+			delete me[me.length];
+			me.onRemove(item, me.length);
+		}
+		me.onAfterSet();
+		return me;
+	},
+	
+	remove: function(item){
+		assert.notNull(item, &quot;Collection.prototype.remove(item): 参数 {item} ~。&quot;);
+		var index = this.indexOf(item);
+		this.removeAt(index);
+		return index;
+	},
+	
+	removeAt: function(index){
+		var item = this[index];
+		if(item){
+			Array.prototype.splice.call(this, index, 1);
+			delete this[this.length];
+			this.onRemove(item, index);
+		}
+			
+		return item;
+	},
+		
+	set: function(index, item){
+		var me = this;
+		me.onBeforeSet();
+		
+		if(typeof index === 'number'){
+			item = this.initItem(item);
+			assert.notNull(item, &quot;Collection.prototype.set(item): 参数 {item} ~。&quot;);
+			assert(index &gt;= 0 &amp;&amp; index &lt; me.length, 'Collection.prototype.set(index, item): 设置的 {index} 超出范围。请确保  0 &lt;= index &lt; ' + this.length, index);
+			item = me.onInsert(item, index);
+			me.onRemove(me[index], index);
+			me[index] = item;
+		} else{
+			if(me.length)
+				me.clear();
+			index.forEach(me.add, me);
+		}
+		
+		me.onAfterSet();
+		return me;
+	}
+	
+});
+
+Object.map(&quot;indexOf forEach each invoke lastIndexOf item filter&quot;, function(value){
+	return Array.prototype[value];
+}, Collection.prototype);
+</pre>
+</body>
+</html>

@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Ajax.prototype.pause',"source":'Base_2.js',"sourceFile":'data/source/Base_2.js.html#Ajax-prototype-pause',"summary":'<p>\u505c\u6b62\u5f53\u524d\u7684\u8bf7\u6c42\u3002</p>\n',"memberAccess":'protected',"returns":{"type":'',"summary":'<p>this</p>\n'},"name":'pause',"memberOf":'Ajax',"memberType":'method',"params":[]});

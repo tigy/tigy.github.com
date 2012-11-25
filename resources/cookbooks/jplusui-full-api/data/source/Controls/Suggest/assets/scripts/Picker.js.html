@@ -1,0 +1,191 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Suggest\assets\scripts\Picker.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author  xuld
+ */
+
+imports(&quot;Controls.Button.Button&quot;);
+imports(&quot;Controls.Button.MenuButton&quot;);
+imports(&quot;Controls.Suggest.Picker&quot;);
+using(&quot;Controls.Core.Base&quot;);
+using(&quot;Controls.Core.IInput&quot;);
+using(&quot;Controls.Core.IDropDownOwner&quot;);
+
+<span id="Picker">/**
+ * 表示一个数据选择器。
+ * @abstract class
+ * @extends Control
+ */</span>
+var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
+
+    <span id="Picker-prototype-listMode">/**
+	 * 当前控件是否为列表形式。如果列表模式则优先考虑使用下拉菜单。
+     * @config {Boolean}
+	 */</span>
+    listMode: true,
+
+    <span id="Picker-prototype-tpl">/**
+	 * 当前控件的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */</span>
+    tpl: '&lt;span class=&quot;x-picker&quot;&gt;\
+			&lt;input type=&quot;text&quot; class=&quot;x-textbox&quot;/&gt;\
+		&lt;/span&gt;',
+
+    /**
+	 * 当前控件下拉按钮的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */
+    menuButtonTpl: '&lt;button class=&quot;x-button&quot; type=&quot;button&quot;&gt;&lt;span class=&quot;x-menubutton-arrow&quot;&gt;&lt;/span&gt;&lt;/button&gt;',
+
+    <span id="Picker-prototype-button">/**
+	 * 获取当前控件的按钮部分。
+	 */</span>
+    button: function () {
+        return this.find('button');
+    },
+
+    <span id="Picker-prototype-updateDropDown">/**
+	 * 将当前文本的值同步到下拉菜单。
+	 * @protected virtual
+	 */</span>
+    updateDropDown: Function.empty,
+
+    <span id="Picker-prototype-onDropDownShow">/**
+	 * 当下拉菜单被显示时执行。
+     * @protected override
+	 */</span>
+    onDropDownShow: function () {
+        // 默认选择当前值。
+        this.updateDropDown();
+        this.state('actived', true);
+    },
+
+    <span id="Picker-prototype-onDropDownHide">/**
+	 * 当下拉菜单被隐藏时执行。
+     * @protected override
+	 */</span>
+    onDropDownHide: function () {
+        this.state('actived', false);
+    },
+
+    <span id="Picker-prototype-state">/**
+	 * 设置当前输入域的状态, 并改变控件的样式。
+     * @param {String} name 状态名。常用的状态如： disabled、readonly、checked、selected、actived 。
+     * @param {Boolean} value=false 要设置的状态值。
+	 * @protected override
+	 */</span>
+    state: function (name, value) {
+        value = value !== false;
+        if (name == &quot;disabled&quot; || name == &quot;readonly&quot;) {
+
+            // 为按钮增加 disabled 样式。
+            this.query('.x-button,button').setAttr(&quot;disabled&quot;, value).toggleClass(&quot;x-button-disabled&quot;, value);
+
+            // 为文本框增加设置样式。
+            this.input().setAttr(name, value).toggleClass(&quot;x-textbox-&quot; + name, value);
+
+        } else if (name == &quot;actived&quot;) {
+            this.query('.x-button,button').toggleClass(&quot;x-button-actived&quot;, value);
+        } else {
+            IInput.state.call(this, name, value);
+        }
+
+    },
+
+    <span id="Picker-prototype-createDropDown">/**
+     * 创建当前组件的下拉菜单。
+     * @param {Dom} existDom=null 已存在的 DOM 节点。
+     * @return {Dom} 返回新创建的下拉菜单对象。
+     * @protected virtual
+     */</span>
+    createDropDown: function (existDom) {
+        return existDom;
+    },
+
+    <span id="Picker-prototype-init">/**
+	 * @protected
+	 * @override
+	 */</span>
+    init: function (options) {
+
+        var me = this, elem;
+
+        // 如果是 &lt;input&gt; 或 &lt;a&gt; 直接替换为 x-picker
+        if (!me.first() &amp;&amp; !me.hasClass('x-picker')) {
+            elem = me.node;
+
+            // 创建 x-picker 组件。
+            me.node = Dom.createNode('span', 'x-picker x-' + me.xtype);
+
+            // 替换当前节点。
+            if (elem.parentNode) {
+                elem.parentNode.replaceChild(me.node, elem);
+            }
+
+            // 插入原始 &lt;input&gt; 节点。
+            me.prepend(elem);
+
+        }
+
+        // 如果没有下拉菜单按钮，添加之。
+        if (!me.button()) {
+            me.append(me.menuButtonTpl);
+        }
+
+        // 列表形式，则无法手动更改值，必须强制使用 listMode 。
+        if ('listMode' in options) {
+            me.listMode = options.listMode;
+        } else if (me.first().node.tagName !== 'INPUT') {
+            me.listMode = true;
+        }
+
+        // 初始化菜单。
+        me.setDropDown(me.createDropDown(me.next('.x-dropdown')));
+
+        // 设置菜单显示的事件。
+        (me.listMode ? me : me.button()).on('click', me.toggleDropDown, me);
+        
+        if(me.listMode &amp;&amp; me.input().node.tagName === 'INPUT'){
+        	me.on('keyup', function(){
+        		this.updateDropDown();
+        	}, this);
+        }
+
+    },
+    
+    setText: function (value){
+    	this.input().setText(value);
+    	this.updateDropDown();
+    	return this;
+    },
+
+    setWidth: function (value) {
+        var first = this.first();
+        if (value &gt;= 0) {
+            value -= this.getWidth() - first.getWidth();
+        }
+        first.setWidth(value);
+        return this;
+    }
+
+}).addEvents('change select', {
+    add: function (picker, type, fn) {
+        Dom.$event.$default.add(picker.input(), type, fn);
+    },
+    remove: function (picker, type, fn) {
+        Dom.$event.$default.remove(picker.input(), type, fn);
+    }
+});
+</pre>
+</body>
+</html>

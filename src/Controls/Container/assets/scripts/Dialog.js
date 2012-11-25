@@ -9,6 +9,10 @@ using("System.Fx.Animate");
 using("Controls.Core.ContainerControl");
 
 
+/**
+ * @class Dialog
+ * @extends ContainerControl
+ */
 var Dialog = ContainerControl.extend({
 
     _centerType: 1 | 2,

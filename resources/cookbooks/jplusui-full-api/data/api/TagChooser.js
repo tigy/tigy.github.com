@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'TagChooser',"source":'Controls\\Suggest\\assets\\scripts\\TagChooser.js',"sourceFile":'data/source/Controls\\Suggest\\assets\\scripts\\TagChooser.js.html#TagChooser',"summary":'<p>\u4e00\u4e2a\u6807\u7b7e\u9009\u62e9\u5668\u3002</p>\n',"name":'TagChooser',"memberOf":'',"memberType":'field'});

@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Control.prototype.xtype',"source":'Base_4.js',"sourceFile":'data/source/Base_4.js.html#Control-prototype-xtype',"summary":'<p>xtype: \u7528\u4e8e\u6807\u8bb0\u63a7\u4ef6\u7684 css \u7c7b\u3002</p>\n',"memberAccess":'protected',"memberAttribute":'virtual',"name":'xtype',"memberOf":'Control',"type":'String',"defaultValue":'\"control\"',"memberType":'field'});

@@ -1,0 +1,66 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Utils\assets\scripts\TimeCounter.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author 
+ */
+
+var TimeCounter = Class({
+	
+	/**
+	 * @param {Number} month
+	 * @param {Number} day
+	 * @param {Number} hour
+	 * @param {Number} minite
+	 * @param {Number} second
+	 */
+	update: Function.empty,
+	
+	constructor: function(callback){
+		if(callback)
+			this.update = callback;
+	},
+	
+	step: function () {
+		var leftTime = this.targetTime - Date.now(); 
+		if(leftTime &lt;= 0) {
+			this.update(0, 0, 0, 0, 0);
+			this.stop();
+			return;
+		}
+		
+		var s = 0 | (leftTime / 1000 ),
+			t = s,
+			d = Math.floor(s / 86400),
+			h = Math.floor((t -= d * 86400) / 3600),
+			m = Math.floor((t -= h * 3600) / 60); 
+		this.update(d, h, m, Math.floor(t -= m * 60), s);
+	},
+	
+	start: function(year, month, day, hour, minute){
+		if(arguments.length &gt; 1) {
+			this.targetTime = new Date(year, month - 1, day || 1, hour || 0, minute || 0).getTime();
+		} else if(arguments.length == 1){
+			this.targetTime = year;
+		}
+		this.step();
+		this.timer = window.setInterval(this.step.bind(this), 1000);
+		return this;
+	},
+	
+	stop: function(){
+		clearInterval(this.timer);
+		return this;
+	}
+	
+});
+
+</pre>
+</body>
+</html>

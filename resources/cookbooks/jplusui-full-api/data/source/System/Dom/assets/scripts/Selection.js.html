@@ -1,0 +1,157 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Dom\assets\scripts\Selection.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author sun
+ */
+
+//===========================================
+//  元素的选区       selection.js       A
+//===========================================
+
+
+
+(function() {
+
+	function selection(dom){
+		
+		var s, e, range, stored_range;
+		if (dom.selectionStart == undefined) {
+			var selection = document.selection;
+			if (dom.tagName.toLowerCase() != &quot;textarea&quot;) {
+				var val = Dom.getText(dom),
+				range = selection.createRange().duplicate();
+				range.moveEnd(&quot;character&quot;, val.length);
+				s = (range.text == &quot;&quot; ? val.length: val.lastIndexOf(range.text));
+				range = selection.createRange().duplicate();
+				range.moveStart(&quot;character&quot;, -val.length);
+				e = range.text.length;
+			} else {
+				range = selection.createRange();
+				stored_range = range.duplicate();
+				stored_range.moveToElementText(dom);
+				stored_range.setEndPoint('EndToEnd', range);
+				s = stored_range.text.length - range.text.length;
+				e = s + range.text.length;
+			}
+		} else {
+			s = dom.selectionStart;
+			e = dom.selectionEnd;
+		}
+		var te = dom.value.substring(s, e);
+		return {
+			start: s,
+			end: e,
+			text: te
+		}
+		
+	}
+	
+	function setCursor(dom, pos){
+		
+		if(dom.createTextRange) { 
+			var range = dom.createTextRange(); 
+			range.move(&quot;character&quot;, pos); 
+			range.select(); 
+		} else if(dom.selectionStart) { 
+			dom.focus();
+			dom.setSelectionRange(pos, pos); 
+		} 
+		
+	}
+	
+	function setRange(dom, start, end){
+		
+		if(dom.createTextRange){
+			
+			var range = dom.createTextRange();
+			range.moveStart(&quot;character&quot;, 0)
+			range.moveEnd(&quot;character&quot;, 0);
+			range.collapse(true);
+			range.moveEnd(&quot;character&quot;, end);
+			range.moveStart(&quot;character&quot;, start);
+			range.select();
+			
+		}else if(dom.selectionStart){
+			
+			dom.focus();
+			dom.setSelectionRange(start, end); 
+			
+		}
+		
+	}
+	
+	Dom.implement({
+		
+		<span id="getSelectionRange">/**
+		 * 获取选区区域范围
+		 * @return {Object} 返回 {start: 0, end: 3}  对象。
+		 */</span>
+		getSelectionRange: function(){
+		
+			var s = selection(this.node);
+			
+			return{
+				start: s.start,
+				end: s.end
+			}
+		
+		},
+		
+		<span id="setSelectionRange">/**
+		 * 设置选区区域范围
+		 * @param {Object} {start: 0, end: 3} 对象。
+		 */</span>
+		setSelectionRange: function(arg){
+			
+			setRange(this.node, arg.start, arg.end);
+			
+		},
+		
+		<span id="getSelectedText">/**
+		 * 获取选区文本
+		 * @return {String} 选中的文本
+		 */</span>
+		getSelectedText: function(){
+			
+			var s = selection(this.node);
+			return s.text;
+			
+		},
+		
+		<span id="setSelectedText">/**
+		 * 设置选区文本
+		 * @param {String} 文本
+		 * @param {Boolean} true代表选中插入文本 false表示不选中
+		 */</span>
+		setSelectedText: function(text, isSelect){
+			
+			var isSelect = isSelect || false;
+			var val = this.getText();
+			
+			var s = selection(this.node);
+			
+			var a = val.substring(0,s.start);
+			var b = val.substring(s.end);
+			
+			this.setText(a + text + b);
+			
+			if(isSelect){
+				setRange(this.node, s.start, s.start + text.length);
+			}else{
+				setCursor(this.node, s.start + text.length);
+			}
+			
+		}
+	
+	});
+
+})();</pre>
+</body>
+</html>

@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'TreeControl.Item.prototype.getSubControl',"source":'TreeControl.js',"sourceFile":'data/source/TreeControl.js.html#TreeControl-Item-prototype-getSubControl',"summary":'<p>\u83b7\u53d6\u5f53\u524d\u9879\u7684\u5b50\u6811\u63a7\u4ef6\u3002</p>\n',"name":'getSubControl',"memberOf":'TreeControl.Item',"memberType":'method',"params":[]});

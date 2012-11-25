@@ -1,0 +1,346 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Data\assets\scripts\Dictionary.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">
+
+
+	
+	
+	
+Ext.util.MixedCollection = function(allowFunctions, keyFn){
+    this.items = [];
+    this.map = {};
+    this.keys = [];
+    this.length = 0;
+    this.addEvents({
+        
+        &quot;clear&quot; : true,
+        
+        &quot;add&quot; : true,
+        
+        &quot;replace&quot; : true,
+        
+        &quot;remove&quot; : true,
+        &quot;sort&quot; : true
+    });
+    this.allowFunctions = allowFunctions === true;
+    if(keyFn){
+        this.getKey = keyFn;
+    }
+    Ext.util.MixedCollection.superclass.constructor.call(this);
+};
+
+Ext.extend(Ext.util.MixedCollection, Ext.util.Observable, {
+    allowFunctions : false,
+    
+
+    add : function(key, o){
+        if(arguments.length == 1){
+            o = arguments[0];
+            key = this.getKey(o);
+        }
+        if(typeof key == &quot;undefined&quot; || key === null){
+            this.length++;
+            this.items.push(o);
+            this.keys.push(null);
+        }else{
+            var old = this.map[key];
+            if(old){
+                return this.replace(key, o);
+            }
+            this.length++;
+            this.items.push(o);
+            this.map[key] = o;
+            this.keys.push(key);
+        }
+        this.fireEvent(&quot;add&quot;, this.length-1, o, key);
+        return o;
+    },
+   
+
+    getKey : function(o){
+         return o.id; 
+    },
+   
+
+    replace : function(key, o){
+        if(arguments.length == 1){
+            o = arguments[0];
+            key = this.getKey(o);
+        }
+        var old = this.item(key);
+        if(typeof key == &quot;undefined&quot; || key === null || typeof old == &quot;undefined&quot;){
+             return this.add(key, o);
+        }
+        var index = this.indexOfKey(key);
+        this.items[index] = o;
+        this.map[key] = o;
+        this.fireEvent(&quot;replace&quot;, key, old, o);
+        return o;
+    },
+   
+
+    addAll : function(objs){
+        if(arguments.length &gt; 1 || objs instanceof Array){
+            var args = arguments.length &gt; 1 ? arguments : objs;
+            for(var i = 0, len = args.length; i &lt; len; i++){
+                this.add(args[i]);
+            }
+        }else{
+            for(var key in objs){
+                if(this.allowFunctions || typeof objs[key] != &quot;function&quot;){
+                    this.add(objs[key], key);
+                }
+            }
+        }
+    },
+   
+
+    each : function(fn, scope){
+        var items = [].concat(this.items); 
+        for(var i = 0, len = items.length; i &lt; len; i++){
+            if(fn.call(scope || items[i], items[i], i, len) === false){
+                break;
+            }
+        }
+    },
+   
+
+    eachKey : function(fn, scope){
+        for(var i = 0, len = this.keys.length; i &lt; len; i++){
+            fn.call(scope || window, this.keys[i], this.items[i], i, len);
+        }
+    },
+   
+
+    find : function(fn, scope){
+        for(var i = 0, len = this.items.length; i &lt; len; i++){
+            if(fn.call(scope || window, this.items[i], this.keys[i])){
+                return this.items[i];
+            }
+        }
+        return null;
+    },
+   
+
+    insert : function(index, key, o){
+        if(arguments.length == 2){
+            o = arguments[1];
+            key = this.getKey(o);
+        }
+        if(index &gt;= this.length){
+            return this.add(key, o);
+        }
+        this.length++;
+        this.items.splice(index, 0, o);
+        if(typeof key != &quot;undefined&quot; &amp;&amp; key != null){
+            this.map[key] = o;
+        }
+        this.keys.splice(index, 0, key);
+        this.fireEvent(&quot;add&quot;, index, o, key);
+        return o;
+    },
+   
+
+    remove : function(o){
+        return this.removeAt(this.indexOf(o));
+    },
+   
+
+    removeAt : function(index){
+        if(index &lt; this.length &amp;&amp; index &gt;= 0){
+            this.length--;
+            var o = this.items[index];
+            this.items.splice(index, 1);
+            var key = this.keys[index];
+            if(typeof key != &quot;undefined&quot;){
+                delete this.map[key];
+            }
+            this.keys.splice(index, 1);
+            this.fireEvent(&quot;remove&quot;, o, key);
+        }
+    },
+   
+
+    removeKey : function(key){
+        return this.removeAt(this.indexOfKey(key));
+    },
+   
+
+    getCount : function(){
+        return this.length; 
+    },
+   
+
+    indexOf : function(o){
+        if(!this.items.indexOf){
+            for(var i = 0, len = this.items.length; i &lt; len; i++){
+                if(this.items[i] == o) return i;
+            }
+            return -1;
+        }else{
+            return this.items.indexOf(o);
+        }
+    },
+   
+
+    indexOfKey : function(key){
+        if(!this.keys.indexOf){
+            for(var i = 0, len = this.keys.length; i &lt; len; i++){
+                if(this.keys[i] == key) return i;
+            }
+            return -1;
+        }else{
+            return this.keys.indexOf(key);
+        }
+    },
+   
+
+    item : function(key){
+        var item = typeof this.map[key] != &quot;undefined&quot; ? this.map[key] : this.items[key];
+        return typeof item != 'function' || this.allowFunctions ? item : null; 
+    },
+    
+
+    itemAt : function(index){
+        return this.items[index];
+    },
+    
+
+    key : function(key){
+        return this.map[key];
+    },
+   
+
+    contains : function(o){
+        return this.indexOf(o) != -1;
+    },
+   
+
+    containsKey : function(key){
+        return typeof this.map[key] != &quot;undefined&quot;;
+    },
+   
+
+    clear : function(){
+        this.length = 0;
+        this.items = [];
+        this.keys = [];
+        this.map = {};
+        this.fireEvent(&quot;clear&quot;);
+    },
+   
+
+    first : function(){
+        return this.items[0]; 
+    },
+   
+
+    last : function(){
+        return this.items[this.length-1];   
+    },
+    
+    _sort : function(property, dir, fn){
+        var dsc = String(dir).toUpperCase() == &quot;DESC&quot; ? -1 : 1;
+        fn = fn || function(a, b){
+            return a-b;
+        };
+        var c = [], k = this.keys, items = this.items;
+        for(var i = 0, len = items.length; i &lt; len; i++){
+            c[c.length] = {key: k[i], value: items[i], index: i};
+        }
+        c.sort(function(a, b){
+            var v = fn(a[property], b[property]) * dsc;
+            if(v == 0){
+                v = (a.index &lt; b.index ? -1 : 1);
+            }
+            return v;
+        });
+        for(var i = 0, len = c.length; i &lt; len; i++){
+            items[i] = c[i].value;
+            k[i] = c[i].key;
+        }
+        this.fireEvent(&quot;sort&quot;, this);
+    },
+    
+    
+    sort : function(dir, fn){
+        this._sort(&quot;value&quot;, dir, fn);
+    },
+    
+    
+    keySort : function(dir, fn){
+        this._sort(&quot;key&quot;, dir, fn || function(a, b){
+            return String(a).toUpperCase()-String(b).toUpperCase();
+        });
+    },
+    
+    
+    getRange : function(start, end){
+        var items = this.items;
+        if(items.length &lt; 1){
+            return [];
+        }
+        start = start || 0;
+        end = Math.min(typeof end == &quot;undefined&quot; ? this.length-1 : end, this.length-1);
+        var r = [];
+        if(start &lt;= end){
+            for(var i = start; i &lt;= end; i++) {
+        	    r[r.length] = items[i];
+            }
+        }else{
+            for(var i = start; i &gt;= end; i--) {
+        	    r[r.length] = items[i];
+            }
+        }
+        return r;
+    },
+        
+    
+    filter : function(property, value){
+        if(!value.exec){ 
+            value = String(value);
+            if(value.length == 0){
+                return this.clone();
+            }
+            value = new RegExp(&quot;^&quot; + Ext.escapeRe(value), &quot;i&quot;);
+        }
+        return this.filterBy(function(o){
+            return o &amp;&amp; value.test(o[property]);
+        });
+	},
+    
+    
+    filterBy : function(fn, scope){
+        var r = new Ext.util.MixedCollection();
+        r.getKey = this.getKey;
+        var k = this.keys, it = this.items;
+        for(var i = 0, len = it.length; i &lt; len; i++){
+            if(fn.call(scope||this, it[i], k[i])){
+				r.add(k[i], it[i]);
+			}
+        }
+        return r;
+    },
+    
+    
+    clone : function(){
+        var r = new Ext.util.MixedCollection();
+        var k = this.keys, it = this.items;
+        for(var i = 0, len = it.length; i &lt; len; i++){
+            r.add(k[i], it[i]);
+        }
+        r.getKey = this.getKey;
+        return r;
+    }
+});
+
+Ext.util.MixedCollection.prototype.get = Ext.util.MixedCollection.prototype.item;</pre>
+</body>
+</html>

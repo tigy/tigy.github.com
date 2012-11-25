@@ -1,0 +1,53 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Ajax\assets\scripts\Load.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">//===========================================
+//  元素        A
+//===========================================
+
+
+using(&quot;System.Ajax.Base&quot;);
+using(&quot;System.Ajax.Html&quot;);
+using(&quot;System.Dom.Base&quot;);
+
+/**
+ * 通过 Ajax 动态更新一个节点
+ */
+Dom.implement({
+
+	<span id="load">/**
+	 * 从一个地址，载入到本元素， 并使用 setHtml 设置内容。
+	 * @param {String} url 要载入的页面地址。
+	 * @param {Object} [data] 发送给服务器的数据。
+	 * @param {Function} [oncomplete] 数据返回完成后的回调。
+	 */</span>
+	load: function(url, data, oncomplete) {
+		if (typeof data === 'function') {
+			complete = data;
+			data = null;
+		}
+
+		var me = this;
+
+		Ajax.send({
+			url: url,
+			data: data,
+			dataType: 'html',
+			success: function(data) {
+				me.setHtml(data);
+			},
+			complete: oncomplete
+		});
+
+		return me;
+	}
+
+});</pre>
+</body>
+</html>

@@ -1,0 +1,58 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Data\assets\scripts\CollectionEx.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">//===========================================
+//  集合的扩展   collection.js         A
+//===========================================
+
+JPlus.CollectionBase.implement({
+	
+	<span id="clone">/**
+	 * 返回当前集合的副本。
+	 */</span>
+	clone: function(){
+		var list = new this.constructor();
+		this.forEach(function(value){
+			list.add(value);
+		});
+		
+		return list;
+	},
+	
+	<span id="toArray">/**
+	 * 将当前集合转为数组。
+	 * @return Array 数组。
+	 */</span>
+	toArray: function(){
+		return Array.create( this);
+	},
+	
+	<span id="sort">/**
+	 * 排序当前集合元素。
+	 */</span>
+	sort: function(){
+		for(var i = this.length; i--; )
+			this.onRemove(i, this[i]);
+		Array.prototype.sort.call(this);
+		for(i = 0; i &lt; this.length; i++)
+			this.onAdd(i, this[i]);
+			
+		return this;
+	},
+	
+	<span id="getCount">/**
+	 * 获取当前集合数目。
+	 * @return Number 个数。
+	 */</span>
+	getCount: function(){
+		return this.length;
+	}
+});</pre>
+</body>
+</html>

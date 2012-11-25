@@ -1,0 +1,73 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Dom\assets\scripts\Insert.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author 
+ */
+
+
+
+
+Dom.implement({
+
+	<span id="insert">/**
+	 * 在某个位置插入一个HTML 。
+	 * @param {String} where 插入地点。
+	 *
+	 * - **beforeBegin**: 节点外。
+	 * - **beforeEnd** 节点里。
+	 * - **afterBegin** 节点外。
+	 * - **afterEnd** 节点里。
+	 *
+	 * @param {String/Node/Dom} html 要插入的内容。
+	 * @return {Dom} 返回插入的新节点对象。
+	 * 向每个匹配的元素内部前置内容。
+	 * @example
+	 * 向所有段落中前置一些HTML标记代码。
+	 * #####HTML:
+	 * &lt;pre lang=&quot;htm&quot; format=&quot;none&quot;&gt;&amp;lt;p&amp;gt;I would like to say: &amp;lt;/p&amp;gt;&lt;/pre&gt;
+	 * #####JavaScript:
+	 * &lt;pre&gt;Dom.query(&quot;p&quot;).insert(&quot;afterBegin&quot;,&quot;&amp;lt;b&amp;gt;Hello&amp;lt;/b&amp;gt;&quot;);&lt;/pre&gt;
+	 * #####结果:
+	 * &lt;pre lang=&quot;htm&quot; format=&quot;none&quot;&gt;[ &amp;lt;p&amp;gt;&amp;lt;b&amp;gt;Hello&amp;lt;/b&amp;gt;I would like to say: &amp;lt;/p&amp;gt; ]&lt;/pre&gt;
+	 */</span>
+	insert: function(where, html) {
+
+		assert(' afterEnd beforeBegin afterBegin beforeEnd '.indexOf(' ' + where + ' ') &gt;= 0, &quot;Dom.prototype.insert(where, html): {where} 必须是 beforeBegin、beforeEnd、afterBegin 或 afterEnd 。&quot;, where);
+
+		var me = this,
+				parentControl = me,
+				refChild = me;
+
+		html = Dom.parse(html, me.node);
+
+		switch (where) {
+			case &quot;afterEnd&quot;:
+				refChild = me.next(null);
+
+				// 继续。
+			case &quot;beforeBegin&quot;:
+				parentControl = me.parent();
+				assert(parentControl, &quot;Dom.prototype.insert(where, html): 节点无父节点时无法执行 insert({where})。&quot;, where);
+				break;
+			case &quot;afterBegin&quot;:
+				refChild = me.first(null);
+				break;
+			default:
+				refChild = null;
+				break;
+		}
+
+		parentControl.insertBefore(html, refChild);
+		return html;
+	}
+
+}, 3);</pre>
+</body>
+</html>

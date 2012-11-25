@@ -1,0 +1,43 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Fx\assets\scripts\Text.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author 
+ */
+
+
+
+//===========================================
+//  字符串的变换   string.js      A
+//===========================================
+
+
+
+using(&quot;System.Fx.Animate&quot;);
+
+
+
+<span id="string">/**
+ * 文字。
+ */</span>
+JPlus.Fx.Animate.parses.string = {
+
+	parse: function(value) {
+		return typeof value === 'string' &amp;&amp; value;
+	},
+
+	get: Element.getStyle,
+
+	set: function set(target, from, to, delta) {
+		target.style[this.name] = from.substr(0, Fx.compute(from[0], to[0], delta));
+	}
+
+};</pre>
+</body>
+</html>

@@ -880,6 +880,7 @@ using("System.Core.Base");
 	/**
 	 * @class Dom
 	 */
+	
 	extend(Dom, {
 		
 		/**
@@ -1764,6 +1765,9 @@ using("System.Core.Base");
 
 	})
 	
+	/**
+	 * @class Dom
+	 */
 	.implement({
 
 		/**

@@ -1,0 +1,46 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Display\assets\scripts\ImageZoom.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+Dom.implement({
+	
+	imageZoom: function(getUrlCallback){
+				
+	    return this.addClass('x-imagezoom-small').on('click', function (e) {
+	    	if(this.hasClass('x-imagezoom-small')){
+	    		this.removeClass('x-imagezoom-small').addClass('x-imagezoom-large');
+	    		var oldState;
+	    		if(getUrlCallback){
+	    			this.dataField().imageZoomSrc = this.node.src;
+	    			this.node.src = getUrlCallback(this.node.src);
+	    		} else {
+	    			this.dataField().imageZoomWidth = this.getWidth();
+	    			this.dataField().imageZoomHeight = this.getHeight();
+	    			this.node.style.width = this.node.style.height = 'auto';
+	    		}
+	    	} else {
+	    		this.addClass('x-imagezoom-small').removeClass('x-imagezoom-large');
+	    		if(getUrlCallback){
+	    			this.node.src = this.dataField().imageZoomSrc;
+	    		} else {
+	    			this.setWidth(this.dataField().imageZoomWidth);
+	    			this.setHeight(this.dataField().imageZoomHeight);
+	    		}
+	    	}
+	    });
+	}
+	
+});
+
+</pre>
+</body>
+</html>

@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'pause',"source":'System\\Fx\\assets\\scripts\\Marquee.js',"sourceFile":'data/source/System\\Fx\\assets\\scripts\\Marquee.js.html#pause',"summary":'<p>\u6682\u505c\u6eda\u52a8</p>\n',"memberType":'method',"name":'pause',"memberOf":''});

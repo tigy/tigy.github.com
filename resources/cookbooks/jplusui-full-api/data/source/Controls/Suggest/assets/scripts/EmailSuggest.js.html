@@ -1,0 +1,40 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Suggest\assets\scripts\EmailSuggest.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+
+using(&quot;Controls.Suggest.Suggest&quot;);
+
+var EmailSuggest = Suggest.extend({
+
+    mails: &quot; @126.com @139.com @163.com @gmail.com @hotmail.cn @hotmail.com @qq.com @sina.com @sohu.com @vip.163.com @vip.qq.com @yahoo.cn @yahoo.com.cn&quot;.split(' '),
+
+    getSuggestItems: function (value) {
+
+        if (!value)
+            return null;
+
+        var r = [], v = value.indexOf('@') !== -1 ? value.substr(0, value.indexOf('@')) : value;
+
+        this.mails.each(function (m) {
+            if ((v + m).indexOf(value) === 0)
+                r.push(v + m);
+        });
+
+
+        return r;
+
+    }
+
+});</pre>
+</body>
+</html>

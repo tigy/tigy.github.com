@@ -1,0 +1,40 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Dom\assets\scripts\OuterHtml.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author 
+ */
+
+
+
+Dom.implement({
+	getOuterHtml: function() {
+		var elem = this.node;
+		if (&quot;outerHTML&quot; in elem) {
+			return elem.outerHTML;
+		} else {
+			var div = Dom.getDocument(elem).createElement('div')
+			div.appendChild(this.clone().node);
+			return div.innerHTML;
+		}
+	}
+}).implement({
+	setOuterHtml: function(value) {
+		var elem = this.node;
+		if (&quot;outerHTML&quot; in this &amp;&amp; !/&lt;(?:script|style|link)/i.test(value)) {
+			elem.outerHTML = value;
+		} else {
+			this.before(value);
+			this.remove();
+		}
+		return this;
+	}
+});</pre>
+</body>
+</html>
