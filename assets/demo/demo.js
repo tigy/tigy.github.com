@@ -100,7 +100,7 @@ Demo.extend(Demo, {
         doc: '<a href="~/resources/cookbooks/jplusui-full-api/index.html" target="_blank">jPlusUI API 文档</a>\
                 <a href="~/resources/cookbooks/jplusui-core-api/index.html" target="_blank">jPlusUI Core 文档</a>\
                 <a href="~/resources/cookbooks/jquery2jplus.html" target="_blank">jQuery 转 jPlusUI</a>\
-                <a href="~/resources/cookbooks/dplsystem.html" target="_blank">组件系统文档</a>\
+                <a href="~/resources/cookbooks/dplsystem.html" target="_blank">测试系统使用方法</a>\
                 <a href="~/resources/index.html#doc" target="_blank">更多文档</a>',
 
         /**
@@ -3062,7 +3062,7 @@ if (typeof module !== 'object') {
                 // script.demo[type=code/html] => pre.demo
                 // script.demo[type=code/javascript] => pre.demo
                 Demo.Dom.iterate('SCRIPT', function (node) {
-                	var value = node.innerHTML.replace(/<\\(\/?)script>/g, "<$1script>");
+                	var value = node.innerHTML.replace(/<(\/?)\\script/g, "<$1script");
                     switch (node.type) {
                         case '':
                         case 'text/javascript':

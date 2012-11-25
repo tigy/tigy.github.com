@@ -17,21 +17,6 @@
 </head>
 <body>
     <article class="demo">
-        <script>
-
-            Demo.writeExamples({
-                'Tpl.parse': {
-                    'Tpl.parse("{for p in _.path}{p}{end}", {path: [1,2,3]})': "123",
-                    'Tpl.parse("{if _.a}abc{else if _.b.c}def{end}", {a:0, b: {c: 4}})': "def",
-                    'Tpl.parse("{var aa = 4}{aa}", {a:0, b: {c: 4}})': "4"
-                }
-            });
-
-            function $(id) {
-                return document.getElementById(id);
-            }
-
-        </script>
 
         <textarea id="from">遍历 dataArr 对象: 
 {for a in dataArr}
@@ -48,6 +33,22 @@
 		<input class="demo" onclick="$('to').value = Tpl.parse($('from').value, eval('(' + $('data').value + ')'))" type="button" value="解析模板"><br>
         <textarea id="to"></textarea>
         
+        <script>
+
+            Demo.writeExamples({
+                'Tpl.parse': 'Tpl.parse("{for p in _.path}{p}{end}", {path: [1,2,3]})'
+            });
+
+            function $(id) {
+                return document.getElementById(id);
+            }
+
+        </script>
+        
+    </article>
+       
+    <article class="demo">
+ 
         <h2 class="demo">语法介绍</h2>
 
         <h3 class="demo">常量</h3>
