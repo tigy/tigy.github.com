@@ -17,6 +17,7 @@
             font-size: 14px;
             line-height: 20px;
             width: 150px;
+            background: #fff;
         }
 
             .object header {
@@ -54,6 +55,10 @@
             margin: 0;
             font-size: 16px;
             line-height: 20px;
+        }
+        
+        .object header .type {
+            clear: both;
         }
 
         .object dl {
@@ -203,6 +208,7 @@
 
         .arrow-top, .arrow-circle {
             font-family: Arial, sans-serif;
+            color: #716F64;
             font-size: 12px;
         }
 
@@ -270,6 +276,33 @@
                 Class2: {
                     extend: 'Class1',
                     type: '类',
+                    implements: ['IIgasdas', 'IIccad']  ,
+                    fields: {
+                        'aaa': 1,
+                        'gggg': 2,
+                        'rrrr': 4
+                    },
+                    methods: {
+                        'aaa': function(){}
+                    }
+                },
+
+                Class3: {
+                    extend: 'Class1',
+                    type: '类',
+                    fields: {
+                        'aaa': 1,
+                        'gggg': 2,
+                        'rrrr': 4
+                    },
+                    methods: {
+                        'aaa': function(){}
+                    }
+                },
+
+                Class7: {
+                    extend: 'Class1',
+                    type: '类',
                     fields: {
                         'aaa': 1,
                         'gggg': 2,
@@ -285,6 +318,22 @@
             };
 
         }
+        
+        // 参数
+
+        var simpleClassColumn = 9;
+        var objectWidth = 150;
+        var objectHeight = 37;
+        var objectMarginRight = 30;
+        var objectMarginBottom = 90;
+        var implementHeight = 34;
+        var implementOffset = 20;
+        
+        var members = {
+          'field': '字段',
+          'method': '方法',
+          'event': '事件'
+        };
 
         // 绘图
 
@@ -323,17 +372,28 @@
             }
 
             // 统计每个类的全部子类个数
+            
+            var maxRow = 0;
 
-            getCount(r);
+            getCount(r, 0);
 
-            function getCount(children) {
+            function getCount(children, row) {
 
                 var count = 0;
+                
+                var col = 0;
+                
+                if(maxRow < row){
+                    maxRow++;
+                }
 
                 for (var i = 0; i < children.length; i++) {
-
+                    
+                    children[i].row = row;
+                    children[i].col = count;
+                    
                     if (children[i].children) {
-                        children[i].count = getCount(children[i].children);
+                        children[i].count = getCount(children[i].children, row + 1);
                         count += children[i].count;
                     } else {
                         children[i].count = 0;
@@ -343,6 +403,21 @@
                 }
 
                 return count;
+            }
+            
+            for(var i = 0, col = 0; i < r.length; i++){
+                
+                if(r[i].count === 0){
+                    
+                    r[i].row = maxRow;
+                    r[i].col = col;
+                    
+                    if(++col >= simpleClassColumn){
+                        maxRow++;
+                    }
+                    
+                }
+                
             }
 
             return r;
@@ -360,109 +435,115 @@
             */
         }
 
-        function paintClassDom(classDom) {
-
-            // 按照 count 排序
-
-            classDom.sort(function (a, b) {
-                return a.count - b.count;
-            });
-
-            // 绘制含子类的类。
-
-            var i = 0;
+        function paintClassDom(classes) {
+            
+            var classDom = getClasssDom(classes);
+            
+            var nonParent = [];
 
             // 每个类的宽度。
-            var objectWidth = 150;
-            var objectHeight = 37;
-            var objectMarginRight = 30;
-            var objectMarginBottom = 60;
-
-            var y = 0;
-
             var html = '';
-
-            for (; i < classDom.length; i++) {
-
-                // 如果不存在父类，也不存在子类，使用下一个 for 循环绘制。
-                if (classDom[i].count === 0) {
-                    break;
-                }
-
-                drawSignleLine({ children: [classDom[i]] });
-
+            
+            for (var i = 0; i < classDom.length; i++) {
+                drawSignleObject(classDom[i]);
             }
-
-            // 画继承链中的一行。
-            function drawSignleLine(parentClassDom) {
-
-                var x = 0;
-
-                for (var i = 0; i < parentClassDom.children.length; i++) {
-
-                    var totalWidth = parentClassDom.children[i].count * objectWidth + (parentClassDom.children[i].count > 0 ? (parentClassDom.children[i].count - 1) * objectMarginRight : 0);
-
-                    html += drawObject(totalWidth / 2 - objectWidth / 2, objectWidth, y);
-
-                    x += totalWidth;
-
-                }
-
-                y += objectHeight + objectMarginBottom;
-
-            }
-
+            
+            // 绘制单一的对象。
             function drawSignleObject(clazz) {
-
-                if (count === 0) {
-
+                
+                var x = clazz.col * (objectWidth + objectMarginRight);
+                var y = clazz.row * (objectHeight + objectMarginBottom);
+                
+                var width = clazz.count > 0 ? objectWidth * clazz.count + (clazz.count - 1) * objectMarginRight : objectWidth;
+                
+                clazz.x = x + (width - objectWidth) / 2;
+                clazz.y = y;
+                clazz.width = width;
+                
+                html += drawObject(clazz);
+                
+                if(clazz.implements){
+                    html += drawVerticalCircle(clazz.x + objectWidth / 2 + implementOffset, clazz.y - implementHeight, implementHeight);
+                    html += drawText(clazz.implements.join(','), clazz.x + objectWidth / 2 + implementOffset + 18, clazz.y - implementHeight - 4);
                 }
-
-                var x = (count * objectWidth + (count - 1) * objectMarginRight) / 2 - objectWidth / 2;
-
-                html += drawObject(x - objectWidth / 2, x + objectWidth, y);
-
-                y += objectHeight + objectMarginBottom;
-
+                
+                // 如果有子对象。画一个继承的箭头。
+                if(clazz.count > 0){
+                    
+                    for(var i = 0; i < clazz.children.length; i++){
+                        drawSignleObject(clazz.children[i]);
+                    }
+                    
+                    html += drawVerticalArrow(x + width / 2, y + objectHeight, objectMarginBottom / 2);
+                    
+                    y = y + objectHeight + objectMarginBottom / 2;
+                    
+                    html += drawHorizonalLine(clazz.children[0].x + objectWidth / 2, y, clazz.children[clazz.children.length - 1].x - clazz.children[0].x);
+                    
+                    for(var i = 0; i < clazz.children.length; i++){
+                        
+                        html += drawVerticalLine(clazz.children[i].x + objectWidth / 2, y, objectMarginBottom / 2);
+                    
+                    }
+                }
+                
             }
-
-            // 绘制不含子类的类。
-
-            for (; i < classDom.length; i++) {
-
-
-            }
-
+            
+            document.getElementById('body').innerHTML = html;
 
         }
 
         // 绘图底层
 
-
-        function drawObject(fromX, toX, y) {
+        function drawObject(clazz) {
+            var html = '';
+            html += '<aside class="object collapsed1" style="left:' + clazz.x + 'px;top:' + clazz.y + 'px"><header><div class="collapse"></div><h4>' + clazz.name + '</h4><div class="type">' + (clazz.type || '对象') + '</div>';
             
-        }
-
-        function drawHorizonalLine(fromX, toX, y) {
-            if (fromX > toX) {
-                var t = toX;
-                toX = fromX;
-                fromX = t;
+            if(clazz.extend){
+                html += '<div><span class="rightarrow"></span><a href="#">' + clazz.extend +'</a></div>';
             }
-            return '<div class="line-horizonal" style="top:' + y + 'px;left:' + fromX + 'px;width:' + (toX - fromX) + 'px"></div>';
-        }
-
-        function drawVerticalLine(x, fromY, toY) {
-            if (fromY > toY) {
-                var t = toY;
-                toY = fromY;
-                fromY = t;
+            
+            html += '</header><dl>';
+            
+            for(var memberType in members){
+                
+                var t = clazz[memberType + 's'];
+                
+                if(t){
+                    html += '<dt>' + members[memberType] + '</dt>';
+                    
+                    for(var field in clazz[memberType + 's']){
+                        html += '<dd><span class="icon-member icon-' + (t[field].static ? 'static' : 'none') +'"></span><span class="icon-member icon-' + memberType + '"></span><a href="#" class="member-' + t[field].attribute + '">' + field + '</a></dd>';
+                    }
+                }
             }
-            return '<div class="line-vertical" style="left:' + x + 'px;top:' + fromY + 'px;height:' + (toY - fromY) + 'px"></div>';
+            
+            html += '</dl></aside>';
+            
+            return html;
         }
 
-        function drawVerticalArrow(html, x, fromY, toY) {
+        function drawHorizonalLine(x, y, width) {
+            return '<div class="line-horizonal" style="top:' + y + 'px;left:' + x + 'px;width:' + width + 'px"></div>';
+        }
 
+        function drawVerticalLine(x, y, height) {
+            return '<div class="line-vertical" style="left:' + x + 'px;top:' + y + 'px;height:' + height + 'px"></div>';
+        }
+
+        function drawVerticalArrow(x, y, height) {
+            
+            return '<div class="arrow-top" style="left:' + (x - 5) + 'px;top:' + y + 'px;">△</div>' + drawVerticalLine(x, y + 12, height - 12) ;
+        }
+
+        function drawText(text, x, y) {
+            
+            return '<div style="left:' + (x - 5) + 'px;top:' + y + 'px;">' + text + '</div>' ;
+        }
+
+        function drawVerticalCircle(x, y, height) {
+            
+            return '<div class="arrow-circle" style="left:' + (x - 5) + 'px;top:' +  (y - 12) + 'px;">◦</div>' + drawVerticalLine(x, y + 12, height - 12) ;
         }
 
         function testDraw(func, args0, args1, args2) {
@@ -536,6 +617,16 @@
         <div class="line-vertical">
             
         </div>
+        
+        <script>
+            var a = getClasses();
+            
+            paintClassDom(a);
+            
+            
+            
+            
+        </script>
     </article>
 
 </body>
