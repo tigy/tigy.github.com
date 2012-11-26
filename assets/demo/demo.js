@@ -3489,6 +3489,10 @@ if (typeof module !== 'object') {
             // document.write('<link type="text/css" rel="stylesheet" href="' + configs.rootUrl + 'assets/demo/_staticpages/assets/styles/demo.css" />');
             if (!window.console)
                 document.write('<script type="text/javascript" src="' + configs.rootUrl + 'assets/demo/firebug-lite/build/firebug-lite.js"></script>');
+            
+            if (!configs.dev) {
+                document.write('<script type="text/javascript" src="' + configs.rootUrl + 'assets/web/scripts/stat.js"></script>');
+            }
 
             // IE 需要强制中止 <head>
             if (Demo.Dom.isIE) {
