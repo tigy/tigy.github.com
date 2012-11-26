@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Panel.prototype.xtype',"source":'Controls\\Container\\assets\\scripts\\Panel.js',"sourceFile":'data/source/Controls\\Container\\assets\\scripts\\Panel.js.html#Panel-prototype-xtype',"summary":'<p>xtype</p>\n',"type":'String',"name":'xtype',"memberOf":'Panel',"defaultValue":'\"panel\"',"memberType":'field'});

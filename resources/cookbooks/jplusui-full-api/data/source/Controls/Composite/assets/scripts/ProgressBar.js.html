@@ -1,0 +1,37 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Composite\assets\scripts\ProgressBar.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+imports(&quot;Controls.Composite.ProgressBar&quot;);
+using(&quot;Controls.Core.Base&quot;);
+
+
+var ProgressBar = Control.extend({
+
+    xtype: 'progressbar',
+
+    tpl: '&lt;div class=&quot;x-control&quot;&gt;\
+                &lt;div class=&quot;x-progressbar-fore&quot;&gt;&lt;/div&gt;\
+            &lt;/div&gt;',
+
+    setValue: function (value) {
+        this.find('.x-progressbar-fore').node.style.width = value + '%';
+        return this;
+    },
+
+    getValue: function () {
+        return parseInt(this.find('.x-progressbar-fore').node.style.width);
+    }
+
+});</pre>
+</body>
+</html>

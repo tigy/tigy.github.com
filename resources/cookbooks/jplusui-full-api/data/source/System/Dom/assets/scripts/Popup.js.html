@@ -1,0 +1,98 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Dom\assets\scripts\Popup.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+
+using(&quot;System.Dom.Base&quot;);
+
+
+Dom.implement({
+	
+	popup: function(options){
+		
+		if(options.constructor !== Object){
+			options = {target: Dom.get(options)};
+		}
+		
+		var me = this, timer, atPopup, atTarget;
+		
+		options.delay = options.delay || 300;
+		
+		options.target
+			.hide()
+			.on('mouseenter', function(){
+				atPopup = true;
+			})
+			.on('mouseleave', function(){
+				atPopup = false;
+			});
+		
+		me.on('mouseenter', function(e){
+			
+			atTarget = true;
+			
+			if(timer){
+				clearTimeout(timer);
+			}
+			
+			timer = setTimeout(function(){
+				
+				timer = 0;
+				
+				options.target.show();
+				
+				if(options.show){
+					options.show.call(me);
+				}
+				
+			}, options.delay);
+			
+		});
+		
+		me.on('mouseleave', function(e){
+			
+			atTarget = false;
+			
+			if(timer){
+				clearTimeout(timer);
+			}
+			
+			timer = setTimeout(function(){
+				
+				timer = 0;
+				
+				if(!atTarget){
+					
+					if(!atPopup){
+						options.target.hide();
+						
+						if(options.hide){
+							options.hide.call(me);
+						}
+						
+					} else {
+						setTimeout(arguments.callee, options.delay);
+					}
+					
+				}
+				
+			}, options.delay);
+			
+		});
+		
+		return me;
+		
+	}
+
+});</pre>
+</body>
+</html>

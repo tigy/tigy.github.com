@@ -880,6 +880,7 @@ using("System.Core.Base");
 	/**
 	 * @class Dom
 	 */
+	
 	extend(Dom, {
 		
 		/**
@@ -1593,7 +1594,7 @@ using("System.Core.Base");
 
 			// 如果元素的 display 仍然为 none , 说明通过 CSS 实现的隐藏。这里默认将元素恢复为 block。
 			if(getStyle(elem, 'display') === 'none')
-				elem.style.display = elem.style.$display || Dom.defaultDisplay(elem);
+				elem.style.display = elem.style.defaultDisplay || Dom.defaultDisplay(elem);
 		},
 		
 		/**
@@ -1764,6 +1765,9 @@ using("System.Core.Base");
 
 	})
 	
+	/**
+	 * @class Dom
+	 */
 	.implement({
 
 		/**

@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Droppable',"source":'System\\Dom\\assets\\scripts\\Drop.js',"sourceFile":'data/source/System\\Dom\\assets\\scripts\\Drop.js.html#Droppable',"summary":'<p>\u521d\u59cb\u5316\u3002</p>\n',"memberType":'constructor',"name":'Droppable',"memberOf":''});

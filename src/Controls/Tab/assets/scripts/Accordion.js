@@ -40,12 +40,20 @@ var Accordion = TabbableControl.extend({
 				return;
 			}
 			
-			from.removeClass('x-accordion-collapsed').last().hide('height', this.collapseDuration, finish);
+			from.removeClass('x-accordion-collapsed').last().hide({
+		    	effect: 'height',
+		    	duration: this.collapseDuration,
+		    	callback: finish
+		    });
 		} else
 		    finish();
 		
 		if(to)
-		    to.removeClass('x-accordion-collapsed').last().show('height', this.collapseDuration, finish);
+		    to.removeClass('x-accordion-collapsed').last().show({
+		    	effect: 'height',
+		    	duration: this.collapseDuration,
+		    	callback: finish
+		    });
 		else
 		    finish();
 			

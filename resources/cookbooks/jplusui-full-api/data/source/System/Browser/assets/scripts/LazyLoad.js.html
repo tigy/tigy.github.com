@@ -1,0 +1,124 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Browser\assets\scripts\LazyLoad.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+
+using(&quot;System.Dom.Base&quot;);
+using(&quot;System.Fx.Animate&quot;);
+var Lazyload = Class({
+	
+	placeholder: null,
+	
+	duration: 300,
+	
+	effect: 'opacity',
+	
+	onLoad: null,
+	
+	event: 'scroll',
+	
+	offset: 0,
+	
+	update: function(){
+		if(this.targets.length === 0)
+			return;
+			
+		var left = [];
+		this.targets.forEach(function(value){
+			var container = Dom.get(this.container) || document,
+				containerPos = container.getPosition(),
+				containerRight = containerPos.add(container.getSize());
+			if(this.isInView(value, containerPos, containerRight)){
+				this.load(value);	
+			} else {
+				left.push(value);	
+			}
+		}, this);
+		
+		this.targets = left;
+	},
+	
+	isInView: function(img, containerPos, containerRight){
+		var pos = img.getPosition(),
+			size = img.getSize(),
+			right = pos.add(size);
+		return Math.max(pos.x, containerPos.x) &lt;= Math.min(right.x, containerRight.x) &amp;&amp;
+			Math.max(pos.y, containerPos.y) &lt;= Math.min(right.y, containerRight.y);
+	},
+	
+	getSrc: function (img) {
+	  return img.getAttr('data-src');
+	},
+	
+	load: function(img){
+		
+		if(Dom.get(img).dataField().imageLoaded)
+			return;
+		
+		var me = this, proxy = new Image();
+		
+		proxy.onload = function(){
+			
+			img.hide().setAttr('src', proxy.src).show(me.effect,me.duration, me.onLoad &amp;&amp; function () {
+				me.onLoad(img);
+			});
+			
+			img.dataField().imageLoaded = true;
+		};
+		proxy.src = me.getSrc(img);
+	},
+	
+	init: function(img){
+		if(this.placeholder &amp;&amp; !img.getAttr('src')){
+			img.setAttr('src', this.placeholder);
+		}
+		
+		var container = Dom.get(this.container || window);
+		
+		
+		if(this.event === 'scroll'){
+			container.on('scroll', this.update, this);
+			new Dom(window).on('resize', this.update, this);
+		} else {
+			img.on(this.event, function(){
+				this.load(img);
+			}, this);
+		}
+	},
+	
+	constructor: function(targets, options){
+		Object.extend(this, options);
+		
+		this.targets = [];
+		
+		targets.forEach(function(value){
+			value = Dom.get(value);
+			this.init(value);
+			this.targets.push(value);
+		}, this);
+		this.update();
+		
+	}
+	
+});
+
+
+DomList.implement({
+	
+	lazyload: function (options) {
+		new Lazyload(this, options);
+		return this;
+	}
+	
+});</pre>
+</body>
+</html>

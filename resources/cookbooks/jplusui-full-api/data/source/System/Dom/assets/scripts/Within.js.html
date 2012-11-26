@@ -1,0 +1,38 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Dom\assets\scripts\Within.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">//===========================================
+//  判断元素是否在制定原元素范围   within.js    A
+//===========================================
+
+
+Dom.implement({
+	
+	within: function (x,y,width,height) {
+		var container,
+			containerPos,
+			containerSize,
+			targetPos = this.getPosition(),
+			targetSize = targetPos.add(this.getSize());
+		if(typeof(x)=='String'){
+			container = Dom.get(id);
+			containerPos = container.getPosition();
+			containerSize = containerPos.add(container.getSize());
+			targetPos = this.getPosition();
+			targetSize = targetPos.add(this.getSize());
+		}else{
+			containerPos = {x:x,y:y};
+			containerSize = {x:containerPos.x+(width||0),y:containerPos.y+(height||0)};			
+		}
+		return Math.max(targetPos.x, containerPos.x) &lt;= Math.min(targetSize.x, containerSize.x) &amp;&amp;
+			Math.max(targetPos.y, containerPos.y) &lt;= Math.min(targetSize.y, containerSize.y);
+	}
+});</pre>
+</body>
+</html>

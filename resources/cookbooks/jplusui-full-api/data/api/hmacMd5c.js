@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'hmacMd5c',"source":'System\\Text\\assets\\scripts\\Md5Ex.js',"sourceFile":'data/source/System\\Text\\assets\\scripts\\Md5Ex.js.html#hmacMd5c',"summary":'<p>\u8ba1\u7b97 HMAC-MD5 \u3002</p>\n',"name":'hmacMd5c',"memberOf":'',"memberType":'method',"params":[{"type":'',"name":'key',"summary":''},{"type":'',"name":'data',"summary":''}]});

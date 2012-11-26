@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Picker.prototype.init',"source":'Controls\\Suggest\\assets\\scripts\\Picker.js',"sourceFile":'data/source/Controls\\Suggest\\assets\\scripts\\Picker.js.html#Picker-prototype-init',"memberAccess":'protected',"name":'init',"memberOf":'Picker',"memberType":'method',"params":[{"type":'',"name":'options',"summary":''}]});

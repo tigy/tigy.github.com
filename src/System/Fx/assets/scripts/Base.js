@@ -13,7 +13,6 @@ using("System.Utils.Deferrable");
  */
 var Fx = (function() {
 	
-	
 	/// #region interval
 	
 	var cache = {};
@@ -69,23 +68,20 @@ var Fx = (function() {
 		 * @param {Object} from 开始位置。
 		 * @param {Object} to 结束位置。
 		 * @return {Base} this
+		 * @protected virtual
 		 */
 		init: Function.empty,
 		
 		/**
-		 * @event step 当进度改变时触发。
-		 * @param {Number} value 当前进度值。
-		 */
-		
-		/**
 		 * 根据指定变化量设置值。
 		 * @param {Number} delta 变化量。 0 - 1 。
-		 * @abstract
+		 * @protected abstract
 		 */
 		set: Function.empty,
 		
 		/**
 		 * 进入变换的下步。
+		 * @protected
 		 */
 		step: function() {
 			var me = this,
@@ -128,7 +124,7 @@ var Fx = (function() {
 				if (options.start && options.start.call(options.target, options, me) === false) {
 					me.progress();
 				} else {
-
+					
 					me.init(options);
 					me.set(0);
 					me.time = 0;
@@ -140,17 +136,9 @@ var Fx = (function() {
 		},
 
 		/**
-		 * 让当前特效执行器等待指定时间。
-		 */
-		delay: function(timeout){
-			return this.run({
-				duration: timeout
-			});
-		},
-
-		/**
 		 * 由应用程序通知当前 Fx 对象特效执行完。
 		 * @param {Boolean} isAbort 如果是强制中止则为 true, 否则是 false 。
+		 * @protected
 		 */
 		end: function(isAbort) {
 			var me = this;
@@ -173,6 +161,8 @@ var Fx = (function() {
 		
 		/**
 		 * 中断当前效果。
+		 * @protected override
+		 * @return this
 		 */
 		stop: function() {
 			this.abort();
@@ -182,6 +172,7 @@ var Fx = (function() {
 		
 		/**
 		 * 暂停当前效果。
+		 * @protected override
 		 */
 		pause: function() {
 			var me = this, fps, intervals;
@@ -196,7 +187,6 @@ var Fx = (function() {
 				}
 				me.timer = 0;
 			}
-			return me;
 		},
 		
 		/**

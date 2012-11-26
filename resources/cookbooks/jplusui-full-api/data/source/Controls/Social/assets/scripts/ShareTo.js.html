@@ -1,0 +1,55 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Social\assets\scripts\ShareTo.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author 
+ */
+
+
+
+/**
+ * @author 
+ */
+
+
+
+var ShareTo = Control.extend({
+
+    tpl: '&lt;div class=&quot;x-shareto&quot;&gt;\
+			&lt;a href=&quot;http://v.t.sina.com.cn/share/share.php?title={title}&amp;url={url}&quot; onclick=&quot;ShareTo.open(this);return false;&quot; class=&quot;x-shareto-content x-shareto-sina&quot; title=&quot;分享到新浪微博&quot;&gt;新浪微博&lt;/a&gt;&amp;nbsp;\
+			&lt;a href=&quot;http://v.t.qq.com/share/share.php?title={title}&amp;url={url}&quot; onclick=&quot;ShareTo.open(this);return false;&quot; class=&quot;x-shareto-content x-shareto-qqt&quot; title=&quot;分享到腾讯微博&quot;&gt;腾讯微博&lt;/a&gt;&amp;nbsp;\
+			&lt;a href=&quot;http://t.163.com/article/user/checkLogin.do?info={title}{url}&amp;link={url}&quot; onclick=&quot;ShareTo.open(this);return false;&quot; class=&quot;x-shareto-content x-shareto-163&quot; title=&quot;分享到网易微博&quot;&gt;网易微博&lt;/a&gt;&amp;nbsp;\
+			&lt;a href=&quot;http://share.renren.com/share/buttonshare?title={title}{url}&amp;link={url}&quot; onclick=&quot;ShareTo.open(this);return false;&quot; class=&quot;x-shareto-content x-shareto-renren&quot; title=&quot;分享到人人网&quot;&gt;人人网&lt;/a&gt;&amp;nbsp;\
+			&lt;a href=&quot;http://www.douban.com/recommend/?title={title}&amp;url={url}&quot; onclick=&quot;ShareTo.open(this);return false;&quot; class=&quot;x-shareto-content x-shareto-douban&quot; title=&quot;分享到豆瓣&quot;&gt;豆瓣&lt;/a&gt;\
+		&lt;/div&gt;',
+
+    parseTpl: function (title, url, text, plain) {
+        var tpl = this.tpl.replace(/{url}/g, encodeURIComponent(url || location.href)).replace(/{title}/g, encodeURIComponent(title || document.title));
+
+        if (text)
+            tpl = tpl.replace('x-shareto&quot;&gt;', 'x-shareto&quot;&gt;&lt;span&gt;' + text + '&lt;/span&gt;');
+        return plain ? tpl.replace('x-shareto', 'x-shareto x-shareto-plain') : tpl;
+    },
+
+    create: function (options) {
+        return Dom.parseNode(this.parseTpl(options.title, options.url, options.text, options.plain));
+    }
+
+});
+
+
+ShareTo.write = function (title, url, text, plain) {
+    document.write(ShareTo.prototype.parseTpl(title, url, text, plain));
+};
+
+ShareTo.open = function (dom) {
+    window.open(dom.href, &quot;newwindow&quot;, &quot;height=600, width=700, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, status=no&quot;);
+}</pre>
+</body>
+</html>

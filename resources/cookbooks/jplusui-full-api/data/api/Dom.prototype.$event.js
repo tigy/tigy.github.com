@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Dom.prototype.$event',"source":'Base_1.js',"sourceFile":'data/source/Base_1.js.html#Dom-prototype-$event',"summary":'<p>\u5b58\u50a8\u4e8b\u4ef6\u5bf9\u8c61\u7684\u4fe1\u606f\u3002</p>\n',"name":'$event',"memberOf":'Dom',"memberType":'field'});

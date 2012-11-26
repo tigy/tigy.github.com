@@ -1,0 +1,164 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Container\assets\scripts\Dialog.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+imports(&quot;Controls.Part.Icon&quot;);
+imports(&quot;Controls.Part.Mask&quot;);
+imports(&quot;Controls.Part.CloseButton&quot;);
+imports(&quot;Controls.Container.Dialog&quot;);
+using(&quot;System.Fx.Animate&quot;);
+using(&quot;Controls.Core.ContainerControl&quot;);
+
+
+var Dialog = ContainerControl.extend({
+
+    _centerType: 1 | 2,
+	
+	xtype: 'dialog',
+
+	showDuration: -1,
+	
+	// 基本属性
+		
+	headerTpl: '&lt;div class=&quot;x-control-header&quot;&gt;&lt;a class=&quot;x-dialog-close x-closebutton&quot;&gt;&#215;&lt;/a&gt;&lt;h4&gt;&lt;/h4&gt;&lt;/div&gt;',
+
+	onCloseButtonClick: function(){
+	    this.close();
+	},
+	
+	init: function(options){
+		
+		var t ;
+		
+		// 允许直接传入一个节点。
+		if (!this.hasClass('x-dialog')) {
+            
+		    // 判断节点是否已渲染过。
+		    t = this.parent();
+
+		    if (t &amp;&amp; t.hasClass('x-dialog-body')) {
+		        this.node = t.node.parentNode;
+		    } else {
+
+		        // 保存当前节点。
+		        t = this.node;
+		        this.node = this.create(options);
+		        this.body().append(t);
+
+		    }
+		}
+		
+		// 关闭按钮。
+		this.delegate('.x-dialog-close', 'click', this.onCloseButtonClick.bind(this));
+
+		this.setStyle('display', 'none');
+		
+		// 移除 script 脚本。
+		this.query('script').remove();
+
+	},
+	
+	mask: function(opacity){
+		var mask = this.maskDom || (this.maskDom = Dom.find('.x-mask-dialog') || Dom.create('div', 'x-mask x-mask-dialog').appendTo());
+		if (opacity === null) {
+			mask.hide();
+		} else {
+			mask.show();
+			mask.setSize(document.getScrollSize());
+			if (opacity != null)
+				mask.setStyle('opacity', opacity);
+		}
+		return this;
+	},
+	
+	setOffset: function(p){
+		if(p.x != null) {
+			this._centerType &amp;= ~2;
+			this.setStyle('margin-left', 0);
+		}
+		
+		if(p.y != null) {
+			this._centerType &amp;= ~1;
+			this.setStyle('margin-top', 0);
+		}
+		
+		return this.base('setOffset');
+	},
+	
+	setWidth: function(){
+		return this.base('setWidth').center();
+	},
+	
+	setHeight: function(){
+		return this.base('setHeight').center();
+	},
+	
+	setContent: function () {
+	    return this.base('setContent').center();
+	},
+	
+	/**
+	 * 重对齐当前对话框的位置以确保居中显示。
+	 */
+	center: function(){
+		if(this._centerType &amp; 1)
+			this.setStyle('margin-top', - this.getHeight() / 2 + document.getScroll().y);
+			
+		if(this._centerType &amp; 2)
+			this.setStyle('margin-left', - this.getWidth() / 2 + document.getScroll().x);
+			
+		return this;
+	},
+
+	show: function(){
+		
+		if(!this.closest('body')){
+			this.appendTo();	
+		}
+		
+		return Dom.prototype.show.call(this, arguments, {
+			duration: this.showDuration
+		}).center();
+		
+	},
+	
+	showDialog: function(){
+		return this.show.apply(this.mask(), arguments);
+	},
+	
+	hide: function(){
+		if (this.maskDom) this.maskDom.hide();
+		return Dom.prototype.hide.call(this, arguments, {
+			duration: this.showDuration
+		});
+	},
+	
+	setContentSize: function(x, y){
+		this.setWidth('auto');
+		this.body().setWidth(x).setHeight(y);
+		return this.center();
+	},
+	
+	close: function () {
+	    var me = this;
+	    if (this.trigger('closing'))
+	        this.hide({
+	        	callback: function () {
+		            this.trigger('close');
+		        }
+		    });
+		return this;
+	}
+	
+});
+</pre>
+</body>
+</html>

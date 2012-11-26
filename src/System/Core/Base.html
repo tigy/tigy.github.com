@@ -15,134 +15,78 @@
 
             <script>
 
-                Demo.writeTestCases({
+                Demo.writeExamples({
                     'Object': '-',
-                    'Object.extend': {
-                        'var target={"a":"g"}; Object.extend(target, [])': function (value, assert) {
-                            assert.areEqual(value["a"], "g");
-                        }
+                    'Object.extend': function(){
+                        var dest = {a: 1};
+                        var src = {b: 2};
+                        Object.extend(dest, src);
+                        
+                        // 此时 dest = {a: 1, b: 2}
                     },
-                    'Object.extendIf': {
-                        'var target={"a":"g"}; Object.extendIf(target, [])': function (value, assert) {
-                            assert.areEqual(value["a"], "g");
-                        }
+                    'Object.extendIf': function(){
+                        var dest = {a: 1, b: 2};
+                        var src = {b: 3, c: 4};
+                        Object.extendIf(dest, src);
+                        
+                        // 此时 dest = {a: 1, b: 2, c: 4}
                     },
-                    'Object.each': {
-                        'var target={a:1, b:2, c:3}; Object.each(target, assert.log)': function (value, assert) {
-                            assert.logged("123");
-                            return value === true;
-                        },
-                        'var target=null; Object.each(target, assert.log)': true,
-                        'var target=[1,2,3]; Object.each(target, assert.log)': function (value, assert) {
-                            assert.logged("123");
-                            return value === true;
-                        }
+                    'Object.each': function(){
+                        var obj = {a: 1, b: 2};
+                        Object.each(obj, function(value, key){
+                            alert(key + ' = ' + value);
+                        });
                     },
-                    'Object.map': {
-                        'Object.map(["aa","bb"], assert.log)': function (value, assert) {
-                            assert.logged("aabb");
-                        },
-                        'Object.map("aa bb", assert.log)': function (value, assert) {
-                            assert.logged("aabb");
-                        }
+                    'Object.map': function(){
+                        Object.map("aa bb", function(value, key){
+                            alert(key + ' = ' + value);
+                        });
+                        
+                        var result1 = Object.map(["aa","bb"], function(value, key){
+                            return value + value;
+                        });  // 返回 ["aaaa","bbbb"]
+                        
+                        var result2 = Object.map({a:"aa",b:"bb"}, function(value, key){
+                            return value + value;
+                        });  // 返回  {a:"aaaa",b:"bbbb"}
                     },
                     'Array': '-',
-                    'Array#indexOf': {
-                        '[5,4].indexOf(5)': 0,
-                        '[5,4].indexOf(4)': 1,
-                        '[5,4].indexOf()': -1,
-                        '[5,4].indexOf("4")': -1
+                    'Array#indexOf': '[5,4].indexOf(5)',
+                    'Array#item': function () {
+                      [5,4].item(0); // 5
+                      [5,4].item(1); // 4
+                      [5,4].item(2); // undefined
+                      [5,4].item(-1); // 4
+                      [5,4].item(-2); // 5
+                      [5,4].item(-3); // undefined
                     },
-                    'Array#item': {
-                        '[5,4].item(0)': 5,
-                        '[5,4].item(1)': 4,
-                        '[5,4].item(-1)': 4,
-                        '[5,4].item(2)': undefined
-                    },
-                    'Array#invoke': {
-                        '[5,4].invoke("toString", [])': ["5", "4"]
-                    },
-                    'Array#unique': {
-                        '[2, 5, 7, 5].unique()': [2, 5, 7]
-                    },
-                    'Array#forEach': {
-                        '[5,4].forEach(assert.log)': function (value, assert) {
-                            assert.logged("54");
-                        }
-                    },
-                    'Array#each': {
-                        '[5,4].each(assert.log)': function (value, assert) {
-                            assert.logged("54");
-                        }
-                    },
-                    'Array#filter': {
-                        '[5,4].filter(function(v){return v > 2;})': [5, 4],
-                        '[5,4].filter(function(v){return v > 4;})': [5],
-                        '[5,4].filter(function(v){return v > 5;})': []
-                    },
-                    'Array#include': {
-                        'var ar = [5,4];ar.include(2); ar': function (value, assert) {
-                            assert.areEqual(value, [5, 4, 2]);
-                        }
-                    },
-                    'Array#remove': {
-                        'var ar = [5,4];ar.remove(4); ar': function (value, assert) {
-                            assert.areEqual(value, [5]);
-                        }
-                    },
-                    'Array.isArray': {
-                        'Array.isArray([])': true,
-                        'Array.isArray()': false
-                    },
+                    'Array#invoke': '[5,4].invoke("toString", [])',
+                    'Array#unique':  '[2, 5, 7, 5].unique()',
+                    'Array#forEach': '[5,4].forEach(alert)',
+                    'Array#each': '[5,4].each(function(value){alert(value); return false;})',
+                    'Array#filter': '[5,4].filter(function(v){return v > 4;})',
+                    'Array#include': 'var ar = [5,4];ar.include(2); ar',
+                    'Array#remove': 'var ar = [5,4];ar.remove(4); ar',
+                    'Array.isArray': 'Array.isArray([])',
                     'Function': '-',
-                    'Function#bind': {
-                        '(function(){assert.log(this)}).bind(2)': function (value, assert) {
-                            value();
-                            assert.logged("2");
-                        }
-                    },
-                    'Function.empty': {
-                        'Function.empty()': undefined
-                    },
+                    'Function#bind': '(function(){assert.log(this)}).bind(2)()',
+                    'Function.empty': 'Function.empty()',
                     'String': '-',
-                    'String#trim': {
-                        '"      abcd  ".trim()': "abcd"
-                    },
-                    'String#capitalize': {
-                        '"abcd".capitalize()': "Abcd"
-                    },
-                    'String#toCamelCase': {
-                        '"font-size".toCamelCase()': "fontSize"
-                    },
-                    'String.format': {
-                        'String.format("{0} {1}", "h", "v")': "h v",
-                        'String.format("{a}", {a: 1})': "1"
+                    'String#trim': '"      abcd  ".trim()',
+                    'String#capitalize': '"abcd".capitalize()',
+                    'String#toCamelCase': '"font-size".toCamelCase()',
+                    'String.format': function(){
+                        String.format("{0} {1}", "h", "v"); // "h v",
+                        String.format("{a}", {a: 1}); // "1"
                     },
                     'Date': '-',
-                    'Date.now': {
-                        'Date.now()': function (value) {
-                            return value > 0;
-                        }
-                    },
+                    'Date.now': 'Date.now()',
                     'JPlus & Global': '-',
                     'JPlus.id': 'JPlus.id++',
-                    'window.execScript': {
-                        'window.execScript("Demo.assert.log(false)")': function (value, assert) {
-                            assert.logged("false")
-                        }
-                    },
+                    'JPlus.version': 'JPlus.version',
+                    'window.execScript': 'window.execScript("Demo.assert.log(false)")',
                     '浏览器判断': '-',
-                    '判断指定的浏览器(基于UA)': {
-                        'navigator.isIE': '-',
-                        'navigator.isIE6': '-',
-                        'navigator.isIE7': '-',
-                        'navigator.isIE8': '-',
-                        'navigator.isIE9': '-',
-                        'navigator.isFirefox': '-',
-                        'navigator.isOpera': '-',
-                        'navigator.isChrome': '-',
-                        'navigator.isSafari': '-'
-                    },
+                    '判断指定的浏览器(基于UA)': 'navigator.isIE6',
                     '判断是否支持 HTML5（非 IE6/7/8）': 'navigator.isStd',
                     '判断是否为老浏览器（IE6/7）': 'navigator.isQuirks',
                     '获取浏览器名字': 'navigator.name',

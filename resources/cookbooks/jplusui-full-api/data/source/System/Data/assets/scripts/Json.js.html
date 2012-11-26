@@ -1,0 +1,70 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Data\assets\scripts\Json.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">
+
+<span id="JSON">/**
+ * 提供解析 JSON 的函数。
+ */</span>
+var JSON = JSON || {};
+	
+Object.extend(JSON, {
+	
+	specialChars: {'\b': '\\b', '\t': '\\t', '\n': '\\n', '\f': '\\f', '\r': '\\r', '&quot;' : '\\&quot;', '\\': '\\\\'},
+
+	replaceChars: function(chr){
+		return JSON.specialChars[chr] || '\\u00' + Math.floor(chr.charCodeAt() / 16).toString(16) + (chr.charCodeAt() % 16).toString(16);
+	},
+
+	encode: function(obj){
+		switch (typeof obj){
+			case 'string':
+				return '&quot;' + obj.replace(/[\x00-\x1f\\&quot;]/g, JSON.replaceChars) + '&quot;';
+			case 'object':
+				if (obj) {
+					if (Array.isArray(obj)) {
+						return '[' + String(Object.map(obj, JSON.encode, [])) + ']';
+					}
+					var s = [];
+					for (var key in obj) {
+						s.push(JSON.encode(key) + ':' + JSON.encode(obj[key]));
+					}
+					return '{' + s + '}';
+				}
+			default:
+				return String(obj);
+		}
+	},
+
+	decode: function(string){
+		if (typeof string != 'string' || !string.length) return null;
+		
+		// 摘自 json2.js
+		if (/^[\],:{}\s]*$/
+                    .test(string.replace(/\\(?:[&quot;\\\/bfnrt]|u[\da-fA-F]{4})/g, '@')
+                        .replace(/&quot;[^&quot;\\\n\r]*&quot;|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
+                        .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
+
+        	return new Function('return ' + string)();
+        	
+        }
+        
+        throw new SyntaxError('JSON.parse: unexpected character\n' + value);
+	}
+
+});
+
+Object.extendIf(JSON, {
+	stringify: JSON.encode,
+	parse: JSON.decode
+});
+
+</pre>
+</body>
+</html>

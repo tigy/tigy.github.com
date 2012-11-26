@@ -1,0 +1,132 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Suggest\assets\scripts\DropDownMenu.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+imports(&quot;Controls.Form.ListBox&quot;);
+using(&quot;System.Dom.KeyNav&quot;);
+using(&quot;Controls.Core.ListControl&quot;);
+
+<span id="DropDownMenu">/**
+ * 表示一个下拉菜单。用于 Suggest 和 ComboBox 组件。
+ * @extends ListControl
+ */</span>
+var DropDownMenu = ListControl.extend({
+
+    xtype: &quot;listbox&quot;,
+
+    <span id="_handleUpDown">/**
+	 * 处理上下按键。
+     * @private
+	 */</span>
+    _handleUpDown: function (next) {
+
+        // 如果菜单未显示。
+        if (this.isDropDownHidden()) {
+
+            // 显示菜单。
+            this.showDropDown();
+        } else {
+
+            var item = this.dropDown._hovering;
+
+            if (item) {
+                item = item[next ? 'next' : 'prev']();
+            }
+
+            if (!item) {
+                item = this.dropDown[next ? 'first' : 'last']();
+            }
+
+            this.dropDown.hovering(item);
+        }
+    },
+
+    <span id="_handleEnter">/**
+	 * 处理回车键。
+     * @private
+	 */</span>
+    _handleEnter: function (next) {
+        if (this.isDropDownHidden()) {
+            return true;
+        }
+
+        // 交给下列菜单处理。
+        this.dropDown.selectCallback(this.dropDown._hovering);
+    },
+
+    onItemClick: function (item) {
+        this.selectCallback(item);
+        return false;
+    },
+
+    <span id="constructor">/**
+     * 设置当前下拉菜单的所有者。绑定所有者的相关事件。
+     */</span>
+    constructor: function (options) {
+
+        assert(options &amp;&amp; options.owner &amp;&amp; options.selectCallback, &quot;DropDownMenu#constructor(options): {options} 必须有 owner 和 selectCallback 字段&quot;, options);
+        
+	    var me = this;
+
+        // 创建原生节点。
+	    me.node = options.node ? Dom.getNode(options.node) : me.create();
+    	
+    	// 执行父类的构造函数。
+        ListControl.prototype.init.apply(me, arguments);
+    	
+    	// 设置鼠标移到某项后高亮某项。
+        me.itemOn('mouseover', me.hovering);
+        
+        // 绑定下拉菜单的点击事件
+        me.itemOn('mousedown', me.onItemClick);
+
+        options.owner.keyNav({
+
+            up: function () {
+                me._handleUpDown.call(this, false);
+            },
+
+            down: function () {
+                me._handleUpDown.call(this, true);
+            },
+
+            enter: me._handleEnter,
+
+            esc: function(){
+            	this.hideDropDown();
+            },
+
+            other: options.updateCallback
+
+        });
+
+        me.selectCallback = options.selectCallback.bind(options.owner);
+		
+	},
+
+    <span id="hovering">/**
+     * 重新设置当前高亮项。
+     */</span>
+	hovering: function (item) {if(window.aa++ &gt;= 2)debugger
+	    var clazz = 'x-' + this.xtype + '-hover';
+
+	    if (this._hovering) {
+	        this._hovering.removeClass(clazz);
+	    }
+
+	    this._hovering = item ? item.addClass(clazz) : null;
+	    return this;
+	}
+
+});</pre>
+</body>
+</html>

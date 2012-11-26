@@ -1,0 +1,127 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>TabbableControl.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author  xuld
+ */
+
+
+using(&quot;Controls.Core.Base&quot;);
+
+
+<span id="TabbableControl">/**
+ * 表示一个可以切换的选项卡。
+ * @abstract class TabbableControl
+ * @extends Control
+ */</span>
+var TabbableControl = Control.extend({
+	
+	<span id="TabbableControl-prototype-collapseDuration">/**
+	 * 折叠效果使用的时间。
+	 */</span>
+	collapseDuration: 200,
+	
+	<span id="TabbableControl-prototype-item">/**
+	 * 获取指定位置的选项卡。
+	 * @return {Dom} 返回选项卡。
+	 */</span>
+	item: Dom.prototype.child,
+	
+	<span id="TabbableControl-prototype-add">/**
+	 * 添加一个选项卡到列表末尾。
+	 * @param {String} title 添加的标题。
+	 * @param {String} content 添加的内容。
+	 */</span>
+	add: function (title, content) {
+	    return this.addAt(1 / 0, title, content);
+	},
+	
+	<span id="TabbableControl-prototype-addAt">/**
+	 * 添加一个选项卡到指定位置。
+	 * @param {Integer} index 添加的位置。
+	 * @param {String} title 添加的标题。
+	 * @param {String} content 添加的内容。
+	 */</span>
+	addAt: Function.empty,
+
+    <span id="TabbableControl-prototype-onToggleTab">/**
+     * 当被子类重写时，实现选项卡切换逻辑。
+     * @param {Dom} to 切换的目标选项卡。
+     * @param {Dom} from 切换的源选项卡。
+     * @param {Function} callbacl 切换完成后的回调函数。
+     * @protected abstract
+     */</span>
+	onToggleTab: Function.empty,
+
+	<span id="TabbableControl-prototype-removeAt">/**
+	 * 删除指定位置选项卡。
+	 * @param {Integer} index 删除的位置。
+	 * @return {Dom} 被删除的选项卡。
+	 */</span>
+	removeAt: function (index) {
+	    if (this.getSelectedIndex() === index) {
+	        this.setSelectedIndex(index + 1);
+	    }
+	    return this.removeChild(this.item(index));
+	},
+
+	<span id="TabbableControl-prototype-selectTab">/**
+	 * 模拟选中一个选项卡。
+	 * @param {Dom} value 要选中的选项卡。
+	 * @return this
+	 */</span>
+	selectTab: function (value) {
+	    var me = this, old;
+	    if (me.trigger('selecting', value) !== false) {
+	        old = me.getSelectedTab();
+	        me.onToggleTab(old, value);
+	        if(!(old ? old.equals(value) : value)){
+	            me.trigger('change');
+	        }
+	    }
+	    return me;
+	},
+
+	<span id="TabbableControl-prototype-getSelectedTab">/**
+	 * 获取当前选中的选项卡。
+	 * @return {Dom} 选中的选项卡。
+	 */</span>
+    getSelectedTab: Function.empty,
+	
+	<span id="TabbableControl-prototype-setSelectedTab">/**
+	 * 设置当前选中的选项卡。
+	 * @param {Dom} value 要选中的选项卡。
+	 * @return this
+	 */</span>
+    setSelectedTab: function (value) {
+        this.onToggleTab(this.getSelectedTab(), value);
+		return this;
+	},
+	
+	<span id="TabbableControl-prototype-getSelectedIndex">/**
+	 * 获取当前选中的选项卡位置。
+	 * @return {Integer} 选中的选项卡位置。
+	 */</span>
+	getSelectedIndex: function(){
+		var tab = this.getSelectedTab();
+		return tab ? tab.index() : -1;
+	},
+	
+	<span id="TabbableControl-prototype-setSelectedIndex">/**
+	 * 设置当前选中的选项卡位置。
+	 * @param {Integer} value 需要选中的位置。
+	 * @return this
+	 */</span>
+	setSelectedIndex: function(value){
+	    return this.setSelectedTab(this.item(value));
+	}
+
+}).addEvents('change');</pre>
+</body>
+</html>

@@ -1,0 +1,102 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Ajax\assets\scripts\Script.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * AJAX 传输 JavaScript 。
+ * @author xuld
+ */
+
+using(&quot;System.Ajax.Base&quot;);
+
+Ajax.accepts.script = &quot;text/javascript, application/javascript, application/ecmascript, application/x-ecmascript&quot;;
+
+Ajax.dataParsers.script = function (xhrObject) {
+    window.execScript(this.text(xhrObject));
+};
+
+Ajax.transports.script = function (xhrObject, parseData, done) {
+    if (!xhrObject.crossDomain) {
+        return Ajax.transports.text(xhrObject, parseData &amp;&amp; function (xhrObject) {
+            this.script(xhrObject);
+            return parseData(xhrObject);
+        }, done);
+    }
+
+    var script, t, callback;
+
+    xhrObject.type = &quot;GET&quot;;
+
+    // cache
+    if (xhrObject.cache !== false) {
+        xhrObject.cache = false;
+
+        xhrObject.url = Ajax.addCachePostfix(xhrObject.url);
+    }
+
+    // data
+    if (xhrObject.data) {
+        xhrObject.url = Ajax.concatUrl(xhrObject.url, xhrObject.data);
+        xhrObject.data = null;
+    }
+
+    xhrObject.xhr = script = document.createElement('SCRIPT');
+
+    xhrObject.owner.callback = callback = function (eventArgs, error) {
+        var script = xhrObject.xhr;
+        if (script &amp;&amp; (error || !script.readyState || !/in/.test(script.readyState))) {
+
+            // 删除 callback 避免再次执行。
+            xhrObject.owner.callback = Function.empty;
+
+            // 删除全部绑定的函数。
+            script.onerror = script.onload = script.onreadystatechange = null;
+
+            // 删除当前脚本。
+            script.parentNode.removeChild(script);
+
+            // 清空对 script 的引用。
+            script = null;
+
+            // 执行全部回调。
+            if (error) {
+                Ajax.done(xhrObject, error, error, &quot;&quot;, eventArgs, done);
+            } else {
+                Ajax.done(xhrObject, 0, 200, &quot;OK&quot;, parseData || Function.empty, done);
+            }
+
+        }
+    };
+
+    script.src = xhrObject.url;
+    script.type = &quot;text/javascript&quot;;
+    script.async = &quot;async&quot;;
+    if (xhrObject.charset)
+        script.charset = xhrObject.charset;
+
+    // 预处理数据。
+    if (xhrObject.start &amp;&amp; xhrObject.start.call(xhrObject.owner, xhrObject.data, xhrObject) === false)
+        return callback('Prevented', -3);
+
+    script.onload = script.onreadystatechange = callback;
+
+    script.onerror = function (e) {
+        callback('Script Execute Error', 2);
+    };
+
+    if (xhrObject.timeouts &gt; 0) {
+        setTimeout(function () {
+            callback('Timeout', -2);
+        }, xhrObject.timeouts);
+    }
+
+    t = document.getElementsByTagName(&quot;SCRIPT&quot;)[0];
+    t.parentNode.insertBefore(script, t);
+};</pre>
+</body>
+</html>

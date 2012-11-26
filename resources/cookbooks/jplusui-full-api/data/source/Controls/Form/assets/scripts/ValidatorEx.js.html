@@ -1,0 +1,81 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Form\assets\scripts\ValidatorEx.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+using(&quot;Controls.Form.Validator&quot;);
+
+Validator.get = function (dom) {
+    dom = Dom.get(dom);
+    var dataField = dom.dataField();
+    return dataField.validator || (dataField.validator = Validator.init(dom));
+}
+
+Validator.init = (function(){
+
+    function initInput(dom) {
+        var options = {
+            target: dom,
+            rules: {
+                
+            }
+        };
+
+        if(dom.getAttr('required')) {
+            options.rules.required = true;
+            dom.setAttr('required', null);
+        }
+
+        if(dom.getAttr('pattern')) {
+            options.rules.pattern = new RegExp(dom.getAttr('pattern'));
+            dom.setAttr('pattern', null);
+        }
+
+        if(dom.getAttr('minlength')) {
+            var val = +dom.getAttr('minlength');
+            if(val &gt; 0) {
+                options.rules.minLength = val;
+                dom.setAttr('minlength', null);
+            }
+        }
+
+        return new Validator(options);
+    }
+
+    function initForm(dom) {
+        var options = {
+            target: dom,
+            rules: {
+                
+            }
+        };
+
+        dom.query('[name]').each(function (dom) {
+            dom = new Dom(dom);
+            rules[dom.getAttr('name')] = initInput(dom);
+        });
+
+        return new Validator.Form(options);
+    }
+
+    return function(target){
+
+        if(target.node.tagName === 'FORM') {
+            return initForm(target);
+        } else {
+            return initInput(target);
+        }
+
+    }
+
+})();
+</pre>
+</body>
+</html>

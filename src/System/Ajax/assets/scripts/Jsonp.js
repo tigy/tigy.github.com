@@ -45,6 +45,14 @@ Ajax.transports.jsonp = function (xhrObject, parseData) {
     });
 };
 
+/**
+ * 发送一个 jsonp 请求。
+ * @method Ajax.jsonp
+ * @param {String} [url] 请求的地址。
+ * @param {Object} [data] 请求的数据。
+ * @param {String} [onsuccess] 请求成功时的回调。
+ * @param {String} [onerror] 请求失败时的回调。
+ */
 Ajax.jsonp = function(url, data, onsuccess, onerror) {
     if (typeof data === 'function') {
         onerror = onsuccess;

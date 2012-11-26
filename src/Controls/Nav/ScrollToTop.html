@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-        <meta name="dpl-info" content="status=ok" />
+        <meta name="dpl-info" content="status=complete" />
 		<title>滚到顶部</title>
 		
         <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css" />
@@ -18,13 +18,15 @@
 	<body style="height: 2000px;">
 
         <article class="demo">
+            
+            <p class="demo">往下滚，    然后看右下角 :)</p>
 
             <aside class="demo">
 
-                <a id="a" href="#" class="x-scrolltotop">回到顶部</a>
+                <a id="scrollToTop" href="#" class="x-scrolltotop" title="返回顶部">返回顶部</a>
 
                 <script>
-                    var a = new ScrollToTop('a');
+                    var scrollToTop = new ScrollToTop('scrollToTop');
                 </script>
 
             </aside>

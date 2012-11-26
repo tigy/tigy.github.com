@@ -1,0 +1,111 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Suggest\assets\scripts\Suggest.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+
+using(&quot;Controls.Core.IDropDownOwner&quot;);
+using(&quot;Controls.Suggest.DropDownMenu&quot;);
+
+<span id="Suggest">/**
+ * 智能提示组件。
+ * @extends Control
+ */</span>
+var Suggest = Control.extend(IDropDownOwner).implement({
+
+    /**
+	 * 创建当前 Suggest 的菜单。
+	 * @return {Dom} 下拉菜单。
+	 * @protected virtual
+	 */
+    createDropDown: function (existDom) {
+        return new DropDownMenu({
+            node: existDom,
+            owner: this,
+            selectCallback: this.selectItem,
+            updateCallback: this.showDropDown
+        }).addClass('x-suggest');
+    },
+
+    <span id="onDropDownShow">/**
+	 * 当下拉菜单被显示时执行。
+     * @protected override
+	 */</span>
+    onDropDownShow: function () {
+		
+	    var text = this.getText();
+	    var items = this.getSuggestItems(text);
+
+        // 如果智能提示的项为空或唯一项就是当前的项，则不提示。
+	    if (!items || !items.length || (items.length === 1 &amp;&amp; items[0] === text)) {
+	        return this.hideDropDown();
+	    }
+
+	    this.dropDown.set(items);
+
+        // 默认选择当前值。
+	    this.dropDown.hovering(this.dropDown.item(0));
+
+    },
+	
+    init: function(options){
+		
+        // 关闭原生的智能提示。
+        this.setAttr('autocomplete', 'off')
+        	
+        	// 创建并设置提示的下拉菜单。
+        	.setDropDown(this.createDropDown(this.next('x-suggest')))
+			
+			// 获取焦点后更新智能提示显示状态。
+            .on('focus', this.showDropDown)
+            
+            // 失去焦点后隐藏菜单。
+            .on('blur', function () {
+                this.hideDropDown();
+            });
+		
+    },
+
+    <span id="getSuggestItems">/**
+     * 根据当前的文本框值获取智能提示的项。
+     */</span>
+	getSuggestItems: function(text){
+	    if (!text) {
+	        return this.suggestItems;
+	    }
+
+		text = text.toLowerCase();
+		return this.suggestItems.filter(function (value) {
+			return value.toLowerCase().indexOf(text) &gt;= 0;
+		});
+	},
+	
+    <span id="setSuggestItems">/**
+     * 强制设置当前选中的项。
+     */</span>
+	setSuggestItems: function(value){
+	    this.suggestItems = value || [];
+		return this;
+	},
+
+    /**
+     * 模拟用户选择一项。
+     */
+	selectItem: function (item) {
+	    if (item) {
+	        this.setText(item.getText());
+	    }
+	    return this.hideDropDown();
+	}
+	
+});</pre>
+</body>
+</html>

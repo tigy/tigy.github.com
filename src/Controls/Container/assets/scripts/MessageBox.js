@@ -134,13 +134,18 @@ MessageBox.confirm = function (text, title, onOk, onCancel) {
     return messageBox;
 };
 
-MessageBox.tip = function (text, icon, timeout) {
+MessageBox.tip = function (text, icon, timeout, callback) {
 
     var messageBox = MessageBox.tipInstance || (MessageBox.tipInstance = new MessageBox());
-
+	
     messageBox.setContent(text).setIcon(icon).showDialog();
 
-    messageBox.timer = setTimeout(messageBox.close.bind(messageBox), timeout || 3000);
+    messageBox.timer = setTimeout(function(){
+    	messageBox.close();
+    	if(callback){
+    		callback.call(messageBox);
+    	}
+    }, timeout || 3000);
 
     return messageBox;
 };

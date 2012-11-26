@@ -1,0 +1,52 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Suggest\assets\scripts\CharCounter.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+
+var CharCounter = Control.extend({
+
+    maxLength: 300,
+
+    tpl: '&lt;span class=&quot;x-charcounter&quot;&gt;&lt;/span&gt;',
+
+    message: '还可以输入&lt;span class=&quot;x-charcounter-success&quot;&gt; {0} &lt;/span&gt;个字符',
+
+    errorMessage: '已超过&lt;span class=&quot;x-charcounter-error&quot;&gt; {0} &lt;/span&gt;个字符',
+    
+    isValidated: function(){
+    	return this.target.getText().length &lt;= this.maxLength;
+    },
+
+    update: function () {
+        var len = this.target.getText().length - this.maxLength;
+        if (len &gt; 0) {
+            this.setHtml(String.format(this.errorMessage, len, this.maxLength));
+        } else {
+            this.setHtml(String.format(this.message, -len, this.maxLength));
+        }
+    },
+
+    constructor: function (target, maxLength, tip) {
+        this.target = target = Dom.get(target);
+        if (maxLength)
+            maxLength = this.maxLength;
+        tip = (tip ? Dom.get(tip) : target.siblings('.x-charcounter').item(0)) || target.after(this.tpl);
+        this.node = tip.node;
+
+        target.on('keyup', this.update, this);
+
+        this.update();
+    }
+
+});</pre>
+</body>
+</html>

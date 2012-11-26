@@ -30,12 +30,31 @@ var Ajax = (function () {
 
     ajaxLocParts = rUrl.exec(ajaxLoc.toLowerCase()) || [];
 
+	/**
+	 * @class Ajax
+	 */
     Ajax = Deferrable.extend({
 
-        /**
-		 * Ajax 对象。
-		 * @constructor Ajax
+		/**
+		 * 当前 Ajax 对象的默认配置。
+		 * @type {Object}
 		 */
+		options: {
+			
+			/**
+			 * 默认的地址。
+			 * @type {String}
+			 */
+			url: ajaxLoc,
+
+			/**
+			 * 默认超时数。
+			 * @type {Number}
+			 */
+			timeout: -1,
+
+		},
+
         constructor: function () {
 
         },
@@ -44,33 +63,35 @@ var Ajax = (function () {
 		 * 发送一个 AJAX 请求。
 		 * @param {Object} xhrObject 发送的配置。
 		 *
-		 * //  accepts - 请求头的 accept ，默认根据 dataType 生成。
-		 * async - 是否为异步的请求。默认为 true 。
-		 * cache - 是否允许缓存。默认为 true 。
-		 * charset - 请求的字符编码。
-		 * complete(statusCode, xhrObject) - 请求完成时的回调。
-		 * //  contentType - 请求头的 Content-Type 。默认为 'application/x-www-form-urlencoded; charset=UTF-8'。
-		 * // createNativeRequest() - 创建原生 XHR 对象的函数。
-		 * crossDomain - 指示 AJAX 强制使用跨域方式的请求。默认为 null,表示系统自动判断。
-		 * data - 请求的数据。
-		 * dataType - 请求数据的类型。默认为根据返回内容自动识别。
-		 * error(message, xhrObject) - 请求失败时的回调。
-		 * headers - 附加的额外请求头信息。
-		 * jsonp - 如果使用 jsonp 请求，则指示 jsonp 参数。如果设为 false，则不添加后缀。默认为 callback。
-		 * jsonpCallback - jsonp请求回调函数名。默认为根据当前时间戳自动生成。
-		 * //  mimeType - 用于覆盖原始 mimeType 的 mimeType 。
-		 * //  getResponse(data) - 用于解析请求数据用的回调函数。
-		 * password - 请求的密码 。
-		 * start(data, xhrObject) - 请求开始时的回调。return false 可以终止整个请求。
-		 * success(data, xhrObject) - 请求成功时的回调。
-		 * timeout - 请求超时时间。单位毫秒。默认为 -1 无超时 。
-		 * type - 请求类型。默认是 "GET" 。
-		 * url - 请求的地址。
-		 * username - 请求的用户名 。
+		 * - async: 是否为异步的请求。默认为 true 。
+		 * - cache: 是否允许缓存。默认为 true 。
+		 * - charset: 请求的字符编码。
+		 * - complete(statusCode, xhrObject): 请求完成时的回调。
+		 * - crossDomain: 指示 AJAX 强制使用跨域方式的请求。默认为 null,表示系统自动判断。
+		 * - data: 请求的数据。
+		 * - dataType: 请求数据的类型。默认为根据返回内容自动识别。
+		 * - error(message, xhrObject): 请求失败时的回调。
+		 * - headers: 附加的额外请求头信息。
+		 * - jsonp: 如果使用 jsonp 请求，则指示 jsonp 参数。如果设为 false，则不添加后缀。默认为 callback。
+		 * - jsonpCallback: jsonp请求回调函数名。默认为根据当前时间戳自动生成。
+		 * - password: 请求的密码 。
+		 * - start(data, xhrObject): 请求开始时的回调。return false 可以终止整个请求。
+		 * - success(data, xhrObject): 请求成功时的回调。
+		 * - timeout: 请求超时时间。单位毫秒。默认为 -1 无超时 。
+		 * - type: 请求类型。默认是 "GET" 。
+		 * - url: 请求的地址。
+		 * - username: 请求的用户名 。
 		 *
 		 * @param {String} link='wait' 当出现两次并发的请求后的操作。
+		 * 
+		 * - wait: 等待上个任务完成。
+		 * - ignore: 忽略新的任务。
+		 * - stop: 正常中断上个任务，上个操作的回调被立即执行，然后执行当前任务。
+		 * - abort: 强制停止上个任务，上个操作的回调被忽略，然后执行当前任务。
+		 * - replace: 替换上个任务为新的任务，上个任务的回调将被复制。
+		 * @return this
 		 */
-        run: function (xhrObject, link) {
+        send: function (xhrObject, link) {
             var me = this, parts;
 
             // 串联请求。
@@ -79,13 +100,13 @@ var Ajax = (function () {
                 // 首先复制默认配置，然后复制用户对应的配置。
                 xhrObject = Object.extend({
                     owner: me,
-                    timeout: -1
+                    timeout: me.options.timeout
                 }, xhrObject);
 
                 assert(!xhrObject.url || xhrObject.url.replace, "Ajax#run(xhrObject): {xhrObject.url} 必须是字符串。", xhrObject.url);
 
                 // url
-                xhrObject.url = xhrObject.url ? xhrObject.url.replace(/#.*$/, "") : ajaxLoc;
+                xhrObject.url = xhrObject.url ? xhrObject.url.replace(/#.*$/, "") : me.options.url;
 
                 // data
                 xhrObject.data = xhrObject.data ? typeof xhrObject.data !== 'string' ? Ajax.param(xhrObject.data) : xhrObject.data : null;
@@ -115,6 +136,7 @@ var Ajax = (function () {
 
         /**
 		 * 停止当前的请求。
+		 * @protected override
 		 * @return this
 		 */
         pause: function () {
@@ -122,13 +144,55 @@ var Ajax = (function () {
                 this.callback('Aborted', -3);
             return this;
         }
+	
+        /**
+         * 由 XHR 负责调用的状态检测函数。
+         * @param {Object} extraArgs 忽略的参数。
+         * @param {Integer} errorCode 系统控制的错误码。
+         *
+         * - 0: 成功。
+         * - -1: 程序出现异常，导致进程中止。
+         * - -2: HTTP 相应超时， 程序自动终止。
+         * - -3: 用户强制中止操作。
+         * - 1: HTTP 成功相应，但返回的状态码被认为是不对的。
+         * - 2: HTTP 成功相应，但返回的内容格式不对。
+         * @method callback
+         * @private 
+         */
 
     });
-
+	
+	/**
+	 * @namespace Ajax
+	 */
     Object.extend(Ajax, {
-
+		
+		/**
+		 * 发送一个新的 AJAX 请求。
+		 * @param {Object} xhrObject 发送的配置。
+		 *
+		 * - async: 是否为异步的请求。默认为 true 。
+		 * - cache: 是否允许缓存。默认为 true 。
+		 * - charset: 请求的字符编码。
+		 * - complete(statusCode, xhrObject): 请求完成时的回调。
+		 * - crossDomain: 指示 AJAX 强制使用跨域方式的请求。默认为 null,表示系统自动判断。
+		 * - data: 请求的数据。
+		 * - dataType: 请求数据的类型。默认为 text。
+		 * - error(message, xhrObject): 请求失败时的回调。
+		 * - headers: 附加的额外请求头信息。
+		 * - jsonp: 如果使用 jsonp 请求，则指示 jsonp 参数。如果设为 false，则不添加后缀。默认为 callback。
+		 * - jsonpCallback: jsonp请求回调函数名。默认为根据当前时间戳自动生成。
+		 * - password: 请求的密码 。
+		 * - start(data, xhrObject): 请求开始时的回调。return false 可以终止整个请求。
+		 * - success(data, xhrObject): 请求成功时的回调。
+		 * - timeout: 请求超时时间。单位毫秒。默认为 -1 无超时 。
+		 * - type: 请求类型。默认是 "GET" 。
+		 * - url: 请求的地址。
+		 * - username: 请求的用户名 。
+		 *
+		 */
         send: function (xhrObject) {
-            return new Ajax().run(xhrObject);
+            return new Ajax().send(xhrObject);
         },
 
         transports: {},
@@ -259,9 +323,10 @@ var Ajax = (function () {
         }
 
     });
-
+    
     /**
      * 根据 xhr 获取响应。
+     * @ignore
      * @type {Object} xhrObject 要处理的原始 xhrObject。
      */
     Ajax.dataParsers.text = function (xhrObject) {
@@ -280,6 +345,7 @@ var Ajax = (function () {
 
     /**
      * 发送指定配置的 Ajax 对象。
+     * @ignore
      * @type {Object} xhrObject 要发送的 AJAX 对象。
      * @type {Function} parseData 使用当前发送器发送数据后的回调函数。
      */
@@ -332,18 +398,6 @@ var Ajax = (function () {
         // 请求对象。
         xhrObject.xhr = xhr = Ajax.createNativeRequest();
 
-        /**
-         * 由 XHR 负责调用的状态检测函数。
-         * @param {Object} _ 忽略的参数。
-         * @param {Integer} errorCode 系统控制的错误码。
-         *
-         * - 0: 成功。
-         * - -1: 程序出现异常，导致进程中止。
-         * - -2: HTTP 相应超时， 程序自动终止。
-         * - -3: 用户强制中止操作。
-         * - 1: HTTP 成功相应，但返回的状态码被认为是不对的。
-         * - 2: HTTP 成功相应，但返回的内容格式不对。
-         */
         xhrObject.owner.callback = callback = function (eventArgs, error) {
 
             // xhr
@@ -461,6 +515,26 @@ var Ajax = (function () {
         // 发送完成。
 
     };
+	
+	/**
+	 * 发送一个 get 请求。
+	 * @method get
+	 * @param {String} [url] 请求的地址。
+	 * @param {Object} [data] 请求的数据。
+	 * @param {String} [onsuccess] 请求成功时的回调。
+	 * @param {String} [onerror] 请求失败时的回调。
+	 * @param {String} dataType='text' 请求数据的类型。默认为 text。
+	 */
+
+	/**
+	 * 发送一个 post 请求。
+	 * @method post
+	 * @param {String} [url] 请求的地址。
+	 * @param {Object} [data] 请求的数据。
+	 * @param {String} [onsuccess] 请求成功时的回调。
+	 * @param {String} [onerror] 请求失败时的回调。
+	 * @param {String} dataType='text' 请求数据的类型。默认为 text。
+	 */
 
     Object.map("get post", function (type) {
 

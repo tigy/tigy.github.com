@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Ajax.prototype.options.timeout',"source":'Base_2.js',"sourceFile":'data/source/Base_2.js.html#Ajax-prototype-options-timeout',"summary":'<p>\u9ed8\u8ba4\u8d85\u65f6\u6570\u3002</p>\n',"type":'Number',"name":'timeout',"memberOf":'Ajax.prototype.options',"defaultValue":'-1',"memberType":'field'});

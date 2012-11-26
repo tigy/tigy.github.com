@@ -1,0 +1,659 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Browser\assets\scripts\SimulateIE.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">//===========================================
+//  兼容IE   simuldateie.js     
+//===========================================
+
+// 
+// if(!document.all){
+// //zzcv的ff ie兼容脚本
+// /*脚本没有解决的问题及处理:
+// 
+// 2.IE下,可以使用()或[]获取集合类对象;Firefox下,只能使用[]获取集合类对象. 
+// 解决方法:统一使用[]获取集合类对象. 
+// 3.IE下,可以使用获取常规属性的方法来获取自定义属性,也可以使用getAttribute()获取自定义属性;Firefox下,只能使用getAttribute()获取自定义属性. 
+// 解决方法:统一通过getAttribute()获取自定义属性. 
+// 4.IE下,HTML对象的ID可以作为document的下属对象变量名直接使用;Firefox下则不能.
+// 5.Firefox下,可以使用与HTML对象ID相同的变量名;IE下则不能。
+// 解决方法:使用document.getElementById(&quot;idName&quot;)代替document.idName.最好不要取HTML对象ID相同的变量名,以减少错误;在声明变量时,一律加上var,以避免歧义. 
+// 6.IE下input.type属性为只读;但是Firefox下input.type属性为读写. 
+// 8.IE下,可以通过showModalDialog和showModelessDialog打开模态和非模态窗口;Firefox下则不能
+// 9.Firefox的body在body标签没有被浏览器完全读入之前就存在；而IE的body则必须在body标签被浏览器完全读入之后才存在
+// 10.
+// */
+// 
+// 
+// //文档兼容
+// HTMLDocument.prototype.__defineGetter__(&quot;all&quot;,function(){
+    // return this.getElementsByName(&quot;*&quot;);});
+// 
+// HTMLFormElement.constructor.prototype.item=function(s){
+    // return this.elements[s];};
+// 
+// HTMLCollection.prototype.item=function(s){
+    // return this[s];};
+//     
+// //事件兼容
+// window.constructor.prototype.__defineGetter__(&quot;event&quot;,function(){
+    // for(var o=arguments.callee.caller,e=null;o!=null;o=o.caller){
+        // e=o.arguments[0];
+        // if(e&amp;&amp;(e instanceof Event))
+            // return e;}
+    // return null;});
+// 
+// window.constructor.prototype.attachEvent=HTMLDocument.prototype.attachEvent=HTMLElement.prototype.attachEvent=function(e,f){
+    // this.addEventListener(e.replace(/^on/i,&quot;&quot;),f,false);};
+// 
+// window.constructor.prototype.detachEvent=HTMLDocument.prototype.detachEvent=HTMLElement.prototype.detachEvent=function(e,f){
+    // this.removeEventListener(e.replace(/^on/i,&quot;&quot;),f,false);};
+// 
+// 
+// with(window.Event.constructor.prototype){
+    // __defineGetter__(&quot;srcElement&quot;,function(){
+        // return this.target;});
+// 
+    // __defineSetter__(&quot;returnValue&quot;,function(b){
+        // if(!b)this.preventDefault();});
+// 
+    // __defineSetter__(&quot;cancelBubble&quot;,function(b){
+        // if(b)this.stopPropagation();});
+// 
+    // __defineGetter__(&quot;fromElement&quot;,function(){
+        // var o=(this.type==&quot;mouseover&quot;&amp;&amp;this.relatedTarget)||(this.type==&quot;mouseout&quot;&amp;&amp;this.target)||null;
+        // if(o)
+            // while(o.nodeType!=1)
+                // o=o.parentNode;
+        // return o;});
+// 
+    // __defineGetter__(&quot;toElement&quot;,function(){
+        // var o=(this.type==&quot;mouseover&quot;&amp;&amp;this.target)||(this.type==&quot;mouseout&quot;&amp;&amp;this.relatedTarget)||null;
+        // if(o)
+            // while(o.nodeType!=1)
+                // o=o.parentNode;
+        // return o;});
+// 
+    // __defineGetter__(&quot;x&quot;,function(){
+        // return this.pageX;});
+// 
+    // __defineGetter__(&quot;y&quot;,function(){
+        // return this.pageY;});
+// 
+    // __defineGetter__(&quot;offsetX&quot;,function(){
+        // return this.layerX;});
+// 
+    // __defineGetter__(&quot;offsetY&quot;,function(){
+        // return this.layerY;});
+// }
+// //节点操作兼容
+// with(window.Node.prototype){
+    // replaceNode=function(o){
+        // this.parentNode.replaceChild(o,this);}
+// 
+    // removeNode=function(b){
+        // if(b)
+            // return this.parentNode.removeChild(this);
+        // var range=document.createRange();
+        // range.selectNodeContents(this);
+        // return this.parentNode.replaceChild(range.extractContents(),this);}
+// 
+    // swapNode=function(o){
+        // return this.parentNode.replaceChild(o.parentNode.replaceChild(this,o),this);}
+// 
+    // contains=function(o){
+        // return o?((o==this)?true:arguments.callee(o.parentNode)):false;}
+// }
+// // //HTML元素兼容
+// // with(window.HTMLElement.prototype){
+    // // __defineGetter__(&quot;parentElement&quot;,function(){
+        // // return (this.parentNode==this.ownerDocument)?null:this.parentNode;});
+// // 
+    // // __defineGetter__(&quot;children&quot;,function(){
+        // // var c=[];
+        // // for(var i=0,cs=this.childNodes;i&lt;cs.length;i++){
+            // // if(cs[i].nodeType==1)
+                // // c.push(cs[i]);}
+        // // return c;});
+// // 
+    // // __defineGetter__(&quot;canHaveChildren&quot;,function(){
+        // // return !/^(area|base|basefont|col|frame|hr|img|br|input|isindex|link|meta|param)$/i.test(this.tagName);});
+// // 
+    // // __defineSetter__(&quot;outerHTML&quot;,function(s){
+        // // var r=this.ownerDocument.createRange();
+        // // r.setStartBefore(this);
+        // // void this.parentNode.replaceChild(r.createContextualFragment(s),this);
+        // // return s;});
+    // // __defineGetter__(&quot;outerHTML&quot;,function(){
+        // // var as=this.attributes;
+        // // var str=&quot;&lt;&quot;+this.tagName;
+        // // for(var i=0,al=as.length;i&lt;al;i++){
+            // // if(as[i].specified)
+                // // str+=&quot; &quot;+as[i].name+&quot;=&quot;&quot;+as[i].value+&quot;&quot;&quot;;}
+        // // return this.canHaveChildren?str+&quot;&gt;&quot;:str+&quot;&gt;&quot;+this.innerHTML+&quot;&lt;/&quot;+this.tagName+&quot;&gt;&quot;;});
+// // 
+    // // __defineSetter__(&quot;innerText&quot;,function(s){
+        // // return this.innerHTML=document.createTextNode(s);});
+    // // __defineGetter__(&quot;innerText&quot;,function(){
+        // // var r=this.ownerDocument.createRange();
+        // // r.selectNodeContents(this);
+        // // return r.toString();});
+// // 
+    // // __defineSetter__(&quot;outerText&quot;,function(s){
+        // // void this.parentNode.replaceChild(document.createTextNode(s),this);
+        // // return s});
+    // // __defineGetter__(&quot;outerText&quot;,function(){
+        // // var r=this.ownerDocument.createRange();
+        // // r.selectNodeContents(this);
+        // // return r.toString();});
+// // 
+    // // insertAdjacentElement=function(s,o){
+        // // return (s==&quot;beforeBegin&quot;&amp;&amp;this.parentNode.insertBefore(o,this))||(s==&quot;afterBegin&quot;&amp;&amp;this.insertBefore(o,this.firstChild))||(s==&quot;beforeEnd&quot;&amp;&amp;this.appendChild(o))||(s==&quot;afterEnd&quot;&amp;&amp;((this.nextSibling)&amp;&amp;this.parentNode.insertBefore(o,this.nextSibling)||this.parentNode.appendChild(o)))||null;}
+// // 
+    // // insertAdjacentHTML=function(s,h){
+        // // var r=this.ownerDocument.createRange();
+        // // r.setStartBefore(this);
+        // // this.insertAdjacentElement(s,r.createContextualFragment(h));}
+// // 
+    // // insertAdjacentText=function(s,t){
+        // // this.insertAdjacentElement(s,document.createTextNode(t));}
+// // }
+// //XMLDOM兼容
+// window.ActiveXObject=function(s){
+    // switch(s){
+        // case &quot;XMLDom&quot;:
+        // document.implementation.createDocument.call(this,&quot;text/xml&quot;,&quot;&quot;, null);
+        // //domDoc = document.implementation.createDocument(&quot;text/xml&quot;,&quot;&quot;, null);
+        // break;
+        // }
+    // }
+// 
+// XMLDocument.prototype.LoadXML=function(s){
+    // for(var i=0,cs=this.childNodes,cl=childNodes.length;i&lt;cl;i++)
+        // this.removeChild(cs[i]);
+    // this.appendChild(this.importNode((new DOMParser()).parseFromString(s,&quot;text/xml&quot;).documentElement,true));}
+// 
+// XMLDocument.prototype.selectSingleNode=Element.prototype.selectSingleNode=function(s){
+    // return this.selectNodes(s)[0];}
+// XMLDocument.prototype.selectNodes=Element.prototype.selectNodes=function(s){
+    // var rt=[];
+    // for(var i=0,rs=this.evaluate(s,this,this.createNSResolver(this.ownerDocument==null?this.documentElement:this.ownerDocument.documentElement),XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,null),sl=rs.snapshotLength;i&lt;sl;i++)
+        // rt.push(rs.snapshotItem(i));
+    // return rt;}
+// 
+// XMLDocument.prototype.__proto__.__defineGetter__(&quot;xml&quot;,function(){
+    // try{
+        // return new XMLSerializer().serializeToString(this);}
+    // catch(e){
+        // return document.createElement(&quot;div&quot;).appendChild(this.cloneNode(true)).innerHTML;}});
+// Element.prototype.__proto__.__defineGetter__(&quot;xml&quot;,function(){
+    // try{
+        // return new XMLSerializer().serializeToString(this);}
+    // catch(e){
+        // return document.createElement(&quot;div&quot;).appendChild(this.cloneNode(true)).innerHTML;}});
+// 
+// XMLDocument.prototype.__proto__.__defineGetter__(&quot;text&quot;,function(){
+    // return this.firstChild.textContent;});
+// 
+// Element.prototype.__proto__.__defineGetter__(&quot;text&quot;,function(){
+    // return this.textContent;});
+// Element.prototype.__proto__.__defineSetter__(&quot;text&quot;,function(s){
+    // return this.textContent=s;});
+// 
+// }
+// 
+
+
+
+
+// BROWSER.firefox = document.getBoxObjectFor &amp;&amp; USERAGENT.indexOf('firefox') != -1 &amp;&amp; USERAGENT.substr(USERAGENT.indexOf('firefox') + 8, 3);
+// 
+// if(BROWSER.firefox &amp;&amp; window.Event){// 修正Event的DOM
+// 
+    // Event.prototype.__defineSetter__(&quot;returnValue&quot;,function(b){//
+// 
+        // if(!b)this.preventDefault();
+// 
+        // return b;
+// 
+        // });
+// 
+    // Event.prototype.__defineSetter__(&quot;cancelBubble&quot;,function(b){// 设置或者检索当前事件句柄的层次冒泡
+// 
+        // if(b)this.stopPropagation();
+// 
+        // return b;
+// 
+        // });
+// 
+    // Event.prototype.__defineGetter__(&quot;srcElement&quot;,function(){
+// 
+        // var node=this.target;
+// 
+        // while(node.nodeType!=1)node=node.parentNode;
+// 
+        // return node;
+// 
+        // });
+// 
+    // Event.prototype.__defineGetter__(&quot;fromElement&quot;,function(){// 返回鼠标移出的源节点
+// 
+        // var node;
+// 
+        // if(this.type==&quot;mouseover&quot;)
+// 
+            // node=this.relatedTarget;
+// 
+        // else if(this.type==&quot;mouseout&quot;)
+// 
+            // node=this.target;
+// 
+        // if(!node)return;
+// 
+        // while(node.nodeType!=1)node=node.parentNode;
+// 
+        // return node;
+// 
+        // });
+// 
+    // Event.prototype.__defineGetter__(&quot;toElement&quot;,function(){// 返回鼠标移入的源节点
+// 
+        // var node;
+// 
+        // if(this.type==&quot;mouseout&quot;)
+// 
+            // node=this.relatedTarget;
+// 
+        // else if(this.type==&quot;mouseover&quot;)
+// 
+            // node=this.target;
+// 
+        // if(!node)return;
+// 
+        // while(node.nodeType!=1)node=node.parentNode;
+// 
+        // return node;
+// 
+        // });
+// 
+    // Event.prototype.__defineGetter__(&quot;offsetX&quot;,function(){
+// 
+        // return this.layerX;
+// 
+        // });
+// 
+    // Event.prototype.__defineGetter__(&quot;offsetY&quot;,function(){
+// 
+        // return this.layerY;
+// 
+        // });
+// 
+    // }
+// 
+// if(BROWSER.firefox &amp;&amp; window.Document){// 修正Document的DOM
+// 
+    // }
+// if(BROWSER.firefox &amp;&amp; window.Node){// 修正Node的DOM
+// 
+    // Node.prototype.replaceNode=function(Node){// 替换指定节点
+// 
+        // this.parentNode.replaceChild(Node,this);
+// 
+        // }
+// 
+    // Node.prototype.removeNode=function(removeChildren){// 删除指定节点
+// 
+        // if(removeChildren)
+// 
+            // return this.parentNode.removeChild(this);
+// 
+        // else{
+// 
+            // var range=document.createRange();
+// 
+            // range.selectNodeContents(this);
+// 
+            // return this.parentNode.replaceChild(range.extractContents(),this);
+// 
+            // }
+// 
+        // }
+// 
+    // Node.prototype.swapNode=function(Node){// 交换节点
+// 
+        // var nextSibling=this.nextSibling;
+// 
+        // var parentNode=this.parentNode;
+// 
+        // node.parentNode.replaceChild(this,Node);
+// 
+        // parentNode.insertBefore(node,nextSibling);
+// 
+        // }
+// 
+    // }
+// 
+// if(BROWSER.firefox &amp;&amp; window.HTMLElement){
+// 
+    // HTMLElement.prototype.__defineGetter__(&quot;all&quot;,function(){
+// 
+        // var a=this.getElementsByTagName(&quot;*&quot;);
+// 
+        // var node=this;
+// 
+        // a.tags=function(sTagName){
+// 
+            // return node.getElementsByTagName(sTagName);
+// 
+            // }
+// 
+        // return a;
+// 
+        // });
+// 
+    // HTMLElement.prototype.__defineGetter__(&quot;parentElement&quot;,function(){
+// 
+        // if(this.parentNode==this.ownerDocument)return null;
+// 
+        // return this.parentNode;
+// 
+        // });
+// 
+    // HTMLElement.prototype.__defineGetter__(&quot;children&quot;,function(){
+// 
+        // var tmp=[];
+// 
+        // var j=0;
+// 
+        // var n;
+// 
+        // for(var i=0;i&lt;this.childNodes.length;i++){
+// 
+            // n=this.childNodes;
+// 
+            // if(n.nodeType==1){
+// 
+                // tmp[j++]=n;
+// 
+                // if(n.name){
+// 
+                    // if(!tmp[n.name])
+// 
+                        // tmp[n.name]=[];
+// 
+                    // tmp[n.name][tmp[n.name].length]=n;
+// 
+                    // }
+// 
+                // if(n.id)
+// 
+                    // tmp[n.id]=n;
+// 
+                // }
+// 
+            // }
+// 
+        // return tmp;
+// 
+        // });
+// 
+    // HTMLElement.prototype.__defineGetter__(&quot;currentStyle&quot;, function(){
+// 
+        // return this.ownerDocument.defaultView.getComputedStyle(this,null);
+// 
+        // });
+// 
+    // HTMLElement.prototype.__defineSetter__(&quot;outerHTML&quot;,function(sHTML){
+// 
+        // var r=this.ownerDocument.createRange();
+// 
+        // r.setStartBefore(this);
+// 
+        // var df=r.createContextualFragment(sHTML);
+// 
+        // this.parentNode.replaceChild(df,this);
+// 
+        // return sHTML;
+// 
+        // });
+// 
+    // HTMLElement.prototype.__defineGetter__(&quot;outerHTML&quot;,function(){
+// 
+        // var attr;
+// 
+        // var attrs=this.attributes;
+// 
+        // var str=&quot;&lt;&quot;+this.tagName;
+// 
+        // for(var i=0;i&lt;attrs.length;i++){
+// 
+            // attr=attrs;
+// 
+            // if(attr.specified)
+// 
+                // str+=&quot; &quot;+attr.name+'=&quot;'+attr.value+'&quot;';
+// 
+            // }
+// 
+        // if(!this.canHaveChildren)
+// 
+            // return str+&quot;&gt;&quot;;
+// 
+        // return str+&quot;&gt;&quot;+this.innerHTML+&quot;&lt;/&quot;+this.tagName+&quot;&gt;&quot;;
+// 
+        // });
+// 
+    // HTMLElement.prototype.__defineGetter__(&quot;canHaveChildren&quot;,function(){
+// 
+        // switch(this.tagName.toLowerCase()){
+// 
+            // case &quot;area&quot;:
+// 
+            // case &quot;base&quot;:
+// 
+            // case &quot;basefont&quot;:
+// 
+            // case &quot;col&quot;:
+// 
+            // case &quot;frame&quot;:
+// 
+            // case &quot;hr&quot;:
+// 
+            // case &quot;img&quot;:
+// 
+            // case &quot;br&quot;:
+// 
+            // case &quot;input&quot;:
+// 
+            // case &quot;isindex&quot;:
+// 
+            // case &quot;link&quot;:
+// 
+            // case &quot;meta&quot;:
+// 
+            // case &quot;param&quot;:
+// 
+                // return false;
+// 
+            // }
+// 
+        // return true;
+// 
+        // });
+// 
+    // HTMLElement.prototype.__defineSetter__(&quot;innerText&quot;,function(sText){
+// 
+        // var parsedText=document.createTextNode(sText);
+// 
+        // this.innerHTML=parsedText;
+// 
+        // return parsedText;
+// 
+        // });
+// 
+    // HTMLElement.prototype.__defineGetter__(&quot;innerText&quot;,function(){
+// 
+        // var r=this.ownerDocument.createRange();
+// 
+        // r.selectNodeContents(this);
+// 
+        // return r.toString();
+// 
+        // });
+// 
+    // HTMLElement.prototype.__defineSetter__(&quot;outerText&quot;,function(sText){
+// 
+        // var parsedText=document.createTextNode(sText);
+// 
+        // this.outerHTML=parsedText;
+// 
+        // return parsedText;
+// 
+        // });
+// 
+    // HTMLElement.prototype.__defineGetter__(&quot;outerText&quot;,function(){
+// 
+        // var r=this.ownerDocument.createRange();
+// 
+        // r.selectNodeContents(this);
+// 
+        // return r.toString();
+// 
+        // });
+// 
+    // HTMLElement.prototype.attachEvent=function(sType,fHandler){
+// 
+        // var shortTypeName=sType.replace(/on/,&quot;&quot;);
+// 
+        // fHandler._ieEmuEventHandler=function(e){
+// 
+            // window.event=e;
+// 
+            // return fHandler();
+// 
+            // }
+// 
+        // this.addEventListener(shortTypeName,fHandler._ieEmuEventHandler,false);
+// 
+        // }
+// 
+    // HTMLElement.prototype.detachEvent=function(sType,fHandler){
+// 
+        // var shortTypeName=sType.replace(/on/,&quot;&quot;);
+// 
+        // if(typeof(fHandler._ieEmuEventHandler)==&quot;function&quot;)
+// 
+            // this.removeEventListener(shortTypeName,fHandler._ieEmuEventHandler,false);
+// 
+        // else
+// 
+            // this.removeEventListener(shortTypeName,fHandler,true);
+// 
+        // }
+// 
+    // HTMLElement.prototype.contains=function(Node){// 是否包含某节点
+// 
+        // do if(Node==this)return true;
+// 
+        // while(Node=Node.parentNode);
+// 
+        // return false;
+// 
+        // }
+// 
+    // HTMLElement.prototype.insertAdjacentElement=function(where,parsedNode){
+// 
+        // switch(where){
+// 
+            // case &quot;beforeBegin&quot;:
+// 
+                // this.parentNode.insertBefore(parsedNode,this);
+// 
+                // break;
+// 
+            // case &quot;afterBegin&quot;:
+// 
+                // this.insertBefore(parsedNode,this.firstChild);
+// 
+                // break;
+// 
+            // case &quot;beforeEnd&quot;:
+// 
+                // this.appendChild(parsedNode);
+// 
+                // break;
+// 
+            // case &quot;afterEnd&quot;:
+// 
+                // if(this.nextSibling)
+// 
+                    // this.parentNode.insertBefore(parsedNode,this.nextSibling);
+// 
+                // else
+// 
+                    // this.parentNode.appendChild(parsedNode);
+// 
+                // break;
+// 
+            // }
+// 
+        // }
+// 
+    // HTMLElement.prototype.insertAdjacentHTML=function(where,htmlStr){
+// 
+        // var r=this.ownerDocument.createRange();
+// 
+        // r.setStartBefore(this);
+// 
+        // var parsedHTML=r.createContextualFragment(htmlStr);
+// 
+        // this.insertAdjacentElement(where,parsedHTML);
+// 
+        // }
+// 
+    // HTMLElement.prototype.insertAdjacentText=function(where,txtStr){
+// 
+        // var parsedText=document.createTextNode(txtStr);
+// 
+        // this.insertAdjacentElement(where,parsedText);
+// 
+        // }
+// 
+    // HTMLElement.prototype.attachEvent=function(sType,fHandler){
+// 
+        // var shortTypeName=sType.replace(/on/,&quot;&quot;);
+// 
+        // fHandler._ieEmuEventHandler=function(e){
+// 
+            // window.event=e;
+// 
+            // return fHandler();
+// 
+            // }
+// 
+        // this.addEventListener(shortTypeName,fHandler._ieEmuEventHandler,false);
+// 
+        // }
+// 
+    // HTMLElement.prototype.detachEvent=function(sType,fHandler){
+// 
+        // var shortTypeName=sType.replace(/on/,&quot;&quot;);
+// 
+        // if(typeof(fHandler._ieEmuEventHandler)==&quot;function&quot;)
+// 
+            // this.removeEventListener(shortTypeName,fHandler._ieEmuEventHandler,false);
+// 
+        // else
+// 
+            // this.removeEventListener(shortTypeName,fHandler,true);
+// 
+        // }
+// 
+    // }</pre>
+</body>
+</html>

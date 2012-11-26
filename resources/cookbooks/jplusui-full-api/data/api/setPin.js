@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'setPin',"source":'System\\Fx\\assets\\scripts\\ScrollSpy.js',"sourceFile":'data/source/System\\Fx\\assets\\scripts\\ScrollSpy.js.html#setPin',"summary":'<p>\ufffd\ufffd\ufffd\ufffd\u052a\ufffd\ufffd\ufffd\u01f7\ufffd\u0336\ufffd\ufffd\ufffd</p>\n',"name":'setPin',"memberOf":'',"memberType":'field'});

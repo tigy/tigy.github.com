@@ -1,18 +1,18 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/1 14:59
+ * This file is created by a tool at 2012/11/25 20:5
  *********************************************************
  * Contains: 
  *     System.Core.Base
  *     System.Dom.Base
- *     System.Utils.Deferrable
- *     System.Fx.Base
- *     System.Fx.Tween
- *     System.Fx.Animate
- *     Modules.Web.Footer
  *     Controls.Core.Base
  *     Controls.Core.ContentControl
  *     Controls.Core.IInput
  *     Controls.Button.Button
+ *     Modules.Web.Footer
+ *     System.Utils.Deferrable
+ *     System.Fx.Base
+ *     System.Fx.Tween
+ *     System.Fx.Animate
  ********************************************************/
 
 
@@ -20,8 +20,8 @@
  * System.Core.Base
  ********************************************************/
 /**
- * J+ Library, 4
- * @projectDescription jPlusUI: 简单灵活的 JS UI 组件库。
+ * J+ Library, 1.0
+ * @projectDescription jPlusUI: 一个轻量但完整的 Web UI 组件库。
  * @copyright 2011-2012 J+ Team
  * @license The BSD License
  * @author xuld
@@ -127,7 +127,7 @@
 			 * 获取当前框架的版本号。
 			 * @getter
 			 */
-			version: /*@VERSION*/4
+			version: /*@VERSION*/1.00
 
 		},
 		
@@ -183,6 +183,7 @@
 			 * @param {String} targetProperty 要基于的属性名。
 			 * @param {String} setters=undefined 设置函数的方法名数组，用空格隔开。
 			 * @param {String} getters=undefined 获取函数的方法名数组，用空格隔开。
+             * @remark 使用此函数只能传递最多 3 个参数。
 			 * @example <pre>
 			 * MyClass.defineMethods('field', 'fn1 fn2 fn3');
 			 * </pre>
@@ -214,17 +215,20 @@
 				
 				// 最后使用 implement 添加成员。
 				return this.implement(Object.map(methods, function(fnName) {
-					return function() {
+				    return function (arg0, arg1, arg2) {
 						
 						// 获取实际调用的函数目标对象。
 						var target = propertyGetterFunc ? this[propertyGetterFunc]() : this[targetProperty],
 							r;
 							
 						assert(target, "#" + targetProperty + " 不能为空。");
-						assert(!target || Object.isFunction(target[fnName]), "#" + targetProperty + "." + fnName + "(): 不是函数。");
+						assert(!target || target[fnName], "#" + targetProperty + "." + fnName + "(): 不是函数。");
+
+						r = target[fnName];
 						
-						// 调用被代理的实际函数。
-						r = target[fnName].apply(target, arguments);
+				        // 调用被代理的实际函数。
+                        // 不能使用 .apply: IE 6/7 原生函数不是 function 。
+						r = r.apply ? r.apply(target, arguments) : r(arg0, arg1, arg2);
 						
 						// 如果不是 getter，返回 this 链式引用。
 						return target === r || r === undefined ? this : r;
@@ -385,12 +389,10 @@
 			 */
 			extend: function (members) {
 
-				// 未指定函数 使用默认构造函数(Object.prototype.constructor);
+			    // 未指定函数 使用默认构造函数(Object.prototype.constructor);
 
 				// 生成子类 。
-				var subClass = hasOwnProperty.call(members = members instanceof Function ? {
-					constructor: members
-				} : (members || {}), "constructor") ? members.constructor : function () {
+			    var subClass = members && members.hasOwnProperty("constructor") ? members.constructor : function () {
 
 					// 调用父类构造函数 。
 					arguments.callee.base.apply(this, arguments);
@@ -515,8 +517,8 @@
 		 */
 		each: function (iterable, fn, scope) {
 
-			assert(!Object.isFunction(iterable), "Object.each(iterable, fn, scope): {iterable} 不能是函数。 ", iterable);
-			assert(Object.isFunction(fn), "Object.each(iterable, fn, scope): {fn} 必须是函数。", fn);
+			assert(typeof iterable !== 'function', "Object.each(iterable, fn, scope): {iterable} 不能是函数。 ", iterable);
+			assert(typeof fn === 'function', "Object.each(iterable, fn, scope): {fn} 必须是函数。", fn);
 			
 			// 如果 iterable 是 null， 无需遍历 。
 			if (iterable != null) {
@@ -604,89 +606,18 @@
 
 			// 返回目标。
 			return dest;
-		},
-
-		/**
-		 * 判断一个变量是否是数组。
-		 * @param {Object} obj 要判断的变量。
-		 * @return {Boolean} 如果是数组，返回 true， 否则返回 false。
-		 * @example
-		 * <pre>
-	     * Object.isArray([]); // true
-	     * Object.isArray(document.getElementsByTagName("div")); // false
-	     * Object.isArray(new Array); // true
-	     * </pre>
-		 */
-		isArray: Array.isArray || function (obj) {
-			return toString.call(obj) === "[object Array]";
-		},
-
-		/**
-		 * 判断一个变量是否是函数。
-		 * @param {Object} obj 要判断的变量。
-		 * @return {Boolean} 如果是函数，返回 true， 否则返回 false。
-		 * @example
-		 * <pre>
-	     * Object.isFunction(function () {}); // true
-	     * Object.isFunction(null); // false
-	     * Object.isFunction(new Function); // true
-	     * </pre>
-		 */
-		isFunction: function (obj) {
-			return toString.call(obj) === "[object Function]";
-		},
-
-		/**
-		 * 判断一个变量是否是引用变量。
-		 * @param {Object} obj 变量。
-		 * @return {Boolean} 如果 *obj* 是引用变量，则返回 **true**, 否则返回 **false** 。
-		 * @remark 此函数等效于 `obj !== null && typeof obj === "object"`
-		 * @example
-		 * <pre>
-	     * Object.isObject({}); // true
-	     * Object.isObject(null); // false
-	     * </pre>
-		 */
-		isObject: function (obj) {
-			// 只检查 null 。
-			return obj !== null && typeof obj === "object";
 		}
 
 	});
 
-	/**
-	 * @static class Function
-	 */
-	extend(Function, {
-
-		/**
-		 * 表示一个空函数。这个函数总是返回 undefined 。
-		 * @property
-		 * @type Function
-		 * @remark
-		 * 在定义一个类的抽象函数时，可以让其成员的值等于 **Function.empty** 。
-		 */
-		empty: emptyFn,
-
-		/**
-		 * 返回一个新函数，这个函数始终返回 *value*。
-		 * @param {Object} value 需要返回的参数。
-		 * @return {Function} 执行得到参数的一个函数。
-		 * @example
-		 * <pre>
-		 * var fn = Function.from(0);
-	     * fn()    // 0
-	     * </pre>
-	 	 */
-		from: function (value) {
-
-			// 返回一个值，这个值是当前的参数。
-			return function () {
-				return value;
-			}
-		}
-
-	});
+    /**
+     * 表示一个空函数。这个函数总是返回 undefined 。
+     * @property
+     * @type Function
+     * @remark
+     * 在定义一个类的抽象函数时，可以让其成员的值等于 **Function.empty** 。
+     */
+	Function.empty = emptyFn;
 
 	/**
 	 * 格式化指定的字符串。
@@ -725,7 +656,7 @@
 		// 支持参数2为数组或对象的直接格式化。
 		var toString = this;
 
-		args = arguments.length === 2 && Object.isObject(args) ? args : ap.slice.call(arguments, 1);
+		args = arguments.length === 2 && args && typeof args === 'object' ? args : ap.slice.call(arguments, 1);
 
 		// 通过格式化返回
 		return formatString ? formatString.replace(/\{+?(\S*?)\}+/g, function (match, name) {
@@ -736,44 +667,29 @@
 		}) : "";
 	};
 
-	/**
-	 * 将一个伪数组对象转为原生数组。
-	 * @param {Object} iterable 一个伪数组对象。
-	 * @param {Number} startIndex=0 转换开始的位置。
-	 * @return {Array} 返回新数组，其值和 *value* 一一对应。
-	 * @memberOf Array
-	 * @remark iterable 不支持原生的 DomList 对象。
-	 * @example
-	 * <pre>
-     * // 将 arguments 对象转为数组。
-     * Array.create(arguments); // 返回一个数组
-     *
-     * // 获取数组的子集。
-     * Array.create([4,6], 1); // [6]
-     *
-     * // 处理伪数组。
-     * Array.create({length: 1, "0": "value"}); // ["value"]
-     *
-     * </pre>
+    /**
+	 * 系统原生的数组对象。
+	 * @class Array
 	 */
-	Array.create = function (iterable, startIndex) {
-		// if(!iterable)
-		// return [];
+	if (!Array.isArray) {
 
-		// [DOM Object] 。
-		// if(iterable.item) {
-		// var r = [], len = iterable.length;
-		// for(startIndex = startIndex || 0; startIndex < len;
-		// startIndex++)
-		// r[startIndex] = iterable[startIndex];
-		// return r;
-		// }
 
-		assert(!iterable || toString.call(iterable) !== '[object HTMLCollection]' || typeof iterable.length !== 'number', 'Array.create(iterable, startIndex): {iterable} 不允许是 NodeList 。', iterable);
+	    /**
+		 * 判断一个变量是否是数组。
+		 * @param {Object} obj 要判断的变量。
+		 * @return {Boolean} 如果是数组，返回 true， 否则返回 false。
+		 * @example
+		 * <pre>
+	     * Array.isArray([]); // true
+	     * Array.isArray(document.getElementsByTagName("div")); // false
+	     * Array.isArray(new Array); // true
+	     * </pre>
+		 */
+	    Array.isArray = function (obj) {
+	        return toString.call(obj) === "[object Array]";
+	    }
 
-		// 调用 slice 实现。
-		return iterable ? ap.slice.call(iterable, startIndex) : [];
-	};
+	}
 
 	/// #if CompactMode
 
@@ -965,7 +881,7 @@
 			 * @type Boolean
 			 * @remark 就目前浏览器状况， IE6，7 中 isQuirks = true 其它浏览器都为 false 。
 			 */
-			isQuirks: !isStd && !Object.isObject(document.constructor),
+			isQuirks: !isStd && typeof document.constructor !== 'object',
 
 			/// #endif
 
@@ -1288,7 +1204,7 @@
 		 */
 		un: function (eventName, eventHandler) {
 
-			assert(!eventHandler || Object.isFunction(eventHandler), 'JPlus.Base#un(eventName, eventHandler): {eventHandler} 必须是函数。', eventHandler);
+			assert(!eventHandler || typeof eventHandler === 'function', 'JPlus.Base#un(eventName, eventHandler): {eventHandler} 必须是函数。', eventHandler);
 
 			// 获取本对象 本对象的数据内容 本事件值
 			var me = this, 
@@ -1529,36 +1445,6 @@
 				this.push(value);
 			return exists;
 		},
-		
-		/// TODO: clear
-
-		/**
-		 * 将指定的 *value* 插入到当前数组的指定位置。
-		 * @param {Number} index 要插入的位置。索引从 0 开始。如果 *index* 大于数组的长度，则插入到末尾。
-		 * @param {Object} value 要插入的内容。
-		 * @return {Number} 返回实际插入到的位置。
-		 * @example
-		 * <pre>
-	     * ["I", "you"].insert(1, "love"); //   ["I", "love", "you"]
-	     * </pre>
-		 */
-		insert: function (index, value) {
-			assert.deprected("Array#insert 即将从 System.Core.Base 移除。要使用此函数，可引用 System.Utils.Array 组件。");
-			assert.isNumber(index, "Array#insert(index, value): {index} ~");
-			var me = this, tmp;
-			if (index < 0 || index >= me.length) {
-				me[index = me.length++] = value;
-			} else {
-				tmp = ap.slice.call(me, index);
-				me.length = index + 1;
-				this[index] = value;
-				ap.push.apply(me, tmp);
-			}
-			return index;
-
-		},
-		
-		/// TODO: clear
 
 		/**
 		 * 对当前数组的每个元素调用其指定属性名的函数，并将返回值放入新的数组返回。
@@ -1748,8 +1634,8 @@
 		assert(dest != null, "Object.extend(dest, src): {dest} 不可为空。", dest);
 
 		// 直接遍历，不判断是否为真实成员还是原型的成员。
-		for (var b in src)
-			dest[b] = src[b];
+		for (var key in src)
+		    dest[key] = src[key];
 		return dest;
 	}
 
@@ -1761,7 +1647,7 @@
 	 */
 	function each(fn, scope) {
 
-		assert(Object.isFunction(fn), "Array#each(fn, scope): {fn} 必须是一个函数。", fn);
+		assert(typeof fn === 'function', "Array#each(fn, scope): {fn} 必须是一个函数。", fn);
 
 		var i = -1, me = this;
 
@@ -1842,8 +1728,7 @@ function trace() {
 
 	// 无参数的话，自动补充一个参数。
 	if (arguments.length === 0) {
-		if (!trace.$count)
-
+		if (!trace.$count)
 		return trace('(trace: ' + (trace.$count++) + ')');
 	}
 
@@ -2366,7 +2251,7 @@ function imports(namespace) {
 					return !isEmptyObject(obj.prototype) || isUpper(name, 0) ? '类' : '函数';
 
 				// 最后判断对象。
-				if (Object.isObject(obj))
+				if (obj && typeof obj === 'object')
 					return name.charAt(0) === 'I' && isUpper(name, 1) ? '接口' : '对象';
 
 				// 空成员、值类型都作为属性。
@@ -2405,8 +2290,7 @@ function imports(namespace) {
 					new APIInfo(obj, showPredefinedMembers).copyTo(r);
 				} else {
 					r.push('无法对 ' + (obj === null ? "null" : "undefined") + ' 分析');
-				}
-
+				}
 
 			};
 
@@ -2631,8 +2515,7 @@ function imports(namespace) {
 		 * 指示一个函数已过时。
 		 * @param {String} message="此成员已过时" 提示的信息。
 		 */
-		deprected: function(message) {
-
+		deprected: function(message) {
 		},
 
 		/**
@@ -2772,8 +2655,7 @@ function imports(namespace) {
 	                } else {
 	                    window["eval"].call(window, src);
 	                }
-	            } catch (e) {
-
+	            } catch (e) {
 	            } 
 	        }
 		},
@@ -2832,8 +2714,7 @@ function imports(namespace) {
 
 			} catch (e) {
 
-			    // 调试输出。
-
+			    // 调试输出。
 
 			} finally {
 
@@ -2923,8 +2804,7 @@ function imports(namespace) {
  ********************************************************/
 /**
  * @author xuld
- */
-
+ */
  
  
 // Core - 核心部分
@@ -3040,10 +2920,6 @@ function imports(namespace) {
 			constructor: function(node) {
 				assert.isNode(node, "Dom#constructor(node): {node} 必须是 DOM 节点。");
 				this.node = node;
-
-				/// TODO: clear
-				this.dom = node;
-				/// TODO: clear
 			},
 		
 			/**
@@ -3324,21 +3200,6 @@ function imports(namespace) {
 				this.returnValue = false;
 			},
 			
-			/// TODO: clear
-			
-			/**
-			 * 停止默认事件和冒泡。
-			 * @remark 此函数可以完全撤销事件。 事件处理函数中 return false 和调用 stop() 是不同的， return
-			 *         false 只会阻止当前事件其它函数执行， 而 stop() 只阻止事件冒泡和默认事件，不阻止当前事件其它函数。
-			 */
-			stop: function() {
-				assert.deprected('Dom.Event#stop() 已过时，请改用 return false 实现阻止事件。');
-				this.stopPropagation();
-				this.preventDefault();
-			},
-			
-			/// TODO: clear
-			
 			/**
 			 * 获取当前发生事件 Dom 对象。
 			 * @return {Dom} 发生事件 Dom 对象。
@@ -3363,7 +3224,7 @@ function imports(namespace) {
 		/**
 		 * 一个返回 true 的函数。
 		 */
-		returnTrue = Function.from(true),
+		returnTrue = function () { return true; },
 
 		/**
 		 * 用于测试的元素。
@@ -3993,10 +3854,7 @@ function imports(namespace) {
 	 	 * </pre>        
 		 */
 		parse: function(html, context, cachable) {
-
-			assert.notNull(html, 'Dom.parse(html, context, cachable): {html} ~');
-
-			return html.node ? html: new Dom(Dom.parseNode(html, context, cachable));
+		    return (html = Dom.parseNode(html, context, cachable)) ? html.nodeType ? new Dom(html) : html : null;
 		},
 
 		/**
@@ -4057,20 +3915,21 @@ function imports(namespace) {
 		 * @return {Element/TextNode/DocumentFragment} 如果 HTML 是纯文本，返回 TextNode。如果 HTML 包含多个节点，返回 DocumentFragment 。否则返回 Element。
 	 	 * @static
 		 */
-		parseNode: function(html, context, cachable) {
+		parseNode: function (html, context, cachable) {
 
 			// 不是 html，直接返回。
 			if( typeof html === 'string') {
 
-				var srcHTML = html;
+			    var srcHTML = html;
+
+                // 仅缓存 512B 以内的 HTML 字符串。
+			    cachable = cachable !== false && srcHTML.length < 512;
+			    context = context && context.ownerDocument || document;
+
+			    assert(context.createElement, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
 
 				// 查找是否存在缓存。
-				html = cache[srcHTML];
-				context = context && context.ownerDocument || document;
-
-				assert(context.createElement, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
-
-				if(html && html.ownerDocument === context) {
+			    if (cachable && (html = cache[srcHTML]) && html.ownerDocument === context) {
 
 					// 复制并返回节点的副本。
 					html = html.cloneNode(true);
@@ -4078,8 +3937,7 @@ function imports(namespace) {
 				} else {
 
 					// 测试查找 HTML 标签。
-					var tag = /<([\w:]+)/.exec(srcHTML);
-					cachable = cachable !== false;
+					var tag = /<([!\w:]+)/.exec(srcHTML);
 
 					if(tag) {
 
@@ -4113,11 +3971,20 @@ function imports(namespace) {
 						if (html.previousSibling) {
 							wrap = html.parentNode;
 
-							assert(context.createDocumentFragment, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
-							html = context.createDocumentFragment();
-							while (wrap.firstChild) {
-								html.appendChild(wrap.firstChild);
+							//if (createDocumentFragment) {
+							//    assert(context.createDocumentFragment, 'Dom.parseNode(html, context, cachable): {context} 必须是 DOM 节点。', context);
+							//    html = context.createDocumentFragment();
+							//    while (wrap.firstChild) {
+							//        html.appendChild(wrap.firstChild);
+							//    }
+							//} else {
+							html = new DomList();
+							for (srcHTML = wrap.firstChild; srcHTML; srcHTML = srcHTML.nextSibling) {
+							    html.push(srcHTML);
 							}
+
+							cachable = false;
+							//}
 						} else {
 
 							// 删除用于创建节点的父 DIV 标签。
@@ -4170,15 +4037,6 @@ function imports(namespace) {
 			}
 			return match(elem, selector);
 		},
-		
-		/// TODO: clear
-		
-		hasChild: function(elem, child){
-			assert.deprected("Dom.hasChild 已过时，请改用 Dom.has");
-			return Dom.has(elem, child);
-		},
-		
-		/// TODO: clear
 
 		/**
 		 * 判断指定节点之后有无存在子节点。
@@ -4509,10 +4367,10 @@ function imports(namespace) {
 					// IE and Opera will allow us to reuse the iframeDoc without re-writing the fake HTML
 					// document to it; WebKit & Firefox won't allow reusing the iframe document.
 					iframeDoc =  ( iframe.contentWindow || iframe.contentDocument ).document;
-					frameDoc.write("<!doctype html><html><body>");
+					iframeDoc.write("<!doctype html><html><body>");
 					iframeDoc.close();
 
-					elem = iframeDoc.body.appendChild( iframeDoc.createElement(nodeName) );
+					elem = iframeDoc.body.appendChild(iframeDoc.createElement(tagName));
 					display = getStyle(elem, 'display');
 					document.body.removeChild( iframe );
 				}
@@ -4536,7 +4394,7 @@ function imports(namespace) {
 
 			// 如果元素的 display 仍然为 none , 说明通过 CSS 实现的隐藏。这里默认将元素恢复为 block。
 			if(getStyle(elem, 'display') === 'none')
-				elem.style.display = elem.style.$display || Dom.defaultDisplay(elem);
+				elem.style.display = elem.style.defaultDisplay || Dom.defaultDisplay(elem);
 		},
 		
 		/**
@@ -4698,14 +4556,6 @@ function imports(namespace) {
 		implementIf: function(obj, listType) {
 			return this.implement(obj, listType, true);
 		},
-	
-		//// TODO: clear it
-		define: function(ctrl, target, setters, getters) {
-			assert.deprected("Dom.define(ctrl, target, setters, getters) 已过时，请使用 MyClass.defineMethods(target, methods)");
-
-			return ctrl.defineMethods(target, (setters + " " +  getters).trim());
-		},
-		//// TODO: clear it
 
 		/**
 		 * 表示事件的参数。
@@ -4803,7 +4653,7 @@ function imports(namespace) {
 			var elem = this.node;
 			//if (elem.nodeType == 1)
 			//	each(elem.getElementsByTagName("*"), clean);
-			while (elem = this.last(true))
+			while (elem = this.last(null))
 				this.removeChild(elem);
 			return this;
 		},
@@ -4952,7 +4802,7 @@ function imports(namespace) {
 			return this;
 		} : 'onselectstart' in div ? function(value) {
 			assert.isElement(this.node, "Dom#unselectable(value): 当前 dom 不支持此操作");
-			this.node.onselectstart = value !== false ? Function.from(false) : null;
+			this.node.onselectstart = value !== false ? function () { return false; } : null;
 			return this;
 		} : function(value) {
 			assert.isElement(this.node, "Dom#unselectable(value): 当前 dom 不支持此操作");
@@ -5049,7 +4899,7 @@ function imports(namespace) {
 					me.setStyle(key, value);
 
 				// .setKey(value)
-				else if (Object.isFunction(me[setter = 'set' + key.capitalize()]))
+				else if (typeof me[setter = 'set' + key.capitalize()] === 'function')
 					me[setter](value);
 
 				// 如果是当前对象的成员。
@@ -5058,7 +4908,7 @@ function imports(namespace) {
 					setter = me[key];
 
 					// .key(value)
-					if (Object.isFunction(setter))
+					if (typeof setter === 'function')
 						me[key](value);
 
 					// .key.set(value)
@@ -5071,7 +4921,7 @@ function imports(namespace) {
 					
 				// .on(event, value)
 				} else if (/^on(\w+)/.test(key))
-					me.on(RegExp.$1, value);
+				    value && me.on(RegExp.$1, value);
 
 				// .setAttr(attr, value);
 				else
@@ -5325,7 +5175,7 @@ function imports(namespace) {
 		 */
 		setOffset: function(offsetPoint) {
 
-			assert(Object.isObject(offsetPoint), "Dom#setOffset(offsetPoint): {offsetPoint} 必须有 'x' 和 'y' 属性。", offsetPoint);
+		    assert(offsetPoint, "Dom#setOffset(offsetPoint): {offsetPoint} 必须有 'x' 和 'y' 属性。", offsetPoint);
 			var style = this.node.style;
 
 			if (offsetPoint.y != null)
@@ -5403,22 +5253,23 @@ function imports(namespace) {
 			
 			var eventName, selector;
 			
-			if(Object.isObject(eventAndSelector)){
-				for(eventName in eventAndSelector) {
-					this.on(eventName, eventAndSelector[eventName]);
-				}
+			if (typeof eventAndSelector === 'string') {
+
+			    eventName = (/^\w+/.exec(eventAndSelector) || [''])[0];
+
+			    assert(eventName, "Dom#bind(eventAndSelector, handler): {eventAndSelector} 中不存在事件信息。正确的 eventAndSelector 格式： click.selector")
+
+			    if (selector = eventAndSelector.substr(eventName.length)) {
+			        this.delegate(selector, eventName, handler);
+			    } else {
+			        this.on(eventName, handler);
+			    }
 			} else {
-				
-				eventName = (/^\w+/.match(eventAndSelector) || [''])[0];
-					
-				assert(eventName, "Dom#bind(eventAndSelector, handler): {eventAndSelector} 中不存在事件信息。正确的 eventAndSelector 格式： click.selector")
-				
-				if(selector = eventAndSelector.substr(eventName.length)){
-					this.delegate(eventName, delegateEventName, handler);
-				} else {
-					this.on(eventName, handler);
-				}
-				
+
+			    for (eventName in eventAndSelector) {
+			        this.bind(eventName, eventAndSelector[eventName]);
+			    }
+
 			}
 			
 			return this;
@@ -5841,7 +5692,7 @@ function imports(namespace) {
 
 		/**
 		 * 获取当前 Dom 对象的指定位置的直接子节点。
-		 * @param {Integer/String/Function/Boolean} [filter] 用于查找子元素的 CSS 选择器 或者 元素在Control对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。如果 args 是小于 0 的数字，则从末尾开始计算。
+		 * @param {Integer} index 用于查找子元素的 CSS 选择器 或者 元素在 Dom 对象中的索引 或者 用于筛选元素的过滤函数 或者 true 则同时接收包含文本节点的所有节点。如果 args 是小于 0 的数字，则从末尾开始计算。
 		 * @return {Dom} 返回一个节点对象。如果不存在，则返回 null 。
 		 * @example
 		 * 获取第1个子节点。
@@ -5850,8 +5701,31 @@ function imports(namespace) {
 		 * #####JavaScript:
 		 * <pre>Dom.find("span").child(1)</pre>
 		 */
-		child: function(args) {
-			return ~args >= 0 ? this.last(~args) : this.first(args);
+		child: function(index) {
+			
+			//assert(typeof index === 'function' || typeof index === 'number' || typeof index === 'string' , 'Dom#child(index): {index} 必须是函数、数字或字符串。');
+			
+			var first = 'firstChild',
+				next = 'nextSibling',
+				isNumber = typeof index === 'number';
+			
+			if(index < 0){
+				index = ~index;
+				first = 'lastChild';
+				next = 'previousSibling';
+			}
+			
+			first = this.node[first];
+			
+			while(first){
+				if(first.nodeType === 1 && (isNumber ? index-- <= 0 : quickMatch(first, index))){
+					return new Dom(first);
+				}
+				
+				first = first[next];
+			}
+			
+			return null;
 		},
 
 		/**
@@ -5876,8 +5750,17 @@ function imports(namespace) {
 		 * closest 和 parent 最大区别就是 closest 会测试当前的元素。
 		 */
 		closest: function(selector, context) {
-			selector = typeof selector === 'function' ? selector(this, this.node) : this.match(selector) ? this : this.parent(selector);
-			return selector && (!context || Dom.get(context).has(selector)) ? selector : null;
+			var node = this.node;
+				
+			while(node) {
+				if(quickMatch(node, selector)){
+					return (!context || Dom.get(context).has(node)) ? new Dom(node) : null;
+				}
+				
+				node = node.parentNode;
+			}
+			
+			return null;
 		},
 
 		/**
@@ -6202,15 +6085,6 @@ function imports(namespace) {
 			return Dom.isHidden(this.node);
 		},
 		
-		/// TODO: clear
-		
-		hasChild: function(dom, allowSelf){
-			assert.deprected("Dom#hasChild 已过时，请改用 Dom#has");
-			return this.has(dom, allowSelf);
-		},
-		
-		/// TODO: clear
-		
 		/**
 		 * 判断一个节点是否有子节点。
 		 * @param {Dom} dom 子节点。
@@ -6247,7 +6121,7 @@ function imports(namespace) {
 		 * @return {Dom} 返回插入的新节点对象。
 		 */
 		prepend: function(ctrl, dom) {
-			return ctrl.insertBefore(dom, ctrl.first(true));
+			return ctrl.insertBefore(dom, ctrl.first(null));
 		},
 
 		/**
@@ -6267,7 +6141,7 @@ function imports(namespace) {
 		 */
 		after: function(ctrl, dom) {
 			var p = ctrl.parentControl || ctrl.parent();
-			return p ? p.insertBefore(dom, ctrl.next(true)) : null;
+			return p ? p.insertBefore(dom, ctrl.next(null)) : null;
 		},
 
 		/**
@@ -6312,41 +6186,64 @@ function imports(namespace) {
 		}
 
 	}, function(value, key) {
-		dp[key] = function(html) {
-			html = Dom.parse(html, this);
+	    dp[key] = function (html) {
 
 			var scripts,
-				i = 0,
+				i,
 				script,
-				r = value(this, html);
+				t;
 
-			if (html.node.tagName === 'SCRIPT') {
-				scripts = [html.node];
-			} else {
-				scripts = html.getElements('SCRIPT');
-			}
-
-			// 如果存在脚本，则一一执行。
-			while (script = scripts[i++]) {
-				if (!script.type || /\/(java|ecma)script/i.test(script.type)) {
-
-					if (script.src) {
-						assert(window.Ajax && Ajax.send, "必须载入 System.Request.Script 模块以支持动态执行 <script src=''>");
-						Ajax.send({
-							url: script.src,
-							type: "GET",
-							dataType: 'script',
-							async: false
-						});
-						//    script.parentNode.removeChild(script);
+	        if (html = Dom.parse(html, this)) {
+	        	if(html instanceof DomList){
+		        	t = Dom.getDocument(this.node).createDocumentFragment();
+		            for (i = 0; i < html.length; i++) {
+		                t.appendChild(html[i]);
+		            }
+		            
+		            t = new Dom(t);
+		            scripts = t.getElements('SCRIPT');
+		            if (!navigator.isStd) {
+		                scripts = new DomList(scripts);
+		            }
+		            value(this, t);
+		        } else {
+		        	t = html;
+		        	if (t.node.tagName === 'SCRIPT') {
+						scripts = [t.node];
 					} else {
-						window.execScript(script.text || script.textContent || script.innerHTML || "");
+		        	    scripts = t.getElements('SCRIPT');
+		        	    if (!navigator.isStd) {
+		        	        scripts = new DomList(scripts);
+		        	    }
 					}
-
+		        	html = value(this, t);
+	            }
+		        
+		        i = 0;
+	
+				// 如果存在脚本，则一一执行。
+				while (script = scripts[i++]) {
+					if (!script.type || /\/(java|ecma)script/i.test(script.type)) {
+	
+						if (script.src) {
+							assert(window.Ajax && Ajax.send, "必须载入 System.Ajax.Script 模块以支持动态执行 <script src=''>");
+							Ajax.send({
+								url: script.src,
+								type: "GET",
+								dataType: 'script',
+								async: false
+							});
+							//    script.parentNode.removeChild(script);
+						} else {
+							window.execScript(script.text || script.textContent || script.innerHTML || "");
+						}
+	
+					}
 				}
+				
 			}
 
-			return r;
+			return html;
 		};
 
 		DomList.prototype[key] = function(html) {
@@ -6430,7 +6327,7 @@ function imports(namespace) {
 	}
 
 	// document 函数。
-	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize first last parent child children has', function (fnName) {
+	map('on un trigger once delegate dataField getElements getPosition getSize getScroll setScroll getScrollSize has', function (fnName) {
 		document[fnName] = dp[fnName];
 	});
 	
@@ -6458,13 +6355,7 @@ function imports(namespace) {
 	/// #endif
 
 		domReady = 'DOMContentLoaded';
-		t = Event.prototype;
-		
-		/// TODO: clear
-		t.stop = ep.stop;
-		
-		/// TODO: clear
-		t.getTarget = ep.getTarget;
+		Event.prototype.getTarget = ep.getTarget;
 		
 	/// #if CompactMode
 	
@@ -6474,11 +6365,6 @@ function imports(namespace) {
 		
 		defaultEvent.initEvent = function (e) {
 			e.target = e.srcElement;
-		
-		/// TODO: clear
-			e.stop = ep.stop;
-		
-		/// TODO: clear
 			e.getTarget = ep.getTarget;
 			e.stopPropagation = ep.stopPropagation;
 			e.preventDefault = ep.preventDefault;
@@ -6488,10 +6374,12 @@ function imports(namespace) {
 			initEvent: function (e) {
 			    if (!e.getTarget) {
 			        defaultEvent.initEvent(e);
-					var node = getDocument(e.target).node;
-					e.relatedTarget = e.fromElement === e.srcElement ? e.toElement: e.fromElement;
-					e.pageX = e.clientX + node.scrollLeft;
-					e.pageY = e.clientY + node.scrollTop;
+			        e.relatedTarget = e.fromElement === e.srcElement ? e.toElement : e.fromElement;
+
+			        var eventDoc = getDocument(e.target).documentElement;
+			        e.pageX = e.clientX + (eventDoc.scrollLeft || 0) - (eventDoc.clientLeft || 0);
+			        e.pageY = e.clientY + (eventDoc.scrollTop || 0) - (eventDoc.clientTop || 0);
+
 					e.layerX = e.x;
 					e.layerY = e.y;
 					// 1 ： 单击 2 ： 中键点击 3 ： 右击
@@ -6779,7 +6667,7 @@ function imports(namespace) {
 		return function (fn, scope) {
 			
 			// 忽略参数不是函数的调用。
-			var isFn = Object.isFunction(fn);
+		    var isFn = typeof fn === 'function';
 
 			// 如果已载入，则直接执行参数。
 			if(Dom[isReadyOrIsLoad]) {
@@ -6959,6 +6847,16 @@ function imports(namespace) {
 		assert.isNode(node, 'Dom.getDocument(node): {node} ~', node);
 		return node.ownerDocument || node.document || node;
 	}
+	
+	/**
+	 * 快速判断一个节点满足制定的过滤器。
+	 * @param {Node} elem 元素。
+	 * @param {String/Function/Undefined} filter 过滤器。
+	 * @return {Boolean} 返回结果。
+	 */
+	function quickMatch(elem, filter){
+		return !filter || (typeof filter === 'string' ? /^(?:[-\w:]|[^\x00-\xa0]|\\.)+$/.test(filter) ? elem.tagName === filter.toUpperCase() : Dom.match(elem, filter) : filter(elem));
+	}
 
 	/**
 	 * 返回简单的遍历函数。
@@ -6968,20 +6866,24 @@ function imports(namespace) {
 	 */
 	function createTreeWalker(next, first) {
 		first = first || next;
-		return function(args) {
+		return function(filter) {
 			var node = this.node[first];
 			
-			// 如果存在 args 编译为函数。
-			if(args){
-				args = getFilter(args);
+			// 如果 filter === null，则表示获取任意 nodeType 的节点。
+			if(filter === null){
+				return node ? new Dom(node) : node;
 			}
 			
-			while(node) {
-				if(args ? args.call(this, node) : node.nodeType === 1)
-					return new Dom(node);
+			// 找到第一个nodeType == 1 的节点。
+			while(node && node.nodeType !== 1) {
 				node = node[next];
 			}
 			
+			// 如果存在过滤器，执行过滤器。
+			if(node && quickMatch(node, filter)){
+				return new Dom(node);
+			}
+		
 			return null;
 		};
 	}
@@ -6994,63 +6896,19 @@ function imports(namespace) {
 	 */
 	function createTreeDir(next, first) {
 		first = first || next;
-		return function(args) {
+		return function(filter) {
 			var node = this.node[first],
 				r = new DomList;
 
-			// 如果存在 args 编译为函数。
-			if (args) {
-				args = getFilter(args);
-			}
-
+			// 如果 filter === null，则表示获取任意 nodeType 的节点。
 			while (node) {
-				if (args ? args.call(this, node) : node.nodeType === 1)
+				if ((node.nodeType === 1 && quickMatch(node, filter)) || filter === null)
 					r.push(node);
 				node = node[next];
 			}
 
 			return r;
 		}
-	}
-	
-	/**
-	 * 获取一个选择器。
-	 * @param {Number/Function/String/Boolean} args 参数。
-	 * @return {Funtion} 函数。
-	 */
-	function getFilter(args) {
-		
-		// 如果存在 args，则根据不同的类型返回不同的检查函数。
-		switch (typeof args) {
-			
-			// 数字返回一个计数器函数。
-			case 'number':
-				return function(elem) {
-					return elem.nodeType === 1 && --args < 0;
-				};
-				
-				// 字符串，表示选择器。
-			case 'string':
-				if(/^(?:[-\w:]|[^\x00-\xa0]|\\.)+$/.test(args)) {
-					args = args.toUpperCase();
-					return function(elem) {
-						return elem.nodeType === 1 && elem.tagName === args;
-					};
-				}
-				return args === '*' ? null : function(elem) {
-					return elem.nodeType === 1 && Dom.match(elem, args);
-				};
-				
-				// 布尔类型，而且是 true, 返回 Function.from(true)，  表示不过滤。
-			case 'boolean':
-				args = returnTrue;
-				break;
-			
-		}
-
-		assert.isFunction(args, "Dom#xxxAll(args): {args} 必须是一个 null、函数、数字或字符串。", args);
-		
-		return args;
 	}
 	
 	/**
@@ -7477,14 +7335,303 @@ function imports(namespace) {
 })(this);
 
 /*********************************************************
+ * Controls.Core.Base
+ ********************************************************/
+/**
+ * @author  xuld
+ */
+
+
+/**
+ * 所有控件基类。
+ * @class Control
+ * @extends Dom
+ * @abstract
+ * 控件的生命周期：
+ * constructor - 创建控件对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。
+ * create - 创建本身的 dom 节点。默认为解析 #tpl 对应的 HTML 字符串，返回相应原生节点。
+ * init - 初始化控件本身。默认为空函数。
+ * attach - 添加控件对应的节点到 DOM 树。不建议重写，如果一个控件封装了多个 DOM 节点则需重写本函数。
+ * detach - 删除控件对应的节点。不建议重写，如果一个控件封装了多个 DOM 节点则需重写本函数。
+ */
+var Control = Dom.extend({
+
+	/**
+	 * xtype: 用于标记控件的 css 类。
+	 * @protected virtual
+	 */
+    xtype: "control",
+
+	/**
+	 * 当前控件的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */
+
+	/**
+	 * 当被子类重写时，生成当前控件对应的原生节点。
+	 * @param {Object} options 选项。
+     * @return {Element} 原生的 DOM 节点。
+	 * @protected virtual
+	 */
+	create: function () {
+
+		assert.isString(this.tpl, "Control#create: 无法获取或创建当前控件所关联的 DOM 节点。请为控件定义 tpl 属性或重写 create 函数。");
+
+		// 转为对 tpl解析。
+		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype));
+	},
+
+	/**
+	 * 当被子类重写时，初始化当前控件。
+	 * @param {Object} options 当前控件的初始化配置。
+	 * @protected virtual
+	 */
+	init: Function.empty,
+
+	/**
+	 * 初始化一个新的控件。
+	 * @param {String/Element/Dom/Object} [options] 绑定的节点或节点 id 或完整的配置对象，用于初始化当前控件。
+	 */
+	constructor: function (options) {
+
+		// 这是所有控件共用的构造函数。
+		var me = this,
+
+			// 临时的配置对象。
+			opt = {},
+
+			// 当前实际的节点。
+			node;
+
+		// 如果存在配置。
+		if (options) {
+
+			// 如果 options 是纯配置。
+			if (options.constructor === Object) {
+				
+                // 将配置拷贝到 opt 对象。
+				Object.extend(opt, options);
+				
+			    // 处理 node、selector、dom 字段
+				if(opt.node) {
+					node = opt.node;
+					delete opt.node;
+				} else if(opt.selector) {
+					node = Dom.find(opt.selector);
+					delete opt.selector;
+				} else if(opt.dom) {
+					node = opt.dom;
+					delete opt.dom;
+				}
+					
+				if(node){
+					node = Dom.getNode(node);
+				}
+				
+			} else {
+
+			    // 否则，尝试根据 options 找到节点。
+				node = Dom.getNode(options);
+			}
+
+		}
+
+	    // 如果 node 被找到，则使用 node，否则使用 #create(opt)生成节点。
+		me.node = node || me.create(opt);
+
+		assert.isNode(me.node, "Dom#constructor(options): Dom 对象的 {node} 不是节点。", me.node);
+
+		// 调用 init 初始化控件。
+		me.init(opt);
+
+		// 设置其它的各个选项。
+		me.set(opt);
+	}
+
+});
+/*********************************************************
+ * Controls.Core.ContentControl
+ ********************************************************/
+/**
+ * @author xuld
+ */
+
+
+/**
+ * 所有内容控件的基类。
+ * @abstract class
+ * @extends Control
+ */
+var ContentControl = Control.extend({
+	
+	// 基本属性
+
+    /**
+	 * 当前控件的 HTML 模板字符串。
+	 * @getter {String} tpl
+	 * @protected virtual
+	 */
+	tpl: '<div class="x-control">\
+			<div class="x-control-content"></div>\
+		</div>',
+	
+    /**
+	 * 获取当前容器用于存放内容的 Dom 对象。
+	 * @return {Dom}
+     * @protected virtual
+	 */
+	content: function(){
+		return this.find('x-' + this.xtype + '-content') || new Dom(this.node);
+	},
+
+    /**
+	 * 设置当前输入域的状态, 并改变控件的样式。
+     * @param {String} name 状态名。
+     * @param {Boolean} value=false 要设置的状态值。
+	 * @protected virtual
+	 */
+	state: function (name, value) {
+	    this.toggleClass('x-' + this.xtype + '-' + name, value);
+	}
+	
+}).defineMethods("content()", "setHtml getHtml setText getText");
+
+
+
+/*********************************************************
+ * Controls.Core.IInput
+ ********************************************************/
+/**
+ * @author xuld
+ */
+
+
+/**
+ * 所有表单输入控件实现的接口。
+ * @interface IInput
+ */
+var IInput = {
+	
+	/**
+	 * 获取或设置当前表单的代理输入域。
+	 * @protected
+	 * @type {Dom}
+	 */
+	inputProxy: null,
+	
+	/**
+	 * 获取当前输入域实际用于提交数据的表单域。
+	 * @return {Dom} 一个用于提交表单的数据域。
+     * @remark 此函数会在当前控件内搜索可用于提交的表单域，如果找不到，则创建返回一个 input[type=hidden] 表单域。
+	 * @protected virtual
+	 */
+	input: function () {
+        
+	    // 如果不存在隐藏域, 则创建一个。
+	    // 如果当前控件本身就是 INPUT|SELECT|TEXTAREA|BUTTON，则输入域为自身。
+	    // 否则在控件内部查找合适的输入域。
+        // 如果找不到，则创建一个 input:hidden 。
+	    return this.inputProxy || (this.inputProxy = /^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(this.node.tagName) ? new Dom(this.node) : this.find("input,select,textarea") || Dom.parse('<input type="hidden">').setAttr('name', Dom.getAttr(this.node, 'name')).appendTo(this));
+	},
+
+    /**
+	 * 设置当前输入域的状态, 并改变控件的样式。
+     * @param {String} name 状态名。常用的状态如： disabled、readonly、checked、selected、actived 。
+     * @param {Boolean} value=false 要设置的状态值。
+	 * @protected virtual
+	 */
+	state: function (name, value) {
+	    this.toggleClass('x-' + this.xtype + '-' + name, value);
+	},
+	
+	/**
+	 * 获取当前控件所在的表单。
+	 * @return {Dom} 返回当前控件所在的表单的 Dom 对象。
+	 */
+	form: function () {
+		return new Dom(this.input().node.form);
+	},
+
+	setAttr: function (name, value) {
+	    var dom = this;
+
+	    // 一些状态属性需执行 state() 
+        // 几个特殊属性需要对 input() 操作。
+	    if (/^(disabled|readonly|checked|selected|actived)$/i.test(name)) {
+	        value = value !== false;
+	        this.state(name.toLowerCase(), value);
+	        dom = this.input();
+	    } else if (/^(value|name|form)$/i.test(name)) {
+	        dom = this.input();
+	    }
+
+	    Dom.prototype.setAttr.call(dom, name, value);
+	    return this;
+	},
+
+	getAttr: function (name, type) {
+	    // 几个特殊属性需要对 input() 操作。
+	    return Dom.getAttr((/^(disabled|readonly|checked|selected|actived|value|name|form)$/i.test(name) ? this.input() : this).node, name, type);
+	},
+
+	getText: function () {
+	    return Dom.getText(this.input().node);
+	},
+
+	setText: function () {
+	    Dom.prototype.setText.apply(this.input(), arguments);
+	    return this;
+	},
+	
+	/**
+	 * 选中当前控件。
+	 * @return this
+	 */
+	select: function(){
+		Dom.prototype.select.apply(this.input(), arguments);
+		return this;
+	}
+	
+};
+/*********************************************************
+ * Controls.Button.Button
+ ********************************************************/
+/**
+ * @author  xuld
+ */
+
+
+var Button = ContentControl.extend({
+	
+	xtype: 'button',
+	
+	type: 'button',
+	
+	tpl: '<button class="x-control" type="button"></button>',
+	
+	create: function (options) {
+	    this.tpl = this.tpl.replace('type="button"', 'type="' + (options.type || this.type) + '"');
+	    return Control.prototype.create.call(this, options);
+	}
+	
+}).implement(IInput);
+
+
+/*********************************************************
+ * Modules.Web.Footer
+ ********************************************************/
+/** * @author  */
+/*********************************************************
  * System.Utils.Deferrable
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
 
 /**
- * �����첽ִ������ʱ��֤�����Ǵ��еġ�
+ * 用于异步执行任务时保证任务是串行的。
  */
 var Deferrable = Class({
 
@@ -7515,12 +7662,12 @@ var Deferrable = Class({
     },
 
     /**
-	 * ��������ͬʱ�������Ĵ���������
-	 * wait - �ȴ��ϸ��������ɡ�
-	 * ignore - ���Ե�ǰ������
-	 * stop - �����ж��ϸ��������ϸ������Ļص�������ִ�У�Ȼ��ִ�е�ǰ������
-	 * abort - �Ƿ�ֹͣ�ϸ��������ϸ������Ļص󱻺��ԣ�Ȼ��ִ�е�ǰ������
-	 * replace - �滻�ϸ�����Ϊ�µĲ������ϸ������Ļص󽫱����ơ�
+	 * 多个请求同时发生后的处理方法。
+	 * wait - 等待上个操作完成。
+	 * ignore - 忽略当前操作。
+	 * stop - 正常中断上个操作，上个操作的回调被立即执行，然后执行当前操作。
+	 * abort - 非法停止上个操作，上个操作的回调被忽略，然后执行当前操作。
+	 * replace - 替换上个操作为新的操作，上个操作的回调将被复制。
 	 */
     defer: function (args, link) {
 
@@ -7546,7 +7693,7 @@ var Deferrable = Class({
             case "ignore":
                 return true;
             default:
-                assert(link === "wait", "Deferred#defer(args, link): ��Ա {link} ������ wait��abort��stop��ignore��replace ֮һ��", link);
+                assert(link === "wait", "Deferred#defer(args, link): 成员 {link} 必须是 wait、abort、stop、ignore、replace 之一。", link);
         }
 
         this.chain(this, args);
@@ -7554,7 +7701,7 @@ var Deferrable = Class({
     },
 
     /**
-	 * �õ�ǰ���еȴ�ָ���� deferred ȫ��ִ�����Ϻ�ִ�С�
+	 * 让当前队列等待指定的 deferred 全部执行完毕后执行。
 	 */
     wait: function (deferred) {
         if (this.isRunning) {
@@ -7612,8 +7759,7 @@ var Deferrable = Class({
 /**
  * @fileOverview 提供底层的 特效算法支持。
  * @author xuld
- */
-
+ */
 
 /**
  * 特效算法基类。
@@ -7738,7 +7884,7 @@ var Fx = (function() {
 				if (options.start && options.start.call(options.target, options, me) === false) {
 					me.progress();
 				} else {
-
+					
 					me.init(options);
 					me.set(0);
 					me.time = 0;
@@ -7836,241 +7982,27 @@ var Fx = (function() {
 /*********************************************************
  * System.Fx.Tween
  ********************************************************/
-/**
- * DOM 补间动画
- * @author xuld
- */
-
-
-
-
-Object.extend(Fx, {
-	
-	/**
-	 * 用于特定 css 补间动画的引擎。 
-	 */
-	tweeners: {},
-	
-	/**
-	 * 默认的补间动画的引擎。 
-	 */
-	defaultTweeners: [],
-	
-	/**
-	 * 用于数字的动画引擎。
-	 */
-	numberTweener: {
-		get: function(target, name){
-			return Dom.styleNumber(target.node, name);
-		},
-				
-		/**
-		 * 常用计算。
-		 * @param {Object} from 开始。
-		 * @param {Object} to 结束。
-		 * @param {Object} delta 变化。
-		 */
-		compute: function(from, to, delta){
-			return (to - from) * delta + from;
-		},
-		
-		parse: function(value){
-			return typeof value == "number" ? value : parseFloat(value);
-		},
-		
-		set: function(target, name, value){
-			target.node.style[name] = value;
-		}
-	},
-
-	/**
-	 * 补间动画
-	 * @class Tween
-	 * @extends Fx
-	 */
-	Tween: Fx.extend({
-		
-		/**
-		 * 初始化当前特效。
-		 */
-		constructor: function(){
-			
-		},
-		
-		/**
-		 * 根据指定变化量设置值。
-		 * @param {Number} delta 变化量。 0 - 1 。
-		 * @override
-		 */
-		set: function(delta){
-			var options = this.options,
-				params = options.params,
-				target = options.target,
-				tweener,
-				key,
-				value;
-
-			// 对当前每个需要执行的特效进行重新计算并赋值。
-			for (key in params) {
-				value = params[key];
-				tweener = value.tweener;
-				tweener.set(target, key, tweener.compute(value.from, value.to, delta));
-			}
-		},
-		
-		/**
-		 * 生成当前变化所进行的初始状态。
-		 * @param {Object} options 开始。
-		 */
-		init: function (options) {
-				
-			// 对每个设置属性
-			var key,
-				tweener,
-				part,
-				value,
-				parsed,
-				i,
-				// 生成新的 tween 对象。
-				params = {};
-			
-			for (key in options.params) {
-
-				// value
-				value = options.params[key];
-
-				// 如果 value 是字符串，判断 += -= 或 a-b
-				if (typeof value === 'string' && (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {
-					value = part[3];
-				}
-
-				// 找到用于变化指定属性的解析器。
-				tweener = Fx.tweeners[key = key.toCamelCase()];
-				
-				// 已经编译过，直接使用， 否则找到合适的解析器。
-				if (!tweener) {
-					
-					// 如果是纯数字属性，使用 numberParser 。
-					if(key in Dom.styleNumbers) {
-						tweener = Fx.numberTweener;
-					} else {
-						
-						i = Fx.defaultTweeners.length;
-						
-						// 尝试使用每个转换器
-						while (i-- > 0) {
-							
-							// 获取转换器
-							parsed = Fx.defaultTweeners[i].parse(value, key);
-							
-							// 如果转换后结果合格，证明这个转换器符合此属性。
-							if (parsed || parsed === 0) {
-								tweener = Fx.defaultTweeners[i];
-								break;
-							}
-						}
-
-						// 找不到合适的解析器。
-						if (!tweener) {
-							continue;
-						}
-						
-					}
-
-					// 缓存 tweeners，下次直接使用。
-					Fx.tweeners[key] = tweener;
-				}
-				
-				// 如果有特殊功能。 ( += -= a-b)
-				if(part){
-					parsed = part[2];
-					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);
-					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));
-				} else {
-					parsed = tweener.parse(value);
-					i = tweener.get(options.target, key);
-				}
-				
-				params[key] = {
-					tweener: tweener,
-					from: i,
-					to: parsed		
-				};
-				
-				assert(i !== null && parsed !== null, "Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, i, parsed);
-				
-			}
-
-			options.params = params;
-		}
-	
-	}),
-	
-	createTweener: function(tweener){
-		return Object.extendIf(tweener, Fx.numberTweener);
-	}
-	
-});
-
-Object.each(Dom.styleFix, function(value, key){
-	Fx.tweeners[key] = this;
-}, Fx.createTweener({
-	set: function (target, name, value) {
-		Dom.styleFix[name].call(target, value);
-	}
-}));
-
-Fx.tweeners.scrollTop = Fx.createTweener({
-	set: function (target, name, value) {
-		target.setScroll(null, value);
-	},
-	get: function (target) {
-		return target.getScroll().y;
-	}
-});
-
-Fx.tweeners.scrollLeft = Fx.createTweener({
-	set: function (target, name, value) {
-		target.setScroll(value);
-	},
-	get: function (target) {
-		return target.getScroll().x;
-	}
-});
-
-Fx.defaultTweeners.push(Fx.createTweener({
-
-	set: navigator.isStd ? function (target, name, value) {
-		
-		target.node.style[name] = value + 'px';
-	} : function(target, name, value) {
-		try {
-			
-			// ie 对某些负属性内容报错
-			target.node.style[name] = value;
-		}catch(e){}
-	}
-
-}));
-
+/** * @author xuld */Object.extend(Fx, {		/**	 * 用于特定 css 补间动画的引擎。 
+	 */	tweeners: {},		/**	 * 默认的补间动画的引擎。 	 */	defaultTweeners: [],		/**	 * 用于数字的动画引擎。
+	 */	numberTweener: {		get: function(target, name){			return Dom.styleNumber(target.node, name);		},						/**		 * 常用计算。		 * @param {Object} from 开始。		 * @param {Object} to 结束。		 * @param {Object} delta 变化。		 */		compute: function(from, to, delta){			return (to - from) * delta + from;		},				parse: function(value){			return typeof value == "number" ? value : parseFloat(value);		},				set: function(target, name, value){			target.node.style[name] = value;		}	},	/**	 * 补间动画	 * @class Tween	 * @extends Fx	 */	Tween: Fx.extend({				/**		 * 初始化当前特效。		 */		constructor: function(){					},				/**		 * 根据指定变化量设置值。		 * @param {Number} delta 变化量。 0 - 1 。		 * @override		 */		set: function(delta){			var options = this.options,				params = options.params,				target = options.target,				tweener,				key,				value;			// 对当前每个需要执行的特效进行重新计算并赋值。			for (key in params) {				value = params[key];				tweener = value.tweener;				tweener.set(target, key, tweener.compute(value.from, value.to, delta));			}		},				/**		 * 生成当前变化所进行的初始状态。		 * @param {Object} options 开始。		 */		init: function (options) {							// 对每个设置属性			var key,				tweener,				part,				value,				parsed,				i,				// 生成新的 tween 对象。				params = {};						for (key in options.params) {				// value				value = options.params[key];				// 如果 value 是字符串，判断 += -= 或 a-b				if (typeof value === 'string' && (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {					value = part[3];				}				// 找到用于变化指定属性的解析器。				tweener = Fx.tweeners[key = key.toCamelCase()];								// 已经编译过，直接使用， 否则找到合适的解析器。				if (!tweener) {										// 如果是纯数字属性，使用 numberParser 。					if(key in Dom.styleNumbers) {						tweener = Fx.numberTweener;					} else {												i = Fx.defaultTweeners.length;												// 尝试使用每个转换器						while (i-- > 0) {														// 获取转换器							parsed = Fx.defaultTweeners[i].parse(value, key);														// 如果转换后结果合格，证明这个转换器符合此属性。							if (parsed || parsed === 0) {								tweener = Fx.defaultTweeners[i];								break;							}						}						// 找不到合适的解析器。						if (!tweener) {							continue;						}											}					// 缓存 tweeners，下次直接使用。					Fx.tweeners[key] = tweener;				}								// 如果有特殊功能。 ( += -= a-b)				if(part){					parsed = part[2];					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));				} else {					parsed = tweener.parse(value);					i = tweener.get(options.target, key);				}								params[key] = {					tweener: tweener,					from: i,					to: parsed						};								assert(i !== null && parsed !== null, "Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, i, parsed);							}			options.params = params;		}		}),		createTweener: function(tweener){		return Object.extendIf(tweener, Fx.numberTweener);	}	});Object.each(Dom.styleFix, function(value, key){	Fx.tweeners[key] = this;}, Fx.createTweener({	set: function (target, name, value) {		Dom.styleFix[name].call(target, value);	}}));Fx.tweeners.scrollTop = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(null, value);	},	get: function (target) {		return target.getScroll().y;	}});Fx.tweeners.scrollLeft = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(value);	},	get: function (target) {		return target.getScroll().x;	}});Fx.defaultTweeners.push(Fx.createTweener({	set: navigator.isStd ? function (target, name, value) {				target.node.style[name] = value + 'px';	} : function(target, name, value) {		try {						// ie 对某些负属性内容报错			target.node.style[name] = value;		}catch(e){}	}}));
 /*********************************************************
  * System.Fx.Animate
  ********************************************************/
 /**
- * @fileOverview 通过改变CSS实现的变换。
  * @author xuld
- */
-
-
-
+ */
 
 
 (function(){
 	
-	var displayEffects = Fx.displayEffects = {
-			opacity: Function.from({
-				opacity: 0
-			})
+    var opacity0 = {
+            opacity: 0
+        },
+
+        displayEffects = Fx.displayEffects = {
+            opacity: function () {
+                return opacity0;
+            }
 		},
 
 		toggle = Dom.prototype.toggle,
@@ -8112,7 +8044,9 @@ Fx.defaultTweeners.push(Fx.createTweener({
 			
 			return value;
 		};
-	}, Function.from(0));
+	}, function () {
+	    return 0;
+	});
 	
 	Object.map('left right top bottom', function(key, index) {
 		key = 'margin' + key.capitalize();
@@ -8152,6 +8086,53 @@ Fx.defaultTweeners.push(Fx.createTweener({
 		
 	}, displayEffects);
 
+	/**
+	 * 初始化 show/hide 的参数。
+	 */
+	function initArgs(args){
+	
+	   // [300]
+	   // [300, function(){}]
+	   // [300, function(){}, 'wait']
+	   // [{}]
+	   // [[opacity, 300], {}]
+	   
+		var defaultConfigs = args[1];
+		
+		// 如果有默认配置。
+		if(defaultConfigs && typeof defaultConfigs === 'object'){
+			args = args[0];
+		} else {
+			defaultConfigs = null;
+		}
+		
+		// 转换为真实的配置对象。
+		args = !args[0] || typeof args[0] !== 'object' ? {
+			duration: args[0],
+			callback: args[1],
+			link: args[2]
+		} : args[0];
+		
+		// 拷贝默认事件。
+		Object.extendIf(args, defaultConfigs);
+		
+		// 默认为 opacity 渐变。
+		if(!args.effect){
+			args.effect = 'opacity';
+		} else if(args.duration === undefined){
+			
+			// 如果指定了渐变方式又没指定时间，覆盖为默认大小。
+			args.duration = -1;
+		}
+		
+		args.callback = args.callback || Function.empty;
+		
+		assert(Fx.displayEffects[args.effect], "Dom#toggle(effect, duration, callback, link): 不支持 {effect} 。", args.effect);
+		
+		return args;
+	
+	}
+
 	Dom.implement({
 		
 		/**
@@ -8169,13 +8150,13 @@ Fx.defaultTweeners.push(Fx.createTweener({
 		
 		/**
 		 * 变化到某值。
-		 * @param {String/Object} [name] 变化的名字或变化的末值或变化的初值。
+		 * @param {Object} [params] 变化的名字或变化的末值或变化的初值。
 		 * @param {Number} duration=-1 变化的时间。
 		 * @param {Function} [oncomplete] 停止回调。
 		 * @param {String} link='wait' 变化串联的方法。 可以为 wait, 等待当前队列完成。 rerun 柔和转换为目前渐变。 cancel 强制关掉已有渐变。 ignore 忽视当前的效果。
 		 * @return this
 		 */
-		animate: function (params, duration, oncomplete, link) {
+		animate: function (params, duration, callback, link) {
 			assert.notNull(params, "Dom#animate(params, duration, oncomplete, link): {params} ~", params);
 				
 			if(params.params){
@@ -8184,14 +8165,14 @@ Fx.defaultTweeners.push(Fx.createTweener({
 				params = {
 					params: params,
 					duration: duration,
-					complete: oncomplete
+					complete: callback
 				};
 			}
 			
 			params.target = this;
 
-			assert(!params.duration || typeof params.duration === 'number', "Dom#animate(params, duration, oncomplete, link): {duration} 必须是数字。如果需要制定为默认时间，使用 -1 。", params.duration);
-			assert(!params.oncomplete || Object.isFunction(params.oncomplete), "Dom#animate(params, duration, oncomplete, link): {oncomplete} 必须是函数", params.oncomplete);
+			assert(!params.duration || typeof params.duration === 'number', "Dom#animate(params, duration, callback, link): {duration} 必须是数字。如果需要制定为默认时间，使用 -1 。", params.duration);
+			assert(!params.complete || typeof params.complete === 'function', "Dom#animate(params, duration, callback, link): {callback} 必须是函数", params.complete);
 			
 			this.fx().run(params, link);
 			
@@ -8200,85 +8181,91 @@ Fx.defaultTweeners.push(Fx.createTweener({
 		
 		/**
 		 * 显示当前元素。
-		 * @param {Number} duration=500 时间。
-		 * @param {Function} [callback] 回调。
-		 * @param {String} [type] 方式。
-		 * @return {Element} this
+		 * @param {String} [params] 显示时使用的特效。如果为 null，则表示无特效。
+		 * @param {Number} duration=300 特效持续的毫秒数。如果为 null，则表示无特效。
+		 * @param {Function} [callback] 特效执行完之后的回调。
+		 * @param {String} link='wait' 如果正在执行其它特效时的处理方式。
+		 *
+		 * - "**wait**"(默认): 等待上个效果执行完成。
+		 * - "**ignore**": 忽略新的效果。
+		 * - "**stop**": 正常中止上一个效果，然后执行新的效果。
+		 * - "**abort**": 强制中止上一个效果，然后执行新的效果。
+		 * - "**replace**": 将老的特效直接过渡为新的特效。
+		 * @return this
 		 */
 		show: function() {
 			var me = this,
-				args = arguments,
-				callback,
-				effect;
+				args = arguments;
 
-			// 如果没有参数，直接隐藏。
-			if (args[0] == undefined) {
+			// 加速空参数的 show 调用。
+			if (args.length === 0) {
 				Dom.show(me.node);
 			} else {
-
-				// 如果第一个参数是字符串。则表示是显示类型。
-				effect = typeof args[0] === 'string' ? shift.call(args) : 'opacity';
-				assert(Fx.displayEffects[effect], "Dom#show(effect, duration, callback, link): 不支持 {effect} 。", effect);
-				callback = args[1];
-
-				me.fx().run({
-					target: me,
-					duration: args[0],
-					start: function(options, fx) {
-
-						var elem = this.node,
-							t,
-							params,
-							param;
-
-						// 如果元素本来就是显示状态，则不执行后续操作。
-						if (!Dom.isHidden(elem)) {
-							if (callback)
-								callback.call(this, true, true);
-							return false;
-						}
-
-						// 首先显示元素。
-						Dom.show(elem);
-
-						// 保存原有的值。
-						options.orignal = {};
-
-						// 新建一个新的 params 。
-						options.params = params = {};
-
-						// 获取指定特效实际用于展示的css字段。
-						t = Fx.displayEffects[effect](options, elem, true);
-
-						// 保存原有的css值。
-						// 用于在hide的时候可以正常恢复。
-						for (param in t) {
-							options.orignal[param] = elem.style[param];
-						}
-
-						// 因为当前是显示元素，因此将值为 0 的项修复为当前值。
-						for (param in t) {
-							if (t[param] === 0) {
-
-								// 设置变化的目标值。
-								params[param] = Dom.styleNumber(elem, param);
-
-								// 设置变化的初始值。
-								elem.style[param] = 0;
-							} else {
-								params[param] = t[param];
+				
+				args = initArgs(args);
+				
+				// 如果 duration === null，则使用同步方式显示。
+				if(args.duration == null){
+					Dom.show(me.node);
+					args.callback.call(me, false, false);
+				} else {
+					me.fx().run({
+						target: me,
+						duration: args.duration,
+						start: function(options, fx) {
+	
+							var elem = this.node,
+								t,
+								params,
+								param;
+	
+							// 如果元素本来就是显示状态，则不执行后续操作。
+							if (!Dom.isHidden(elem)) {
+								args.callback.call(me, true, true);
+								return false;
 							}
+	
+							// 首先显示元素。
+							Dom.show(elem);
+	
+							// 保存原有的值。
+							options.orignal = {};
+	
+							// 新建一个新的 params 。
+							options.params = params = {};
+	
+							// 获取指定特效实际用于展示的css字段。
+							t = Fx.displayEffects[args.effect](options, elem, true);
+	
+							// 保存原有的css值。
+							// 用于在hide的时候可以正常恢复。
+							for (param in t) {
+								options.orignal[param] = elem.style[param];
+							}
+	
+							// 因为当前是显示元素，因此将值为 0 的项修复为当前值。
+							for (param in t) {
+								if (t[param] === 0) {
+	
+									// 设置变化的目标值。
+									params[param] = Dom.styleNumber(elem, param);
+	
+									// 设置变化的初始值。
+									elem.style[param] = 0;
+								} else {
+									params[param] = t[param];
+								}
+							}
+						},
+						complete: function(isAbort, fx) {
+	
+							// 拷贝回默认值。
+							Object.extend(this.node.style, fx.options.orignal);
+	
+							args.callback.call(me, false, isAbort);
 						}
-					},
-					complete: function(isAbort, fx) {
-
-						// 拷贝回默认值。
-						Object.extend(this.node.style, fx.options.orignal);
-
-						if (callback)
-							callback.call(this, false, isAbort);
-					}
-				}, args[2]);
+					}, args.link);
+				}
 
 			}
 		
@@ -8287,71 +8274,76 @@ Fx.defaultTweeners.push(Fx.createTweener({
 		
 		/**
 		 * 隐藏当前元素。
-		 * @param {Number} duration=500 时间。
-		 * @param {Function} [callback] 回调。
-		 * @param {String} [type] 方式。
-		 * @return {Element} this
+		 * @param {String} effect='opacity' 隐藏时使用的特效。如果为 null，则表示无特效。
+		 * @param {Number} duration=300 特效持续的毫秒数。如果为 null，则表示无特效。
+		 * @param {Function} [callback] 特效执行完之后的回调。
+		 * @param {String} link='wait' 如果正在执行其它特效时的处理方式。
+		 *
+		 * - "**wait**"(默认): 等待上个效果执行完成。
+		 * - "**ignore**": 忽略新的效果。
+		 * - "**stop**": 正常中止上一个效果，然后执行新的效果。
+		 * - "**abort**": 强制中止上一个效果，然后执行新的效果。
+		 * - "**replace**": 将老的特效直接过渡为新的特效。
+		 * @return this
 		 */
 		hide: function () {
 			var me = this,
-				args = arguments,
-				callback,
-				effect;
-			
-			// 如果没有参数，直接隐藏。
-			if (args[0] == undefined) {
+				args = arguments;
+
+			// 加速空参数的 show 调用。
+			if (args.length === 0) {
 				Dom.hide(me.node);
 			} else {
 
-				// 如果第一个参数是字符串。则表示是显示类型。
-				effect = typeof args[0] === 'string' ? shift.call(args) : 'opacity';
-				assert(Fx.displayEffects[effect], "Dom#hide(effect, duration, callback, link): 不支持 {effect} 。", effect);
-				callback = args[1];
-
-				me.fx().run({
-					target: me,
-					duration: args[0],
-					start: function(options, fx) {
-
-						var elem = this.node,
-							params,
-							param;
-
-						// 如果元素本来就是隐藏状态，则不执行后续操作。
-						if (Dom.isHidden(elem)) {
-							if (callback)
-								callback.call(this, false, true);
-							return false;
+				args = initArgs(args);
+				
+				// 如果 duration === null，则使用同步方式显示。
+				if(args.duration === null){
+					Dom.hide(me.node);
+					args.callback.call(me, false, false);
+				} else {
+					me.fx().run({
+						target: me,
+						duration: args.duration,
+						start: function(options, fx) {
+	
+							var elem = this.node,
+								params,
+								param;
+	
+							// 如果元素本来就是隐藏状态，则不执行后续操作。
+							if (Dom.isHidden(elem)) {
+								args.callback.call(me, false, true);
+								return false;
+							}
+	
+							// 保存原有的值。
+							options.orignal = {};
+	
+							// 获取指定特效实际用于展示的css字段。
+							options.params = params = Fx.displayEffects[args.effect](options, elem, false);
+	
+							// 保存原有的css值。
+							// 用于在show的时候可以正常恢复。
+							for (param in params) {
+								options.orignal[param] = elem.style[param];
+							}
+						},
+						complete: function(isAbort, fx) {
+	
+							var elem = this.node;
+	
+							// 最后显示元素。
+							Dom.hide(elem);
+	
+							// 恢复所有属性的默认值。
+							Object.extend(elem.style, fx.options.orignal);
+	
+							// callback
+							args.callback.call(me, false, isAbort);
 						}
-
-						// 保存原有的值。
-						options.orignal = {};
-
-						// 获取指定特效实际用于展示的css字段。
-						options.params = params = Fx.displayEffects[effect](options, elem, false);
-
-						// 保存原有的css值。
-						// 用于在show的时候可以正常恢复。
-						for (param in params) {
-							options.orignal[param] = elem.style[param];
-						}
-					},
-					complete: function(isAbort, fx) {
-
-						var elem = this.node;
-
-						// 最后显示元素。
-						Dom.hide(elem);
-
-						// 恢复所有属性的默认值。
-						Object.extend(elem.style, fx.options.orignal);
-
-						// callback
-						if (callback)
-							callback.call(this, false, isAbort);
-					}
-				}, args[2]);
-
+					}, args.link);
+				}
 			}
 			
 			return this;
@@ -8370,333 +8362,3 @@ Fx.defaultTweeners.push(Fx.createTweener({
 	});
 	
 })();
-
-/// TODO: clear
-
-document.animate = function() {
-	assert.deprected("document.animate 已过时，请改用 Dom.get(document).animate。");
-	var doc = Dom.get(document);
-	doc.animate.apply(doc, arguments);
-	return this;
-};
-
-/// TODO: clear
-
-/*********************************************************
- * Modules.Web.Footer
- ********************************************************/
-/**
- * @author 
- */
-
-
-
-
-/*********************************************************
- * Controls.Core.Base
- ********************************************************/
-/**
- * @author  xuld
- */
-
-
-
-
-
-
-/**
- * 所有控件基类。
- * @class Control
- * @abstract
- * 控件的周期：
- * constructor - 创建控件对应的 Javascript 类。不建议重写构造函数，除非你知道你在做什么。
- * create - 创建本身的 dom 节点。 可重写 - 默认使用 this.tpl 创建。
- * init - 初始化控件本身。 可重写 - 默认为无操作。
- * attach - 渲染控件到文档。不建议重写，如果你希望额外操作渲染事件，则重写。
- * detach - 删除控件。不建议重写，如果一个控件用到多个 dom 内容需重写。
- */
-var Control = Dom.extend({
-
-	/**
-	 * 存储当前控件的默认模板字符串。
-	 * @getter {String} tpl
-	 * @protected
-	 * @virtual
-	 */
-
-	/**
-	 * 当被子类重写时，生成当前控件。
-	 * @param {Object} options 选项。
-	 * @protected
-	 * @virtual
-	 */
-	create: function () {
-
-		assert.isString(this.tpl, "Control#create: 无法获取或创建当前控件所关联的 DOM 节点。请为控件定义 tpl 属性或重写 create 函数。");
-
-		// 转为对 tpl解析。
-		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype));
-	},
-
-	/**
-	 * 当被子类重写时，渲染控件。
-	 * @method
-	 * @param {Object} options 配置。
-	 * @protected virtual
-	 */
-	init: Function.empty,
-
-	/**
-	 * 初始化一个新的控件。
-	 * @param {String/Element/Control/Object} [options] 对象的 id 或对象或各个配置。
-	 */
-	constructor: function (options) {
-
-		// 这是所有控件共用的构造函数。
-		var me = this,
-
-			// 临时的配置对象。
-			opt = {},
-
-			// 当前实际的节点。
-			node;
-
-		// 如果存在配置。
-		if (options) {
-
-			// 如果 options 是纯配置。
-			if (options.constructor === Object) {
-				
-				Object.extend(opt, options);
-				
-				if(opt.node) {
-					node = opt.node;
-					delete opt.node;
-				} else if(opt.selector) {
-					node = Dom.find(opt.selector);
-					delete opt.selector;
-				} else if(opt.dom) {
-					node = opt.dom;
-					delete opt.dom;
-				}
-					
-				if(node){
-					node = Dom.getNode(node);
-				}
-				
-			} else {
-				node = Dom.getNode(options);
-			}
-
-		}
-
-		// 如果 dom 的确存在，使用已存在的， 否则使用 create(opt)生成节点。
-		me.node = node || me.create(opt);
-
-		assert.isNode(me.node, "Dom#constructor(options): Dom 对象的 {node} 不是节点。", me.node);
-
-		// 调用 init 初始化控件。
-		me.init(opt);
-
-		//// 如果指定的节点已经在 DOM 树上，且重写了 attach 方法，则调用之。
-		//if (me.node.parentNode && me.attach !== Control.prototype.attach) {
-		//	me.attach(me.node.parentNode, me.node.nextSibling);
-		//}
-
-		// 复制各个选项。
-		me.set(opt);
-	},
-
-	/**
-	 * xtype 。
-	 * @virtual
-	 */
-	xtype: "control"
-
-});
-/*********************************************************
- * Controls.Core.ContentControl
- ********************************************************/
-/**
- * @fileOverview 表示一个包含文本内容的控件。
- * @author xuld
- */
-
-
-/**
- * 表示一个有内置呈现的控件。
- * @abstract
- * @class ContentControl
- * @extends Control
- * 
- * <p>
- * ContentControl 的外元素是一个根据内容自动改变大小的元素。它自身没有设置大小，全部的大小依赖子元素而自动决定。
- * 因此，外元素必须满足下列条件的任何一个:
- *  <ul>
- * 		<li>外元素的 position 是 absolute<li>
- * 		<li>外元素的 float 是 left或 right <li>
- * 		<li>外元素的 display 是  inline-block (在 IE6 下，使用 inline + zoom模拟) <li>
- *  </ul>
- * </p>
- */
-var ContentControl = Control.extend({
-	
-	/**
-	 * 获取当前控件中显示文字的主 DOM 对象。
-	 */
-	content: function(){
-		return this.find('x-' + this.xtype + '-content') || new Dom(this.node);
-	},
-
-    /**
-	 * 获取或设置当前输入域的状态。
-	 * @protected
-	 */
-	state: function (name, value) {
-	    return this.toggleClass('x-' + this.xtype + '-' + name, value);
-	}
-	
-}).defineMethods("content()", "setHtml getHtml setText getText");
-
-
-
-/*********************************************************
- * Controls.Core.IInput
- ********************************************************/
-/**
- * @author xuld
- */
-
-/**
- * 所有表单输入控件实现的接口。
- * @interface IInput
- */
-var IInput = {
-
-    /**
-	 * 获取或设置当前输入域的状态。
-	 * @protected
-	 */
-    state: function (name, value) {
-        return this.toggleClass('x-' + this.xtype + '-' + name, value);
-    },
-
-    /**
-	 * 当设置文本时执行此函数。
-	 */
-    onChange: function () {
-        this.trigger('change');
-    },
-	
-	/**
-	 * 获取或设置当前表单的实际域。
-	 * @protected
-	 * @type {Control}
-	 */
-	inputProxy: null,
-	
-	///**
-	// * 创建用于在表单内保存当前输入值的隐藏域。
-	// * @return {Dom} 隐藏输入域。
-	// */
-	//createHiddenField: function(){
-	//    return Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
-	//},
-	
-	/**
-	 * 获取当前输入域实际用于提交数据的表单域。
-	 * @return {Dom} 一个用于提交表单的数据域。
-     * @remark 此函数会在当前控件内搜索可用于提交的表单域，如果找不到，则创建返回一个 hidden 表单域。
-	 */
-	input: function(){
-		
-		// 如果不存在隐藏域。
-		if(!this.inputProxy) {
-			
-			// 如果 当前元素是表单元素，直接返回。
-			if(/^(INPUT|SELECT|TEXTAREA|BUTTON)$/.test(this.node.tagName)){
-				return new Dom(this.node);
-			}
-			
-			this.inputProxy = this.find("input,select,textarea") || Dom.parse('<input type="hidden">').appendTo(this).setAttr('name', Dom.getAttr(this.node, 'name'));
-		}
-		
-		return this.inputProxy;
-	},
-	
-	/**
-	 * 获取当前控件所在的表单。
-	 * @return {Dom} 表单。
-	 */
-	form: function () {
-		return Dom.get(this.input().node.form);
-	},
-	
-	/**
-	 * 选中当前控件。
-	 * @return this
-	 */
-	select: function(){
-		Dom.prototype.select.apply(this.input(), arguments);
-		return this;
-	},
-	
-	setAttr: function (name, value) {
-		var dom = this;
-		if (/^(disabled|readonly|checked|selected|actived)$/i.test(name)) {
-		    value = value !== false;
-		    this.state(name.toLowerCase(), value);
-		    dom = this.input();
-		} else if(/^(value|name|form)$/i.test(name)) {
-			dom = this.input();
-		}
-		
-		Dom.prototype.setAttr.call(dom, name, value);
-		return this;
-	},
-	
-	getAttr: function (name, type) {
-		return Dom.getAttr((/^(disabled|readonly|checked|selected|actived|value|name|form)$/i.test(name) ? this.input() : this).node, name, type);
-	},
-	
-	getText: function(){
-		return Dom.getText(this.input().node);
-	},
-	
-	setText: function(value){
-		var old = this.getText();
-		Dom.prototype.setText.call(this.input(), value);
-		if(old !== value)
-			this.onChange();
-			
-		return this;
-	}
-	
-};
-/*********************************************************
- * Controls.Button.Button
- ********************************************************/
-/**
- * @author  xuld
- */
-
-
-
-
-
-
-
-var Button = ContentControl.extend({
-	
-	xtype: 'button',
-	
-	type: 'button',
-	
-	tpl: '<button class="x-control" type="button"></button>',
-	
-	create: function(options){
-		return Dom.parseNode(this.tpl.replace(/x-control/g, 'x-' + this.xtype).replace('type="button"', 'type="' + (options.type || this.type) + '"'));
-	}
-	
-}).implement(IInput);
-

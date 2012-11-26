@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'clone',"source":'System\\Data\\assets\\scripts\\CollectionEx.js',"sourceFile":'data/source/System\\Data\\assets\\scripts\\CollectionEx.js.html#clone',"summary":'<p>\u8fd4\u56de\u5f53\u524d\u96c6\u5408\u7684\u526f\u672c\u3002</p>\n',"name":'clone',"memberOf":'',"memberType":'method',"params":[]});

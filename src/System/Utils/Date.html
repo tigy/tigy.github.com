@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=beta">
     <title>日期扩展</title>
     <script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
     <script src="../../System/Utils/assets/scripts/Date.js" type="text/javascript"></script>
@@ -12,19 +11,11 @@
 <body>
     <article class="demo">
         <script>
-            Demo.writeTestCases({
-                'Date#toString': {
-                    'new Date(2001,2,3,4,5,6,7).toString("yyyy 年 MM 月 dd 日  yy 年 M 月 d 日   hh mm ss")': "2001 年 03 月 03 日  1 年 3 月 3 日   04 05 06"
-                },
-                'Date.isLeapYear': {
-                    'Date.isLeapYear(2002)': false
-                },
-                'Date.getDayInMonth': {
-                    'Date.getDayInMonth(2001, 2)': 28
-                },
-                'Date.compare': {
-                    'Date.compare(new Date(), new Date())': 0
-                }
+            Demo.writeExamples({
+                'Date#toString': 'new Date(2001,2,3,4,5,6,7).toString("yyyy 年 MM 月 dd 日  yy 年 M 月 d 日   hh mm ss")',
+                'Date.isLeapYear': 'Date.isLeapYear(2002)',
+                'Date.getDayInMonth': 'Date.getDayInMonth(2001, 2)',
+                'Date.compare': 'Date.compare(new Date(), new Date())'
             });
         </script>
     </article>

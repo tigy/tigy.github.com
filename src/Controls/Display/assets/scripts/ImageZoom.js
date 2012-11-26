@@ -1,35 +1,35 @@
 /**
- * @author sun
+ * @author xuld
  */
 
-$(function () {
-    $('.x-imagezoom').addClass('x-imagezoom-small').each(function (index) {
-        var $me = $(this);
-        var img = new Image();
+Dom.implement({
+	
+	imageZoom: function(getUrlCallback){
+				
+	    return this.addClass('x-imagezoom-small').on('click', function (e) {
+	    	if(this.hasClass('x-imagezoom-small')){
+	    		this.removeClass('x-imagezoom-small').addClass('x-imagezoom-large');
+	    		var oldState;
+	    		if(getUrlCallback){
+	    			this.dataField().imageZoomSrc = this.node.src;
+	    			this.node.src = getUrlCallback(this.node.src);
+	    		} else {
+	    			this.dataField().imageZoomWidth = this.getWidth();
+	    			this.dataField().imageZoomHeight = this.getHeight();
+	    			this.node.style.width = this.node.style.height = 'auto';
+	    		}
+	    	} else {
+	    		this.addClass('x-imagezoom-small').removeClass('x-imagezoom-large');
+	    		if(getUrlCallback){
+	    			this.node.src = this.dataField().imageZoomSrc;
+	    		} else {
+	    			this.setWidth(this.dataField().imageZoomWidth);
+	    			this.setHeight(this.dataField().imageZoomHeight);
+	    		}
+	    	}
+	    });
+	}
+	
+});
 
-        img.onload = function () {
-            $me.attr('data-ori', img.width);
-        }
-
-        img.src = $me.attr('src');
-
-        if (window.navigator.isIE) $me.attr('data-ori', img.width);
-    });
-
-
-    $('.x-imagezoom').click(function (e) {
-        var $me = $(this);
-        var maxWidth = $me.parent().width();
-
-        var orignalWidth = $me.attr('data-ori');
-
-        if ($me.hasClass('x-imagezoom-small')) {
-            $me.attr('data-small', $me.width());
-            var w = maxWidth > orignalWidth ? orignalWidth : maxWidth;
-            $me.width(w).removeClass('x-imagezoom-small').addClass('x-imagezoom-large');
-        } else if ($me.hasClass('x-imagezoom-large')) {
-            $me.width($me.attr('data-small')).removeClass('x-imagezoom-large').addClass('x-imagezoom-small');
-        }
-    });
-})
 

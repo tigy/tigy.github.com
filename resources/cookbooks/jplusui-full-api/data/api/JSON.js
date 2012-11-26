@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'JSON',"source":'System\\Data\\assets\\scripts\\Json.js',"sourceFile":'data/source/System\\Data\\assets\\scripts\\Json.js.html#JSON',"summary":'<p>\u63d0\u4f9b\u89e3\u6790 JSON \u7684\u51fd\u6570\u3002</p>\n',"name":'JSON',"memberOf":'',"memberType":'field'});

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=ok">
+    <meta name="dpl-info" content="status=complete">
     <title>数据选择器</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -25,182 +25,119 @@
 </head>
 <body>
 
-    <article class="demo demo-grid demo-grid-2">
+    <article class="demo">
 
-        <p class="demo">Picker 表示一个文本框加一个按钮的组合框。 选择框(ComboBox)、日期选择器(DatePicker) 等都是继承于此类实现的。</p>
+        <p class="demo">Picker 是一个底层组件，它表示一个文本框加一个按钮的组合框。 选择框(<a href="ComboBox.html">ComboBox</a>)、日期选择器(<a href="DatePicker.html">DatePicker</a>) 等都是继承于此类实现的。</p>
 
-        <h2 class="demo">1. 组件初始化</h2>
+        <h3 class="demo">HTML 结构</h3>
+        
+        <aside class="demo">
 
-        <section class="demo">
-            <h3 class="demo">最简单方式: 动态渲染 input</h3>
+            <span class="x-picker">
+                <input type="text" class="x-textbox" />
+                <button class="x-button"><span class="x-menubutton-arrow"></span></button>
+            </span>
+            
+        </aside>
+        
+        <p class="demo">Picker 最终的 DOM 结构如上。但是 Picker 在其 init函数中会对不满足上述结构的 HTML 重新渲染。</p>
 
-            <p class="demo">在 HTML 中定义一个 input, 并使用 JavaScript 动态添加按钮。</p>
+        <h3 class="demo">1. 只需写 &lt;input&gt; 即可渲染一个 Picker</h3>
 
-            <script class="demo demo-expand" type="text/html">
+        <script class="demo" type="text/html">
 
-                <input type="text" class="x-textbox" id="demo1" />
+            <input type="text" class="x-textbox" id="picker1" />
 
-                <\script>
-                    var demo1 = new Picker("demo1");
-                <\/script>
-                
-            </script>
+            <\script>
+                var picker1 = new Picker("picker1");
+            </\script>
+            
+        </script>
 
-        </section>
+        <h3 class="demo">2. 只需写 &lt;a&gt; 即可渲染一个 Picker</h3>
 
-        <section class="demo">
-            <h3 class="demo">动态渲染其它标签</h3>
+        <script class="demo" type="text/html">
 
-            <p class="demo">在 HTML 中定义一个链接, 使用 JavaScript 动态添加按钮。</p>
+            <a href="javascript:;" class="x-button" id="picker2">B</a>
 
-            <script class="demo demo-expand" type="text/html">
+            <\script>
+                var picker2 = new Picker("picker2");
+            </\script>
+            
+        </script>
 
-                <a href="javascript:;" class="x-button" id="demo2">A</a>
+        <h3 class="demo">3. 仅动态渲染一个按钮</h3>
 
-                <\script>
-                    var demo2 = new Picker("demo2");
-                <\/script>
-                
-            </script>
+        <script class="demo" type="text/html">
 
-        </section>
+            <span class="x-picker" id="picker3">
+                <input type="text" class="x-textbox" />
+            </span>
 
-        <section class="demo">
-            <h3 class="demo">仅动态渲染按钮</h3>
+            <\script>
+                var picker3 = new Picker("picker3");
+            </\script>
+            
+        </script>
 
-            <script class="demo demo-expand" type="text/html">
+        <h3 class="demo">4. 绑定下拉菜单</h3>
+        
+        <p class="demo">Picker 会自动将节点紧跟的  <code class="demo">x-dropdown</code> 作为下拉菜单。 最常见的做法是使用  <a href="DropDownMenu.html">DropDownMenu</a> 作为下拉菜单。</p>
 
-                <span class="x-picker" id="demo3">
-                    <input type="text" class="x-textbox" />
-                </span>
+        <script class="demo" type="text/html">
 
-                <\script>
-                    var demo3 = new Picker("demo3");
-                <\/script>
-                
-            </script>
+            <input type="text" class="x-textbox" id="picker4" />
+            
+            <div class="x-dropdown">
+                紧跟的 class=x-dropdown 项会被作为子菜单打开。
+            </div>
 
-        </section>
-
-        <section class="demo">
-            <h3 class="demo">完整 HTML，不动态渲染</h3>
-
-            <script class="demo demo-expand" type="text/html">
-
-                <span class="x-picker" id="demo4">
-                    <a href="javascript:;" class="x-button">B</a>
-                    <button class="x-button" onclick="trace('trigger');"><span class="x-menubutton-arrow"></span></button>
-                </span>
-
-                <\script>
-                    var demo4 = new Picker("demo4");
-                <\/script>
-                
-            </script>
-
-        </section>
-
-    </article>
-
-    <article class="demo demo-grid demo-grid-2">
-
-        <h2 class="demo">2. 设置下拉菜单</h2>
+            <\script>
+                var picker4 = new Picker("picker4");
+            </\script>
+            
+        </script>
 
         <p class="demo">Picker 使用 <a href="../Core/IDropDownOwner.html">IDropDownOwner</a> 创建和管理下拉菜单。</p>
-
-        <section class="demo">
-            <h3 class="demo">HTML 方式创建</h3>
-
-            <script class="demo demo-expand" type="text/html">
-
-                <input type="text" class="x-textbox" id="demo5" />
-
-                <div class="x-dropdown">紧跟的 class=x-dropdown 项会被作为子菜单打开。</div>
-
-                <\script>
-                    var demo5 = new Picker("demo5");
-                <\/script>
-                
-            </script>
-
-        </section>
-
-        <section class="demo">
-            <h3 class="demo">JavaScript 方式创建</h3>
-
-            <script class="demo demo-expand" type="text/html">
-
-                <a href="javascript:;" class="x-button" id="demo6">B</a>
-
-                <\script>
-                    var demo6 = new Picker("demo6");
-                    demo6.setDropDown(Dom.parse("<div>这是使用 setDropDown 定义的</div>"));
-                <\/script>
-                
-            </script>
-
-        </section>
 
     </article>
     
     <article class="demo">
         
         <h2 class="demo">常用 API</h2>
-        
-        <section class="demo demo-control demo-absolute">
+    
+        <section class="demo-sample">
             
-            <script class="demo demo-expand" type="text/html">
-                        
-                <input type="text" class="x-textbox" id="a" />
-                
-                <\script>
-                    var a = new Picker("a");
-                <\/script>
-                
-            </script>
+            <input type="text" class="x-textbox" id="picker" />
             
-            <script class="demo demo-expand" type="text/html">
-                        
-                <a href="javascript:;" class="x-button" id="b">D</a>
-                
-                <\script>
-                    var b = new Picker("b");
-                <\/script>
-                
-            </script>
-            
-        </section>
-        
-        <section class="demo demo-api">
-                
             <script>
-    
-                Demo.writeTestCases({
-                    '文本框形式': '-',
-                    
-                    '设置禁用': 'a.setAttr("disabled", true)',
-                    '取消禁用': 'a.setAttr("disabled", false)',
-                    '获取禁用状态': 'a.getAttr("disabled")',
-                    
-                    '设置只读': 'a.setAttr("readOnly", true)',
-                    '取消只读': 'a.setAttr("readOnly", false)',
-                    '获取只读状态': 'a.getAttr("readOnly")'
-                });
-    
-                Demo.writeTestCases({
-                    '纯按钮形式': '-',
-                    
-                    '设置禁用': 'b.setAttr("disabled", true)',
-                    '取消禁用': 'b.setAttr("disabled", false)',
-                    '获取禁用状态': 'b.getAttr("disabled")',
-                    
-                    '设置只读': 'b.setAttr("readOnly", true)',
-                    '取消只读': 'b.setAttr("readOnly", false)',
-                    '获取只读状态': 'b.getAttr("readOnly")'
-                });
+                var picker = new Picker("picker");
             </script>
-
+                
         </section>
+
+        <script>
+
+            Demo.writeExamples({
+                
+                '状态相关': '-',
+                '禁用': function(){
+                    picker.setAttr("disabled", true); // 设置
+                    picker.setAttr("disabled", false); // 取消
+                    picker.getAttr("disabled"); // 获取目前状态
+                },
+                '只读': function(){
+                    picker.setAttr("readOnly", true); // 设置
+                    picker.setAttr("readOnly", false); // 取消
+                    picker.getAttr("readOnly"); // 获取目前状态
+                }
+            });
+            
+        </script>
+
+        <blockquote class="demo">要控制文本框， 参考 <a href="../Core/IInput.html">IInput</a> 组件。(Picker 实现了IInput 接口)</blockquote>
+
+        <blockquote class="demo">要控制下拉菜单， 参考 <a href="../Core/IDropDownOwner.html">IDropDownOwner</a> 组件。(Picker 实现了 IDropDownOwner 接口)</blockquote>
 
     </article>
     

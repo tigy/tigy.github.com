@@ -170,15 +170,16 @@ var Validator = Class({
         if (me.complete) {
             me.complete(errorMessage, rule);
         }
-
-        // 如果当前字段关联的一个表单，且这个表单因为当前字段正在验证而导致的阻止提交时间，那么重新提交表单。
-        if (me.form && me.form.delaySubmit && me.form.errorFields) {
-            me.form.errorFields.remove(this);
-            if (!me.form.errorFields.length) {
-                me.form.errorFields = [];
-                me.form.target.submit();
-            }
-        }
+// 
+        // // 如果当前字段关联的一个表单，且这个表单因为当前字段正在验证而导致的阻止提交时间，那么重新提交表单。
+        // if (me.form && me.form.delaySubmit && me.form.errorFields) {
+//         	
+            // me.form.errorFields.remove(this);
+            // if (!me.form.errorFields.length) {
+                // me.form.errorFields = [];
+                // me.form.target.submit();
+            // }
+        // }
 
     },
 
@@ -198,7 +199,7 @@ Validator.Form = Class({
 
     event: 'submit',
 
-    delaySubmit: true,
+    //delaySubmit: true,
 
     onValidate: function () {
         return this.validate().length === 0;
@@ -214,8 +215,10 @@ Validator.Form = Class({
         // 创建每个 rules 的子 Validator 。
         for (rule in me.rules) {
             t = me.rules[rule];
-            t.target = t.target || target.query('[name="' + fieldName + '"]');
-            me.rules[rule] = new Validator(t);
+            me.rules[rule] = new Validator({
+            	target: target.query('[name="' + rule + '"]'),
+            	rules: t
+           	});
         }
 
         if (this.event) {
@@ -304,7 +307,7 @@ Validator.defaultValidators = {
     },
 
     equalsTo: function (text, args, errorMessage) {
-        return args.getText() === text ? '' : errorMessage;
+        return Dom.get(args).getText() === text ? '' : errorMessage;
     },
 
     other: function (text, args, errorMessage) {

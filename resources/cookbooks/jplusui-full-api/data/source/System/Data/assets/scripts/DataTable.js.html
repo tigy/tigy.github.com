@@ -1,0 +1,263 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Data\assets\scripts\DataTable.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">//===========================================
+//  表格数据结构   DataTable.js  MIT LICENCE
+//  Copyright(c) 2009-2010 xuld
+//===========================================
+//功能说明: 类主要用于存储类似数据库结构的表格
+//              全局变量  playjs.DataSet :  全部数据的集合
+//              一个playjs.DataSet含有多个playjs.DataTable  每个playjs.DataTable 含有一个playjs.DataTitle和多个playjs.DataRow
+//              不提供UI界面。只能作为一个数据(XML,数据库,JSON)接口。
+//最简单示例:
+//     /*  js code 
+//		* * playObject 最简单示例
+//		* * 创建一个表格并创建一个列
+//      */
+//          var Table = playjs.DataSet.add(&quot;表格名字&quot;,[&quot;标题1&quot;,&quot;标题2&quot;,&quot;标题3&quot;]);    //创建一个表格,并定义表格有哪些标题
+//			Table.add([&quot;第一行第1列&quot;,&quot;第一行第2列&quot;,&quot;第一行第3列&quot;],&quot;名字1&quot;);           //创建一行
+//          Table.add([&quot;第二行第1列&quot;,&quot;第二行第2列&quot;,&quot;第二行第3列&quot;],&quot;名字2&quot;);           //创建一行
+//			Table[&quot;名字1&quot;][&quot;标题1&quot;] = 3;             // 这样调用名字为名字1的行的第一列。
+//			Table[0][3] = 6                          // 也可以使用数字
+//			Table.play()                           // 创建一个 &lt;TABLE&gt; 标签,这个方法一般用于调试,观察所有的表格数据
+//
+//基本示例:
+//       常用方法说明: 
+//          add   增加一项
+//          del   删除一项
+//          indexOf   返回指定索引的内容
+//          find   返回指定内容索引,如果找不到有关内容,返回 -1
+//          insert   在当前位置末尾插入一个内容
+//          insertAt   在一个位置插入一个内容
+//          remove   按照内容删除,可以传入一个数组
+//          removeAt   按照索引删除
+//          search   返回当前有无指定内容
+//          getAt   返回指定索引位置,如果索引越界,返回一个 NULL
+//          length  个数
+//          key     主键
+//
+//       playjs.DataSet::add()    增加一个表,参数:如果是1个。表示表格标题,如果2个,前个参数为表格名,后个是标题。
+//       playjs.DataSet::del()    删除一个表,参数:表格名字。
+//       playjs.DataSet::table    全部表格的集合
+//                              当您添加一个表格后,要使用table集合获得该表格     playjs.DataSet.table[索引]  或 playjs.DataSet.table[名]
+//       playjs.DataSet::count    表格数
+//       playjs.DataSet::xtype    JPlus对象对自身的说明
+//       playjs.DataTable::addTitle    增加表格的标题,参数可以是数组,或逗号隔开的字符串。
+//       playjs.DataTable::addTitleAt    增加表格的标题到一个位置,第一个参数为位置(数字),第二个为标题
+//       playjs.DataTable::render    渲染到一个DIV元素
+//       playjs.DataTable::container    读取一个&lt;TABLE&gt;
+//       playjs.DataTable::sort(列,比较函数,顺序/逆序,开始位置,结束位置)    排序
+//                                 排序是使用较多的功能,使用的参数全可选,
+//                                 当没有列时,列使用主列。
+//                                 比较函数,默认是返回由小到大。
+//                                       比叫函数  2   个参数,  表示 2个列。 返回一个布尔 如 function(x,y){return x&lt;y};  这样按  x&lt;y  排序
+//                                 顺序,逆序:布尔,始排序结果相反(默认true)。   
+//                                 开始位置,开始排序的位置。  
+//       
+//==========================================
+
+
+namespace(&quot;System.Data&quot;);
+
+///	&lt;summary&gt;
+///	表格行
+///	&lt;/summary&gt;
+/// &lt;class extend=&quot;Array&quot; name=&quot;DataRow&quot; /&gt;
+JPlus.Data.DataRow = Array.extend({
+    
+    ///	&lt;summary&gt;
+	///	当前行所在的表格。
+	///	&lt;/summary&gt;
+	/// &lt;type name=&quot;ownerTable&quot; /&gt;
+    ownerTable : null,
+    
+    ///	&lt;summary&gt;
+	///	构造函数。
+	///	&lt;/summary&gt;
+	/// &lt;params name=&quot;array&quot; type=&quot;Array&quot;&gt;内容。如果不需要可等于 null。&lt;/params&gt;
+	/// &lt;params name=&quot;ownerTable&quot; type=&quot;DataTable&quot;&gt;所在的表格。&lt;/params&gt;
+    constructor : function(array,ownerTable){
+    
+        assert(array == null || Array.isArray(array),&quot;用于生成 dataRow 的参数 array必须是null或数组&quot;);
+    
+        if(array != null)
+            array.cloneTo(this);
+        this.ownerTable = ownerTable;
+    },
+
+    ///	&lt;summary&gt;
+	///	xtype。
+	///	&lt;/summary&gt;
+	/// &lt;type name=&quot;String&quot; /&gt;
+	/// &lt;const /&gt;
+	xtype : &quot;DataRow&quot;,
+	
+	///	&lt;summary&gt;
+	///	结合标题。
+	///	&lt;/summary&gt;
+	titleBind : function(){
+	
+	    assert(this.ownerTable,&quot;结合标题时必须指定行的所在表&quot;);
+	    
+		var title = this.ownerTable.title;
+		for(var i = title.length; i &gt; 0; i--)
+			this[title[i]] = this[i];
+		
+	},
+	
+	///	&lt;summary&gt;
+	///	在一个位置插入列。
+	///	&lt;/summary&gt;
+	/// &lt;params name=&quot;value&quot; type=&quot;Object&quot;&gt;内容。&lt;/params&gt;
+	insert : Array.prototype.push,
+
+	///	&lt;summary&gt;
+	///	获取或设置行的某一列的值。
+	///	&lt;/summary&gt;
+	/// &lt;params name=&quot;title&quot; type=&quot;Number&quot;&gt;列位置。&lt;/params&gt;
+	/// &lt;params name=&quot;title&quot; type=&quot;String&quot;&gt;列名。&lt;/params&gt;
+	/// &lt;params name=&quot;value&quot; type=&quot;Object&quot;&gt;内容。&lt;/params&gt;
+	/// &lt;returns type=&quot;Object&quot;&gt;内容&lt;/returns&gt;
+	valueAt : function(title,value){
+
+	    assert(typeof title == &quot;number&quot; || this.ownerTable,&quot;通过标题时必须指定行的所在表&quot;);
+	
+	    var index = typeof title == &quot;number&quot; ? title : this.ownerTable.title.indexOf(value);
+	    
+	    if(typeof value != &quot;undefined&quot;)
+	        this[index] = value;
+	        
+	    return this[index];
+	}
+
+});
+
+
+///	&lt;summary&gt;
+///	表格结构
+///	&lt;/summary&gt;
+/// &lt;class extend=&quot;Array&quot; name=&quot;DataTable&quot; /&gt;
+JPlus.Data.DataTable = Array.extend({
+    
+    ///	&lt;summary&gt;
+	///	名字。
+	///	&lt;/summary&gt;
+	/// &lt;type name=&quot;String&quot; /&gt;
+    name : null,
+    
+    ///	&lt;summary&gt;
+	///	标题。
+	///	&lt;/summary&gt;
+	/// &lt;type name=&quot;DataRow&quot; /&gt;
+    title : null,
+    
+    ///	&lt;summary&gt;
+	///	主键。
+	///	&lt;/summary&gt;
+	/// &lt;type name=&quot;String&quot; /&gt;
+    key : null,
+    
+    ///	&lt;summary&gt;
+	///	当前排序列。默认null。
+	///	&lt;/summary&gt;
+	/// &lt;type name=&quot;String&quot; /&gt;
+    sortBy : null,
+    
+    ///	&lt;summary&gt;
+	///	构造函数。
+	///	&lt;/summary&gt;
+    constructor : function(value,name,key){
+        // [null,&quot;&quot;]  -&gt;标题
+        
+        assert(value == null || Array.isArray(value),&quot;初始化表格的value必须是数组或null值&quot;);
+        
+        if(value == null) return;
+        if(value.length || !Array.isArray(value[0]))  //二维数组
+            value = [value];
+        var me = this;
+        value.each(function(v,index){me[index] = new DataRow(v,this);});
+        
+        me.title = me[0] || new DataRow(null,me);
+        
+        me.name = name;
+        
+        me.key = key || (me.title.length ? null : me.title[0] );
+    
+    },
+    
+    ///	&lt;summary&gt;
+	///	生成一个新行。
+	///	&lt;/summary&gt;
+	/// &lt;params name=&quot;value&quot; type=&quot;Array&quot;&gt;内容。&lt;/params&gt;
+	/// &lt;params name=&quot;index&quot; type=&quot;Number&quot;&gt;位置。默认末尾。&lt;/params&gt;
+	/// &lt;returns type=&quot;DataRow&quot;&gt;新行&lt;/returns&gt;
+    newRow : function(value,index){
+        var a = new DataRow(value,this);
+        this.insertAt(a,index);
+        return a;
+    },
+    
+    ///	&lt;summary&gt;
+	///	xtype。
+	///	&lt;/summary&gt;
+	/// &lt;type name=&quot;String&quot; /&gt;
+	/// &lt;const /&gt;
+    xtype : &quot;DataTable&quot;,
+    
+    ///	&lt;summary&gt;
+	///	设置所有内容。
+	///	&lt;/summary&gt;
+	/// &lt;params name=&quot;value&quot; type=&quot;Object&quot;&gt;内容。&lt;/params&gt;
+    setValue : function(value){
+        for(var i = 0, l = this.length; i &lt; l; i++)
+            this[i] = value[i];
+    },
+    
+    ///	&lt;summary&gt;
+	///	简单排序。
+	///	&lt;/summary&gt;
+	/// &lt;params name=&quot;row&quot; type=&quot;Object&quot;&gt;列。&lt;/params&gt;
+	/// &lt;params name=&quot;f&quot; type=&quot;Function&quot;&gt;比较。&lt;/params&gt;
+	/// &lt;params name=&quot;bool&quot; type=&quot;Boolean&quot;&gt;是否倒序。&lt;/params&gt;
+	/// &lt;params name=&quot;start&quot; type=&quot;Number&quot;&gt;开始。&lt;/params&gt;
+	/// &lt;params name=&quot;end&quot; type=&quot;Number&quot;&gt;结束。&lt;/params&gt;
+    sort : function(row,f,bool,start,end){
+    
+        //设置建
+		this.sortBy = row = row || this.key;
+		
+		//设置排序委托
+		f = typeof f == &quot;function&quot; ? f : function(x,y){return x&lt;y};
+		
+		//是否倒序
+		var fn = bool===false ? function(x,y){return !f(x,y)} : f;
+		
+		//位置
+		start = start || 0;
+		end = end || this.length;
+		var tmp;
+		for(var i=start;i&lt; end;i++){
+			for(var j=i+1;j&lt;end;j++)
+				if(!fn(this[i][row],this[j][row])){
+					tmp = 	this[j][row];
+					this[j][row] = this[i][row];
+					this[i][row] = tmp;
+				}
+		}
+		
+	}
+
+
+});
+
+
+var DataRow = JPlus.Data.DataRow;
+var DataTable = JPlus.Data.DataTable;</pre>
+</body>
+</html>

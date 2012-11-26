@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Fx.prototype.resume',"source":'Base_3.js',"sourceFile":'data/source/Base_3.js.html#Fx-prototype-resume',"summary":'<p>\u6062\u590d\u5f53\u524d\u6548\u679c\u3002</p>\n',"name":'resume',"memberOf":'Fx',"memberType":'method',"params":[]});

@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Base.prototype.version',"source":'Base.js',"sourceFile":'data/source/Base.js.html#Base-prototype-version',"summary":'<p>\u83b7\u53d6\u5f53\u524d\u6846\u67b6\u7684\u7248\u672c\u53f7\u3002</p>\n',"memberType":'property',"name":'version',"memberOf":'Base',"type":'Number',"defaultValue":'1',"propertyAttribute":'get'});

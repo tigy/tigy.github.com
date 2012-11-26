@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'md5c',"source":'System\\Text\\assets\\scripts\\Md5.js',"sourceFile":'data/source/System\\Text\\assets\\scripts\\Md5.js.html#md5c',"summary":'<p>\u8ba1\u7b97\u4e00\u4e2a\u6570\u7ec4\u7684 MD5 \u503c\u3002</p>\n',"name":'md5c',"memberOf":'',"memberType":'method',"params":[{"type":'',"name":'x',"summary":''},{"type":'',"name":'len',"summary":''}]});

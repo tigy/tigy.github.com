@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'dynamicStyleMap',"source":'System\\Dom\\assets\\scripts\\CssRule.js',"sourceFile":'data/source/System\\Dom\\assets\\scripts\\CssRule.js.html#dynamicStyleMap',"summary":'<p>dynamicStyleMap - <Hash> used to keep a reference to dynamically\ncreated style sheets for quick access</p>\n',"name":'dynamicStyleMap',"memberOf":'',"memberType":'field'});

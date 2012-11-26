@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Ajax.prototype.options.url',"source":'Base_2.js',"sourceFile":'data/source/Base_2.js.html#Ajax-prototype-options-url',"summary":'<p>\u9ed8\u8ba4\u7684\u5730\u5740\u3002</p>\n',"type":'String',"name":'url',"memberOf":'Ajax.prototype.options',"memberType":'field'});

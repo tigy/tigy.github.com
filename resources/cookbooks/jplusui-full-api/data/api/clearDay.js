@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'clearDay',"source":'System\\Lang\\assets\\scripts\\Date.js',"sourceFile":'data/source/System\\Lang\\assets\\scripts\\Date.js.html#clearDay',"summary":'<p>\u8f6c\u5230\u672c\u6708\u7b2c\u4e00\u5929\u3002</p>\n',"name":'clearDay',"memberOf":'',"memberType":'method',"params":[]});

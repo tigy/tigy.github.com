@@ -7,6 +7,18 @@ using("System.Dom.Align");
 
 
 var IToolTip = {
+
+    /**
+     * 工具提示显示之前经过的时间。
+     * @type Integer
+     */
+    initialDelay: 500,
+
+    /**
+     * 指针从一个控件移到另一控件时，必须经过多长时间才会出现后面的工具提示窗口。
+     * @type Integer
+     */
+    reshowDelay: 100,
 	
 	menuTpl: '<span>\
 	    <span class="x-arrow-fore">◆</span>\
@@ -17,22 +29,28 @@ var IToolTip = {
 	 */	showDuration: -2,	show: function () {
 	    if (!this.closest('body')) {
 	        this.appendTo();
-	    }	    Dom.prototype.show.apply(this, arguments);
+	    }	    return Dom.prototype.show.call(this, arguments, {
+	    	duration: this.showDuration
+	    });
+	},
 
-	    return this;
+	hide: function () {
+	    return Dom.prototype.hide.call(this, arguments, {
+	    	duration: this.showDuration
+	    });
 	},	showAt: function (x, y) {
-	    return this.show(this.showDuration).setPosition(x, y);
+	    return this.show().setPosition(x, y);
 	},	showBy: function (ctrl, offsetX, offsetY, e) {
 			    var configs = ({
-	        left: ['rr-yc', 15, 0],	        right: ['ll-yc', 15, 0],	        top: ['xc-bb', 0, 15],	        bottom: ['xc-tt', 0, 15],	        'null': ['xc-bb', 0, 5]
-	    }[this.getArrow()]);	    this.show(this.showDuration).align(ctrl, configs[0], offsetX === undefined ? configs[1] : offsetX, offsetY === undefined ? configs[2] : offsetY);
+	        left: ['rr-yc', 15, 0],	        right: ['ll-yc', 15, 0],	        top: ['xc-bb', 0, 15],	        bottom: ['xc-tt', 0, 15],	        'null': ['xc-bb', 0, 5, 1]
+	    }[this.getArrow()]);	    this.show().align(ctrl, configs[0], offsetX === undefined ? configs[1] : offsetX, offsetY === undefined ? configs[2] : offsetY);
 		
-		if(e){
+		if(configs[3] && e){
 			this.setPosition(e.pageX + (offsetX || 0));
 		}
 
 		return this;
-	},	close: function () {	    return this.hide(this.showDuration);	},	setArrow: function (value) {
+	},	setArrow: function (value) {
 	    var arrow = this.find('.x-arrow') || this.append(this.menuTpl);
 	    if (value) {
 	        arrow.node.className = 'x-arrow x-arrow-' + value;
@@ -73,7 +91,7 @@ var IToolTip = {
 	            clearTimeout(me.showTimer);
 	        }
 
-	        this.close();
+	        this.hide();
 	    }, this);
 		
 		

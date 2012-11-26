@@ -1,0 +1,200 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Suggest\assets\scripts\ComboBox.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+using(&quot;Controls.Suggest.Picker&quot;);
+using(&quot;Controls.Suggest.DropDownMenu&quot;);
+
+<span id="ComboBox">/**
+ * 表示一个组合框。
+ * @extends Picker
+ * @example &lt;pre&gt;
+ * var comboBox = new ComboBox();
+ * comboBox.add(&quot;aaa&quot;);
+ * comboBox.add(&quot;bbb&quot;);
+ * comboBox.setSelectedIndex(0);
+ * &lt;/pre&gt;
+ */</span>
+var ComboBox = Picker.extend({
+
+    <span id="listMode">/**
+	 * 当前控件是否为列表形式。如果列表模式则优先考虑使用下拉菜单。
+     * @config {Boolean}
+	 */</span>
+    listMode: false,
+	
+    xtype: 'combobox',
+	
+    autoResize: true,
+	
+    <span id="createDropDown">/**
+	 * 创建当前 Picker 的菜单。
+	 * @return {Control} 下拉菜单。
+	 * @protected override
+	 */</span>
+    createDropDown: function (existDom) {
+        return new DropDownMenu({
+            node: existDom,
+            owner: this,
+            selectCallback: this.selectItem
+        });
+    },
+	
+    <span id="updateDropDown">/**
+	 * 将当前文本的值同步到下拉菜单。
+	 * @protected override
+	 */</span>
+    updateDropDown: function(){
+        this.dropDown.hovering(this.getSelectedItem());
+    },
+	
+    init: function (options) {
+		
+        // 1. 处理 &lt;select&gt;
+        var selectDom;
+		
+        // 如果初始化的时候传入一个 &lt;select&gt; 则替换 &lt;select&gt;, 并拷贝相关数据。
+        if(this.node.tagName === 'SELECT') {
+			
+            this.selectDom = selectDom = new Dom(this.node);
+			
+            // 调用 create 重新生成 dom 。
+            this.node = this.create();
+			
+        }
+		
+        // 2. 初始化文本框
+		
+        // 初始化文本框
+        this.base('init');
+		
+        // 3. 设置默认项
+			
+        if(selectDom) {
+			
+            // 让 listBox 拷贝 &lt;select&gt; 的成员。
+            this.copyItemsFromSelect(selectDom);
+			
+            // 隐藏 &lt;select&gt; 为新的 dom。
+            selectDom.hide();
+
+            // 插入当前节点。
+            selectDom.after(this);
+        }
+		
+    },
+	
+    <span id="selectItem">/**
+	 * 模拟用户选择某一个项。
+	 */</span>
+    selectItem: function (item) {
+
+        var me = this, old;
+    	
+        if (me.trigger('selecting', item)) {
+            old = me.getText();
+            me.setSelectedItem(item);
+            if (old !== me.getText()) {
+                me.trigger('change');
+            }
+            me.hideDropDown();
+        }
+
+        return me;
+    },
+	
+    <span id="setSelectedItem">/**
+	 * 设置当前选中的项。
+	 * @param {Dom} item 选中的项。
+	 * @return this
+	 */</span>
+    setSelectedItem: function (item) {
+        this.setText(item ? item.getText() : &quot;&quot;);
+        return this;
+    },
+
+    <span id="getSelectedItem">/**
+	 * 获取当前选中的项。如果不存在选中的项，则返回 null 。
+	 * @return {Dom} 选中的项。
+	 */</span>
+    getSelectedItem: function () {
+        var value = this.getText();
+        return this.dropDown.child(function (dom) {
+            return Dom.getText(dom) === value;
+        });
+    },
+	
+    setSelectedIndex: function(value){
+        return this.setSelectedItem(this.dropDown.item(value));
+    },
+
+    getSelectedIndex: function () {
+        return this.dropDown.indexOf(this.getSelectedItem());
+    },
+
+    // select
+	
+    resizeToFitItems: function(){
+        var dropDown = this.dropDown,
+			oldWidth = dropDown.getStyle('width'),
+			oldDisplay = dropDown.getStyle('display');
+			
+        dropDown.setStyle('display', 'inline-block');
+        dropDown.setWidth('auto');
+		
+        this.first().setSize(dropDown.getWidth());
+		
+        dropDown.setStyle('width', oldWidth);
+        dropDown.setStyle('display', oldDisplay);
+        return this;
+    },
+	
+    copyItemsFromSelect: function(select) {
+		
+        this.dropDown.empty();
+		
+        for(var node = select.node.firstChild; node; node = node.nextSibling) {
+            if(node.tagName  === 'OPTION') {
+                var item = this.dropDown.add(Dom.getText(node));
+				
+                item.dataField().option = node;
+                if(node.selected){
+                    this.setSelectedItem(item);
+                }
+            }
+        }
+		
+        if(select.node.onclick)
+            this.node.onclick = select.node.onclick;
+		
+        if(select.node.onchange)
+            this.on('change', select.node.onchange);
+		
+        if(this.autoResize)
+            this.setWidth(select.getWidth());
+        
+        if(select.getAttr('disabled')) {
+            this.setAttr('disabled', true);
+        }
+
+        if (select.getAttr('readonly')) {
+            this.setAttr('readonly', true);
+        }
+		
+    }
+
+});
+
+ListControl.aliasMethods(ComboBox, 'dropDown');
+</pre>
+</body>
+</html>

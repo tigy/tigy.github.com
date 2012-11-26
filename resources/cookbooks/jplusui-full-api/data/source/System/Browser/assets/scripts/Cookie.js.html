@@ -1,0 +1,61 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Browser\assets\scripts\Cookie.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">
+
+
+using(&quot;System.Browser.Base&quot;);
+
+
+/**
+ * 获取 Cookies 。
+ * @param {String} name 名字。
+ * @param {String} 值。
+ */
+Browser.getCookie = function (name) {
+	assert.isString(name, &quot;Browser.getCookie(name): 参数 {name} ~&quot;);
+	var matches = document.cookie.match(new RegExp(&quot;(?:^|; )&quot; + encodeURIComponent(name).replace(/([-.*+?^${}()|[\]\/\\])/g, '\\$1') + &quot;=([^;]*)&quot;));
+	return matches ? decodeURIComponent(matches[1]) : null;
+};
+	
+/**
+ * 设置 Cookies 。
+ * @param {String} name 名字。
+ * @param {String} value 值。
+ * @param {Number} expires 有效天数。天。-1表示无限。
+ * @param {Object} props 其它属性。如 domain, path, secure    。
+ */
+Browser.setCookie = function (name, value, expires, props) {
+	var e = encodeURIComponent,
+		    updatedCookie = e(name) + &quot;=&quot; + e(value),
+		    t;
+
+	if (expires == undefined)
+		expires = value === null ? -1 : 1000;
+
+	if (expires) {
+		t = new Date();
+		t.setHours(t.getHours() + expires * 24);
+		updatedCookie += '; expires=' + t.toGMTString();
+	}
+
+	for (t in props) {
+		updatedCookie = String.concat(updatedCookie, &quot;; &quot; + t, &quot;=&quot;, e(props[t]));
+	}
+	
+	assert(updatedCookie.length &lt; 4096, &quot;Browser.setCookie(name, value, expires, props): 参数  value 内容过长(大于 4096)，操作失败。&quot;);
+
+	document.cookie = updatedCookie;
+
+	return value;
+};
+
+</pre>
+</body>
+</html>

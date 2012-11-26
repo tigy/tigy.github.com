@@ -157,6 +157,7 @@ var ListControl = Control.extend({
 	 * @param {String} fn 执行的函数。
 	 * @param {Object} scope 函数执行时的作用域。
      * @return this
+     * @protected
 	 */
 	itemOn: function(eventName, fn, scope){
 		return this.on(eventName, function(e){

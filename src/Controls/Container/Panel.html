@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=ok">
+    <meta name="dpl-info" content="status=complete">
     <title>面板</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -18,7 +18,8 @@
 <body>
 
     <article class="demo">
-
+        
+        <h2 class="demo">纯 HTML 方式创建</h2>
 
         <aside class="demo">
 
@@ -27,7 +28,7 @@
                     <h2>顶部</h2>
                 </div>
                 <div class="x-panel-body">
-                    <div class="x-panel-container">
+                    <div class="x-panel-content">
                         内容
                     </div>
                 </div>
@@ -49,7 +50,7 @@
 
             <div class="x-panel">
                 <div class="x-panel-body">
-                    <div class="x-panel-container">
+                    <div class="x-panel-content">
                         内容
                     </div>
                 </div>
@@ -57,10 +58,23 @@
 
         </aside>
 
-
-        <script>
-            var a = new Panel().setHtml('aaa').appendTo();
+    </article>
+        
+    <article class="demo">
+        
+        <h2 class="demo">纯 JavaScript 方式创建</h2>
+        
+        <script class="demo" type="text/html">
+            
+            <div id="ct"></div>
+    
+            <\script>
+                var panel = new Panel().setHtml('<em>我是内容</em>').appendTo("ct");
+            </\script>
+                
         </script>
+
+        <blockquote class="demo">其它 API 参考 <a href="../Core/ContainerControl.html">ContainerControl</a> 组件。(Panel 继承于 ContainerControl)</blockquote>
 
     </article>
 

@@ -8,9 +8,15 @@ using("System.Core.Base");
 
 /**
  * 用于异步执行任务时保证任务是串行的。
+ * @class Deferrable
  */
 var Deferrable = Class({
-
+	
+	/**
+	 * 让 *deferrable* 等待当前任务完成后继续执行。
+	 * @param {Deferrable} deferrable 需要等待的 Deferrable 对象。
+	 * @param {Object} args 执行 *deferrable* 时使用的参数。
+	 */
     chain: function (deferrable, args) {
         var lastTask = [deferrable, args];
 
@@ -21,7 +27,12 @@ var Deferrable = Class({
         }
         this._lastTask = lastTask;
     },
-
+	
+	/**
+	 * 通知当前对象任务已经完成，并继续执行下一个任务。
+	 * @protected
+	 * @return this
+	 */
     progress: function () {
 
         var firstTask = this._firstTask;
@@ -38,12 +49,17 @@ var Deferrable = Class({
     },
 
     /**
-	 * 多个请求同时发生后的处理方法。
-	 * wait - 等待上个操作完成。
-	 * ignore - 忽略当前操作。
-	 * stop - 正常中断上个操作，上个操作的回调被立即执行，然后执行当前操作。
-	 * abort - 非法停止上个操作，上个操作的回调被忽略，然后执行当前操作。
-	 * replace - 替换上个操作为新的操作，上个操作的回调将被复制。
+	 * 检查当前的任务执行状态，防止任务同时执行。
+	 * @param {Object} args 即将需要执行时使用的参数。
+	 * @param {String} link="wait" 如果当前任务正在执行后的操作。
+	 * 
+	 * - wait: 等待上个任务完成。
+	 * - ignore: 忽略新的任务。
+	 * - stop: 正常中断上个任务，上个操作的回调被立即执行，然后执行当前任务。
+	 * - abort: 强制停止上个任务，上个操作的回调被忽略，然后执行当前任务。
+	 * - replace: 替换上个任务为新的任务，上个任务的回调将被复制。
+	 * @return {Boolean} 返回一个值，指示是否可以执行新的操作。
+	 * @protected
 	 */
     defer: function (args, link) {
 
@@ -77,7 +93,9 @@ var Deferrable = Class({
     },
 
     /**
-	 * 让当前队列等待指定的 deferred 全部执行完毕后执行。
+	 * 让当前任务等待指定的 *deferred* 全部执行完毕后执行。
+	 * @param {Deferrable} deferrable 需要预先执行的 Deferrable 对象。
+	 * @return this
 	 */
     wait: function (deferred) {
         if (this.isRunning) {
@@ -88,7 +106,12 @@ var Deferrable = Class({
         this.progress = deferred.progress.bind(deferred);
         return this;
     },
-
+	
+	/**
+	 * 定义当前任务执行完成后的回调函数。
+	 * @param {Deferrable} callback 需要等待执行的回调函数。
+	 * @param {Object} args 执行 *callback* 时使用的参数。
+	 */
     then: function (callback, args) {
         if (this.isRunning) {
             this.chain({
@@ -104,25 +127,48 @@ var Deferrable = Class({
         return this;
     },
 
+	/**
+	 * 让当前任务推迟指定时间后执行。
+	 * @param {Integer} duration 等待的毫秒数。
+	 * @return this
+	 */
     delay: function (duration) {
         return this.run({ duration: duration });
     },
 
+	/**
+	 * 当被子类重写时，用于暂停正在执行的任务。
+	 * @protected virtual
+	 * @method
+	 */
     pause: Function.empty,
 
+	/**
+	 * 中止然后跳过正在执行的任务。
+	 * @return this
+	 */
     skip: function () {
         this.pause();
         this.progress();
         return this;
     },
 
+	/**
+	 * 强制中止正在执行的任务。
+	 * @return this
+	 */
     abort: function () {
         this.pause();
         this._firstTask = this._lastTask = null;
         this.isRunning = false;
         return this;
     },
-
+	
+	/**
+	 * 正常中止正在执行的任务。
+	 * @return this
+	 * @virtual
+	 */
     stop: function () {
         return this.abort();
     }

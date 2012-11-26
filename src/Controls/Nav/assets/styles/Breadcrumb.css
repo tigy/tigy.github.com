@@ -17,6 +17,6 @@
   padding: 0 5px;
   color: #999999;
 }
-.x-breadcrumb .x-breadcrumb-actived a {
+.x-breadcrumb .x-breadcrumb-selected a {
   color: #333333;
 }

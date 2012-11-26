@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Picker.prototype.button',"source":'Controls\\Suggest\\assets\\scripts\\Picker.js',"sourceFile":'data/source/Controls\\Suggest\\assets\\scripts\\Picker.js.html#Picker-prototype-button',"summary":'<p>\u83b7\u53d6\u5f53\u524d\u63a7\u4ef6\u7684\u6309\u94ae\u90e8\u5206\u3002</p>\n',"name":'button',"memberOf":'Picker',"memberType":'method',"params":[]});

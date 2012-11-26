@@ -18,16 +18,10 @@
         <input type="button" value="hmacMd5 & HMAC Md5 加密" onclick="document.getElementById('value').value = Text.base64HmacMd5(document.getElementById('value').value, 'key')" />
 
         <script>
-            Demo.writeTestCases({
-                "MD5 & base64 加密": {
-                    'Text.base64Md5("abc")': "kAFQmDzST7DWlj99KOF/cg"
-                },
-                "HMD5 加密": {
-                    'Text.hmacMd5("abc", "key")': "42a724aeb701cef74eee75871d6770cd"
-                },
-                "HMD5 & base64 加密": {
-                    'Text.base64HmacMd5("abc", "key")': "rB0fA9COpW63Z6sfkXcxdA"
-                }
+            Demo.writeExamples({
+                "MD5 & base64 加密": 'Text.base64Md5("abc")',
+                "HMD5 加密": 'Text.hmacMd5("abc", "key")',
+                "HMD5 & base64 加密": 'Text.base64HmacMd5("abc", "key")'
             });
         </script>
 

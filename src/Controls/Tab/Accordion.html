@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=ok">
+    <meta name="dpl-info" content="status=complete">
     <title>手风琴</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -26,7 +26,7 @@
 
         <aside class="demo">
 
-            <div class="x-accordion" id="a">
+            <div class="x-accordion" id="accordion">
                 <div class="x-accordion-panel">
                     <div class="x-accordion-header">
                         <a href="javascript:;">标题 title 1
@@ -63,7 +63,7 @@
             </div>
 
             <script>
-                var a = new Accordion('a');
+                var accordion = new Accordion('accordion');
             </script>
 
 
@@ -73,11 +73,11 @@
 
             <script>
 
-                Demo.writeTestCases({
-                    '切换到第2个面板': 'a.setSelectedIndex(1)',
-                    '增加一个面板': 'a.add("标题", "<div class=\'x-tabpage-content\'>内容</div>")',
-                    '插入一个面板到第一个位置': 'a.addAt(0, "标题", "<div class=\'x-tabpage-content\'>内容</div>")',
-                    '删除第1个面板': 'a.removeAt(0)'
+                Demo.writeExamples({
+                    '切换到第2个面板': 'accordion.setSelectedIndex(1)',
+                    '增加一个面板': 'accordion.add("标题", "<div class=\'x-tabpage-content\'>内容</div>")',
+                    '插入一个面板到第一个位置': 'accordion.addAt(0, "标题", "<div class=\'x-tabpage-content\'>内容</div>")',
+                    '删除第1个面板': 'accordion.removeAt(0)'
                 });
 
             </script>

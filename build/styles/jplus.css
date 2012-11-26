@@ -1,5 +1,5 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/21 21:49
+ * This file is created by a tool at 2012/11/25 20:4
  *********************************************************
  * Contains: 
  *     Controls.Core.Base
@@ -351,7 +351,7 @@ a:focus {
   background-image: linear-gradient(to bottom, #ffffff, #e6e6e6);
   background-repeat: repeat-x;
   border-color: #e6e6e6 #e6e6e6 #bfbfbf;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.25);
   text-align: center;
   vertical-align: middle;
   -webkit-border-radius: 4px;
@@ -443,7 +443,7 @@ a:focus {
   background-image: linear-gradient(to bottom, #454545, #262626);
   background-repeat: repeat-x;
   border-color: #262626 #262626 #000000;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.25);
 }
 .x-button-hint:hover,
 .x-button-hint:active,
@@ -461,7 +461,7 @@ a:focus {
   background-image: linear-gradient(to bottom, #62c462, #51a351);
   background-repeat: repeat-x;
   border-color: #51a351 #51a351 #387038;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.25);
 }
 .x-button-success:hover,
 .x-button-success:active,
@@ -479,7 +479,7 @@ a:focus {
   background-image: linear-gradient(to bottom, #5bc0de, #2f96b4);
   background-repeat: repeat-x;
   border-color: #2f96b4 #2f96b4 #1f6377;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.25);
 }
 .x-button-info:hover,
 .x-button-info:active,
@@ -497,7 +497,7 @@ a:focus {
   background-image: linear-gradient(to bottom, #fbb450, #f89406);
   background-repeat: repeat-x;
   border-color: #f89406 #f89406 #ad6704;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.25);
 }
 .x-button-warning:hover,
 .x-button-warning:active,
@@ -515,7 +515,7 @@ a:focus {
   background-image: linear-gradient(to bottom, #ee5f5b, #bd362f);
   background-repeat: repeat-x;
   border-color: #bd362f #bd362f #802420;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.25);
 }
 .x-button-error:hover,
 .x-button-error:active,
@@ -533,7 +533,7 @@ a:focus {
   background-image: linear-gradient(to bottom, #4aacca, #4a81ca);
   background-repeat: repeat-x;
   border-color: #4a81ca #4a81ca #2d5c9a;
-  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.15) rgba(0, 0, 0, 0.25);
 }
 .x-button-highlight:hover,
 .x-button-highlight:active,
@@ -1504,7 +1504,7 @@ input.x-button-small {
   clear: both;
   visibility: hidden;
 }
-.x-panel-container {
+.x-panel-content {
   padding: 10px;
 }
 .x-panel-collapsed .x-panel-header {

@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'RegExp',"source":'',"methods":[{"name":'create',"icon":'method',"fullName":'RegExp.create',"summary":'<p>\u4ece\u5b57\u7b26\u4e32\u521b\u5efa\u6b63\u5219\u5f0f\u3002</p>\n',"isStatic":true}],"type":'Object',"name":'RegExp',"memberType":'namespace'});

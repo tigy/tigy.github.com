@@ -1,0 +1,61 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Form\assets\scripts\StarRater.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author 
+ */
+
+
+
+/**
+ * @author chunterg
+ */
+
+var Starrating = {
+    init: function () {
+        var me = this;
+        me.setRate();
+        if (Dom.query('.x-starrating-do').getAttr('read-only') == &quot;&quot;) {
+            Dom.query('.x-starrating-do-ul a').on('click', function () {
+                me.setRate(this.getAttr('data-rate'), true, this.getAttr('title'));
+            }).on('mouseenter', function () {
+                me.setRate(this.getAttr('data-rate'), false, this.getAttr('title'));
+            }).on('mouseout', function () {
+                me.setRate();
+            })
+        } else {
+            Dom.query('.x-starrating-do span.x-left').setText('���Ѿ���������');
+            Dom.query('.x-starrating-readonly').setStyle('z-index', 10);
+        }
+    },
+    setRate: function (rate, isClick, grade) {
+        var current = Dom.query('.x-starrating-current');
+        if (rate &amp;&amp; isClick) {
+            Dom.get('x-starrating-do-result').setText(rate);
+            Dom.get('x-starrating-do-result').setAttr('data-grade', grade);
+            Dom.get('x-starrating-grade').setText(grade);
+            //current.setWidth(rate+'%');
+        } else if (rate) {
+            current.setWidth(0);
+            Dom.query('#x-starrating-grade').setText(grade);
+        } else {
+            var currentRate = Dom.get('x-starrating-do-result').getText() || 0;
+            current.setWidth(currentRate + '%');
+            if (currentRate) {
+                Dom.get('x-starrating-grade').setText(Dom.get('x-starrating-do-result').getAttr('data-grade'));
+            } else {
+                Dom.get('x-starrating-grade').setText('');
+            }
+        }
+
+    }
+}
+</pre>
+</body>
+</html>

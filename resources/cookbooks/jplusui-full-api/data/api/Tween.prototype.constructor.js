@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Tween.prototype.constructor',"source":'Tween.js',"sourceFile":'data/source/Tween.js.html#Tween-prototype-constructor',"summary":'<p>\u521d\u59cb\u5316\u5f53\u524d\u7279\u6548\u3002</p>\n',"name":'constructor',"memberOf":'Tween',"memberType":'constructor',"params":[]});

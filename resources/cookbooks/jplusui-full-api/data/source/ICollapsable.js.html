@@ -1,0 +1,147 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>ICollapsable.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author  xuld
+ */
+
+
+using(&quot;System.Fx.Animate&quot;);
+
+
+<span id="ICollapsable">/**
+ * 表示一个可折叠的控件接口。
+ * @interface ICollapsable
+ * @remark ICollapsable 会对 #body() 节点（如果存在）进行折叠和展开效果。
+ */</span>
+var ICollapsable = {
+
+    <span id="ICollapsable-collapseDuration">/**
+	 * 折叠效果的默认使用时间。如果为 0 表示无效果。
+	 * @type {Integer} 
+	 * @virtual
+	 */</span>
+    collapseDuration: -1,
+
+    <span id="ICollapsable-onCollapsing">/**
+	 * 当控件已经被折叠时执行。
+	 * @protected virtual
+	 */</span>
+    onCollapsing: Function.empty,
+
+    <span id="ICollapsable-onCollapse">/**
+	 * 当控件已经被折叠时执行。
+	 * @protected virtual
+	 */</span>
+    onCollapse: Function.empty,
+
+    <span id="ICollapsable-onExpanding">/**
+	 * 当控件已经被折叠时执行。
+	 * @protected virtual
+	 */</span>
+    onExpanding: Function.empty,
+
+    <span id="ICollapsable-onExpand">/**
+	 * 当控件即将被展开时执行。
+	 * @protected virtual
+	 */</span>
+    onExpand: Function.empty,
+
+    /**
+	 * 当控件即将被展开时执行。
+	 * @protected virtual
+	 */
+    onExpand: Function.empty,
+
+    <span id="ICollapsable-isCollapsed">/**
+	 * 获取目前是否折叠。
+	 * @return {Boolean} 获取一个值，该值指示当前面板是否折叠。
+	 * @virtual
+	 */</span>
+    isCollapsed: function () {
+        var body = this.body ? this.body() : this;
+        return !body || Dom.isHidden(body.node);
+    },
+
+    <span id="ICollapsable-toggleCollapse">/**
+	 * 切换面板的折叠。
+	 * @param {Integer} duration=#collapseDuration 折叠效果使用的时间。如果为 0 表示无效果。
+     * @return this
+	 */</span>
+    toggleCollapse: function (duration) {
+        return this[this.isCollapsed() ? 'expand' : 'collapse'](duration);
+    },
+
+    <span id="ICollapsable-collapse">/**
+	 * 折叠面板。
+	 * @param {Integer} duration=#collapseDuration 折叠效果使用的时间。如果为 0 表示无效果。
+     * @return this
+	 */</span>
+    collapse: function () {
+        var me = this,
+			body,
+			callback;
+
+        // 如果允许折叠，则继续执行。
+        if (me.trigger('collapsing') &amp;&amp; (body = me.body ? me.body() : me)) {
+
+            me.onCollapsing();
+            
+			body.hide(arguments, {
+				effect: 'height', 
+				duration: me.collapseDuration, 
+				callback: function () {
+	                me.addClass('x-' + me.xtype + '-collapsed');
+	                me.onCollapse();
+	                me.trigger('collapse');
+	            }, 
+	            link: 'ignore'
+	        });
+
+        }
+        return me;
+    },
+
+    <span id="ICollapsable-expand">/**
+	 * 展开面板。
+	 * @param {Integer} duration=#collapseDuration 折叠效果使用的时间。如果为 0 表示无效果。
+     * @return this
+	 */</span>
+    expand: function () {
+
+        var me = this,
+            body;
+
+        // 如果允许展开，则继续执行。
+        // 获取主体内容。
+        // 仅当存在主体内容时才执行操作。
+        if (me.trigger('expanding') &amp;&amp; (body = me.body ? me.body() : me)) {
+
+            me.onExpanding();
+
+            me.removeClass('x-' + me.xtype + '-collapsed');
+			
+			body.show(arguments, {
+				effect: 'height', 
+				duration: me.collapseDuration, 
+				callback: function () {
+	            	me.onExpand(); 
+	                me.trigger('expand');
+	            }, 
+	            link: 'ignore'
+	        });
+
+        }
+
+        return me;
+    }
+
+};</pre>
+</body>
+</html>

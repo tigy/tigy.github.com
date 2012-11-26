@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Deferrable.prototype.skip',"source":'Deferrable.js',"sourceFile":'data/source/Deferrable.js.html#Deferrable-prototype-skip',"summary":'<p>\u4e2d\u6b62\u7136\u540e\u8df3\u8fc7\u6b63\u5728\u6267\u884c\u7684\u4efb\u52a1\u3002</p>\n',"returns":{"type":'',"summary":'<p>this</p>\n'},"name":'skip',"memberOf":'Deferrable',"memberType":'method',"params":[]});

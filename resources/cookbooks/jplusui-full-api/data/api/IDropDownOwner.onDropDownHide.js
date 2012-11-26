@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'IDropDownOwner.onDropDownHide',"source":'IDropDownOwner.js',"sourceFile":'data/source/IDropDownOwner.js.html#IDropDownOwner-onDropDownHide',"summary":'<p>\u5f53\u4e0b\u62c9\u83dc\u5355\u88ab\u9690\u85cf\u65f6\u6267\u884c\u3002</p>\n',"memberAccess":'protected',"name":'onDropDownHide',"memberOf":'IDropDownOwner',"memberType":'field'});

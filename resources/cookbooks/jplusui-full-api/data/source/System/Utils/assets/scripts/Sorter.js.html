@@ -1,0 +1,162 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Utils\assets\scripts\Sorter.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ *   @author 
+ */
+
+var Sorter = Sorter || {};
+
+<span id="_defaultSorter">/**
+ *   默认比较的函数。
+ *   @param {Object} a 比较的参数。
+ *   @param {Object} b 比较的参数。
+ *   @return {Boolean} 布尔。表示 a 是否比 b 大。
+ *   @private
+ */</span>
+Sorter._defaultSorter = function (a, b) {
+	return a &lt; b; 
+};
+
+Sorter._createFn = function (sortFn) {
+	return function (iteratable, compareFn, start, end) {
+		assert.isNumber(iteratable &amp;&amp; iteratable.length, &quot;Sorter.sort(iteratable, start, end, compareFn): 参数 {iteratable} 必须有 length 属性。&quot;);
+
+		compareFn = compareFn || Sorter._defaultSorter;
+		start = start || 0;
+		end = end || iteratable.length;
+
+		assert(start &gt;= 0 &amp;&amp; start &lt;= end, &quot;Sorter.sort(iteratable, start, end, compareFn): 参数 {start} ~。&quot;);
+		assert(end &lt;= iteratable.length, &quot;Sorter.sort(iteratable, start, end, compareFn): 参数 {end} ~。&quot;);
+		assert.isFunction(compareFn, &quot;Sorter.sort(iteratable, start, end, compareFn): 参数 {compareFn} ~。&quot;);
+
+
+		sortFn(iteratable, compareFn, start, end);
+		return iteratable;
+
+	};
+};
+
+<span id="bubble">/**
+ * 冒泡排序。
+ * @param {Object} iteratable 集合。
+ * @param {Number} start 开始排序的位置。
+ * @param {Number} end 结束排序的位置。
+ * @param {Function} compareFn 比较函数。
+*/</span>
+Sorter.bubble = Sorter._createFn(function (iteratable, compareFn, start, end) {
+
+	for (; start &lt; end; start++)
+		for (var k = start + 1; k &lt; end; k++)
+			if (compareFn(iteratable[k], iteratable[start])) {
+				var c = iteratable[start];
+				iteratable[start] = iteratable[k];
+				iteratable[k] = c;
+			}
+
+	return iteratable;
+}),
+
+<span id="JPlus-Sorter-shell">/**
+ *  对集合进行希尔排序。
+ *  @param {Object} iteratable 集合。
+ *  @param {Number} start 开始排序的位置。
+ *  @param {Number} end 结束排序的位置。
+ *  @param {Function} compareFn 比较函数。
+ *  @memberOf JPlus.Sorter
+ */</span>
+Sorter.shell = Sorter._createFn(function (iteratable, compareFn, start, end) {
+
+	for (var gap = (end - start) &gt;&gt; 1; gap &gt; 0; gap = gap &gt;&gt; 1) {
+		for (var i = gap + start; i &lt; end; i++) {
+			for (var temp = iteratable[i], j = i; (j - gap &gt;= start) &amp;&amp; compareFn(temp, iteratable[j - gap]) ; j -= gap) {
+				iteratable[j] = iteratable[j - gap];
+			}
+			iteratable[j] = temp;
+		}
+	}
+
+	return iteratable;
+}),
+
+<span id="JPlus-Sorter-quick">/**
+ *  对集合进行快速排序。
+ *  @param {Object} iteratable 集合。
+ *  @param {Number} start 开始排序的位置。
+ *  @param {Number} end 结束排序的位置。
+ *  @param {Function} compareFn 比较函数。
+ *  @memberOf JPlus.Sorter
+*/</span>
+Sorter.quick = Sorter._createFn(function (iteratable, compareFn, start, end) {
+
+	if (start &gt;= end)
+		return;
+
+	var temp = iteratable[start], low = start, high = end;
+	do {
+		while (high &gt; low &amp;&amp; !compareFn(iteratable[high], temp))
+			high--;
+
+		if (low &lt; high)
+			iteratable[low++] = iteratable[high];
+
+
+		while (low &lt; high &amp;&amp; compareFn(iteratable[low], temp))
+			low++;
+
+		if (low &lt; high)
+			iteratable[high--] = iteratable[low];
+
+	} while (low &lt; high);
+	iteratable[low] = temp;
+
+	var qsort = arguments.callee;
+	qsort(iteratable, compareFn, start, high - 1);
+	qsort(iteratable, compareFn, high + 1, end);
+
+});
+
+//Sorter.mergeSort = (function () {
+//	function merge(left, right) {
+//		var result = [];
+
+//		while (left.length &gt; 0 &amp;&amp; right.length &gt; 0) {
+//			if (this.comparator((left[0]).get(this.col), (right[0]).get(this.col)) &lt;= 0) {
+//				result.push(left[0]);
+//				left = left.slice(1);
+//			} else {
+//				result.push(right[0]);
+//				right = right.slice(1);
+//			}
+//		}
+//		while (left.length &gt; 0) {
+//			result.push(left[0]);
+//			// left = left.slice(1);
+//		}
+//		while (right.length &gt; 0) {
+//			result.push(right[0]);
+//			right = right.slice(1);
+//		}
+//		return result;
+//	}
+
+//	return function (iteratable, compareFn, start, end) {
+//		var middle = (iteratable.length) / 2,
+//			left = iteratable.slice(0, middle),
+//			right = iteratable.slice(middle),
+//			result;
+//			left = this.mergeSort(left);
+//			right = this.mergeSort(right);
+//			result = this.merge(left, right);
+//			return result;
+//	};
+//})()
+</pre>
+</body>
+</html>

@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Fx.prototype.options.duration',"source":'Base_3.js',"sourceFile":'data/source/Base_3.js.html#Fx-prototype-options-duration',"summary":'<p>\u7279\u6548\u6267\u884c\u6beb\u79d2\u6570\u3002</p>\n',"type":'Number',"name":'duration',"memberOf":'Fx.prototype.options',"defaultValue":'300',"memberType":'field'});

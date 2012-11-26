@@ -1,0 +1,69 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Utils\assets\scripts\BigInteger.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">
+
+
+
+var BigInteger = BigInteger || {};
+
+Object.extend(BigInteger, {
+	
+	<span id="multiple">/**
+	 * 计算大数的乘积。
+	 */</span>
+	multiple: function (a, b) {
+		var p = a.match(/\d{1,4}/g).reverse(),
+			q = b.match(/\d{1,4}/g).reverse(),
+			f1 = 0;
+			result = &quot;0&quot;;
+	
+		for(var i = 0; i &lt; p.length; i++){
+			var f2 = 0;
+			for(var j = 0; j &lt; q.length; j++){
+				var t = (p[i]|0)*(q[j]|0);
+				t += new Array(f1+f2+1).join(&quot;0&quot;);
+				result = BigInteger.add(result, t);
+				f2 += q[j].length;
+			}
+			f1 += p[i].length;
+		}
+		return result;
+
+	},
+	
+	add: function (a,b){
+		var m = a.split('').reverse();
+		var n = b.split('').reverse();
+		var ret = [];
+		var s = 0;
+	
+		for(var i = 0; i &lt; a.length || i &lt; b.length; i++){
+			var t = (m[i]|0) + (n[i]|0) + s;
+	
+			ret.push(t%10);
+			s = (t/10)|0;
+		}
+		if(s){
+			ret.push(s);
+		}
+		return ret.reverse().join('');
+	},
+	
+	power: function(a,      b){
+		var ret = &quot;1&quot;;
+		for(var i = 0; i &lt; b; i++){
+			ret = BigInteger.multiple(ret, a);
+		}
+		return ret;
+	}
+	
+});</pre>
+</body>
+</html>

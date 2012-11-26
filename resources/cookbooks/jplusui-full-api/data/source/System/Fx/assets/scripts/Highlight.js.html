@@ -1,0 +1,52 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Fx\assets\scripts\Highlight.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+using(&quot;System.Dom.Base&quot;);
+using(&quot;System.Fx.Color&quot;);
+using(&quot;System.Fx.Animate&quot;);
+
+Dom.implement({
+	
+	<span id="highlight">/**
+	 * 高亮元素。
+	 * @param {String} color 颜色。
+	 * @param {Function} [callback] 回调。
+	 * @param {Number} duration=500 时间。
+	 * @return this
+	 */</span>
+	highlight: function(color, duration, callback){
+	    assert(!callback || typeof callback === 'function', &quot;Dom#highlight(color, duration, callback): 参数 {callback} 不是可执行的函数。&quot;, callback);
+		var fx = this.fx(),
+			back = {
+				target: this,
+				params: {},
+				duration: duration,
+				stop: callback
+			};
+		
+		fx.run({
+			target: this,
+			params: {
+				backgroundColor: color || '#ffff88'
+			},
+			duration: duration,
+			start: function(){
+				back.params.backgroundColor = Dom.styleString(this.node, 'backgroundColor');
+			}
+		}).run(back);
+		
+		return this;
+	}
+
+});</pre>
+</body>
+</html>

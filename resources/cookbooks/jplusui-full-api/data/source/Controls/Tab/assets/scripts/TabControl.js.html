@@ -1,0 +1,127 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Controls\Tab\assets\scripts\TabControl.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author 
+ */
+
+imports(&quot;Controls.Tab.Tabbable&quot;);
+using(&quot;Controls.Core.TabbableControl&quot;);
+
+<span id="TabControl">/**
+ * TAB 选项卡。
+ */</span>
+var TabControl = TabbableControl.extend({
+	
+	xtype: 'tabcontrol',
+	
+	tpl: '&lt;div class=&quot;x-tabcontrol&quot;&gt;\
+			&lt;ul class=&quot;x-tabcontrol-header x-tabbable&quot;&gt;\
+			&lt;/ul&gt;\
+			&lt;div class=&quot;x-tabcontrol-body&quot;&gt;\
+	        &lt;/div&gt;\
+        &lt;/div&gt;',
+
+	collapseDuration: undefined,
+        
+	header: function () {
+	    return this.find('.x-tabbable');
+	},
+        
+	body: function () {
+	    return this.find('.x-tabcontrol-body');
+	},
+	
+	item: function(index){
+	    return this.header().child(index);
+	},
+
+	getContentOf: function (tab) {
+	    var href = tab.getAttr('href');
+	    return /^#/.test(href) &amp;&amp; Dom.get(href.substr(1)) || this.body().child(tab.index());
+	},
+
+	init: function (options) {
+
+	    var me = this;
+
+	    // 委托头部选择信息。
+	    this.header().delegate('&gt;li', options.selectEvent || 'click', function (e) {
+	        e.preventDefault();
+	        me.selectTab(this);
+	    });
+
+	    var tab = me.getSelectedTab() || me.item(0);
+
+	    me.header().children().removeClass('x-tabbable-selected');
+
+	    me.body().children().hide();
+
+	    if (tab) {
+	        tab.addClass('x-tabbable-selected');
+	        var content = me.getContentOf(tab);
+	        if (content) {
+	            content.show();
+	        }
+	    }
+
+	},
+
+	onToggleTab: function (from, to) {
+	    if (from) {
+	        from.removeClass('x-tabbable-selected');
+	        var content = this.getContentOf(from);
+	        if (content) {
+	            content.hide();
+	        }
+	    }
+
+	    if (to) {
+	        to.addClass('x-tabbable-selected');
+	        var content = this.getContentOf(to);
+	        if (content) {
+	            content.show(this.collapseDuration);
+	        }
+	    }
+	},
+	
+	addAt: function (index, title, content) {
+	    var header = this.header();
+	    var tab = header.insertBefore(Dom.parse('&lt;li class=&quot;x-tabbable-item&quot;&gt;&lt;a href=&quot;javascript:;&quot;&gt;' + title + '&lt;/a&gt;&lt;/li&gt;'), header.child(index));
+	    var body = this.body();
+	    body.insertBefore(Dom.parse('&lt;div class=&quot;x-tabpage&quot;&gt;' + content + '&lt;/div&gt;').hide(), body.child(index));
+	    return tab;
+	},
+	
+	removeAt: function (index) {
+	    var tab = this.header().child(index);
+	    if (tab) {
+	        if (this.getSelectedIndex() === index) {
+	            this.setSelectedIndex(index + 1);
+	        }
+	        var content = this.getContentOf(tab);
+	        if (content) {
+	            content.remove();
+	        }
+
+	        tab.remove();
+	    }
+
+	    return tab;
+	},
+
+	getSelectedTab: function () {
+	    return this.header().find('.x-tabbable-selected');
+	}
+
+});
+
+</pre>
+</body>
+</html>

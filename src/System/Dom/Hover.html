@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=plan">
     <title>鼠标移上后的操作</title>
     <script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
     <script src="../../System/Dom/assets/scripts/Base.js" type="text/javascript"></script>
@@ -12,13 +11,12 @@
 </head>
 <body>
     <article class="demo">
-        <div id="a">
-        </div>
+        <span id="hover">移到我这里</span>
         <script class="demo">
-            Dom.get("a").hover(function () {
-                trace('�Ƶ���');
+            Dom.get("hover").hover(function () {
+                this.setHtml('鼠标进来了');
             }, function () {
-                trace('�Ƴ���');
+                this.setHtml('鼠标走掉了');
             });
         </script>
     </article>

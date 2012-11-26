@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'isId',"source":'System\\Text\\assets\\scripts\\CheckChinese.js',"sourceFile":'data/source/System\\Text\\assets\\scripts\\CheckChinese.js.html#isId',"summary":'<p>\u9a8c\u8bc1\u662f\u5426\u5408\u6cd5\u7684\u8eab\u4efd\u8bc1\u3002</p>\n',"params":[{"type":'Object',"name":'value',"summary":''}],"name":'isId',"memberOf":'',"memberType":'method'});

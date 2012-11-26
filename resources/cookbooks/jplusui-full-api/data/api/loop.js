@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'loop',"source":'System\\Fx\\assets\\scripts\\Marquee.js',"sourceFile":'data/source/System\\Fx\\assets\\scripts\\Marquee.js.html#loop',"summary":'<p>\u662f\u5426\u5faa\u73af\u3002</p>\n',"memberType":'property',"type":'Boolean',"name":'loop',"memberOf":''});

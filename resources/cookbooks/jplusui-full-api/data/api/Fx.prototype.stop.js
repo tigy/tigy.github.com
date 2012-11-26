@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Fx.prototype.stop',"source":'Base_3.js',"sourceFile":'data/source/Base_3.js.html#Fx-prototype-stop',"summary":'<p>\u4e2d\u65ad\u5f53\u524d\u6548\u679c\u3002</p>\n',"memberAccess":'protected',"returns":{"type":'',"summary":'<p>this</p>\n'},"name":'stop',"memberOf":'Fx',"memberType":'method',"params":[]});

@@ -71,81 +71,13 @@ Demo.DplList = {
 
 };
 
-/**
- * 将 Article.demo-grid 转为瀑布流。
- * @param {Integer} column 列号。
- */
-Demo.waterFall = function (column) {
-
-    var articles = document.getElementsByTagName("ARTICLE"),
-        articlesIndex,
-        sections,
-        len,
-        heights = [],
-        section,
-        min,
-        minIndex,
-        baseHeight = 40,
-        marginRight = 10,
-        marginBottom = 30,
-        columnWidth,
-        i,
-        j;
-
-    // 每个 ARTICLE 分开处理。
-    for (articlesIndex = 0; articles[articlesIndex]; articlesIndex++) {
-        if (articles[articlesIndex].className.indexOf("demo-grid") >= 0) {
-            sections = articles[articlesIndex].getElementsByTagName("SECTION");
-            len = sections.length;
-            heights.length = 0;
-            columnWidth = len && sections[0].offsetWidth + marginRight;
-
-            // 第一行不处理。
-            for (i = 0; i < column; i++) {
-                if (section = sections[i]) {
-                    heights[i] = baseHeight + section.offsetHeight + marginBottom;
-                }
-            }
-
-            // 每个块依次选择合适的位置。
-            for (i = column; i < len; i++) {
-                min = Infinity;
-                for (j = heights.length; --j >= 0;) {
-                    if (min >= heights[j]) {
-                        minIndex = j;
-                        min = heights[j];
-                    }
-                }
-
-                section = sections[i];
-                section.style.position = 'absolute';
-                section.style.top = min + 'px';
-                section.style.left = minIndex * columnWidth + 'px';
-
-                heights[minIndex] += section.offsetHeight + marginBottom;
-            }
-
-            max = 0;
-            for (j = heights.length; --j >= 0;) {
-                if (max < heights[j]) {
-                    max = heights[j];
-                }
-            }
-
-            articles[articlesIndex].style.height = max - 40 + 'px';
-        }
-
-    }
-
-};
-
 Demo.writeDplList = function (values) {
 
     Demo.DplList.list = DplList;
     Demo.DplList.tree = Demo.listToTree(DplList);
 
     var list = Demo.DplList.list, tree = Demo.DplList.tree, key, a, ai, b, bi, c, dplInfo, html = '', html2, all, finish,
-    	from = document.referrer || "", // decodeURIComponent((/(&|\?)from=(.*?)(&|$)/.exec(location.href) || [0, 0, ""])[2]),
+    	from = document.referrer || "",
         counts = {},
     	column = 4;
     
@@ -159,7 +91,7 @@ Demo.writeDplList = function (values) {
 
         for (ai in a) {
 
-            html2 += '<section class="demo"><h3 class="demo">' + ai + '</h3><ul class="list demo-mono">';
+            html2 += '<section class="demo"><h3 class="demo">' + ai + '</h3><ul class="list demo">';
 
             b = a[ai];
 
@@ -199,7 +131,11 @@ Demo.writeDplList = function (values) {
         }
 
         if (html2) {
-            html += '<article class="demo demo-relative demo-grid demo-grid-' + column + '"><nav class="demo-toolbar"><a href="javascript://在' + key + '下添加一个组件" title="在' + key + '下添加一个组件" class="x-linkbutton" onclick="Demo.DplList.addDpl(this.parentNode, \'' + key + '\')">✚ 添加组件</a></nav><h2 class="demo">' + key + '(' + values[key] + ')' + '<small title="共: ' + (all + (counts.obsolete || 0));
+            html += '<article class="demo demo-relative demo-grid demo-grid-' + column + '">';
+
+            if(Demo.Configs.dev)
+                html += '<nav class="demo demo-toolbar"><a href="javascript://在' + key + '下添加一个组件" title="在' + key + '下添加一个组件" class="x-linkbutton" onclick="Demo.DplList.addDpl(this.parentNode, \'' + key + '\')">✚ 添加组件</a></nav>'
+            html += '<h2 class="demo">' + key + '(' + values[key] + ')' + '<small title="共: ' + (all + (counts.obsolete || 0));
             
             for (var ai in counts) {
                 b = counts[ai];

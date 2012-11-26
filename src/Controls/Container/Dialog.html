@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=ok">
+    <meta name="dpl-info" content="status=complete">
     <title>对话框</title>
 
     <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css">
@@ -19,131 +19,69 @@
     <script src="../../../assets/demo/demo.js" type="text/javascript"></script>
 </head>
 <body>
-    
-    <!--    http://d.lanrentuku.com/down/js/qita-862/   -->
 
     <article class="demo">
 
-        <h2 class="demo">创建对话框</h2>
+        <h2 class="demo">创建对话框(弹层)</h2>
 
-        <section class="demo">
+        <h3 class="demo">纯 JavaScript 创建最基本的对话框</h3>
+        
+        <script class="demo" type="text/javascript">
 
-            <h3 class="demo">纯 JavaScript 创建最基本的对话框</h3>
+            // 创建一个新的对话框。
+            var dialog = new Dialog();
 
-            <script class="demo" type="text/javascript">
+            // 设置对话框的标题。
+            dialog.setTitle('标题');
 
-                // 创建一个新的对话框。
-                var dialog = new Dialog();
+            // 设置对话框的内容。
+            dialog.setContent('<em>内容</em>');
 
-                // 设置对话框的标题。
-                dialog.setTitle('标题');
+            // 显示对话框。
+            dialog.show();
+        </script>
 
-                // 设置对话框的内容。
-                dialog.setContent('<em>内容</em>');
+        <h3 class="demo">将 HTML 渲染为对话框</h3>
+        
+        <script class="demo" type="code/html">
+           <div id="dialog2">我是对话框2</div>
+
+            <\script>
+            
+                // new Dialog(这里写id或 dom对象)。对应的 DOM 节点将被移到新创建的对话框内部。
+                var dialog2 = new Dialog('dialog2');
 
                 // 显示对话框。
-                dialog.show();
-            </script>
+                dialog2.show();
+            </\script>
+        </script>
 
-        </section>
-
-        <section class="demo">
-
-            <h3 class="demo">将 HTML 渲染为对话框</h3>
-
-            <script class="demo" type="code/html">
-               <div id="dialog2">我是对话框2</div>
-
-                <\script>
-                
-                    // 创建一个新的对话框。
-                    var dialog2 = new Dialog('dialog2');
-
-                    // 显示对话框。
-                    dialog2.showDialog();
-                <\/script>
-            </script>
-
-        </section>
-
-        <p class="demo">创建含有确定/取消按钮或者含有一个图标的对话框，请使用 <a href="MessageBox.html">MessageBox</a> 组件。</p>
+        <blockquote class="demo">创建含有确定/取消按钮或者含有一个图标的对话框，请使用 <a href="MessageBox.html">MessageBox</a> 组件。</blockquote>
 
     </article>
 
     <article class="demo">
 
-        <h2 class="demo">常用 API</h2>
+        <h2 class="demo">常用 API </h2>
 
-        <section class="demo">
-
-            <h4 class="demo">创建模式对话框（对话框后有阴影）</h4>
-
-            <script class="demo" type="code/javascript">
-                dialog.showDialog(); // 使用此函数显示对话框即可。
-            </script>
-
-            <h4 class="demo">关闭对话框</h4>
-
-            <script class="demo" type="code/javascript">
-                dialog.close();
-            </script>
-
-            <h4 class="demo">删除关闭按钮</h4>
-
-            <script class="demo" type="code/javascript">
-                dialog.remove('.x-closebutton');
-            </script>
-
-            <h4 class="demo">设置关闭后回调一个函数</h4>
-
-            <script class="demo" type="code/javascript">
-                dialog.on('close', function(){
-                    alert('对话框已经关闭了');
-                });
-            </script>
-
-            <h4 class="demo">设置关闭前回调一个函数，并阻止关闭事件</h4>
-
-            <script class="demo" type="code/javascript">
-                dialog.on('closing', function(){
-                    alert('这个对话框时不允许被关闭的');
-                    return false;
-                });
-            </script>
-
-            <h4 class="demo">设置对话框双击标题后关闭</h4>
-
-            <script class="demo" type="code/javascript">
-                dialog.header().on('dblclick', dialog.close, dialog);
-            </script>
-
-            <h4 class="demo">让对话框允许拖动标题</h4>
-
-            <script class="demo" type="code/javascript">
-                using("System.Dom.Drag");  // 载入拖动模块。
-                dialog.draggable(dialog.header());
-            </script>
-
-            <h4 class="demo">设置对话框内容的大小</h4>
-
-            <script class="demo" type="code/javascript">
-                dialog.setContentSize(300, 100);
-            </script>
-
-            <h4 class="demo">设置对话框的位置</h4>
-
-            <script class="demo" type="code/javascript">
-                dialog.setPosition(300, 100);
-            </script>
-
-            <h4 class="demo">往对话框追加内容</h4>
-
-            <script class="demo" type="code/javascript">
-                dialog.body().append('追加的内容');
-                dialog.body().append(document.getElementById('id'));
-            </script>
-
-        </section>
+        <script>
+            Demo.writeExamples({
+                '显示有关': '-',
+                '创建模式对话框（对话框后有阴影）': 'dialog.showDialog(); // 使用此函数显示对话框即可。',
+                '让对话框允许拖动标题': 'using("System.Dom.Drag"); /* 载入拖动模块。 */ dialog.draggable(dialog.header().setStyle("cursor", "move"));dialog.setPosition(dialog.getPosition());// 因为对话框默认为居中的，强制对话框使用绝对定位方式，这样可以保证拖动效果正常执行。',
+                '设置对话框内容的大小': 'dialog.setContentSize(300, 100);',
+                '设置对话框的位置': 'dialog.setPosition(300, 100);',
+                '往对话框追加内容': 'dialog.body().append("<em>追加的内容</em>");dialog.body().append(document.getElementById("id"));',
+                
+                '关闭有关': '-',
+                '关闭对话框': 'dialog.close();',
+                '去掉关闭按钮': 'dialog.remove(".x-closebutton");',
+                '设置关闭后的回调': 'dialog.on("close", function(){alert("对话框已经关闭了");});',
+                '设置关闭前的回调，并阻止关闭事件': 'dialog.on("closing", function(){alert("这个对话框时不允许被关闭的");return false;/*return false 阻止事件，这样将关闭不了对话框。*/});',
+                '设置双击对话框标题后关闭对话框': 'dialog.header().on("dblclick", dialog.close, dialog);'
+                
+            });
+        </script>
 
     </article>
 

@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'Ajax.prototype.Ajax',"source":'Base_2.js',"sourceFile":'data/source/Base_2.js.html#Ajax-prototype-Ajax',"summary":'<p>Ajax \u5bf9\u8c61\u3002</p>\n',"memberType":'constructor',"name":'Ajax',"memberOf":'Ajax',"type":'Function',"params":[]});

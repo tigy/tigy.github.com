@@ -1,0 +1,39 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>System\Data\assets\scripts\Xml.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author
+ */
+
+var XML = XML || {};
+
+XML.parse = function(value) {
+	if( typeof value !== &quot;string&quot; || !value) {
+		return null;
+	}
+	var xml, tmp;
+	try {
+		if(window.DOMParser) {// Standard
+			tmp = new DOMParser();
+			xml = tmp.parseFromString(value, &quot;text/xml&quot;);
+		} else {// IE
+			xml = new ActiveXObject(&quot;Microsoft.XMLDOM&quot;);
+			xml.async = &quot;false&quot;;
+			xml.loadXML(value);
+		}
+	} catch( e ) {
+		xml = undefined;
+	}
+	if(!xml || !xml.documentElement || xml.getElementsByTagName(&quot;parsererror&quot;).length) {
+		throw new SyntaxError('XML.parse: parse error\n' + value);
+	}
+	return xml;
+};</pre>
+</body>
+</html>

@@ -1,0 +1,1 @@
+﻿jsonp({"fullName":'TreeControl.prototype.init',"source":'TreeControl.js',"sourceFile":'data/source/TreeControl.js.html#TreeControl-prototype-init',"summary":'<p>\u521d\u59cb\u5316 DOM \u4e2d\u5df2\u7ecf\u5b58\u5728\u7684\u9879\u3002</p>\n',"memberAccess":'protected',"name":'init',"memberOf":'TreeControl',"memberType":'method',"params":[]});

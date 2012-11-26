@@ -1,0 +1,232 @@
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Tween.js 源码</title>
+		<link href="../../assets/styles/prettify.css" type="text/css" rel="stylesheet" />
+		<script src="../../assets/scripts/prettify.js" type="text/javascript"></script>
+		<style type="text/css">.highlight { display: block; background-color: #ddd; }</style>
+</head>
+<body onload="setTimeout('prettyPrint()', 0);var node = document.getElementById(location.hash.replace(/#/, ''));if(node)node.className = 'highlight';"><pre class="prettyprint lang-js">/**
+ * @author xuld
+ */
+
+
+using(&quot;System.Fx.Base&quot;);
+using(&quot;System.Dom.Base&quot;);
+
+
+/**
+ * @namespace Fx
+ */
+Object.extend(Fx, {
+	
+	<span id="Fx-tweeners">/**
+	 * 用于特定 css 补间动画的引擎。 
+	 */</span>
+	tweeners: {},
+	
+	<span id="Fx-defaultTweeners">/**
+	 * 默认的补间动画的引擎。 
+	 */</span>
+	defaultTweeners: [],
+	
+	<span id="Fx-numberTweener">/**
+	 * 用于数字的动画引擎。
+	 */</span>
+	numberTweener: {
+		get: function(target, name){
+			return Dom.styleNumber(target.node, name);
+		},
+				
+		<span id="Fx-numberTweener-compute">/**
+		 * 常用计算。
+		 * @param {Object} from 开始。
+		 * @param {Object} to 结束。
+		 * @param {Object} delta 变化。
+		 */</span>
+		compute: function(from, to, delta){
+			return (to - from) * delta + from;
+		},
+		
+		parse: function(value){
+			return typeof value == &quot;number&quot; ? value : parseFloat(value);
+		},
+		
+		set: function(target, name, value){
+			target.node.style[name] = value;
+		}
+	},
+
+	<span id="Fx-Tween">/**
+	 * 补间动画
+	 * @class Fx.Tween
+	 * @extends Fx
+	 */</span>
+	Tween: Fx.extend({
+		
+		<span id="Fx-Tween-prototype-constructor">/**
+		 * 初始化当前特效。
+		 */</span>
+		constructor: function(){
+			
+		},
+		
+		<span id="Fx-Tween-prototype-set">/**
+		 * 根据指定变化量设置值。
+		 * @param {Number} delta 变化量。 0 - 1 。
+		 * @protected override
+		 */</span>
+		set: function(delta){
+			var options = this.options,
+				params = options.params,
+				target = options.target,
+				tweener,
+				key,
+				value;
+
+			// 对当前每个需要执行的特效进行重新计算并赋值。
+			for (key in params) {
+				value = params[key];
+				tweener = value.tweener;
+				tweener.set(target, key, tweener.compute(value.from, value.to, delta));
+			}
+		},
+		
+		<span id="Fx-Tween-prototype-init">/**
+		 * 生成当前变化所进行的初始状态。
+		 * @param {Object} options 开始。
+		 * @protected override
+		 */</span>
+		init: function (options) {
+				
+			// 对每个设置属性
+			var key,
+				tweener,
+				part,
+				value,
+				parsed,
+				i,
+				// 生成新的 tween 对象。
+				params = {};
+			
+			for (key in options.params) {
+
+				// value
+				value = options.params[key];
+
+				// 如果 value 是字符串，判断 += -= 或 a-b
+				if (typeof value === 'string' &amp;&amp; (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {
+					value = part[3];
+				}
+
+				// 找到用于变化指定属性的解析器。
+				tweener = Fx.tweeners[key = key.toCamelCase()];
+				
+				// 已经编译过，直接使用， 否则找到合适的解析器。
+				if (!tweener) {
+					
+					// 如果是纯数字属性，使用 numberParser 。
+					if(key in Dom.styleNumbers) {
+						tweener = Fx.numberTweener;
+					} else {
+						
+						i = Fx.defaultTweeners.length;
+						
+						// 尝试使用每个转换器
+						while (i-- &gt; 0) {
+							
+							// 获取转换器
+							parsed = Fx.defaultTweeners[i].parse(value, key);
+							
+							// 如果转换后结果合格，证明这个转换器符合此属性。
+							if (parsed || parsed === 0) {
+								tweener = Fx.defaultTweeners[i];
+								break;
+							}
+						}
+
+						// 找不到合适的解析器。
+						if (!tweener) {
+							continue;
+						}
+						
+					}
+
+					// 缓存 tweeners，下次直接使用。
+					Fx.tweeners[key] = tweener;
+				}
+				
+				// 如果有特殊功能。 ( += -= a-b)
+				if(part){
+					parsed = part[2];
+					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);
+					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));
+				} else {
+					parsed = tweener.parse(value);
+					i = tweener.get(options.target, key);
+				}
+				
+				params[key] = {
+					tweener: tweener,
+					from: i,
+					to: parsed		
+				};
+				
+				assert(i !== null &amp;&amp; parsed !== null, &quot;Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。&quot;, key, i, parsed);
+				
+			}
+
+			options.params = params;
+		}
+	
+	}),
+	
+	createTweener: function(tweener){
+		return Object.extendIf(tweener, Fx.numberTweener);
+	}
+	
+});
+
+Object.each(Dom.styleFix, function(value, key){
+	Fx.tweeners[key] = this;
+}, Fx.createTweener({
+	set: function (target, name, value) {
+		Dom.styleFix[name].call(target, value);
+	}
+}));
+
+Fx.tweeners.scrollTop = Fx.createTweener({
+	set: function (target, name, value) {
+		target.setScroll(null, value);
+	},
+	get: function (target) {
+		return target.getScroll().y;
+	}
+});
+
+Fx.tweeners.scrollLeft = Fx.createTweener({
+	set: function (target, name, value) {
+		target.setScroll(value);
+	},
+	get: function (target) {
+		return target.getScroll().x;
+	}
+});
+
+Fx.defaultTweeners.push(Fx.createTweener({
+
+	set: navigator.isStd ? function (target, name, value) {
+		
+		target.node.style[name] = value + 'px';
+	} : function(target, name, value) {
+		try {
+			
+			// ie 对某些负属性内容报错
+			target.node.style[name] = value;
+		}catch(e){}
+	}
+
+}));</pre>
+</body>
+</html>

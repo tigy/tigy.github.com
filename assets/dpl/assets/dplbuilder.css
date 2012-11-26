@@ -55,40 +55,20 @@ td{
     width: 266px;   
 }
 
-/*.namespace {
-	margin-bottom: 10px;
+.demo-tip {
+  padding: 4px 6px;
+  margin: 4px 0;
+  line-height: 18px;
+  clear: both;
 }
 
-a.link  {
-	color: #333333;	
+.demo-tip .demo-toolbar {
+  display: none;
 }
-
-.namespace li{
-	margin: 5px 0;	
+.demo-tip-hover {
+  background: #eee;
 }
-
-
-
-
-#toolbar {
-	text-align: right;	
+.demo-tip-hover .demo-toolbar {
+  display: block;
+  line-height: 18px!important;
 }
-
-#content {
-    float: left;
-    margin-left: 10px;
-}
-
-
-
-.name {
-	line-height:  28px;	
-}
-
-
-
-
-
-tr.alt {
-	background-color: #f0f0f0;	
-}*/
