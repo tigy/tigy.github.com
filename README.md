@@ -1,10 +1,10 @@
 # jPlusUI 概述
 
-jPlusUI 是一个使用 JavaScript 开发的轻量但完整的 Web UI 组件库。它提供了：
+jPlusUI 是一个使用 JavaScript 开发的轻量但完整的开源 Web UI 组件库。它提供了：
 
-* 200个可直接使用 UI 组件。
+* 100 多个可直接使用 UI 组件。
 * 100 多个可复用的 CSS 设计。
-* 200 个常用的 JavaScript 代码和案例。
+* 150 多个常用的 JavaScript 代码和案例。
 * 一个轻量的面向对象的 Javascript 开发框架。
 * 一套完善的组件开发思路、方法、构架和工具。
 

@@ -112,9 +112,6 @@ a.button-short {
     padding-top: 10px;
 }
 
-.features .block h4 {
-}
-
 .summary {
     background: url(../images/feature-arrow.png) no-repeat center top;
 }
@@ -146,7 +143,11 @@ a.button-short {
     margin-bottom: 40px;
 }
 
-.examples h5 a{
+.examples h4 {
+    margin: 0;
+}
+
+.examples h4 a{
     color: #333;
     text-decoration: none;
 }

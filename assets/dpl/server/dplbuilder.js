@@ -684,7 +684,7 @@ var DplBuilder = {
         writer.write("This file is created by a tool at " + d + lineBreak);
         writer.write(" *********************************************************");
         writer.write(lineBreak);
-        writer.write(" * Contains: ");
+        writer.write(" * Include: ");
         writer.write(lineBreak);
         for (var i = 0; i < arr.length; i++) {
             writer.write(" *     ");
