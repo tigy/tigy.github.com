@@ -13,20 +13,9 @@
     <article class="demo">
         <script>
             Demo.writeExamples({
-                '获取 Cookie': {
-                    'Browser.getCookie("aaaa")': "-"
-                },
-                '设置 Cookie': {
-                    'Browser.setCookie("aaaa", "b")': function (value, assert) {
-                        assert.areEqual(Browser.getCookie("aaaa"), "b");
-                    },
-                    'Browser.setCookie("aaaa", "b", 1)': '-'
-                },
-                '删除 Cookie': {
-                    'Browser.setCookie("aaaa", null)': function (value, assert) {
-                        assert.areEqual(Browser.getCookie("aaaa"), null);
-                    }
-                }
+                '获取 Cookie': 'Browser.getCookie("aaaa")',
+                '设置 Cookie': 'Browser.setCookie("aaaa", "b")',
+                '删除 Cookie': 'Browser.setCookie("aaaa", null)'
             });
         </script>
     </article>
