@@ -77,7 +77,7 @@ Demo.writeList = function (list, newWindow) {
 
         data = list[category];
 
-        html += '<section class="demo"><h3 class="demo">' + category + '</h3><ul class="demo-mono list">';
+        html += '<section class="demo"><h3 class="demo">' + category + '</h3><ul class="demo list">';
 
         for (name in data) {
             html += '<li><a ' + (newWindow ? ' target="_blank"' : '') + ' class="demo" href="' + data[name] + '" title="' + name + '">' + name + '</a></li>';
