@@ -51,7 +51,7 @@ var Ajax = (function () {
 			 * 默认超时数。
 			 * @type {Number}
 			 */
-			timeout: -1,
+			timeout: -1
 
 		},
 
