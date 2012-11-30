@@ -11,6 +11,9 @@ using("System.Dom.Base");
  */
 var Draggable = Class({
 
+    /**
+     * 从鼠标按下到开始拖动的延时。
+     */
     dragDelay: 500,
 
     /**
@@ -19,7 +22,7 @@ var Draggable = Class({
 	 * @param {Event} e mousemove 事件参数对象。
      * @protected virtual
 	 */
-    raiseDragEvent: function (eventName, e) {
+    raiseEvent: function (eventName, e) {
 
         // 绑定 draggable 和当前的 Draggable 对象。
         e.draggable = this;
@@ -34,10 +37,12 @@ var Draggable = Class({
 	 */
     onDragStart: function (e) {
 
+        if (!this.raiseEvent('dragstart', e)) {
+            return false;
+        }
+
         // 记录当前的 offset, 用于在 onDrag 时设置位置。
         this.offset = this.proxy.getOffset();
-
-        return this.raiseDragEvent('dragstart', e);
     },
 	
 	/**
@@ -47,16 +52,13 @@ var Draggable = Class({
 	 */
 	onDrag: function (e) {
 	    var me = this;
-	    if (this.raiseDragEvent('drag', e)) {
-	        me.proxy.setOffset({
-	            x: me.offset.x + me.to.x - me.from.x,
-	            y: me.offset.y + me.to.y - me.from.y
-	        });
 
-	        return true;
-	    }
+	    me.raiseEvent('drag', e);
 
-	    return false;
+	    me.proxy.setOffset({
+	        x: me.offset.x + me.to.x - me.from.x,
+	        y: me.offset.y + me.to.y - me.from.y
+	    });
 	},
 	
 	/**
@@ -64,7 +66,10 @@ var Draggable = Class({
 	 * @param {Event} e 原生的 mouseup 事件。
      * @protected virtual
 	 */
-	onDragEnd: Function.empty,
+	onDragEnd: function (e) {
+	    this.raiseEvent('dragend', e);
+	    this.offset = null;
+	},
 	
 	/**
 	 * 处理 mousedown 事件。
@@ -95,16 +100,16 @@ var Draggable = Class({
 		// 设置当前处理  mousemove 的方法。
 		// 初始需设置 onDrag
 		// 由 onDrag 设置为    onDrag
-		me.currentHandler = me._handlerDragStart;
+		me.currentHandler = me.handlerDragStart;
 		
         // 延时拖动。
 		me.timer = setTimeout(function () {
 		    me.timer = 0;
-		    me._handlerDragStart(e);
+		    me.currentHandler(e);
 		}, me.dragDelay);
 		
 		// 设置文档  mouseup 和   mousemove
-		Dom.getDocument(me.handle.node).on('mouseup', me._handlerDragStop, me).on('mousemove', me._handlerMouseMove, me);
+		Dom.getDocument(me.handle.node).on('mouseup', me.handlerDragStop, me).on('mousemove', me.handlerMouseMove, me);
 	
 	},
 	
@@ -112,7 +117,7 @@ var Draggable = Class({
 	 * 处理 mousemove 事件。
 	 * @param {Event} e 事件参数。
 	 */
-	_handlerMouseMove: function (e) {
+	handlerMouseMove: function (e) {
 		
 		e.preventDefault();
 		
@@ -129,7 +134,7 @@ var Draggable = Class({
 	 * @param {Event} e 事件。
 	 * 这个函数调用 onDragStart 和 beforeDrag
 	 */
-	_handlerDragStart: function (e) {
+	handlerDragStart: function (e) {
 		
 		var me = this;
 		
@@ -143,13 +148,12 @@ var Draggable = Class({
 		Draggable.current = me;
 		
 	    // 设置下次 mousemove 时的处理函数。
-		me.currentHandler = me.drag;
+		me.currentHandler = me.handlerDrag;
 		
 	    // 触发 dragstart 事件，  就完全停止拖动。
-		if (me.raiseDragEvent('dragstart', e)) {
+		if (me.onDragStart(e) !== false) {
 		    me.beforeDrag(e);
-		    me.onDragStart();
-			me.drag(e);
+		    me.handlerDrag(e, true);
 		} else {
 			// 停止。
 			me.stopDragging();
@@ -161,7 +165,7 @@ var Draggable = Class({
 	 * @param {Event} e 事件参数。
 	 * 这个函数调用 onDrag 和 doDrag
 	 */
-	_handlerDrag: function (e) {
+	handlerDrag: function (e) {
 		this.onDrag(e);
 		this.doDrag(e);
 	},
@@ -171,57 +175,49 @@ var Draggable = Class({
 	 * @param {Event} e 事件参数。
 	 * 这个函数调用 onDragEnd 和 afterDrag
 	 */
-	_handlerDragStop: function (e) {
+	handlerDragStop: function (e) {
 		
 		// 只有鼠标左键松开， 才认为是停止拖动。
 		if(e.which !== 1)
 			return;
 		
 		e.preventDefault();
+
+	    // 在 stopDragging 前记录 Draggable.current 。
+		var isCurrentDraggable = Draggable.current === this;
+
+		this.stopDragging();
 		
 		// 检查是否拖动。
 		// 有些浏览器效率较低，肯能出现这个函数多次被调用。
 		// 为了安全起见，检查 current 变量。
-		if (Draggable.current === this) {
-			
-			this.stopDragging();
+		if (isCurrentDraggable) {
+
+		    // 改变结束的鼠标类型，一般这个函数将恢复鼠标样式。
+		    this.afterDrag(e);
 			
 			this.onDragEnd(e);
-
-			// 改变结束的鼠标类型，一般这个函数将恢复鼠标样式。
-			this.afterDrag(e);
 		
-		} else {
-
-			this.stopDragging();
-			
 		}
 	},
 	
-	beforeDrag: function(e){
-		this.offset = this.proxy.getOffset();
+	beforeDrag: function (e) {
+	    this.oldCursor = document.documentElement.style.cursor;
 		document.documentElement.style.cursor = this.target.getStyle('cursor');
 		if('pointerEvents' in document.body.style)
 			document.body.style.pointerEvents = 'none';
 		else if(document.body.setCapture)
 			document.body.setCapture();
 	},
-	
-	doDrag: function(e){
-		var me = this;
-		me.proxy.setOffset({
-			x: me.offset.x + me.to.x - me.from.x,
-			y: me.offset.y + me.to.y - me.from.y
-		});
-	},
+
+    doDrag: Function.empty,
 	
 	afterDrag: function(){
 		if(document.body.style.pointerEvents === 'none')
 			document.body.style.pointerEvents = '';
 		else if(document.body.releaseCapture)
 			document.body.releaseCapture();
-		document.documentElement.style.cursor = '';
-		this.offset = null;
+		document.documentElement.style.cursor = this.oldCursor;
 	},
 	
 	constructor: function (options) {
@@ -231,14 +227,14 @@ var Draggable = Class({
 
 	    this.proxy = this.proxy || this.target;
 
-		this.draggable();
+	    this.disable(false);
 	},
 
 	/**
 	 * 停止当前对象的拖动。
 	 */
 	stopDragging: function(){
-	    Dom.getDocument(this.handle.node).un('mousemove', this._handlerMouseMove).un('mouseup', this._handlerDragStop);
+	    Dom.getDocument(this.handle.node).un('mousemove', this.handlerMouseMove).un('mouseup', this.handlerDragStop);
 
 	    //   清空计时器。
 	    if (this.timer) {
@@ -248,9 +244,12 @@ var Draggable = Class({
 
 		Draggable.current = null;
 	},
-	
-	draggable: function(value){
-	    this.handle[value !== false ? 'on' : 'un']('mousedown', this._handlerMouseDown, this);
+
+    /**
+	 * 启用或禁用当前拖动功能的状态。
+	 */
+	disable: function (value) {
+	    this.handle[value === false ? 'on' : 'un']('mousedown', this.handlerMouseDown, this);
 	}
 	
 });
@@ -265,21 +264,22 @@ Dom.implement({
 	 * @param {Element} [handle] 拖动句柄。
 	 * @return this
 	 */
-	draggable: function(handle) {
+    draggable: function (options) {
 		var draggable = this.dataField().draggable;
-		if(handle !== false) {
-			if (handle === true) handle = null;
-			if(draggable) {
-				assert(!handle || draggable.handle.target === handle.target, "Dom.prototype.draggable(handle): 无法重复设置 {handle}, 如果希望重新设置handle，使用以下代码：dom.draggable(false);JPlus.removeData(dom, 'draggable');dom.draggable(handle) 。", handle);
-				draggable.draggable();
+		if (options !== false) {
+		    if (typeof options !== 'object') options = {};
+		    if (draggable) {
+		        Object.extend(draggable, options);
+				draggable.disable(false);
 			} else  {
+			    options.target = this;
 				Dom.movable(this.node);
-				draggable = this.dataField().draggable = new Draggable(this, handle);
+				draggable = this.dataField().draggable = new Draggable(options);
 			}
 			
 			
 		} else if(draggable)
-			draggable.draggable(false);
+		    draggable.disable();
 		return this;
 	}
 	

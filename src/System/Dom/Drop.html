@@ -34,6 +34,12 @@
             color: #999;
             background: none;
         }
+
+        .drag-proxy {
+            opacity: 0.5;
+            filter: alpha(opacity=50);
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
@@ -52,26 +58,34 @@
             <div id="z2" class="zone"></div>
             <div id="z3" class="zone"></div>
         </div>
-        <script>
-
+        <script class="demo">
 
             // 让 小方块 可拖动。
-            $('drag').query('.demo-box-small').draggable(true);
+            Dom.query('.demo-box-small').draggable(true).on('dragstart', function (e) {
+                // 拖动前先创建一个副本。
+                e.draggable.proxy = e.draggable.target.clone().addClass('drag-proxy').appendTo('drag').setPosition(e.draggable.target.getPosition());
+            }).on('dragend', function (e) {
+                // 拖动前先创建一个副本。
+                e.draggable.proxy.remove();
+            });
 
             // 拖入之后，创建虚位。
-            $('drop').query('.zone').on('dragenter', function (e) {
-                this.node.hover = Dom.create('div', 'demo-box-small hover').setHtml(e.dragTarget.node.id.substr(1));
-                this.append(this.dom.hover);
+            Dom.query('.zone').on('dragenter', function (e) {
+
+                // 在 zone 创建虚线放开。
+                e.draggable.hover = Dom.create('div', 'demo-box-small hover').setHtml(e.draggable.target.node.id.substr(1)).appendTo(this);
 
                 // 拖到外面时，隐藏虚位。
             }).on('dragleave', function (e) {
-                this.node.hover.remove();
 
-                // 放置时，隐藏虚位，并添加方块。
+                // 删除虚线。
+                e.draggable.hover.remove();
+
             }).on('drop', function (e) {
-                this.node.hover.remove();
-                e.dragTarget.setOffset({ x: 0, y: 0 });
-                this.append(e.dragTarget);
+                
+                // 放置时，隐藏虚位，并添加方块。
+                e.draggable.hover.remove();
+                e.draggable.target.appendTo(this).setOffset({ x: 0, y: 0 });
             });
 
         </script>

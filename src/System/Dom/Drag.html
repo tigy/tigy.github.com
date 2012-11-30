@@ -2,7 +2,6 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="dpl-info" content="status=beta">
     <title>拖动</title>
     <script src="../../System/Core/assets/scripts/Base.js" type="text/javascript"></script>
     <script src="../../System/Dom/assets/scripts/Base.js" type="text/javascript"></script>
@@ -55,7 +54,9 @@
 
         <script class="demo">
 
-            var d3 = $('d3').draggable($('d3').find('button'));
+            var d3 = $('d3').draggable({
+                handle: $('d3').find('button')
+            });
 
         </script>
 
@@ -73,8 +74,7 @@
         <script class="demo">
 
             var d5 = $('d5').draggable(true).on('drag', function (e) {
-                var container = this.parent(1);
-                e.draggable.limit(container.getPosition(), container.getSize());
+                e.draggable.limit(this.parent());
             });
 
         </script>

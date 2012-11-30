@@ -111,56 +111,56 @@ test("Object.each", function() {
 
 });
 
-test("Object.isArray", function() {
+test("Array.isArray", function() {
 	expect(17);
 
 	// Make sure that false values return false
-	ok( !Object.isArray(), "No Value" );
-	ok( !Object.isArray( null ), "null Value" );
-	ok( !Object.isArray( undefined ), "undefined Value" );
-	ok( !Object.isArray( "" ), "Empty String Value" );
-	ok( !Object.isArray( 0 ), "0 Value" );
+	ok( !Array.isArray(), "No Value" );
+	ok( !Array.isArray( null ), "null Value" );
+	ok( !Array.isArray( undefined ), "undefined Value" );
+	ok( !Array.isArray( "" ), "Empty String Value" );
+	ok( !Array.isArray( 0 ), "0 Value" );
 
 	// Check built-ins
 	// Safari uses "(Internal Function)"
-	ok( !Object.isArray(String), "String Function("+String+")" );
-	ok( !Object.isArray(Array), "Array Function("+Array+")" );
-	ok( !Object.isArray(Object), "Object Function("+Object+")" );
-	ok( !Object.isArray(Function), "Function Function("+Function+")" );
+	ok( !Array.isArray(String), "String Function("+String+")" );
+	ok( !Array.isArray(Array), "Array Function("+Array+")" );
+	ok( !Array.isArray(Object), "Object Function("+Object+")" );
+	ok( !Array.isArray(Function), "Function Function("+Function+")" );
 
 	// When stringified, this could be misinterpreted
 	var mystr = "function";
-	ok( !Object.isArray(mystr), "Function String" );
+	ok( !Array.isArray(mystr), "Function String" );
 
 	// When stringified, this could be misinterpreted
 	var myarr = [ "function" ];
-	ok( Object.isArray(myarr), "Function Array" );
+	ok( Array.isArray(myarr), "Function Array" );
 
 	// When stringified, this could be misinterpreted
 	var myArray = { "function": "test", length: 3 };
-	ok( !Object.isArray(myArray), "Function Object" );
+	ok( !Array.isArray(myArray), "Function Object" );
 
 	// Make sure normal functions still work
 	var fn = function(){};
-	ok( !Object.isArray(fn), "Normal Function" );
+	ok( !Array.isArray(fn), "Normal Function" );
 
 	var obj = document.createElement("object");
 
 	// Firefox says this is a function
-	ok( !Object.isArray(obj), "Object Element" );
+	ok( !Array.isArray(obj), "Object Element" );
 
 	// IE says this is an object
 	// Since 1.3, this isn't supported (#2968)
-	//ok( Object.isArray(obj.getAttribute), "getAttribute Function" );
+	//ok( Array.isArray(obj.getAttribute), "getAttribute Function" );
 
 	var nodes = document.body.childNodes;
 
-	ok( !Object.isArray(nodes), "childNodes Property" );
+	ok( !Array.isArray(nodes), "childNodes Property" );
 
 	var first = document.body.firstChild;
 
 	// Normal elements are reported ok everywhere
-	ok( !Object.isArray(first), "A normal DOM Element" );
+	ok( !Array.isArray(first), "A normal DOM Element" );
 
 	var input = document.createElement("input");
 	input.type = "text";
@@ -168,7 +168,7 @@ test("Object.isArray", function() {
 
 	// IE says this is an object
 	// Since 1.3, this isn't supported (#2968)
-	//ok( Object.isArray(input.focus), "A default function property" );
+	//ok( Array.isArray(input.focus), "A default function property" );
 
 	document.body.removeChild( input );
 
@@ -177,7 +177,7 @@ test("Object.isArray", function() {
 	document.body.appendChild( a );
 
 	// This serializes with the word 'function' in it
-	ok( !Object.isArray(a), "Anchor Element" );
+	ok( !Array.isArray(a), "Anchor Element" );
 
 	document.body.removeChild( a );
 });
@@ -217,92 +217,92 @@ test("Function.prototype.bind", function(){
 	test.bind( thisObject )();
 });
 
-test("Object.isFunction", function() {
-	expect(19);
+//test("Object.isFunction", function() {
+//	expect(19);
 
-	// Make sure that false values return false
-	ok( !Object.isFunction(), "No Value" );
-	ok( !Object.isFunction( null ), "null Value" );
-	ok( !Object.isFunction( undefined ), "undefined Value" );
-	ok( !Object.isFunction( "" ), "Empty String Value" );
-	ok( !Object.isFunction( 0 ), "0 Value" );
+//	// Make sure that false values return false
+//	ok( !Object.isFunction(), "No Value" );
+//	ok( !Object.isFunction( null ), "null Value" );
+//	ok( !Object.isFunction( undefined ), "undefined Value" );
+//	ok( !Object.isFunction( "" ), "Empty String Value" );
+//	ok( !Object.isFunction( 0 ), "0 Value" );
 
-	// Check built-ins
-	// Safari uses "(Internal Function)"
-	ok( Object.isFunction(String), "String Function("+String+")" );
-	ok( Object.isFunction(Array), "Array Function("+Array+")" );
-	ok( Object.isFunction(Object), "Object Function("+Object+")" );
-	ok( Object.isFunction(Function), "Function Function("+Function+")" );
+//	// Check built-ins
+//	// Safari uses "(Internal Function)"
+//	ok( Object.isFunction(String), "String Function("+String+")" );
+//	ok( Object.isFunction(Array), "Array Function("+Array+")" );
+//	ok( Object.isFunction(Object), "Object Function("+Object+")" );
+//	ok( Object.isFunction(Function), "Function Function("+Function+")" );
 
-	// When stringified, this could be misinterpreted
-	var mystr = "function";
-	ok( !Object.isFunction(mystr), "Function String" );
+//	// When stringified, this could be misinterpreted
+//	var mystr = "function";
+//	ok( !Object.isFunction(mystr), "Function String" );
 
-	// When stringified, this could be misinterpreted
-	var myarr = [ "function" ];
-	ok( !Object.isFunction(myarr), "Function Array" );
+//	// When stringified, this could be misinterpreted
+//	var myarr = [ "function" ];
+//	ok( !Object.isFunction(myarr), "Function Array" );
 
-	// When stringified, this could be misinterpreted
-	var myfunction = { "function": "test" };
-	ok( !Object.isFunction(myfunction), "Function Object" );
+//	// When stringified, this could be misinterpreted
+//	var myfunction = { "function": "test" };
+//	ok( !Object.isFunction(myfunction), "Function Object" );
 
-	// Make sure normal functions still work
-	var fn = function(){};
-	ok( Object.isFunction(fn), "Normal Function" );
+//	// Make sure normal functions still work
+//	var fn = function(){};
+//	ok( Object.isFunction(fn), "Normal Function" );
 
-	var obj = document.createElement("object");
+//	var obj = document.createElement("object");
 
-	// Firefox says this is a function
-	ok( !Object.isFunction(obj), "Object Element" );
+//	// Firefox says this is a function
+//	ok( !Object.isFunction(obj), "Object Element" );
 
-	// IE says this is an object
-	// Since 1.3, this isn't supported (#2968)
-	//ok( Object.isFunction(obj.getAttribute), "getAttribute Function" );
+//	// IE says this is an object
+//	// Since 1.3, this isn't supported (#2968)
+//	//ok( Object.isFunction(obj.getAttribute), "getAttribute Function" );
 
-	var nodes = document.body.childNodes;
+//	var nodes = document.body.childNodes;
 
-	// Safari says this is a function
-	ok( !Object.isFunction(nodes), "childNodes Property" );
+//	// Safari says this is a function
+//	ok( !Object.isFunction(nodes), "childNodes Property" );
 
-	var first = document.body.firstChild;
+//	var first = document.body.firstChild;
 
-	// Normal elements are reported ok everywhere
-	ok( !Object.isFunction(first), "A normal DOM Element" );
+//	// Normal elements are reported ok everywhere
+//	ok( !Object.isFunction(first), "A normal DOM Element" );
 
-	var input = document.createElement("input");
-	input.type = "text";
-	document.body.appendChild( input );
+//	var input = document.createElement("input");
+//	input.type = "text";
+//	document.body.appendChild( input );
 
-	// IE says this is an object
-	// Since 1.3, this isn't supported (#2968)
-	//ok( Object.isFunction(input.focus), "A default function property" );
+//	// IE says this is an object
+//	// Since 1.3, this isn't supported (#2968)
+//	//ok( Object.isFunction(input.focus), "A default function property" );
 
-	document.body.removeChild( input );
+//	document.body.removeChild( input );
 
-	var a = document.createElement("a");
-	a.href = "some-function";
-	document.body.appendChild( a );
+//	var a = document.createElement("a");
+//	a.href = "some-function";
+//	document.body.appendChild( a );
 
-	// This serializes with the word 'function' in it
-	ok( !Object.isFunction(a), "Anchor Element" );
+//	// This serializes with the word 'function' in it
+//	ok( !Object.isFunction(a), "Anchor Element" );
 
-	document.body.removeChild( a );
+//	document.body.removeChild( a );
 
-	// Recursive function calls have lengths and array-like properties
-	function callme(callback){
-		function fn(response){
-			callback(response);
-		}
+//	// Recursive function calls have lengths and array-like properties
+//	function callme(callback){
+//		function fn(response){
+//			callback(response);
+//		}
 
-		ok( Object.isFunction(fn), "Recursive Function Call" );
+//		ok( Object.isFunction(fn), "Recursive Function Call" );
 
-		fn({ some: "data" });
-	};
+//		fn({ some: "data" });
+//	};
 
-	callme(function(){
-		callme(function(){});
-	});
-});
+//	callme(function(){
+//		callme(function(){});
+//	});
+//});
 
 test("String.format", function() {
 

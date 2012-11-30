@@ -7,7 +7,7 @@ using("Controls.Container.Dialog");
 
 var MessageBox = Dialog.extend({
 
-    onClickClose: function(){
+    onCloseButtonClick: function () {
         this.cancel();
     },
 
@@ -20,13 +20,13 @@ var MessageBox = Dialog.extend({
     },
 
     ok: function(){
-        if (this.onOk()) {
+        if (this.onOk() !== false) {
             this.close();
         }
     },
 
     cancel: function () {
-        if (this.onCancel()) {
+        if (this.onCancel() !== false) {
             this.close();
         }
     },

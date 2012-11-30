@@ -112,7 +112,7 @@ Dom.implement({
 	
 		return function(dom, position, offsetX, offsetY, enableReset) {
 					
-			assert(position, "Dom#align(ctrl, position,  offsetX, offsetY): {position} 格式不正确。正确的格式如 lt", position);
+			assert(position, "Dom#pin(ctrl, position,  offsetX, offsetY): {position} 格式不正确。正确的格式如 lt", position);
 			
 			dom = dom instanceof Dom ? dom : Dom.get(dom);
 			
@@ -139,7 +139,7 @@ Dom.implement({
 				y = position.substr(3);
 			}	
 			
-			assert(aligners[x] && aligners[y], "Dom#align(ctrl, position,  offsetX, offsetY): {position} 格式不正确。正确的格式如 lt", position);
+			assert(aligners[x] && aligners[y], "Dom#pin(ctrl, position,  offsetX, offsetY): {position} 格式不正确。正确的格式如 lt", position);
 			
 			aligners[x](opt, r);
 			aligners[y](opt, r);
