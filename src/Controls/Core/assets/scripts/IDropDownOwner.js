@@ -4,7 +4,7 @@
 
 
 imports("Controls.Core.IDropDownOwner");
-using("System.Dom.Align");
+using("System.Dom.Pin");
 
 
 /**
@@ -41,13 +41,17 @@ var IDropDownOwner = {
 	 * 当下拉菜单被显示时执行。
      * @protected virtail
 	 */
-	onDropDownShow: Function.empty,
+	onDropDownShow: function () {
+	    this.trigger('dropdownshow');
+	},
 
     /**
 	 * 当下拉菜单被隐藏时执行。
      * @protected virtail
 	 */
-	onDropDownHide: Function.empty,
+	onDropDownHide: function () {
+	    this.trigger('dropdownhide');
+	},
 
 	attach: function (parentNode, refNode) {
 	    var dropDown = this.dropDown;
@@ -144,7 +148,7 @@ var IDropDownOwner = {
 	        if (me.isDropDownHidden()) {
 
                 // 重新设置位置。
-	            var dropDown = me.dropDown.show().align(me, 'b', 0, -1), 
+	            var dropDown = me.dropDown.show().pin(me, 'b', 0, -1), 
 	                dropDownWidth = me.dropDownWidth;
 
                 // 重新修改宽度。
@@ -166,8 +170,6 @@ var IDropDownOwner = {
             }
 
 	        me.onDropDownShow();
-		
-	        me.trigger('dropdownshow');
 
         }
 
@@ -203,7 +205,7 @@ var IDropDownOwner = {
 
 		this.onDropDownHide();
 		
-		return this.trigger('dropdownhide');
+		return this;
 	}
 	
 };

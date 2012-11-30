@@ -12,11 +12,22 @@ Draggable.implement({
 	 * 将当前值改在指定范围内。
 	 * @param {Rectangle} box 限制的范围。
 	 */
-	limit: function(position, size) {
+    limit: function (position, size) {
 
-		this.doDrag();
-		var me = this,
-			myPosition = me.proxy.getPosition(),
+        if (typeof position.x !== 'number') {
+            position = position instanceof Dom ? position : Dom.get(position);
+            size = position.getSize();
+            position = position.getPosition();
+        }
+
+        var me = this;
+
+        me.proxy.setOffset({
+            x: me.offset.x + me.to.x - me.from.x,
+            y: me.offset.y + me.to.y - me.from.y
+        });
+
+		var myPosition = me.proxy.getPosition(),
 			mySize = me.proxy.getSize(),
 			deltaX = position.x - myPosition.x,
 			deltaY = position.y - myPosition.y;
@@ -40,11 +51,6 @@ Draggable.implement({
 			}
 		}
 		
-		
-	},
-	
-	limitIn: function(elem) {
-		this.limit(elem.getPosition(), elem.getSize());
 	},
 	
 	revert: function(){

@@ -51,11 +51,11 @@ var DropDownMenu = ListControl.extend({
         }
 
         // 交给下列菜单处理。
-        this.dropDown.selectCallback(this.dropDown._hovering);
+        this[this.dropDown.selectMethod](this.dropDown._hovering);
     },
 
     onItemClick: function (item) {
-        this.selectCallback(item);
+        this.owner[this.selectMethod](item);
         return false;
     },
 
@@ -64,9 +64,16 @@ var DropDownMenu = ListControl.extend({
      */
     constructor: function (options) {
 
-        assert(options && options.owner && options.selectCallback, "DropDownMenu#constructor(options): {options} 必须有 owner 和 selectCallback 字段", options);
+        assert(options && options.owner && options.selectMethod, "DropDownMenu#constructor(options): {options} 必须有 owner 和 selectMethod 字段", options);
         
-	    var me = this;
+        var me = this;
+
+        // 复制一些属性。
+        me.owner = options.owner;
+
+        me.selectMethod = options.selectMethod;
+
+        me.updateMethod = options.updateMethod;
 
         // 创建原生节点。
 	    me.node = options.node ? Dom.getNode(options.node) : me.create();
@@ -96,18 +103,18 @@ var DropDownMenu = ListControl.extend({
             	this.hideDropDown();
             },
 
-            other: options.updateCallback
+            other: options.updateMethod && function () {
+                this[this.dropDown.updateMethod]();
+            }
 
         });
-
-        me.selectCallback = options.selectCallback.bind(options.owner);
 		
 	},
 
     /**
      * 重新设置当前高亮项。
      */
-	hovering: function (item) {if(window.aa++ >= 2)debugger
+	hovering: function (item) {
 	    var clazz = 'x-' + this.xtype + '-hover';
 
 	    if (this._hovering) {

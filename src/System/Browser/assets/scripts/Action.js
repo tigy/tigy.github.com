@@ -14,8 +14,10 @@ Browser.addFavorite = function (title, url) {
 	if (window.sidebar) {
 		window.sidebar.addPanel(title, url, '');
 	} else if (window.external) {
-		window.external.addFavorite(url, title);
-	} else return false;
+	    window.external.addFavorite(url, title);
+	} else {
+	    return false;
+	}
 	return true;
 };
 	
@@ -34,7 +36,7 @@ Browser.setHomepage = function (url) {
 			try {
 				netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect"); //解决执行命令的问题
 			} catch (e) {
-				trace.error("您使用的FireFox浏览器安全设置过高,以至于影响程序的正常响应！\n请在浏览器地址栏输入'about:config'并回车\n然后将'signed.applets.codebase_principal_support'设置为'true'");
+				alert("您使用的FireFox浏览器安全设置过高, 无法设置主页！\n请在浏览器地址栏输入'about:config'并回车\n然后将'signed.applets.codebase_principal_support'设置为'true'");
 				return false;
 			}
 		}

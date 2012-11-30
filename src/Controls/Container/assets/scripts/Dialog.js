@@ -1,6 +1,8 @@
 /**
  * @author xuld
  */
+
+
 imports("Controls.Part.Icon");
 imports("Controls.Part.Mask");
 imports("Controls.Part.CloseButton");
@@ -25,7 +27,7 @@ var Dialog = ContainerControl.extend({
 		
 	headerTpl: '<div class="x-control-header"><a class="x-dialog-close x-closebutton">×</a><h4></h4></div>',
 
-	onCloseButtonClick: function(){
+	onCloseButtonClick: function () {
 	    this.close();
 	},
 	

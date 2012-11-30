@@ -68,7 +68,7 @@
             Demo.writeExamples({
                 '显示有关': '-',
                 '创建模式对话框（对话框后有阴影）': 'dialog.showDialog(); // 使用此函数显示对话框即可。',
-                '让对话框允许拖动标题': 'using("System.Dom.Drag"); /* 载入拖动模块。 */ dialog.draggable(dialog.header().setStyle("cursor", "move"));dialog.setPosition(dialog.getPosition());// 因为对话框默认为居中的，强制对话框使用绝对定位方式，这样可以保证拖动效果正常执行。',
+                '让对话框允许拖动标题': 'using("System.Dom.Drag"); /* 载入拖动模块。 */ dialog.draggable({handle:dialog.header().setStyle("cursor", "move")});dialog.setPosition(dialog.getPosition());// 因为对话框默认为居中的，强制对话框使用绝对定位方式，这样可以保证拖动效果正常执行。',
                 '设置对话框内容的大小': 'dialog.setContentSize(300, 100);',
                 '设置对话框的位置': 'dialog.setPosition(300, 100);',
                 '往对话框追加内容': 'dialog.body().append("<em>追加的内容</em>");dialog.body().append(document.getElementById("id"));',

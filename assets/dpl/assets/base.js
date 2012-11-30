@@ -8103,7 +8103,7 @@ Object.extendIf(JSON, {
 
 
 /************************************
- * System.Dom.Align
+ * System.Dom.Pin
  ************************************/
 Dom.implement({
 

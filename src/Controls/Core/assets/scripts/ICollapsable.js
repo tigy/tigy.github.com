@@ -24,31 +24,33 @@ var ICollapsable = {
 	 * 当控件已经被折叠时执行。
 	 * @protected virtual
 	 */
-    onCollapsing: Function.empty,
+    onCollapsing: function () {
+        return this.trigger('collapsing');
+    },
 
     /**
 	 * 当控件已经被折叠时执行。
 	 * @protected virtual
 	 */
-    onCollapse: Function.empty,
+    onCollapse: function () {
+        return this.trigger('collapse');
+    },
 
     /**
 	 * 当控件已经被折叠时执行。
 	 * @protected virtual
 	 */
-    onExpanding: Function.empty,
+    onExpanding: function () {
+        return this.trigger('expanding');
+    },
 
     /**
 	 * 当控件即将被展开时执行。
 	 * @protected virtual
 	 */
-    onExpand: Function.empty,
-
-    /**
-	 * 当控件即将被展开时执行。
-	 * @protected virtual
-	 */
-    onExpand: Function.empty,
+    onExpand: function () {
+        return this.trigger('expand');
+    },
 
     /**
 	 * 获取目前是否折叠。
@@ -80,9 +82,7 @@ var ICollapsable = {
 			callback;
 
         // 如果允许折叠，则继续执行。
-        if (me.trigger('collapsing') && (body = me.body ? me.body() : me)) {
-
-            me.onCollapsing();
+        if (me.onCollapsing() !== false && (body = me.body ? me.body() : me)) {
             
 			body.hide(arguments, {
 				effect: 'height', 
@@ -90,7 +90,6 @@ var ICollapsable = {
 				callback: function () {
 	                me.addClass('x-' + me.xtype + '-collapsed');
 	                me.onCollapse();
-	                me.trigger('collapse');
 	            }, 
 	            link: 'ignore'
 	        });
@@ -112,9 +111,7 @@ var ICollapsable = {
         // 如果允许展开，则继续执行。
         // 获取主体内容。
         // 仅当存在主体内容时才执行操作。
-        if (me.trigger('expanding') && (body = me.body ? me.body() : me)) {
-
-            me.onExpanding();
+        if (me.onExpanding() !== false && (body = me.body ? me.body() : me)) {
 
             me.removeClass('x-' + me.xtype + '-collapsed');
 			
@@ -123,7 +120,6 @@ var ICollapsable = {
 				duration: me.collapseDuration, 
 				callback: function () {
 	            	me.onExpand(); 
-	                me.trigger('expand');
 	            }, 
 	            link: 'ignore'
 	        });

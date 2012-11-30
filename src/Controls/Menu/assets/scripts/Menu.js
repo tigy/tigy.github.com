@@ -4,7 +4,7 @@
 
 
 imports("Controls.Menu.Menu");
-using("System.Dom.Align");
+using("System.Dom.Pin");
 using("Controls.Core.TreeControl");
 
 
@@ -122,7 +122,7 @@ var Menu = TreeControl.extend({
         // 显示节点。
         this.show();
 
-        this.align(ctrl, pos || 'r', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);
+        this.pin(ctrl, pos || 'r', offsetX != null ? offsetX : -5, offsetY != null ? offsetY : -5, enableReset);
 
         return this;
     },

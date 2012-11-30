@@ -3,7 +3,7 @@
  */
 
 
-using("System.Dom.Align");
+using("System.Dom.Pin");
 
 
 var IToolTip = {
@@ -23,13 +23,19 @@ var IToolTip = {
 	menuTpl: '<span>\
 	    <span class="x-arrow-fore">◆</span>\
         <span class="x-arrow-back">◆</span>\
-    </span>',
+    </span>',
+
     /**
 	 * 显示时使用的特效持续时间。
-	 */	showDuration: -2,	show: function () {
+	 */
+	showDuration: -2,
+
+	show: function () {
 	    if (!this.closest('body')) {
 	        this.appendTo();
-	    }	    return Dom.prototype.show.call(this, arguments, {
+	    }
+
+	    return Dom.prototype.show.call(this, arguments, {
 	    	duration: this.showDuration
 	    });
 	},
@@ -38,29 +44,49 @@ var IToolTip = {
 	    return Dom.prototype.hide.call(this, arguments, {
 	    	duration: this.showDuration
 	    });
-	},	showAt: function (x, y) {
+	},
+
+	showAt: function (x, y) {
 	    return this.show().setPosition(x, y);
-	},	showBy: function (ctrl, offsetX, offsetY, e) {
-			    var configs = ({
-	        left: ['rr-yc', 15, 0],	        right: ['ll-yc', 15, 0],	        top: ['xc-bb', 0, 15],	        bottom: ['xc-tt', 0, 15],	        'null': ['xc-bb', 0, 5, 1]
-	    }[this.getArrow()]);	    this.show().align(ctrl, configs[0], offsetX === undefined ? configs[1] : offsetX, offsetY === undefined ? configs[2] : offsetY);
+	},
+
+	showBy: function (ctrl, offsetX, offsetY, e) {
+		
+	    var configs = ({
+	        left: ['rr-yc', 15, 0],
+	        right: ['ll-yc', 15, 0],
+	        top: ['xc-bb', 0, 15],
+	        bottom: ['xc-tt', 0, 15],
+	        'null': ['xc-bb', 0, 5, 1]
+	    }[this.getArrow()]);
+
+	    this.show().pin(ctrl, configs[0], offsetX === undefined ? configs[1] : offsetX, offsetY === undefined ? configs[2] : offsetY);
 		
 		if(configs[3] && e){
 			this.setPosition(e.pageX + (offsetX || 0));
 		}
 
 		return this;
-	},	setArrow: function (value) {
+
+	},
+
+	setArrow: function (value) {
 	    var arrow = this.find('.x-arrow') || this.append(this.menuTpl);
 	    if (value) {
 	        arrow.node.className = 'x-arrow x-arrow-' + value;
 	    } else {
 	        arrow.remove();
-	    }	    return this;
-	},	getArrow: function () {
-	    var arrow = this.find('.x-arrow'), r = null;	    if (arrow) {
+	    }
+	    return this;
+	},
+
+	getArrow: function () {
+	    var arrow = this.find('.x-arrow'), r = null;
+
+	    if (arrow) {
 	        r = (/\bx-arrow-(top|bottom|left|right)/.exec(arrow.node.className) || [0, r])[1];
-	    }	    return r;
+	    }
+	    return r;
 	},
 	
     /**

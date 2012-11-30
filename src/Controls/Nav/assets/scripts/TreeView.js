@@ -306,18 +306,21 @@ var TreeNode = TreeControl.Item.extend(ICollapsable).implement({
 		return this;
 	},
 	
-	onCollapse: function(){
+	onCollapse: function () {
+	    TreeControl.Item.prototype.onCollapse.call(this);
 	    this.updateNodeType();
 	},
 	
 	onExpanding: function(){
-		this.setNodeType(this.subControl && this.subControl.first() ? 'minus' : 'normal');	
+	    this.setNodeType(this.subControl && this.subControl.first() ? 'minus' : 'normal');
+	    TreeControl.Item.prototype.onExpanding.call(this);
 	},
 	
 	onExpand: function(){
 		if(this.subControl) {
 			this.subControl.node.style.height = 'auto';
 		}
+		TreeControl.Item.prototype.onExpand.call(this);
 	},
 	
 	/**

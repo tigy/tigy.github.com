@@ -85,6 +85,11 @@ Demo.extend(Demo, {
         encoding: 'utf-8',
 
         /**
+         * dpl 访问历史最大值。
+         */
+        maxHistory: 10,
+
+        /**
          * 工具的下拉菜单 HTML 模板。
          */
         tool: '<a href="~/assets/dpl/dplfilelist.html" target="_blank">组件合成工具</a>\
@@ -100,8 +105,9 @@ Demo.extend(Demo, {
         doc: '<a href="~/resources/cookbooks/jplusui-full-api/index.html" target="_blank">jPlusUI API 文档</a>\
                 <a href="~/resources/cookbooks/jplusui-core-api/index.html" target="_blank">jPlusUI Core 文档</a>\
                 <a href="~/resources/cookbooks/jquery2jplus.html" target="_blank">jQuery 转 jPlusUI</a>\
-                <a href="~/resources/cookbooks/dplsystem.html" target="_blank">测试系统使用方法</a>\
-                <a href="~/resources/index.html#doc" target="_blank">更多文档</a>',
+                <a href="~/resources/cookbooks/dplsystem.html" target="_blank" style="border-top: 1px solid #EBEBEB;">组件开发教程</a>\
+                <a href="~/resources/cookbooks/dplsystem.html" target="_blank">测试系统用法</a>\
+                <a href="~/resources/index.html#doc" target="_blank" style="border-top: 1px solid #EBEBEB;">更多文档</a>',
 
         /**
          * 底部 HTML 模板。
@@ -3072,8 +3078,15 @@ if (typeof module !== 'object') {
                             var code = document.createElement('ASIDE');
                             code.className = node.className;
                             node.parentNode.replaceChild(code, node);
-                            code.innerHTML = code.$code = value;
+                            code.$code = value;
 
+                            if (Demo.Dom.isIE) {
+                                code.innerHTML = '$' + value;
+                                code.removeChild(code.firstChild);
+                            } else {
+                                code.innerHTML = value;
+                            }
+                            
                             // 模拟执行全部脚本。
                             var scripts = code.getElementsByTagName('SCRIPT');
                             for (var i = 0; scripts[i]; i++) {
@@ -3344,7 +3357,7 @@ if (typeof module !== 'object') {
                         }
                     }
 
-                    if (dplList.length > 3) {
+                    if (dplList.length > Demo.Configs.maxHistory) {
                         dplList.shift();
                     }
 

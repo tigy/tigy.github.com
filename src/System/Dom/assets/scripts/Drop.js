@@ -21,10 +21,10 @@ using("System.Dom.Drag");
 		
 		Droppable = window.Droppable = Class({
 		
-			initEvent: function (draggable, e) {
-				e.draggable = draggable;
+		    raiseEvent: function (eventName, draggable, e) {
+		        e.draggable = draggable;
 				e.droppable = this;
-				e.dragTarget = draggable.target;
+				return this.target.trigger(eventName, e);
 			},
 			
 			/**
@@ -32,9 +32,8 @@ using("System.Dom.Drag");
 			 * @param {Draggable} droppable 拖放物件。
 			 * @param {Event} e 事件参数。
 			 */
-			onDragEnter: function(draggable, e){
-				this.initEvent(draggable, e);
-				return this.target.trigger('dragenter', e);
+		    onDragEnter: function (draggable, e) {
+			    return this.raiseEvent('dragenter', draggable, e);
 			},
 			
 			/**
@@ -42,9 +41,8 @@ using("System.Dom.Drag");
 			 * @param {Draggable} droppable 拖放物件。
 			 * @param {Event} e 事件参数。
 			 */
-			onDragOver: function(draggable, e){
-				this.initEvent(draggable, e);
-				return this.target.trigger('dragover', e);
+			onDragOver: function (draggable, e) {
+			    return this.raiseEvent('dragover', draggable, e);
 			},
 
 			/**
@@ -52,9 +50,8 @@ using("System.Dom.Drag");
 			 * @param {Draggable} draggable 拖放物件。
 			 * @param {Event} e 事件参数。
 			 */
-			onDrop: function(draggable, e){
-				this.initEvent(draggable, e);
-				return this.target.trigger('drop', e);
+			onDrop: function (draggable, e) {
+			    return this.raiseEvent('drop', draggable, e);
 			},
 			
 			/**
@@ -62,113 +59,93 @@ using("System.Dom.Drag");
 			 * @param {Draggable} droppable 拖放物件。
 			 * @param {Event} e 事件参数。
 			 */
-			onDragLeave: function(draggable, e){
-				this.initEvent(draggable, e);
-				return this.target.trigger('dragleave', e);
+			onDragLeave: function (draggable, e) {
+			    return this.raiseEvent('dragleave', draggable, e);
 			},
 			
 			/**
 			 * 初始化。
 			 * @constructor Droppable
 			 */
-			constructor: function(ctrl){
-				this.target = ctrl;
-				this.setDisabled(false);
+			constructor: function(options){
+			    Object.extend(this, options);
+				this.disable(false);
+			},
+
+		    /**
+             * 判断当前区域是否接受指定的拖动块。
+             */
+			init: function (draggable) {
+			    this.lt = this.target.getPosition();
+			    this.rb = this.lt.add(this.target.getSize());
+			    return true;
 			},
 			
 			/**
 			 * 判断当前的 bound 是否在指定点和大小表示的矩形是否在本区范围内。
-			 * @param {Rectange} box 范围。
-			 * @return {Boolean} 在上面返回 true
+			 * @param {Draggable} draggable 拖放物件。
+			 * @return {Boolean} 在上面返回 true。
 			 */
-			check: function(draggable, position, size){
-				var myLeft = position.x,
-					myRight = myLeft + size.x,
-					targetLeft = this.position.x,
-					targetRight = targetLeft + this.size.x,
-					myTop,
-					myBottom,
-					targetTop,
-					targetBottom;
-				
-				if((myRight >= targetRight || myRight <= targetLeft) && 
-						(myLeft >= targetRight || myLeft <= targetLeft) && 
-						(myLeft >= targetLeft || myRight <= targetRight))
-					return false;
-				
-				
-				myTop = position.y;
-				myBottom = myTop + size.y;
-				targetTop = this.position.y;
-				targetBottom = targetTop + this.size.y;
-
-				if((myBottom >= targetBottom || myBottom <= targetTop) && 
-						(myTop >= targetBottom || myTop <= targetTop) && 
-						(myTop >= targetTop || myBottom <= targetBottom))
-					return false;
-				
-				return true;
+			check: function (draggable) {
+			    return this.lt.x <= draggable.to.x && draggable.to.x <= this.rb.x &&
+                    this.lt.y <= draggable.to.y && draggable.to.y <= this.rb.y;
 			},
-			
-			/**
+
+		    /**
 			 * 使当前域处理当前的 drop 。
 			 */
-			setDisabled: function(value){
-				droppables[value ? 'remove' : 'include'](this);
-			},
-			
-			accept: function(elem){
-				this.position = this.target.getPosition();
-				this.size = this.target.getSize();
-				return true;
+			disable: function (value) {
+			    droppables[value !== false ? 'remove' : 'include'](this);
+			    return this;
 			}
 			
 		}),
 		
 		beforeDrag = dp.beforeDrag,
 		
-		doDrag = dp.doDrag,
-		
 		afterDrag = dp.afterDrag,
 		
 		mouseEvents = Dom.$event.mousemove;
 	
+    /**
+     * 对 Draggable 扩展实现拖放判断。
+     */
 	Draggable.implement({
 		
 		beforeDrag: function(e){
 			var me = this;
 			beforeDrag.call(me, e);
-			me.position = me.proxy.getPosition();
-			me.size = me.proxy.getSize();
-			me.droppables = droppables.filter(function(droppable){
-				return droppable.accept(me);
+			me.availableDroppables = droppables.filter(function(droppable){
+			    return droppable.init(me);
 			});
-			me.activeDroppables = new Array(me.droppables.length);
+			me.droppableFlags = new Array(me.availableDroppables.length);
+			me.droppables = [];
 		},
 		
 		doDrag: function(e){
-			doDrag.call(this, e);
 			var me = this,
 				i = 0,
 				droppables = me.droppables,
-				position = me.proxy.getPosition(),
-				size = me.proxy.getSize(),
-				activeDroppables = me.activeDroppables,
-				droppable;
-			while(i < droppables.length) {
-				droppable = droppables[i];
-				if(droppable.check(me, position, size)) {
-					if(activeDroppables[i])
-						droppable.onDragOver(me, e);
+				availableDroppables = me.availableDroppables,
+				droppableFlags = me.droppableFlags,
+				droppable,
+				eventProcess = true;
+
+			while (i < availableDroppables.length) {
+			    droppable = availableDroppables[i];
+				if (eventProcess && droppable.check(me)) {
+					if(droppableFlags[i])
+					    droppable.onDragOver(me, e);
 					else {
-						activeDroppables[i] = true;
-						droppable.onDragEnter(me, e);
+						droppableFlags[i] = true;
+						eventProcess = droppable.onDragEnter(me, e) !== false;
+						droppables.push(droppable);
 					}
-					
-					
-				} else if(activeDroppables[i]){
-					activeDroppables[i] = false;
+
+				} else if(droppableFlags[i]){
+					droppableFlags[i] = false;
 					droppable.onDragLeave(me, e);
+					droppables.remove(droppable);
 				}
 				i++;
 			}
@@ -177,28 +154,27 @@ using("System.Dom.Drag");
 		afterDrag: function(e){
 			var me = this;
 			afterDrag.call(me, e);
-			me.droppables.forEach(function(droppable, i){
-				if(me.activeDroppables[i])
-					droppable.onDrop(me, e);
+			me.droppables.forEach(function (droppable) {
+			    droppable.onDrop(me, e);
 			});
-			me.activeDroppables = me.droppables = null;
+			me.droppableFlags = me.availableDroppables = null;
 		}
 	});
 	
 	Dom.addEvents('dragenter dragleave dragover drop', {
-		add:  function(elem, type, fn){
-			Dom.$event.$default.add(elem, type, fn);
-			fn = elem.dataField().droppable;
+	    add: function (dom, type, fn) {
+	        Dom.$event.$default.add(dom, type, fn);
+	        fn = dom.dataField().droppable;
 			if(fn){
-				fn.setDisabled(false);
+				fn.disable(false);
 			} else {
-				elem.dataField().droppable = new Droppable(elem);
+			    dom.dataField().droppable = new Droppable({ target: dom });
 			}
 		},
-		remove: function(elem, type, fn){
-			Dom.$event.$default.remove(elem, type, fn);
-			elem.dataField().droppable.setDisabled();
-			delete elem.dataField().droppable;
+	    remove: function (dom, type, fn) {
+	        Dom.$event.$default.remove(dom, type, fn);
+	        dom.dataField().droppable.disable();
+	        delete dom.dataField().droppable;
 		},
 		initEvent: mouseEvents && mouseEvents.initEvent
 	});

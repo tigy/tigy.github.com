@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>前端与 OO</title>
+        <script src="../../../assets/demo/demo.js" type="text/javascript"></script>
+        <script src="../../../assets/demo/navbar.js" type="text/javascript"></script>
+    </head>
+	<body>
+
+        <script src="menu.js" type="text/javascript"></script>
+
+        <article class="demo">
+
+            <h2 class="demo">OO 是什么</h2>
+
+            <p class="demo">OO 就是面向对象。说到 OO，大部分前端想到的就是 Java ，并且大部分前端人员都认为 OO 是一个复杂又麻烦的东西，从而拒绝接受 OO 。其实 OO 只是一个编程思想，在 js 中，确实不需要太复杂的 OO ，但是如果有少量的 OO 元素，则可以提高很多开发效率，特别是在组件开发上尤为明显。</p>
+
+        </article>
+
+        <article class="demo">
+
+            <h2 class="demo">jPlusUI 原创的 OO 实现</h2>
+
+            <p class="demo">我们目标不是做出和 java 完全一致的 OO，而仅仅模拟一个简单的 OO：只需要单继承功能。</p>
+
+
+            <script>
+
+                Demo.writeExamples({
+                    '创建类': function () {
+
+                        // 创建一个类。
+                        var Animale = new Class({ // new 可省略
+
+                            // 类的一个方法。
+                            say: function () {
+                                alert("调用了 say 方法");
+                            }
+                        });
+
+                        // 创建一个类的实例。
+                        var ani = new Animale();
+
+                        // 调用 Animale 类的 say 方法。
+                        ani.say();
+
+                    },
+                    '定义类的构造函数': function () {
+
+                        // 创建一个类。
+                        var Animale = new Class({
+
+                            // 构造函数。
+                            constructor: function (args) {
+                                alert("正在执行 Animal 类的构造函数。");
+                            }
+                        });
+
+                        // 创建一个类的实例。
+                        var ani = new Animale();
+
+                    },
+                    '继承类': function () {
+
+                        // 创建一个类。
+                        var Animale = new Class({
+
+                            // 类的一个方法。
+                            say: function () {
+                                alert("正在执行 Animale 类的 say 方法");
+                            },
+
+                            // 构造函数。
+                            constructor: function (args) {
+                                alert("正在执行 Animal 类的构造函数。");
+                            }
+                        });
+
+                        // 创建一个类。
+                        var Dog = Animale.extend({
+
+                            // 类的一个方法。
+                            say2: function () {
+                                alert("正在执行 Dog 类的 say 方法");
+                            }
+
+                        });
+
+                        // 创建一个类的实例。
+                        var dog = new Dog();
+
+                        // 调用 Animale 类的 say 方法。
+                        dog.say();
+
+                        // 调用 Dog 类的 say2 方法。
+                        dog.say2();
+
+                    },
+                    '多态类': function () {
+
+                        // 创建一个类。
+                        var Animale = new Class({
+
+                            // 类的一个方法。
+                            say: function (name) {
+                                alert("正在执行 Animale 类的 say 方法: 参数 name=" + name);
+                            }
+
+                        });
+
+                        // 创建一个类。
+                        var Dog = Animale.extend({
+
+                            // 类的一个方法。
+                            say: function () {
+                                this.base('say', 'Dog');
+                            }
+
+                        });
+
+                        // 创建一个类。
+                        var Cat = Animale.extend({
+
+                            // 类的一个方法。
+                            say: function () {
+                                this.base('say', 'Cat');
+                            }
+
+                        });
+
+                        var dog = new Dog();
+                        dog.say();
+
+                        var cat = new Cat();
+                        cat.say();
+                    },
+                    '扩展类': function () {
+
+                        // 创建一个类。
+                        var Animale = new Class({
+
+                            // 构造函数。
+                            constructor: function (args) {
+                                alert("正在执行 Animal 类的构造函数。");
+                            }
+                        });
+
+                        Animale.implement({
+
+
+                            // 类的一个方法。
+                            say: function () {
+                                alert("正在执行 Animale 类的 say 方法");
+                            }
+
+                        });
+
+                        // 注意：构造函数是不能后期扩展的。
+
+                    },
+                    '使用类的事件': function () {
+
+                        // 创建一个类。
+                        var Animale = new Class({
+
+                        });
+
+                        var ani = new Animale();
+                        ani.on('needsay', function (name) {
+                            alert("needsay事件被触发了， 参数 name=" + name);
+                        });
+
+                        ani.trigger('needsay', "触发needsay事件时的参数");
+
+                    },
+                    '定义类的事件': function () {
+
+                        // 创建一个类。
+                        var Animale = new Class({
+
+                        });
+
+                        Animale.addEvents('needsay', {
+
+                            add: function (target, eventName, eventHandler) {
+                                alert(eventName + "事件被绑定了一个函数: " + eventHandler);
+                            },
+
+                            remove: function (target, eventName, eventHandler) {
+                                alert(eventName + "事件被解绑了");
+                            },
+
+                            dispatch: function (target, eventName, eventHandler, eventArgs) {
+                                alert(eventName + "事件被触发了, 接下来执行用户传入的事件处理函数");
+
+                                eventHandler(eventArgs);
+                            }
+
+                        });
+
+                        var ani = new Animale();
+                        ani.on('needsay', function (name) {
+                            alert("needsay事件被触发了， 参数 name=" + name);
+                        });
+
+                        ani.trigger('needsay', "触发needsay事件时的参数");
+
+                    }
+                });
+
+            </script>
+
+        </article>
+
+        <script>
+            Demo.writeFooter();
+        </script>
+
+    </body>
+</html>
