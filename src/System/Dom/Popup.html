@@ -36,7 +36,7 @@
                 Dom.get('popup2').popup({
                     target: Dom.get('popup-box'),
                     show: function(dom){
-                        this.target.align(dom, 'b'); // 手动显示浮层并定位浮层。
+                        this.target.pin(dom, 'b'); // 手动显示浮层并定位浮层。
                     }
                 });
             </script>
@@ -50,7 +50,7 @@
                     target: Dom.get('popup-box'),
                     event: 'click',
                     show: function (dom) {
-                        this.target.align(dom, 'b'); // 手动显示浮层并定位浮层。
+                        this.target.pin(dom, 'b'); // 手动显示浮层并定位浮层。
                     }
                 });
             </script>
@@ -71,7 +71,7 @@
                     target: Dom.get('popup-box'),
                     event: 'mouseenter a',
                     show: function (dom) {
-                        this.target.align(dom, 'b'); // 手动显示浮层并定位浮层。
+                        this.target.pin(dom, 'b'); // 手动显示浮层并定位浮层。
                     }
                 });
             </script>
@@ -90,7 +90,7 @@
                 <tr>
                     <td>show</td>
                     <td>浮层时显示之后的回调，用于重定位浮层。 函数的第一个参数 dom 是引发浮层显示的节点。</td>
-                    <td>show: function(dom){  this.target.align(dom, 'b');  }</td>
+                    <td>show: function(dom){  this.target.pin(dom, 'b');  }</td>
                 </tr>
                 <tr>
                     <td>hide</td>

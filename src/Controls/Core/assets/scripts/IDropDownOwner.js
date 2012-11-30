@@ -4,7 +4,7 @@
 
 
 imports("Controls.Core.IDropDownOwner");
-using("System.Dom.Align");
+using("System.Dom.Pin");
 
 
 /**
@@ -144,7 +144,7 @@ var IDropDownOwner = {
 	        if (me.isDropDownHidden()) {
 
                 // 重新设置位置。
-	            var dropDown = me.dropDown.show().align(me, 'b', 0, -1), 
+	            var dropDown = me.dropDown.show().pin(me, 'b', 0, -1), 
 	                dropDownWidth = me.dropDownWidth;
 
                 // 重新修改宽度。

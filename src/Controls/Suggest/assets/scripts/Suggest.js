@@ -21,8 +21,8 @@ var Suggest = Control.extend(IDropDownOwner).implement({
         return new DropDownMenu({
             node: existDom,
             owner: this,
-            selectCallback: this.selectItem,
-            updateCallback: this.showDropDown
+            selectMethod: 'selectItem',
+            updateMethod: 'showDropDown'
         }).addClass('x-suggest');
     },
 
@@ -37,14 +37,19 @@ var Suggest = Control.extend(IDropDownOwner).implement({
 
         // 如果智能提示的项为空或唯一项就是当前的项，则不提示。
 	    if (!items || !items.length || (items.length === 1 && items[0] === text)) {
-	        return this.hideDropDown();
+
+            // 隐藏菜单。
+	        this.hideDropDown();
+	    } else {
+
+	        this.dropDown.set(items);
+
+	        // 默认选择当前值。
+	        this.dropDown.hovering(this.dropDown.item(0));
+
 	    }
 
-	    this.dropDown.set(items);
-
-        // 默认选择当前值。
-	    this.dropDown.hovering(this.dropDown.item(0));
-
+	    IDropDownOwner.onDropDownShow.apply(this, arguments);
     },
 	
     init: function(options){

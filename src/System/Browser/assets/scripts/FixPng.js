@@ -18,9 +18,9 @@ Browser.pngFix = navigator.isIE6 ? function () {
 			var imgClass = (img.className) ? "class='" + img.className + "' " : "";
 			var imgTitle = (img.title) ? "title='" + img.title + "' " : "title='" + img.alt + "' ";
 			var imgStyle = "display:inline-block;" + img.style.cssText;
-			if (img.align == "left")
+			if (img.pin == "left")
 				imgStyle = "float:left;" + imgStyle;
-			if (img.align == "right")
+			if (img.pin == "right")
 				imgStyle = "float:right;" + imgStyle;
 			if (img.parentElement.href)
 				imgStyle = "cursor:hand;" + imgStyle;

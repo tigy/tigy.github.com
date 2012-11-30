@@ -36,7 +36,7 @@ var ComboBox = Picker.extend({
         return new DropDownMenu({
             node: existDom,
             owner: this,
-            selectCallback: this.selectItem
+            selectMethod: 'selectItem'
         });
     },
 	

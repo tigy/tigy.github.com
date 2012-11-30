@@ -1,81 +1,110 @@
-//===========================================
-//  拖动 
-//   A: xuld
-//===========================================
+/**
+ * @author xuld
+ */
+
 
 using("System.Dom.Base");
 
 
-	
+/**
+ * 处理用户拖动操作的类。
+ */
 var Draggable = Class({
-	
-	initEvent: function (e) {
-		e.draggable = this;
-		e.dragTarget = this.target;
-	},
-	
-	/**
-	 * 触发 dragstart 事件。
-	 * @param {Event} e 原生的 mousemove 事件。
+
+    dragDelay: 500,
+
+    /**
+	 * 触发原生的 DOM 事件。
+	 * @param {String} eventName 触发的事件名。
+	 * @param {Event} e mousemove 事件参数对象。
+     * @protected virtual
 	 */
-	onDragStart: function(e){
-		this.initEvent(e);
-		// 如果都正常。
-		return this.target.trigger('dragstart', e);
-	},
+    raiseDragEvent: function (eventName, e) {
+
+        // 绑定 draggable 和当前的 Draggable 对象。
+        e.draggable = this;
+
+        return this.target.trigger(eventName, e);
+    },
 	
 	/**
-	 * 触发 drag 事件。
+	 * 当 dragstart 事件发生时执行。
 	 * @param {Event} e 原生的 mousemove 事件。
+     * @protected virtual
 	 */
-	onDrag: function(e){
-		this.initEvent(e);
-		this.target.trigger('drag', e);
+    onDragStart: function (e) {
+
+        // 记录当前的 offset, 用于在 onDrag 时设置位置。
+        this.offset = this.proxy.getOffset();
+
+        return this.raiseDragEvent('dragstart', e);
+    },
+	
+	/**
+	 * 当 drag 事件发生时执行。
+	 * @param {Event} e 原生的 mousemove 事件。
+     * @protected virtual
+	 */
+	onDrag: function (e) {
+	    var me = this;
+	    if (this.raiseDragEvent('drag', e)) {
+	        me.proxy.setOffset({
+	            x: me.offset.x + me.to.x - me.from.x,
+	            y: me.offset.y + me.to.y - me.from.y
+	        });
+
+	        return true;
+	    }
+
+	    return false;
 	},
 	
 	/**
-	 * 触发 dragend 事件。
+	 * 当 dragend 事件发生时执行。
 	 * @param {Event} e 原生的 mouseup 事件。
+     * @protected virtual
 	 */
-	onDragEnd: function(e){
-		this.initEvent(e);
-		return this.target.trigger('dragend', e);
-	},
+	onDragEnd: Function.empty,
 	
 	/**
 	 * 处理 mousedown 事件。
-	 * 初始化拖动，当单击时，执行这个函数，但不执行 doDragStart。
-	 * 只有鼠标移动时才会继续执行doDragStart。
+	 * 初始化拖动，当单击时，执行这个函数，但不触发 dragStart。
+	 * 只有鼠标移动时才会继续触发 dragStart。
 	 * @param {Event} e 事件参数。
 	 */
-	initDrag: function(e){
+	handlerMouseDown: function (e) {
 
 		// 左键才继续
 		if(e.which !== 1)
 			return;
 		
+        // 如果当前正在拖动，通知当前拖动对象停止拖动。
 		if(Draggable.current) {
 			Draggable.current.stopDrag(e);
 		}
 		
+        // 阻止默认事件。
 		e.preventDefault();
-		
+
 		var me = this;
 		
+        // 记录当前的开始位置。
 		me.from = new Point(e.pageX, e.pageY);
 		me.to = new Point(e.pageX, e.pageY);
 		
 		// 设置当前处理  mousemove 的方法。
 		// 初始需设置 onDrag
 		// 由 onDrag 设置为    onDrag
-		me.handler = me.startDrag;
+		me.currentHandler = me._handlerDragStart;
 		
-		me.timer = setTimeout(function(){
-			me.startDrag(e);
+        // 延时拖动。
+		me.timer = setTimeout(function () {
+		    me.timer = 0;
+		    me._handlerDragStart(e);
 		}, me.dragDelay);
 		
 		// 设置文档  mouseup 和   mousemove
-		Dom.getDocument(me.handle.node).on('mouseup', me.stopDrag, me).on('mousemove', me.handleDrag, me);
+		Dom.getDocument(me.handle.node).on('mouseup', me._handlerDragStop, me).on('mousemove', me._handlerMouseMove, me);
 	
 	},
 	
@@ -83,15 +112,16 @@ var Draggable = Class({
 	 * 处理 mousemove 事件。
 	 * @param {Event} e 事件参数。
 	 */
-	handleDrag: function(e){
+	_handlerMouseMove: function (e) {
 		
 		e.preventDefault();
 		
+        // 更新当前的鼠标位置。
 		this.to.x = e.pageX;
 		this.to.y = e.pageY;
 		
-		// 调用函数处理。
-		this.handler(e);
+		// 调用当前的处理句柄来处理此函数。
+		this.currentHandler(e);
 	},
 	
 	/**
@@ -99,21 +129,26 @@ var Draggable = Class({
 	 * @param {Event} e 事件。
 	 * 这个函数调用 onDragStart 和 beforeDrag
 	 */
-	startDrag: function (e) {
+	_handlerDragStart: function (e) {
 		
 		var me = this;
 		
-		//   清空计时器。
-		clearTimeout(me.timer);
+	    //   清空计时器。
+		if (me.timer) {
+		    clearTimeout(me.timer);
+		    me.timer = 0;
+		}
 		
+        // 设置当前正在拖动的对象。
 		Draggable.current = me;
 		
-		// 设置句柄。
-		me.handler = me.drag;
+	    // 设置下次 mousemove 时的处理函数。
+		me.currentHandler = me.drag;
 		
-		// 开始拖动事件，如果这个事件 return false，  就完全停止拖动。
-		if (me.onDragStart(e)) {
-			me.beforeDrag(e);
+	    // 触发 dragstart 事件，  就完全停止拖动。
+		if (me.raiseDragEvent('dragstart', e)) {
+		    me.beforeDrag(e);
+		    me.onDragStart();
 			me.drag(e);
 		} else {
 			// 停止。
@@ -126,7 +161,7 @@ var Draggable = Class({
 	 * @param {Event} e 事件参数。
 	 * 这个函数调用 onDrag 和 doDrag
 	 */
-	drag: function(e){
+	_handlerDrag: function (e) {
 		this.onDrag(e);
 		this.doDrag(e);
 	},
@@ -136,7 +171,7 @@ var Draggable = Class({
 	 * @param {Event} e 事件参数。
 	 * 这个函数调用 onDragEnd 和 afterDrag
 	 */
-	stopDrag: function (e) {
+	_handlerDragStop: function (e) {
 		
 		// 只有鼠标左键松开， 才认为是停止拖动。
 		if(e.which !== 1)
@@ -189,11 +224,13 @@ var Draggable = Class({
 		this.offset = null;
 	},
 	
-	dragDelay: 500,
-	
-	constructor: function(dom, handle){
-		this.proxy = this.target = dom;
-		this.handle = handle || dom;
+	constructor: function (options) {
+	    Object.extend(this, options);
+
+	    this.handle = this.handle || this.target;
+
+	    this.proxy = this.proxy || this.target;
+
 		this.draggable();
 	},
 
@@ -201,19 +238,25 @@ var Draggable = Class({
 	 * 停止当前对象的拖动。
 	 */
 	stopDragging: function(){
-		Dom.getDocument(this.handle.node).un('mousemove', this.handleDrag).un('mouseup', this.stopDrag);
-		clearTimeout(this.timer);
+	    Dom.getDocument(this.handle.node).un('mousemove', this._handlerMouseMove).un('mouseup', this._handlerDragStop);
+
+	    //   清空计时器。
+	    if (this.timer) {
+	        clearTimeout(this.timer);
+	        this.timer = 0;
+	    }
+
 		Draggable.current = null;
 	},
 	
 	draggable: function(value){
-		this.handle[value !== false ? 'on' : 'un']('mousedown', this.initDrag, this);
+	    this.handle[value !== false ? 'on' : 'un']('mousedown', this._handlerMouseDown, this);
 	}
 	
 });
 
 /**
- * @class Element
+ * @class Dom
  */
 Dom.implement({
 	

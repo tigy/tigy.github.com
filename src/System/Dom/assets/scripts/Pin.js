@@ -20,7 +20,7 @@ Dom.implement({
 	 * @param {Number} offsetY=0 偏移的y大小。
 	 * @param {Boolean} enableReset=true 如果元素超出屏幕范围，是否自动更新节点位置。
 	 */
-	align: (function(){
+	pin: (function(){
 
 		var aligners = {
 			

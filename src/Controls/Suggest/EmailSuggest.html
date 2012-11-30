@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-        <meta name="dpl-info" content="status=ok" />
+        <meta name="dpl-info" content="status=complete" />
 		<title>邮件地址自动填充</title>
 		
         <link href="../../Controls/Core/assets/styles/Base.css" rel="stylesheet" type="text/css" />
@@ -25,16 +25,17 @@
 
             <aside class="demo">
 
-                <input type="text" class="x-textbox" id="a" placeholder="输入 a...">
+                <input type="text" class="x-textbox" id="emailSuggest" placeholder="输入邮箱地址...">
 
                 <script>
 
-
-                    var a = new EmailSuggest('a');
+                    var emailSuggest = new EmailSuggest('emailSuggest');
 
                 </script>
 
             </aside>
+
+            <blockquote class="demo">EmailSuggest 继承于 <a href="Suggest.html" class="demo">Suggest</a> 组件。</blockquote>
 
         </article>
 		

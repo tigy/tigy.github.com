@@ -12,7 +12,7 @@
  *     Controls.Core.ListControl
  *     Controls.Core.ContentControl
  *     Controls.Core.TreeControl
- *     System.Dom.Align
+ *     System.Dom.Pin
  *     Controls.Menu.Menu
  *     System.Fx.Base
  *     System.Fx.Tween
@@ -1759,7 +1759,8 @@ function trace() {
 
 	// 无参数的话，自动补充一个参数。
 	if (arguments.length === 0) {
-		if (!trace.$count)
+		if (!trace.$count)
+
 		return trace('(trace: ' + (trace.$count++) + ')');
 	}
 
@@ -2321,7 +2322,8 @@ function imports(namespace) {
 					new APIInfo(obj, showPredefinedMembers).copyTo(r);
 				} else {
 					r.push('无法对 ' + (obj === null ? "null" : "undefined") + ' 分析');
-				}
+				}
+
 
 			};
 
@@ -2546,7 +2548,8 @@ function imports(namespace) {
 		 * 指示一个函数已过时。
 		 * @param {String} message="此成员已过时" 提示的信息。
 		 */
-		deprected: function(message) {
+		deprected: function(message) {
+
 		},
 
 		/**
@@ -2686,7 +2689,8 @@ function imports(namespace) {
 	                } else {
 	                    window["eval"].call(window, src);
 	                }
-	            } catch (e) {
+	            } catch (e) {
+
 	            } 
 	        }
 		},
@@ -2745,7 +2749,8 @@ function imports(namespace) {
 
 			} catch (e) {
 
-			    // 调试输出。
+			    // 调试输出。
+
 
 			} finally {
 
@@ -2835,7 +2840,8 @@ function imports(namespace) {
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
  
  
 // Core - 核心部分
@@ -7374,7 +7380,8 @@ function imports(namespace) {
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
 
 
 /**
@@ -7551,7 +7558,8 @@ var Deferrable = Class({
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
 
 /**
  * 用于发送和接收 AJAX 请求的工具。
@@ -8119,7 +8127,8 @@ var Ajax = (function () {
 /**
  * AJAX 传输 JavaScript 。
  * @author xuld
- */
+ */
+
 
 Ajax.accepts.script = "text/javascript, application/javascript, application/ecmascript, application/x-ecmascript";
 
@@ -8211,7 +8220,8 @@ Ajax.transports.script = function (xhrObject, parseData, done) {
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
 
 Ajax.transports.jsonp = function (xhrObject, parseData) {
 
@@ -8282,7 +8292,9 @@ Ajax.jsonp = function(url, data, onsuccess, onerror) {
  ********************************************************/
 /**
  * @author  xuld
- */
+ */
+
+
 
 
 /**
@@ -8398,7 +8410,8 @@ var Control = Dom.extend({
  ********************************************************/
 /**
  * @author  xuld
- */
+ */
+
 
 
 /**
@@ -8610,7 +8623,8 @@ ListControl.aliasMethods = function(controlClass, targetProperty, removeChildPro
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
 
 
 /**
@@ -8657,13 +8671,251 @@ var ContentControl = Control.extend({
 /*********************************************************
  * Controls.Core.TreeControl
  ********************************************************/
-/** * @author  xuld *//** * 表示一个树结构的子组件。 * @class TreeControl * @extends ListControl */var TreeControl = ListControl.extend({		// 树节点		/**	 * 将已有的 DOM 节点转为 {@link TreeControl.Item} 对象。	 * @param {Dom} childControl 要转换的 DOM 对象。	 * @param {Dom} parent=null DOM 对象的父节点。	 * @protected virtual	 */	createTreeItem: function(childControl, li) {		return new TreeControl.Item(childControl);	},		/**	 * 初始化并返回每一个 TreeItem 对象。	 * @param {Dom} li 包含树节点的  li 节点对象。	 * @param {Dom} [childControl] 强制指定 li 内指定的子节点。	 * @private	 */	initTreeItem: function(li, childControl) {			// 获取第一个子节点。		var subControl = li.addClass('x-' + this.xtype + '-item').find('>ul');				// 如果没有指定 childControl，则使用 li.first()作为内容。		if(!childControl) {			childControl = (subControl ? (subControl.prev() || subControl.prev(null)) : (li.first() || li.first(null))) || Dom.parse('');		}				// 根据节点创建一个 MenuItem 对象。		childControl = this.createTreeItem(childControl, li);				// 插入创建的菜单项。		li.prepend(childControl);		// 如果存在子菜单，设置子菜单。		if (subControl) {			childControl.setSubControl(subControl);		}				// 保存 li -> childControl 的关联。		li.dataField().item = childControl;				// 绑定 parentControl。		childControl.parentControl = this;				return childControl;	},		/**	 * 初始化 DOM 中已经存在的项。 	 * @protected override	 */	init: function(){		for(var c = this.first(); c; c = c.next()){			this.initTreeItem(c);		}	},		// 增删节点	/**	 * 当新控件被添加时执行。	 * @param {Control} childControl 新添加的元素。	 * @param {Control} refControl 元素被添加的位置。	 * @protected override	 */	insertBefore: function(childControl, refControl) {				var item;				// 如果不是添加 <li> 标签，则创建一个。		if (childControl.node.tagName !== 'LI') {						// 作为 initTreeItem 的参数。			item = childControl;						// 生成一个 <li>			childControl = Dom.create('LI');		}				// 插入 DOM 树。		childControl.attach(this.node, refControl && refControl.node || null);				// 返回 treeItem		return this.initTreeItem(childControl, item);	},	/**	 * 当新控件被移除时执行。	 * @param {Object} childControl 新添加的元素。	 * @protected override	 */	removeChild: function(childControl) {				// 取消删除一个项(自动转到 <li>)。		if(childControl = ListControl.prototype.removeChild.call(this, childControl)){							var data = childControl.dataField();						delete data.item.parentControl;						delete data.item;					}				// 返回被删除的子控件。		return childControl;	},		// 项		item: function(index){		if(index = this.child(index)){			index = index.dataField().item;		}				return index;	}});/** * 表示 TreeControl 中的一项。 * @class TreeControl.Item */TreeControl.Item = ContentControl.extend({		tpl: '<a class="x-control"></a>',		/**	 * 获取当前菜单管理的子菜单。	 * @type {TreeControl}	 */	subControl: null,		/**	 * 当被子类重写时，用于创建子树。	 * @param {TreeControl} treeControl 要初始化的子树。	 * @return {TreeControl} 新的 {@link TreeControl} 对象。	 * @protected virtual	 */	createSubControl: function(control){		return new TreeControl(control);	},		/**	 * 当被子类重写时，用于初始化子树。	 * @param {TreeControl} treeControl 要初始化的子树。	 * @protected virtual	 */	initSubControl: Function.empty,		/**	 * 当被子类重写时，用于删除初始化子树。	 * @param {TreeControl} treeControl 要删除初始化的子树。	 * @protected virtual	 */	uninitSubControl: Function.empty,		/**	 * 获取当前项的子树控件。 	 */	getSubControl: function(){		if(!this.subControl){			this.setSubControl(this.createSubControl());		}		return this.subControl;	},		/**	 * 设置当前项的子树控件。	 */	setSubControl: function(treeControl) {		if (treeControl) {						if(!(treeControl instanceof TreeControl)){				treeControl = this.createSubControl(treeControl);				}						// 如果子控件不在 DOM 树中，插入到当前节点后。			if (!treeControl.closest('body') && this.node.parentNode) {				this.node.parentNode.appendChild(treeControl.node);			}					this.subControl = treeControl;			this.initSubControl(treeControl);			treeControl.owner = this;		} else if(this.subControl){			this.subControl.remove();			this.uninitSubControl(this.subControl);			delete this.subControl.owner;			this.subControl = null;		}		return this;	},	attach: function(parentNode, refNode) {			    parentNode.insertBefore(this.node, refNode);	    // 如果有关联的容器，添加容器。		var subControl = this.subControl;		if (subControl && !subControl.closest('body')) {			parentNode.insertBefore(subControl.node, refNode);		}	},	detach: function(parentNode) {				if(this.node.parentNode === parentNode) {			parentNode.removeChild(this.node);		}				// 如果有关联的容器，删除容器。		var subControl = this.subControl;		if (subControl) {			parentNode.removeChild(subControl.node);		}	}});ListControl.aliasMethods(TreeControl.Item, 'getSubControl()', 'subControl');
+/**
+ * @author  xuld
+ */
+
+
+
+
+/**
+ * 表示一个树结构的子组件。
+ * @class TreeControl
+ * @extends ListControl
+ */
+var TreeControl = ListControl.extend({
+	
+	// 树节点
+	
+	/**
+	 * 将已有的 DOM 节点转为 {@link TreeControl.Item} 对象。
+	 * @param {Dom} childControl 要转换的 DOM 对象。
+	 * @param {Dom} parent=null DOM 对象的父节点。
+	 * @protected virtual
+	 */
+	createTreeItem: function(childControl, li) {
+		return new TreeControl.Item(childControl);
+	},
+	
+	/**
+	 * 初始化并返回每一个 TreeItem 对象。
+	 * @param {Dom} li 包含树节点的  li 节点对象。
+	 * @param {Dom} [childControl] 强制指定 li 内指定的子节点。
+	 * @private
+	 */
+	initTreeItem: function(li, childControl) {
+	
+		// 获取第一个子节点。
+		var subControl = li.addClass('x-' + this.xtype + '-item').find('>ul');
+		
+		// 如果没有指定 childControl，则使用 li.first()作为内容。
+		if(!childControl) {
+			childControl = (subControl ? (subControl.prev() || subControl.prev(null)) : (li.first() || li.first(null))) || Dom.parse('');
+		}
+		
+		// 根据节点创建一个 MenuItem 对象。
+		childControl = this.createTreeItem(childControl, li);
+		
+		// 插入创建的菜单项。
+		li.prepend(childControl);
+
+		// 如果存在子菜单，设置子菜单。
+		if (subControl) {
+			childControl.setSubControl(subControl);
+		}
+		
+		// 保存 li -> childControl 的关联。
+		li.dataField().item = childControl;
+		
+		// 绑定 parentControl。
+		childControl.parentControl = this;
+		
+		return childControl;
+
+	},
+	
+	/**
+	 * 初始化 DOM 中已经存在的项。 
+	 * @protected override
+	 */
+	init: function(){
+		for(var c = this.first(); c; c = c.next()){
+			this.initTreeItem(c);
+		}
+	},
+	
+	// 增删节点
+
+	/**
+	 * 当新控件被添加时执行。
+	 * @param {Control} childControl 新添加的元素。
+	 * @param {Control} refControl 元素被添加的位置。
+	 * @protected override
+	 */
+	insertBefore: function(childControl, refControl) {
+		
+		var item;
+		
+		// 如果不是添加 <li> 标签，则创建一个。
+		if (childControl.node.tagName !== 'LI') {
+			
+			// 作为 initTreeItem 的参数。
+			item = childControl;
+			
+			// 生成一个 <li>
+			childControl = Dom.create('LI');
+		}
+		
+		// 插入 DOM 树。
+		childControl.attach(this.node, refControl && refControl.node || null);
+		
+		// 返回 treeItem
+		return this.initTreeItem(childControl, item);
+	},
+
+	/**
+	 * 当新控件被移除时执行。
+	 * @param {Object} childControl 新添加的元素。
+	 * @protected override
+	 */
+	removeChild: function(childControl) {
+		
+		// 取消删除一个项(自动转到 <li>)。
+		if(childControl = ListControl.prototype.removeChild.call(this, childControl)){
+				
+			var data = childControl.dataField();
+			
+			delete data.item.parentControl;
+			
+			delete data.item;
+			
+		}
+		
+		// 返回被删除的子控件。
+		return childControl;
+	},
+	
+	// 项
+	
+	item: function(index){
+		if(index = this.child(index)){
+			index = index.dataField().item;
+		}
+		
+		return index;
+	}
+
+});
+
+/**
+ * 表示 TreeControl 中的一项。
+ * @class TreeControl.Item
+ */
+TreeControl.Item = ContentControl.extend({
+	
+	tpl: '<a class="x-control"></a>',
+	
+	/**
+	 * 获取当前菜单管理的子菜单。
+	 * @type {TreeControl}
+	 */
+	subControl: null,
+	
+	/**
+	 * 当被子类重写时，用于创建子树。
+	 * @param {TreeControl} treeControl 要初始化的子树。
+	 * @return {TreeControl} 新的 {@link TreeControl} 对象。
+	 * @protected virtual
+	 */
+	createSubControl: function(control){
+		return new TreeControl(control);
+	},
+	
+	/**
+	 * 当被子类重写时，用于初始化子树。
+	 * @param {TreeControl} treeControl 要初始化的子树。
+	 * @protected virtual
+	 */
+	initSubControl: Function.empty,
+	
+	/**
+	 * 当被子类重写时，用于删除初始化子树。
+	 * @param {TreeControl} treeControl 要删除初始化的子树。
+	 * @protected virtual
+	 */
+	uninitSubControl: Function.empty,
+	
+	/**
+	 * 获取当前项的子树控件。 
+	 */
+	getSubControl: function(){
+		if(!this.subControl){
+			this.setSubControl(this.createSubControl());
+		}
+		return this.subControl;
+	},
+	
+	/**
+	 * 设置当前项的子树控件。
+	 */
+	setSubControl: function(treeControl) {
+		if (treeControl) {
+			
+			if(!(treeControl instanceof TreeControl)){
+				treeControl = this.createSubControl(treeControl);	
+			}
+			
+			// 如果子控件不在 DOM 树中，插入到当前节点后。
+			if (!treeControl.closest('body') && this.node.parentNode) {
+				this.node.parentNode.appendChild(treeControl.node);
+			}
+		
+			this.subControl = treeControl;
+			this.initSubControl(treeControl);
+			treeControl.owner = this;
+		} else if(this.subControl){
+			this.subControl.remove();
+			this.uninitSubControl(this.subControl);
+			delete this.subControl.owner;
+			this.subControl = null;
+		}
+		return this;
+	},
+
+	attach: function(parentNode, refNode) {
+		
+	    parentNode.insertBefore(this.node, refNode);
+
+	    // 如果有关联的容器，添加容器。
+		var subControl = this.subControl;
+		if (subControl && !subControl.closest('body')) {
+			parentNode.insertBefore(subControl.node, refNode);
+		}
+	},
+
+	detach: function(parentNode) {
+		
+		if(this.node.parentNode === parentNode) {
+			parentNode.removeChild(this.node);
+		}
+		
+		// 如果有关联的容器，删除容器。
+		var subControl = this.subControl;
+		if (subControl) {
+			parentNode.removeChild(subControl.node);
+		}
+	}
+
+});
+
+ListControl.aliasMethods(TreeControl.Item, 'getSubControl()', 'subControl');
 /*********************************************************
- * System.Dom.Align
+ * System.Dom.Pin
  ********************************************************/
 /**
  * @author xuld 
- */
+ */
+
 
 
 /**
@@ -8817,7 +9069,10 @@ Dom.implement({
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
+
+
 
 
 var Menu = TreeControl.extend({
@@ -9113,7 +9368,8 @@ var MenuSeperator = MenuItem.extend({
 /**
  * @fileOverview 提供底层的 特效算法支持。
  * @author xuld
- */
+ */
+
 
 /**
  * 特效算法基类。
@@ -9326,16 +9582,233 @@ var Fx = (function() {
 /*********************************************************
  * System.Fx.Tween
  ********************************************************/
-/** * @author xuld *//** * @namespace Fx
- */Object.extend(Fx, {		/**	 * 用于特定 css 补间动画的引擎。 
-	 */	tweeners: {},		/**	 * 默认的补间动画的引擎。 	 */	defaultTweeners: [],		/**	 * 用于数字的动画引擎。
-	 */	numberTweener: {		get: function(target, name){			return Dom.styleNumber(target.node, name);		},						/**		 * 常用计算。		 * @param {Object} from 开始。		 * @param {Object} to 结束。		 * @param {Object} delta 变化。		 */		compute: function(from, to, delta){			return (to - from) * delta + from;		},				parse: function(value){			return typeof value == "number" ? value : parseFloat(value);		},				set: function(target, name, value){			target.node.style[name] = value;		}	},	/**	 * 补间动画	 * @class Fx.Tween	 * @extends Fx	 */	Tween: Fx.extend({				/**		 * 初始化当前特效。		 */		constructor: function(){					},				/**		 * 根据指定变化量设置值。		 * @param {Number} delta 变化量。 0 - 1 。		 * @protected override		 */		set: function(delta){			var options = this.options,				params = options.params,				target = options.target,				tweener,				key,				value;			// 对当前每个需要执行的特效进行重新计算并赋值。			for (key in params) {				value = params[key];				tweener = value.tweener;				tweener.set(target, key, tweener.compute(value.from, value.to, delta));			}		},				/**		 * 生成当前变化所进行的初始状态。		 * @param {Object} options 开始。		 * @protected override		 */		init: function (options) {							// 对每个设置属性			var key,				tweener,				part,				value,				parsed,				i,				// 生成新的 tween 对象。				params = {};						for (key in options.params) {				// value				value = options.params[key];				// 如果 value 是字符串，判断 += -= 或 a-b				if (typeof value === 'string' && (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {					value = part[3];				}				// 找到用于变化指定属性的解析器。				tweener = Fx.tweeners[key = key.toCamelCase()];								// 已经编译过，直接使用， 否则找到合适的解析器。				if (!tweener) {										// 如果是纯数字属性，使用 numberParser 。					if(key in Dom.styleNumbers) {						tweener = Fx.numberTweener;					} else {												i = Fx.defaultTweeners.length;												// 尝试使用每个转换器						while (i-- > 0) {														// 获取转换器							parsed = Fx.defaultTweeners[i].parse(value, key);														// 如果转换后结果合格，证明这个转换器符合此属性。							if (parsed || parsed === 0) {								tweener = Fx.defaultTweeners[i];								break;							}						}						// 找不到合适的解析器。						if (!tweener) {							continue;						}											}					// 缓存 tweeners，下次直接使用。					Fx.tweeners[key] = tweener;				}								// 如果有特殊功能。 ( += -= a-b)				if(part){					parsed = part[2];					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));				} else {					parsed = tweener.parse(value);					i = tweener.get(options.target, key);				}								params[key] = {					tweener: tweener,					from: i,					to: parsed						};								assert(i !== null && parsed !== null, "Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, i, parsed);							}			options.params = params;		}		}),		createTweener: function(tweener){		return Object.extendIf(tweener, Fx.numberTweener);	}	});Object.each(Dom.styleFix, function(value, key){	Fx.tweeners[key] = this;}, Fx.createTweener({	set: function (target, name, value) {		Dom.styleFix[name].call(target, value);	}}));Fx.tweeners.scrollTop = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(null, value);	},	get: function (target) {		return target.getScroll().y;	}});Fx.tweeners.scrollLeft = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(value);	},	get: function (target) {		return target.getScroll().x;	}});Fx.defaultTweeners.push(Fx.createTweener({	set: navigator.isStd ? function (target, name, value) {				target.node.style[name] = value + 'px';	} : function(target, name, value) {		try {						// ie 对某些负属性内容报错			target.node.style[name] = value;		}catch(e){}	}}));
+/**
+ * @author xuld
+ */
+
+
+
+
+/**
+ * @namespace Fx
+ */
+Object.extend(Fx, {
+	
+	/**
+	 * 用于特定 css 补间动画的引擎。 
+	 */
+	tweeners: {},
+	
+	/**
+	 * 默认的补间动画的引擎。 
+	 */
+	defaultTweeners: [],
+	
+	/**
+	 * 用于数字的动画引擎。
+	 */
+	numberTweener: {
+		get: function(target, name){
+			return Dom.styleNumber(target.node, name);
+		},
+				
+		/**
+		 * 常用计算。
+		 * @param {Object} from 开始。
+		 * @param {Object} to 结束。
+		 * @param {Object} delta 变化。
+		 */
+		compute: function(from, to, delta){
+			return (to - from) * delta + from;
+		},
+		
+		parse: function(value){
+			return typeof value == "number" ? value : parseFloat(value);
+		},
+		
+		set: function(target, name, value){
+			target.node.style[name] = value;
+		}
+	},
+
+	/**
+	 * 补间动画
+	 * @class Fx.Tween
+	 * @extends Fx
+	 */
+	Tween: Fx.extend({
+		
+		/**
+		 * 初始化当前特效。
+		 */
+		constructor: function(){
+			
+		},
+		
+		/**
+		 * 根据指定变化量设置值。
+		 * @param {Number} delta 变化量。 0 - 1 。
+		 * @protected override
+		 */
+		set: function(delta){
+			var options = this.options,
+				params = options.params,
+				target = options.target,
+				tweener,
+				key,
+				value;
+
+			// 对当前每个需要执行的特效进行重新计算并赋值。
+			for (key in params) {
+				value = params[key];
+				tweener = value.tweener;
+				tweener.set(target, key, tweener.compute(value.from, value.to, delta));
+			}
+		},
+		
+		/**
+		 * 生成当前变化所进行的初始状态。
+		 * @param {Object} options 开始。
+		 * @protected override
+		 */
+		init: function (options) {
+				
+			// 对每个设置属性
+			var key,
+				tweener,
+				part,
+				value,
+				parsed,
+				i,
+				// 生成新的 tween 对象。
+				params = {};
+			
+			for (key in options.params) {
+
+				// value
+				value = options.params[key];
+
+				// 如果 value 是字符串，判断 += -= 或 a-b
+				if (typeof value === 'string' && (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {
+					value = part[3];
+				}
+
+				// 找到用于变化指定属性的解析器。
+				tweener = Fx.tweeners[key = key.toCamelCase()];
+				
+				// 已经编译过，直接使用， 否则找到合适的解析器。
+				if (!tweener) {
+					
+					// 如果是纯数字属性，使用 numberParser 。
+					if(key in Dom.styleNumbers) {
+						tweener = Fx.numberTweener;
+					} else {
+						
+						i = Fx.defaultTweeners.length;
+						
+						// 尝试使用每个转换器
+						while (i-- > 0) {
+							
+							// 获取转换器
+							parsed = Fx.defaultTweeners[i].parse(value, key);
+							
+							// 如果转换后结果合格，证明这个转换器符合此属性。
+							if (parsed || parsed === 0) {
+								tweener = Fx.defaultTweeners[i];
+								break;
+							}
+						}
+
+						// 找不到合适的解析器。
+						if (!tweener) {
+							continue;
+						}
+						
+					}
+
+					// 缓存 tweeners，下次直接使用。
+					Fx.tweeners[key] = tweener;
+				}
+				
+				// 如果有特殊功能。 ( += -= a-b)
+				if(part){
+					parsed = part[2];
+					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);
+					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));
+				} else {
+					parsed = tweener.parse(value);
+					i = tweener.get(options.target, key);
+				}
+				
+				params[key] = {
+					tweener: tweener,
+					from: i,
+					to: parsed		
+				};
+				
+				assert(i !== null && parsed !== null, "Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, i, parsed);
+				
+			}
+
+			options.params = params;
+		}
+	
+	}),
+	
+	createTweener: function(tweener){
+		return Object.extendIf(tweener, Fx.numberTweener);
+	}
+	
+});
+
+Object.each(Dom.styleFix, function(value, key){
+	Fx.tweeners[key] = this;
+}, Fx.createTweener({
+	set: function (target, name, value) {
+		Dom.styleFix[name].call(target, value);
+	}
+}));
+
+Fx.tweeners.scrollTop = Fx.createTweener({
+	set: function (target, name, value) {
+		target.setScroll(null, value);
+	},
+	get: function (target) {
+		return target.getScroll().y;
+	}
+});
+
+Fx.tweeners.scrollLeft = Fx.createTweener({
+	set: function (target, name, value) {
+		target.setScroll(value);
+	},
+	get: function (target) {
+		return target.getScroll().x;
+	}
+});
+
+Fx.defaultTweeners.push(Fx.createTweener({
+
+	set: navigator.isStd ? function (target, name, value) {
+		
+		target.node.style[name] = value + 'px';
+	} : function(target, name, value) {
+		try {
+			
+			// ie 对某些负属性内容报错
+			target.node.style[name] = value;
+		}catch(e){}
+	}
+
+}));
+
 /*********************************************************
  * System.Fx.Animate
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
 
 
 (function(){
@@ -9716,7 +10189,8 @@ var Fx = (function() {
  ********************************************************/
 /**
  * @author  xuld
- */
+ */
+
 
 
 /**
@@ -9853,7 +10327,10 @@ var ICollapsable = {
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
+
+
 
 
 var TreeView = TreeControl.extend({
@@ -10304,7 +10781,8 @@ var TreeNode = TreeControl.Item.extend(ICollapsable).implement({
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
 
 
 /**
@@ -10399,7 +10877,10 @@ var IInput = {
  ********************************************************/
 /**
  * @author  xuld
- */
+ */
+
+
+
 
 
 var Button = ContentControl.extend({
@@ -10423,7 +10904,9 @@ var Button = ContentControl.extend({
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
+
 
 
 /**
@@ -10632,7 +11115,11 @@ var IDropDownOwner = {
  ********************************************************/
 /**
  * @author  xuld
- */
+ */
+
+
+
+
 
 
 
@@ -10680,7 +11167,10 @@ ListControl.aliasMethods(MenuButton, 'dropDown');
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
+
+
 
 
 var SplitButton = MenuButton.extend({
@@ -10724,7 +11214,10 @@ var SplitButton = MenuButton.extend({
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
+
+
 
 
 var Carousel = Control.extend({
@@ -10877,7 +11370,9 @@ var Carousel = Control.extend({
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
+
 
 
 var ProgressBar = Control.extend({
@@ -10903,7 +11398,8 @@ var ProgressBar = Control.extend({
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
 
 
 /**
@@ -10977,7 +11473,10 @@ Dom.implement({
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
+
+
 
 /**
  * 表示一个下拉菜单。用于 Suggest 和 ComboBox 组件。
@@ -11097,7 +11596,9 @@ var DropDownMenu = ListControl.extend({
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
+
 
 /**
  * 智能提示组件。
@@ -11197,7 +11698,8 @@ var Suggest = Control.extend(IDropDownOwner).implement({
  ********************************************************/
 /**
  * @author  xuld
- */
+ */
+
 
 
 /**
@@ -11353,13 +11855,37 @@ var ContainerControl = Control.extend({
 /*********************************************************
  * Controls.Container.Panel
  ********************************************************/
-/** * @author  xuld *//** * 内容显示面板。 * @class Panel * @extends ContainerControl */var Panel = ContainerControl.extend({		/**	 * xtype	 * @type String	 */	xtype: 'panel'	});
+/**
+ * @author  xuld
+ */
+
+
+
+
+/**
+ * 内容显示面板。
+ * @class Panel
+ * @extends ContainerControl
+ */
+var Panel = ContainerControl.extend({
+	
+	/**
+	 * xtype
+	 * @type String
+	 */
+	xtype: 'panel'
+	
+});
+
+
+
 /*********************************************************
  * Controls.Core.IToolTip
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
 
 
 var IToolTip = {
@@ -11379,13 +11905,19 @@ var IToolTip = {
 	menuTpl: '<span>\
 	    <span class="x-arrow-fore">◆</span>\
         <span class="x-arrow-back">◆</span>\
-    </span>',
+    </span>',
+
     /**
 	 * 显示时使用的特效持续时间。
-	 */	showDuration: -2,	show: function () {
+	 */
+	showDuration: -2,
+
+	show: function () {
 	    if (!this.closest('body')) {
 	        this.appendTo();
-	    }	    return Dom.prototype.show.call(this, arguments, {
+	    }
+
+	    return Dom.prototype.show.call(this, arguments, {
 	    	duration: this.showDuration
 	    });
 	},
@@ -11394,29 +11926,49 @@ var IToolTip = {
 	    return Dom.prototype.hide.call(this, arguments, {
 	    	duration: this.showDuration
 	    });
-	},	showAt: function (x, y) {
+	},
+
+	showAt: function (x, y) {
 	    return this.show().setPosition(x, y);
-	},	showBy: function (ctrl, offsetX, offsetY, e) {
-			    var configs = ({
-	        left: ['rr-yc', 15, 0],	        right: ['ll-yc', 15, 0],	        top: ['xc-bb', 0, 15],	        bottom: ['xc-tt', 0, 15],	        'null': ['xc-bb', 0, 5, 1]
-	    }[this.getArrow()]);	    this.show().align(ctrl, configs[0], offsetX === undefined ? configs[1] : offsetX, offsetY === undefined ? configs[2] : offsetY);
+	},
+
+	showBy: function (ctrl, offsetX, offsetY, e) {
+		
+	    var configs = ({
+	        left: ['rr-yc', 15, 0],
+	        right: ['ll-yc', 15, 0],
+	        top: ['xc-bb', 0, 15],
+	        bottom: ['xc-tt', 0, 15],
+	        'null': ['xc-bb', 0, 5, 1]
+	    }[this.getArrow()]);
+
+	    this.show().align(ctrl, configs[0], offsetX === undefined ? configs[1] : offsetX, offsetY === undefined ? configs[2] : offsetY);
 		
 		if(configs[3] && e){
 			this.setPosition(e.pageX + (offsetX || 0));
 		}
 
 		return this;
-	},	setArrow: function (value) {
+
+	},
+
+	setArrow: function (value) {
 	    var arrow = this.find('.x-arrow') || this.append(this.menuTpl);
 	    if (value) {
 	        arrow.node.className = 'x-arrow x-arrow-' + value;
 	    } else {
 	        arrow.remove();
-	    }	    return this;
-	},	getArrow: function () {
-	    var arrow = this.find('.x-arrow'), r = null;	    if (arrow) {
+	    }
+	    return this;
+	},
+
+	getArrow: function () {
+	    var arrow = this.find('.x-arrow'), r = null;
+
+	    if (arrow) {
 	        r = (/\bx-arrow-(top|bottom|left|right)/.exec(arrow.node.className) || [0, r])[1];
-	    }	    return r;
+	    }
+	    return r;
 	},
 	
     /**
@@ -11460,13 +12012,31 @@ var IToolTip = {
 /*********************************************************
  * Controls.Form.TextBox
  ********************************************************/
-/** * @author  xuld */var TextBox = Control.extend(IInput).implement({		xtype: 'textbox',		tpl: '<input type="text" class="x-control">'	});
+/**
+ * @author  xuld
+ */
+
+
+
+
+
+var TextBox = Control.extend(IInput).implement({
+	
+	xtype: 'textbox',
+	
+	tpl: '<input type="text" class="x-control">'
+	
+});
+
 /*********************************************************
  * Controls.Form.RadioButton
  ********************************************************/
 /**
  * @author  xuld
- */
+ */
+
+
+
 
 
 var RadioButton = Control.extend(IInput).implement({
@@ -11480,13 +12050,32 @@ var RadioButton = Control.extend(IInput).implement({
 /*********************************************************
  * Controls.Form.CheckBox
  ********************************************************/
-/** * @author  xuld */var CheckBox = Control.extend(IInput).implement({		xtype: 'checkbox',		tpl: '<input type="checkbox" class="x-control">'	});
+/**
+ * @author  xuld
+ */
+
+
+
+
+
+var CheckBox = Control.extend(IInput).implement({
+	
+	xtype: 'checkbox',
+	
+	tpl: '<input type="checkbox" class="x-control">'
+	
+});
+
 /*********************************************************
  * Controls.Form.FileUpload
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
+
+
+
 
 
 var FileUpload = Control.extend(IInput).implement({
@@ -11529,7 +12118,13 @@ var FileUpload = Control.extend(IInput).implement({
  ********************************************************/
 /**
  * @author  xuld
- */
+ */
+
+
+
+
+
+
 
 /**
  * 表示一个数据选择器。
@@ -11704,7 +12299,9 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 /*********************************************************
  * Controls.Form.SearchTextBox
  ********************************************************/
-
+
+
+
 
 
 var SearchTextBox = Picker.extend({
@@ -11780,7 +12377,9 @@ var SearchTextBox = Picker.extend({
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
+
 
 /**
  * 表示一个组合框。
@@ -11970,7 +12569,13 @@ ListControl.aliasMethods(ComboBox, 'dropDown');
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
+
+
+
+
+
 
 
 /**
@@ -12274,7 +12879,11 @@ MessageBox.tip = function (text, icon, timeout, callback) {
  ********************************************************/
 /**
  * @author xuld
- */
+ */
+
+
+
+
 
 
 	
@@ -12309,7 +12918,8 @@ var ToolTip = ContentControl.extend(IToolTip).implement({
 //===========================================
 //  拖动 
 //   A: xuld
-//===========================================
+//===========================================
+
 
 
 	
@@ -12555,7 +13165,8 @@ Dom.implement({
  ********************************************************/
 //===========================================
 //  拖放         A
-//===========================================
+//===========================================
+
 
 
 

@@ -1,5 +1,4 @@
 
-/// #if !Publish
 
 /**
  * Debug Tools
@@ -1086,7 +1085,6 @@ function imports(namespace) {
     }
 
 })();
-
 
 /// #endif
 

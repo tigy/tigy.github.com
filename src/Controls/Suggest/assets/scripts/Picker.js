@@ -5,6 +5,7 @@
 imports("Controls.Button.Button");
 imports("Controls.Button.MenuButton");
 imports("Controls.Suggest.Picker");
+imports("Controls.Form.TextBox");
 using("Controls.Core.Base");
 using("Controls.Core.IInput");
 using("Controls.Core.IDropDownOwner");
@@ -59,6 +60,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
         // 默认选择当前值。
         this.updateDropDown();
         this.state('actived', true);
+        IDropDownOwner.onDropDownShow.apply(this, arguments);
     },
 
     /**
@@ -67,6 +69,7 @@ var Picker = Control.extend(IInput).implement(IDropDownOwner).implement({
 	 */
     onDropDownHide: function () {
         this.state('actived', false);
+        IDropDownOwner.onDropDownHide.apply(this, arguments);
     },
 
     /**
