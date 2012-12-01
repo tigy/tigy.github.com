@@ -2408,17 +2408,19 @@ using("System.Core.Base");
 		 * </pre>
 		 */
 		setPosition: function(x, y) {
-			var me = this,
-				offset = me.getOffset().sub(me.getPosition()),
-				offsetPoint = formatPoint(x, y);
 
-			if (offsetPoint.y != null) offset.y += offsetPoint.y;
+			Dom.movable(this.node);
+			
+			var me = this,
+				currentPosition = me.getPosition(),
+				offset = me.getOffset(),
+				newPosition = formatPoint(x, y);
+
+			if (newPosition.y != null) offset.y += newPosition.y - currentPosition.y;
 			else offset.y = null;
 
-			if (offsetPoint.x != null) offset.x += offsetPoint.x;
+			if (newPosition.x != null) offset.x += newPosition.x - currentPosition.x;
 			else offset.x = null;
-
-			Dom.movable(me.node);
 
 			return me.setOffset(offset);
 		},
@@ -2781,26 +2783,22 @@ using("System.Core.Base");
 		 */
 		getOffset: function() {
 			// 如果设置过 left top ，这是非常轻松的事。
-			var elem = this.node, left = elem.style.left, top = elem.style.top;
+			var elem = this.node, 
+				left = styleString(elem, 'left'), 
+				top = styleString(elem, 'top');
 		
 			// 如果未设置过。
-			if(!left || !top) {
+			if((!left || !top || left === 'auto' || top === 'auto') && styleString(elem, "position") === 'absolute') {
 		
 				// 绝对定位需要返回绝对位置。
-				if(styleString(elem, "position") === 'absolute') {
-					top = this.offsetParent();
-					left = this.getPosition();
-					if(!rBody.test(top.node.nodeName))
-						left = left.sub(top.getPosition());
-					left.x -= styleNumber(elem, 'marginLeft') + styleNumber(top.node, 'borderLeftWidth');
-					left.y -= styleNumber(elem, 'marginTop') + styleNumber(top.node, 'borderTopWidth');
-		
-					return left;
-				}
-		
-				// 非绝对的只需检查 css 的style。
-				left = getStyle(elem, 'left');
-				top = getStyle(elem, 'top');
+				top = this.offsetParent();
+				left = this.getPosition();
+				if(!rBody.test(top.node.nodeName))
+					left = left.sub(top.getPosition());
+				left.x -= styleNumber(elem, 'marginLeft') + styleNumber(top.node, 'borderLeftWidth');
+				left.y -= styleNumber(elem, 'marginTop') + styleNumber(top.node, 'borderTopWidth');
+	
+				return left;
 			}
 		
 			// 碰到 auto ， 空 变为 0 。
@@ -2833,7 +2831,7 @@ using("System.Core.Base");
 			}
 		
 			var elem = this.node, 
-				bound = elem.getBoundingClientRect(),
+				bound = typeof elem.getBoundingClientRect !== "undefined" ? elem.getBoundingClientRect() : {x:0, y:0},
 				doc = getDocument(elem),
 				html = doc.documentElement,
 				htmlScroll = doc.getScroll();

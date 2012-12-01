@@ -1,7 +1,7 @@
 /*********************************************************
- * This file is created by a tool at 2012/11/25 20:5
+ * This file is created by a tool at 2012/12/1 20:0
  *********************************************************
- * Contains: 
+ * Include: 
  *     System.Core.Base
  *     System.Dom.Base
  *     Controls.Core.Base
@@ -1921,382 +1921,6 @@ function imports(namespace) {
 		},
 
 		/**
-         * 输出类的信息。
-         * @param {Object} [obj] 要查看成员的对象。如果未提供这个对象，则显示全局的成员。
-         * @param {Boolean} showPredefinedMembers=true 是否显示内置的成员。
-         */
-		api: (function () {
-
-			var nodeTypes = 'Window Element Attr Text CDATASection Entity EntityReference ProcessingInstruction Comment HTMLDocument DocumentType DocumentFragment Document Node'.split(' '),
-
-                definedClazz = 'String Date Array Number RegExp Function XMLHttpRequest Object'.split(' ').concat(nodeTypes),
-
-                predefinedNonStatic = {
-                	'Object': 'valueOf hasOwnProperty toString',
-                	'String': 'length charAt charCodeAt concat indexOf lastIndexOf match quote slice split substr substring toLowerCase toUpperCase trim sub sup anchor big blink bold small fixed fontcolor italics link',
-                	'Array': 'length pop push reverse shift sort splice unshift concat join slice indexOf lastIndexOf filter forEach',
-                	/*
-                     * every
-                     * map
-                     * some
-                     * reduce
-                     * reduceRight'
-                     */
-                	'Number': 'toExponential toFixed toLocaleString toPrecision',
-                	'Function': 'length extend call',
-                	'Date': 'getDate getDay getFullYear getHours getMilliseconds getMinutes getMonth getSeconds getTime getTimezoneOffset getUTCDate getUTCDay getUTCFullYear getUTCHours getUTCMinutes getUTCMonth getUTCSeconds getYear setDate setFullYear setHours setMinutes setMonth setSeconds setTime setUTCDate setUTCFullYear setUTCHours setUTCMilliseconds setUTCMinutes setUTCMonth setUTCSeconds setYear toGMTString toLocaleString toUTCString',
-                	'RegExp': 'exec test'
-                },
-
-                predefinedStatic = {
-                	'Array': 'isArray',
-                	'Number': 'MAX_VALUE MIN_VALUE NaN NEGATIVE_INFINITY POSITIVE_INFINITY',
-                	'Date': 'now parse UTC'
-                },
-
-                APIInfo = function (obj, showPredefinedMembers) {
-                	this.members = {};
-                	this.sortInfo = {};
-
-                	this.showPredefinedMembers = showPredefinedMembers !== false;
-                	this.isClass = obj === Function || (obj.prototype && obj.prototype.constructor !== Function);
-
-                	// 如果是普通的变量。获取其所在的原型的成员。
-                	if (!this.isClass && obj.constructor !== Object) {
-                		this.prefix = this.getPrefix(obj.constructor);
-
-                		if (!this.prefix) {
-                			var nodeType = obj.replaceChild ? obj.nodeType : obj.setInterval && obj.clearTimeout ? 0 : null;
-                			if (nodeType) {
-                				this.prefix = this.memberName = nodeTypes[nodeType];
-                				if (this.prefix) {
-                					this.baseClassNames = ['Node', 'Element', 'HTMLElement', 'Document'];
-                					this.baseClasses = [window.Node, window.Element, window.HTMLElement, window.HTMLDocument];
-                				}
-                			}
-                		}
-
-                		if (this.prefix) {
-                			this.title = this.prefix + this.getBaseClassDescription(obj.constructor) + "的实例成员: ";
-                			this.prefix += '.prototype.';
-                		}
-
-                		if ([Number, String, Boolean].indexOf(obj.constructor) === -1) {
-                			var betterPrefix = this.getPrefix(obj);
-                			if (betterPrefix) {
-                				this.orignalPrefix = betterPrefix + ".";
-                			}
-                		}
-
-                	}
-
-                	if (!this.prefix) {
-
-                		this.prefix = this.getPrefix(obj);
-
-                		// 如果是类或对象， 在这里遍历。
-                		if (this.prefix) {
-                			this.title = this.prefix
-                                    + (this.isClass ? this.getBaseClassDescription(obj) : ' ' + getMemberType(obj, this.memberName)) + "的成员: ";
-                			this.prefix += '.';
-                		}
-
-                	}
-
-                	// 如果是类，获取全部成员。
-                	if (this.isClass) {
-                		this.getExtInfo(obj);
-                		this.addStaticMembers(obj);
-                		this.addStaticMembers(obj.prototype, 1, true);
-                		this.addEvents(obj, '');
-                		delete this.members.prototype;
-                		if (this.showPredefinedMembers) {
-                			this.addPredefinedNonStaticMembers(obj, obj.prototype, true);
-                			this.addPredefinedMembers(obj, obj, predefinedStatic);
-                		}
-
-                	} else {
-                		this.getExtInfo(obj.constructor);
-                		// 否则，获取当前实例下的成员。
-                		this.addStaticMembers(obj);
-
-                		if (this.showPredefinedMembers && obj.constructor) {
-                			this.addPredefinedNonStaticMembers(obj.constructor, obj);
-                		}
-
-                	}
-                };
-
-			APIInfo.prototype = {
-
-				memberName: '',
-
-				title: 'API 信息:',
-
-				prefix: '',
-
-				getPrefix: function (obj) {
-					if (!obj)
-						return "";
-					for (var i = 0; i < definedClazz.length; i++) {
-						if (window[definedClazz[i]] === obj) {
-							return this.memberName = definedClazz[i];
-						}
-					}
-
-					return this.getTypeName(obj, window, "", 3);
-				},
-
-				getTypeName: function (obj, base, baseName, deep) {
-
-					for (var memberName in base) {
-						if (base[memberName] === obj) {
-							this.memberName = memberName;
-							return baseName + memberName;
-						}
-					}
-
-					if (deep-- > 0) {
-						for (var memberName in base) {
-							try {
-								if (base[memberName] && isUpper(memberName, 0)) {
-									memberName = this.getTypeName(obj, base[memberName], baseName + memberName + ".", deep);
-									if (memberName)
-										return memberName;
-								}
-							} catch (e) {
-							}
-						}
-					}
-
-					return '';
-				},
-
-				getBaseClassDescription: function (obj) {
-					if (obj && obj.base && obj.base !== JPlus.Object) {
-						var extObj = this.getTypeName(obj.base, window, "", 3);
-						return " 类" + (extObj && extObj != "System.Object" ? "(继承于 " + extObj + " 类)" : "");
-					}
-
-					return " 类";
-				},
-
-				/**
-                 * 获取类的继承关系。
-                 */
-				getExtInfo: function (clazz) {
-					if (!this.baseClasses) {
-						this.baseClassNames = [];
-						this.baseClasses = [];
-						while (clazz && clazz.prototype) {
-							var name = this.getPrefix(clazz);
-							if (name) {
-								this.baseClasses.push(clazz);
-								this.baseClassNames.push(name);
-							}
-
-							clazz = clazz.base;
-						}
-					}
-
-				},
-
-				addStaticMembers: function (obj, nonStatic) {
-					for (var memberName in obj) {
-						this.addMember(obj, memberName, 1, nonStatic);
-					}
-
-				},
-
-				addPredefinedMembers: function (clazz, obj, staticOrNonStatic, nonStatic) {
-					for (var type in staticOrNonStatic) {
-						if (clazz === window[type]) {
-							staticOrNonStatic[type].forEach(function (memberName) {
-								this.addMember(obj, memberName, 5, nonStatic);
-							}, this);
-						}
-					}
-				},
-
-				addPredefinedNonStaticMembers: function (clazz, obj, nonStatic) {
-
-					if (clazz !== Object) {
-
-						predefinedNonStatic.Object.forEach(function (memberName) {
-							if (clazz.prototype[memberName] !== Object.prototype[memberName]) {
-								this.addMember(obj, memberName, 5, nonStatic);
-							}
-						}, this);
-
-					}
-
-					if (clazz === Object && !this.isClass) {
-						return;
-					}
-
-					this.addPredefinedMembers(clazz, obj, predefinedNonStatic, nonStatic);
-
-				},
-
-				addEvents: function (obj, extInfo) {
-					var evtInfo = obj.$event;
-
-					if (evtInfo) {
-
-						for (var evt in evtInfo) {
-							this.sortInfo[this.members[evt] = evt + ' 事件' + extInfo] = 4 + evt;
-						}
-
-						if (obj.base) {
-							this.addEvents(obj.base, '(继承的)');
-						}
-					}
-				},
-
-				addMember: function (base, memberName, type, nonStatic) {
-					try {
-
-						var hasOwnProperty = Object.prototype.hasOwnProperty, owner = hasOwnProperty.call(base, memberName), prefix, extInfo = '';
-
-						nonStatic = nonStatic ? 'prototype.' : '';
-
-						// 如果 base 不存在 memberName 的成员，则尝试在父类查找。
-						if (owner) {
-							prefix = this.orignalPrefix || (this.prefix + nonStatic);
-							type--; // 自己的成员置顶。
-						} else {
-
-							// 搜索包含当前成员的父类。
-							this.baseClasses.each(function (baseClass, i) {
-								if (baseClass.prototype[memberName] === base[memberName] && hasOwnProperty.call(baseClass.prototype, memberName)) {
-									prefix = this.baseClassNames[i] + ".prototype.";
-
-									if (nonStatic)
-										extInfo = '(继承的)';
-
-									return false;
-								}
-							}, this);
-
-							// 如果没找到正确的父类，使用当前类替代，并指明它是继承的成员。
-							if (!prefix) {
-								prefix = this.prefix + nonStatic;
-								extInfo = '(继承的)';
-							}
-
-						}
-
-						this.sortInfo[this.members[memberName] = (type >= 4 ? '[内置]' : '') + prefix + getDescription(base, memberName) + extInfo] = type
-							+ memberName;
-
-					} catch (e) {
-					}
-				},
-
-				copyTo: function (value) {
-					for (var member in this.members) {
-						value.push(this.members[member]);
-					}
-
-					if (value.length) {
-						var sortInfo = this.sortInfo;
-						value.sort(function (a, b) {
-							return sortInfo[a] < sortInfo[b] ? -1 : 1;
-						});
-						value.unshift(this.title);
-					} else {
-						value.push(this.title + '没有可用的子成员信息。');
-					}
-
-				}
-
-			};
-
-			initPredefined(predefinedNonStatic);
-			initPredefined(predefinedStatic);
-
-			function initPredefined(predefined) {
-				for (var obj in predefined)
-					predefined[obj] = predefined[obj].split(' ');
-			}
-
-			function isEmptyObject(obj) {
-
-				// null 被认为是空对象。
-				// 有成员的对象将进入 for(in) 并返回 false 。
-				for (obj in (obj || {}))
-					return false;
-				return true;
-			}
-
-			// 90 是 'Z' 65 是 'A'
-			function isUpper(str, index) {
-				str = str.charCodeAt(index);
-				return str <= 90 && str >= 65;
-			}
-
-			function getMemberType(obj, name) {
-
-				// 构造函数最好识别。
-				if (typeof obj === 'function' && name === 'constructor')
-					return '构造函数';
-
-				// IE6 的 DOM 成员不被认为是函数，这里忽略这个错误。
-				// 有 prototype 的函数一定是类。
-				// 没有 prototype 的函数肯能是类。
-				// 这里根据命名如果名字首字母大写，则作为空类理解。
-				// 这不是一个完全正确的判断方式，但它大部分时候正确。
-				// 这个世界不要求很完美，能解决实际问题的就是好方法。
-				if (obj.prototype && obj.prototype.constructor)
-					return !isEmptyObject(obj.prototype) || isUpper(name, 0) ? '类' : '函数';
-
-				// 最后判断对象。
-				if (obj && typeof obj === 'object')
-					return name.charAt(0) === 'I' && isUpper(name, 1) ? '接口' : '对象';
-
-				// 空成员、值类型都作为属性。
-				return '属性';
-			}
-
-			function getDescription(base, name) {
-				return name + ' ' + getMemberType(base[name], name);
-			}
-
-			return function (obj, showPredefinedMembers) {
-				var r = [];
-
-				// 如果没有参数，显示全局对象。
-				if (arguments.length === 0) {
-					for (var i = 0; i < 7; i++) {
-						r.push(getDescription(window, definedClazz[i]));
-					}
-
-					r.push("trace 函数", "assert 函数", "using 函数", "imports 函数");
-
-					for (var name in window) {
-
-						try {
-							if (isUpper(name, 0) || JPlus[name] === window[name])
-								r.push(getDescription(window, name));
-						} catch (e) {
-
-						}
-					}
-
-					r.sort();
-					r.unshift('全局对象: ');
-
-				} else if (obj != null) {
-					new APIInfo(obj, showPredefinedMembers).copyTo(r);
-				} else {
-					r.push('无法对 ' + (obj === null ? "null" : "undefined") + ' 分析');
-				}
-
-			};
-
-		})(),
-
-		/**
          * 获取对象的字符串形式。
          * @param {Object} obj 要输出的内容。
          * @param {Number/undefined} deep=0 递归的层数。
@@ -3681,6 +3305,7 @@ function imports(namespace) {
 	/**
 	 * @class Dom
 	 */
+	
 	extend(Dom, {
 		
 		/**
@@ -4565,6 +4190,9 @@ function imports(namespace) {
 
 	})
 	
+	/**
+	 * @class Dom
+	 */
 	.implement({
 
 		/**
@@ -5205,17 +4833,19 @@ function imports(namespace) {
 		 * </pre>
 		 */
 		setPosition: function(x, y) {
-			var me = this,
-				offset = me.getOffset().sub(me.getPosition()),
-				offsetPoint = formatPoint(x, y);
 
-			if (offsetPoint.y != null) offset.y += offsetPoint.y;
+			Dom.movable(this.node);
+			
+			var me = this,
+				currentPosition = me.getPosition(),
+				offset = me.getOffset(),
+				newPosition = formatPoint(x, y);
+
+			if (newPosition.y != null) offset.y += newPosition.y - currentPosition.y;
 			else offset.y = null;
 
-			if (offsetPoint.x != null) offset.x += offsetPoint.x;
+			if (newPosition.x != null) offset.x += newPosition.x - currentPosition.x;
 			else offset.x = null;
-
-			Dom.movable(me.node);
 
 			return me.setOffset(offset);
 		},
@@ -5578,26 +5208,22 @@ function imports(namespace) {
 		 */
 		getOffset: function() {
 			// 如果设置过 left top ，这是非常轻松的事。
-			var elem = this.node, left = elem.style.left, top = elem.style.top;
+			var elem = this.node, 
+				left = styleString(elem, 'left'), 
+				top = styleString(elem, 'top');
 		
 			// 如果未设置过。
-			if(!left || !top) {
+			if((!left || !top || left === 'auto' || top === 'auto') && styleString(elem, "position") === 'absolute') {
 		
 				// 绝对定位需要返回绝对位置。
-				if(styleString(elem, "position") === 'absolute') {
-					top = this.offsetParent();
-					left = this.getPosition();
-					if(!rBody.test(top.node.nodeName))
-						left = left.sub(top.getPosition());
-					left.x -= styleNumber(elem, 'marginLeft') + styleNumber(top.node, 'borderLeftWidth');
-					left.y -= styleNumber(elem, 'marginTop') + styleNumber(top.node, 'borderTopWidth');
-		
-					return left;
-				}
-		
-				// 非绝对的只需检查 css 的style。
-				left = getStyle(elem, 'left');
-				top = getStyle(elem, 'top');
+				top = this.offsetParent();
+				left = this.getPosition();
+				if(!rBody.test(top.node.nodeName))
+					left = left.sub(top.getPosition());
+				left.x -= styleNumber(elem, 'marginLeft') + styleNumber(top.node, 'borderLeftWidth');
+				left.y -= styleNumber(elem, 'marginTop') + styleNumber(top.node, 'borderTopWidth');
+	
+				return left;
 			}
 		
 			// 碰到 auto ， 空 变为 0 。
@@ -5630,7 +5256,7 @@ function imports(namespace) {
 			}
 		
 			var elem = this.node, 
-				bound = elem.getBoundingClientRect(),
+				bound = typeof elem.getBoundingClientRect !== "undefined" ? elem.getBoundingClientRect() : {x:0, y:0},
 				doc = getDocument(elem),
 				html = doc.documentElement,
 				htmlScroll = doc.getScroll();
@@ -7632,9 +7258,15 @@ var Button = ContentControl.extend({
 
 /**
  * 用于异步执行任务时保证任务是串行的。
+ * @class Deferrable
  */
 var Deferrable = Class({
-
+	
+	/**
+	 * 让 *deferrable* 等待当前任务完成后继续执行。
+	 * @param {Deferrable} deferrable 需要等待的 Deferrable 对象。
+	 * @param {Object} args 执行 *deferrable* 时使用的参数。
+	 */
     chain: function (deferrable, args) {
         var lastTask = [deferrable, args];
 
@@ -7645,7 +7277,12 @@ var Deferrable = Class({
         }
         this._lastTask = lastTask;
     },
-
+	
+	/**
+	 * 通知当前对象任务已经完成，并继续执行下一个任务。
+	 * @protected
+	 * @return this
+	 */
     progress: function () {
 
         var firstTask = this._firstTask;
@@ -7662,12 +7299,17 @@ var Deferrable = Class({
     },
 
     /**
-	 * 多个请求同时发生后的处理方法。
-	 * wait - 等待上个操作完成。
-	 * ignore - 忽略当前操作。
-	 * stop - 正常中断上个操作，上个操作的回调被立即执行，然后执行当前操作。
-	 * abort - 非法停止上个操作，上个操作的回调被忽略，然后执行当前操作。
-	 * replace - 替换上个操作为新的操作，上个操作的回调将被复制。
+	 * 检查当前的任务执行状态，防止任务同时执行。
+	 * @param {Object} args 即将需要执行时使用的参数。
+	 * @param {String} link="wait" 如果当前任务正在执行后的操作。
+	 * 
+	 * - wait: 等待上个任务完成。
+	 * - ignore: 忽略新的任务。
+	 * - stop: 正常中断上个任务，上个操作的回调被立即执行，然后执行当前任务。
+	 * - abort: 强制停止上个任务，上个操作的回调被忽略，然后执行当前任务。
+	 * - replace: 替换上个任务为新的任务，上个任务的回调将被复制。
+	 * @return {Boolean} 返回一个值，指示是否可以执行新的操作。
+	 * @protected
 	 */
     defer: function (args, link) {
 
@@ -7701,7 +7343,9 @@ var Deferrable = Class({
     },
 
     /**
-	 * 让当前队列等待指定的 deferred 全部执行完毕后执行。
+	 * 让当前任务等待指定的 *deferred* 全部执行完毕后执行。
+	 * @param {Deferrable} deferrable 需要预先执行的 Deferrable 对象。
+	 * @return this
 	 */
     wait: function (deferred) {
         if (this.isRunning) {
@@ -7712,7 +7356,12 @@ var Deferrable = Class({
         this.progress = deferred.progress.bind(deferred);
         return this;
     },
-
+	
+	/**
+	 * 定义当前任务执行完成后的回调函数。
+	 * @param {Deferrable} callback 需要等待执行的回调函数。
+	 * @param {Object} args 执行 *callback* 时使用的参数。
+	 */
     then: function (callback, args) {
         if (this.isRunning) {
             this.chain({
@@ -7728,25 +7377,48 @@ var Deferrable = Class({
         return this;
     },
 
+	/**
+	 * 让当前任务推迟指定时间后执行。
+	 * @param {Integer} duration 等待的毫秒数。
+	 * @return this
+	 */
     delay: function (duration) {
         return this.run({ duration: duration });
     },
 
+	/**
+	 * 当被子类重写时，用于暂停正在执行的任务。
+	 * @protected virtual
+	 * @method
+	 */
     pause: Function.empty,
 
+	/**
+	 * 中止然后跳过正在执行的任务。
+	 * @return this
+	 */
     skip: function () {
         this.pause();
         this.progress();
         return this;
     },
 
+	/**
+	 * 强制中止正在执行的任务。
+	 * @return this
+	 */
     abort: function () {
         this.pause();
         this._firstTask = this._lastTask = null;
         this.isRunning = false;
         return this;
     },
-
+	
+	/**
+	 * 正常中止正在执行的任务。
+	 * @return this
+	 * @virtual
+	 */
     stop: function () {
         return this.abort();
     }
@@ -7768,7 +7440,6 @@ var Deferrable = Class({
  * @abstract
  */
 var Fx = (function() {
-	
 	
 	/// #region interval
 	
@@ -7825,23 +7496,20 @@ var Fx = (function() {
 		 * @param {Object} from 开始位置。
 		 * @param {Object} to 结束位置。
 		 * @return {Base} this
+		 * @protected virtual
 		 */
 		init: Function.empty,
 		
 		/**
-		 * @event step 当进度改变时触发。
-		 * @param {Number} value 当前进度值。
-		 */
-		
-		/**
 		 * 根据指定变化量设置值。
 		 * @param {Number} delta 变化量。 0 - 1 。
-		 * @abstract
+		 * @protected abstract
 		 */
 		set: Function.empty,
 		
 		/**
 		 * 进入变换的下步。
+		 * @protected
 		 */
 		step: function() {
 			var me = this,
@@ -7896,17 +7564,9 @@ var Fx = (function() {
 		},
 
 		/**
-		 * 让当前特效执行器等待指定时间。
-		 */
-		delay: function(timeout){
-			return this.run({
-				duration: timeout
-			});
-		},
-
-		/**
 		 * 由应用程序通知当前 Fx 对象特效执行完。
 		 * @param {Boolean} isAbort 如果是强制中止则为 true, 否则是 false 。
+		 * @protected
 		 */
 		end: function(isAbort) {
 			var me = this;
@@ -7929,6 +7589,8 @@ var Fx = (function() {
 		
 		/**
 		 * 中断当前效果。
+		 * @protected override
+		 * @return this
 		 */
 		stop: function() {
 			this.abort();
@@ -7938,6 +7600,7 @@ var Fx = (function() {
 		
 		/**
 		 * 暂停当前效果。
+		 * @protected override
 		 */
 		pause: function() {
 			var me = this, fps, intervals;
@@ -7952,7 +7615,6 @@ var Fx = (function() {
 				}
 				me.timer = 0;
 			}
-			return me;
 		},
 		
 		/**
@@ -7982,9 +7644,10 @@ var Fx = (function() {
 /*********************************************************
  * System.Fx.Tween
  ********************************************************/
-/** * @author xuld */Object.extend(Fx, {		/**	 * 用于特定 css 补间动画的引擎。 
+/** * @author xuld *//** * @namespace Fx
+ */Object.extend(Fx, {		/**	 * 用于特定 css 补间动画的引擎。 
 	 */	tweeners: {},		/**	 * 默认的补间动画的引擎。 	 */	defaultTweeners: [],		/**	 * 用于数字的动画引擎。
-	 */	numberTweener: {		get: function(target, name){			return Dom.styleNumber(target.node, name);		},						/**		 * 常用计算。		 * @param {Object} from 开始。		 * @param {Object} to 结束。		 * @param {Object} delta 变化。		 */		compute: function(from, to, delta){			return (to - from) * delta + from;		},				parse: function(value){			return typeof value == "number" ? value : parseFloat(value);		},				set: function(target, name, value){			target.node.style[name] = value;		}	},	/**	 * 补间动画	 * @class Tween	 * @extends Fx	 */	Tween: Fx.extend({				/**		 * 初始化当前特效。		 */		constructor: function(){					},				/**		 * 根据指定变化量设置值。		 * @param {Number} delta 变化量。 0 - 1 。		 * @override		 */		set: function(delta){			var options = this.options,				params = options.params,				target = options.target,				tweener,				key,				value;			// 对当前每个需要执行的特效进行重新计算并赋值。			for (key in params) {				value = params[key];				tweener = value.tweener;				tweener.set(target, key, tweener.compute(value.from, value.to, delta));			}		},				/**		 * 生成当前变化所进行的初始状态。		 * @param {Object} options 开始。		 */		init: function (options) {							// 对每个设置属性			var key,				tweener,				part,				value,				parsed,				i,				// 生成新的 tween 对象。				params = {};						for (key in options.params) {				// value				value = options.params[key];				// 如果 value 是字符串，判断 += -= 或 a-b				if (typeof value === 'string' && (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {					value = part[3];				}				// 找到用于变化指定属性的解析器。				tweener = Fx.tweeners[key = key.toCamelCase()];								// 已经编译过，直接使用， 否则找到合适的解析器。				if (!tweener) {										// 如果是纯数字属性，使用 numberParser 。					if(key in Dom.styleNumbers) {						tweener = Fx.numberTweener;					} else {												i = Fx.defaultTweeners.length;												// 尝试使用每个转换器						while (i-- > 0) {														// 获取转换器							parsed = Fx.defaultTweeners[i].parse(value, key);														// 如果转换后结果合格，证明这个转换器符合此属性。							if (parsed || parsed === 0) {								tweener = Fx.defaultTweeners[i];								break;							}						}						// 找不到合适的解析器。						if (!tweener) {							continue;						}											}					// 缓存 tweeners，下次直接使用。					Fx.tweeners[key] = tweener;				}								// 如果有特殊功能。 ( += -= a-b)				if(part){					parsed = part[2];					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));				} else {					parsed = tweener.parse(value);					i = tweener.get(options.target, key);				}								params[key] = {					tweener: tweener,					from: i,					to: parsed						};								assert(i !== null && parsed !== null, "Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, i, parsed);							}			options.params = params;		}		}),		createTweener: function(tweener){		return Object.extendIf(tweener, Fx.numberTweener);	}	});Object.each(Dom.styleFix, function(value, key){	Fx.tweeners[key] = this;}, Fx.createTweener({	set: function (target, name, value) {		Dom.styleFix[name].call(target, value);	}}));Fx.tweeners.scrollTop = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(null, value);	},	get: function (target) {		return target.getScroll().y;	}});Fx.tweeners.scrollLeft = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(value);	},	get: function (target) {		return target.getScroll().x;	}});Fx.defaultTweeners.push(Fx.createTweener({	set: navigator.isStd ? function (target, name, value) {				target.node.style[name] = value + 'px';	} : function(target, name, value) {		try {						// ie 对某些负属性内容报错			target.node.style[name] = value;		}catch(e){}	}}));
+	 */	numberTweener: {		get: function(target, name){			return Dom.styleNumber(target.node, name);		},						/**		 * 常用计算。		 * @param {Object} from 开始。		 * @param {Object} to 结束。		 * @param {Object} delta 变化。		 */		compute: function(from, to, delta){			return (to - from) * delta + from;		},				parse: function(value){			return typeof value == "number" ? value : parseFloat(value);		},				set: function(target, name, value){			target.node.style[name] = value;		}	},	/**	 * 补间动画	 * @class Fx.Tween	 * @extends Fx	 */	Tween: Fx.extend({				/**		 * 初始化当前特效。		 */		constructor: function(){					},				/**		 * 根据指定变化量设置值。		 * @param {Number} delta 变化量。 0 - 1 。		 * @protected override		 */		set: function(delta){			var options = this.options,				params = options.params,				target = options.target,				tweener,				key,				value;			// 对当前每个需要执行的特效进行重新计算并赋值。			for (key in params) {				value = params[key];				tweener = value.tweener;				tweener.set(target, key, tweener.compute(value.from, value.to, delta));			}		},				/**		 * 生成当前变化所进行的初始状态。		 * @param {Object} options 开始。		 * @protected override		 */		init: function (options) {							// 对每个设置属性			var key,				tweener,				part,				value,				parsed,				i,				// 生成新的 tween 对象。				params = {};						for (key in options.params) {				// value				value = options.params[key];				// 如果 value 是字符串，判断 += -= 或 a-b				if (typeof value === 'string' && (part = /^([+-]=|(.+?)-)(.*)$/.exec(value))) {					value = part[3];				}				// 找到用于变化指定属性的解析器。				tweener = Fx.tweeners[key = key.toCamelCase()];								// 已经编译过，直接使用， 否则找到合适的解析器。				if (!tweener) {										// 如果是纯数字属性，使用 numberParser 。					if(key in Dom.styleNumbers) {						tweener = Fx.numberTweener;					} else {												i = Fx.defaultTweeners.length;												// 尝试使用每个转换器						while (i-- > 0) {														// 获取转换器							parsed = Fx.defaultTweeners[i].parse(value, key);														// 如果转换后结果合格，证明这个转换器符合此属性。							if (parsed || parsed === 0) {								tweener = Fx.defaultTweeners[i];								break;							}						}						// 找不到合适的解析器。						if (!tweener) {							continue;						}											}					// 缓存 tweeners，下次直接使用。					Fx.tweeners[key] = tweener;				}								// 如果有特殊功能。 ( += -= a-b)				if(part){					parsed = part[2];					i = parsed ? tweener.parse(parsed) : tweener.get(options.target, key);					parsed = parsed ? tweener.parse(value) : (i + parseFloat(part[1] === '+=' ? value : '-' + value));				} else {					parsed = tweener.parse(value);					i = tweener.get(options.target, key);				}								params[key] = {					tweener: tweener,					from: i,					to: parsed						};								assert(i !== null && parsed !== null, "Fx.Tween#init(options): 无法正确获取属性 {key} 的值({from} {to})。", key, i, parsed);							}			options.params = params;		}		}),		createTweener: function(tweener){		return Object.extendIf(tweener, Fx.numberTweener);	}	});Object.each(Dom.styleFix, function(value, key){	Fx.tweeners[key] = this;}, Fx.createTweener({	set: function (target, name, value) {		Dom.styleFix[name].call(target, value);	}}));Fx.tweeners.scrollTop = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(null, value);	},	get: function (target) {		return target.getScroll().y;	}});Fx.tweeners.scrollLeft = Fx.createTweener({	set: function (target, name, value) {		target.setScroll(value);	},	get: function (target) {		return target.getScroll().x;	}});Fx.defaultTweeners.push(Fx.createTweener({	set: navigator.isStd ? function (target, name, value) {				target.node.style[name] = value + 'px';	} : function(target, name, value) {		try {						// ie 对某些负属性内容报错			target.node.style[name] = value;		}catch(e){}	}}));
 /*********************************************************
  * System.Fx.Animate
  ********************************************************/
@@ -8133,11 +7796,14 @@ var Fx = (function() {
 	
 	}
 
+	/**
+	 * @class Dom
+	 */
 	Dom.implement({
 		
 		/**
 		 * 获取和当前节点有关的 param 实例。
-		 * @return {Animate} 一个 param 的实例。
+		 * @return {Fx.Tween} 一个 Fx.Tween 对象。
 		 */
 		fx: function() {
 			var data = this.dataField();

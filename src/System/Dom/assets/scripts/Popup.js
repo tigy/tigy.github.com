@@ -9,7 +9,7 @@ using("System.Dom.Base");
 Dom.implement({
 	
     /**
-     * ¶¨ÒåÒ»¸ö²Ëµ¥µÄµ¯³ö²ã¡£
+     * å®šä¹‰ä¸€ä¸ªèœå•çš„å¼¹å‡ºå±‚ã€‚
      */
 	popup: function(options){
 		
@@ -17,15 +17,15 @@ Dom.implement({
 			options = {target: Dom.get(options)};
 		}
 		
-        // ¸¡²ãÊ×ÏÈÊÇÒş²ØµÄ¡£
+        // æµ®å±‚é¦–å…ˆæ˜¯éšè—çš„ã€‚
 		options.target.hide();
 
-        // Ä¬ÈÏÊÂ¼şÊÇ mouseenter
+        // é»˜è®¤äº‹ä»¶æ˜¯ mouseenter
 		options.event = options.event || 'mouseenter';
 		
 		var me = this, timer, atPopup, atTarget;
 
-		if (/^mouse/.test(options.event)) {
+		if (/^mouse(enter|over)\b/.test(options.event)) {
 
 		    options.delay = options.delay || 300;
 
@@ -86,7 +86,7 @@ Dom.implement({
 
 		    });
 
-            // µã»÷ºóÖ±½ÓÏÔÊ¾¡£
+            // ç‚¹å‡»åç›´æ¥æ˜¾ç¤ºã€‚
 		    me.bind(options.event.replace(/^\w+/, "click"), function (e) {
 
 		        e.preventDefault();
@@ -115,34 +115,26 @@ Dom.implement({
 
 		        e.preventDefault();
 
-                // ½öµ±½Úµã±»Òş²ØÊ±´¦Àí¡£
-		        if (options.target.isHidden()) {
+	            var target = this;
 
-		            var target = this;
+	            toggle('show', target);
 
-		            toggle('show', target);
+                // ç»‘å®š click åéšè—èœå•ã€‚
+                document.on('click', function (e) {
+                    
+                    // å¦‚æœäº‹ä»¶å‘ç”Ÿåœ¨å¼¹çª—ä¸Šï¼Œå¿½ç•¥ã€‚
+                    if (options.target.has(e.target, true)) {
+                        return;
+                    }
 
-                    // ·ÀÖ¹ÊÂ¼şÂíÉÏ±»´¥·¢¡£
-		            setTimeout(function () {
+                    toggle('hide', target);
 
-		                // °ó¶¨ click ºóÒş²Ø²Ëµ¥¡£
-		                document.on('click', function (e) {
-		                    
-		                    // Èç¹ûÊÂ¼ş·¢ÉúÔÚµ¯´°ÉÏ£¬ºöÂÔ¡£
-		                    if (options.target.has(e.target, true)) {
-		                        return;
-		                    }
+                    // åˆ é™¤ click äº‹ä»¶å›è°ƒã€‚
+                    document.un('click', arguments.callee);
 
-		                    toggle('hide', target);
-
-		                    // É¾³ı click ÊÂ¼ş»Øµ÷¡£
-		                    document.un('click', arguments.callee);
-
-		                });
-
-		            }, 0);
-
-		        }
+                });
+            
+	            return false;
 
 		    });
 
@@ -150,10 +142,10 @@ Dom.implement({
 
 		function toggle(showOrHide, target) {
 
-		    // ÏÔÊ¾»òÒş²Ø¸¡²ã¡£
+		    // æ˜¾ç¤ºæˆ–éšè—æµ®å±‚ã€‚
 		    options.target[showOrHide]();
 
-		    // »Øµ÷¡£
+		    // å›è°ƒã€‚
 		    if (options[showOrHide]) {
 		        options[showOrHide](target);
 		    }
