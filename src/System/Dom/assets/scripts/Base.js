@@ -1606,7 +1606,7 @@ using("System.Core.Base");
 			assert.isElement(elem, "Dom.hide(elem): {elem} ~");
 			var currentDisplay = styleString(elem, 'display');
 			if(currentDisplay !== 'none') {
-				elem.style.$display = currentDisplay;
+				elem.style.defaultDisplay = currentDisplay;
 				elem.style.display = 'none';
 			}
 		},

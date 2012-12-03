@@ -53,6 +53,8 @@ var Suggest = Control.extend(IDropDownOwner).implement({
     },
 	
     init: function(options){
+	
+		var inSuggest;
 		
         // 关闭原生的智能提示。
         this.setAttr('autocomplete', 'off')
@@ -65,8 +67,19 @@ var Suggest = Control.extend(IDropDownOwner).implement({
             
             // 失去焦点后隐藏菜单。
             .on('blur', function () {
-                this.hideDropDown();
+				var me = this;
+				setTimeout(function(){
+					if(!inSuggest) {
+						me.hideDropDown();
+					}
+				}, 20);
             });
+			
+		this.dropDown.setStyle('outline', 'none').setAttr('tabindex', -1).on('mousedown', function(){
+			inSuggest = true;
+		}).on('mouseleave', function(){
+			inSuggest = false;
+		});
 		
     },
 
@@ -97,7 +110,7 @@ var Suggest = Control.extend(IDropDownOwner).implement({
      */
 	selectItem: function (item) {
 	    if (item) {
-	        this.setText(item.getText());
+	        this.setText(item.getText()).focus();
 	    }
 	    return this.hideDropDown();
 	}
