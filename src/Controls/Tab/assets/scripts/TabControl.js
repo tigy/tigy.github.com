@@ -44,7 +44,10 @@ var TabControl = TabbableControl.extend({
 
 	    // 委托头部选择信息。
 	    this.header().delegate('>li', options.selectEvent || 'click', function (e) {
-	        e.preventDefault();
+	        var href = e.getTarget().getAttr('href');
+	        if (!href || href == '#' || href == 'javascript') {
+	            e.preventDefault();
+	        }
 	        me.selectTab(this);
 	    });
 

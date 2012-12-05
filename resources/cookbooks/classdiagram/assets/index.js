@@ -1,130 +1,134 @@
 ﻿
 function getClasses() {
+	
+	var classes = {};
+	
+	var reClassName = /^[A-Z][$\w]*$/;
+	
+	for(var className in window){
+		if(reClassName.test(className)){
+			addClass(className, window[className]);
+		}
+	}
+	
+	function addClass(className, value){
+		
+		if(value && typeof value === 'function'){
+		
+			var classInfo = classes[className] = {
+				type: 'class',
+				value: value
+			};
+			
+			for(var subClassName in value){
+				if(reClassName.test(subClassName)){
+					addClass(className + '.' + subClassName, value[subClassName]);
+				}
+			}
+			
+			for(var memberName in value.prototype){
+				if(value.prototype.hasOwnProperty(memberName)){
+					switch(typeof value.prototype[memberName]){
+						case 'function':
+							classInfo.methods = classInfo.methods || {};
+							classInfo.methods[memberName] = {
+								value: value.prototype[memberName]
+							};
+							break;
+						default:
+							classInfo.fields = classInfo.fields || {};
+							classInfo.fields[memberName] = {
+								value: value.prototype[memberName]
+							};
+					}
+				}
+			}
+			
+			for(var eventName in value.$event){
+				classInfo.events = classInfo.events || {};
+				classInfo.events[eventName] = {
+					value: value.$event[eventName]
+				};
+			}
+			
+		} else if(/^I[A-Z]/.test(className)){
+			
+			var classInfo = classes[className] = {
+				type: 'interface',
+				value: value
+			};
+			
+			for(var memberName in value){
+				switch(typeof value[memberName]){
+					case 'function':
+						classInfo.methods = classInfo.methods || {};
+						classInfo.methods[memberName] = {
+							value: value[memberName]
+						};
+						break;
+					default:
+						classInfo.fields = classInfo.fields || {};
+						classInfo.fields[memberName] = {
+							value: value[memberName]
+						};
+				}
+			}
+			
+		}
+		
+	}
+	
+	for(var clazz in classes){
+		
+		if(classes[clazz].value.base) {
+			classes[clazz].extend = getClassNameByValue(classes[clazz].value.base);
+		}
+		
+	}
+	
+	function getClassNameByValue(clazz){
+		for(var className in classes){
+			if(classes[className].value === clazz) {
+				return className;
+			}
+		}
+	}
+	
+	return classes;
 
-    /*
+}
 
-     {
-        Class1: {
-            extends; '',
-            impelemts: ['IInput', 'IInput']
-            type: 'classs',
-            fields: {
-                'aaa': 1,
-                'gggg': 2,
-                'rrrr': 4
-            },
-            methods: {
-                'aaa': function(){}
-            },
-            events: {
-
-            }
-        }
-    */
-
-    return {
-
-        Class1: {
-            fields: {
-                'aaa': 1,
-                'gggg': 2,
-                'rrrr': 4
-            }
-        },
-
-        Class2: {
-            extend: 'Class1',
-            type: '类',
-            implements: ['IIgasdas', 'IIccad'],
-            fields: {
-                'aaa': 1,
-                'gggg': 2,
-                'rrrr': 4
-            },
-            methods: {
-                'aaa': function () { }
-            }
-        },
-
-        Class3: {
-            extend: 'Class1',
-            type: '类',
-            fields: {
-                'aaa': 1,
-                'gggg': 2,
-                'rrrr': 4
-            },
-            methods: {
-                'aaa': function () { }
-            }
-        },
-
-        Class7: {
-            extend: 'Class1',
-            type: '类',
-            fields: {
-                'aaa': 1,
-                'gggg': 2,
-                'rrrr': 4
-            },
-            methods: {
-                'aaa': function () { }
-            }
-        },
-
-        Class76: {
-            type: '类',
-            fields: {
-                'aaa': 1,
-                'gggg': 2,
-                'rrrr': 4
-            },
-            methods: {
-                'aaa': function () { }
-            }
-        },
-
-        Class76234: {
-            type: '类',
-            fields: {
-                'aaa': 1,
-                'gggg': 2,
-                'rrrr': 4
-            },
-            methods: {
-                'aaa': function () { }
-            }
-        },
-
-        Class76231231234: {
-            type: '类',
-            fields: {
-                'aaa': 1,
-                'gggg': 2,
-                'rrrr': 4
-            },
-            methods: {
-                'aaa': function () { }
-            }
-        },
-
-        Class645: {
-            extend: 'Class76231231234',
-            type: '类',
-            fields: {
-                'aaa': 1,
-                'gggg': 2,
-                'rrrr': 4
-            },
-            methods: {
-                'aaa': function () { }
-            }
-        }
-
-
-
-    };
-
+function applyJPlusClassInfo(classes){
+	
+	function addEvent(className, eventName){
+		var info = classes[className];
+		if(info){
+			info.events = info.events || {};
+			info.events[eventName] = {value: {}};
+		}
+	}
+	
+	function addInterface(className, interfaceName){
+		var info = classes[className];
+		if(info){
+			info.implement = info.implement || [];
+			info.implement.push(interfaceName);
+		}
+	}
+	
+	addEvent('Dialog', 'closing');
+	addEvent('Dialog', 'close');
+	
+	addInterface('ToolTip', 'IToolTip');
+	addInterface('BalloonTip', 'IToolTip');
+	
+	addInterface('Picker', 'IDropDownOwner');
+	addInterface('Picker', 'IInput');
+	addInterface('CheckBox', 'IInput');
+	addInterface('RadioButton', 'IInput');
+	addInterface('TextBox', 'IInput');
+	addInterface('TreeNode', 'ICollapsable');
+	addInterface('MenuButton', 'IDropDownOwner');
 }
 
 // 参数
@@ -182,9 +186,9 @@ function getClasssDom(classes) {
 
     // 统计每个类的全部子类个数
 
-    getCount(r, 0);
+    getCount(r, 0, 0);
 
-    function getCount(children, row) {
+    function getCount(children, col, row) {
 
         var rowCount = 0;
         var colCount = 0;
@@ -192,10 +196,10 @@ function getClasssDom(classes) {
         for (var i = 0; i < children.length; i++) {
 
             children[i].row = row;
-            children[i].col = colCount;
+            children[i].col = col + colCount;
 
             if (children[i].children) {
-                var t = getCount(children[i].children, row + 1);
+                var t = getCount(children[i].children, col + colCount, row + 1);
                 colCount += t[1];
 
                 children[i].rowCount = t[0];
@@ -217,23 +221,53 @@ function getClasssDom(classes) {
     // 根据体系大小排序
 
     r.sort(function (x, y) {
-        return x.colCount > y.colCount;
+        return x.colCount === y.colCount ? x.rowCount < y.rowCount : x.colCount < y.colCount;
     });
-
-    //for (var i = 0, col = 0; i < r.length; i++) {
-
-    //    if (r[i].colCount === 0) {
-
-    //        r[i].row = maxRow;
-    //        r[i].col = col;
-
-    //        if (++col >= simpleClassColumn) {
-    //            maxRow++;
-    //        }
-
-    //    }
-
-    //}
+    
+    rr = r;
+    
+    function moveBy(classDom, x, y){
+    	
+    	classDom.col += x;
+    	classDom.row += y;
+    	
+    	if(classDom.children) {
+	    	for (var i = 0; i < classDom.children.length; i++) {
+				moveBy(classDom.children[i], x, y);
+	        }
+       }
+    	
+    }
+    
+    if(r.length) {
+	     	
+	    var maxCol = r[0].colCount, currentRow = 0, i = 0, currentCol = 0;
+	
+	    for (; i < r.length; i++) {
+	    	
+	    	if(r[i].colCount === 1 && r[i].rowCount === 1){
+	    		break;
+	    	}
+	    	
+			moveBy(r[i], -r[i].col, currentRow);
+			
+			currentRow += r[i].rowCount;
+	    }
+	
+	    for (; i < r.length; i++) {
+	    	
+			moveBy(r[i], -r[i].col + currentCol, currentRow);
+			
+			currentCol++;
+			
+			if(currentCol >= maxCol) {
+				currentCol = 0;
+				currentRow++;
+			}
+			
+	    }
+	    
+    }
 
     return r;
 
@@ -260,7 +294,14 @@ function paintClassDom(classes) {
     for (var i = 0; i < classDom.length; i++) {
         drawSignleObject(classDom[i]);
     }
+    
+    var maxWidth = classDom[classDom.length - 1].x + objectWidth + padding;
+    var maxHeight = classDom[classDom.length - 1].y + objectHeight + padding;
+    
+    html += '<div style="left:' + maxWidth　+ 'px;top:' + maxHeight　+ 'px;">&nbsp;</div>'
 
+	document.getElementById('body').style.width = maxWidth + 'px';
+	document.getElementById('body').style.height = maxHeight + 'px';
     document.getElementById('body').innerHTML = html;
 
     // 绘制单一的对象。
@@ -277,9 +318,9 @@ function paintClassDom(classes) {
 
         html += drawObject(clazz);
 
-        if (clazz.implements) {
+        if (clazz.implement) {
             html += drawVerticalCircle(clazz.x + objectWidth / 2 + implementOffset, clazz.y - implementHeight, implementHeight);
-            html += drawText(clazz.implements.join(','), clazz.x + objectWidth / 2 + implementOffset + 18, clazz.y - implementHeight - 4);
+            html += drawLink(clazz.implement.join(','), clazz.x + objectWidth / 2 + implementOffset + 18, clazz.y - implementHeight - 4);
         }
 
         // 如果有子对象。画一个继承的箭头。
@@ -312,7 +353,7 @@ function drawObject(clazz) {
     var html = '';
 
     var extend = clazz.extend || 'Object';
-    html += '<aside class="object collapsed" style="left:' + clazz.x + 'px;top:' + clazz.y + 'px"><header><div class="collapse"></div><h4 title="' + clazz.name + '">' +   clazz.name + '</h4><div class="info"><span class="rightarrow"></span><a href="#">' + extend + '</a></div>';
+    html += '<aside class="object ' + (clazz.type || 'class') +' collapsed" style="left:' + clazz.x + 'px;top:' + clazz.y + 'px"><header><div class="collapse"></div><h4 title="' + clazz.name + '">' +   clazz.name + '</h4><div class="info"><span class="rightarrow"></span><a href="#' + extend + '">' + extend + '</a></div>';
 
     html += '</header><dl>';
 
@@ -324,7 +365,7 @@ function drawObject(clazz) {
             html += '<dt>' + members[memberType] + '</dt>';
 
             for (var field in clazz[memberType + 's']) {
-                html += '<dd><span class="icon-member icon-' + (t[field].static ? 'static' : 'none') + '"></span><span class="icon-member icon-' + memberType + '"></span><a href="#" class="member-' + t[field].attribute + '">' + field + '</a></dd>';
+                html += '<dd><a href="#' + clazz.name + '" title="' + field + '" class="member-' + (t[field].attribute || 'public') + '" data-class="' + clazz.name + '" data-memberType="' + memberType + 's" data-field="' + field + '"><span class="icon-member icon-' + (t[field].isStatic ? 'static' : 'none') + '"></span><span class="icon-member icon-' + memberType + '"></span>' + field + '</a></dd>';
             }
         }
     }
@@ -347,9 +388,9 @@ function drawVerticalArrow(x, y, height) {
     return '<div class="arrow-top" style="left:' + (x - 5) + 'px;top:' + y + 'px;">△</div>' + drawVerticalLine(x, y + 14, height - 14);
 }
 
-function drawText(text, x, y) {
+function drawLink(text, x, y) {
 
-    return '<div style="left:' + (x - 5) + 'px;top:' + y + 'px;">' + text + '</div>';
+    return '<a class="x-linkbutton" style="left:' + (x - 20) + 'px;top:' + ( y - 2) + 'px;" href="#' + text + '">' + text + '</a>';
 }
 
 function drawVerticalCircle(x, y, height) {
@@ -365,47 +406,111 @@ function testDraw(func, args0, args1, args2) {
 var zIndex = 1;
 
 function initUI(){
+	
+	// 获取类图。
+	var classes = getClasses();
+	
+	applyJPlusClassInfo(classes);
+	
+	// 生成全部类图。
+    paintClassDom(classes);
+    
+    // 类图的交互。
+    
     var body = Dom.get('body');
+    var main = Dom.get('main');
     body.delegate('.collapse', 'click', function () {
         this.parent().parent().toggleClass('collapsed');
     }).delegate('.object', 'click', function () {
         this.setStyle('zIndex', zIndex++);
-    }).setStyle('cursor', 'move');
+    });
 
 
     var MyDraggable = Draggable.extend({
 
-        beforeDrag: function (e) {
+        onDragStart: function (e) {
             var me = this;
-            this.offset = body.getScroll();
-            me.position = me.proxy.getPosition();
-            me.size = me.proxy.getSize();
-            me.droppables = [];
-            me.activeDroppables = new Array(me.droppables.length);
-            document.documentElement.style.cursor = this.target.getStyle('cursor');
-            if ('pointerEvents' in document.body.style)
-                document.body.style.pointerEvents = 'none';
-            else if (document.body.setCapture)
-                document.body.setCapture();
+            this.offset = main.getScroll();
         },
 
-        doDrag: function (e) {
+        onDrag: function (e) {
 
             var me = this;
 
-            body.setScroll(me.offset.x - me.to.x + me.from.x, me.offset.y - me.to.y + me.from.y);
+            main.setScroll(me.offset.x - me.to.x + me.from.x, me.offset.y - me.to.y + me.from.y);
 
-            //var me = this;
-            //me.proxy.setOffset({
-            //    x: me.offset.x + me.to.x - me.from.x,
-            //    y: me.offset.y + me.to.y - me.from.y
-            //});
         }
 
     });
 
 
-    new MyDraggable(body);
+    new MyDraggable({target: body});
+    
+    
+    body.popup({
+    	event: 'click dd a',
+    	
+    	target: Dom.parse('<aside class="source">\
+            <span class="arrow"><span class="arrow-fore">◆</span></span>\
+            <pre class="sh">AAAA</pre>\
+        </aside>').appendTo(main),
+    	
+    	show: function(dom){
+    		var classInfo = dom.getAttr('data-class');
+    		var memeberType = dom.getAttr('data-memberType');
+    		var fieldInfo = dom.getAttr('data-field');
+    		
+    		var value = classes[classInfo][memeberType][fieldInfo].value;
+    		
+    		this.target.find('pre').setText(String(value));
+			Demo.SyntaxHighligher.one(this.target.find('pre').node, memeberType == 'methods' ? 'js' : '');
+			
+    		this.target.pin(dom, 'r', 0, -4, false);
+    		
+    	}
+    });
+    
+    Dom.hashchange(function(){
+    	
+    	var hash = location.getHash();
+    	
+    	
+    	var info =classes[hash];
+    	
+    	if(info){
+    		
+    		main.animate({scrollLeft: info.x - main.getWidth() / 2, scrollTop: info.y - main.getHeight() / 2 + objectHeight});
+    		
+    	}
+    	
+    });
+    
+    var d1 = new SearchTextBox('d1');
+        
+        　　d1.on('search', function(text) {
+        	location.hash = text;
+        　　});
+        
+    var suggest = new Suggest(d1.input());
+    
+    suggest.selectItem = function(item){
+    	suggest.setText(item.getText());
+    	location.hash = item.getText();
+    	return this.hideDropDown();
+    };
+    
+    suggest.getSuggestItems = function(text){
+    	var r = [];
+    	for(var className in classes){
+    		if(className.indexOf(text) >= 0){
+    			r.push(className);
+    		}
+    	}
+    	
+    	return r;
+    };
+    
+
 }
 
 Dom.ready(initUI);

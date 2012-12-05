@@ -47,3 +47,8 @@ using Controls.Container.MessageBox
 using Controls.Tip.ToolTip
 using System.Dom.Drag
 using System.Dom.Drop
+using System.Dom.Popup
+using System.Dom.HashChange
+using Controls.Button.LinkButton
+using Controls.Tip.BalloonTip
+using Controls.Suggest.EmailSuggest

@@ -244,16 +244,16 @@ var DplBuilder = {
     viewSource: function (node, type, path) {
         var div = Dom.get(node.parentNode.parentNode);
 
-        var source = div.next();
+        var source = div.next('.source');
 
-        if (source && source.hasClass('source')) {
+        if (source) {
             source.toggle();
             return;
         }
 		
-		source = div.next(1);
+        source = div.next().next('.source');
 
-        if (source && source.hasClass('source')) {
+        if (source) {
             source.toggle();
             return;
         }
@@ -289,16 +289,16 @@ var DplBuilder = {
     viewRefs: function (node, type, path) {
         var div = Dom.get(node.parentNode.parentNode);
         
-        var source = div.next();
+        var source = div.next('.refs');
 
-        if (source && source.hasClass('refs')) {
+        if (source) {
             source.toggle();
             return;
         }
         
-        source = div.next(1);
+        source = div.next().next('.refs');
 
-        if (source && source.hasClass('refs')) {
+        if (source) {
             source.toggle();
             return;
         }
