@@ -21,3 +21,4 @@ using Modules.Web.Topbar
 using Modules.Web.Footer
 using Controls.Display.List
 using System.Fx.Animate
+using Controls.Composite.Carousel

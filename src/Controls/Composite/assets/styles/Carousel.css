@@ -33,3 +33,6 @@
   top: 0;
   left: 0;
 }
+.x-carousel-body li li {
+  position: static;
+}

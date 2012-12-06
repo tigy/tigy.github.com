@@ -1,5 +1,5 @@
 /*********************************************************
- * This file is created by a tool at 2012/12/1 19:34
+ * This file is created by a tool at 2012/12/6 10:27
  *********************************************************
  * Include: 
  *     System.Core.Base
@@ -4066,7 +4066,7 @@ function imports(namespace) {
 			assert.isElement(elem, "Dom.hide(elem): {elem} ~");
 			var currentDisplay = styleString(elem, 'display');
 			if(currentDisplay !== 'none') {
-				elem.style.$display = currentDisplay;
+				elem.style.defaultDisplay = currentDisplay;
 				elem.style.display = 'none';
 			}
 		},
@@ -9777,20 +9777,20 @@ var TreeNode = TreeControl.Item.extend(ICollapsable).implement({
 	},
 	
 	onCollapse: function () {
-	    TreeControl.Item.prototype.onCollapse.call(this);
+	    ICollapsable.onCollapse.call(this);
 	    this.updateNodeType();
 	},
 	
 	onExpanding: function(){
 	    this.setNodeType(this.subControl && this.subControl.first() ? 'minus' : 'normal');
-	    TreeControl.Item.prototype.onExpanding.call(this);
+	    ICollapsable.onExpanding.call(this);
 	},
 	
 	onExpand: function(){
 		if(this.subControl) {
 			this.subControl.node.style.height = 'auto';
 		}
-		TreeControl.Item.prototype.onExpand.call(this);
+		ICollapsable.onExpand.call(this);
 	},
 	
 	/**
@@ -10782,6 +10782,8 @@ var Suggest = Control.extend(IDropDownOwner).implement({
     },
 	
     init: function(options){
+	
+		var inSuggest;
 		
         // 关闭原生的智能提示。
         this.setAttr('autocomplete', 'off')
@@ -10794,8 +10796,19 @@ var Suggest = Control.extend(IDropDownOwner).implement({
             
             // 失去焦点后隐藏菜单。
             .on('blur', function () {
-                this.hideDropDown();
+				var me = this;
+				setTimeout(function(){
+					if(!inSuggest) {
+						me.hideDropDown();
+					}
+				}, 20);
             });
+			
+		this.dropDown.setStyle('outline', 'none').setAttr('tabindex', -1).on('mousedown', function(){
+			inSuggest = true;
+		}).on('mouseleave', function(){
+			inSuggest = false;
+		});
 		
     },
 
@@ -10826,7 +10839,7 @@ var Suggest = Control.extend(IDropDownOwner).implement({
      */
 	selectItem: function (item) {
 	    if (item) {
-	        this.setText(item.getText());
+	        this.setText(item.getText()).focus();
 	    }
 	    return this.hideDropDown();
 	}

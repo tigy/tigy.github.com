@@ -115,7 +115,7 @@ var Carousel = Control.extend({
 	        this.timer = setTimeout(this.step, this.delay);
 	    }
 
-	    return this.start();
+	    return this;
 
 	},
 
