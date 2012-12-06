@@ -1,5 +1,5 @@
 /*********************************************************
- * This file is created by a tool at 2012/12/6 10:27
+ * This file is created by a tool at 2012/12/6 15:29
  *********************************************************
  * Include: 
  *     System.Core.Base
@@ -10463,7 +10463,7 @@ var Carousel = Control.extend({
 	        this.timer = setTimeout(this.step, this.delay);
 	    }
 
-	    return this.start();
+	    return this;
 
 	},
 
