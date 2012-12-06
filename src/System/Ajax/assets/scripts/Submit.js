@@ -53,14 +53,13 @@ Ajax.paramForm = function(formElem) {
  * @param {Object} timeouts=-1 超时时间， -1 表示不限。
  * @param {Function} [ontimeout] 超时回调函数。
  */
-Ajax.submit = function(form, onsuccess, onerror, timeouts) {
+Ajax.submit = function(form, onsuccess, onerror) {
 	form = Dom.getNode(form);
 	return Ajax.send({
 		type: form.method,
 		url: form.action,
 		data: Ajax.paramForm(form),
 		success: onsuccess,
-		error: onerror,
-		timeouts: timeouts === undefined ? -1 : timeouts
+		error: onerror
 	});
 };

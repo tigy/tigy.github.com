@@ -1,5 +1,5 @@
 /*********************************************************
- * This file is created by a tool at 2012/12/6 10:27
+ * This file is created by a tool at 2012/12/6 15:29
  *********************************************************
  * Include: 
  *     Controls.Core.Base
@@ -808,6 +808,9 @@ input.x-button-small {
   position: absolute;
   top: 0;
   left: 0;
+}
+.x-carousel-body li li {
+  position: static;
 }
 
 /*********************************************************

@@ -12,3 +12,4 @@ using System.Dom.Base
 using System.Ajax.Base
 using System.Ajax.Jsonp
 using System.Fx.Animate
+using System.Ajax.Submit
