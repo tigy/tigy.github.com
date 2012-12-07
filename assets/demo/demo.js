@@ -3561,7 +3561,8 @@ if (typeof module !== 'object') {
          * 向页面写入自动生成的底部信息。
          */
         writeFooter: function () {
-            document.write(Demo.Configs.footer.replace(/~\//g, Demo.Configs.rootUrl));
+        	if(Demo.dev)
+            	document.write(Demo.Configs.footer.replace(/~\//g, Demo.Configs.rootUrl));
         },
 
         /**
