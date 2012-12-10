@@ -72,7 +72,8 @@ var Menu = TreeControl.extend({
         // 如果菜单是浮动的，则点击后关闭菜单，否则，只关闭子菜单。
         if (this.floating)
             document.once('mouseup', this.hide, this);
-        return this.trigger('show');
+        this.trigger('show');
+        return this;
     },
 
     /**

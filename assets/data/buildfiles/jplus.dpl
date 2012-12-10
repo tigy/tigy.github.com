@@ -52,3 +52,16 @@ using System.Dom.HashChange
 using Controls.Button.LinkButton
 using Controls.Tip.BalloonTip
 using Controls.Suggest.EmailSuggest
+using Controls.Display.List
+using Controls.Display.Table
+using Controls.Display.Thumbnail
+using Controls.Display.VideoPlaceholder
+using System.Dom.Pin
+using Controls.Tip.TipBox
+using Controls.Suggest.DropDownList
+using Controls.Suggest.DatePicker
+using Controls.Suggest.NumericUpDown
+using Controls.Suggest.TagChooser
+using Controls.Suggest.CharCounter
+using Controls.Tip.Tip
+using Controls.Tip.Badge

@@ -441,6 +441,8 @@ var PathSuggest = Suggest.extend({
 
     getSuggestItems: function (text) {
 
+        text = text.trim();
+
         // 空的文本，获取模块列表。
         if (!text) {
             return this._getModules();

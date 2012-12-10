@@ -370,6 +370,9 @@ html .demo-c8 {
   background-color: #000000;
   color: #fff;
 }
+html .demo-gray {
+    background-color: #EDEDED;
+}
 /***************** 测试工具 ****************/
 .demo-test {
   display: none;
