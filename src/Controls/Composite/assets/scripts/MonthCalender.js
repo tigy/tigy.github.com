@@ -176,7 +176,9 @@ var MonthCalender = Control.extend({
         return this.today;
     },
 
-    // 切换当前显示的界面。
+    /**
+     * 切换当前显示的界面。
+     */
     setView: function (view, duration) {
         if (duration !== 0) {
             view.render(this, true);

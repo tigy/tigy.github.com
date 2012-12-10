@@ -35,12 +35,12 @@ var MenuButton = Button.extend(IDropDownOwner).implement({
 	
 	onDropDownShow: function(){
 	    this.state('actived', true);
-	    Button.prototype.onDropDownShow.apply(this, arguments);
+	    IDropDownOwner.onDropDownShow.apply(this, arguments);
 	},
 	
 	onDropDownHide: function(){
 	    this.state('actived', false);
-	    Button.prototype.onDropDownHide.apply(this, arguments);
+	    IDropDownOwner.onDropDownHide.apply(this, arguments);
 	},
 	
 	onDropDownClick: function(){

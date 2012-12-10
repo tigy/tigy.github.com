@@ -95,7 +95,7 @@ Demo.extend(Demo, {
         tool: '<a href="~/assets/dpl/dplfilelist.html" target="_blank">组件合成工具</a>\
                 <a href="~/assets/dpl/codehelper.html" target="_blank">代码工具</a>\
                 <a href="~/assets/dpl/specialcharacters.html" target="_blank">特殊字符</a>\
-                <a href="~/resources/index.html#tool" target="_blank">更多工具</a>\
+                <!--<a href="~/resources/index.html#tool" target="_blank">更多工具</a>-->\
                 <a href="{serverRootUrl}explorer:{pathname}" style="border-top: 1px solid #EBEBEB;">打开源文件</a>\
                 <a href="javascript://展开或折叠全部源码" onclick="Demo.System.toggleSources()">切换源码折叠</a>',
 
@@ -105,9 +105,10 @@ Demo.extend(Demo, {
         doc: '<a href="~/resources/cookbooks/jplusui-full-api/index.html" target="_blank">jPlusUI API 文档</a>\
                 <a href="~/resources/cookbooks/jplusui-core-api/index.html" target="_blank">jPlusUI Core 文档</a>\
                 <a href="~/resources/cookbooks/jquery2jplus.html" target="_blank">jQuery 转 jPlusUI</a>\
-                <a href="~/resources/cookbooks/dplsystem.html" target="_blank" style="border-top: 1px solid #EBEBEB;">组件开发教程</a>\
-                <a href="~/resources/cookbooks/dplsystem.html" target="_blank">测试系统用法</a>\
-                <a href="~/resources/index.html#doc" target="_blank" style="border-top: 1px solid #EBEBEB;">更多文档</a>',
+                <!--<a href="~/resources/cookbooks/dplsystem.html" target="_blank" style="border-top: 1px solid #EBEBEB;">组件开发教程</a>-->\
+                <a href="~/resources/cookbooks/dev/dplsystem.html" target="_blank">测试系统用法</a>\
+                <a href="~/resources/cookbooks/classdiagram" target="_blank">类图</a>\
+                <!--<a href="~/resources/index.html#doc" target="_blank" style="border-top: 1px solid #EBEBEB;">更多文档</a>-->',
 
         /**
          * 底部 HTML 模板。
@@ -3560,7 +3561,8 @@ if (typeof module !== 'object') {
          * 向页面写入自动生成的底部信息。
          */
         writeFooter: function () {
-            document.write(Demo.Configs.footer.replace(/~\//g, Demo.Configs.rootUrl));
+        	if(Demo.dev)
+            	document.write(Demo.Configs.footer.replace(/~\//g, Demo.Configs.rootUrl));
         },
 
         /**

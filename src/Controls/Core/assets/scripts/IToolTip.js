@@ -60,7 +60,7 @@ var IToolTip = {
 	        'null': ['xc-bb', 0, 5, 1]
 	    }[this.getArrow()]);
 
-	    this.show().pin(ctrl, configs[0], offsetX === undefined ? configs[1] : offsetX, offsetY === undefined ? configs[2] : offsetY);
+	    this.show().pin(ctrl, configs[0], offsetX === undefined ? configs[1] : offsetX, offsetY === undefined ? configs[2] : offsetY, false);
 		
 		if(configs[3] && e){
 			this.setPosition(e.pageX + (offsetX || 0));

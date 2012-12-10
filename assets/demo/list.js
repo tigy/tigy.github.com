@@ -63,7 +63,7 @@ Demo.waterFall = function (column) {
                 }
             }
 
-            articles[articlesIndex].style.height = max - 40 + 'px';
+            articles[articlesIndex].style.height = max - 20 + 'px';
         }
 
     }

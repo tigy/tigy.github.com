@@ -17,8 +17,8 @@ using Controls.Core.Base
 using Controls.Core.Common
 using Controls.Layout.Grid
 using Controls.Display.Thumbnail
-using Modules.Web.Topbar
-using Modules.Web.Footer
+using Modules.Page.Topbar
+using Modules.Page.Footer
 using Controls.Display.List
 using System.Fx.Animate
 using Controls.Composite.Carousel
