@@ -1,0 +1,46 @@
+
+@import "../core/less/variables.less";
+@import "../core/less/mixins.less";
+
+.badgeBackgroundColor(@color){
+	background-color: @color;
+
+	&:hover {
+		background-color: darken(@color, 10%);
+	}
+}
+
+// Base
+.ui-badge {
+    padding: 1px 9px 2px;
+    font-size: @baseFontSize * .925;
+    font-weight: bold;
+    white-space: nowrap;
+    color: @white;
+    background-color: @grayLight;
+    .border-radius(9px);
+
+	&:hover {
+		color: @white;
+		text-decoration: none;
+		cursor: pointer;
+	}
+}
+
+// Colors
+
+.ui-badge-info {
+    .badgeBackgroundColor(@infoTextColor);
+}
+
+.ui-badge-success {
+    .badgeBackgroundColor(@successTextColor);
+}
+
+.ui-badge-warning {
+    .badgeBackgroundColor(@warningTextColor);
+}
+
+.ui-badge-error {
+    .badgeBackgroundColor(@errorTextColor);
+}

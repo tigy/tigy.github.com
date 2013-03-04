@@ -1,0 +1,53 @@
+
+@import "../core/less/variables.less";
+@import "../core/less/mixins.less";
+
+@sideWidth: 230px;
+@extraWidth: 200px;
+
+.ui-grid {
+    margin-top: 10px;
+    .clear();
+}
+
+.ui-col {
+    float: left;
+    margin-left: @gridGutterWidth;
+}
+
+// Container
+.ui-container {
+    width: @gridRowWidth;
+    .center-block();
+}
+
+.ui-grid-1 .ui-col-main {
+    width: @gridRowWidth;
+    margin-left: 0;
+}
+
+.ui-grid-2 .ui-col-side, .ui-grid-3 .ui-col-side {
+    width: @sideWidth;
+    margin-left: 0;
+}
+
+.ui-grid-2 .ui-col-main {
+    width: @gridRowWidth - @sideWidth - @gridGutterWidth;
+}
+
+.ui-grid-2x .ui-col-extra {
+    width: @sideWidth;
+}
+
+.ui-grid-2x .ui-col-main {
+    width: @gridRowWidth - @sideWidth - @gridGutterWidth;
+    margin-left: 0;
+}
+
+.ui-grid-3 .ui-col-extra {
+    width: @extraWidth;
+}
+
+.ui-grid-3 .ui-col-main {
+    width: @gridRowWidth - @sideWidth - @extraWidth - @gridGutterWidth - @gridGutterWidth;
+}

@@ -1,0 +1,104 @@
+@import "../core/less/variables.less";
+@import "../core/less/mixins.less";
+
+
+
+/* Tree */
+
+
+
+.ui-treeview {
+    padding: 3px 0;
+    overflow: auto;
+    border: 1px solid #CCCCCC;
+    .border-radius(@baseBorderRadius);
+}
+
+.ui-treeview-plain {
+    border: 0;
+}
+
+.ui-treeview  li {
+    white-space: nowrap;
+}
+
+.ui-treenode, .ui-treeview a, .ui-treenode-space {
+    height: 20px;
+    vertical-align: top;
+}
+
+.ui-treenode {
+    cursor: default;
+    display: block;
+    color: @textColor;
+    font-size: @baseFontSize + 2;
+}
+
+.ui-treenode-space {
+    display: inline-block;
+    width: 19px;
+    background-repeat: no-repeat;
+    background-image: url(images/treeview.gif);
+}
+
+.ui-treenode-none {
+    background-image: none!important;
+}
+
+.ui-treenode-selected {
+    background-color: #D9E8FB;
+}
+
+.ui-treenode:hover {
+    background-color: #EEEEEE;
+    text-decoration: none;
+}
+
+
+
+.ui-treenode-plus {
+    background-position: 0 -30px;
+}
+
+.ui-treenode-minus {
+    background-position: 0 -60px;
+}
+
+.ui-treenode-plus:hover {
+    background-position: -30px -30px;
+}
+
+.ui-treenode-minus:hover {
+    background-position: -30px -60px;
+}
+
+.ui-treeview-alt {
+    .ui-treenode-space {
+        background-image: url(images/treeview-alt.gif);
+    }
+
+    .ui-treenode-normal {
+        background-position: 0 -90px;
+    }
+
+    .ui-treenode-last {
+
+        .ui-treenode-plus {
+            background-position: 0 -120px;
+        }
+
+        .ui-treenode-minus {
+            background-position: 0 -150px;
+        }
+
+        .ui-treenode-normal {
+            background-position: 0 -180px;
+        }
+    }
+}
+
+
+.ui-treenode-loading {
+    background-image: url(images/loading.gif)!important;
+    background-position: 50% 50%;
+}

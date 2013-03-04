@@ -1,0 +1,77 @@
+
+@import "../core/less/variables.less";
+@import "../core/less/mixins.less";
+
+/// #imports Controls.Layout.Grid
+
+// Fluid grid
+@fluidGridColumnWidth:    6.836734693%;
+@fluidGridGutterWidth:    1.632653061%;
+
+
+// Fluid grid system
+// -------------------------
+#fluidGridSystem {
+    // Calculates Column Width
+    .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, @columns) {
+        width: 1% * (@fluidGridColumnWidth * @columns) + (@fluidGridGutterWidth * (@columns - 1));
+    }
+}
+
+// Gird Conatiner
+.ui-grid-fluid {
+
+    // Columns
+    .ui-col {
+        margin-left: @fluidGridGutterWidth;
+    }
+
+    // Default columns
+    .ui-col-1 {
+        #fluidGridSystem > .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, 1);
+    }
+
+    .ui-col-2 {
+        #fluidGridSystem > .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, 2);
+    }
+
+    .ui-col-3 {
+        #fluidGridSystem > .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, 3);
+    }
+
+    .ui-col-4 {
+        #fluidGridSystem > .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, 4);
+    }
+
+    .ui-col-5 {
+        #fluidGridSystem > .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, 5);
+    }
+
+    .ui-col-6 {
+        #fluidGridSystem > .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, 6);
+    }
+
+    .ui-col-7 {
+        #fluidGridSystem > .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, 7);
+    }
+
+    .ui-col-8 {
+        #fluidGridSystem > .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, 8);
+    }
+
+    .ui-col-9 {
+        #fluidGridSystem > .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, 9);
+    }
+
+    .ui-col-10 {
+        #fluidGridSystem > .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, 10);
+    }
+
+    .ui-col-11 {
+        #fluidGridSystem > .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, 11);
+    }
+
+    .ui-col-12 {
+        #fluidGridSystem > .columns(@fluidGridGutterWidth, @fluidGridColumnWidth, 12);
+    }
+}

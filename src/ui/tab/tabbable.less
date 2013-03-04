@@ -1,0 +1,72 @@
+@import "../core/less/variables.less";
+@import "../core/less/mixins.less";
+
+
+.ui-tabbable {
+    // Give the tabs something to sit on
+    border-bottom: 1px solid @grayBorder;
+    margin: 0;
+    .clear();
+}
+
+// Make the list-items overlay the bottom border
+.ui-tabbable li {
+    margin: 0 0 -1px;
+    list-style: none;
+    float: left;
+}
+
+// Make links block level
+.ui-tabbable a {
+    display: block;
+    border: 1px solid transparent;
+	.ie6-border-transparent(@backgroundColor);
+    .border-radius(@baseBorderRadius @baseBorderRadius 0 0);
+    padding: 7px 12px;
+
+    &:hover {
+        border-color: @grayLighter @grayLighter #ddd;
+        background-color: @grayLighter;
+        text-decoration: none;
+    }
+}
+
+// Active state, and it's :hover to override normal :hover
+.ui-tabbable-selected a, .ui-tabbable-selected a:hover {
+    color: @gray;
+    background-color: @backgroundColor;
+    border: 1px solid @grayBorder;
+    border-bottom-color: transparent;
+    _border-bottom-color: @backgroundColor;
+    _filter: chroma(color=@backgroundColor);
+    cursor: default;
+}
+
+// Alt
+// -----
+
+.ui-tabbable-alt {
+    border-bottom: none;
+
+    li a, li a:hover {
+        border-color: transparent;
+        _border-color: @backgroundColor;
+    }
+}
+
+.ui-tabbable-alt li {
+    margin-right: 2px;
+}
+
+// Links rendered as pills
+.ui-tabbable-alt  li a {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    .border-radius(@baseBorderRadius);
+}
+
+// Active state
+.ui-tabbable-alt .ui-tabbable-selected a, .ui-tabbable-alt .ui-tabbable-selected a:hover {
+    color: @white;
+    background-color: @linkColor;
+}

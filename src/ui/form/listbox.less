@@ -1,0 +1,80 @@
+@import "../core/less/variables.less";
+@import "../core/less/mixins.less";
+
+
+@listBoxTextColor:						@gray;
+@listBoxBackgroundColor:				@white;
+@listBoxBorderColor:					rgba(0,0,0,.2);
+@listBoxTextColorHover:					@white;
+@listBoxBackgroundColorHover:			@linkColor;
+@listBoxBackgroundColorSelected:		darken(@listBoxBackgroundColorHover, 15%);
+
+.ui-listbox {
+    .inline-block();
+    background-color: @listBoxBackgroundColor;
+    border-color: #ccc;
+    border-color: @listBoxBorderColor;
+    border-style: solid;
+    border-width: 1px;
+    .border-radius(@baseBorderRadius);
+	_display: block;
+	_zoom: 0;
+    padding: 4px 0;
+    margin: 0; // override default ul
+    list-style: none;
+    overflow: auto;
+	*overflow-x: hidden;
+	text-align: left;
+}
+
+// Links within the dropdown menu
+.ui-listbox li {
+    display: block;
+    padding: 3px 10px;
+    color: @gray;
+    white-space: nowrap;
+    cursor: default;
+    _width: 100%;
+    line-height: @baseLineHeight;
+	*text-indent: -16px;
+	_text-indent: 0;
+
+	a {
+		color: @textColor;
+		cursor: default;
+
+		&:hover {
+			text-decoration: none;
+		}
+	}
+
+}
+
+.ui-listbox-selected {
+    background-color: @listBoxBackgroundColorSelected;
+}
+
+.ui-listbox-hover {
+    #gradient > .vertical(@listBoxBackgroundColorHover, darken(@listBoxBackgroundColorHover, 5%));
+}
+
+.ui-listbox .ui-listbox-selected, .ui-listbox .ui-listbox-hover {
+    color: @listBoxTextColorHover;
+
+    a {
+        color: @listBoxTextColorHover;
+    }
+}
+
+.ui-listbox-readonly {
+    background-color: @grayLighter!important;
+}
+
+.ui-listbox-disabled {
+    border-color: @grayBorder!important;
+    background-color: @grayLighter!important;
+
+    .ui-listbox-selected {
+        background-color: @gray;
+    }
+}

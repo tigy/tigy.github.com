@@ -1,0 +1,139 @@
+@import "../core/less/variables.less";
+@import "../core/less/mixins.less";
+
+
+.ui-monthcalender {
+    border: 1px solid @grayBorder;
+    font-size: 12px;
+    font-family: Arial;
+    padding: 3px;
+    cursor: default;
+    text-align: center;
+    .inline-block();
+    .border-radius(@baseBorderRadius);
+    background-color: #F5F5F5;
+}
+
+.ui-monthcalender-main {
+    border: 1px solid @grayBorder;
+    padding: 6px;
+    background-color: @white;
+}
+
+
+.ui-monthcalender-header {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.ui-monthcalender-title {
+    padding: 0 31px;
+}
+
+.ui-monthcalender a {
+    text-decoration: none;
+    color: #111;
+}
+
+.ui-monthcalender a:hover {
+    color: #568cca;
+}
+
+.ui-monthcalender-prev, .ui-monthcalender-next {
+    display: block;
+    width: 16px;
+    font-size: 18px;
+}
+
+.ui-monthcalender-prev {
+    float: left;
+}
+
+.ui-monthcalender-next {
+    float: right;
+}
+
+//  内容
+.ui-monthcalender-body {
+    position: relative;
+    width: 173px;
+    height: 118px;
+    overflow: hidden;
+    margin: 1px;
+}
+
+.ui-monthcalender-days, .ui-monthcalender-monthyears {
+    width: 173px;
+    position: absolute;
+}
+
+.ui-monthcalender-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.ui-monthcalender-days a, .ui-monthcalender-days span, .ui-monthcalender-monthyears a {
+    float: left;
+    overflow: hidden;
+    border: 1px solid transparent;
+	.ie6-border-transparent();
+    .border-radius(2px);
+}
+
+.ui-monthcalender-days a:hover, .ui-monthcalender-monthyears a:hover {
+    background-color: #EDF5FF;
+    #gradient > .vertical-all(#FDFEFF, #EDF5FF);
+    border-color: #B9D7FC;
+}
+
+// 天
+.ui-monthcalender-days a, .ui-monthcalender-days span {
+    text-align: right;
+    width: 14px;
+    height: 14px;
+    line-height: 14px;
+    padding: 0px 4px;
+}
+
+.ui-monthcalender-week {
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid #e0e0e0;
+    .clear();
+    font-weight: bold;
+}
+
+.ui-monthcalender-monthyears a {
+    width: 40px;
+    line-height: 36px;
+    height: 36px;
+}
+
+a.ui-monthcalender-actived {
+    color: #007FE6;
+	font-weight: bold;
+}
+
+a.ui-monthcalender-selected {
+    background-color: #D0E5FF;
+    #gradient > .vertical-all(#ECF5FF, #D0E5FF);
+    border-color: #007FE6!important;
+}
+
+a.ui-monthcalender-decade {
+    line-height: 18px;
+}
+
+.ui-monthcalender-alt, .ui-monthcalender-disabled a {
+    color: @grayLight!important;
+    cursor: default!important;
+}
+
+.ui-monthcalender-disabled .ui-monthcalender-body a {
+    background: none!important;
+}
+
+.ui-dropdownmenu .ui-monthcalender-main {
+    border: none;
+}

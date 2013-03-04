@@ -1,0 +1,11 @@
+.ui-linkbutton {
+  padding: 4px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333333;
+}
+.ui-linkbutton:hover {
+  color: #333333;
+  text-decoration: underline;
+}

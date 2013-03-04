@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="module-info" content="status=obsolete">
+    <title>菜单-Windows风格</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../src/ui/core/base.css" />
+    <link rel="stylesheet" type="text/css" href="../../../src/ui/display/icon.css" />
+    <link rel="stylesheet" type="text/css" href="../../../src/ui/button/menu-windows.css" />
+
+    <script type="text/javascript" src="../../../src/core/base.js"></script>
+    <script type="text/javascript" src="../../../src/dom/base.js"></script>
+    <script type="text/javascript" src="../../../src/ui/core/base.js"></script>
+    <script type="text/javascript" src="../../../src/ui/button/menu-alt.js"></script>
+
+    <script type="text/javascript" src="../../assets/demo/less.js"></script>
+    <script type="text/javascript" src="../../../apps/demo/demo.js"></script>
+</head>
+<body>
+
+
+
+    <article class="demo">
+        <ul id="a" class="ui-menu">
+            <li>a-1-text
+            </li>
+            <li>-
+            </li>
+            <li>
+                <a class="ui-menuitem" href="javascript:alert(0)">a-2-menuitem
+                </a>
+            </li>
+            <li>
+                <div class="ui-menuseperator"></div>
+            </li>
+            <li>
+                <div>
+                    a-3-custom
+                </div>
+            </li>
+            <li>subMenu
+            <ul id="b" class="ui-menu">
+                <li>b-1</li>
+                <li>b-2</li>
+            </ul>
+            </li>
+        </ul>
+
+        <aside class="demo">
+            <script>
+                var a = new Menu("a");
+                a.add('-');
+                a.add('a-4-js').on('click', trace);
+                a.add(new MenuSeperator);
+                a.add(new MenuItem().setText('a-5-menuitem'));
+
+                var b = new Menu();
+                b.add('b-1');
+                b.add('-');
+                b.add('b-2');
+                a.item(-1).setSubMenu(b);
+
+                a.add('a-6-submenu').getSubMenu().add('c-1-js', '-', new MenuItem().setText('c-2-menuitem'));
+
+            </script>
+        </aside>
+        <section class="demo-test">
+            <hr style="margin-top: 300px;">
+            <ul class="ui-menu">
+                <li class="ui-menu-item">
+                    <span class="ui-icon ui-icon-checked"></span>
+                    内容 tmp</li>
+                <li class="ui-menu-item"><a class="ui-menuitem ui-menuitem-submenu ui-menu-hover"
+                    href="#">内容 tmp</a></li>
+                <li class="ui-menu-item"><a class="ui-menuitem ui-menuitem-submenu" href="#">内容 tmp</a>
+                </li>
+                <li class="ui-menu-item">
+                    <div class="ui-menuseperator"></div>
+                </li>
+                <li class="ui-menu-item"><a class="ui-menuitem" href="#">内容 tmp</a></li>
+            </ul>
+        </section>
+
+        <section class="demo-test">
+
+            <hr>
+
+
+            <ul class="ui-menu">
+                <li class="ui-menu-item">内容 tmp</li>
+                <li class="ui-menu-item ui-menu-hover">
+                    <a class="ui-menuitem ui-menuitem-submenu" href="#">内容  tmp</a>
+                </li>
+                <li class="ui-menu-item">
+                    <a class="ui-menuitem ui-menuitem-submenu" href="#">
+                        <span class="ui-icon ui-icon-checked"></span>
+                        内容  tmp
+                    </a>
+                </li>
+                <li class="ui-menu-item">
+                    <div class="ui-menuseperator"></div>
+                </li>
+                <li class="ui-menu-item">
+                    <a class="ui-menuitem" href="#">
+                        <span class="ui-icon ui-icon-none"></span>
+                        内容  tmp</a>
+                </li>
+            </ul>
+        </section>
+
+    </article>
+</body>
+</html>

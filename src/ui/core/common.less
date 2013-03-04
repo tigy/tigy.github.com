@@ -1,0 +1,130 @@
+
+@import "../core/less/variables.less";
+@import "../core/less/mixins.less";
+
+// align
+html {
+	
+	.ui-left {
+		float: left;
+	}
+	
+	.ui-right {
+		float: right;
+	}
+	
+	/// IE6
+	// fix double margin bug for IE6
+	.ui-left, .ui-right {
+		_display: inline;
+	}
+	
+	.ui-middle {
+		vertical-align: middle;	
+	}
+
+}
+
+.ui-center {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+// position
+html {
+		
+	.ui-relative, div.ui-relative {
+		position: relative;	
+	}
+	
+	.ui-absolute, div.ui-absolute {
+		position: absolute;	
+	}
+
+}
+
+// display
+html {
+	
+	.ui-inline {
+		display: inline;	
+	}
+	
+	.ui-block {
+		display: block;	
+	}
+	
+	.ui-inline-block {
+		.inline-block();
+	}
+	
+	.ui-hide, div.ui-hide{
+		display: none;
+	}
+	
+	// plain
+	.ui-plain, div.ui-plain {
+		margin: 0;
+		padding: 0;
+	}
+	
+}
+
+// text
+.ui-break-word {
+	-ms-word-wrap: break-word;
+	word-wrap: break-word;
+	-ms-word-break: break-all;
+	word-break: break-all;
+}
+
+// clear
+.ui-clear {
+	.clear();
+}
+
+// colors
+
+.ui-hint {
+	color: @hintTextColor;
+}
+
+.ui-success {
+	color: @successTextColor!important;
+}
+
+.ui-info {
+	color: @infoTextColor!important;
+}
+
+.ui-warning {
+	color: @warningTextColor!important;
+}
+
+.ui-error {
+	color: @errorTextColor!important;
+}
+
+.ui-highlight {
+	color: @highlightTextColor!important;
+}
+
+// misc
+html {
+	.ui-row {
+		margin-bottom: 10px;
+	}
+}
+	
+.ui-blank {
+	height: 10px;
+	display: block;
+	visibility: hidden;
+	color: @white;
+}
+
+.ui-debug {
+	background: #C03!important;
+	color: #fff!important;
+}
+

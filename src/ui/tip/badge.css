@@ -1,0 +1,40 @@
+.ui-badge {
+  padding: 1px 9px 2px;
+  font-size: 11.100000000000001px;
+  font-weight: bold;
+  white-space: nowrap;
+  color: #ffffff;
+  background-color: #999999;
+  -webkit-border-radius: 9px;
+  -moz-border-radius: 9px;
+  border-radius: 9px;
+}
+.ui-badge:hover {
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+}
+.ui-badge-info {
+  background-color: #3a87ad;
+}
+.ui-badge-info:hover {
+  background-color: #2d6987;
+}
+.ui-badge-success {
+  background-color: #468847;
+}
+.ui-badge-success:hover {
+  background-color: #356635;
+}
+.ui-badge-warning {
+  background-color: #c09853;
+}
+.ui-badge-warning:hover {
+  background-color: #a47e3c;
+}
+.ui-badge-error {
+  background-color: #b94a48;
+}
+.ui-badge-error:hover {
+  background-color: #953b39;
+}

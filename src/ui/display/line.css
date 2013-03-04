@@ -1,0 +1,10 @@
+﻿@import url(../typography/hr.css);
+.ui-line {
+  border-color: #dddddd;
+}
+.ui-line-dotted {
+  border-style: dotted;
+}
+.ui-line-dashed {
+  border-style: dashed;
+}

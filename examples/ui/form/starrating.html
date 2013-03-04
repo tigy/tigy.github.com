@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+        <meta name="module-info" content="status=obsolete" />
+		<title>星级评分</title>
+		
+        <link rel="stylesheet" type="text/css" href="../../../src/ui/core/base.css" />
+        <link rel="stylesheet" type="text/css" href="../../../src/ui/form/starrating.css" />
+
+            <script type="text/javascript" src="../../../src/core/base.js"></script>
+        <script type="text/javascript" src="../../../src/dom/base.js"></script>
+        <script type="text/javascript" src="../../../src/ui/core/base.js"></script>
+		<script type="text/javascript" src="../../../src/ui/form/starrating.js"></script>
+		
+		<script type="text/javascript" src="../../../apps/demo/demo.js"></script>
+	</head>
+	<body>
+
+        <article class="demo">
+
+            <aside class="demo">
+
+
+                <a class="ui-star ui-star-actived"></a>
+                <a class="ui-star"></a>
+
+
+                <div class="ui-starrating ui-block">
+                    <div class="ui-starrating-fore" style="width: 74%"></div>
+                    <div class="ui-starrating-back"></div>
+                </div>
+
+                <div class="ui-starrating-do ui-clear ui-relative" read-only="">
+                    <input id="ui-starrating-do-result" type="hidden" value="80" data-grade="推荐">
+                    <span class="ui-left">请您评分：</span>
+                    <ul class="ui-starrating-do-ul ui-plain ui-relative ui-left">
+                        <li><a class="ui-star1" href="javascript:;" title="很差" data-rate="20">20</a></li>
+                        <li><a class="ui-star2" href="javascript:;" title="较差" data-rate="40">40</a></li>
+                        <li><a class="ui-star3" href="javascript:;" title="还行" data-rate="60">60</a></li>
+                        <li><a class="ui-star4" href="javascript:;" title="推荐" data-rate="80">80</a></li>
+                        <li><a class="ui-star5" href="javascript:;" title="力荐" data-rate="100">100</a></li>
+                        <li class="ui-starrating-current">&nbsp;</li>
+                    </ul>
+                    <span id="ui-starrating-grade" class="ui-starrating-grade"></span>
+                    <div class="ui-absolute ui-starrating-readonly"></div>
+                </div>
+                <script>
+			Starrating.init();
+                </script>
+            </aside>
+
+        </article>
+		
+	</body>
+</html>

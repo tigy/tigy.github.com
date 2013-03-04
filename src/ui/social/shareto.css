@@ -1,0 +1,48 @@
+/**
+ * @author 
+ *//**
+ * @author 
+ */
+
+
+.ui-shareto-content {
+	display:inline-block;
+	line-height:16px;
+	height:16px;
+	padding-left:20px;
+	background-position: left top;
+	background-repeat:no-repeat;
+}
+
+.ui-shareto span{
+	color: #999999;
+	display:inline-block;
+	line-height:16px;
+}
+
+.ui-shareto-plain .ui-shareto-content {
+	width: 0px;
+	overflow: hidden;
+	vertical-align: -3px;
+}
+
+
+.ui-shareto-sina {
+	background-image: url(images/weibo.gif);
+}
+
+.ui-shareto-qqt {
+	background-image: url(images/qqt.png);
+}
+
+.ui-shareto-163 {
+	background-image: url(images/163.png);
+}
+
+.ui-shareto-renren {
+	background-image: url(images/renren.png);
+}
+
+.ui-shareto-douban {
+	background-image: url(images/douban.png);
+}
