@@ -56,18 +56,18 @@ Demo.Configs = {
 	/**
 	 * 文档的下拉菜单 HTML 模板。
 	 */
-	doc: '<!--<a href="~/resources/cookbooks/jplusui-full-api/index.html" target="_blank">jPlusUI API 文档</a>\
+	doc: '<a href="~/resources/cookbooks/jplusui-full-api/index.html" target="_blank">jPlusUI API 文档</a>\
                 <a href="~/resources/cookbooks/jplusui-core-api/index.html" target="_blank">jPlusUI Core 文档</a>\
-                <a href="~/resources/cookbooks/jquery2jplus.html" target="_blank">jQuery 转 jPlusUI</a>-->\
+                <a href="~/resources/cookbooks/jquery2jplus.html" target="_blank">jQuery 转 jPlusUI</a>\
                 <!--<a href="~/resources/cookbooks/dplsystem.html" target="_blank" style="border-top: 1px solid #EBEBEB;">模块开发教程</a>-->\
-				<a href="~/dev/cookbooks/apps.html" target="_blank">开发系统文档</a>\
-                <!--<a href="~/resources/cookbooks/classdiagram" target="_blank">类图</a>-->\
-                <a href="~/dev/index.html" target="_blank" style="border-top: 1px solid #EBEBEB;">更多文档</a>',
+                <a href="~/dev/cookbooks/develop/apps.html" target="_blank">开发系统文档</a>\
+                <a href="~/resources/cookbooks/classdiagram" target="_blank">类图</a>\
+                <!--<a href="~/resources/index.html#doc" target="_blank" style="border-top: 1px solid #EBEBEB;">更多文档</a>-->',
 
 	/**
 	 * 底部 HTML 模板。
 	 */
-	footer: '<footer class="demo"><hr class="demo"><nav class="demo-toolbar"><a href="http://www.jplusui.com/">jPlusUI.com</a> | <a href="https://www.github.com/jplusui/jplusui">Github</a> | <a href="#">返回顶部</a></nav><span>Copyright &copy; 2011-2013 jPlusUI.com</span></footer>',
+	footer: '',
 
 	/**
 	 * 合法的状态值。
@@ -274,7 +274,7 @@ if (typeof module !== 'object') {
 			var node = document.getElementsByTagName("script");
 			node = node[node.length - 1];
 			node = (!Demo.Dom.isIE || typeof document.constructor === 'object') ? node.src : node.getAttribute('src', 5);
-			node = node.substr(0, node.length - configs.apps.length - "/demo/demo.js".length);
+			node = node.substr(0, node.length - "docs/assets/demo.js".length);
 			Demo.baseUrl = node;
 
 			// 获取当前的目录信息。
@@ -768,16 +768,12 @@ if (typeof module !== 'object') {
 		}
 
 		// 输出 css 和 js
-		document.write('<link type="text/css" rel="stylesheet" href="' + Demo.baseUrl + configs.apps + '/demo/demo.css" />');
+		document.write('<link type="text/css" rel="stylesheet" href="' + Demo.baseUrl + '/docs/assets/demo.css" />');
 		// document.write('<link type="text/css" rel="stylesheet" href="' + Demo.baseUrl + configs.apps + '_staticpages/assets/demo.css" />');
-
-		// 不支持 console 时，自动载入 firebug-lite 。
-		if (!window.console)
-			document.write('<script type="text/javascript" src="' + Demo.baseUrl + configs.apps + '/demo/firebug-lite/build/firebug-lite.js"></script>');
 
 		// 非本地运行时，自动载入统计代码。
 		if (!Demo.local) {
-			document.write('<script type="text/javascript" src="' + Demo.baseUrl + configs.apps + '/demo/social.js"></script>');
+			document.write('<script type="text/javascript" src="' + configs.baseUrl + configs.apps + '/demo/social.js"></script>');
 		}
 
 		// IE 需要强制中止 <head>
@@ -786,50 +782,13 @@ if (typeof module !== 'object') {
 			document.body.removeChild(document.getElementById("demo-ie6-html5hack"));
 		}
 
-		// 输出 header
-		html += '<header class="demo">';
+		if (window.top !== window) {
 
-		html += '<aside id="demo-toolbar"><nav class="demo-toolbar">';
+		    document.write(html);
 
-		// 如果当前的页面是 docs 下的一个页面。
-		// 则添加模块状态和历史记录。
-		if (isInDocs && !isHomePage) {
+		    document.documentElement.className = 'demo-fullscreen';
 
-			if (!('path' in moduleInfo)) {
-				moduleInfo.path = Demo.Module.toModulePath(Demo.urlPostfix);
-			}
-
-			// 模块默认使用路径作为副标题。
-			if (!moduleInfo.subtitle) {
-				moduleInfo.subtitle = moduleInfo.path;
-			}
-
-			Demo.Page.addModuleHistory(Demo.urlPostfix);
-
-			// 只有本地的时候，才支持修改模块状态。
-			if (Demo.local) {
-				html += '<a href="javascript://更改模块属性" onclick="Demo.Page.showDropDown(\'demo-toolbar-controlstate\', 1);return false;" onmouseout="Demo.Page.hideDropDown()" title="点击修改模块状态" accesskey="S">' + configs.status[moduleInfo.status] + '</a> | ';
-			} else {
-				html += '<a href="javascript:;">' + configs.status[moduleInfo.status] + '</a> | ';
-			}
 		}
-
-		html += '<a href="javascript://常用文档" onclick="Demo.Page.showDropDown(\'demo-toolbar-doc\', 1);return false;" onmouseover="Demo.Page.showDropDown(\'demo-toolbar-doc\')" onmouseout="Demo.Page.hideDropDown()" accesskey="D">文档' + space + '▾</a> | <a href="javascript://常用工具" onclick="Demo.Page.showDropDown(\'demo-toolbar-tool\', 1);return false;" onmouseover="Demo.Page.showDropDown(\'demo-toolbar-tool\')" onclick="Demo.Page.showDropDown(\'demo-toolbar-tool\', 1);return false;" onmouseout="Demo.Page.hideDropDown()" accesskey="T">工具' + space + '▾</a> | <a href="javascript://快速打开其他模块" onmouseover="Demo.Page.showDropDown(\'demo-toolbar-goto\')" onclick="Demo.Page.showDropDown(\'demo-toolbar-goto\', 1);return false;" onmouseout="Demo.Page.hideDropDown()" accesskey="F">搜索' + space + '▾</a> | <a href="' + Demo.baseUrl + configs.examples + '/index.html" title="返回模块列表" accesskey="H">返回列表</a></nav></aside>';
-
-		// 生成标题。
-		if (moduleInfo.name) {
-			html += '<h1 class="demo">' + moduleInfo.name;
-
-			if (moduleInfo.subtitle) {
-				html += '<small>' + moduleInfo.subtitle + '</small>';
-			}
-
-			html += '</h1>';
-		}
-
-		html += '</header>';
-
-		document.write(html);
 
 	};
 

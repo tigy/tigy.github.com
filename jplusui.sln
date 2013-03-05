@@ -18,7 +18,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "jplusui", ".", "{096E64AA-7
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "58615"
+		VWDPort = "59482"
 	EndProjectSection
 EndProject
 Global

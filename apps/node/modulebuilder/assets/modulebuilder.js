@@ -21,12 +21,12 @@ function BuildFile() {
 	this.uniqueBuildFiles = '';
 	this.parseMacro = false;
 	this.defines = '';
-	this.prependComments = '/*********************************************************\r\n' +
-                           ' * This file is created by a tool at {time}\r\n' +
-                           ' ********************************************************/\r\n\r\n' +
+	this.prependComments = '/*********************************************************\n' +
+                           ' * This file is created by a tool at {time}\n' +
+                           ' ********************************************************/\n\n' +
                            '{modules}';
-	this.prependModuleComments = '/*********************************************************\r\n' +
-                                 ' * {module}\r\n' +
+	this.prependModuleComments = '/*********************************************************\n' +
+                                 ' * {module}\n' +
                                  ' ********************************************************/';
 
 	this.lineBreak = "\r\n";
@@ -138,7 +138,8 @@ BuildFile.prototype.save = function () {
 				case "lineBreak":
 				case "prefix":
 				case "postfix":
-				case "isNew":
+			    case "isNew":
+			    case "path":
 					break;
 				default:
 					var value = this[key];
