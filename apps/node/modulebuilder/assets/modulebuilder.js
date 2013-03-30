@@ -24,10 +24,10 @@ function BuildFile() {
 	this.prependComments = '/*********************************************************\n' +
                            ' * This file is created by a tool at {time}\n' +
                            ' ********************************************************/\n\n' +
-                           '{modules}';
+                           '{modules}\n';
 	this.prependModuleComments = '/*********************************************************\n' +
                                  ' * {module}\n' +
-                                 ' ********************************************************/';
+                                 ' ********************************************************/\n';
 
 	this.lineBreak = "\r\n";
 	this.moduleBasePath = "";
@@ -303,6 +303,10 @@ ModuleBuilder.build = function (options) {
 
 	for(var key in options) {
 		buildContext[key] = options[key];
+	}
+
+	if (!buildContext.file.relativeImages && buildContext.file.css && buildContext.file.assets) {
+	    buildContext.file.relativeImages = Path.relative(Path.dirname(buildContext.file.css), buildContext.file.assets).replace(/\\/g, '/');
 	}
 
 	buildContext.start();
