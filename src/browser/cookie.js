@@ -14,20 +14,26 @@ var Cookie = {
     * 设置 Cookie 。
     * @param {String} name 名字。
     * @param {String} value 值。
-    * @param {Object} options 其它属性。如 domain, path, secure， expires (单位：天) 。
+    * @param {Object} expires 过期时间。单位：分钟
+    * @param {Object} path 路径。
+    * @param {Object} domain 域名。
+    * @param {Object} secure 安全限制。
     */
-    set: function (name, value, options) {
-        //assert.isString(name, "Cookie.get(name): 参数 {name} ~");
+    set: function (name, value, expires, path, domain, secure) {
+        //assert.isString(name, "Cookie.set(name): 参数 {name} ~");
         var e = encodeURIComponent,
-        updatedCookie = e(name) + "=" + e(value),
-        expires = options && options.expires !== undefined ? options.expires : value === null ? -1 : 365;
-        t = new Date();
-        t.setHours(t.getHours() + expires * 24);
+            updatedCookie = e(name) + "=" + e(value),
+            options = {path: path, domain: domain, secure: secure},
+            t = new Date();
+        expires = expires != undefined ? expires : value === null ? -1 : 365 * 60 * 24;
+        t.setMinutes(t.getMinutes() + expires);
         updatedCookie += '; expires=' + t.toGMTString();
         for (t in options) {
-            updatedCookie = updatedCookie + "; " + t + "=" + e(options[t]);
+            if(options[t] !== undefined) {
+                updatedCookie = updatedCookie + "; " + t + "=" + e(options[t]);
+            }
         }
-        //assert(updatedCookie.length < 4096, "Cookie.set(name, value, expires, props): value 内容过长(大于 4096)，操作失败。");
+        //assert(updatedCookie.length < 4096, "Cookie.set(name, value, expires, path, domain, secure): value 内容过长(大于 4096)，操作失败。");
         document.cookie = updatedCookie;
         return value;
     }
