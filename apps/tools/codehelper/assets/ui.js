@@ -168,12 +168,12 @@ var UI = {
 		var firstChar = value.charAt(0);
 
 		function html2js(value) {
-			value = value.replace(/^\s+|\s+$/g, '').replace(/\n/g, "\\\n").replace(/'/g, "\\'");
+			value = value.replace(/^\s+|\s+$/g, '').replace(/\\/g, "\\\\").replace(/\n/g, "\\r\\n\\\r\n").replace(/'/g, "\\'");
 			return "'" + value + "'";
 		}
 
 		function js2html(value) {
-			return value.replace(/\\\n/g, "\n").replace(/\\'/g, "'").replace(/^'|^"|'$|"$/g, "");
+			return value.replace(/\\\n/g, "\n").replace(/\\\\/g, "\\").replace(/\\'/g, "'").replace(/^'|^"|'$|"$/g, "");
 		}
 
 		if (value === '"' || firstChar === "'") {
